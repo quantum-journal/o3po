@@ -1,5 +1,7 @@
 <?php
 
+require_once 'PHPUnit/Autoload.php';
+
 /**
  * The bootstrap file for the PHPUnit tests.
  *
@@ -96,8 +98,6 @@ function get_file_data( $file, $options ) {
         preg_match('#\s*\\*\s*' . $option . ':\s*(.*)#', $file_contents, $match);
         $matches[$option] = $match[1];
     }
-    echo("options: " . implode($options, ", ") . "\n");
-    echo("matches: " . implode($matches, ",  ") . "\n");
     
     return $matches;
 }

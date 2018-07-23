@@ -23,7 +23,7 @@ lint:
 	@find . -type f -name '*.php' -exec php -l {} \;
 
 run-tests: $(shell find . -type f -name '*.php') $(PHPUNITPHAR)
-	@$(PHPUNITCOMMAND) --coverage-clover=coverage.xml --whitelist $(SRC) --bootstrap tests/resources/bootstrap.php --test-suffix 'test.php' tests/
+	@$(PHPUNITCOMMAND) --version && $(PHPUNITCOMMAND) --coverage-clover=coverage.xml --whitelist $(SRC) --bootstrap tests/resources/bootstrap.php --test-suffix 'test.php' tests/
 
 $(PHPUNITPHAR):
 	@wget -O $(PHPUNITPHAR) https://phar.phpunit.de/$(PHPUNITPHAR)
