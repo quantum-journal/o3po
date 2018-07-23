@@ -13,7 +13,7 @@ lint:
 	@find . -type f -name '*.php' -exec php -l {} \;
 
 run-tests: $(shell find . -type f -name '*.php') $(PHPUNIT)
-	@php $(PHPUNIT) --bootstrap tests/resources/bootstrap.php --test-suffix '.php' tests/
+	@php $(PHPUNIT) --bootstrap tests/resources/bootstrap.php --test-suffix 'test.php' tests/
 
 $(PHPUNIT):
 	@wget https://phar.phpunit.de/$(PHPUNIT)
