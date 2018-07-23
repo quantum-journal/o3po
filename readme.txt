@@ -16,7 +16,7 @@ O-3PO stands for Open-source Open-access Overlay Publishing Option, it intends t
 
 O-3PO offers the following features:
 
-* Automatic download of TeX source code and pdf from the arXiv
+* Automatic download of TeX source code and PDF from the arXiv
 * Automatic extraction of meta-data
 * Automagic interpretation of references and DOI links
 * Interfaces with [Crossref REST API](https://api.crossref.org/)
@@ -77,7 +77,7 @@ Answer to foo bar dilemma.
 
 ## Changelog
 
-= 0.1.0 =
+# 0.1.0
 * First publicly available version.
 
 ## Upgrade Notice
