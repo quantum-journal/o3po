@@ -63,11 +63,11 @@ To build the documentation, install [phpDocumentor](http://docs.phpdoc.org/getti
 
 ## Frequently Asked Questions
 
-### A question that someone might have =
+### A question that someone might have
 
 An answer to that question.
 
-### What about foo bar? =
+### What about foo bar?
 
 Answer to foo bar dilemma.
 
