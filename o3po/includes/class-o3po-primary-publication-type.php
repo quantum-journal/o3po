@@ -471,15 +471,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 
                 if(!empty($new_author_latex_macro_definitions))
                 {
-                    $new_author_latex_macro_definitions_without_specials = array();
-                    foreach($new_author_latex_macro_definitions as $new_author_latex_macro_definition)
-                    {
-                        $special_macros_to_ignore = O3PO_Latex::get_special_macros_to_ignore_in_bbl();
-                        if(!in_array($new_author_latex_macro_definition[2], $special_macros_to_ignore))
-                        {
-                            $new_author_latex_macro_definitions_without_specials[] = $new_author_latex_macro_definition;
-                        }
-                    }
+                    $new_author_latex_macro_definitions_without_specials = remove_special_macros_to_ignore_in_bbl($new_author_latex_macro_definitions);
                     
                     $bbl = O3PO_Latex::expand_latex_macros($new_author_latex_macro_definitions_without_specials, $bbl);
                 }
