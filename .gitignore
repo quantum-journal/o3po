@@ -1,3 +1,4 @@
 phpDocumentor.phar
 docs/phpdoc-cache-*
 test-supload
+phpunit-*.phar
