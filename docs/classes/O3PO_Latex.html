@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <meta charset="utf-8"/>
+    <title>API Documentation</title>
+    <meta name="author" content=""/>
+    <meta name="description" content=""/>
+
+    <link href="../css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/prism.css" rel="stylesheet" media="all"/>
+    <link href="../css/template.css" rel="stylesheet" media="all"/>
+    
+    <!--[if lt IE 9]>
+    <script src="../js/html5.js"></script>
+    <![endif]-->
+    <script src="../js/jquery-1.11.0.min.js"></script>
+    <script src="../js/ui/1.10.4/jquery-ui.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/jquery.smooth-scroll.js"></script>
+    <script src="../js/prism.min.js"></script>
+    <!-- TODO: Add http://jscrollpane.kelvinluck.com/ to style the scrollbars for browsers not using webkit-->
+    <script type="text/javascript">
+    function loadExternalCodeSnippets() {
+        Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(function (pre) {
+            var src = pre.getAttribute('data-src');
+            var extension = (src.match(/\.(\w+)$/) || [, ''])[1];
+            var language = 'php';
+
+            var code = document.createElement('code');
+            code.className = 'language-' + language;
+
+            pre.textContent = '';
+
+            code.textContent = 'Loading…';
+
+            pre.appendChild(code);
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('GET', src, true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+
+                    if (xhr.status < 400 && xhr.responseText) {
+                        code.textContent = xhr.responseText;
+
+                        Prism.highlightElement(code);
+                    }
+                    else if (xhr.status >= 400) {
+                        code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
+                    }
+                    else {
+                        code.textContent = '✖ Error: File does not exist or is empty';
+                    }
+                }
+            };
+
+            xhr.send(null);
+        });
+    }
+
+    $(document).ready(function(){
+        loadExternalCodeSnippets();
+    });
+    $('#source-view').on('shown', function () {
+        loadExternalCodeSnippets();
+    })
+</script>
+
+    <link rel="shortcut icon" href="../images/favicon.ico"/>
+    <link rel="apple-touch-icon" href="../images/apple-touch-icon.png"/>
+    <link rel="apple-touch-icon" sizes="72x72" href="../images/apple-touch-icon-72x72.png"/>
+    <link rel="apple-touch-icon" sizes="114x114" href="../images/apple-touch-icon-114x114.png"/>
+</head>
+<body>
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <i class="icon-ellipsis-vertical"></i>
+            </a>
+            <a class="brand" href="../index.html">API Documentation</a>
+
+            <div class="nav-collapse">
+                <ul class="nav pull-right">
+                                        <li class="dropdown" id="charts-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Charts <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../graphs/class.html">
+                                    <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="reports-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Reports <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../reports/errors.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">6</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/markers.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">0</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/deprecated.html">
+                                                                                                            <i class="icon-list-alt"></i>&#160;Deprecated <span class="label label-info pull-right">0</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--<div class="go_to_top">-->
+    <!--<a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>-->
+    <!--</div>-->
+</div>
+
+<div id="___" class="container-fluid">
+        <section class="row-fluid">
+        <div class="span2 sidebar">
+                                <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-586038472"></a>
+                                <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
+            </div>
+            <div id="namespace-586038472" class="accordion-body collapse in">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/O3PO.html">O3PO</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Activator.html">O3PO_Activator</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Admin.html">O3PO_Admin</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Deactivator.html">O3PO_Deactivator</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Environment.html">O3PO_Environment</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_i18n.html">O3PO_i18n</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Journal.html">O3PO_Journal</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Latex.html">O3PO_Latex</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Latex_Dictionary_Provider.html">O3PO_Latex_Dictionary_Provider</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Loader.html">O3PO_Loader</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_PrimaryPublicationType.html">O3PO_PrimaryPublicationType</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Public.html">O3PO_Public</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_PublicationType.html">O3PO_PublicationType</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_SecondaryPublicationType.html">O3PO_SecondaryPublicationType</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Settings.html">O3PO_Settings</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Singleton.html">O3PO_Singleton</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Utility.html">O3PO_Utility</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        </div>
+    </section>
+    <section class="row-fluid">
+        <div class="span10 offset2">
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <nav>
+                                                <a href="../namespaces/default.html">\</a> <i class="icon-level-up"></i>
+                                            </nav>
+                    <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal"><i class="icon-code"></i></a>
+
+                    <h1><small>\</small>O3PO_Latex</h1>
+                    <p><em>This class provides a collection of various functions to transform, parse, and convert latex code to and from utf8 and other encodings.</em></p>
+                    
+                    
+                                        
+                    <section id="summary">
+                        <h2>Summary</h2>
+                        <section class="row-fluid heading">
+                            <section class="span4">
+                                <a href="#methods">Methods</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#properties">Properties</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#constants">Constants</a>
+                            </section>
+                        </section>
+                        <section class="row-fluid public">
+                            <section class="span4">
+                                                                    <a href="../classes/O3PO_Latex_Dictionary_Provider.html#method_get_latex_special_chars_dictionary" class="">get_latex_special_chars_dictionary()</a><br />
+                                                                    <a href="../classes/O3PO_Latex_Dictionary_Provider.html#method_get_latex_clean_up_dictionary" class="">get_latex_clean_up_dictionary()</a><br />
+                                                                    <a href="../classes/O3PO_Latex_Dictionary_Provider.html#method_get_latex_special_chars_reverse_dictionary" class="">get_latex_special_chars_reverse_dictionary()</a><br />
+                                                                    <a href="../classes/O3PO_Latex_Dictionary_Provider.html#method_get_utf8_to_ascii_dictionary" class="">get_utf8_to_ascii_dictionary()</a><br />
+                                                                    <a href="../classes/O3PO_Latex_Dictionary_Provider.html#method_expand_cite_to_html" class="">expand_cite_to_html()</a><br />
+                                                                    <a href="../classes/O3PO_Latex.html#method_latex_to_utf8_outside_math_mode" class="">latex_to_utf8_outside_math_mode()</a><br />
+                                                                    <a href="../classes/O3PO_Latex.html#method_preg_split_at_latex_math_mode_delimters" class="">preg_split_at_latex_math_mode_delimters()</a><br />
+                                                                    <a href="../classes/O3PO_Latex.html#method_strpos_outside_math_mode" class="">strpos_outside_math_mode()</a><br />
+                                                                    <a href="../classes/O3PO_Latex.html#method_parse_bbl" class="">parse_bbl()</a><br />
+                                                                    <a href="../classes/O3PO_Latex.html#method_utf8_to_latex" class="">utf8_to_latex()</a><br />
+                                                                    <a href="../classes/O3PO_Latex.html#method_utf8_to_bibtex" class="">utf8_to_bibtex()</a><br />
+                                                                    <a href="../classes/O3PO_Latex.html#method_extract_latex_macros" class="">extract_latex_macros()</a><br />
+                                                                    <a href="../classes/O3PO_Latex.html#method_get_special_macros_to_ignore_in_bbl" class="">get_special_macros_to_ignore_in_bbl()</a><br />
+                                                                    <a href="../classes/O3PO_Latex.html#method_expand_latex_macros" class="">expand_latex_macros()</a><br />
+                                                                    <a href="../classes/O3PO_Latex.html#method_get_month_string" class="">get_month_string()</a><br />
+                                                                    <a href="../classes/O3PO_Latex.html#method_utf8_to_closest_latin_letter_string" class="">utf8_to_closest_latin_letter_string()</a><br />
+                                                                    <a href="../classes/O3PO_Latex.html#method_title_to_key_suffix" class="">title_to_key_suffix()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No public properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No constants found</em>
+                                                            </section>
+                        </section>
+                        <section class="row-fluid protected">
+                            <section class="span4">
+                                                                    <em>No protected methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No protected properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                        <section class="row-fluid private">
+                            <section class="span4">
+                                                                    <a href="../classes/O3PO_Latex_Dictionary_Provider.html#method_match_single_non_character_makro_regexp_fragment" class="">match_single_non_character_makro_regexp_fragment()</a><br />
+                                                                    <a href="../classes/O3PO_Latex_Dictionary_Provider.html#method_match_single_character_makro_regexp_fragment" class="">match_single_character_makro_regexp_fragment()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/O3PO_Latex_Dictionary_Provider.html#property_latex_special_chars_dictionary" class="">$latex_special_chars_dictionary</a><br />
+                                                                    <a href="../classes/O3PO_Latex_Dictionary_Provider.html#property_latex_clean_up_dictionary" class="">$latex_clean_up_dictionary</a><br />
+                                                                    <a href="../classes/O3PO_Latex_Dictionary_Provider.html#property_latex_special_chars_reverse_dictionary" class="">$latex_special_chars_reverse_dictionary</a><br />
+                                                                    <a href="../classes/O3PO_Latex_Dictionary_Provider.html#property_utf8_to_ascii_dictionary" class="">$utf8_to_ascii_dictionary</a><br />
+                                                                    <a href="../classes/O3PO_Latex.html#property_additional_defaul_macros" class="">$additional_defaul_macros</a><br />
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                    </section>
+                </div>
+                <aside class="span4 detailsbar">
+                                        
+                    
+                    <dl>
+                        <dt>File</dt>
+                            <dd><a href="../files/includes.class-o3po-latex.html"><div class="path-wrapper">includes/class-o3po-latex.php</div></a></dd>
+                                                <dt>Package</dt>
+                            <dd><div class="namespace-wrapper">O3PO\O3PO/includes</div></dd>
+                                                <dt>Class hierarchy</dt>
+                            <dd class="hierarchy">
+                                                                                                                                                                                                                                                                                                
+                                        <div class="namespace-wrapper"><a href="../classes/O3PO_Latex_Dictionary_Provider.html">\O3PO_Latex_Dictionary_Provider</a></div>
+                                                                                                    <div class="namespace-wrapper">\O3PO_Latex</div>
+                            </dd>
+
+                        
+                        
+                        
+                        
+                                                                        </dl>
+                    <h2>Tags</h2>
+                    <table class="table table-condensed">
+                                            <tr>
+                            <th>
+                                since
+                            </th>
+                            <td>
+                                                                    
+                                                            </td>
+                        </tr>
+                                            <tr>
+                            <th>
+                                author
+                            </th>
+                            <td>
+                                                                    <p>Christian Gogolin <a href="mailto:o3po@quantum-journal.org">o3po@quantum-journal.org</a></p>
+                                                            </td>
+                        </tr>
+                                        </table>
+                </aside>
+            </div>
+
+                        
+                                    <a id="properties" name="properties"></a>
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <h2>Properties</h2>
+                </div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_latex_special_chars_dictionary" name="property_latex_special_chars_dictionary" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$latex_special_chars_dictionary</h3>
+                <pre class="signature">$latex_special_chars_dictionary : array</pre>
+                <p><em>An associative array of regular expressions that match latex code and utf8 representations of the respective symbol they represent</em></p>
+                <p>As PHP does not allow the initialization of static variables
+from static member methods we have to initialize this array to
+null. You may thus never use this variable directly, instead
+use the getter method below.</p>
+
+                                <h4>Type</h4>
+                array
+                &mdash; An associative array of regular expressions that match latex code and utf8 representations of the respective symbol they represent                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/O3PO_Latex_Dictionary_Provider.html"><div class="path-wrapper">\O3PO_Latex_Dictionary_Provider</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_latex_clean_up_dictionary" name="property_latex_clean_up_dictionary" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$latex_clean_up_dictionary</h3>
+                <pre class="signature">$latex_clean_up_dictionary : </pre>
+                <p><em>LaTeX cleanup dictionary</em></p>
+                <p>After we have performed the above replacements in the following function
+we clean up remaining special characters accoding to the following list.</p>
+
+                                <h4>Type</h4>
+                
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/O3PO_Latex_Dictionary_Provider.html"><div class="path-wrapper">\O3PO_Latex_Dictionary_Provider</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            
+                                                    </td>
+                    </tr>
+                                    <tr>
+                        <th>
+                            vat
+                        </th>
+                        <td>
+                                                            <p>$latex_clean_up_dictionary    Dictionary of LaTeX control sequences and characters and their replacements when converting to utf8 or similar representations.</p>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_latex_special_chars_reverse_dictionary" name="property_latex_special_chars_reverse_dictionary" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$latex_special_chars_reverse_dictionary</h3>
+                <pre class="signature">$latex_special_chars_reverse_dictionary : </pre>
+                <p><em>Associative array of utf8 representations and their respective LaTeX representations.</em></p>
+                <p>In some cases we need to generate LaTeX code from utf-8 encoded
+strings containing special characters. This array helps in doing
+this.</p>
+
+                                <h4>Type</h4>
+                
+                &mdash; Dictionary of special characters and their LaTeX representations.                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/O3PO_Latex_Dictionary_Provider.html"><div class="path-wrapper">\O3PO_Latex_Dictionary_Provider</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_utf8_to_ascii_dictionary" name="property_utf8_to_ascii_dictionary" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$utf8_to_ascii_dictionary</h3>
+                <pre class="signature">$utf8_to_ascii_dictionary : </pre>
+                <p><em>Associative array of utf8 representations and their closest ascii characters.</em></p>
+                <p>In some cases we need to generate ascii strings from utf-8 encoded
+strings containing special characters. This array helps in doing
+this.</p>
+
+                                <h4>Type</h4>
+                
+                &mdash; Dictionary of special character to closes ascii versions.                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/O3PO_Latex_Dictionary_Provider.html"><div class="path-wrapper">\O3PO_Latex_Dictionary_Provider</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_additional_defaul_macros" name="property_additional_defaul_macros" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$additional_defaul_macros</h3>
+                <pre class="signature">$additional_defaul_macros : array</pre>
+                <p><em>Additional macros.</em></p>
+                <p>Array of default macros that we always want to expand,
+irrespective of whether they appeared in a LaTeX file.</p>
+
+                                <h4>Type</h4>
+                array
+                &mdash; Array of additional macros that we often want to expand even if they were not explicitely defined by the user.                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                            
+                                    <a id="methods" name="methods"></a>
+            <div class="row-fluid">
+                <div class="span8 content class"><h2>Methods</h2></div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_get_latex_special_chars_dictionary" name="method_get_latex_special_chars_dictionary" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">get_latex_special_chars_dictionary()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">get_latex_special_chars_dictionary() </pre>
+                <p><em>Get the $latex_special_chars_dictionary.</em></p>
+                <p>We are dealing with a lot of LaTeX code in wich special characters are
+LaTeX encoded. On our website we want to display them in a pretty way.
+The following is a (more or less complete) mapping of LaTeX encodigs into
+utf-8 characters whenever such a character is available. This list must
+only contain latex macros that contain a \ as for preformance reasons
+replacing is stoped once all \ have been eliminated. Also there is a
+negative look ahead added in the function below to prevent cases such as
+\v{a} to be replaced.</p>
+
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/O3PO_Latex_Dictionary_Provider.html"><div class="path-wrapper">\O3PO_Latex_Dictionary_Provider</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            0.1.0                                
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_get_latex_clean_up_dictionary" name="method_get_latex_clean_up_dictionary" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">get_latex_clean_up_dictionary()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">get_latex_clean_up_dictionary() </pre>
+                <p><em>Get the $latex_clean_up_dictionary.</em></p>
+                
+
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/O3PO_Latex_Dictionary_Provider.html"><div class="path-wrapper">\O3PO_Latex_Dictionary_Provider</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            0.1.0                                
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_get_latex_special_chars_reverse_dictionary" name="method_get_latex_special_chars_reverse_dictionary" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">get_latex_special_chars_reverse_dictionary()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">get_latex_special_chars_reverse_dictionary() </pre>
+                <p><em>Get the $latex_special_chars_reverse_dictionary.</em></p>
+                
+
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/O3PO_Latex_Dictionary_Provider.html"><div class="path-wrapper">\O3PO_Latex_Dictionary_Provider</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            0.1.0                                
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_get_utf8_to_ascii_dictionary" name="method_get_utf8_to_ascii_dictionary" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">get_utf8_to_ascii_dictionary()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">get_utf8_to_ascii_dictionary() </pre>
+                <p><em>Get the $utf8_to_ascii_dictionary.</em></p>
+                
+
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/O3PO_Latex_Dictionary_Provider.html"><div class="path-wrapper">\O3PO_Latex_Dictionary_Provider</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            sine
+                        </th>
+                        <td>
+                                                                                            <p>0.1.0</p>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_expand_cite_to_html" name="method_expand_cite_to_html" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">expand_cite_to_html()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">expand_cite_to_html(string  <span class="argument">$text</span>, string  <span class="argument">$bbl</span>) </pre>
+                <p><em>Expand \cite{} commands to html code.</em></p>
+                <p>The resulting html code makes every \cite a clickable hyperlink to the
+correspnding entry in the bibliograhy.</p>
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$text </td>
+                                <td><p>The text in which \cite commands are to be expanded</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$bbl </td>
+                                <td><p>The bbl code of the bibliography that contains the corresponding bibliography entries.</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/O3PO_Latex_Dictionary_Provider.html"><div class="path-wrapper">\O3PO_Latex_Dictionary_Provider</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            0.1.0                                
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_latex_to_utf8_outside_math_mode" name="method_latex_to_utf8_outside_math_mode" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">latex_to_utf8_outside_math_mode()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">latex_to_utf8_outside_math_mode(string  <span class="argument">$latex_text</span>) </pre>
+                <p><em>Convert LaTeX code to utf8, leaving along everything within math mode.</em></p>
+                <p>This is the function that actually does all the replacements. It
+leaves mathematicla formulas enclosed in $...$ intact so that they can be
+displayed nicely using MathJax. This function turns various math modes
+into standard linline mode $a+b$. At the moment this is a feature.</p>
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$latex_text </td>
+                                <td><p>Latex code whose non-math part is to be converted to utf8</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            0.1.0                                
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_preg_split_at_latex_math_mode_delimters" name="method_preg_split_at_latex_math_mode_delimters" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">preg_split_at_latex_math_mode_delimters()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">preg_split_at_latex_math_mode_delimters(string  <span class="argument">$text</span>) </pre>
+                <p><em>Preg split LaTeX code at math mode delimters.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$text </td>
+                                <td><p>Text to be split at LaTeX math mode delimiters such as $$ [] ().</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            0.1.0                                
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_strpos_outside_math_mode" name="method_strpos_outside_math_mode" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">strpos_outside_math_mode()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">strpos_outside_math_mode(string  <span class="argument">$latex_text</span>, string  <span class="argument">$string</span>) </pre>
+                <p><em>Strpos in latex code, but only taking into account the part of
+code that is not in math mode.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$latex_text </td>
+                                <td><p>Latex text in whose non-math parts the string is to be found.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$string </td>
+                                <td><p>String to be found.</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            0.1.0                                
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_parse_bbl" name="method_parse_bbl" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">parse_bbl()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">parse_bbl(string  <span class="argument">$bbl</span>) </pre>
+                <p><em>Parser for bbl code</em></p>
+                <p>Parses bbl code produced by either bibtex or biblatex as well as
+such written by authors by hand.</p>
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$bbl </td>
+                                <td><p>Bibliography in .bbl format as it is produced by BibTeX, Biber, and BibLaTeX.</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            0.1.0                                
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_utf8_to_latex" name="method_utf8_to_latex" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">utf8_to_latex()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">utf8_to_latex(string  <span class="argument">$text</span>) </pre>
+                <p><em>Convert utf8 text to LaTeX code.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$text </td>
+                                <td><p>Text with special characters that are to be converted to LaTeX encoding.</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            0.1.0                                
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_utf8_to_bibtex" name="method_utf8_to_bibtex" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">utf8_to_bibtex()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">utf8_to_bibtex(string  <span class="argument">$text</span>) </pre>
+                <p><em>Convert utf8 text to LaTeX code suitable for BibTeX.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$text </td>
+                                <td><p>Text with special characters that are to be converted to a LaTeX type encoding suitable for the use in BibTeX .bib files.</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            0.1.0                                
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_extract_latex_macros" name="method_extract_latex_macros" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">extract_latex_macros()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">extract_latex_macros(string  <span class="argument">$latex_source</span>) </pre>
+                <p><em>Extracts LaTeX command definitions from latex code.</em></p>
+                <p>Extracts LaTeX command definitions from latex code. The definitions are of the following form:</p>
+<p>\newcommand{\myvec}[1]{\vec{#1}}</p>
+<p>Full match  0-22    <code>\newcommand{\myvec}[1]</code>
+Group 1.    1-11    <code>newcommand</code>
+Group 2.    12-18   <code>\myvec</code>
+Group 3.    19-22   <code>[1]</code>
+Group 4.    22-22   <code>`  (in case a default is set making an argument optional) Group 5.    23-31</code>\vec{#1}`</p>
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$latex_source </td>
+                                <td><p>LaTeX source code from with the macro definitions are to be extracted.</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            0.1.0                                
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_get_special_macros_to_ignore_in_bbl" name="method_get_special_macros_to_ignore_in_bbl" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">get_special_macros_to_ignore_in_bbl()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">get_special_macros_to_ignore_in_bbl() </pre>
+                <p><em>Get special macros we always ignore in the expansion.</em></p>
+                <p>Some macros are better kept unexpended even if the authors have
+manually re-defined them, because we need them to more efficiently
+parse the latex code (i.e., to identify DOIs or URLs).</p>
+
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            0.1.0                                
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_expand_latex_macros" name="method_expand_latex_macros" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">expand_latex_macros()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">expand_latex_macros(array  <span class="argument">$macro_definitions</span>, string  <span class="argument">$text</span>) </pre>
+                <p><em>Expand LaTeX macros.</em></p>
+                <p>Attempts to expands all macros in $text for which a definition is
+given in $macro_definitions.</p>
+<p>Expects definitions like those produced by self::extract_latex_macros().</p>
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>array</td>
+                                <td>$macro_definitions </td>
+                                <td><p>Array of macro definitions.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$text </td>
+                                <td><p>Text containing LaTeX macros that are to be expanded.</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            0.1.0                                
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_get_month_string" name="method_get_month_string" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">get_month_string()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">get_month_string(\string/int  <span class="argument">$month</span>) </pre>
+                <p><em>Get the BibTeX string representation of a numeric month</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\string/int</td>
+                                <td>$month </td>
+                                <td><p>Number of the month in the range 1-12.</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            0.1.0                                
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_utf8_to_closest_latin_letter_string" name="method_utf8_to_closest_latin_letter_string" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">utf8_to_closest_latin_letter_string()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">utf8_to_closest_latin_letter_string(string  <span class="argument">$text</span>) </pre>
+                <p><em>Convert utf8 strings to the closes latin letter string.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$text </td>
+                                <td><p>Text with utf8 special characters.</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            0.1.0                                
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_title_to_key_suffix" name="method_title_to_key_suffix" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">title_to_key_suffix()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">title_to_key_suffix(string  <span class="argument">$text</span>) </pre>
+                <p><em>Compute a string suitable for taking the role of the BibTeX key
+from a text such as a title.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$text </td>
+                                <td><p>Title of an article from which a BibTeX entry key is to be generated.</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            0.1.0                                
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_match_single_non_character_makro_regexp_fragment" name="method_match_single_non_character_makro_regexp_fragment" class="anchor"></a>
+            <article class="method">
+                <h3 class="private ">match_single_non_character_makro_regexp_fragment()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">match_single_non_character_makro_regexp_fragment(string  <span class="argument">$char</span>) </pre>
+                <p><em>Utility function to construct the $latex_special_chars_dictionary.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$char </td>
+                                <td><p>The non-character symbol characteristic to the respective latex macro.</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/O3PO_Latex_Dictionary_Provider.html"><div class="path-wrapper">\O3PO_Latex_Dictionary_Provider</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            0.1.0                                
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_match_single_character_makro_regexp_fragment" name="method_match_single_character_makro_regexp_fragment" class="anchor"></a>
+            <article class="method">
+                <h3 class="private ">match_single_character_makro_regexp_fragment()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">match_single_character_makro_regexp_fragment(string  <span class="argument">$char</span>) </pre>
+                <p><em>Utility function to construct the $latex_special_chars_dictionary.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$char </td>
+                                <td><p>The character characteristic to the respective latex macro.</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/O3PO_Latex_Dictionary_Provider.html"><div class="path-wrapper">\O3PO_Latex_Dictionary_Provider</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            0.1.0                                
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    </div>
+    </section>
+
+    <div id="source-view" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="source-view-label" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="source-view-label">class-o3po-latex.php</h3>
+        </div>
+        <div class="modal-body">
+            <pre data-src="../files/includes/class-o3po-latex.php.txt" class="language-php line-numbers"></pre>
+        </div>
+    </div>
+
+    <footer class="row-fluid">
+        <section class="span10 offset2">
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <section class="row-fluid footer-sections">
+                        <section class="span4">
+                                                        <h1><i class="icon-code"></i></h1>
+                            <div>
+                                <ul>
+                                                                    </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-bar-chart"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../graphs/class.html">Class Hierarchy Diagram</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-pushpin"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../reports/errors.html">Errors</a></li>
+                                    <li><a href="../reports/markers.html">Markers</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                    </section>
+                </section>
+            </section>
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <hr />
+                    Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
+                    on July 23rd, 2018 at 07:30.
+                </section>
+            </section>
+        </section>
+    </footer>
+</div>
+
+</body>
+</html>
