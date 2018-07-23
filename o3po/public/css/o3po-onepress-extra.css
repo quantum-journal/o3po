@@ -1,0 +1,77 @@
+/* site specific css*/
+p.authors, p.authors a {
+    color:black;
+}
+p.abstract {
+    color:black;
+}
+h3.additional-info a:active {
+    color:black;
+}
+p.abstract-in-excerpt {
+    color:black;
+}
+a.abstract-in-excerpt:hover,
+a.abstract-in-excerpt:visited,
+a.abstract-in-excerpt:link,
+a.abstract-in-excerpt:active {
+    color: black;
+}
+
+/* css to fix some glitches in OnePress */
+#content > div.page-header,
+div.page-header {
+    display: none;
+}
+.site-header {
+    border-bottom: 10px solid #e9e9e9;
+}
+.widget_recent_entries ul li {
+    border-bottom: none;
+}
+.site-header {
+    border-bottom: 1px solid #e9e9e9;
+}
+img[src*="/wp-content/themes/onepress/assets/images/placholder2.png"] {
+    visibility: hidden;
+    width: 300px;
+    height: 1px;
+}
+ol.paragraphs {
+    list-style-type: none;
+    counter-reset: paragraph-counter;
+}
+ol.paragraphs > li::before {
+    counter-increment: paragraph-counter;
+    content: "\0000a7 " counter(paragraph-counter,decimal) " ";
+}
+#metadata_metabox input[readonly],
+input:disabled,
+input#submitButton:disabled {
+    background: #dddddd;
+}
+#search-2 > form > input {
+    width: 100%;
+}
+aside form label {
+    width: 100%;
+}
+/*fix scrolling to anchors*/
+:target:before {
+    content:"";
+    display:block;
+    height:89px;
+    margin:-89px 0 0;
+}
+p.feature-image-caption:before {
+  content: "";
+  width: 10em;
+  display: block;
+  overflow: hidden;
+}
+div.important-box {
+    align: center;
+    margin: 40px;
+    padding: 20px;
+    border: 2px solid #53257f;
+}

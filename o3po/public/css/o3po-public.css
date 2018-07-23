@@ -1,0 +1,97 @@
+.content-area form.search-form {
+    display: flex;
+    display: -webkit-flex;
+    align-items: center;
+    -webkit-align-items: center;
+}
+.content-area form.search-form label,
+.content-area form.search-form label input
+{
+    display: flex;
+    flex-grow: 100;
+    margin-bottom: 0px;
+    margin-right: 0.2em;
+
+}
+.content-area form.search-form input.search-submit {
+    width: auto;
+}
+table.meta-data-table {
+    border: none;
+}
+table.meta-data-table td {
+    border: none;
+    text-align: left;
+    padding-left: 0;
+}
+p.authors, p.authors a {
+    font-size: 1.5rem;
+}
+p.abstract {
+    text-align: justify;
+    padding-top: 1rem;
+}
+h3.additional-info {
+    padding-top: 1rem;
+}
+div.featured-image-box {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+p.feature-image-caption {
+    text-align: justify;
+}
+a.abstract-in-excerpt:hover,
+a.abstract-in-excerpt:visited,
+a.abstract-in-excerpt:link,
+a.abstract-in-excerpt:active {
+    text-decoration: none;
+}
+textarea.bibtex {
+    padding-bottom: 1rem;
+    font-size: 0.875rem;
+    width: 100%;
+}
+p.copyright {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+.break-at-all-cost {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    -ms-word-break: break-all;
+    word-break: break-all;
+    word-break: break-all;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+}
+#comments h3.comments-title {
+    text-transform: none;
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: normal;
+}
+p.about-the-author {
+    font-style: italic;
+}
+#metadata_metabox input[type=text] {
+    margin: 1px;
+    padding: 4px;
+    width:100%;
+}
+content-area form.search-form {
+    display: flex;
+}
+form.search-form input.search-submit {
+    width: 100%;
+}
+/* make header and sidebar invisible when printing */
+@media print
+{    
+    .addtoany_share_save_container, .addtoany_share_save_container *, input#print-btn, div.sidebar, div.sidebar *, div#header-section, div#header-section *
+    {
+        display: none !important;
+    }
+}

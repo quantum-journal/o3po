@@ -1,0 +1,8 @@
+/**
+ * All of the CSS for your admin-specific functionality should be
+ * included in this file.
+ */
+#metadata_metabox input.required:invalid,
+#metadata_metabox textarea.required:invalid{
+    border-color: red;
+}
