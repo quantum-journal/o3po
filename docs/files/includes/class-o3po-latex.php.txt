@@ -442,14 +442,14 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
          *
          * @since    0.1.0
          * @access   private
-         * @var      array    $additional_defaul_macros   Array of additional macros that we often want to expand even if they were not explicitely defined by the user.
+         * @var      array    $additional_default_macros   Array of additional macros that we often want to expand even if they were not explicitely defined by the user.
          */
-    static private $additional_defaul_macros = array(
+    static private $additional_default_macros = array(
         array('', '\\newcommand', '\\\@firstoftwo', '[2]', '', '#1'),
         array('', '\\newcommand', '\\\@secondoftwo', '[2]', '', '#2'),
                                                      );
         /**
-         * Get special macros we always ignore in the expansion.
+         * Get special macros we sometimes want to ignore in expansion.
          *
          * Some macros are better kept unexpended even if the authors have
          * manually re-defined them, because we need them to more efficiently
@@ -461,6 +461,27 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
     static public function get_special_macros_to_ignore_in_bbl() {
         
         return array('\\href', '\\doi', '\\url');
+    }
+
+        /**
+         * Remove special macros we sometimes want to ignore in expansion.
+         *
+         * @since    0.1.0
+         * @access   public
+         * @param    array    $latex_macro_definitions    Array of latex macro definitions.
+         */
+    static public function remove_special_macros_to_ignore_in_bbl( $latex_macro_definitions ) {
+        $latex_macro_definitions_without_specials = array();
+        $special_macros_to_ignore = O3PO_Latex::get_special_macros_to_ignore_in_bbl();
+        foreach($latex_macro_definitions as $latex_macro_definition)
+        {
+            if(!in_array($latex_macro_definition[2], $special_macros_to_ignore))
+            {
+                $latex_macro_definitions_without_specials[] = $latex_macro_definition;
+            }
+        }
+        
+        return $latex_macro_definitions_without_specials;
     }
     
         /**
@@ -481,8 +502,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
         if(strpos($text, '\\') === false || empty($macro_definitions))
             return $text;
     
-        $additional_defaul_macros = $GLOBALS['additional_defaul_macros'];
-        $macro_definitions = array_merge_recursive($macro_definitions, $additional_defaul_macros);
+        $macro_definitions = array_merge_recursive($macro_definitions, $this->additional_default_macros);
     
         $patterns_and_replacements = array();
         foreach($macro_definitions as $macro_definition)
@@ -552,7 +572,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
          * @access   public
          * @param    string/int   $month   Number of the month in the range 1-12.
          */
-    static public function get_month_string($month) {
+    static public function get_month_string( $month ) {
         
         $month = intval($month);
         return array(

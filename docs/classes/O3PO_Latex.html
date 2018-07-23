@@ -136,10 +136,10 @@
                                 <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-586038472"></a>
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-214604980"></a>
                                 <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
             </div>
-            <div id="namespace-586038472" class="accordion-body collapse in">
+            <div id="namespace-214604980" class="accordion-body collapse in">
                 <div class="accordion-inner">
 
                     
@@ -211,6 +211,7 @@
                                                                     <a href="../classes/O3PO_Latex.html#method_utf8_to_bibtex" class="">utf8_to_bibtex()</a><br />
                                                                     <a href="../classes/O3PO_Latex.html#method_extract_latex_macros" class="">extract_latex_macros()</a><br />
                                                                     <a href="../classes/O3PO_Latex.html#method_get_special_macros_to_ignore_in_bbl" class="">get_special_macros_to_ignore_in_bbl()</a><br />
+                                                                    <a href="../classes/O3PO_Latex.html#method_remove_special_macros_to_ignore_in_bbl" class="">remove_special_macros_to_ignore_in_bbl()</a><br />
                                                                     <a href="../classes/O3PO_Latex.html#method_expand_latex_macros" class="">expand_latex_macros()</a><br />
                                                                     <a href="../classes/O3PO_Latex.html#method_get_month_string" class="">get_month_string()</a><br />
                                                                     <a href="../classes/O3PO_Latex.html#method_utf8_to_closest_latin_letter_string" class="">utf8_to_closest_latin_letter_string()</a><br />
@@ -244,7 +245,7 @@
                                                                     <a href="../classes/O3PO_Latex_Dictionary_Provider.html#property_latex_clean_up_dictionary" class="">$latex_clean_up_dictionary</a><br />
                                                                     <a href="../classes/O3PO_Latex_Dictionary_Provider.html#property_latex_special_chars_reverse_dictionary" class="">$latex_special_chars_reverse_dictionary</a><br />
                                                                     <a href="../classes/O3PO_Latex_Dictionary_Provider.html#property_utf8_to_ascii_dictionary" class="">$utf8_to_ascii_dictionary</a><br />
-                                                                    <a href="../classes/O3PO_Latex.html#property_additional_defaul_macros" class="">$additional_defaul_macros</a><br />
+                                                                    <a href="../classes/O3PO_Latex.html#property_additional_default_macros" class="">$additional_default_macros</a><br />
                                                             </section>
                             <section class="span4">
                                 <em>N/A</em>
@@ -453,10 +454,10 @@ this.</p>
 
                                     <div class="row-fluid">
         <div class="span8 content class">
-            <a id="property_additional_defaul_macros" name="property_additional_defaul_macros" class="anchor"></a>
+            <a id="property_additional_default_macros" name="property_additional_default_macros" class="anchor"></a>
             <article class="property">
-                <h3 class="private ">$additional_defaul_macros</h3>
-                <pre class="signature">$additional_defaul_macros : array</pre>
+                <h3 class="private ">$additional_default_macros</h3>
+                <pre class="signature">$additional_default_macros : array</pre>
                 <p><em>Additional macros.</em></p>
                 <p>Array of default macros that we always want to expand,
 irrespective of whether they appeared in a LaTeX file.</p>
@@ -1008,11 +1009,53 @@ Group 4.    22-22   <code>`  (in case a default is set making an argument option
                 <h3 class="public ">get_special_macros_to_ignore_in_bbl()</h3>
                 <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
                 <pre class="signature" style="margin-right: 54px;">get_special_macros_to_ignore_in_bbl() </pre>
-                <p><em>Get special macros we always ignore in the expansion.</em></p>
+                <p><em>Get special macros we sometimes want to ignore in expansion.</em></p>
                 <p>Some macros are better kept unexpended even if the authors have
 manually re-defined them, because we need them to more efficiently
 parse the latex code (i.e., to identify DOIs or URLs).</p>
 
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            0.1.0                                
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_remove_special_macros_to_ignore_in_bbl" name="method_remove_special_macros_to_ignore_in_bbl" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">remove_special_macros_to_ignore_in_bbl()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">remove_special_macros_to_ignore_in_bbl(array  <span class="argument">$latex_macro_definitions</span>) </pre>
+                <p><em>Remove special macros we sometimes want to ignore in expansion.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>array</td>
+                                <td>$latex_macro_definitions </td>
+                                <td><p>Array of latex macro definitions.</p></td>
+                            </tr>
+                                            </table>
                 
                 
                 				
@@ -1350,7 +1393,7 @@ from a text such as a title.</em></p>
                 <section class="span10 offset1">
                     <hr />
                     Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
-                    on July 23rd, 2018 at 07:30.
+                    on July 23rd, 2018 at 21:41.
                 </section>
             </section>
         </section>

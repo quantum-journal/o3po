@@ -136,10 +136,10 @@
                                 <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-435304154"></a>
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-60571792"></a>
                                 <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
             </div>
-            <div id="namespace-435304154" class="accordion-body collapse in">
+            <div id="namespace-60571792" class="accordion-body collapse in">
                 <div class="accordion-inner">
 
                     
@@ -330,7 +330,9 @@
                 <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
                 <pre class="signature" style="margin-right: 54px;">check_orcid(string  <span class="argument">$orcid</span>) </pre>
                 <p><em>Check that the given ORCID is well formated.</em></p>
-                <p>Verifies whether the given ORCID has a valid chekcsum.</p>
+                <p>Verifies whether the given ORCID has a valid checksum.</p>
+<p>Return true if the $orcid is a valid ORCID and otherwise a string
+describing why it is not valid.</p>
 
                                     <h4>Parameters</h4>
                     <table class="table table-condensed table-hover">
@@ -424,7 +426,8 @@
                 <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
                 <pre class="signature" style="margin-right: 54px;">remove_stopwords(string  <span class="argument">$text</span>) </pre>
                 <p><em>Remove stopwords.</em></p>
-                
+                <p>Removes the stopwords in static::stop_words from $text and
+tries to avoid the creation of double spaces.</p>
 
                                     <h4>Parameters</h4>
                     <table class="table table-condensed table-hover">
@@ -596,7 +599,7 @@ pasted.</p>
                 <section class="span10 offset1">
                     <hr />
                     Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
-                    on July 23rd, 2018 at 07:30.
+                    on July 23rd, 2018 at 21:41.
                 </section>
             </section>
         </section>
