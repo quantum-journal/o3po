@@ -24,8 +24,11 @@ class O3PO_Utility
         /**
          * Check that the given ORCID is well formated.
          *
-         * Verifies whether the given ORCID has a valid chekcsum. 
+         * Verifies whether the given ORCID has a valid checksum. 
          *
+         * Return true if the $orcid is a valid ORCID and otherwise a string
+         * describing why it is not valid.
+         * 
          * @since    0.1.0
          * @access   public
          * @param    string     $orcid   ORCID to check
