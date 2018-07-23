@@ -69,9 +69,13 @@ class O3PO_Utility
          * @param    int       $tobase       Base to with the number is to be converted.
          * */
     static public function base_convert_arbitrary_precision( $str, $frombase, $tobase ) {
-        
-        $str = trim($str); 
-        if (intval($frombase) != 10) { 
+            
+        $str = trim($str);
+
+        if(intval($str) === 0)
+            return "0";
+                
+        if(intval($frombase) != 10) { 
             $len = strlen($str); 
             $q = 0; 
             for ($i=0; $i<$len; $i++) { 
@@ -90,7 +94,8 @@ class O3PO_Utility
                 $q = bcdiv($q, $tobase, 0); 
             } 
         } 
-        else $s = $q; 
+        else
+            $s = $q; 
         
         return $s; 
     }
@@ -102,10 +107,13 @@ class O3PO_Utility
          * @access   public
          * @var      array   $stop_words     Array of stopwords.
          * */
-    static public $stop_words = array('a','an','the','on','for','with', 'at', 'by');
+    static public $stop_words = array('a','an','the','on','for','with', 'at', 'by', 'and');
     
         /**
          * Remove stopwords.
+         *
+         * Removes the stopwords in static::stop_words from $text and
+         * tries to avoid the creation of double spaces.
          *
          * @since    0.1.0
          * @access   public
@@ -114,7 +122,7 @@ class O3PO_Utility
     static public function remove_stopwords( $text ) {
         
         foreach (static::$stop_words as $target) {
-            $text = preg_replace('#\\b' . $target . '\\b#i', '', $text);
+            $text = preg_replace('#\\b( ' . $target . '|' . $target . ' |' . $target . ')\\b#i', '', $text);
         }
         
         return $text;
