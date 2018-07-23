@@ -1,6 +1,6 @@
 <?php
 
-require_once 'PHPUnit/Autoload.php';
+require_once('PHPUnit/Framework/TestCase.php');
 
 /**
  * The bootstrap file for the PHPUnit tests.
