@@ -11,7 +11,7 @@ class O3PO_SingletonTest extends PHPUnit_Framework_TestCase
         {
             $singleton = new O3PO_Singleton();
         }
-        catch (Error $e) {
+        catch (Exception $e) {
             $exception = $e;
         }
         
@@ -29,7 +29,7 @@ class O3PO_SingletonTest extends PHPUnit_Framework_TestCase
             $singleton = O3PO_Singleton::instance();
             $clone = clone $singleton;
         }
-        catch (Error $e) {
+        catch (Exception $e) {
             $exception = $e;
         }
         
