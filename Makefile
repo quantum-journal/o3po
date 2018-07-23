@@ -1,7 +1,7 @@
 PHPUNIT := phpunit-5.0.0.phar
 
 all:
-	@echo "Please specify a target to make:\ndocs: generate the documentation\nlint: run php in lint mode"
+	@echo "Please specify a target to make:\ndocs:\t\tgenerate the documentation\nlint:\t\trun php in lint mode\nrun-tests:\trun phpunit unit tests"
 
 docs: $(shell find . -type f -name '*.php') phpDocumentor.phar
 	@php phpDocumentor.phar --force --validate --sourcecode -vv -d . -t docs
