@@ -45,6 +45,8 @@ O-3PO offers the following features:
 
 ## Documentation
 
+Please refer to the [online documentation](https://quantum-journal.github.io/o3po/) to learn about the implementation.
+
 To build the documentation, install [phpDocumentor](http://docs.phpdoc.org/getting-started/installing.html). The easiest option is to simply download  
 `phpDocumentor.phar`, put it in the o3po folder and then run:
 
