@@ -4,7 +4,9 @@ require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-singleton.php';
 
 class O3PO_SingletonTest extends PHPUnit_Framework_TestCase
 {
-
+        /**
+         * @runInSeparateProcess
+         */
     public function test___construct() {
 
         $reflection = new ReflectionClass('O3PO_Singleton');
