@@ -6,34 +6,33 @@ class O3PO_SingletonTest extends PHPUnit_Framework_TestCase
 {
 
     public function test___construct() {
-        $exception = null;
-        try
-        {
-            $singleton = new O3PO_Singleton();
-        }
-        catch (Exception $e) {
-            $exception = $e;
-        }
+
+        $reflection = new ReflectionClass('O3PO_Singleton');
+        $this->assertTrue($reflection->getMethod('__construct')->isPrivate());
         
-        $this->assertInstanceOf(Error::class, $exception);
-
         $singleton = O3PO_Singleton::instance();
-
         $this->assertInstanceOf(O3PO_Singleton::class, $singleton);
+        
     }
 
     public function test___clone() {
-        $exception = null;
-        try
-        {
-            $singleton = O3PO_Singleton::instance();
-            $clone = clone $singleton;
-        }
-        catch (Exception $e) {
-            $exception = $e;
-        }
+
+        $reflection = new ReflectionClass('O3PO_Singleton');
+        $this->assertTrue($reflection->getMethod('__clone')->isPrivate());
         
-        $this->assertInstanceOf(Error::class, $exception);
     }    
 
+    public function test___sleep() {
+
+        $reflection = new ReflectionClass('O3PO_Singleton');
+        $this->assertTrue($reflection->getMethod('__sleep')->isPrivate());
+        
+    }    
+
+    public function test___wakeup() {
+
+        $reflection = new ReflectionClass('O3PO_Singleton');
+        $this->assertTrue($reflection->getMethod('__wakeup')->isPrivate());
+        
+    }
 }
