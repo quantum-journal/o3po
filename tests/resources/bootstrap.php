@@ -99,3 +99,5 @@ function get_file_data( $file, $options ) {
     
     return $matches;
 }
+
+function flush_rewrite_rules( $hard=false ) {}
