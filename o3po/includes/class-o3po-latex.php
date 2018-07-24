@@ -33,30 +33,34 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
          * @since    0.1.0
          * @access   public
          * @param    string     $latex_text    Latex code whose non-math part is to be converted to utf8
+         * @param    boolean    $clean         Whether to perform some cleanup at the end.
          * */
-    static public function latex_to_utf8_outside_math_mode( $latex_text ) {
+    static public function latex_to_utf8_outside_math_mode( $latex_text, $clean=true  ) {
         
         $latex_lines = self::preg_split_at_latex_math_mode_delimters($latex_text);
-        $latex_text_cleaned = '';
+        $latex_text_converted = '';
         foreach ($latex_lines as $x => $line) {
             if ($x % 2 === 1) //In math mode
-                $latex_text_cleaned .= '$' . $line . '$';
-                //$latex_text_cleaned .= '$'.preg_replace('/([a-zA-Z]{2,})/', '\\\\'."$1", $line).'$';
+                $latex_text_converted .= '$' . $line . '$';
+                //$latex_text_converted .= '$'.preg_replace('/([a-zA-Z]{2,})/', '\\\\'."$1", $line).'$';
             else { //Outside math mode
                 foreach (self::get_latex_special_chars_dictionary() as $target => $substitute) {
                     $line = preg_replace('#'.'(?<!\\\\)'.$target.'#', $substitute, $line);
                     if( strpos($line, '\\') === false ) break;
                 }
-                foreach (self::get_latex_clean_up_dictionary() as $target => $substitute) 
+                if($clean)
                 {
-                    $line = str_replace($target, $substitute, $line);
+                    foreach (self::get_latex_clean_up_dictionary() as $target => $substitute) 
+                    {
+                        $line = str_replace($target, $substitute, $line);
+                    }
+                    $line = preg_replace('#  +#', ' ', $line);
                 }
-                $line = preg_replace('#  +#', ' ', $line);
-                $latex_text_cleaned .= $line;
+                $latex_text_converted .= $line;
             }
         }
         
-        return $latex_text_cleaned;
+        return $latex_text_converted;
     }
 
 
@@ -502,7 +506,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
         if(strpos($text, '\\') === false || empty($macro_definitions))
             return $text;
     
-        $macro_definitions = array_merge_recursive($macro_definitions, $this->additional_default_macros);
+        $macro_definitions = array_merge_recursive($macro_definitions, static::$additional_default_macros);
     
         $patterns_and_replacements = array();
         foreach($macro_definitions as $macro_definition)
