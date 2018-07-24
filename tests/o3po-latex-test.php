@@ -68,6 +68,14 @@ class O3PO_LatexTest extends PHPUnit_Framework_TestCase
         return O3PO_Latex::parse_bbl($bbl);
     }
 
+        /**
+         * @depends test_get_biblatex_bbl_file
+         */ 
+    public function test_parse_biblatex_bbl( $bbl ) {
+
+        return O3PO_Latex::parse_bbl($bbl);
+    }
+
     public function get_month_string_provider() {
         return [
             [0, null],
