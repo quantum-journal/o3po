@@ -22,8 +22,11 @@ $(PHPDOCUMENTORPHAR):
 lint:
 	@find . -type f -name '*.php' -exec php -l {} \;
 
-run-tests: $(shell find . -type f -name '*.php') $(PHPUNITPHAR)
-	@$(PHPUNITCOMMAND) --coverage-clover=coverage.xml --whitelist $(SRC) --bootstrap tests/resources/bootstrap.php --test-suffix 'test.php' tests/
+run-tests: $(shell find . -type f -name '*.php') $(PHPUNITPHAR) setsttysizenonzero
+	@$(PHPUNITCOMMAND) --verbose --coverage-clover=coverage.xml --whitelist $(SRC) --bootstrap tests/resources/bootstrap.php --test-suffix 'test.php' tests/
 
 $(PHPUNITPHAR):
 	@wget -O $(PHPUNITPHAR) https://phar.phpunit.de/$(PHPUNITPHAR)
+
+setsttysizenonzero:
+	@if [ "$(shell stty size)" = "0 0" ]; then stty cols 80; fi
