@@ -1554,7 +1554,7 @@ abstract class O3PO_PublicationType {
          */
     protected function the_admin_panel_intro_text( $post_id ) {
         
-        echo '<p>Use the large editor field above only for additional content on the ' . $this->get_publication_type_name() . '\'s page that does not fit into the fields below.</p>';
+        echo '<p>Use the large editor field above only for additional content on the page of this ' . $this->get_publication_type_name() . ' that does not fit into the fields below.</p>';
         echo '<p>Hint: You can drag and drop this box to appear closer to the top of the admin panel page.</p>';
         
     }
@@ -1606,7 +1606,7 @@ abstract class O3PO_PublicationType {
 		if( empty( $corresponding_author_has_been_notifed_date ) ) $corresponding_author_has_been_notifed_date = '' ;
         
 		echo '	<tr>';
-		echo '          <th><label for="' . $post_type . '_corresponding_author_email" class="' . $post_type .'_corresponding_author_email_label">' . __( 'Email', 'qj-plugin' ) . '</label></th>';
+		echo '          <th><label for="' . $post_type . '_corresponding_author_email" class="' . $post_type .'_corresponding_author_email_label">' . 'Email' . '</label></th>';
 		echo '          <td>';
 		echo '                  <input' . ($corresponding_author_has_been_notifed_date === '' ? " " : " readonly ") . 'type="text" id="' . $post_type . '_corresponding_author_email" name="' . $post_type . '_corresponding_author_email" class="' . $post_type . '_corresponding_author_email_field required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( $corresponding_author_email ) . '">' . ( !empty($corresponding_author_has_been_notifed_date) ? " The authors have been automatically notified on " . $corresponding_author_has_been_notifed_date . '.' : '' );
 		echo '                  <p>(The email of the corresponding author. They get sent an automatic notification of publication email when the post is first published.)</p>';
@@ -1641,7 +1641,7 @@ abstract class O3PO_PublicationType {
             $buffer_special_text = '';
         
 		echo '	<tr>';
-		echo '		<th><label for="' . $post_type . '_buffer_email" class="' . $post_type .'_buffer_email_label">' . __( 'Buffer', 'qj-plugin' ) . '</label></th>';
+		echo '		<th><label for="' . $post_type . '_buffer_email" class="' . $post_type .'_buffer_email_label">' . 'Buffer' . '</label></th>';
         echo '		<td>';
         
         if(empty($buffer_email_was_sent_date))
@@ -1678,7 +1678,7 @@ abstract class O3PO_PublicationType {
 		if( empty( $title_mathml ) ) $title_mathml = '';
         
         echo '	<tr>';
-		echo '		<th><label for="' . $post_type . '_title" class="' . $post_type . '_title_label">' . __( 'Title', 'qj-plugin' ) . '</label></th>';
+		echo '		<th><label for="' . $post_type . '_title" class="' . $post_type . '_title_label">' . 'Title' . '</label></th>';
 		echo '		<td>';
 		echo '			<input style="width:100%;" type="text" id="' . $post_type . '_title" name="' . $post_type . '_title" class="' . $post_type . '_title_field preview_and_mathml required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( $title ) . '"><p>(The title may contain special characters. Type Č instead of \\v{C} for example. In contrary, mathematical formulas must be entered in LaTeX notation surrounded by $ signs. Write \\$ for an actual dollar sign. If a mathematical formula is detected, a live preview of how it will appear on the website and the MathML we submit to Crossref appears above this help text.)</p>';
 		echo '		</td>';
@@ -1712,7 +1712,7 @@ abstract class O3PO_PublicationType {
         if( empty( $author_urls ) ) $author_urls = array();
 
         echo '	<tr>';
-		echo '		<th><label for="' . $post_type . '_number_authors" class="' . $post_type . '_number_authors_label">' . __( 'Number of authors', 'qj-plugin' ) . '</label></th>';
+		echo '		<th><label for="' . $post_type . '_number_authors" class="' . $post_type . '_number_authors_label">' . 'Number of authors' . '</label></th>';
 		echo '		<td>';
 		echo '			<input style="width:4rem" type="number" id="' . $post_type . '_number_authors" name="' . $post_type . '_number_authors" class="' . $post_type . '_number_authors_field required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( $number_authors ) . '"><p>(Please put here the actual number of authors. To update the number of entries in the list below please save the post. Give affiliations as a comma separated list referring to the affiliations below, e.g., 1,2,5,7. As with the title, special characters are allowed and must be entered as í or é and so on.)</p>';
 		echo '		</td>';
@@ -1721,7 +1721,7 @@ abstract class O3PO_PublicationType {
 		for ($x = 0; $x < $number_authors; $x++) {
 			$y = $x+1;
 			echo '	<tr>';
-			echo '		<th><label for="' . $post_type . '_author" class="' . $post_type . '_author_label">' . __( "Author  $y", 'qj-plugin' ) . '</label></th>';
+			echo '		<th><label for="' . $post_type . '_author" class="' . $post_type . '_author_label">' . "Author  $y" . '</label></th>';
 			echo '		<td>';
 			echo '			<div style="float:left"><input type="text" name="' . $post_type . '_author_given_names[]" class="' . $post_type . '_author_given_names_field" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( isset($author_given_names[$x]) ? $author_given_names[$x] : '' ) . '" /><br /><label for="' . $post_type . '_author_given_names" class="' . $post_type . '_author_given_names_label">Given name</label></div>';
 			echo '			<div style="float:left"><input type="text" name="' . $post_type . '_author_surnames[]" class="' . $post_type . '_author_surnames_field required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( isset($author_surnames[$x]) ? $author_surnames[$x] : '' ) . '" /><br /><label for="' . $post_type . '_author_surnames" class="' . $post_type . '_author_surnames_label">Surname</label></div>';
@@ -1755,7 +1755,7 @@ abstract class O3PO_PublicationType {
 		if( empty( $affiliations ) ) $affiliations = array();
         
 		echo '	<tr>';
-		echo '		<th><label for="' . $post_type . '_number_affiliations" class="' . $post_type . '_number_affiliations_label">' . __( 'Number of affiliations', 'qj-plugin' ) . '</label></th>';
+		echo '		<th><label for="' . $post_type . '_number_affiliations" class="' . $post_type . '_number_affiliations_label">' . 'Number of affiliations' . '</label></th>';
 		echo '		<td>';
 		echo '			<input style="width:4rem" type="number" id="' . $post_type . '_number_affiliations" name="' . $post_type . '_number_affiliations" class="' . $post_type . '_number_affiliations_field required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( $number_affiliations ) . '"><p>(Please put here the total number of affiliations. To update the number of Affiliation fields save the post.)</p>';
 		echo '		</td>';
@@ -1763,7 +1763,7 @@ abstract class O3PO_PublicationType {
 		for ($x = 0; $x < $number_affiliations; $x++) {
 			$y = $x+1;
 			echo '	<tr>';
-			echo '		<th><label for="' . $post_type . '_affiliation" class="' . $post_type . '_affiliation_label">' . __( "Affiliation  $y", 'qj-plugin' ) . '</label></th>';
+			echo '		<th><label for="' . $post_type . '_affiliation" class="' . $post_type . '_affiliation_label">' . "Affiliation  $y" . '</label></th>';
 			echo '		<td>';
 			echo '			<input style="width:100%" type="text" name="' . $post_type . '_affiliations[]" class="' . $post_type . '_affiliations required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( isset($affiliations[$x]) ? $affiliations[$x] : '' ) . '" />';
 
@@ -1805,21 +1805,21 @@ abstract class O3PO_PublicationType {
 		}
         
         echo '	<tr>';
-		echo '		<th><label for="' . $post_type . '_date_published" class="' . $post_type . '_date_published_label">' . __( 'Publication date', 'qj-plugin' ) . '</label></th>';
+		echo '		<th><label for="' . $post_type . '_date_published" class="' . $post_type . '_date_published_label">' . 'Publication date' . '</label></th>';
 		echo '		<td>';
 		echo '			<input' . ($post_status !== 'publish' ? " " : " readonly ") .  'type="date" id="' . $post_type . '_date_published" name="' . $post_type . '_date_published" class="' . $post_type . '_date_published_field required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( $date_published ) . '">';
 		echo '		</td>';
 		echo '	</tr>';
         
         echo '	<tr>';
-		echo '		<th><label for="' . $post_type . '_journal" class="' . $post_type . '_journal_label">' . __( 'Journal', 'qj-plugin' ) . '</label></th>';
+		echo '		<th><label for="' . $post_type . '_journal" class="' . $post_type . '_journal_label">' . 'Journal' . '</label></th>';
 		echo '		<td>';
 		echo '			<input readonly type="text" id="' . $post_type . '_journal" name="' . $post_type . '_journal" class="' . $post_type . '_journal_field required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( $journal ) . '">';
 		echo '		</td>';
 		echo '	</tr>';
 
 		echo '	<tr>';
-		echo '		<th><label for="' . $post_type . '_volume" class="' . $post_type . '_volume_label">' . __( 'Volume', 'qj-plugin' ) . '</label></th>';
+		echo '		<th><label for="' . $post_type . '_volume" class="' . $post_type . '_volume_label">' . 'Volume' . '</label></th>';
 		echo '		<td>';
 		echo '			<input' . ($post_status !== 'publish' ? " " : " readonly ") .  'type="number" id="' . $post_type . '_volume" name="' . $post_type . '_volume" class="' . $post_type . '_volume_field required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( $volume ) . '">';
 		echo '			<p>(The volume number is the year of publication minus ' . ($this->get_journal_property('first_volume_year')-1) . '.)</p>';
@@ -1827,7 +1827,7 @@ abstract class O3PO_PublicationType {
 		echo '	</tr>';
 
 		echo '	<tr>';
-		echo '		<th><label for="' . $post_type . '_pages" class="' . $post_type . '_pages_label">' . __( 'Pages', 'qj-plugin' ) . '</label></th>';
+		echo '		<th><label for="' . $post_type . '_pages" class="' . $post_type . '_pages_label">' . 'Pages' . '</label></th>';
 		echo '		<td>';
 		echo '			<input' . ($post_status !== 'publish' ? " " : " readonly ") .  'type="number" id="' . $post_type . '_pages" name="' . $post_type . '_pages" class="' . $post_type . '_pages_field required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( $pages ) . '">';
 		echo '			<p>(This is our (fake) page number. Must be one larger than that of the last published work. Please double check the default value this is automatically set to. If it is -1, then publishing this post at the given date would break lexicographic ordering or DOIs.)</p>';
@@ -1849,7 +1849,7 @@ abstract class O3PO_PublicationType {
         $doi = static::get_doi($post_id);
         
 		echo '	<tr>';
-		echo '		<th><label for="' . $post_type . '_doi" class="' . $post_type . '_doi_label">' . __( 'Doi', 'qj-plugin' ) . '</label></th>';
+		echo '		<th><label for="' . $post_type . '_doi" class="' . $post_type . '_doi_label">' . 'Doi' . '</label></th>';
 		echo '		<td>';
 		echo '			<input type="text" readonly value="' . esc_attr__( $doi ) . '" ><br /><p>(The doi is automatically calculated from the above meta data and is of the form ' . $this->get_journal_property('journal_level_doi_suffix') . '-YYYY-MM-DD-pages. If not enough information is available, it is not set and the post is forced to private)</p>';
 		echo '		</td>';
@@ -1870,7 +1870,7 @@ abstract class O3PO_PublicationType {
         $author_latex_macro_definitions = get_post_meta( $post_id, $post_type . '_author_latex_macro_definitions', true );
         
         echo '	<tr>';
-		echo '		<th><label for="' . $post_type . '_bbl" class="' . $post_type . '_bbl_label">' . __( 'Bibliography', 'qj-plugin' ) . '</label></th>';
+		echo '		<th><label for="' . $post_type . '_bbl" class="' . $post_type . '_bbl_label">' . 'Bibliography' . '</label></th>';
 		echo '		<td><p>(The bibliography as extracted from the bbl code below.)</p>';
 		if ( !empty($bbl) ) {
                 
@@ -1931,7 +1931,7 @@ abstract class O3PO_PublicationType {
         
 		if ( !empty($crossref_xml) ) {
 			echo '	<tr>';
-			echo '		<th><label for="' . $post_type . '_crossref_xml" class="' . $post_type . '_crossref_xml_label">' . __( 'Crossref xml', 'qj-plugin' ) . '</label></th>';
+			echo '		<th><label for="' . $post_type . '_crossref_xml" class="' . $post_type . '_crossref_xml_label">' . 'Crossref xml' . '</label></th>';
 			echo '		<td>';
 			echo '			<textarea rows="16" style="width:100%;" readonly>' . esc_attr__( $crossref_xml ) . '</textarea><p>(The Crossref xml is automatically calculated from the above meta data.)</p>';
 			echo '		</td>';
@@ -1940,7 +1940,7 @@ abstract class O3PO_PublicationType {
 
 		if ( !empty($crossref_response) ) {
 			echo '	<tr>';
-			echo '		<th><label for="' . $post_type . '_crossref_response" class="' . $post_type . '_crossref_response_label">' . __( 'Crossref response', 'qj-plugin' ) . '</label></th>';
+			echo '		<th><label for="' . $post_type . '_crossref_response" class="' . $post_type . '_crossref_response_label">' . 'Crossref response' . '</label></th>';
 			echo '		<td>';
 			echo '			<textarea rows="' . (substr_count( $crossref_response, "\n" )+1) . '" style="width:100%;" readonly>' . esc_attr__( $crossref_response ) . '</textarea><p>(The response we got from Crossref when uploading the metadata.)</p>';
 			echo '		</td>';
@@ -1964,7 +1964,7 @@ abstract class O3PO_PublicationType {
         
 		if ( !empty($doaj_json) ) {
 			echo '	<tr>';
-			echo '		<th><label for="' . $post_type . '_doaj_json" class="' . $post_type . '_doaj_json_label">' . __( 'DOAJ json', 'qj-plugin' ) . '</label></th>';
+			echo '		<th><label for="' . $post_type . '_doaj_json" class="' . $post_type . '_doaj_json_label">' . 'DOAJ json' . '</label></th>';
 			echo '		<td>';
 			echo '			<textarea rows="16" style="width:100%;" readonly>' . esc_attr__( $doaj_json ) . '</textarea><p>(The DOAJ json is automatically calculated from the above meta data.)</p>';
 			echo '		</td>';
@@ -1973,7 +1973,7 @@ abstract class O3PO_PublicationType {
 
 		if ( !empty($doaj_response) ) {
 			echo '	<tr>';
-			echo '		<th><label for="' . $post_type . '_doaj_response" class="' . $post_type . '_doaj_response_label">' . __( 'DOAJ response', 'qj-plugin' ) . '</label></th>';
+			echo '		<th><label for="' . $post_type . '_doaj_response" class="' . $post_type . '_doaj_response_label">' . 'DOAJ response' . '</label></th>';
 			echo '		<td>';
 			echo '			<textarea rows="' . (substr_count( $doaj_response, "\n" )+2) . '" style="width:100%;" readonly>' . esc_attr__( $doaj_response ) . '</textarea><p>(The response we got from DOAJ when uploading the metadata.)</p>';
 			echo '		</td>';

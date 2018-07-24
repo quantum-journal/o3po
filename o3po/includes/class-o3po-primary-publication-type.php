@@ -54,10 +54,14 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
          * @param     Post    $post    Post for which the meta box is to be rendered.
          */
     public function render_metabox( $post ) {
-        
-        parent::render_metabox( $post );
 
         $post_id = $post->ID;
+        $post_type = get_post_type($post_id);
+            // If the post type doesn't fit do nothing
+        if ( $this->get_publication_type_name() !== $post_type )
+            return;
+        
+        parent::render_metabox( $post );
 
         $this->the_admin_panel_intro_text($post_id);
         $this->the_admin_panel_howto($post_id);
@@ -760,7 +764,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         
         if( empty( $eprint ) ) $eprint = '';
 		echo '	<tr>';
-		echo '		<th><label for="' . $post_type . '_eprint" class="' . $post_type . '_eprint_label">' . __( 'Eprint', 'qj-plugin' ) . '</label></th>';
+		echo '		<th><label for="' . $post_type . '_eprint" class="' . $post_type . '_eprint_label">' . 'Eprint' . '</label></th>';
 		echo '		<td>';
 		echo '			<input type="text" id="' . $post_type . '_eprint" name="' . $post_type . '_eprint" class="' . $post_type . '_eprint_field required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( $eprint ) . '">';
 		echo '                  <input type="checkbox" name="' . $post_type . '_fetch_metadata_from_arxiv"' . (empty($eprint) ? 'checked' : '' ) . '>Fetch title, authors, and abstract from the arXiv upon next Save/Update';
@@ -790,7 +794,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 		if( empty( $fermats_library_permalink_worked ) ) $fermats_library_permalink_worked = 'false' ;
 
         echo '	<tr>';
-		echo '		<th><label for="' . $post_type . '_fermats_library" class="' . $post_type . '_fermats_library_label">' . __( 'Fermat&#39;s library', 'qj-plugin' ) . '</label></th>';
+		echo '		<th><label for="' . $post_type . '_fermats_library" class="' . $post_type . '_fermats_library_label">' . 'Fermat&#39;s library' . '</label></th>';
 		echo '		<td>';
 		echo '                  <input type="checkbox" name="' . $post_type . '_fermats_library" value="checked"' . $fermats_library . '>Opt-in for Fermat&#39;s library.' . ( !empty($fermats_library_has_been_notifed_date) ? " Fermat&#39;s library has been automatically notified on " . $fermats_library_has_been_notifed_date . '.' : ' Fermat&#39;s library has not been notified so far.' ) . '<br />';
 		echo '			<input ' . (!empty($fermats_library_has_been_notifed_date) ? 'readonly' : '' ) . ' style="width:100%;" type="text" id="' . $post_type . '_fermats_library_permalink" name="' . $post_type . '_fermats_library_permalink" class="' . $post_type . '_fermats_library_permalink_field" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( $fermats_library_permalink ) . '"><br />(If you leave blank the permalink field it is automatically generated when the email is sent and can then no longer be modified.)';
@@ -817,7 +821,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 		if( empty( $abstract_mathml ) ) $abstract_mathml = '';
 
         echo '	<tr>';
-        echo '		<th><label for="' . $post_type . '_abstract" class="' . $post_type . '_abstract_label">' . __( 'Abstract', 'qj-plugin' ) . '</label></th>';
+        echo '		<th><label for="' . $post_type . '_abstract" class="' . $post_type . '_abstract_label">' . 'Abstract' . '</label></th>';
 		echo '		<td>';
 		echo '			<textarea rows="10" style="width:100%;" name="' . $post_type . '_abstract" id="' . $post_type . '_abstract" class="preview_and_mathml required">' . esc_html($abstract) . '</textarea><p>(Just like the title, the abstract may contain special characters typed out as é or ç for example. Do not use LaTeX notation for special characters. In contrary, mathematical formulas must be entered in LaTeX notation surrounded by $ signs. Type \\$ for an actual dollar symbol. Beware that the automatic import sometimes confuses a \\langle or \\rangle with a smaller or larger sign and fix these manually. If a formula is detected a live preview and the corresponding MathML code is shown above this help text.)</p>';
 		echo '		</td>';
@@ -841,7 +845,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         if( empty( $feature_image_caption ) ) $feature_image_caption = '' ;
         
 		echo '	<tr>';
-		echo '		<th><label for="' . $post_type . '_feature_image_caption" class="' . $post_type . '_feature_image_caption_label">' . __( 'Feature image caption', 'qj-plugin' ) . '</label></th>';
+		echo '		<th><label for="' . $post_type . '_feature_image_caption" class="' . $post_type . '_feature_image_caption_label">' . 'Feature image caption' . '</label></th>';
 		echo '		<td>';
 		echo '			<textarea rows="6" style="width:100%;" name="' . $post_type . '_feature_image_caption" id="' . $post_type . '_feature_image_caption">' . esc_attr__( $feature_image_caption ) . '</textarea><p>(Please upload images sent by the authors as feature image via the button on the right. Please add here a caption in case the ' . $this->get_publication_type_name() . ' has a feature image.)</p>';
 		echo '		</td>';
@@ -865,7 +869,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 		if( empty( $popular_summary ) ) $popular_summary = '' ;
         
         echo '	<tr>';
-		echo '		<th><label for="' . $post_type . '_popular_summary" class="' . $post_type . '_popular_summary_label">' . __( 'Popular summary', 'qj-plugin' ) . '</label></th>';
+		echo '		<th><label for="' . $post_type . '_popular_summary" class="' . $post_type . '_popular_summary_label">' . 'Popular summary' . '</label></th>';
 		echo '		<td>';
 		echo '			<textarea rows="6" style="width:100%;" name="' . $post_type . '_popular_summary" id="' . $post_type . '_popular_summary">' . esc_attr__( $popular_summary ) . '</textarea><p>(Popular summary if provided by the authors.)</p>';
 		echo '		</td>';
@@ -889,7 +893,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         
 		if ( !empty($arxiv_fetch_results) ) {
 			echo '	<tr>';
-			echo '		<th><label for="' . $post_type . '_arxiv_fetch_results" class="' . $post_type . '_arxiv_fetch_results_label">' . __( 'ArXiv fetch result', 'qj-plugin' ) . '</label></th>';
+			echo '		<th><label for="' . $post_type . '_arxiv_fetch_results" class="' . $post_type . '_arxiv_fetch_results_label">' . 'ArXiv fetch result' . '</label></th>';
 			echo '		<td>';
 			echo '			<textarea rows="' . (substr_count( $arxiv_fetch_results, "\n" )+1) . '" cols="65" readonly>' . esc_attr__( $arxiv_fetch_results ) . '</textarea><p>(The result of fetching metadata from the arXiv.)</p>';
 			echo '		</td>';
@@ -898,18 +902,18 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 
 		if ( !empty($arxiv_pdf_attach_ids) ) {
 			echo '	<tr>';
-			echo '		<th><label for="' . $post_type . '_arxiv_pdf_ids" class="' . $post_type . '_arxiv_pdf_ids_label">' . __( 'PDFs from arXiv', 'qj-plugin' ) . '</label></th>';
+			echo '		<th><label for="' . $post_type . '_arxiv_pdf_ids" class="' . $post_type . '_arxiv_pdf_ids_label">' . 'PDFs from arXiv' . '</label></th>';
 			echo '		<td>';
 			echo '                  <input type="checkbox" name="' . $post_type . '_download_arxiv_pdf">Download the pdf from the arXiv again upon next Save/Update.';
 			foreach ($arxiv_pdf_attach_ids as $arxiv_pdf_attach_id) {
-				echo '<p>ID: <a href="post.php?post=' . $arxiv_pdf_attach_id . '&action=edit" target="_blank">' . $arxiv_pdf_attach_id . '</a> Url: <a href="' . wp_get_attachment_url( $arxiv_pdf_attach_id ) . '" target="_blank">' . wp_get_attachment_url( $arxiv_pdf_attach_id ) . "</a></p>\n";
+				echo '<p>ID: <a href="post.php?post=' . $arxiv_pdf_attach_id . '%26action=edit" target="_blank">' . $arxiv_pdf_attach_id . '</a> Url: <a href="' . wp_get_attachment_url( $arxiv_pdf_attach_id ) . '" target="_blank">' . wp_get_attachment_url( $arxiv_pdf_attach_id ) . "</a></p>\n";
 			}
 			echo '		</td>';
 			echo '	</tr>';
 		}
 		if ( !empty($arxiv_source_attach_ids) ) {
 			echo '	<tr>';
-			echo '		<th><label for="' . $post_type . '_arxiv_source_ids" class="' . $post_type . '_arxiv_source_ids_label">' . __( 'Source files from arXiv', 'qj-plugin' ) . '</label></th>';
+			echo '		<th><label for="' . $post_type . '_arxiv_source_ids" class="' . $post_type . '_arxiv_source_ids_label">' . 'Source files from arXiv' . '</label></th>';
 			echo '		<td>';
 			echo '                  <input type="checkbox" name="' . $post_type . '_download_arxiv_source">Download the source from the arXiv again upon next Save/Update.';
 			foreach ($arxiv_source_attach_ids as $arxiv_source_attach_id) {

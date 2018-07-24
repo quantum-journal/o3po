@@ -1,5 +1,7 @@
 # O-3PO
 
+[![Build Status](https://travis-ci.org/quantum-journal/o3po.svg?branch=master)](https://travis-ci.org/quantum-journal/o3po) [![codecov](https://codecov.io/gh/quantum-journal/o3po/branch/master/graph/badge.svg)](https://codecov.io/gh/quantum-journal/o3po)
+
 * Contributors: cgogolin
 * Donate link: https://quantum-journal.org/donate/
 * Tags: publishing, open-access
