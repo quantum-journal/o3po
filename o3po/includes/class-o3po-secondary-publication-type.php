@@ -92,6 +92,12 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          */
     public function render_metabox( $post ) {
         
+        $post_id = $post->ID;
+        $post_type = get_post_type($post_id);
+            // If the post type doesn't fit do nothing
+        if ( $this->get_publication_type_name() !== $post_type )
+            return;
+        
         parent::render_metabox( $post );
         
         $post_id = $post->ID;        
