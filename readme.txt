@@ -12,6 +12,8 @@
 
 O-3PO stands for Open-source Open-access Overlay Publishing Option, it intends to make publishing of open-access arXiv overlay journals on WordPress powered websites as easy as possible.
 
+O-3PO powers the website of [Quantum - the open journal for quantum science](https://quantum-journal.org/) and was originally developed for this purpose.
+
 ## Description
 
 O-3PO offers the following features:
@@ -58,7 +60,7 @@ The documentation can be build locally by running `make docs`.
 * Move fix_custom_logo_html into separate plug-in
 * Make single-paper.php theme independent 
 * Make handle_volumes_endpoint_request() theme independent
-* Disable the fall-back loading of options from the `quantum-journal-plugin` context. 
+* Disable the fall-back loading of options from the `quantum-journal-plugin` context.
 
 ## Frequently Asked Questions
 
