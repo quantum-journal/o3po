@@ -364,7 +364,7 @@ exit();
          * @param    string   $doi_suffix   Doi suffix to be checked.
          * @param    array    $post_types   Post types to take into accoun.
          * */
-    public static function doi_suffix_stil_free( $doi_suffix, $post_type ) {
+    public static function doi_suffix_stil_free( $doi_suffix, $post_types ) {
 
         $still_free = true;
         foreach($post_types as $post_type)
