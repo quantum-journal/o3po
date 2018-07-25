@@ -175,7 +175,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     public function download_to_media_library_provider() {
 
         return [
-            ['https://quantum-journal.org/papers/q-2018-07-11-76/pdf/', 'q-2018-07-11-76', 'pdf', 'application/pdf', '1', false],
+            ['https://arxiv.org/pdf/0908.2921v2', 'q-1234-07-11-14', 'pdf', 'application/pdf', '1', false],
         ];
     }
 
@@ -203,8 +203,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         }
         else
         {
-            print($expected_error . "\n");
-            print($results['error'] . "\n");
             $this->assertSame($expected_error, $results['error']);
         }
     }
@@ -214,7 +212,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          */
     function pages_still_free_info_provider( $primary_publication_type ) {
         return [
-            [null, 2, array('still_free' => true, 'title' => '')],
+            [null, 1234, array('still_free' => true, 'title' => '')],
             [null, 1, array('still_free' => false, 'title' => 'Fake title')],
         ];
     }
@@ -228,35 +226,47 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $this->assertSame($expected, $journal->pages_still_free_info( $post_id_to_exclude, $pages, array($primary_publication_type->get_publication_type_name()) ));
     }
 
+    public function posts_for_validate_and_process_data_provider() {
+        global $posts;
+
+        return [
+            [1, $posts[1], array(
+                    '#REVIEW: The pdf was downloaded successfully from the arXiv#',
+                    '#REVIEW: The source was downloaded successfully from the arXiv to [^ ]*' . get_post_meta( 1, 'paper_doi_suffix', true) . '\.tex and is of mime-type text/x-tex#',
+                    '#REVIEW: Found bibliographic information#',
+                    '#REVIEW: Bibliographic information updated.#',
+                    '#ERROR: Corresponding author email is malformed#',
+                    '#(INFO: Licensing information .* and meta-data of .*' . get_post_meta( 1, 'paper_doi_suffix', true) . '\.pdf added/updated|ERROR: Adding meta-data to pdfs requires the external programm exiftool but the exiftool binary was not found)#',
+                    '#ERROR: Corresponding author email is malformed#',
+                                 )],
+            [5, $posts[5], array(
+                    '#INFO: URL of author 1 is empty\.#',
+                                 )],
+                ];
+    }
+
         /**
+         * @dataProvider posts_for_validate_and_process_data_provider
          * @depends test_create_primary_publication_type
-         * @depends test_download_to_media_library
          */
-    public function test_validate_and_process_data( $primary_publication_type ) {
+    public function test_validate_and_process_data( $post_id, $post_data, $expections, $primary_publication_type ) {
         global $posts;
 
         $class = new ReflectionClass('O3PO_PrimaryPublicationType');
-        foreach($posts as $post_id => $post_data)
+
+        $post_type = get_post_type($post_id);
+        if ( $primary_publication_type->get_publication_type_name() !== $post_type )
+            return;
+
+        $method = $class->getMethod('validate_and_process_data');
+        $method->setAccessible(true);
+        $validation_result = $method->invokeArgs($primary_publication_type, array($post_id));
+
+        print("\n\n" . $validation_result . "\n\n");
+
+        foreach($expections as $expection)
         {
-            $post_type = get_post_type($post_id);
-            if ( $primary_publication_type->get_publication_type_name() !== $post_type )
-                continue;
-
-            $method = $class->getMethod('validate_and_process_data');
-            $method->setAccessible(true);
-            $validation_result = $method->invokeArgs($primary_publication_type, array($post_id));
-
-                //print($validation_result);
-
-            $this->assertRegexp('#REVIEW: The pdf was downloaded successfully from the arXiv#', $validation_result);
-            $this->assertRegexp('#REVIEW: The source was downloaded successfully from the arXiv to [^ ]*' . get_post_meta( $post_id, 'paper_doi_suffix', true) . '\.tex and is of mime-type text/x-tex#', $validation_result);
-
-
-            $this->assertRegexp('#REVIEW: Found bibliographic information#', $validation_result);
-            $this->assertRegexp('#REVIEW: Bibliographic information updated.#', $validation_result);
-            $this->assertRegexp('#ERROR: Corresponding author email is malformed#', $validation_result);
-            $this->assertRegexp('#(INFO: Licensing information .* and meta-data of .*' . get_post_meta( $post_id, 'paper_doi_suffix', true) . '\.pdf added/updated|ERROR: Adding meta-data to pdfs requires the external programm exiftool but the exiftool binary was not found)#', $validation_result);
-            $this->assertRegexp('#ERROR: Corresponding author email is malformed#', $validation_result);
+            $this->assertRegexp($expection, $validation_result);
         }
     }
 }

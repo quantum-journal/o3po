@@ -204,6 +204,68 @@ $posts = array(
         'attachment_url' => 'fake_attachment_url',
         'attachment_path' => 'fake_attachment_path',
                ),
+    5 => array(
+        'post_type' => 'paper',
+        'thumbnail_id' => 2,
+        'post_status' => 'private',
+        'post_title' => 'Fake title 2',
+        'meta' => array(
+            'paper_abstract' => 'This is a test abstract 2 that contains not math so far and no special characters.',
+            'paper_abstract_mathml' => 'This is a test abstract 2 that contains not math so far and no special characters.',
+            'paper_eprint' => '0809.2542v4',
+            'paper_eprint_was_changed_on_last_save' => false,
+//            'paper_arxiv_pdf_attach_ids' => array(4),
+            'paper_arxiv_pdf_attach_ids' => array(6),
+            'paper_popular_summary' => 'Some random fake summary.',
+            'paper_feature_image_caption' => 'Some random fake cation.',
+            'paper_fermats_library' => '',
+            'paper_validation_result' => 'fake_validation_result',
+            'paper_title' => 'Fake title 2',
+            'paper_title_mathml' => 'Fake title 2',
+            'paper_corresponding_author_email' => 'validemail@quantum-journal.org',
+            'paper_corresponding_author_has_been_notifed_date' => 'fake_paper_corresponding_author_has_been_notifed_date',
+            'paper_buffer_email' => 'fake_paper_buffer_email',
+            'paper_buffer_email_was_sent_date' => 'fake_paper_buffer_email_was_sent_date',
+            'paper_buffer_special_text' => 'fake_paper_buffer_special_text',
+            'paper_fermats_library_permalink' => 'fake_paper_fermats_library_permalink',
+            'paper_fermats_library_permalink_worked' => 'fake_paper_fermats_library_permalink_worked',
+            'paper_fermats_library_has_been_notifed_date' => 'fake_paper_fermats_library_has_been_notifed_date',
+            'paper_number_authors' => 1,
+            'paper_author_given_names' => ['Foo'],
+            'paper_author_surnames' => ['Bar'],
+            'paper_author_name_styles' => ["western"],
+            'paper_author_affiliations' => ['1'],
+            'paper_author_orcids' => ['0000-0003-0290-4698'],
+            'paper_author_urls' => [''],
+            'paper_number_affiliations' => 1,
+            'paper_affiliations' => ['Foo Institute'],
+            'paper_date_published' => 'fake_paper_date_published',
+            'paper_journal' => 'fake_paper_journal',
+            'paper_volume' => 'fake_paper_volume',
+            'paper_pages' => '2',
+            'paper_doi_prefix' => 'fake_paper_doi_prefix',
+            'paper_doi_suffix' => 'fake_paper_doi_suffix',
+            'paper_bbl' => 'fake_paper_bbl',
+            'paper_author_latex_macro_definitions' => array(),
+            'paper_crossref_xml' => 'fake_paper_crossref_xml',
+            'paper_crossref_response' => 'fake_paper_crossref_response',
+            'paper_doaj_json' => 'fake_paper_doaj_json',
+            'paper_doaj_response' => 'fake_paper_doaj_response',
+            'paper_arxiv_fetch_results' => 'fake_paper_arxiv_fetch_results',
+            'paper_arxiv_source_attach_ids' => array(7),
+            'paper_doi_suffix_was_changed_on_last_save' => false,
+                        )
+               ),
+    6 => array(
+        'post_type' => 'attachment',
+        'attachment_url' => 'fake_attachment_url',
+        'attachment_path' => dirname(__FILE__) . '/arxiv/0809.2542v4.pdf',
+               ),
+    7 => array(
+        'post_type' => 'attachment',
+        'attachment_url' => 'fake_attachment_url',
+        'attachment_path' => dirname(__FILE__) . '/arxiv/0809.2542v4.tar.gz',
+               ),
                );
 
 function get_post_type( $post_id ) {
@@ -297,15 +359,17 @@ class WP_Query
 
         if(empty($this->posts))
         {
-            $post_data = array();
-            return;
+            throw new Exception("the_post() called with no posts left");
+            /* $post_data = array(); */
+            /* return; */
         }
 
         $keys = array_keys($this->posts);
         $min_key = min($keys);
 
         $current = $this->posts[$min_key];
-        array_shift($this->posts);
+//        array_shift($this->posts);
+        unset($this->posts[$min_key]);
 
         $post_data = array('current' => $current, 'ID' => $min_key);
     }
@@ -390,15 +454,15 @@ function get_the_date( $format, $post_id ) {
 }
 
 function download_url( $url, $timeout_seconds ) {
-    $tmppath = ABSPATH . 'tmp/';
+    $tmppath = dirname(__FILE__) . '/tmp/';
     if(!file_exists($tmppath))
         mkdir($tmppath);
     $tmpfile = tempnam($tmppath , 'download_url_' );
 
-        //we fike some downloads by copying local files
+        //we fake some downloads by copying local files
     $special_urls = array(
-        'https://arxiv.org/pdf/0908.2921v2' => ABSPATH . 'arxiv/0908.2921v2.pdf',
-        'https://arxiv.org/e-print/0908.2921v2' => ABSPATH . 'arxiv/0908.2921v2.tex',
+        'https://arxiv.org/pdf/0908.2921v2' => dirname(__FILE__) . '/arxiv/0908.2921v2.pdf',
+        'https://arxiv.org/e-print/0908.2921v2' => dirname(__FILE__) . '/arxiv/0908.2921v2.tex',
     );
     if(!empty($special_urls[$url]))
         copy($special_urls[$url], $tmpfile);
