@@ -919,7 +919,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 			echo '		<td>';
 			echo '                  <input type="checkbox" name="' . $post_type . '_download_arxiv_source">Download the source from the arXiv again upon next Save/Update.';
 			foreach ($arxiv_source_attach_ids as $arxiv_source_attach_id) {
-				echo '<p>ID: <a href="post.php?post=' . $arxiv_source_attach_id . '&action=edit" target="_blank">' . $arxiv_source_attach_id . '</a> Url: <a href="' . wp_get_attachment_url( $arxiv_source_attach_id ) . '" target="_blank">' . wp_get_attachment_url( $arxiv_source_attach_id ) . "</a></p>\n";
+				echo '<p>ID: <a href="post.php?post=' . $arxiv_source_attach_id . '%26action=edit" target="_blank">' . $arxiv_source_attach_id . '</a> Url: <a href="' . wp_get_attachment_url( $arxiv_source_attach_id ) . '" target="_blank">' . wp_get_attachment_url( $arxiv_source_attach_id ) . "</a></p>\n";
 			}
 			echo '		</td>';
 			echo '	</tr>';
