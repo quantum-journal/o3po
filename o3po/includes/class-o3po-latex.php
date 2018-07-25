@@ -110,8 +110,6 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
     static public function parse_bbl( $bbl ) {
 
         preg_match('/% \$ (biblatex bbl format|biblatex) version ([0-9.]*) \$/' , $bbl, $version);
-        print(json_encode($version));
-
         if( !empty($version[1]))
             $biblatex = $version[1];
         else

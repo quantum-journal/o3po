@@ -525,7 +525,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $post_type = get_post_type($post_id);
         $arxiv_pdf_attach_ids = get_post_meta( $post_id, $post_type . '_arxiv_pdf_attach_ids', true );
         if(empty($arxiv_pdf_attach_ids))
-            return "ERROR: Can not add licensing information, no pdf attached to post " . $post_id ;
+            return "ERROR: Cannot add licensing information, no pdf attached to post " . $post_id ;
         $path = get_attached_file(end($arxiv_pdf_attach_ids));
         if(empty($path))
             return "ERROR: Cannot add licensing information, no file found for pdf attachment of post " . $post_id;
@@ -547,12 +547,12 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 
         $command .= ' ' . escapeshellarg($path);
 
-        exec($command, $output, $exit_code); // We can not use escapeshellcmd() here as it escapes even the content of arguments enclosed in '' and this breaks things. In PHP safe mode escapeshellcmd() is forcefully run inside exec(), which is why we can not add licencing information in safe mode.
+        exec($command, $output, $exit_code); // We can not use escapeshellcmd() here as it escapes even the content of arguments enclosed in '' and this breaks things. In PHP safe mode escapeshellcmd() is forcefully run inside exec(), which is why we cannot add licencing information in safe mode.
 
         if($exit_code!=0)
-            return "ERROR: Exiftool finished with exit code=" . $exit_code . " for file " . $path . " the output was: " . implode($output," ");
+            return "ERROR: Exiftool (" . $command . ") finished with exit code=" . $exit_code . " for file " . $path . " the output was: " . implode($output," ");
 
-        return "INFO: " . $this->get_journal_property('license_type') . ' ' . $this->get_journal_property('license_version') . " licensing information and meta-data in " . $path . " added/updated";
+        return "INFO: Licensing information (" . $this->get_journal_property('license_type') . ' ' . $this->get_journal_property('license_version') . ") and meta-data of " . $path . " added/updated";
     }
 
         /**
