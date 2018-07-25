@@ -214,8 +214,7 @@ $posts = array(
             'paper_abstract_mathml' => 'This is a test abstract 2 that contains not math so far and no special characters.',
             'paper_eprint' => '0809.2542v4',
             'paper_eprint_was_changed_on_last_save' => false,
-//            'paper_arxiv_pdf_attach_ids' => array(4),
-            'paper_arxiv_pdf_attach_ids' => array(6),
+            'paper_arxiv_pdf_attach_ids' => array(),
             'paper_popular_summary' => 'Some random fake summary.',
             'paper_feature_image_caption' => 'Some random fake cation.',
             'paper_fermats_library' => '',
@@ -252,7 +251,7 @@ $posts = array(
             'paper_doaj_json' => 'fake_paper_doaj_json',
             'paper_doaj_response' => 'fake_paper_doaj_response',
             'paper_arxiv_fetch_results' => 'fake_paper_arxiv_fetch_results',
-            'paper_arxiv_source_attach_ids' => array(7),
+            'paper_arxiv_source_attach_ids' => array(),
             'paper_doi_suffix_was_changed_on_last_save' => false,
                         )
                ),
