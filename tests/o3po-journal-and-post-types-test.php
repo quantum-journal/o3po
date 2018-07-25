@@ -124,8 +124,8 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     }
 
         /**
-         * @depends test_create_primary_publication_type
          * @dataProvider primary_the_admin_components_provider
+         * @depends test_create_primary_publication_type
          */
     public function test_primary_the_admin_components_is_well_formed_html( $function, $primary_publication_type ) {
 
@@ -250,7 +250,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          * @depends test_create_primary_publication_type
          */
     public function test_validate_and_process_data( $post_id, $post_data, $expections, $primary_publication_type ) {
-        global $posts;
 
         $class = new ReflectionClass('O3PO_PrimaryPublicationType');
 
@@ -270,5 +269,87 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         }
 
         $this->assertFalse(strpos('Exception while downloading the source', $validation_result));
+    }
+
+
+    public function on_post_actually_published_provider() {
+
+        return [
+            [1],
+            [5],
+        ];
+    }
+
+        /**
+         * @dataProvider on_post_actually_published_provider
+         * @depends test_create_primary_publication_type
+         */
+    public function test_on_post_actually_published( $post_id, $primary_publication_type ) {
+        $class = new ReflectionClass('O3PO_PrimaryPublicationType');
+
+        $post_type = get_post_type($post_id);
+        if ( $primary_publication_type->get_publication_type_name() !== $post_type )
+            return;
+
+        $method = $class->getMethod('on_post_actually_published');
+        $method->setAccessible(true);
+        $validation_result = $method->invokeArgs($primary_publication_type, array($post_id));
+
+        $this->assertRegexp('#INFO: This paper was publicly published#', $validation_result);
+        $this->assertFalse(strpos('ERROR', $validation_result));
+    }
+
+
+    public function save_meta_data_provider() {
+
+        return [
+            [1, array(
+                    '_title' => '',
+                    '_title_mathml' => '',
+                    '_number_authors' => 2,
+                    '_author_given_names' => '',
+                    '_author_surnames' => '',
+                    '_author_name_styles' => '',
+                    '_author_affiliations' => '',
+                    '_author_orcids' => '',
+                    '_author_urls' => '',
+                    '_number_affiliations' => '',
+                    '_affiliations' => '',
+                    '_date_published' => '',
+                    '_journal' => '',
+                    '_volume' => '',
+                    '_pages' => '',
+                    '_corresponding_author_email' => '',
+                    '_buffer_email' => '',
+                    '_buffer_special_text' => '',
+                    '_bbl' => '',
+
+            )],
+                ];
+    }
+
+        /**
+         * @runInSeparateProcess
+         * @dataProvider save_meta_data_provider
+         * @depends test_create_primary_publication_type
+         */
+    public function test_save_meta_data( $post_id, $POST_args, $primary_publication_type ) {
+        $post_type = get_post_type($post_id);
+
+
+        foreach($POST_args as $key => $value)
+        {
+            $_POST[ $post_type . $key ] = $value;
+        }
+
+        $class = new ReflectionClass('O3PO_PrimaryPublicationType');
+
+        $post_type = get_post_type($post_id);
+        if ( $primary_publication_type->get_publication_type_name() !== $post_type )
+            return;
+
+        $method = $class->getMethod('save_meta_data');
+        $method->setAccessible(true);
+        $method->invokeArgs($primary_publication_type, array($post_id));
     }
 }
