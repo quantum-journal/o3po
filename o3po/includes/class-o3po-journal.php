@@ -15,7 +15,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-setti
 /**
  * The functionality related to individual journals.*
  *
- * @since      0.1.0 
+ * @since      0.1.0
  * @package    O3PO
  * @subpackage O3PO/includes
  * @author     Christian Gogolin <o3po@quantum-journal.org>
@@ -25,13 +25,13 @@ class O3PO_Journal {
 
         /**
          * Array holding the configuration of the journal.
-         * 
+         *
          * @since    0.1.0
          * @access   private
-         * @var      array      $journal_config    Array of properties definig the journal. 
+         * @var      array      $journal_config    Array of properties definig the journal.
          */
     private $journal_config = array();
-    
+
         /**
          * Initialize the journal.
          *
@@ -46,7 +46,7 @@ class O3PO_Journal {
             //check whether at least all properties specified in get_journal_config_properties have been provided
         foreach($this->get_journal_config_properties() as $journal_config_property)
             $this->get_journal_property($journal_config_property);
-        
+
 	}
 
 
@@ -78,7 +78,7 @@ class O3PO_Journal {
             'doi_prefix',
             'journal_level_doi_suffix',
             'doi_url_prefix',
-            'eissn',                    
+            'eissn',
             'fermats_library_email', //from primary
             'fermats_library_url_prefix', //from primary
             'first_volume_year',
@@ -93,12 +93,12 @@ class O3PO_Journal {
             'publisher_country',
             'publisher_email',
             'scholastica_manuscripts_url', //from primary
-            
+
             'publication_type_name', //not in in settings
             'publication_type_name_plural', //not in in settings
             'volumes_endpoint', //in settings
                        );
-        
+
         /**
          * Get an array of all options the journal expects in its journal config.
          *
@@ -106,7 +106,7 @@ class O3PO_Journal {
          * @access   public
          */
     public static function get_journal_config_properties() {
-        
+
         return static::$required_journal_config_properties;
     }
 
@@ -118,23 +118,23 @@ class O3PO_Journal {
          * @param    string    $id    Id of the property.
          */
     public function get_journal_property( $id ) {
-        
+
         if(!isset($this->journal_config[$id]))
             throw new Exception('Journal property "' . $id . '" is requested but was not provided.' . ' journal_config contains ' . count($this->journal_config) . ' entries.');
-        
+
         return $this->journal_config[$id];
     }
-    
+
         /**
          * Adds a rewrite endpoint for the .../volumes/1 and so on pages.
          *
          * To be added to the 'init' action.
-         * 
+         *
          * @since    0.1.0
          * @access   public
          * */
     public function add_volumes_endpoint() {
-        
+
         add_rewrite_endpoint( $this->get_journal_property('volumes_endpoint'), EP_ROOT );
             // flush_rewrite_rules( true );  //// <---------- ONLY COMMENT IN WHILE TESTING
     }
@@ -149,7 +149,7 @@ class O3PO_Journal {
          * however are taxonomies. This is just a cludge for now.
          *
          * To be added to the 'parse_request' action.
-         * 
+         *
          * @since    0.1.0
          * @access   public
          * @param    WP_Query     $wp_query   Query to act on.
@@ -157,9 +157,9 @@ class O3PO_Journal {
     public function handle_volumes_endpoint_request( $wp_query ) {
 
         $settings = O3PO_Settings::instance();
-                
+
         if ( !isset( $wp_query->query_vars[ $this->get_journal_property('volumes_endpoint') ] ) )
-            return; 
+            return;
         $extra = $wp_query->query_vars[ $this->get_journal_property('volumes_endpoint') ];
 
         $extras = preg_split('#/#' , $wp_query->query_vars[ $this->get_journal_property('volumes_endpoint') ]);
@@ -171,7 +171,7 @@ class O3PO_Journal {
             $page = (int)$extras[2];
         if(empty($page))
             $page = 1;
-    
+
         add_filter( 'body_class', function( $classes ) {
                 return array_merge( $classes, array( 'archive', 'post-type-archive', 'post-type-archive-' . $this->get_journal_property('publication_type_name') ) );
             } );
@@ -206,7 +206,7 @@ if ( empty($vol_num) or $vol_num < 1 ) {
 else {
     echo '<h1>' . $this->get_count_of_volume($vol_num, $this->get_journal_property('publication_type_name')) . ' ' . $this->get_journal_property('publication_type_name_plural') . ' in Volume ' . $vol_num . ' (' . ($vol_num+($settings->get_plugin_option('first_volume_year')-1)) . ')</h1>';
     echo '<p>&larr; <a href="' . get_site_url() . '/volumes/">back to all volumes</a><p>';
-                    
+
     query_posts(array('post_status' => 'publish', 'post_type' => $this->get_journal_property('publication_type_name'), 'meta_key' => $this->get_journal_property('publication_type_name') . '_volume', 'meta_value' => $vol_num, 'paged' => $page, 'posts_per_page' => 9999 ));
 
         // loop
@@ -227,7 +227,7 @@ else {
 <?php } ?>
       </div><!--#content-inside -->
             </div><!-- #content -->
-              
+
 <?php /* condense the list entries */ ?>
             <script type="text/javascript">
 var i;
@@ -239,9 +239,9 @@ var elemets_to_condense = document.querySelectorAll(".list-article,.entry-title"
 for (i = 0; i < elemets_to_condense.length; i++) {
     elemets_to_condense[i].style.padding = "0.2em 0";
     elemets_to_condense[i].style.margin = "0";
-}          
+}
 </script>
-      
+
 <?php get_footer();
 exit();
     }
@@ -250,43 +250,43 @@ exit();
 
         /**
          * Returns information about the post with the highest page number.
-         * 
+         *
          * We have an aricle/fake page number that counts up 1,2,3,... This
          * function determines the highes such number among all posts of the
          * given publication types as well as the publication date of that
          * post. Only published and future posts (i.e. such scheduled for
          * publication) apart from the excluded post are taken into account.
-         * 
+         *
          * @since    0.1.0
          * @access   public
          * @param    int    $post_id_to_exclude    Id of a post to exclude in the calculation
          * @param    array  $post_types            Array of post types to take into account.
          * */
     public static function get_post_type_highest_pages_info( $post_id_to_exclude, $post_types ) {
-        
+
         $pages_highest = 0;
         $pages_highest_date_published = '';
         $pages_highest_id = 0;
         $future_post_exists = false;
-        foreach($post_types as $post_type) 
+        foreach($post_types as $post_type)
         {
             $query = array(
                 'post_type' => $post_type,
                 'post_status' => array('publish', 'future')
                            );
-            
+
             $my_query = new WP_Query( $query );
-            if ( $my_query->have_posts() ) { 
-                while ( $my_query->have_posts() ) { 
+            if ( $my_query->have_posts() ) {
+                while ( $my_query->have_posts() ) {
                     $my_query->the_post();
 
                     if( get_post_status ( get_the_ID() ) === 'future') {
                         $future_post_exists = true;
                     }
-                    
+
                     if(get_the_ID() === $post_id_to_exclude)
                         continue;
-                    
+
                     $curr_pages = get_post_meta( get_the_ID(), $post_type . '_pages', true );
                     if( $pages_highest <= $curr_pages) {
                         $pages_highest = $curr_pages;
@@ -297,7 +297,7 @@ exit();
             }
         }
         wp_reset_postdata();
-        
+
         return array( 'pages' => $pages_highest,
                       'date_published' => $pages_highest_date_published,
                       'future_post_exists' => $future_post_exists);
@@ -305,12 +305,12 @@ exit();
 
         /**
          * Determines whether a given page number is still free.
-         * 
+         *
          * We have an aricle/fake page number that counts up 1,2,3,... This
          * function determines whether $pages is still free, in the sense
          * that no post with a type in $post_types other than that with
          * id $post_id already has page number $pages.
-         * 
+         *
          * @since    0.1.0
          * @access   public
          * @param    int      $post_id_to_exclude    Id of a post to exclude.
@@ -318,7 +318,7 @@ exit();
          * @param    array    $post_types            Post types to take into accoun.
          * */
     public static function pages_still_free_info( $post_id_to_exclude, $pages, $post_types ) {
-        
+
         $still_free = true;
         $title = '';
         foreach($post_types as $post_type)
@@ -326,15 +326,15 @@ exit();
             $query = array(
                 'post_type' => $post_type
                            );
-            
+
             $my_query = new WP_Query( $query );
-            if ( $my_query->have_posts() ) { 
-                while ( $my_query->have_posts() ) { 
+            if ( $my_query->have_posts() ) {
+                while ( $my_query->have_posts() ) {
                     $my_query->the_post();
-                    
+
                     if(get_the_ID() === $post_id_to_exclude)
                         continue;
-                    
+
                     $curr_pages = get_post_meta( get_the_ID(), $post_type . '_pages', true );
                     if( intval($pages) === intval($curr_pages)) {
                         $still_free = false;
@@ -347,7 +347,7 @@ exit();
                 break;
         }
         wp_reset_postdata();
-        
+
         return array( 'still_free' => $still_free,
                       'title' => $title);
     }
@@ -355,23 +355,23 @@ exit();
 
         /**
          * Determines whether a given page number is still free.
-         * 
+         *
          * This function can be used to check whether a given $doi_suffix is
          * sitll free or already taken by a registered post type.
-         * 
+         *
          * @since    0.1.0
          * @access   public
          * @param    string   $doi_suffix   Doi suffix to be checked.
          * @param    array    $post_types   Post types to take into accoun.
          * */
-    public static function doi_suffix_stil_free( $doi_suffix, $post_types ) {
-        
+    public static function doi_suffix_stil_free( $doi_suffix, $post_type ) {
+
         $still_free = true;
-        foreach($post_types as $post_type) 
+        foreach($post_types as $post_type)
         {
             $my_query = new WP_Query( 'post_type=' . $post_type );
-            if ( $my_query->have_posts() ) { 
-                while ( $my_query->have_posts() ) { 
+            if ( $my_query->have_posts() ) {
+                while ( $my_query->have_posts() ) {
                     $my_query->the_post();
                     $curr_doi_suffix = get_post_meta( get_the_ID(), $post_type . '_doi_suffix', true );
                     if( $curr_doi_suffix === $doi_suffix) {
@@ -384,11 +384,11 @@ exit();
             if( !$still_free)
                 break;
         }
-        
+
         return $still_free;
     }
 
-    
+
         /**
          * Get number of posts of the given type in the given volume.
          *
@@ -400,7 +400,7 @@ exit();
          * @param   string  $publication_type   Publication type to count.
          */
     public static function get_count_of_volume( $vol_num, $publication_type ) {
-        
+
         $query = array(
             'post_type' => $publication_type,
             'post_status' => array('publish'),
@@ -412,7 +412,7 @@ exit();
             $query['meta_value'] = $vol_num;
         }
         $my_query = new WP_Query( $query );
-        
+
         return $my_query->post_count;
     }
 
