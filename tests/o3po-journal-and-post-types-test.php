@@ -268,5 +268,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         {
             $this->assertRegexp($expection, $validation_result);
         }
+
+        $this->assertFalse(strpos('Exception while downloading the source', $validation_result));
     }
 }
