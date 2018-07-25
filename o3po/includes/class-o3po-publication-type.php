@@ -406,13 +406,13 @@ abstract class O3PO_PublicationType {
         $doi_batch_id = $this->generate_crossref_xml_doi_batch_id($post_id, $timestamp);
         $crossref_xml = $this->generate_crossref_xml($post_id, $doi_batch_id, $timestamp);
         update_post_meta( $post_id, $post_type . '_crossref_xml', $crossref_xml );
-        if(strpos($crossref_xml, 'ERROR'))
+        if(strpos($crossref_xml, 'ERROR') !== false)
             $validation_result .= $crossref_xml . "\n";
 
             // Generate DOAJ json
         $doaj_json = $this->generate_doaj_json($post_id);
         update_post_meta( $post_id, $post_type . '_doaj_json', wp_slash($doaj_json) ); // see https://codex.wordpress.org/Function_Reference/update_post_meta for why we have to used wp_slash() here and not addslashes()
-        if(strpos($doaj_json, 'ERROR'))
+        if(strpos($doaj_json, 'ERROR') !== false)
             $validation_result .= $doaj_json . "\n";
 
         if( strpos($validation_result, 'ERROR') === false and strpos($validation_result, 'REVIEW') === false) {
