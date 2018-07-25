@@ -7,3 +7,5 @@ script:
  - make run-tests
 after_success:
  - bash <(curl -s https://codecov.io/bash)
+before_install:
+ - sudo apt-get install -y libimage-exiftool-perl
