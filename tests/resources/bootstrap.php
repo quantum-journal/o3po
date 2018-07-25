@@ -88,9 +88,9 @@ function get_option( $option, $default = false ) {
             'crossref_test_deposite_url' => 'fake_crossref_test_deposite_url',
             'crossref_email' => 'fake_crossref_email',
             'crossref_archive_locations' => 'fake_crossref_archive_locations',
-            'arxiv_url_abs_prefix' => 'fake_arxiv_url_abs_prefix',
-            'arxiv_url_pdf_prefix' => 'fake_arxiv_url_pdf_prefix',
-            'arxiv_url_source_prefix' => 'fake_arxiv_url_source_prefix',
+            'arxiv_url_abs_prefix' => 'https://arxiv.org/abs/',
+            'arxiv_url_pdf_prefix' => 'https://arxiv.org/pdf/',
+            'arxiv_url_source_prefix' => 'https://arxiv.org/e-print/',
             'arxiv_url_trackback_prefix' => 'fake_arxiv_url_trackback_prefix',
             'arxiv_doi_feed_identifier' => 'fake_arxiv_doi_feed_identifier',
             'doi_url_prefix' => 'fake_doi_url_prefix',
@@ -141,6 +141,7 @@ $posts = array(
         'post_type' => 'paper',
         'thumbnail_id' => 2,
         'post_status' => 'private',
+        'post_title' => 'Fake title',
         'meta' => array(
             'paper_abstract' => 'This is a test abstract that contains not math so far and no special characters.',
             'paper_abstract_mathml' => 'This is a test abstract that contains not math so far and no special characters.',
@@ -154,7 +155,7 @@ $posts = array(
             'paper_validation_result' => 'fake_validation_result',
             'paper_title' => 'Fake title',
             'paper_title_mathml' => 'Fake title',
-            'paper_corresponding_author_email' => 'fake_paper_corresponding_author_email',
+            'paper_corresponding_author_email' => 'mal_formed_corresponding_author_email',
             'paper_corresponding_author_has_been_notifed_date' => 'fake_paper_corresponding_author_has_been_notifed_date',
             'paper_buffer_email' => 'fake_paper_buffer_email',
             'paper_buffer_email_was_sent_date' => 'fake_paper_buffer_email_was_sent_date',
@@ -223,9 +224,9 @@ function get_post_meta( $post_id, $key, $single = false ) {
         throw new Exception("Post with id=" . $post_id . " has no meta-data.");
     if(!isset($posts[$post_id]['meta'][$key]))
     {
-//        throw new Exception("Post with id=" . $post_id . " has no meta-data for key=" . $key . ".");
-       echo("\nPost with id=" . $post_id . " has no meta-data for key=" . $key . "\n");
-       return "fake!";
+        throw new Exception("Post with id=" . $post_id . " has no meta-data for key=" . $key . ".");
+       /* echo("\nPost with id=" . $post_id . " has no meta-data for key=" . $key . "\n"); */
+       /* return "fake!"; */
     }
 
 
@@ -394,12 +395,23 @@ function download_url( $url, $timeout_seconds ) {
         mkdir($tmppath);
     $tmpfile = tempnam($tmppath , 'download_url_' );
 
-    try {
-        file_put_contents($tmpfile, fopen($url, 'r'));
-        return $tmpfile;
-    } catch(Exception $e) {
-        return new WP_Error($e->getCode(), $e->getMessage());
+        //we fike some downloads by copying local files
+    $special_urls = array(
+        'https://arxiv.org/pdf/0908.2921v2' => ABSPATH . 'arxiv/0908.2921v2.pdf',
+        'https://arxiv.org/e-print/0908.2921v2' => ABSPATH . 'arxiv/0908.2921v2.tex',
+    );
+    if(!empty($special_urls[$url]))
+        copy($special_urls[$url], $tmpfile);
+    else
+    {
+        try {
+            file_put_contents($tmpfile, fopen($url, 'r'));
+        } catch(Exception $e) {
+            return new WP_Error($e->getCode(), $e->getMessage());
+        }
     }
+
+    return $tmpfile;
 }
 
 function is_wp_error( $object ) {
@@ -437,21 +449,25 @@ function wp_insert_attachment( $attachment, $filepath, $parent_post_id ) {
         'post_type' => 'attachment',
         'guid' => $attachment['guid'],
         'post_mime_type' => $attachment['post_mime_type'],
-
         'post_title' => $attachment['post_title'],
         'post_content' => $attachment['post_content'],
         'post_status' => $post_status,
+        'attachment_path' => $filepath,
     );
+
+//    $posts[$parent_post_id][] = max(array_keys($posts));
 
     return max(array_keys($posts));
 }
 
 function wp_generate_attachment_metadata($attach_id, $filename) {
-    global $posts;
+//    global $posts;
 
-    $posts[$attach_id]['attachment_path'] = $filename;
+//    $posts[$attach_id]['filename'] = $filename;
 }
-function wp_update_attachment_metadata() {}
+function wp_update_attachment_metadata( $attach_id, $attach_data ) {
+
+}
 
 function get_attached_file( $id ) {
     global $posts;
@@ -472,8 +488,20 @@ function wp_update_post( $array ) {
 
 }
 
+function update_post_meta( $post_id, $key, $value ) {
+    global $posts;
+
+    $posts[$post_id]['meta'][$key] = $value;
+}
+
 function wp_reset_postdata() {
     global $post_data;
 
     $post_data = array();
+}
+
+function get_the_title( $post_id ) {
+    global $posts;
+
+    return $posts[$post_id]['post_title'];
 }

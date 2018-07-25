@@ -244,7 +244,19 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
             $method = $class->getMethod('validate_and_process_data');
             $method->setAccessible(true);
-            $method->invokeArgs($primary_publication_type, array($post_id));
+            $validation_result = $method->invokeArgs($primary_publication_type, array($post_id));
+
+            print($validation_result);
+
+            $this->assertRegexp('#REVIEW: The pdf was downloaded successfully from the arXiv#', $validation_result);
+            $this->assertRegexp('#REVIEW: The source was downloaded successfully from the arXiv to [^ ]*' . get_post_meta( $post_id, 'paper_doi_suffix', true) . '\.tex and is of mime-type text/x-tex#', $validation_result);
+
+
+            $this->assertRegexp('#REVIEW: Found bibliographic information#', $validation_result);
+            $this->assertRegexp('#REVIEW: Bibliographic information updated.#', $validation_result);
+            $this->assertRegexp('#ERROR: Corresponding author email is malformed#', $validation_result);
+            $this->assertRegexp('#(INFO: Licensing information .* and meta-data of .*' . get_post_meta( $post_id, 'paper_doi_suffix', true) . '\.pdf added/updated|ERROR: Adding meta-data to pdfs requires the external programm exiftool but the exiftool binary was not found)#', $validation_result);
+            $this->assertRegexp('#ERROR: Corresponding author email is malformed#', $validation_result);
         }
     }
 }
