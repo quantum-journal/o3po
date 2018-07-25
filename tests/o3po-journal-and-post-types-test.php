@@ -262,7 +262,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $method->setAccessible(true);
         $validation_result = $method->invokeArgs($primary_publication_type, array($post_id));
 
-        print("\n\n" . $validation_result . "\n\n");
+            //print("\n\n" . $validation_result . "\n\n");
 
         foreach($expections as $expection)
         {
