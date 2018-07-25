@@ -246,7 +246,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             $method->setAccessible(true);
             $validation_result = $method->invokeArgs($primary_publication_type, array($post_id));
 
-            print($validation_result);
+                //print($validation_result);
 
             $this->assertRegexp('#REVIEW: The pdf was downloaded successfully from the arXiv#', $validation_result);
             $this->assertRegexp('#REVIEW: The source was downloaded successfully from the arXiv to [^ ]*' . get_post_meta( $post_id, 'paper_doi_suffix', true) . '\.tex and is of mime-type text/x-tex#', $validation_result);
