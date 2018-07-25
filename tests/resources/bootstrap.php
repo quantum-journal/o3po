@@ -389,10 +389,11 @@ function get_the_date( $format, $post_id ) {
 }
 
 function download_url( $url, $timeout_seconds ) {
-//    $tmpfile = ABSPATH . 'tmp/tmpfile';
-    $tmpfile = tempnam( ABSPATH . 'tmp/', 'download' );
-    if(!file_exists(dirname($tmpfile)))
-        mkdir(dirname($tmpfile));
+    $tmppath = ABSPATH . 'tmp/';
+    if(!file_exists($tmppath))
+        mkdir($tmppath);
+    $tmpfile = tempnam($tmppath , 'download_url_' );
+
     try {
         file_put_contents($tmpfile, fopen($url, 'r'));
         return $tmpfile;
@@ -414,7 +415,7 @@ function wp_handle_sideload( $file, $overrides ) {
 
     $newname = dirname($file['tmp_name']) . '/' . $file['name'];
     if(strpos($newname, ABSPATH) === false)
-        throw new Exception('Target file ' . $newname . ' path would be ouside of ABSPATH ' . ABSPATH . '. Aborting for security reasons.');
+        throw new Exception('Target file ' . $newname . ' path would be outside of ABSPATH ' . ABSPATH . '. Aborting for security reasons.');
     rename($oldname, $newname);
 
     return array('file' => $newname );
