@@ -657,7 +657,7 @@ abstract class O3PO_PublicationType {
 
         if ( empty($corresponding_author_email) )
             $validation_result .= "ERROR: Corresponding author email is empty.\n" ;
-        else if (strpos($corresponding_author_email, '@') === false || !is_email($corresponding_author_email) )
+        else if(!O3PO_Utility::valid_email($corresponding_author_email))
             $validation_result .= "ERROR: Corresponding author email is malformed.\n" ;
 
         return $validation_result;
