@@ -475,7 +475,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 
                 if(!empty($new_author_latex_macro_definitions))
                 {
-                    $new_author_latex_macro_definitions_without_specials = remove_special_macros_to_ignore_in_bbl($new_author_latex_macro_definitions);
+                    $new_author_latex_macro_definitions_without_specials = O3PO_Latex::remove_special_macros_to_ignore_in_bbl($new_author_latex_macro_definitions);
 
                     $bbl = O3PO_Latex::expand_latex_macros($new_author_latex_macro_definitions_without_specials, $bbl);
                 }
