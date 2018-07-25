@@ -514,11 +514,13 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             return "WARNING: Adding meta-data to pdfs only works if PHP is not in safe mode"; // See below for why.
         if(php_uname('s')!=='Linux')
             return "WARNING: Adding meta-data to pdfs is currently only supported on Linux";
-        $whereis = exec('whereis -b exiftool 2>&1');
+        $exiftool_command_name = 'exiftool';
+        $exiftool_in_path = exec('command -v ' . $exiftool_command_name . ' 2>&1 > /dev/null; echo $?');
+
         $exiftool_not_found_message = "ERROR: Adding meta-data to pdfs requires the external programm exiftool but the exiftool binary was not found.";
-        if($whereis===null)
+        if($exiftool_in_path !== '0')
             return $exiftool_not_found_message;
-        $exiftool_binary_path = preg_replace('#^exiftool: (.*)#', '\1', $whereis);
+        $exiftool_binary_path = exec('which ' . $exiftool_command_name);
         if($exiftool_binary_path===null)
             return $exiftool_not_found_message;
 
