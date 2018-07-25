@@ -5,7 +5,7 @@
  *
  * Here we define fake version of the WordPress functions
  * the plugin calls.
- */ 
+ */
 
 function plugin_dir_path($path) {
 
@@ -14,7 +14,7 @@ function plugin_dir_path($path) {
 
 function wp_upload_dir( $time = null, $create_dir = true, $refresh_cache = false) {
     $basedir = dirname(__FILE__) . '/tmp/uploads';
-        
+
     return array(
         'basedir' => $basedir,
         'baseurl' => 'http://foo/' . $basedir,
@@ -24,7 +24,7 @@ function wp_upload_dir( $time = null, $create_dir = true, $refresh_cache = false
 $hooks = array();
 function add_action( $hook, $callable ) {
     global $hooks;
-    
+
     if(!isset($hooks[$hook]))
         $hooks[$hook] = array();
     $hooks[$hook][] = $callable;
@@ -46,7 +46,7 @@ function trigger_hook( $hook ) {
 $filteres = array();
 function add_filter( $hook, $callable ) {
     global $filters;
-    
+
     if(!isset($filters[$hook]))
         $filters[$hook] = array();
     $filters[$hook][] = $callable;
@@ -115,11 +115,11 @@ function get_option( $option, $default = false ) {
                      );
     else
         throw(new Exception("We don't know how to fake the option " . $option . "."));
-    
+
 }
 
 function get_file_data( $file, $options ) {
-    
+
     $file_contents = file_get_contents($file);
 
     $matches = array();
@@ -128,11 +128,13 @@ function get_file_data( $file, $options ) {
         preg_match('#\s*\\*\s*' . $option . ':\s*(.*)#', $file_contents, $match);
         $matches[$option] = $match[1];
     }
-    
+
     return $matches;
 }
 
 function flush_rewrite_rules( $hard=false ) {}
+
+$post_data = array();
 
 $posts = array(
     1 => array(
@@ -144,7 +146,8 @@ $posts = array(
             'paper_abstract_mathml' => 'This is a test abstract that contains not math so far and no special characters.',
             'paper_eprint' => '0908.2921v2',
             'paper_eprint_was_changed_on_last_save' => false,
-            'paper_arxiv_pdf_attach_ids' => array(4),
+//            'paper_arxiv_pdf_attach_ids' => array(4),
+            'paper_arxiv_pdf_attach_ids' => array(),
             'paper_popular_summary' => 'Some random fake summary.',
             'paper_feature_image_caption' => 'Some random fake cation.',
             'paper_fermats_library' => '',
@@ -159,19 +162,19 @@ $posts = array(
             'paper_fermats_library_permalink' => 'fake_paper_fermats_library_permalink',
             'paper_fermats_library_permalink_worked' => 'fake_paper_fermats_library_permalink_worked',
             'paper_fermats_library_has_been_notifed_date' => 'fake_paper_fermats_library_has_been_notifed_date',
-            'paper_number_authors' => 'fake_paper_number_authors',
-            'paper_author_given_names' => 'fake_paper_author_given_names',
-            'paper_author_surnames' => 'fake_paper_author_surnames',
-            'paper_author_name_styles' => 'fake_paper_author_name_styles',
-            'paper_author_affiliations' => 'fake_paper_author_affiliations',
-            'paper_author_orcids' => 'fake_paper_author_orcids',
-            'paper_author_urls' => 'fake_paper_author_urls',
-            'paper_number_affiliations' => 'fake_paper_number_affiliations',
-            'paper_affiliations' => 'fake_paper_affiliations',
+            'paper_number_authors' => 2,
+            'paper_author_given_names' => ['Foo', 'Baz'],
+            'paper_author_surnames' => ['Bar', 'Boo'],
+            'paper_author_name_styles' => ["western", "western"],
+            'paper_author_affiliations' => ['1,2','2'],
+            'paper_author_orcids' => ['',''],
+            'paper_author_urls' => ['',''],
+            'paper_number_affiliations' => 2,
+            'paper_affiliations' => ['Foo University', 'Bar Institut'],
             'paper_date_published' => 'fake_paper_date_published',
             'paper_journal' => 'fake_paper_journal',
             'paper_volume' => 'fake_paper_volume',
-            'paper_pages' => 'fake_paper_pages',
+            'paper_pages' => '1',
             'paper_doi_prefix' => 'fake_paper_doi_prefix',
             'paper_doi_suffix' => 'fake_paper_doi_suffix',
             'paper_bbl' => 'fake_paper_bbl',
@@ -182,15 +185,14 @@ $posts = array(
             'paper_doaj_response' => 'fake_paper_doaj_response',
             'paper_arxiv_fetch_results' => 'fake_paper_arxiv_fetch_results',
             'paper_arxiv_source_attach_ids' => array(),
+            'paper_doi_suffix_was_changed_on_last_save' => false,
                         ),
                ),
     2 => array(
         'post_type' => 'attachment',
         'attachment_image_src' => 'fake_attachment_image_src',
         'thumbnail_id' => 3,
-        'meta' => array(
-            
-                        ),
+        'meta' => array(),
                ),
     3 => array(
         'post_type' => 'attachment',
@@ -199,6 +201,7 @@ $posts = array(
     4 => array(
         'post_type' => 'attachment',
         'attachment_url' => 'fake_attachment_url',
+        'attachment_path' => 'fake_attachment_path',
                ),
                );
 
@@ -207,13 +210,13 @@ function get_post_type( $post_id ) {
 
     if(!isset($posts[$post_id]['post_type']))
         throw new Exception("Post with id=" . $post_id . " has no post_type.");
-    
+
     return $posts[$post_id]['post_type'];
 }
-        
+
 function get_post_meta( $post_id, $key, $single = false ) {
     global $posts;
-    
+
     if(!isset($posts[$post_id]))
         throw new Exception("No post with id=" . $post_id);
     if(!isset($posts[$post_id]['meta']))
@@ -224,20 +227,93 @@ function get_post_meta( $post_id, $key, $single = false ) {
        echo("\nPost with id=" . $post_id . " has no meta-data for key=" . $key . "\n");
        return "fake!";
     }
-    
-    
+
+
     return $posts[$post_id]['meta'][$key];
 }
 
 function wp_nonce_field( $action, $name, $referer=true, $echo=true ) {}
 
-class WP_Post 
+class WP_Error
+{
+    private $code;
+    private $message;
+    private $data;
+
+    function __construct( $code = '', $message = '', $data = '' ) {
+        $this->code = $code;
+        $this->message = $message;
+        $this->data = $data;
+    }
+
+    function get_error_message() {
+        return $this->message;
+    }
+}
+
+class WP_Post
 {
     public function __construct( $post_id ) {
         $this->ID = $post_id;
     }
-    
+
     public $ID;
+}
+
+class WP_Query
+{
+    private $posts;
+
+    function __construct( $array ) {
+        global $posts;
+
+        $this->posts = array();
+        foreach($posts as $id => $post)
+        {
+            $include_post = true;
+            foreach($array as $key => $value)
+            {
+                if(!is_array($value))
+                    $value = array($value);
+
+                if(!isset($posts[$id][$key]) or !in_array ($posts[$id][$key], $value))
+                {
+                    $include_post = false;
+                    break;
+                }
+            }
+            if($include_post)
+                $this->posts[$id] = $post;
+        }
+    }
+
+    function have_posts() {
+        return count($this->posts) > 0;
+    }
+
+    function the_post() {
+        global $post_data;
+
+        if(empty($this->posts))
+        {
+            $post_data = array();
+            return;
+        }
+
+        $keys = array_keys($this->posts);
+        $min_key = min($keys);
+
+        $current = $this->posts[$min_key];
+        array_shift($this->posts);
+
+        $post_data = array('current' => $current, 'ID' => $min_key);
+    }
+}
+
+function get_the_ID() {
+    global $post_data;
+
+    return $post_data['ID'];
 }
 
 function get_post_thumbnail_id( $post_id ) {
@@ -245,8 +321,8 @@ function get_post_thumbnail_id( $post_id ) {
 
     if(!isset($posts[$post_id]['thumbnail_id']))
         throw new Exception("Post with id=" . $post_id . " has no thumbnail_id.");
-    
-    return $posts[$post_id]['thumbnail_id'];    
+
+    return $posts[$post_id]['thumbnail_id'];
 }
 
 function wp_get_attachment_image_src( $post_id ) {
@@ -254,7 +330,7 @@ function wp_get_attachment_image_src( $post_id ) {
 
     if(!isset($posts[$post_id]['attachment_image_src']))
         throw new Exception("Post with id=" . $post_id . " has no attachment_image_src.");
-    
+
     return $posts[$post_id]['attachment_image_src'];
 }
 
@@ -262,25 +338,25 @@ function get_post_status( $ID = '' ) {
     global $posts;
 
     $post_id = $ID;
-    
+
     if(!isset($posts[$post_id]['post_status']))
         throw new Exception("Post with id=" . $post_id . " has no post_status.");
-    
+
     return $posts[$post_id]['post_status'];
 }
 
 function esc_html( $text ) {
-    
+
     return '(esc_html does nothing useful in the bootstaped fake WordPress)' . $text;
 }
 
 function esc_attr__( $text ) {
-    
+
     return '(esc_attr__ does nothing useful in the bootstaped fake WordPress)' . $text;
 }
 
 function esc_attr( $text ) {
-    
+
     return '(esc_attr does nothing useful in the bootstaped fake WordPress)' . $text;
 }
 
@@ -288,9 +364,115 @@ function wp_get_attachment_url($id) {
     global $posts;
 
     $post_id = $id;
-    
+
     if(!isset($posts[$post_id]['attachment_url']))
         throw new Exception("Post with id=" . $post_id . " has no attachment_url.");
-    
+
     return $posts[$post_id]['attachment_url'];
+}
+
+
+function term_exists() {
+    return 0;
+}
+
+function wp_insert_term() {}
+
+function wp_set_post_terms() {}
+
+function current_time( $format ) {
+    return date($format);
+}
+
+function get_the_date( $format, $post_id ) {
+    return current_time( $format );
+}
+
+function download_url( $url, $timeout_seconds ) {
+//    $tmpfile = ABSPATH . 'tmp/tmpfile';
+    $tmpfile = tempnam( ABSPATH . 'tmp/', 'download' );
+    if(!file_exists(dirname($tmpfile)))
+        mkdir(dirname($tmpfile));
+    try {
+        file_put_contents($tmpfile, fopen($url, 'r'));
+        return $tmpfile;
+    } catch(Exception $e) {
+        return new WP_Error($e->getCode(), $e->getMessage());
+    }
+}
+
+function is_wp_error( $object ) {
+
+    return is_object($object) ? get_class($object) == 'WP_Error' : false;
+}
+
+function wp_handle_sideload( $file, $overrides ) {
+    $oldname = $file['tmp_name'];
+
+    if(!file_exists($oldname))
+        return array('error' => 'The file ' . $oldname . 'does not exist.');
+
+    $newname = dirname($file['tmp_name']) . '/' . $file['name'];
+    if(strpos($newname, ABSPATH) === false)
+        throw new Exception('Target file ' . $newname . ' path would be ouside of ABSPATH ' . ABSPATH . '. Aborting for security reasons.');
+    rename($oldname, $newname);
+
+    return array('file' => $newname );
+}
+
+function wp_insert_attachment( $attachment, $filepath, $parent_post_id ) {
+
+    if(!file_exists(dirname($filepath)))
+        throw new Exception('The file ' . $filepath . 'does not exist.');
+
+    global $posts;
+
+    $post_status = $attachment['post_status'];
+
+    if($post_status === 'inherit')
+        $post_status = $posts[$parent_post_id]['post_status'];
+
+    $posts[] = array (
+        'post_type' => 'attachment',
+        'guid' => $attachment['guid'],
+        'post_mime_type' => $attachment['post_mime_type'],
+
+        'post_title' => $attachment['post_title'],
+        'post_content' => $attachment['post_content'],
+        'post_status' => $post_status,
+    );
+
+    return max(array_keys($posts));
+}
+
+function wp_generate_attachment_metadata($attach_id, $filename) {
+    global $posts;
+
+    $posts[$attach_id]['attachment_path'] = $filename;
+}
+function wp_update_attachment_metadata() {}
+
+function get_attached_file( $id ) {
+    global $posts;
+
+    return $posts[$id]["attachment_path"];
+}
+
+function wp_update_post( $array ) {
+    global $posts;
+
+    foreach($array as $key => $value)
+    {
+        if($key === 'ID')
+            continue;
+
+        $posts[$array['ID']][$key] = $value;
+    }
+
+}
+
+function wp_reset_postdata() {
+    global $post_data;
+
+    $post_data = array();
 }
