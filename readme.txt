@@ -1,6 +1,8 @@
 # O-3PO
 
-[![Build Status](https://travis-ci.org/quantum-journal/o3po.svg?branch=master)](https://travis-ci.org/quantum-journal/o3po) [![codecov](https://codecov.io/gh/quantum-journal/o3po/branch/master/graph/badge.svg)](https://codecov.io/gh/quantum-journal/o3po)
+[![Build Status](https://travis-ci.org/quantum-journal/o3po.svg?branch=master)](https://travis-ci.org/quantum-journal/o3po) [![codecov](https://codecov.io/gh/quantum-journal/o3po/branch/master/graph/badge.svg)](https://codecov.io/gh/quantum-journal/o3po) [![GitHub license](https://img.shields.io/github/license/quantum-journal/o3po.svg)](https://github.com/quantum-journal/o3po/blob/master/license.txt)
+
+
 
 * Contributors: cgogolin
 * Donate link: https://quantum-journal.org/donate/
@@ -54,13 +56,13 @@ The documentation can be build locally by running `make docs`.
 ## Bugs, limitations, and to do
 
 * Extend this readme (explain onepress-extra.css, ...)
-* Turn local tests into PHPUnit tests and add to repository 
+* Turn local tests into PHPUnit tests and add to repository
 * Move div.important-box from the plugin css to the theme
 * Fix for special code execution
 * Move fix_custom_logo_html into separate plug-in
-* Make single-paper.php theme independent 
+* Make single-paper.php theme independent
 * Make handle_volumes_endpoint_request() theme independent
-* Disable the fall-back loading of options from the `quantum-journal-plugin` context. 
+* Disable the fall-back loading of options from the `quantum-journal-plugin` context.
 
 ## Frequently Asked Questions
 
