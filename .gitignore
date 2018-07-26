@@ -4,3 +4,5 @@ test-supload
 phpunit-*.phar
 coverage.xml
 tests/resources/arxiv/0809.2542v4.pdf_original
+coverage-html/*
+tests/resources/tmp/*
