@@ -303,28 +303,46 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     public function save_meta_data_provider() {
 
         return [
-            [1, array(
-                    '_title' => '',
-                    '_title_mathml' => '',
-                    '_number_authors' => 2,
-                    '_author_given_names' => '',
-                    '_author_surnames' => '',
-                    '_author_name_styles' => '',
-                    '_author_affiliations' => '',
-                    '_author_orcids' => '',
-                    '_author_urls' => '',
-                    '_number_affiliations' => '',
-                    '_affiliations' => '',
-                    '_date_published' => '',
-                    '_journal' => '',
-                    '_volume' => '',
-                    '_pages' => '',
-                    '_corresponding_author_email' => '',
-                    '_buffer_email' => '',
-                    '_buffer_special_text' => '',
-                    '_bbl' => '',
-
-            )],
+            [1,
+             array(
+                 '_title' => 'a',
+                 '_title_mathml' => 'b',
+                 '_number_authors' => 2,
+                 '_author_given_names' => array('c', 'd'),
+                 '_author_surnames' => array('e', 'f'),
+                 '_author_name_styles' => array('g', 'h'),
+                 '_author_affiliations' => array('1', '1'),
+                 '_author_orcids' => array('k', 'l'),
+                 '_author_urls' => array('m', 'n'),
+                 '_number_affiliations' => 1,
+                 '_affiliations' => array('o'),
+                 '_date_published' => 'p',
+                 '_journal' => 'q',
+                 '_volume' => 'r',
+                 '_pages' => 's',
+                 '_corresponding_author_email' => 't',
+                 '_buffer_email' => 'u',
+                 '_buffer_special_text' => 'v',
+                 '_bbl' => 'w',
+                   ),
+             array(),
+             ],
+            [5,
+             array(
+                 '_eprint' => '0809.2542v4',
+                 '_number_authors' => 4,
+                 '_fetch_metadata_from_arxiv' => 'checked',
+                   ),
+             array('#WARNING: It seems like 0809.2542v4 is not published under a creative commons license on the arXiv\.#'),
+             ],
+            [8,
+             array(
+                 '_eprint' => '1609.09584v4',
+                 '_number_authors' => 4,
+                 '_fetch_metadata_from_arxiv' => 'checked',
+                   ),
+             array('#SUCCESS: Fetched metadata from https://arxiv.org/abs/1609\.09584v4#'),
+             ],
                 ];
     }
 
@@ -333,7 +351,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          * @dataProvider save_meta_data_provider
          * @depends test_create_primary_publication_type
          */
-    public function test_save_meta_data( $post_id, $POST_args, $primary_publication_type ) {
+    public function test_save_meta_data( $post_id, $POST_args, $expections, $primary_publication_type ) {
         $post_type = get_post_type($post_id);
 
 
@@ -351,5 +369,21 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $method = $class->getMethod('save_meta_data');
         $method->setAccessible(true);
         $method->invokeArgs($primary_publication_type, array($post_id));
+
+
+        if(!empty($POST_args['_fetch_metadata_from_arxiv']))
+        {
+                //print( "\n fetch_results: " . get_post_meta( $post_id, $post_type . '_arxiv_fetch_results', true) . "\n" );
+
+            foreach($expections as $expection)
+            {
+                $this->assertRegexp($expection, get_post_meta( $post_id, $post_type . '_arxiv_fetch_results', true));
+            }
+        }
+        else
+        {
+            foreach($POST_args as $key => $value)
+                $this->assertSame($value, get_post_meta( $post_id, $post_type . $key, true), 'Property ' . $post_type . $key . ' was not set correctly.');
+        }
     }
 }

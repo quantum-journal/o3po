@@ -651,3 +651,17 @@ function sanitize_text_field( $string ) {
 
     return $string;
 }
+
+function wp_remote_get( $url, $args ) {
+        //return http_get( $url, $args );
+
+    $special_urls = array(
+        'https://arxiv.org/abs/0809.2542v4' => dirname(__FILE__) . '/arxiv/0809.2542v4.html',
+        'https://arxiv.org/abs/1609.09584v4' => dirname(__FILE__) . '/arxiv/1609.09584v4.html',
+                          );
+
+    if(!empty($special_urls[$url]))
+        return array('headers'=>'' ,'body'=> file_get_contents($special_urls[$url]) );
+    else
+        throw new Exception('Fake wp_remote_get() does not know hot to handle ' . $url);
+}
