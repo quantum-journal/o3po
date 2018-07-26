@@ -154,10 +154,8 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 
 				$arxiv_titles = $x_path->query("/html/body//h1[contains(@class, 'title')]/text()[last()]");
 
-                print('class=' . get_class($arxiv_titles) );
-
-                if( !empty($arxiv_titles[0]))
-                    $arxiv_title_text = preg_replace("/[\r\n\s]+/", " ", trim( $arxiv_titles[0]->nodeValue ) );
+                if( !empty($arxiv_titles->item(0)->nodeValue))
+                    $arxiv_title_text = preg_replace("/[\r\n\s]+/", " ", trim( $arxiv_titles->item(0)->nodeValue ) );
 				if ( !empty($arxiv_title_text) ) {
 					$new_title = addslashes( O3PO_Latex::latex_to_utf8_outside_math_mode($arxiv_title_text) );
                     update_post_meta( $post_id, $post_type . '_title', $new_title );
