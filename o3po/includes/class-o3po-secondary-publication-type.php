@@ -226,10 +226,12 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         $validation_result .= parent::validate_and_process_data($post_id);
 
         if ( empty( $number_target_dois ) && $number_target_dois !== '0' ) $validation_result .= "ERROR: Number of target DOIs is empty.\n";
+
+        $settings = O3PO_Settings::instance();
         for ($x = 0; $x < $number_target_dois; $x++) {
             if ( empty( $target_dois[$x] ) )
                 $validation_result .= "WARNING: Target DOI " . ($x+1) . " is empty.\n" ;
-            else if( substr($target_dois[$x], 0, 8) !== get_plugin_option('doi_prefix') )
+            else if( substr($target_dois[$x], 0, 8) !== $settings->get_plugin_option('doi_prefix') )
                 $validation_result .= "WARNING: Target DOI " . ($x+1) . " does not point to a paper of this publisher or it contains a prefix such as https://dx.doi.org/, which it shouldn't. Pleae check the DOI.\n" ;
         }
 
@@ -262,7 +264,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 		$post_url = get_permalink( $post_id );
 
             // Send Emails about the submission to us
-        $to = ($environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email'));
+        $to = ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email'));
         $headers = array( 'From: ' . $this->get_journal_property('publisher_email'));
         $subject  = ($this->environment->is_test_environment() ? 'TEST ' : '') . 'A ' . strtolower($type) . ' has been published/updated by ' . $journal;
         $message  = ($this->environment->is_test_environment() ? 'TEST ' : '') . $journal . " has published/updated the following " . strtolower($type) . ":\n\n";
@@ -409,7 +411,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 
         $type = get_post_meta( $post_id, $post_type . '_type', true );
         echo '	<tr>';
-		echo '		<th><label for="' . $post_type . '_type" class="' . $post_type . '_type_label">' . __( 'Type', 'qj-plugin' ) . '</label></th>';
+		echo '		<th><label for="' . $post_type . '_type" class="' . $post_type . '_type_label">' . 'Type' . '</label></th>';
 		echo '		<td>';
         echo '			<div style="float:left"><select name="' . $post_type . '_type">';
         foreach(static::get_associated_categories() as $current_type)
@@ -438,14 +440,14 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
             $number_target_dois = 1;
 
         echo '	<tr>';
-        echo '		<th><label for="' . $post_type . '_number_target_dois" class="' . $post_type . '_number_target_dois_label">' . __( 'Number of target dois', 'qj-plugin' ) . '</label></th>';
+        echo '		<th><label for="' . $post_type . '_number_target_dois" class="' . $post_type . '_number_target_dois_label">' . 'Number of target dois' . '</label></th>';
 		echo '		<td>';
 		echo '			<input style="width:4rem" type="number" id="' . $post_type . '_number_target_dois" name="' . $post_type . '_number_target_dois" class="' . $post_type . '_number_target_dois_field required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( $number_target_dois ) . '"><p>(Please put here the total number of other DOIs this ' . $this->get_publication_type_name() . ' is on. To update the number of fields below, please save the post.)</p>';
 		echo '		</td>';
 		echo '	</tr>';
 		for ($x = 0; $x < $number_target_dois; $x++) {
 			echo '	<tr>';
-			echo '		<th><label for="' . $post_type . '_target_doi" class="' . $post_type . '_target_doi_label">' . __( "Target doi " . ($x+1) , 'qj-plugin' ) . '</label></th>';
+			echo '		<th><label for="' . $post_type . '_target_doi" class="' . $post_type . '_target_doi_label">' . "Target doi " . ($x+1) . '</label></th>';
 			echo '		<td>';
 			echo '			<input type="text" name="' . $post_type . '_target_dois[]" class="' . $post_type . '_target_dois required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( isset($target_dois[$x]) ? $target_dois[$x] : '' ) . '" />';
 
@@ -470,7 +472,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 		if( empty( $reviewers_summary ) ) $reviewers_summary = '' ;
 
         echo '	<tr>';
-		echo '		<th><label for="' . $post_type . '_reviewers_summary" class="' . $post_type . '_reviewers_summary_label">' . __( 'Reviewers summary', 'qj-plugin' ) . '</label></th>';
+		echo '		<th><label for="' . $post_type . '_reviewers_summary" class="' . $post_type . '_reviewers_summary_label">' . 'Reviewers summary' . '</label></th>';
 		echo '		<td>';
 		echo '			<textarea rows="6" style="width:100%;" name="' . $post_type . '_reviewers_summary" id="' . $post_type . '_reviewers_summary">' . esc_attr__( $reviewers_summary ) . '</textarea><p>(Summary of the reviewers.)</p>';
 		echo '		</td>';
@@ -508,7 +510,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         if( empty( $reviewer_grades ) ) $reviewer_grades = array();
 
         echo '	<tr>';
-		echo '		<th><label for="' . $post_type . '_number_reviewers" class="' . $post_type . '_number_reviewers_label">' . __( 'Number of reviewers', 'qj-plugin' ) . '</label></th>';
+		echo '		<th><label for="' . $post_type . '_number_reviewers" class="' . $post_type . '_number_reviewers_label">' . 'Number of reviewers' . '</label></th>';
 		echo '		<td>';
 		echo '			<input style="width:4rem" type="number" id="' . $post_type . '_number_reviewers" name="' . $post_type . '_number_reviewers" class="' . $post_type . '_number_reviewers_field required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( $number_reviewers ) . '"><p>(Please put here the actual number of reviewers. To update the number of entries in the list below please save the post. Give affiliations as a comma separated list referring to the affiliations below, e.g., 1,2,5,7. As with the title, special characters are allowed and must be entered as í or é and so on.)</p>';
 		echo '		</td>';
@@ -517,7 +519,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 		for ($x = 0; $x < $number_reviewers; $x++) {
 			$y = $x+1;
 			echo '	<tr>';
-			echo '		<th><label for="' . $post_type . '_reviewer" class="' . $post_type . '_reviewer_label">' . __( "Reviewer  $y", 'qj-plugin' ) . '</label></th>';
+			echo '		<th><label for="' . $post_type . '_reviewer" class="' . $post_type . '_reviewer_label">' . "Reviewer  $y" . '</label></th>';
 			echo '		<td>';
 			echo '			<div style="float:left"><input type="text" name="' . $post_type . '_reviewer_given_names[]" class="' . $post_type . '_reviewer_given_names_field" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( isset($reviewer_given_names[$x]) ? $reviewer_given_names[$x] : '' ) . '" /><br /><label for="' . $post_type . '_reviewer_given_names" class="' . $post_type . '_reviewer_given_names_label">Given name</label></div>';
 			echo '			<div style="float:left"><input type="text" name="' . $post_type . '_reviewer_surnames[]" class="' . $post_type . '_reviewer_surnames_field required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( isset($reviewer_surnames[$x]) ? $reviewer_surnames[$x] : '' ) . '" /><br /><label for="' . $post_type . '_reviewer_surnames" class="' . $post_type . '_reviewer_surnames_label">Surname</label></div>';
@@ -553,7 +555,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 		if( empty( $reviewer_institutions ) ) $reviewer_institutions = array();
 
 		echo '	<tr>';
-		echo '		<th><label for="' . $post_type . '_number_reviewer_institutions" class="' . $post_type . '_number_reviewer_institutions_label">' . __( 'Number of reviewer institutions', 'qj-plugin' ) . '</label></th>';
+		echo '		<th><label for="' . $post_type . '_number_reviewer_institutions" class="' . $post_type . '_number_reviewer_institutions_label">' . 'Number of reviewer institutions' . '</label></th>';
 		echo '		<td>';
 		echo '			<input style="width:4rem" type="number" id="' . $post_type . '_number_reviewer_institutions" name="' . $post_type . '_number_reviewer_institutions" class="' . $post_type . '_number_reviewer_institutions_field required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( $number_reviewer_institutions ) . '"><p>(Please put here the total number of reviewer institutions. To update the number of Reviewer instition fields save the post.)</p>';
 		echo '		</td>';
@@ -561,7 +563,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 		for ($x = 0; $x < $number_reviewer_institutions; $x++) {
 			$y = $x+1;
 			echo '	<tr>';
-			echo '		<th><label for="' . $post_type . '_reviewer_institutions" class="' . $post_type . '_reviewer_institutions_label">' . __( "Reviewer institution  $y", 'qj-plugin' ) . '</label></th>';
+			echo '		<th><label for="' . $post_type . '_reviewer_institutions" class="' . $post_type . '_reviewer_institutions_label">' . "Reviewer institution  $y" . '</label></th>';
 			echo '		<td>';
 			echo '			<input style="width:100%" type="text" name="' . $post_type . '_reviewer_institutions[]" class="' . $post_type . '_reviewer_institutions required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( isset($reviewer_institutions[$x]) ? $reviewer_institutions[$x] : '' ) . '" />';
 
@@ -589,7 +591,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 		if( empty( $about_the_author ) ) $about_the_author = '' ;
 
         echo '	<tr>';
-		echo '		<th><label for="' . $post_type . '_author_commentary" class="' . $post_type . '_author_commentary_label">' . __( 'Author commentary', 'qj-plugin' ) . '</label></th>';
+		echo '		<th><label for="' . $post_type . '_author_commentary" class="' . $post_type . '_author_commentary_label">' . 'Author commentary' . '</label></th>';
 		echo '		<td>';
 		echo '			<textarea rows="6" style="width:100%;" name="' . $post_type . '_author_commentary" id="' . $post_type . '_author_commentary">' . esc_attr__( $author_commentary ) . '</textarea><p>(Commentary of the author(s).)</p>';
 
