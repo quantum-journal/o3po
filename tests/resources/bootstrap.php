@@ -7,6 +7,19 @@
  * the plugin calls.
  */
 
+if(!class_exists('PHPUnit_Framework_TestCase')){
+        /**
+         * Make sure the class PHPUnit_Framework_TestCase is always defined
+         *
+         * Different versions of PHPUnit call the base test class differently.
+         */
+    class PHPUnit_Framework_TestCase extends PHPUnit\Framework\TestCase
+    {
+
+    }
+}
+
+
 function plugin_dir_path($path) {
 
     return dirname($path) . '/';
