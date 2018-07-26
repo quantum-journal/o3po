@@ -7,6 +7,19 @@
  * the plugin calls.
  */
 
+if(!class_exists('PHPUnit_Framework_TestCase')){
+        /**
+         * Make sure the class PHPUnit_Framework_TestCase is always defined
+         *
+         * Different versions of PHPUnit call the base test class differently.
+         */
+    class PHPUnit_Framework_TestCase extends PHPUnit\Framework\TestCase
+    {
+
+    }
+}
+
+
 function plugin_dir_path($path) {
 
     return dirname($path) . '/';
@@ -111,7 +124,7 @@ function get_option( $option, $default = false ) {
             'doi_prefix' => 'fake_doi_prefix',
             'eissn' => 'fake_eissn',
             'secondary_journal_eissn' => "fake_secondary_journal_eissn",
-            'first_volume_year' => "fake_first_volume_year",
+            'first_volume_year' => "2009",
                      );
     else
         throw(new Exception("We don't know how to fake the option " . $option . "."));
@@ -139,9 +152,11 @@ $post_data = array();
 $posts = array(
     1 => array(
         'post_type' => 'paper',
+        'paper_nonce' => 'fake_nonce',
         'thumbnail_id' => 2,
         'post_status' => 'private',
         'post_title' => 'Fake title',
+        'permalink' => 'Fake permalink',
         'meta' => array(
             'paper_abstract' => 'This is a test abstract that contains not math so far and no special characters.',
             'paper_abstract_mathml' => 'This is a test abstract that contains not math so far and no special characters.',
@@ -151,18 +166,18 @@ $posts = array(
             'paper_arxiv_pdf_attach_ids' => array(),
             'paper_popular_summary' => 'Some random fake summary.',
             'paper_feature_image_caption' => 'Some random fake cation.',
-            'paper_fermats_library' => '',
+            'paper_fermats_library' => 'checked',
             'paper_validation_result' => 'fake_validation_result',
             'paper_title' => 'Fake title',
             'paper_title_mathml' => 'Fake title',
             'paper_corresponding_author_email' => 'mal_formed_corresponding_author_email',
-            'paper_corresponding_author_has_been_notifed_date' => 'fake_paper_corresponding_author_has_been_notifed_date',
+            'paper_corresponding_author_has_been_notifed_date' => '',
             'paper_buffer_email' => 'fake_paper_buffer_email',
-            'paper_buffer_email_was_sent_date' => 'fake_paper_buffer_email_was_sent_date',
+            'paper_buffer_email_was_sent_date' => '',
             'paper_buffer_special_text' => 'fake_paper_buffer_special_text',
             'paper_fermats_library_permalink' => 'fake_paper_fermats_library_permalink',
             'paper_fermats_library_permalink_worked' => 'fake_paper_fermats_library_permalink_worked',
-            'paper_fermats_library_has_been_notifed_date' => 'fake_paper_fermats_library_has_been_notifed_date',
+            'paper_fermats_library_has_been_notifed_date' => '',
             'paper_number_authors' => 2,
             'paper_author_given_names' => ['Foo', 'Baz'],
             'paper_author_surnames' => ['Bar', 'Boo'],
@@ -172,9 +187,9 @@ $posts = array(
             'paper_author_urls' => ['',''],
             'paper_number_affiliations' => 2,
             'paper_affiliations' => ['Foo University', 'Bar Institut'],
-            'paper_date_published' => 'fake_paper_date_published',
+            'paper_date_published' => '',
             'paper_journal' => 'fake_paper_journal',
-            'paper_volume' => 'fake_paper_volume',
+            'paper_volume' => '1',
             'paper_pages' => '1',
             'paper_doi_prefix' => 'fake_paper_doi_prefix',
             'paper_doi_suffix' => 'fake_paper_doi_suffix',
@@ -193,11 +208,14 @@ $posts = array(
         'post_type' => 'attachment',
         'attachment_image_src' => 'fake_attachment_image_src',
         'thumbnail_id' => 3,
+        'attachment_url' => "Fake attachment_url",
         'meta' => array(),
                ),
     3 => array(
         'post_type' => 'attachment',
         'attachment_image_src' => 'fake_attachment_image_src',
+        'attachment_url' => "Fake attachment_url",
+        'attachment_path' => dirname(__FILE__) . '/arxiv/0809.2542v4.pdf',
                ),
     4 => array(
         'post_type' => 'attachment',
@@ -206,16 +224,17 @@ $posts = array(
                ),
     5 => array(
         'post_type' => 'paper',
+        'paper_nonce' => 'fake_nonce',
         'thumbnail_id' => 2,
         'post_status' => 'private',
         'post_title' => 'Fake title 2',
+        'permalink' => 'Fake permalink',
         'meta' => array(
             'paper_abstract' => 'This is a test abstract 2 that contains not math so far and no special characters.',
             'paper_abstract_mathml' => 'This is a test abstract 2 that contains not math so far and no special characters.',
             'paper_eprint' => '0809.2542v4',
             'paper_eprint_was_changed_on_last_save' => false,
-//            'paper_arxiv_pdf_attach_ids' => array(4),
-            'paper_arxiv_pdf_attach_ids' => array(6),
+            'paper_arxiv_pdf_attach_ids' => array(),
             'paper_popular_summary' => 'Some random fake summary.',
             'paper_feature_image_caption' => 'Some random fake cation.',
             'paper_fermats_library' => '',
@@ -223,13 +242,13 @@ $posts = array(
             'paper_title' => 'Fake title 2',
             'paper_title_mathml' => 'Fake title 2',
             'paper_corresponding_author_email' => 'validemail@quantum-journal.org',
-            'paper_corresponding_author_has_been_notifed_date' => 'fake_paper_corresponding_author_has_been_notifed_date',
+            'paper_corresponding_author_has_been_notifed_date' => '',
             'paper_buffer_email' => 'fake_paper_buffer_email',
-            'paper_buffer_email_was_sent_date' => 'fake_paper_buffer_email_was_sent_date',
+            'paper_buffer_email_was_sent_date' => '',
             'paper_buffer_special_text' => 'fake_paper_buffer_special_text',
             'paper_fermats_library_permalink' => 'fake_paper_fermats_library_permalink',
             'paper_fermats_library_permalink_worked' => 'fake_paper_fermats_library_permalink_worked',
-            'paper_fermats_library_has_been_notifed_date' => 'fake_paper_fermats_library_has_been_notifed_date',
+            'paper_fermats_library_has_been_notifed_date' => '',
             'paper_number_authors' => 1,
             'paper_author_given_names' => ['Foo'],
             'paper_author_surnames' => ['Bar'],
@@ -239,9 +258,9 @@ $posts = array(
             'paper_author_urls' => [''],
             'paper_number_affiliations' => 1,
             'paper_affiliations' => ['Foo Institute'],
-            'paper_date_published' => 'fake_paper_date_published',
+            'paper_date_published' => '',
             'paper_journal' => 'fake_paper_journal',
-            'paper_volume' => 'fake_paper_volume',
+            'paper_volume' => '1',
             'paper_pages' => '2',
             'paper_doi_prefix' => 'fake_paper_doi_prefix',
             'paper_doi_suffix' => 'fake_paper_doi_suffix',
@@ -252,7 +271,7 @@ $posts = array(
             'paper_doaj_json' => 'fake_paper_doaj_json',
             'paper_doaj_response' => 'fake_paper_doaj_response',
             'paper_arxiv_fetch_results' => 'fake_paper_arxiv_fetch_results',
-            'paper_arxiv_source_attach_ids' => array(7),
+            'paper_arxiv_source_attach_ids' => array(),
             'paper_doi_suffix_was_changed_on_last_save' => false,
                         )
                ),
@@ -266,6 +285,175 @@ $posts = array(
         'attachment_url' => 'fake_attachment_url',
         'attachment_path' => dirname(__FILE__) . '/arxiv/0809.2542v4.tar.gz',
                ),
+    8 => array(
+        'post_type' => 'paper',
+        'paper_nonce' => 'fake_nonce',
+        'thumbnail_id' => 2,
+        'post_status' => 'publish',
+        'post_title' => 'Fake title',
+        'permalink' => 'Fake permalink',
+        'meta' => array(
+            'paper_abstract' => 'This is a test abstract that contains not math so far and no special characters.',
+            'paper_abstract_mathml' => 'This is a test abstract that contains not math so far and no special characters.',
+            'paper_eprint' => '0908.2921v2',
+            'paper_eprint_was_changed_on_last_save' => false,
+            'paper_arxiv_pdf_attach_ids' => array(3),
+            'paper_popular_summary' => 'Some random fake summary.',
+            'paper_feature_image_caption' => 'Some random fake cation.',
+            'paper_fermats_library' => '',
+            'paper_validation_result' => 'fake_validation_result',
+            'paper_title' => 'Fake title',
+            'paper_title_mathml' => 'Fake title',
+            'paper_corresponding_author_email' => 'mal_formed_corresponding_author_email',
+            'paper_corresponding_author_has_been_notifed_date' => '',
+            'paper_buffer_email' => '',
+            'paper_buffer_email_was_sent_date' => '',
+            'paper_buffer_special_text' => 'fake_paper_buffer_special_text',
+            'paper_fermats_library_permalink' => 'fake_paper_fermats_library_permalink',
+            'paper_fermats_library_permalink_worked' => 'fake_paper_fermats_library_permalink_worked',
+            'paper_fermats_library_has_been_notifed_date' => '',
+            'paper_number_authors' => 2,
+            'paper_author_given_names' => ['Foo', 'Baz'],
+            'paper_author_surnames' => ['Bar', 'Boo'],
+            'paper_author_name_styles' => ["western", "western"],
+            'paper_author_affiliations' => ['1,2','2'],
+            'paper_author_orcids' => ['',''],
+            'paper_author_urls' => ['',''],
+            'paper_number_affiliations' => 2,
+            'paper_affiliations' => ['Foo University', 'Bar Institut'],
+            'paper_date_published' => current_time("Y-m-d"),
+            'paper_journal' => 'fake_paper_journal',
+            'paper_volume' => '2',
+            'paper_pages' => '3',
+            'paper_doi_prefix' => 'fake_paper_doi_prefix',
+            'paper_doi_suffix' => 'fake_journal_level_doi_suffix-' . current_time("Y-m-d") . '-3',
+            'paper_bbl' => 'fake_paper_bbl',
+            'paper_author_latex_macro_definitions' => array(),
+            'paper_crossref_xml' => 'fake_paper_crossref_xml',
+            'paper_crossref_response' => 'fake_paper_crossref_response',
+            'paper_doaj_json' => 'fake_paper_doaj_json',
+            'paper_doaj_response' => 'fake_paper_doaj_response',
+            'paper_arxiv_fetch_results' => 'fake_paper_arxiv_fetch_results',
+            'paper_arxiv_source_attach_ids' => array(4),
+            'paper_doi_suffix_was_changed_on_last_save' => false,
+                        ),
+               ),
+    9 => array(
+        'post_type' => 'view',
+        'paper_nonce' => 'fake_nonce',
+        'thumbnail_id' => 2,
+        'post_status' => 'publish',
+        'post_title' => 'Fake title',
+        'permalink' => 'Fake permalink',
+        'meta' => array(
+            'view_type' => 'Leap',
+            'view_number_target_dois' => '0',
+            'view_title' => 'A leaping title',
+            'view_corresponding_author_email' => 'author@leap.me',
+            'view_buffer_email' => 'checked',
+            'view_number_authors' => '1',
+            'view_number_affiliations' => '1',
+            'view_date_published' => current_time("Y-m-d"),
+            'view_doi_prefix' => 'fake',
+            'view_reviewers_summary' => 'A nice summary.',
+            'view_number_reviewers' => '2',
+            'view_number_reviewer_institutions' => 1,
+            'view_author_commentary' => 'A not so nice reply.',
+            'view_validation_result' => '',
+            'view_target_dois' => array(),
+            'view_title_mathml' => '',
+            'view_corresponding_author_has_been_notifed_date' => '',
+            'view_buffer_email_was_sent_date' => '',
+            'view_author_given_names' => array('Foo'),
+            'view_affiliations' => array('Affiliation'),
+            'view_journal' => '',
+            'view_doi_suffix' => '',
+            'view_reviewer_given_names' => array(),
+            'view_reviewer_institutions' => array(),
+            'view_about_the_author' => 'Some text about the author',
+            'view_buffer_special_text' => 'Special buffer message',
+            'view_author_surnames' => array('Bar'),
+            'view_volume' => '1',
+            'view_reviewer_surnames' => array(),
+            'view_author_name_styles' => array('western', 'western'),
+            'view_pages' => '1',
+            'view_reviewer_name_styles' => array(),
+            'view_author_affiliations' => array(),
+            'view_reviewer_affiliations' => array(),
+            'view_author_orcids' => array('', ''),
+            'view_reviewer_orcids' => array(),
+            'view_author_urls' => array('', ''),
+            'view_reviewer_urls' => array(),
+            'view_reviewer_ages' => array(),
+            'view_reviewer_grades' => array(),
+            'view_bbl' => '',
+            'view_author_latex_macro_definitions' => array(),
+            'view_crossref_xml' => '',
+            'view_crossref_response' => '',
+            'view_doaj_json' => '',
+            'view_doaj_response' => '',
+            'view_doi_suffix_was_changed_on_last_save' => false,
+            'view_abstract' => '',
+                        )
+               ),
+    10 => array(
+        'post_type' => 'view',
+        'paper_nonce' => 'fake_nonce',
+        'thumbnail_id' => 2,
+        'post_status' => 'publish',
+        'post_title' => 'Fake title',
+        'permalink' => 'Fake permalink',
+        'meta' => array(
+            'view_type' => 'Leap',
+            'view_number_target_dois' => '1',
+            'view_title' => 'A leaping title',
+            'view_corresponding_author_email' => 'author@leap.me',
+            'view_buffer_email' => 'checked',
+            'view_number_authors' => '1',
+            'view_number_affiliations' => '1',
+            'view_date_published' => current_time("Y-m-d"),
+            'view_doi_prefix' => 'fake',
+            'view_reviewers_summary' => 'A nice summary.',
+            'view_number_reviewers' => '2',
+            'view_number_reviewer_institutions' => 1,
+            'view_author_commentary' => 'A not so nice reply.',
+            'view_validation_result' => '',
+            'view_target_dois' => array('a-doi-that-does-not-exist'),
+            'view_title_mathml' => '',
+            'view_corresponding_author_has_been_notifed_date' => '',
+            'view_buffer_email_was_sent_date' => '',
+            'view_author_given_names' => array('Baz'),
+            'view_affiliations' => array('Foo Instiute'),
+            'view_journal' => '',
+            'view_doi_suffix' => '',
+            'view_reviewer_given_names' => array(),
+            'view_reviewer_institutions' => array(),
+            'view_about_the_author' => 'Some text about the author',
+            'view_buffer_special_text' => 'Special buffer message',
+            'view_author_surnames' => array('Bazzz'),
+            'view_volume' => '1',
+            'view_reviewer_surnames' => array(),
+            'view_author_name_styles' => array('western'),
+            'view_pages' => '2',
+            'view_reviewer_name_styles' => array(),
+            'view_author_affiliations' => array('1'),
+            'view_reviewer_affiliations' => array(),
+            'view_author_orcids' => array(''),
+            'view_reviewer_orcids' => array(),
+            'view_author_urls' => array('http://www.baz.baz'),
+            'view_reviewer_urls' => array(),
+            'view_reviewer_ages' => array(),
+            'view_reviewer_grades' => array(),
+            'view_bbl' => '',
+            'view_author_latex_macro_definitions' => array(),
+            'view_crossref_xml' => '',
+            'view_crossref_response' => '',
+            'view_doaj_json' => '',
+            'view_doaj_response' => '',
+            'view_doi_suffix_was_changed_on_last_save' => false,
+            'view_abstract' => '',
+                        )
+                ),
                );
 
 function get_post_type( $post_id ) {
@@ -327,8 +515,14 @@ class WP_Query
 {
     private $posts;
 
-    function __construct( $array ) {
+    function __construct( $input ) {
         global $posts;
+
+        if(is_array($input))
+            $array = $input;
+        else
+            $array = array($input);
+
 
         $this->posts = array();
         foreach($posts as $id => $post)
@@ -425,6 +619,11 @@ function esc_attr( $text ) {
     return '(esc_attr does nothing useful in the bootstaped fake WordPress)' . $text;
 }
 
+function esc_url( $text ) {
+
+    return '(esc_url does nothing useful in the bootstaped fake WordPress)' . $text;
+}
+
 function wp_get_attachment_url($id) {
     global $posts;
 
@@ -463,6 +662,8 @@ function download_url( $url, $timeout_seconds ) {
     $special_urls = array(
         'https://arxiv.org/pdf/0908.2921v2' => dirname(__FILE__) . '/arxiv/0908.2921v2.pdf',
         'https://arxiv.org/e-print/0908.2921v2' => dirname(__FILE__) . '/arxiv/0908.2921v2.tex',
+        'https://arxiv.org/pdf/0809.2542v4' => dirname(__FILE__) . '/arxiv/0809.2542v4.pdf',
+        'https://arxiv.org/e-print/0809.2542v4' => dirname(__FILE__) . '/arxiv/0809.2542v4.tar.gz',
     );
     if(!empty($special_urls[$url]))
         copy($special_urls[$url], $tmpfile);
@@ -533,10 +734,13 @@ function wp_update_attachment_metadata( $attach_id, $attach_data ) {
 
 }
 
-function get_attached_file( $id ) {
+function get_attached_file( $post_id ) {
     global $posts;
 
-    return $posts[$id]["attachment_path"];
+    if(!isset($posts[$post_id]['attachment_path']))
+        throw new Exception("Post with id=" . $post_id . " has no attachment_path.");
+
+    return $posts[$post_id]["attachment_path"];
 }
 
 function wp_update_post( $array ) {
@@ -569,3 +773,66 @@ function get_the_title( $post_id ) {
 
     return $posts[$post_id]['post_title'];
 }
+
+function get_permalink( $post_id ) {
+    global $posts;
+
+    return $posts[$post_id]['permalink'];
+}
+
+function wp_mail( $to, $subject, $body, $headers, $attach=null) {
+    return true;
+}
+
+function delete_transient() {}
+
+function sanitize_text_field( $string ) {
+
+    return $string;
+}
+
+function wp_remote_get( $url, $args ) {
+        //return http_get( $url, $args );
+
+    $special_urls = array(
+        'https://arxiv.org/abs/0809.2542v4' => dirname(__FILE__) . '/arxiv/0809.2542v4.html',
+        'https://arxiv.org/abs/1609.09584v4' => dirname(__FILE__) . '/arxiv/1609.09584v4.html',
+        'https://arxiv.org/abs/0908.2921v2' => dirname(__FILE__) . '/arxiv/0908.2921v2.html',
+                          );
+
+    if(!empty($special_urls[$url]))
+        return array('headers'=>'' ,'body'=> file_get_contents($special_urls[$url]) );
+    else
+        throw new Exception('Fake wp_remote_get() does not know how to handle ' . $url);
+}
+
+function wp_verify_nonce() {
+    return true;
+}
+
+function current_user_can() {
+    return true;
+}
+
+function wp_is_post_autosave() {
+    return false;
+}
+
+function wp_is_post_revision() {
+    return false;
+}
+
+function remove_action() {}
+
+function wp_slash( $input ) {
+    return $input;
+}
+
+function wp_generate_password( $length ) {
+    $string = '';
+    for($i=0; $i<$length; $i++)
+        $string .= rand(0, 9); //This is just a face environemnt, so no security concerns
+    return $string;
+}
+
+function wp_remote_post( $url, $args = array() ) {}
