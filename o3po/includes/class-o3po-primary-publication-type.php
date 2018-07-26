@@ -153,6 +153,9 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                     $arxiv_fetch_results .= "ERROR: Failed to fetch author information of ".$new_eprint." from the arXiv.\n";
 
 				$arxiv_titles = $x_path->query("/html/body//h1[contains(@class, 'title')]/text()[last()]");
+
+                print('class=' . get_class($arxiv_titles) );
+
                 if( !empty($arxiv_titles[0]))
                     $arxiv_title_text = preg_replace("/[\r\n\s]+/", " ", trim( $arxiv_titles[0]->nodeValue ) );
 				if ( !empty($arxiv_title_text) ) {
