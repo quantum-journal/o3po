@@ -325,29 +325,31 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 if(isset($args[0]))
                     $entry = substr($entry, strlen($args[0]));
 
-                preg_match('|\\\\doi\s*{([^}]*)}|' , $entry, $doi);
-                if( empty($doi[1]) )
-                    preg_match('|\\\\doibase\s*([^} ]*)}|' , $entry, $doi);
-                if( empty($doi[1]) )
-                    preg_match('|\\\\href\s*{.*doi\.org/([^} ]*)}|' , $entry, $doi);
-                if( empty($doi[1]) )
-                    preg_match('|\\\\path\s*{doi:([^} ]*)}|' , $entry, $doi);
-                if( !empty($doi[1]) )
-                    $citations[$n]['doi'] = str_replace('\\%', '_', str_replace('\\#', '_', str_replace('\\_', '_', $doi[1])));
+			preg_match('#\\\\doi\s*{([^}]*)}#' , $entry, $doi);
+			if( empty($doi[1]) )
+				preg_match('#\\\\doibase\s*([^} ]*)}#' , $entry, $doi);
+			if( empty($doi[1]) )
+				preg_match('#\\\\(?:href|url)\s*{.*doi\.org/([^} ]*)}#' , $entry, $doi);
+			if( empty($doi[1]) )
+				preg_match('#\\\\path\s*{doi:([^} ]*)}#' , $entry, $doi);
+            if( !empty($doi[1]) )
+                $citations[$n]['doi'] = str_replace('\\%', '_', str_replace('\\#', '_', str_replace('\\_', '_', $doi[1]))); //Undo escaping of special characters in LaTeX. TODO: make a method that does that propperly.
+			preg_match('#\\\\(href\s*|Eprint)(@noop|)\s*{.*arxiv\.org/abs/([^}]*)}#' , $entry, $eprint);
+			if( empty($eprint[3]) )
+				preg_match('#(arxiv|arXiv)(:)(/*[a-z*-]*/*[0-9]+\.?[0-9]+v*[0-9]*)#' , $entry, $eprint);
+			if( empty($eprint[3]) )
+				preg_match('#()()(quant-ph/[0-9]+\.?[0-9]+v*[0-9]*)#' , $entry, $eprint);
+            if( !empty($eprint[3]) )
+                $citations[$n]['eprint'] = $eprint[3];
 
-                preg_match('#\\\\(href\s*|Eprint)(@noop|)\s*{.*arxiv\.org/abs/([^}]*)}#' , $entry, $eprint);
-                if( empty($eprint[3]) )
-                    preg_match('#(arxiv|arXiv)(:)(/*[a-z*-]*/*[0-9]+\.?[0-9]+v*[0-9]*)#' , $entry, $eprint);
-                if( empty($eprint[3]) )
-                    preg_match('#()()(quant-ph/[0-9]+\.?[0-9]+v*[0-9]*)#' , $entry, $eprint);
-                if( !empty($eprint[3]) )
-                    $citations[$n]['eprint'] = $eprint[3];
+			preg_match('#\\\\(url)(@noop|)\s*{([^}]*)}#' , $entry, $url);
+			if( empty($url[3]) && empty($citations[$n]['eprint']) && empty($citations[$n]['doi']) )
+				preg_match('#\\\\(href)(@noop|)\s*{([^}]*)}#' , $entry, $url);
+            if( !empty($url[3]) )
+                $citations[$n]['url'] = $url[3];
 
-                preg_match('#\\\\(url)(@noop|)\s*{([^}]*)}#' , $entry, $url);
-                if( empty($url[3]) && empty($citations[$n]['eprint']) && empty($citations[$n]['doi']) )
-                    preg_match('#\\\\(href)(@noop|)\s*{([^}]*)}#' , $entry, $url);
-                if( !empty($url[3]) )
-                    $citations[$n]['url'] = $url[3];
+            if( !empty($citations[$n]['url']) && ( !empty($citations[$n]['doi']) &&  strpos($citations[$n]['url'], $citations[$n]['doi']) !== false || !empty($citations[$n]['eprint']) &&  strpos($citations[$n]['url'], $citations[$n]['eprint']) !== false ) )
+                unset($citations[$n]['url']);
 
                 $text = $entry;
 
