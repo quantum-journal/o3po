@@ -370,7 +370,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @since     0.1.0
          * @param     string    $content    Content to be filtered.
          */
-    public static function get_the_excerpt( $content ) {
+    public function get_the_excerpt( $content ) {
 
         global $post;
 

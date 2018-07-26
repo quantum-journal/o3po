@@ -112,7 +112,7 @@ class O3PO_Admin {
     {
         static $plugin;
 
-        $settings = array('settings' => '<a href="options-general.php#redirecthere">' . __('Settings', 'General') . '</a>');
+        $settings = array('settings' => '<a href="' . esc_url('options-general.php?page=' . $this->plugin_name . '-settings' ) . '">' . 'Settings</a>');
 
         $actions = array_merge($actions, $settings);
 

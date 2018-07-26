@@ -57,6 +57,7 @@ The documentation can be build locally by running `make docs`.
 
 * Extend this readme (explain onepress-extra.css, ...)
 * Turn local tests into PHPUnit tests and add to repository
+* Re-include the admin page css
 * Move div.important-box from the plugin css to the theme
 * Fix for special code execution
 * Move fix_custom_logo_html into separate plug-in

@@ -1879,7 +1879,7 @@ abstract class O3PO_PublicationType {
 			$parsed_bbl = O3PO_Latex::parse_bbl($bbl);
 			if( !empty($parsed_bbl) ) {
 				foreach($parsed_bbl as $n => $entry) {
-					static::the_formated_bibliography_entry_html($n, $entry);
+					static::the_formated_bibliography_entry_html($entry);
 					if( O3PO_Latex::strpos_outside_math_mode($entry['text'], '\\') != false ) echo '<p style="color:red;">WARNING: This entry still contains one or more backslashes. Probably this means we have not recognized some LaTeX commmand, but it can also be ok if the entry contains a mathematical formula.</p>';
                     if( empty($entry['doi']) ) echo '<p style="color:orange;">WARNING: No DOI found for this entry. Does it really not have one?</p>';
 				}

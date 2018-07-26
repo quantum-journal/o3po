@@ -1062,7 +1062,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
          * @access    public
          * @param     string     $content     Content to be ammended.
          */
-    public static function get_the_excerpt( $content ) {
+    public function get_the_excerpt( $content ) {
 
         global $post;
         $post_id = $post->ID;

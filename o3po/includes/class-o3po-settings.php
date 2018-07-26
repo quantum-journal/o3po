@@ -12,8 +12,8 @@
  * depend on the plugin slug.
  * Therefore we implement O3PO_Settings as a singleton. It doesn't seem
  * to be such a evil thing to do given that the options are anyway
- * global. 
- * 
+ * global.
+ *
  * @link       http://example.com
  * @since      0.1.0
  *
@@ -31,13 +31,13 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-utili
  * Provide methods to set and get plugin options and to create
  * the respetive admin page and menu entry. *
  *
- * @since      0.1.0 
+ * @since      0.1.0
  * @package    O3PO
  * @subpackage O3PO/includes
  * @author     Christian Gogolin <o3po@quantum-journal.org>
  */
 class O3PO_Settings extends O3PO_Singleton {
-    
+
 	/**
 	 * The unique identifier of this plugin.
 	 *
@@ -63,7 +63,7 @@ class O3PO_Settings extends O3PO_Singleton {
 	 * @access   protected
 	 * @var      string    $version    The current version of the plugin.
 	 */
-	protected $version;    
+	protected $version;
 
      /**
 	 * The callback from which to get the active post type names.
@@ -73,7 +73,7 @@ class O3PO_Settings extends O3PO_Singleton {
 	 * @var      mixed     $active_post_type_names_callback    The callback from which to get the active post type names.
 	 */
 	protected $active_post_type_names_callback;
-    
+
      /**
 	 * The dafaults for various options
 	 *
@@ -114,7 +114,7 @@ class O3PO_Settings extends O3PO_Singleton {
         'secondary_publication_type_name_plural' => 'views',
         'volumes_endpoint' => 'volumes',
                                      );
-    
+
     /**
 	 * Configure the settings singleton.
 	 *
@@ -125,26 +125,26 @@ class O3PO_Settings extends O3PO_Singleton {
 	 * @param    callback  $active_post_type_names_callback  The callback from which to get the active post type names.
 	 */
 	public function configure( $plugin_name, $plugin_pretty_name, $version, $active_post_type_names_callback ) {
-        
+
         $this->plugin_name = $plugin_name;
         $this->version = $version;
         $this->plugin_pretty_name = $plugin_pretty_name;
         $this->active_post_type_names_callback = $active_post_type_names_callback;
-        
+
 	}
 
         /**
          * Add the settings page to the admin menu.
          *
          * To be added to the 'admin_menu' action.
-         * 
+         *
          * @since    0.1.0
          * @access   public
          */
     public function add_settings_page_to_menu() {
-        
+
         add_options_page($this->plugin_pretty_name . ' settings page', $this->plugin_pretty_name, 'manage_options', $this->plugin_name . '-settings', array( $this, 'render_settings_page' ));
-        
+
     }
 
         /**
@@ -154,9 +154,9 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_settings_page() {
-        
+
         echo '<div>';
-        echo '<h2>' . $this->plugin_pretty_name . ' settings page</h2>';
+        echo '<h1>' . $this->plugin_pretty_name . ' settings (version ' . $this->version . ')</h1>';
         echo '<form action="options.php" method="post">';
         settings_fields($this->plugin_name . '-setttings');
         do_settings_sections('plugin_settings');
@@ -167,7 +167,7 @@ class O3PO_Settings extends O3PO_Singleton {
         do_settings_sections('other_service_settings');
         echo '<input name="Submit" type="submit" value="Save Settings" />';
         echo '</form></div>';
-        
+
     }
 
         /**
@@ -179,13 +179,13 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function register_settings() {
-        
+
         register_setting( $this->plugin_name . '-setttings', $this->plugin_name . '-setttings', array( $this, 'validate_settings' ) );
-        
+
         add_settings_section('plugin_settings', 'Plugin settings', array( $this, 'render_plugin_settings' ), 'plugin_settings');
         add_settings_field('production_site_url', 'Production site url', array( $this, 'render_production_site_url_setting' ), 'plugin_settings', 'plugin_settings');
         add_settings_field('custom_search_page', 'Use custom search page', array( $this, 'render_custom_search_page_setting' ), 'plugin_settings', 'plugin_settings');
-                
+
         add_settings_section('journal_settings', 'Journal settings', array( $this, 'render_journal_settings' ), 'journal_settings');
         add_settings_field('doi_prefix', 'Doi prefix', array( $this, 'render_doi_prefix_setting' ), 'journal_settings', 'journal_settings');
         add_settings_field('journal_title', 'Journal title', array( $this, 'render_journal_title_setting' ), 'journal_settings', 'journal_settings');
@@ -206,7 +206,7 @@ class O3PO_Settings extends O3PO_Singleton {
         add_settings_field('license_version', 'License version', array( $this, 'render_license_version_setting' ), 'journal_settings', 'journal_settings');
         add_settings_field('license_url', 'License url', array( $this, 'render_license_url_setting' ), 'journal_settings', 'journal_settings');
         add_settings_field('license_explanation', 'License explanation string', array( $this, 'render_license_explanation_setting' ), 'journal_settings', 'journal_settings');
-    
+
         add_settings_section('crossref_settings', 'Crossref settings', array( $this, 'render_crossref_settings' ), 'crossref_settings');
         add_settings_field('crossref_id', 'Crossref ID', array( $this, 'render_crossref_id_setting' ), 'crossref_settings', 'crossref_settings');
         add_settings_field('crossref_pw', 'Crossref password', array( $this, 'render_crossref_pw_setting' ), 'crossref_settings', 'crossref_settings');
@@ -220,7 +220,7 @@ class O3PO_Settings extends O3PO_Singleton {
         add_settings_field('doaj_api_url', 'DOAJ API url', array( $this, 'render_doaj_api_url_setting' ), 'doaj_settings', 'doaj_settings');
         add_settings_field('doaj_api_key', 'DOAJ API key', array( $this, 'render_doaj_api_key_setting' ), 'doaj_settings', 'doaj_settings');
         add_settings_field('doaj_language_code', 'DOAJ langugage code (two upper case letters)', array( $this, 'render_doaj_language_code_setting' ), 'doaj_settings', 'doaj_settings');
-    
+
         add_settings_section('arxiv_settings', 'ArXiv settings', array( $this, 'render_arxiv_settings' ), 'arxiv_settings');
         add_settings_field('arxiv_url_abs_prefix', 'Url prefix for abstract pages', array( $this, 'render_arxiv_url_abs_prefix_setting' ), 'arxiv_settings', 'arxiv_settings');
         add_settings_field('arxiv_url_pdf_prefix', 'Url prefix for pdfs', array( $this, 'render_arxiv_url_pdf_prefix_setting' ), 'arxiv_settings', 'arxiv_settings');
@@ -229,19 +229,19 @@ class O3PO_Settings extends O3PO_Singleton {
         add_settings_field('arxiv_doi_feed_identifier', 'Indentifier for the doi feed', array( $this, 'render_arxiv_doi_feed_identifier_setting' ), 'arxiv_settings', 'arxiv_settings');
 
         add_settings_section('other_service_settings', 'Settings for other services', array( $this, 'render_other_service_settings' ), 'other_service_settings');
-        add_settings_field('doi_url_prefix', 'Url prefix for doi resolution', array( $this, 'render_doi_url_prefix_setting' ), 'other_service_settings', 'other_service_settings');    
+        add_settings_field('doi_url_prefix', 'Url prefix for doi resolution', array( $this, 'render_doi_url_prefix_setting' ), 'other_service_settings', 'other_service_settings');
         add_settings_field('scirate_url_abs_prefix', 'Url prefix for scirate pages', array( $this, 'render_scirate_url_abs_prefix_setting' ), 'other_service_settings', 'other_service_settings');
         add_settings_field('scholastica_manuscripts_url', 'Url of Scholastica manuscripts page', array( $this, 'render_scholastica_manuscripts_url_setting' ), 'other_service_settings', 'other_service_settings');
         add_settings_field('orcid_url_prefix', 'Orcid url prefix', array( $this, 'render_orcid_url_prefix_setting' ), 'other_service_settings', 'other_service_settings');
         add_settings_field('fermats_library_url_prefix', 'Url prefix for Fermats Library', array( $this, 'render_fermats_library_url_prefix_setting' ), 'other_service_settings', 'other_service_settings');
         add_settings_field('fermats_library_email', 'Email for Fermats Library', array( $this, 'render_fermats_library_email_setting' ), 'other_service_settings', 'other_service_settings');
-    
+
         add_settings_field('mathjax_url', 'MathJax url', array( $this, 'render_mathjax_url_setting' ), 'other_service_settings', 'other_service_settings');
         add_settings_field('social_media_thumbnail_url', 'Url of default thumbnail for social media', array( $this, 'render_social_media_thumbnail_url_setting' ), 'other_service_settings', 'other_service_settings');
         add_settings_field('facebook_app_id', 'Facebook app_id', array( $this, 'render_facebook_app_id_setting' ), 'other_service_settings', 'other_service_settings');
         add_settings_field('buffer_secret_email', 'Secret email for adding posts to buffer.com', array( $this, 'render_buffer_secret_email_setting' ), 'other_service_settings', 'other_service_settings');
     }
-    
+
         /**
          * Render the head of the plugin settings page.
          *
@@ -309,10 +309,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_production_site_url_setting() {
-        
+
         $this->render_setting('production_site_url');
         echo '<p>(Unless this field is filled and matches the string ' . esc_html(get_site_url())  . ' this instance will be considered a test system and the interfaces with various critical services will remain disabled.)</p>';
-        
+
     }
 
         /**
@@ -322,10 +322,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_custom_search_page_setting() {
-        
+
         $this->render_checkbox_setting('custom_search_page');
         echo '<p>(Uncheck to disable the custom search page provided by this plugin.)</p>';
-        
+
     }
 
         /**
@@ -346,8 +346,8 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_journal_title_setting() {
         $this->render_setting('journal_title');
-    } 
-    
+    }
+
         /**
          * Render the setting for the subtitle of the primary journal.
          *
@@ -376,7 +376,7 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_journal_level_doi_suffix_setting() {
         $this->render_setting('journal_level_doi_suffix');
-    } 
+    }
 
         /**
          * Render the setting for the EISSN.
@@ -406,7 +406,7 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_secondary_journal_title_setting() {
         $this->render_setting('secondary_journal_title');
-    } 
+    }
 
         /**
          * Render the setting for the journal level DOI suffix of the secondary journal.
@@ -437,8 +437,8 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_developer_email_setting() {
         $this->render_setting('developer_email');
-    } 
-    
+    }
+
         /**
          * Render the setting for the email of the publisher.
          *
@@ -501,7 +501,7 @@ class O3PO_Settings extends O3PO_Singleton {
     public function render_license_url_setting() {
         $this->render_setting('license_url');
     }
-    
+
         /**
          * Render the setting for the text appearing in the license statement.
          *
@@ -522,7 +522,7 @@ class O3PO_Settings extends O3PO_Singleton {
     public function render_publisher_country_setting() {
         $this->render_setting('publisher_country');
     }
-    
+
         /**
          * Render the setting for the CorssRef id.
          *
@@ -531,7 +531,7 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_crossref_id_setting() {
         $this->render_setting('crossref_id');
-    } 
+    }
 
         /**
          * Render the setting for the CorssRef password.
@@ -541,7 +541,7 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_crossref_pw_setting() {
         $this->render_setting('crossref_pw');
-    } 
+    }
 
         /**
          * Render the setting for the url to query to retrieve citing articles.
@@ -561,7 +561,7 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_crossref_deposite_url_setting() {
         $this->render_setting('crossref_deposite_url');
-    } 
+    }
 
         /**
          * Render the setting for the URl of the CrossRef deposit test system.
@@ -571,7 +571,7 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_crossref_test_deposite_url_setting() {
         $this->render_setting('crossref_test_deposite_url');
-    } 
+    }
 
         /**
          * Render the setting for the email to submit to crossref.
@@ -593,7 +593,7 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->render_setting('crossref_archive_locations');
         echo '<p>(Please put a comma seperated list containing a subset of CLOCKSS, LOCKSS Portico, KB, DWT, Internet Archive, depending on the kind of archive the primary journal\'s content is archived in.)</p>';
     }
-    
+
         /**
          * Render the setting for the URL of the DOAJ API.
          *
@@ -613,7 +613,7 @@ class O3PO_Settings extends O3PO_Singleton {
     public function render_doaj_api_key_setting() {
         $this->render_setting('doaj_api_key');
     }
-    
+
         /**
          * Render the setting for the language code for DOAJ.
          *
@@ -632,7 +632,7 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_arxiv_url_abs_prefix_setting() {
         $this->render_setting('arxiv_url_abs_prefix');
-    } 
+    }
 
         /**
          * Render the setting for the arXiv pdf URL prefix.
@@ -642,7 +642,7 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_arxiv_url_pdf_prefix_setting() {
         $this->render_setting('arxiv_url_pdf_prefix');
-    } 
+    }
 
         /**
          * Render the setting for the arXiv source URL prefix.
@@ -652,7 +652,7 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_arxiv_url_source_prefix_setting() {
         $this->render_setting('arxiv_url_source_prefix');
-    } 
+    }
 
         /**
          * Render the setting for the arXiv trackback prefix.
@@ -662,7 +662,7 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_arxiv_url_trackback_prefix_setting() {
         $this->render_setting('arxiv_url_trackback_prefix');
-    } 
+    }
 
         /**
          * Render the setting for the DOI feed identifier for the arXiv.
@@ -713,7 +713,7 @@ class O3PO_Settings extends O3PO_Singleton {
     public function render_orcid_url_prefix_setting() {
         $this->render_setting('orcid_url_prefix');
     }
-    
+
         /**
          * Render the setting for the URL prefix of Fermat's library.
          *
@@ -722,7 +722,7 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_fermats_library_url_prefix_setting() {
         $this->render_setting('fermats_library_url_prefix');
-    } 
+    }
 
         /**
          * Render the setting for the email of Fermt's library.
@@ -742,7 +742,7 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_mathjax_url_setting() {
         $this->render_setting('mathjax_url');
-    } 
+    }
 
         /**
          * Render the setting for the URL of the default thubnail for social media.
@@ -771,11 +771,11 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_buffer_secret_email_setting() {
-        
+
         $this->render_setting('buffer_secret_email');
         $post_types = O3PO_Utility::oxford_comma_implode(call_user_func($this->active_post_type_names_callback));
         echo '<p>(If this is set, new ' . $post_types . ' posts are <a target="_blank" href="https://faq.buffer.com/article/272-is-it-possible-to-add-a-post-to-buffer-through-email">automatically submitted</a> to the buffer.com queue associated with the secret email)</p>';
-        
+
     }
 
         /**
@@ -786,12 +786,12 @@ class O3PO_Settings extends O3PO_Singleton {
          * @param    string    $id   Id of the setting.
          */
     public function render_setting( $id ) {
-        
+
         $option = $this->get_plugin_option($id);
-        
+
         echo '<input id="' . $this->plugin_name . '-setttings" name="' . $this->plugin_name . '-setttings[' . $id . ']" style="width: 80%" type="text" value="' . $option . '" />';
-        
-    } 
+
+    }
 
         /**
          * Render a checkbox type setting.
@@ -801,12 +801,12 @@ class O3PO_Settings extends O3PO_Singleton {
          * @param    string   $id    Id of the setting.
          */
     public function render_checkbox_setting( $id ) {
-        
+
         $option = $this->get_plugin_option($id);
-        
+
         echo '<input type="checkbox" id="' . $this->plugin_name . '-setttings" name="' . $this->plugin_name . '-setttings[' . $id . ']" value="1"' . checked( 1, $option, false ) . '/>';
-        
-    } 
+
+    }
 
      /**
 	 * An array of all option names to the respective functions used when cleaning user input for these options.
@@ -877,7 +877,7 @@ class O3PO_Settings extends O3PO_Singleton {
                 'secondary_journal_eissn' => array($this, 'clean_secondary_journal_eissn'),
                 'first_volume_year' => array($this, 'clean_first_volume_year'),
                                                    );
-        
+
         return self::$all_settings_fields_map;
     }
 
@@ -891,12 +891,12 @@ class O3PO_Settings extends O3PO_Singleton {
     private function clean_doi_prefix( $doi_prefix ) {
 
         $doi_prefix = trim($doi_prefix);
-        if(preg_match('/^[0-9.]*$/', $doi_prefix)) 
+        if(preg_match('/^[0-9.]*$/', $doi_prefix))
             return $doi_prefix;
         else
             "";
     }
-    
+
         /**
          * Cleam user input to the eissn setting
          *
@@ -912,7 +912,7 @@ class O3PO_Settings extends O3PO_Singleton {
         else
             return "";
     }
-    
+
         /**
          * Cleam user input to the secondary_journal_eissn setting
          *
@@ -943,7 +943,7 @@ class O3PO_Settings extends O3PO_Singleton {
         else
             return "";
     }
-    
+
         /**
          * Validate settings.
          *
@@ -952,9 +952,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @param    string    $input    Value of the setting to validate.
          */
     public function validate_settings( $input ) {
-        
+
         foreach($this->get_all_settings_fields_map() as $field => $callable)
-            $newinput[$field] = call_user_func($callable, $input[$field]);        
+            if(isset($input[$field]))
+                $newinput[$field] = call_user_func($callable, $input[$field]);
         return $newinput;
     }
 
@@ -970,21 +971,21 @@ class O3PO_Settings extends O3PO_Singleton {
         $options = get_option($this->plugin_name . '-setttings');
         if(!empty($options[$id]))
             return $options[$id];
-        
+
         $options = get_option('quantum-journal-plugin-setttings');
         if(!empty($options[$id]))
-            return $options[$id];    
+            return $options[$id];
 
         if(isset($this->option_defaults[$id]))
             return $this->option_defaults[$id];
 
-        
+
         foreach($this->get_all_settings_fields_map() as $field => $callable)
         {
             if($field === $id)
                 return "";
         }
-        
+
         throw new Exception('The non existing plugin option '. $id . ' was requested.');
     }
 
