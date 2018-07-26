@@ -23,102 +23,120 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-setti
  */
 class O3PO_Admin {
 
-	/**
-	 * The ID of this plugin.
-	 *
-	 * @since    0.1.0
-	 * @access   private
-	 * @var      string    $plugin_name    The ID of this plugin.
-	 */
+        /**
+         * The ID of this plugin.
+         *
+         * @since    0.1.0
+         * @access   private
+         * @var      string    $plugin_name    The ID of this plugin.
+         */
 	private $plugin_name;
 
-	/**
-	 * The version of this plugin.
-	 *
-	 * @since    0.1.0
-	 * @access   private
-	 * @var      string    $version    The current version of this plugin.
-	 */
+        /**
+         * The version of this plugin.
+         *
+         * @since    0.1.0
+         * @access   private
+         * @var      string    $version    The current version of this plugin.
+         */
 	private $version;
 
-	/**
-	 * Initialize the class and set its properties.
-	 *
-	 * @since    0.1.0
-	 * @param    string    $plugin_name   The name of this plugin.
-	 * @param    string    $version       The version of this plugin.
-	 */
+        /**
+         * Initialize the class and set its properties.
+         *
+         * @since    0.1.0
+         * @param    string    $plugin_name   The name of this plugin.
+         * @param    string    $version       The version of this plugin.
+         */
 	public function __construct( $plugin_name, $version ) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 	}
 
-	/**
-	 * Register the stylesheets for the admin area.
-	 *
-	 * @since    0.1.0
-	 */
+        /**
+         * Register the stylesheets for the admin area.
+         *
+         * @since    0.1.0
+         */
 	public function enqueue_styles() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in O3PO_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The O3PO_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
+            /**
+             * This function is provided for demonstration purposes only.
+             *
+             * An instance of this class should be passed to the run() function
+             * defined in O3PO_Loader as all of the hooks are defined
+             * in that particular class.
+             *
+             * The O3PO_Loader will then create the relationship
+             * between the defined hooks and the functions defined in this
+             * class.
+             */
 
 		wp_enqueue_style( $this->plugin_name . '-admin.css', plugin_dir_url( __FILE__ ) . 'css/' . $this->plugin_name . '-admin.css', array(), $this->version, 'all' );
 
 	}
 
-	/**
-	 * Register the JavaScript for the admin area.
-	 *
-	 * @since    0.1.0
-	 */
+        /**
+         * Register the JavaScript for the admin area.
+         *
+         * @since    0.1.0
+         */
 	public function enqueue_scripts() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in O3PO_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The O3PO_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
+            /**
+             * This function is provided for demonstration purposes only.
+             *
+             * An instance of this class should be passed to the run() function
+             * defined in O3PO_Loader as all of the hooks are defined
+             * in that particular class.
+             *
+             * The O3PO_Loader will then create the relationship
+             * between the defined hooks and the functions defined in this
+             * class.
+             */
 
-		//wp_enqueue_script( $this->plugin_name . '-admin.js', plugin_dir_url( __FILE__ ) . 'js/' . $this->plugin_name . '-admin.js', array( 'jquery' ), $this->version, false );
+            //wp_enqueue_script( $this->plugin_name . '-admin.js', plugin_dir_url( __FILE__ ) . 'js/' . $this->plugin_name . '-admin.js', array( 'jquery' ), $this->version, false );
 
 	}
 
-    
-	/**
-	 * Enable MathJax and some extra functionality on admin pages. This allows
-     * us to show a live preview of titles and abstracts containing mathematical
-     * formulas and save their MathML representation when a post is saved. This
-     * would be very hard (impossible?) to do with just php, so we have to resort
-     * to running some code in the browser of the person adding the manuscript to the
-     * website. Concretely, the following adds a live preview and MathML output
-     * to all text fields of with css class "preview_and_mathml". The MathML
-     * output is itself a textfield and gets and id that is derived from that of
-     * the input field. When the post is saved its content hence ends up in POST
-     * and can be captured by our PHP code in the custom post types.
-	 *
-	 * @since    0.1.0
-	 */
+        /**
+         * Add links
+         *
+         * To be added to the 'plugin_action_links' filter.
+         *
+         * @since    0.2.0
+         * @param    array     $links    Array of links to filter
+         */
+    function add_plugin_action_links( $actions )
+    {
+        static $plugin;
+
+        $settings = array('settings' => '<a href="options-general.php#redirecthere">' . __('Settings', 'General') . '</a>');
+
+        $actions = array_merge($actions, $settings);
+
+		return $actions;
+    }
+
+        /**
+         * Enable MathJax and some extra functionality on admin pages. This allows
+         * us to show a live preview of titles and abstracts containing mathematical
+         * formulas and save their MathML representation when a post is saved. This
+         * would be very hard (impossible?) to do with just php, so we have to resort
+         * to running some code in the browser of the person adding the manuscript to the
+         * website. Concretely, the following adds a live preview and MathML output
+         * to all text fields of with css class "preview_and_mathml". The MathML
+         * output is itself a textfield and gets and id that is derived from that of
+         * the input field. When the post is saved its content hence ends up in POST
+         * and can be captured by our PHP code in the custom post types.
+         *
+         * @since    0.1.0
+         */
     public function enable_mathjax() {
-        
+
         $settings = O3PO_Settings::instance();
-        
+
 ?>
         <script type="text/x-mathjax-config">
         MathJax.Hub.Config({
@@ -157,7 +175,7 @@ class O3PO_Admin {
                         p.parentNode.insertBefore(textarea, p.nextSibling);
                         var formula = document.getElementById(id + "_preview")
                             var mathml = document.getElementById(id + "_mathml")
-                            } 
+                            }
                     formula.textContent = tex;
                     MathJax.Hub.Queue(["Typeset", MathJax.Hub, formula], [ function (formula, mathml) {
                                 var output = "";
@@ -174,7 +192,7 @@ class O3PO_Admin {
                                     output = output.replace(/\r?\n|\r/g, '');//remove newlines
                                     output = output.replace(/>\s*</g, '><');//remove superflous whitespace
                                     output = output.replace(/<!--.*?-->/g, '');//remove commets
-                                    output = output.replace(/<([\/]?)/g, '<$1mml:');//Add the mml: namespace because crossref wants it like that			
+                                    output = output.replace(/<([\/]?)/g, '<$1mml:');//Add the mml: namespace because crossref wants it like that
                                     output = output.replace(/xmlns=/g, 'xmlns:mml=');
                                     mathml.value = output;
                                 }

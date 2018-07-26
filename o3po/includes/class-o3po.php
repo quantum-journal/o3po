@@ -55,7 +55,7 @@ class O3PO {
          * @var      string    $version    The current version of the plugin.
          */
 	protected $version;
-    
+
         /**
          * The loader that's responsible for maintaining and registering all hooks that power
          * the plugin.
@@ -110,7 +110,7 @@ class O3PO {
          * @var      O3PO_SecondaryPublicationType    $secondary_publication_type    The secondary publiction type.
          */
 	protected $secondary_publication_type;
-    
+
         /**
          * Define the core functionality of the plugin.
          *
@@ -125,11 +125,11 @@ class O3PO {
          * @param    string     $version              Version of the plugin
          */
 	public function __construct( $plugin_name, $plugin_pretty_name, $version ) {
-        
+
 		$this->plugin_name = $plugin_name;
         $this->plugin_pretty_name = $plugin_pretty_name;
         $this->version = $version;
-        
+
 		$this->load_dependencies();
 		$this->set_locale();
 		$this->define_admin_hooks();
@@ -205,12 +205,12 @@ class O3PO {
              * The class providing the secondary publication type.
              */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-secondary-publication-type.php';
-        
+
         $this->loader = new O3PO_Loader();
 
         $settings = O3PO_Settings::instance();
         $settings->configure($this->plugin_name, $this->plugin_pretty_name, $this->version, 'O3PO_PublicationType::get_active_publication_type_names');
-        
+
         $this->environment = new O3PO_Environment($settings->get_plugin_option("production_site_url"));
 
             //construct the journal config from settings
@@ -219,14 +219,14 @@ class O3PO {
         foreach(array_intersect(array_keys($settings->get_all_settings_fields_map()), $journal_config_properties) as $journal_config_property){
             $journal_config[$journal_config_property] = $settings->get_plugin_option($journal_config_property);
         }
-            //add some properties that are named differently (for a reason) in settings 
+            //add some properties that are named differently (for a reason) in settings
             /* $journal_config['volumes_endpoint'] = 'volumes'; */
         $journal_config['publication_type_name'] = $settings->get_plugin_option('primary_publication_type_name');
         $journal_config['publication_type_name_plural'] = $settings->get_plugin_option('primary_publication_type_name_plural');
-    
+
             //create the primary journal
         $this->journal = new O3PO_Journal($journal_config);
-        
+
             //reconfigure for the secondary journal
         $journal_config['journal_title'] = $settings->get_plugin_option('secondary_journal_title');
         $journal_config['journal_level_doi_suffix'] = $settings->get_plugin_option('secondary_journal_level_doi_suffix');
@@ -237,7 +237,7 @@ class O3PO {
 
             //create the secondary journal
         $this->journal_secondary = new O3PO_Journal($journal_config);
-        
+
             //create the publication types for each journal
         $this->primary_publication_type = new O3PO_PrimaryPublicationType($this->journal, $this->environment);
         $this->secondary_publication_type = new O3PO_SecondaryPublicationType($this->primary_publication_type->get_publication_type_name(), $this->primary_publication_type->get_publication_type_name_plural(), $this->journal_secondary, $this->environment);
@@ -275,12 +275,13 @@ class O3PO {
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
+		$this->loader->add_action( 'plugin_action_links', $plugin_admin, 'add_plugin_action_links' );
 
         $this->loader->add_action( 'admin_menu', $settings, 'add_settings_page_to_menu' );
         $this->loader->add_action( 'admin_init', $settings, 'register_settings' );
 
         $this->loader->add_action( 'wp_head', $this->environment, 'modify_css_if_in_test_environment' );
-        $this->loader->add_action( 'upload_mimes', $this->environment, 'custom_upload_mimes' );        
+        $this->loader->add_action( 'upload_mimes', $this->environment, 'custom_upload_mimes' );
         $this->loader->add_action( 'load-post.php', $this->primary_publication_type, 'init_metabox' );
         $this->loader->add_action( 'load-post-new.php', $this->primary_publication_type, 'init_metabox' );
 
@@ -331,12 +332,12 @@ class O3PO {
         $this->loader->add_filter( 'the_content_feed', $this->primary_publication_type, 'get_feed_content' );
         $this->loader->add_filter( 'the_excerpt_rss', $this->primary_publication_type, 'get_feed_content' );
 //        $this->loader->add_filter( 'single_template', $this->primary_publication_type, 'get_custom_post_type_single_template' );
-        
+
             //add hooks for the secondary publication type...
         $this->loader->add_filter( 'the_author', $this->secondary_publication_type, 'get_the_author', PHP_INT_MAX, 1 );
         $this->loader->add_filter( 'the_content', $this->secondary_publication_type, 'get_the_content' );
         $this->loader->add_filter( 'get_the_excerpt', $this->secondary_publication_type, 'get_the_excerpt' );//Use this filter instead of 'the_excerpt' to also affect get_the_excerpt()
-            //...and those inherited from publicationtype 
+            //...and those inherited from publicationtype
         $this->loader->add_action('init', $this->secondary_publication_type, 'register_as_custom_post_type' );
         $this->loader->add_action('pre_get_posts', $this->secondary_publication_type, 'add_custom_post_types_to_query' );
         $this->loader->add_action('wp_head', $this->secondary_publication_type, 'add_dublin_core_and_highwire_press_meta_tags');
@@ -346,14 +347,14 @@ class O3PO {
         $this->loader->add_filter('the_author', $this->secondary_publication_type, 'the_author_feed', PHP_INT_MAX, 1 );
 
 	}
-    
+
         /**
          * Run the loader to execute all of the hooks with WordPress.
          *
          * @since    0.1.0
          */
 	public function run() {
-        
+
 		$this->loader->run();
 	}
 
@@ -365,7 +366,7 @@ class O3PO {
          * @return    string    The name of the plugin.
          */
 	public function get_plugin_name() {
-        
+
 		return $this->plugin_name;
 	}
 
@@ -376,7 +377,7 @@ class O3PO {
          * @return    O3PO_Loader    Orchestrates the hooks of the plugin.
          */
 	public function get_loader() {
-        
+
 		return $this->loader;
 	}
 
@@ -387,7 +388,7 @@ class O3PO {
          * @return    string    The version number of the plugin.
          */
 	public function get_version() {
-        
+
 		return $this->version;
 	}
 
