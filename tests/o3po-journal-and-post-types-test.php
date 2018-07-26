@@ -207,6 +207,19 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         }
     }
 
+
+        /**
+         * @depends test_create_primary_publication_type
+         * @depends test_create_secondary_publication_type
+         */
+    function test_get_active_publication_type_names( $primary_publication_type, $secondary_publication_type ) {
+
+        $this->assertSame($primary_publication_type->get_active_publication_type_names(), array($primary_publication_type->get_publication_type_name(), $secondary_publication_type->get_publication_type_name()));
+        $this->assertSame($primary_publication_type->get_active_publication_types(), array($primary_publication_type, $secondary_publication_type));
+        $this->assertSame($primary_publication_type->get_active_publication_types($primary_publication_type->get_publication_type_name()), $primary_publication_type);
+    }
+
+
         /**
          * @depends test_create_primary_publication_type
          */
@@ -324,6 +337,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                  '_buffer_email' => 'u',
                  '_buffer_special_text' => 'v',
                  '_bbl' => 'w',
+                 '_nonce' => 'fake_nonce',
                    ),
              array(),
              ],
@@ -332,6 +346,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                  '_eprint' => '0809.2542v4',
                  '_number_authors' => 4,
                  '_fetch_metadata_from_arxiv' => 'checked',
+                 '_nonce' => 'fake_nonce',
                    ),
              array('#WARNING: It seems like 0809.2542v4 is not published under a creative commons license on the arXiv\.#'),
              ],
@@ -340,6 +355,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                  '_eprint' => '1609.09584v4',
                  '_number_authors' => 4,
                  '_fetch_metadata_from_arxiv' => 'checked',
+                 '_nonce' => 'fake_nonce',
                    ),
              array('#SUCCESS: Fetched metadata from https://arxiv.org/abs/1609\.09584v4#'),
              ],
@@ -353,7 +369,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          */
     public function test_save_meta_data( $post_id, $POST_args, $expections, $primary_publication_type ) {
         $post_type = get_post_type($post_id);
-
 
         foreach($POST_args as $key => $value)
         {
@@ -383,7 +398,146 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         else
         {
             foreach($POST_args as $key => $value)
+            {
+                if( $key === '_nonce')
+                    continue;
                 $this->assertSame($value, get_post_meta( $post_id, $post_type . $key, true), 'Property ' . $post_type . $key . ' was not set correctly.');
+            }
         }
     }
+
+
+    public function save_metabox_provider() {
+        $settings = O3PO_Settings::instance();
+
+        return [
+            [1,
+             array(
+                 '_title' => 'a',
+                 '_title_mathml' => 'b',
+                 '_number_authors' => 2,
+                 '_author_given_names' => array('c', 'd'),
+                 '_author_surnames' => array('e', 'f'),
+                 '_author_name_styles' => array('g', 'h'),
+                 '_author_affiliations' => array('1', '1'),
+                 '_author_orcids' => array('k', 'l'),
+                 '_author_urls' => array('m', 'n'),
+                 '_number_affiliations' => 1,
+                 '_affiliations' => array('o'),
+                 '_date_published' => 'p',
+                 '_journal' => 'q',
+                 '_volume' => 'r',
+                 '_pages' => 's',
+                 '_corresponding_author_email' => 't',
+                 '_buffer_email' => 'u',
+                 '_buffer_special_text' => 'v',
+                 '_bbl' => 'w',
+                 '_nonce' => 'fake_nonce',
+                   ),
+             array(
+                 '#ERROR: Eprint is empty\.#',
+                 '#ERROR: Abstract is empty\.#',
+                 '#ERROR: Cannot add licensing information, no pdf attached to post.*#',
+                 '#WARNING: The page number s of this paper is not exactly one larger#',
+                 '#ERROR: ORCID of author .* is malformed\.#',
+                 '#ERROR: Corresponding author email is malformed\.#',
+                 '#ERROR: Unable to generate XML for Crossref#',
+                 '#WARNING: Not yet published.#'
+                   ),
+             ],
+            [5,
+             array(
+                 '_eprint' => '0809.2542v4',
+                 '_number_authors' => 4,
+                 '_fetch_metadata_from_arxiv' => 'checked',
+                 '_nonce' => 'fake_nonce',
+                 '_doi_suffix' => 'fake doi_suffix',
+                 '_pages' => '2',
+                 '_date_published' => '2018-01-01',
+                 '_volume' => '2',
+                 '_corresponding_author_email' => 'foo@bar.com',
+                 '_journal' => $settings->get_plugin_option('journal_title'),
+                   ),
+             array(
+                 '#WARNING: It seems like 0809.2542v4 is not published under a creative commons license on the arXiv\.#',
+                 '#REVIEW: Found BibTeX or manually formated bibliographic information#',
+                 '#REVIEW: Affiliations, ORCIDs, and author URLs updated from arxiv source#',
+                 '#REVIEW: The doi suffix was set#',
+                   ),
+             ],
+            [8,
+             array(
+                 '_eprint' => '0908.2921v2',
+                 '_pages' => '3',
+                 '_date_published' => current_time("Y-m-d"),
+                 '_volume' => '2',
+                 '_corresponding_author_email' => 'baz@bar.com',
+                 '_number_authors' => 2,
+                 '_author_given_names' => ['Foo', 'Baz'],
+                 '_author_surnames' => ['Bar', 'Boo'],
+                 '_author_name_styles' => ["western", "western"],
+                 '_author_affiliations' => ['1,2','2'],
+                 '_author_orcids' => ['',''],
+                 '_author_urls' => ['',''],
+                 '_number_affiliations' => 2,
+                 '_affiliations' => ['Foo University', 'Bar Institut'],
+                 '_journal' => $settings->get_plugin_option('journal_title'),
+                 '_number_authors' => 4,
+                 '_fetch_metadata_from_arxiv' => 'checked',
+                 '_nonce' => 'fake_nonce',
+                 '_buffer_email' => 'checked',
+                   ),
+             array(
+                 '#WARNING: It seems like .* not published .* creative commons license#',
+                 '#SUCCESS: Fetched metadata from https://arxiv.org/abs/1609\.09584v4#',
+                 '#INFO: This paper was publicly published\.#',
+                 '#INFO: Emails to buffer.com sent correctly\.#',
+                   ),
+             ],
+                ];
+    }
+
+        /**
+         * @runInSeparateProcess
+         * @dataProvider save_metabox_provider
+         * @depends test_create_primary_publication_type
+         */
+    public function test_save_metabox( $post_id, $POST_args, $expections, $primary_publication_type ) {
+        $post_type = get_post_type($post_id);
+
+        foreach($POST_args as $key => $value)
+        {
+            $_POST[ $post_type . $key ] = $value;
+        }
+
+        $class = new ReflectionClass('O3PO_PrimaryPublicationType');
+
+        $post_type = get_post_type($post_id);
+        if ( $primary_publication_type->get_publication_type_name() !== $post_type )
+            return;
+
+        $method = $class->getMethod('save_metabox'); //calls save_meta_data() but also does some further things
+            //Call it again to trigger a post actually published
+        $method = $class->getMethod('save_metabox');
+        $method->setAccessible(true);
+        $method->invokeArgs($primary_publication_type, array($post_id, new WP_Post($post_id) ));
+
+        print( "\n validation_results: " . get_post_meta( $post_id, $post_type . '_validation_result', true) . "\n" );
+
+        /* if(!empty($POST_args['_fetch_metadata_from_arxiv'])) */
+        /* { */
+        /*         //print( "\n fetch_results: " . get_post_meta( $post_id, $post_type . '_arxiv_fetch_results', true) . "\n" ); */
+
+        /*     foreach($expections as $expection) */
+        /*     { */
+        /*         $this->assertRegexp($expection, get_post_meta( $post_id, $post_type . '_arxiv_fetch_results', true)); */
+        /*     } */
+        /* } */
+        /* else */
+        /* { */
+        /*     foreach($POST_args as $key => $value) */
+        /*         $this->assertSame($value, get_post_meta( $post_id, $post_type . $key, true), 'Property ' . $post_type . $key . ' was not set correctly.'); */
+        /* } */
+    }
+
 }

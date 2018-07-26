@@ -139,6 +139,7 @@ $post_data = array();
 $posts = array(
     1 => array(
         'post_type' => 'paper',
+        'paper_nonce' => 'fake_nonce',
         'thumbnail_id' => 2,
         'post_status' => 'private',
         'post_title' => 'Fake title',
@@ -152,18 +153,18 @@ $posts = array(
             'paper_arxiv_pdf_attach_ids' => array(),
             'paper_popular_summary' => 'Some random fake summary.',
             'paper_feature_image_caption' => 'Some random fake cation.',
-            'paper_fermats_library' => '',
+            'paper_fermats_library' => 'checked',
             'paper_validation_result' => 'fake_validation_result',
             'paper_title' => 'Fake title',
             'paper_title_mathml' => 'Fake title',
             'paper_corresponding_author_email' => 'mal_formed_corresponding_author_email',
-            'paper_corresponding_author_has_been_notifed_date' => 'fake_paper_corresponding_author_has_been_notifed_date',
+            'paper_corresponding_author_has_been_notifed_date' => '',
             'paper_buffer_email' => 'fake_paper_buffer_email',
             'paper_buffer_email_was_sent_date' => 'fake_paper_buffer_email_was_sent_date',
             'paper_buffer_special_text' => 'fake_paper_buffer_special_text',
             'paper_fermats_library_permalink' => 'fake_paper_fermats_library_permalink',
             'paper_fermats_library_permalink_worked' => 'fake_paper_fermats_library_permalink_worked',
-            'paper_fermats_library_has_been_notifed_date' => 'fake_paper_fermats_library_has_been_notifed_date',
+            'paper_fermats_library_has_been_notifed_date' => '',
             'paper_number_authors' => 2,
             'paper_author_given_names' => ['Foo', 'Baz'],
             'paper_author_surnames' => ['Bar', 'Boo'],
@@ -201,6 +202,7 @@ $posts = array(
         'post_type' => 'attachment',
         'attachment_image_src' => 'fake_attachment_image_src',
         'attachment_url' => "Fake attachment_url",
+        'attachment_path' => dirname(__FILE__) . '/arxiv/0809.2542v4.pdf',
                ),
     4 => array(
         'post_type' => 'attachment',
@@ -209,6 +211,7 @@ $posts = array(
                ),
     5 => array(
         'post_type' => 'paper',
+        'paper_nonce' => 'fake_nonce',
         'thumbnail_id' => 2,
         'post_status' => 'private',
         'post_title' => 'Fake title 2',
@@ -271,8 +274,9 @@ $posts = array(
                ),
     8 => array(
         'post_type' => 'paper',
+        'paper_nonce' => 'fake_nonce',
         'thumbnail_id' => 2,
-        'post_status' => 'private',
+        'post_status' => 'publish',
         'post_title' => 'Fake title',
         'permalink' => 'Fake permalink',
         'meta' => array(
@@ -280,7 +284,6 @@ $posts = array(
             'paper_abstract_mathml' => 'This is a test abstract that contains not math so far and no special characters.',
             'paper_eprint' => '0908.2921v2',
             'paper_eprint_was_changed_on_last_save' => false,
-//            'paper_arxiv_pdf_attach_ids' => array(4),
             'paper_arxiv_pdf_attach_ids' => array(3),
             'paper_popular_summary' => 'Some random fake summary.',
             'paper_feature_image_caption' => 'Some random fake cation.',
@@ -290,8 +293,8 @@ $posts = array(
             'paper_title_mathml' => 'Fake title',
             'paper_corresponding_author_email' => 'mal_formed_corresponding_author_email',
             'paper_corresponding_author_has_been_notifed_date' => 'fake_paper_corresponding_author_has_been_notifed_date',
-            'paper_buffer_email' => 'fake_paper_buffer_email',
-            'paper_buffer_email_was_sent_date' => 'fake_paper_buffer_email_was_sent_date',
+            'paper_buffer_email' => '',
+            'paper_buffer_email_was_sent_date' => '',
             'paper_buffer_special_text' => 'fake_paper_buffer_special_text',
             'paper_fermats_library_permalink' => 'fake_paper_fermats_library_permalink',
             'paper_fermats_library_permalink_worked' => 'fake_paper_fermats_library_permalink_worked',
@@ -305,12 +308,12 @@ $posts = array(
             'paper_author_urls' => ['',''],
             'paper_number_affiliations' => 2,
             'paper_affiliations' => ['Foo University', 'Bar Institut'],
-            'paper_date_published' => 'fake_paper_date_published',
+            'paper_date_published' => current_time("Y-m-d"),
             'paper_journal' => 'fake_paper_journal',
-            'paper_volume' => 'fake_paper_volume',
-            'paper_pages' => '1',
+            'paper_volume' => '2',
+            'paper_pages' => '3',
             'paper_doi_prefix' => 'fake_paper_doi_prefix',
-            'paper_doi_suffix' => 'fake_paper_doi_suffix',
+            'paper_doi_suffix' => 'fake_journal_level_doi_suffix-' . current_time("Y-m-d") . '-3',
             'paper_bbl' => 'fake_paper_bbl',
             'paper_author_latex_macro_definitions' => array(),
             'paper_crossref_xml' => 'fake_paper_crossref_xml',
@@ -488,6 +491,11 @@ function esc_attr( $text ) {
     return '(esc_attr does nothing useful in the bootstaped fake WordPress)' . $text;
 }
 
+function esc_url( $text ) {
+
+    return '(esc_url does nothing useful in the bootstaped fake WordPress)' . $text;
+}
+
 function wp_get_attachment_url($id) {
     global $posts;
 
@@ -598,10 +606,13 @@ function wp_update_attachment_metadata( $attach_id, $attach_data ) {
 
 }
 
-function get_attached_file( $id ) {
+function get_attached_file( $post_id ) {
     global $posts;
 
-    return $posts[$id]["attachment_path"];
+    if(!isset($posts[$post_id]['attachment_path']))
+        throw new Exception("Post with id=" . $post_id . " has no attachment_path.");
+
+    return $posts[$post_id]["attachment_path"];
 }
 
 function wp_update_post( $array ) {
@@ -658,10 +669,42 @@ function wp_remote_get( $url, $args ) {
     $special_urls = array(
         'https://arxiv.org/abs/0809.2542v4' => dirname(__FILE__) . '/arxiv/0809.2542v4.html',
         'https://arxiv.org/abs/1609.09584v4' => dirname(__FILE__) . '/arxiv/1609.09584v4.html',
+        'https://arxiv.org/abs/0908.2921v2' => dirname(__FILE__) . '/arxiv/0908.2921v2.html',
                           );
 
     if(!empty($special_urls[$url]))
         return array('headers'=>'' ,'body'=> file_get_contents($special_urls[$url]) );
     else
-        throw new Exception('Fake wp_remote_get() does not know hot to handle ' . $url);
+        throw new Exception('Fake wp_remote_get() does not know how to handle ' . $url);
 }
+
+function wp_verify_nonce() {
+    return true;
+}
+
+function current_user_can() {
+    return true;
+}
+
+function wp_is_post_autosave() {
+    return false;
+}
+
+function wp_is_post_revision() {
+    return false;
+}
+
+function remove_action() {}
+
+function wp_slash( $input ) {
+    return $input;
+}
+
+function wp_generate_password( $length ) {
+    $string = '';
+    for($i=0; $i<$length; $i++)
+        $string .= rand(0, 9); //This is just a face environemnt, so no security concerns
+    return $string;
+}
+
+function wp_remote_post( $url, $args = array() ) {}
