@@ -418,7 +418,7 @@ abstract class O3PO_PublicationType {
         if( strpos($validation_result, 'ERROR') === false and strpos($validation_result, 'REVIEW') === false) {
 
                 //Upload meta-data to crossref
-            $crossref_url = (get_post_status($post_id) === 'publish' && !$environment->is_test_environment()) ? $this->get_journal_property('crossref_deposite_url') : $this->get_journal_property('crossref_test_deposite_url'); // Send it to the test system or the real system
+            $crossref_url = (get_post_status($post_id) === 'publish' && !$this->environment->is_test_environment()) ? $this->get_journal_property('crossref_deposite_url') : $this->get_journal_property('crossref_test_deposite_url'); // Send it to the test system or the real system
             $crossref_response = $this->upload_meta_data_to_crossref($doi_batch_id, $crossref_xml,
                                                                      $this->get_journal_property('crossref_id'),
                                                                      $this->get_journal_property('crossref_pw'),
@@ -427,7 +427,7 @@ abstract class O3PO_PublicationType {
             update_post_meta( $post_id, $post_type . '_crossref_response', $crossref_response );
 
                 //Upload meta-data to DOAJ
-            if (get_post_status($post_id) === 'publish' && !$environment->is_test_environment())
+            if (get_post_status($post_id) === 'publish' && !$this->environment->is_test_environment())
                 $doaj_response = $this->upload_meta_data_to_doaj($doaj_json,
                                                                  $this->get_journal_property('doaj_api_url'),
                                                                  $this->get_journal_property('doaj_api_key')
@@ -677,7 +677,7 @@ abstract class O3PO_PublicationType {
         $post_type = get_post_type($post_id);
         $buffer_secret_email = $this->get_journal_property('buffer_secret_email');
 
-        $validation_result = 'INFO: This ' . $post_type . " was publicly published.";
+        $validation_result = 'INFO: This ' . $post_type . " was publicly published.\n";
 
         if(!empty($buffer_secret_email))
         {
@@ -704,7 +704,7 @@ abstract class O3PO_PublicationType {
                                   );
                 $image_path = $this->environment->get_feature_image_path($post_id);
 
-                $to = ($environment->is_test_environment() ? $this->get_journal_property('developer_email') : $buffer_secret_email );
+                $to = ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $buffer_secret_email );
                 $headers = array( 'From: ' . $this->get_journal_property('publisher_email') );
                 $subject = '';
                 if(!empty($buffer_special_text))
@@ -1052,7 +1052,7 @@ abstract class O3PO_PublicationType {
         #Test for test environment should not be done here but futher up the class hierarchy!
 
         $xml .= '      <depositor_name>' . esc_html($this->get_journal_property('publisher')) . '</depositor_name>' . "\n";
-        $xml .= '      <email_address>' . esc_html($environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('crossref_email') ) . '</email_address>' . "\n";
+        $xml .= '      <email_address>' . esc_html($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('crossref_email') ) . '</email_address>' . "\n";
         $xml .= '    </depositor>' . "\n";
         $xml .= '    <registrant>' . esc_html($this->get_journal_property('publisher')) . '</registrant>' . "\n";
         $xml .= '  </head>' . "\n";

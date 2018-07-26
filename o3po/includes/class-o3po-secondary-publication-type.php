@@ -4,8 +4,8 @@
  * Class representing the secondary publication type.
  *
  * Each publication type is connected to a WordPress custom post type and
- * individual publications are represented by posts of that type.  
- * 
+ * individual publications are represented by posts of that type.
+ *
  * @link       http://example.com
  * @since      0.1.0
  *
@@ -19,7 +19,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-latex
 /**
  * Class representing the secondary publication type.
  *
- * @since      0.1.0 
+ * @since      0.1.0
  * @package    O3PO
  * @subpackage O3PO/includes
  * @author     Christian Gogolin <o3po@quantum-journal.org>
@@ -34,7 +34,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @access   private
          */
     private $targe_publication_type_name;
-    
+
         /**
          * Plural name of the publication type on which this publication
          * type can be meta literature.
@@ -43,8 +43,8 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @access   private
          */
     private $targe_publication_type_name_plural;
-    
-    
+
+
        /**
          * Construct this publication type.
          *
@@ -61,7 +61,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @param    O3PO_Environment     $environment                           The evironment in which this post type is to be created.
          */
     public function __construct( $targe_publication_type_name, $targe_publication_type_name_plural, $journal, $environment ) {
-        
+
         parent::__construct($journal, 1, $environment);
 
         $this->targe_publication_type_name = $targe_publication_type_name;
@@ -69,38 +69,38 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
     }
 
         /**
-         * Get the categories associated with this publication type 
+         * Get the categories associated with this publication type
          *
          * The publication type View comes in different flavors, depending
-         * on the content and authors who wrote it. 
+         * on the content and authors who wrote it.
          *
          * @since    0.1.0
          * @access   public
          */
     public static function get_associated_categories() {
-        
+
         return array("Perspective", "Editorial", "Leap");
     }
 
 
         /**
          * Render the admin panel meta box.
-         * 
+         *
          * @since     0.1.0
          * @access    public
          * @param     Post    $post    Post for which the meta box is to be rendered.
          */
     public function render_metabox( $post ) {
-        
+
         $post_id = $post->ID;
         $post_type = get_post_type($post_id);
             // If the post type doesn't fit do nothing
         if ( $this->get_publication_type_name() !== $post_type )
             return;
-        
+
         parent::render_metabox( $post );
-        
-        $post_id = $post->ID;        
+
+        $post_id = $post->ID;
 
         $this->the_admin_panel_intro_text($post_id);
         $this->the_admin_panel_validation_result($post_id);
@@ -132,7 +132,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         /**
          * Callback function for handling the data enterd into the meta-box
          * when a correspnding post is saved.
-         * 
+         *
          * Warning: This is already called when a New Post is created and not
          * only when the "Publish" or "Update" button is pressed!
          *
@@ -141,11 +141,11 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @param     int     $post_id     Id of the post whose meta data is to be saved.
          * */
     protected function save_meta_data( $post_id ) {
-        
+
         parent::save_meta_data($post_id);
 
         $post_type = get_post_type($post_id);
-        
+
         $new_type = isset( $_POST[ $post_type . '_type' ] ) ? sanitize_text_field( $_POST[ $post_type . '_type' ] ) : '';
         $new_number_target_dois = isset( $_POST[ $post_type . '_number_target_dois' ] ) ? sanitize_text_field( $_POST[ $post_type . '_number_target_dois' ] ) : '';
         $new_target_dois = array();
@@ -181,7 +181,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         update_post_meta( $post_id, $post_type . '_number_target_dois', $new_number_target_dois );
         update_post_meta( $post_id, $post_type . '_target_dois', $new_target_dois );
         update_post_meta( $post_id, $post_type . '_reviewers_summary', $new_reviewers_summary );
-        
+
         update_post_meta( $post_id, $post_type . '_number_reviewers', $new_number_reviewers );
 		update_post_meta( $post_id, $post_type . '_reviewer_given_names', $new_reviewer_given_names );
 		update_post_meta( $post_id, $post_type . '_reviewer_surnames', $new_reviewer_surnames );
@@ -193,7 +193,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         update_post_meta( $post_id, $post_type . '_reviewer_grades', $new_reviewer_grades );
         update_post_meta( $post_id, $post_type . '_number_reviewer_institutions', $new_number_reviewer_institutions );
 		update_post_meta( $post_id, $post_type . '_reviewer_institutions', $new_reviewer_institutions );
-        
+
         update_post_meta( $post_id, $post_type . '_author_commentary', $new_author_commentary );
         update_post_meta( $post_id, $post_type . '_about_the_author', $new_about_the_author );
     }
@@ -206,16 +206,16 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @param    int          $post_id   The id of the post whose meta-data is to be validated and processed.
          */
     protected function validate_and_process_data( $post_id ) {
-        
-        $post_type = get_post_type($post_id);                
+
+        $post_type = get_post_type($post_id);
 
         $type = get_post_meta( $post_id, $post_type . '_type', true );
         $number_target_dois = get_post_meta( $post_id, $post_type . '_number_target_dois', true );
         $target_dois = get_post_meta( $post_id, $post_type . '_target_dois', true );
-        
+
             // Set the category from $type
         $term_id = term_exists( $type, 'category' );
-        if($term_id == 0) 
+        if($term_id == 0)
         {
             wp_insert_term( $type, 'category');
             $term_id = term_exists( $type, 'category' );
@@ -224,7 +224,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 
         $validation_result = '';
         $validation_result .= parent::validate_and_process_data($post_id);
-        
+
         if ( empty( $number_target_dois ) && $number_target_dois !== '0' ) $validation_result .= "ERROR: Number of target DOIs is empty.\n";
         for ($x = 0; $x < $number_target_dois; $x++) {
             if ( empty( $target_dois[$x] ) )
@@ -232,10 +232,10 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
             else if( substr($target_dois[$x], 0, 8) !== get_plugin_option('doi_prefix') )
                 $validation_result .= "WARNING: Target DOI " . ($x+1) . " does not point to a paper of this publisher or it contains a prefix such as https://dx.doi.org/, which it shouldn't. Pleae check the DOI.\n" ;
         }
-        
+
         return $validation_result;
     }
-    
+
 
         /**
          * Do things when the post is finally published.
@@ -247,7 +247,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @param     int     $post_id     Id of the post that is actually published publicly.
          */
     protected function on_post_actually_published( $post_id ) {
-        
+
         $validation_result = parent::on_post_actually_published($post_id);
 
         $post_type = get_post_type($post_id);
@@ -260,22 +260,22 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         $title = get_post_meta( $post_id, $post_type . '_title', true );
         $journal = get_post_meta( $post_id, $post_type . '_journal', true );
 		$post_url = get_permalink( $post_id );
-        
+
             // Send Emails about the submission to us
         $to = ($environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email'));
         $headers = array( 'From: ' . $this->get_journal_property('publisher_email'));
-        $subject  = ($environment->is_test_environment() ? 'TEST ' : '') . 'A ' . strtolower($type) . ' has been published/updated by ' . $journal;
-        $message  = ($environment->is_test_environment() ? 'TEST ' : '') . $journal . " has published/updated the following " . strtolower($type) . ":\n\n";
+        $subject  = ($this->environment->is_test_environment() ? 'TEST ' : '') . 'A ' . strtolower($type) . ' has been published/updated by ' . $journal;
+        $message  = ($this->environment->is_test_environment() ? 'TEST ' : '') . $journal . " has published/updated the following " . strtolower($type) . ":\n\n";
         $message .= "Title:  " . $title . "\n";
         $message .= "Authos: " . static::get_formated_authors($post_id) . "\n";
         $message .= "URL:    " . $post_url . "\n";
         $message .= "DOI:    " . $this->get_journal_property('doi_url_prefix') . $doi . "\n";
-        
+
         $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
-        if(!$successfully_sent) 
+        if(!$successfully_sent)
             $validation_result .= 'WARNING: Error sending email notifation of publication to publisher.' . "\n";
-        
+
             // Send trackbacks to the arXiv and ourselves
         $number_target_dois = get_post_meta( $post_id, $post_type . '_number_target_dois', true );
         $target_dois = get_post_meta( $post_id, $post_type . '_target_dois', true );
@@ -288,7 +288,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                 $target_post_type = get_post_type($target_post_id);
                 $target_eprint = get_post_meta( $target_post_id, $target_post_type . '_eprint', true );
                 $eprint_without_version = preg_replace('#v[0-9]*$#', '', $target_eprint);
-                if(!empty($target_eprint) && !$environment->is_test_environment()) {
+                if(!empty($target_eprint) && !$this->environment->is_test_environment()) {
                         //trachback to the arxiv
                     $trackback_result .= trackback( $this->get_journal_property('arxiv_url_trackback_prefix') . $eprint_without_version , $title, $trackback_excerpt, $post_id );
                 }
@@ -296,19 +296,19 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                 trackback( get_site_url() . $suspected_post_url, $title, $trackback_excerpt, $post_id );
             }
         }
-        
+
             // Send email notifying authors of publication
-		if( empty($corresponding_author_has_been_notifed_date) || $environment->is_test_environment()) {
-            
-            $to = ($environment->is_test_environment() ? $this->get_journal_property('developer_email') : $corresponding_author_email);
-			$headers = array( 'Cc: ' . ($environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') ), 'From: ' . $this->get_journal_property('publisher_email'));
-			$subject  = ($environment->is_test_environment() ? 'TEST ' : '') . $journal . " has published your " . $type;
-			$message  = ($environment->is_test_environment() ? 'TEST ' : '') . "Dear " . static::get_formated_authors($post_id) . ",\n\n";
-			$message .= "Congratulations! Your " . $type . " '" . $title . "' has been published by " . $journal . " and is now available under:\n\n"; 
+		if( empty($corresponding_author_has_been_notifed_date) || $this->environment->is_test_environment()) {
+
+            $to = ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $corresponding_author_email);
+			$headers = array( 'Cc: ' . ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') ), 'From: ' . $this->get_journal_property('publisher_email'));
+			$subject  = ($this->environment->is_test_environment() ? 'TEST ' : '') . $journal . " has published your " . $type;
+			$message  = ($this->environment->is_test_environment() ? 'TEST ' : '') . "Dear " . static::get_formated_authors($post_id) . ",\n\n";
+			$message .= "Congratulations! Your " . $type . " '" . $title . "' has been published by " . $journal . " and is now available under:\n\n";
 			$message .= $post_url . "\n\n";
 			$message .= "Your " . $type . " has been assigned the following journal reference and DOI\n\n";
 			$message .= "Journal reference: " . static::get_formated_citation($post_id) . "\n";
-			$message .= "DOI:               " . $this->get_journal_property('doi_url_prefix') . $doi . "\n\n"; 
+			$message .= "DOI:               " . $this->get_journal_property('doi_url_prefix') . $doi . "\n\n";
 			$message .= "In case you have an ORCID you can go to http://search.crossref.org/?q=" . str_replace('/', '%2F', $doi) . " to conveniently add your new publication to your profile.\n\n";
 			$message .= "Please be patient, it can take several hours before the above link works.\n\n";
             $message .= "Thank you for writing this " . $type . " for " . $journal . "!\n\n";
@@ -316,7 +316,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 			$message .= "Christian, Lídia, and Marcus\n";
 			$message .= "Executive Board\n";
 			$successfully_sent = wp_mail( $to, $subject, $message, $headers);
-            
+
             if($successfully_sent) {
                 update_post_meta( $post_id, $post_type . '_corresponding_author_has_been_notifed_date', date("Y-m-d") );
             }
@@ -337,7 +337,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @param    int      $post_id    Id of the post.
          */
     static private function get_trackback_excerpt( $post_id ) {
-        
+
         $post_type = get_post_type($post_id);
         if ( $post_type === $this->get_publication_type_name() ) {
             $doi = static::get_doi( $post_id );
@@ -356,7 +356,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         else
             return '';
     }
-    
+
         /**
          * Get the excerpt of a this publication type.
          *
@@ -369,12 +369,12 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @param     string    $content    Content to be filtered.
          */
     public static function get_the_excerpt( $content ) {
-        
+
         global $post;
-        
+
         $post_id = $post->ID;
         $post_type = get_post_type($post_id);
-        
+
         if ( $post_type === $this->get_publication_type_name() ) {
             $content = '';
             $content .= '<p class="authors-in-excerpt">' . static::get_formated_authors( $post_id ) . ',</p>' . "\n";
@@ -383,8 +383,8 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
             $bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
             $trimmer_abstract = wp_html_excerpt( do_shortcode(O3PO_Latex::expand_cite_to_html(get_post_field('post_content', $post_id), $bbl)), 190, '&#8230;');
 
-            
-            while( preg_match_all('/(?<!\\\\)\$/', $trimmer_abstract) % 2 !== 0 ) 
+
+            while( preg_match_all('/(?<!\\\\)\$/', $trimmer_abstract) % 2 !== 0 )
             {
                 empty($i) ? $i = 1 : $i += 1;
                 $trimmer_abstract = wp_html_excerpt( get_post_meta( $post_id, $post_type . '_abstract', true ), 190+$i, '&#8230;');
@@ -392,9 +392,9 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
             $content .= esc_html ( $trimmer_abstract );
             $content .= '</a></p>';
         }
-        
+
         return $content;
-    }    
+    }
 
         /**
          * Echo the sub type/category part of the admin panel.
@@ -404,9 +404,9 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @param    int     $post_id     Id of the post.
          */
     protected function the_admin_panel_sub_type( $post_id ) {
-        
+
         $post_type = get_post_type($post_id);
-                
+
         $type = get_post_meta( $post_id, $post_type . '_type', true );
         echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_type" class="' . $post_type . '_type_label">' . __( 'Type', 'qj-plugin' ) . '</label></th>';
@@ -417,7 +417,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         echo '</select><br /><label for="' . $post_type . '_type" class="' . $post_type . '_type_label">Type of ' . $this->get_publication_type_name() . '</label></div>';
 		echo '		</td>';
 		echo '	</tr>';
-        
+
     }
 
         /**
@@ -428,12 +428,12 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @param    int     $post_id     Id of the post.
          */
     protected function the_admin_panel_target_dois( $post_id ) {
-        
+
         $post_type = get_post_type($post_id);
-                
+
         $number_target_dois = get_post_meta( $post_id, $post_type . '_number_target_dois', true );
         $target_dois = get_post_meta( $post_id, $post_type . '_target_dois', true );
-        
+
         if( empty( $number_target_dois ) && $number_target_dois !== '0' )
             $number_target_dois = 1;
 
@@ -462,13 +462,13 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @param    int     $post_id     Id of the post.
          */
     protected static function the_admin_panel_reviewers_summary( $post_id ) {
-        
+
         $post_type = get_post_type($post_id);
-        
+
         $reviewers_summary = get_post_meta( $post_id, $post_type . '_reviewers_summary', true );
-        
+
 		if( empty( $reviewers_summary ) ) $reviewers_summary = '' ;
-        
+
         echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_reviewers_summary" class="' . $post_type . '_reviewers_summary_label">' . __( 'Reviewers summary', 'qj-plugin' ) . '</label></th>';
 		echo '		<td>';
@@ -485,7 +485,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @param    int     $post_id     Id of the post.
          */
     protected static function the_admin_panel_reviewers( $post_id ) {
-        
+
         $post_type = get_post_type($post_id);
 
         $number_reviewers = get_post_meta( $post_id, $post_type . '_number_reviewers', true );
@@ -533,7 +533,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 			echo '		</td>';
 			echo '	</tr>';
 		}
-        
+
     }
 
         /**
@@ -544,14 +544,14 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @param    int     $post_id     Id of the post.
          */
     protected static function the_admin_panel_reviewer_institutions( $post_id ) {
-        
+
         $post_type = get_post_type($post_id);
         $number_reviewer_institutions = get_post_meta( $post_id, $post_type . '_number_reviewer_institutions', true );
 		$reviewer_institutions = get_post_meta( $post_id, $post_type . '_reviewer_institutions', true );
-        
+
         if( empty( $number_reviewer_institutions ) && $number_reviewer_institutions !== '0' ) $number_reviewer_institutions = 1;
 		if( empty( $reviewer_institutions ) ) $reviewer_institutions = array();
-        
+
 		echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_number_reviewer_institutions" class="' . $post_type . '_number_reviewer_institutions_label">' . __( 'Number of reviewer institutions', 'qj-plugin' ) . '</label></th>';
 		echo '		<td>';
@@ -579,22 +579,22 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @param    int     $post_id     Id of the post.
          */
     protected static function the_admin_panel_author_commentary( $post_id ) {
-        
+
         $post_type = get_post_type($post_id);
-        
+
         $author_commentary = get_post_meta( $post_id, $post_type . '_author_commentary', true );
         $about_the_author = get_post_meta( $post_id, $post_type . '_about_the_author', true );
-        
+
 		if( empty( $author_commentary ) ) $author_commentary = '' ;
 		if( empty( $about_the_author ) ) $about_the_author = '' ;
-        
+
         echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_author_commentary" class="' . $post_type . '_author_commentary_label">' . __( 'Author commentary', 'qj-plugin' ) . '</label></th>';
 		echo '		<td>';
 		echo '			<textarea rows="6" style="width:100%;" name="' . $post_type . '_author_commentary" id="' . $post_type . '_author_commentary">' . esc_attr__( $author_commentary ) . '</textarea><p>(Commentary of the author(s).)</p>';
 
         echo '			<textarea rows="6" style="width:100%;" name="' . $post_type . '_about_the_author" id="' . $post_type . '_about_the_author">' . esc_attr__( $about_the_author ) . '</textarea><p>(Some text about the author(s).)</p>';
-                
+
 		echo '		</td>';
 		echo '	</tr>';
     }
@@ -607,15 +607,15 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @param    int     $post_id     Id of the post.
          */
     public static function get_reviewers_summary_html( $post_id ) {
-        
+
         $post_type = get_post_type($post_id);
-        
+
         $reviewers_summary = get_post_meta( $post_id, $post_type . '_reviewers_summary', true );
-        
+
         $reviewers_summary_html = '';
         $reviewers_summary_html .= '<h3>Reviewers summary</h3>';
         $reviewers_summary_html .= '<p class="reviewers-summary">' . $reviewers_summary . '</p>';
-        
+
         return $reviewers_summary_html;
     }
 
@@ -625,9 +625,9 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @since    0.1.0
          * @access   protected
          * @param    int     $post_id     Id of the post.
-         */ 
+         */
     public static function get_reviewers_html( $post_id ) {
-        
+
         $post_type = get_post_type($post_id);
 
         $number_reviewers = get_post_meta( $post_id, $post_type . '_number_reviewers', true );
@@ -643,7 +643,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 
         $number_institutions = get_post_meta( $post_id, $post_type . '_number_reviewer_institutions', true );
         $reviewer_institutions = get_post_meta( $post_id, $post_type . '_reviewer_institutions', true );
-        
+
         $reviewers_html = '';
         $reviewers_html .= '<h3>Reviewed by</h3>';
         $reviewer_names = array();
@@ -657,7 +657,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
             $reviewer_ages_filtered = array_filter($reviewer_ages,'strlen');
             $reviewer_grades_filtered = array_filter($reviewer_grades,'strlen');
             if(!empty($reviewer_ages_filtered) and !empty($reviewer_grades_filtered))
-            {   
+            {
                 $min_age = min($reviewer_ages_filtered);
                 $max_age = max($reviewer_ages_filtered);
                 $min_grade = min($reviewer_grades_filtered);
@@ -669,7 +669,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
             $reviewers_html .= O3PO_Utility::oxford_comma_implode($reviewer_institutions) . '<br />';
         $reviewers_html .= "The reviewers consented to publication of their names as stated" . '<br />';
         $reviewers_html .= '</p>';
-        
+
         return $reviewers_html;
     }
 
@@ -681,20 +681,20 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @param    int     $post_id     Id of the post.
          */
     public static function get_author_commentary_html( $post_id ) {
-        
+
         $post_type = get_post_type($post_id);
-        
+
         $author_commentary = get_post_meta( $post_id, $post_type . '_author_commentary', true );
         $about_the_author = get_post_meta( $post_id, $post_type . '_about_the_author', true );
-        
+
         $author_commentary_html = '';
         $author_commentary_html .= '<h3>Author commentary</h3>';
         $author_commentary_html .= '<p class="author-commentary">' . $author_commentary . '</p>';
         $author_commentary_html .= '<p class="about-the-author">' . $about_the_author . '</p>';
-        
+
         return $author_commentary_html;
     }
-    
+
         /**
          * Fake the author.
          *
@@ -702,15 +702,15 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          *
          * @since    0.1.0
          * @access   pulic
-         * @param    string    $display_name   Display name to be filtered. 
+         * @param    string    $display_name   Display name to be filtered.
          */
     public function get_the_author( $display_name ) {
-        
+
         global $post;
-        
+
         $post_id = $post->ID;
         $post_type = get_post_type($post_id);
-        
+
         if ( $post_type === $this->get_publication_type_name() ) {
             $journal = get_post_meta( $post_id, $post_type . '_journal', true );
             return $journal;
@@ -720,25 +720,25 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
             return $display_name;
         }
     }
-    
+
 
         /**
          * Construct the content.
-         * 
+         *
          * Contrary to posts of primary publication type, we are not using
          * a single template here, but simply output some information
          * alongside the standard content.
          *
          * To be added to the 'the_content' filter.
-         * 
+         *
          * @since     0.1.0
          * @access    public
          * @param     string    $content     Content to be filtered.
          */
     public function get_the_content( $content ) {
-        
+
         global $post;
-        
+
         $post_id = $post->ID;
         $post_type = get_post_type($post_id);
 
@@ -754,18 +754,18 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
             $author_surnames = get_post_meta( $post_id, $post_type . '_author_surnames', true );
             $author_urls = get_post_meta( $post_id, $post_type . '_author_urls', true );
             $author_affiliations = get_post_meta( $post_id, $post_type . '_author_affiliations', true );
-            $affiliations = get_post_meta( $post_id, $post_type . '_affiliations', true );        
+            $affiliations = get_post_meta( $post_id, $post_type . '_affiliations', true );
             $citation = rtrim(static::get_formated_citation($post_id), '.');
             $journal = get_post_meta( $post_id, $post_type . '_journal', true );
-                    
+
             $content = '';
-            
+
             if ( has_post_thumbnail( ) ) {
                 $content .= '<img src="' . get_the_post_thumbnail_url($post_id) . '" alt="" width="300" height="150" class="alignright size-medium wp-image-1433">';
             }
-            
-            $content .= static::lead_in_paragraph($post_id);            
-            
+
+            $content .= static::lead_in_paragraph($post_id);
+
             $all_authors_have_same_affiliation = true;
             if ( !empty($author_affiliations) ) {
                 foreach($author_affiliations as $author_affiliation) {
@@ -775,19 +775,19 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                     }
                 }
             }
-            
+
             $content .= "<p><strong>By";
             for ($x = 0; $x < $number_authors; $x++) {
                 if( !empty($author_urls[$x]))
                     $content .= ' <a href="' . $author_urls[$x] . '">' . $author_given_names[$x] . ' ' . $author_surnames[$x] . '</a>';
                 else
                     $content .= ' ' . $author_given_names[$x] . ' ' . $author_surnames[$x];
-                if( !$all_authors_have_same_affiliation && !empty($author_affiliations) && !empty($author_affiliations[$x]) ) 
+                if( !$all_authors_have_same_affiliation && !empty($author_affiliations) && !empty($author_affiliations[$x]) )
                 {
                     $content .= ' (';
                     $this_authors_affiliations = preg_split('/,/', $author_affiliations[$x]);
                     $this_authors_affiliations_count = count($this_authors_affiliations);
-                    foreach($this_authors_affiliations as $y => $affiliation_num) 
+                    foreach($this_authors_affiliations as $y => $affiliation_num)
                     {
                         $content .= $affiliations[$affiliation_num-1];
                         if( $y < $this_authors_affiliations_count-1 and $this_authors_affiliations_count > 2) $content .= ",";
@@ -804,7 +804,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                 $content .= ' (';
                 $this_authors_affiliations = preg_split('/,/', $author_affiliations[0]);
                 $this_authors_affiliations_count = count($this_authors_affiliations);
-                foreach($this_authors_affiliations as $y => $affiliation_num) 
+                foreach($this_authors_affiliations as $y => $affiliation_num)
                 {
                     $content .= $affiliations[$affiliation_num-1];
                     if( $y < $this_authors_affiliations_count-1 and $this_authors_affiliations_count > 2) $content .= ",";
@@ -814,7 +814,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                 $content .= ')';
             }
             $content .= ".</strong></p>\n";
-            
+
             $content .= '<table class="meta-data-table">';
             $content .= '<tr><td>Published:</td><td>' . esc_html(static::get_formated_date_published( $post_id )) .  ', ' . static::get_formated_volume_html($post_id) . ', page ' . get_post_meta( $post_id, $post_type . '_pages', true ) . '</td></tr>';
             $content .= '<tr><td>Doi:</td><td><a href="' . esc_attr($this->get_journal_property('doi_url_prefix') . $doi) . '">' . esc_html($this->get_journal_property('doi_url_prefix') . $doi ) . '</a></td></tr>';
@@ -853,13 +853,13 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @param    int    $post_id    Id of the post.
          */
     public function lead_in_paragraph( $post_id ) {
-        
+
         $post_type = get_post_type($post_id);
         $type = get_post_meta( $post_id, $post_type . '_type', true );
         $number_target_dois = get_post_meta( $post_id, $post_type . '_number_target_dois', true );
         $target_dois = get_post_meta( $post_id, $post_type . '_target_dois', true );
         $journal = get_post_meta( $post_id, $post_type . '_journal', true );
-                
+
         $content = '';
         $content .= '<p><em>This is ' . ( preg_match('/^[hH]?[aeiouAEIOU]/' , $type) ? 'an' : 'a') . ' ' . $type;
         if($type==="Leap")
@@ -887,7 +887,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                 $content .= '<a href="' . $this->get_journal_property('doi_url_prefix') . $target_dois[$x] . '">' . $target_dois[$x] . '</a>';
         }
         $content .= ".</em></p>\n";
-        
+
         return $content;
     }
 
@@ -898,13 +898,13 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @access    public
          */
     public function the_meta_tags() {
-        
+
         $post_id = get_the_ID();
         $post_type = get_post_type($post_id);
-        
+
         if ( !is_single() || $post_type !== $this->get_publication_type_name())
             return;
-        
+
         parent::the_meta_tags();
     }
 
@@ -915,7 +915,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @access   protected
          */
     protected static function get_default_number_reviewers() {
-        
+
         return 4;
     }
 
