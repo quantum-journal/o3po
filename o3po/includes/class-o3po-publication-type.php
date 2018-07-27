@@ -415,6 +415,13 @@ abstract class O3PO_PublicationType {
         if(strpos($doaj_json, 'ERROR') !== false)
             $validation_result .= $doaj_json . "\n";
 
+
+            // Generate CLOCKSS xml
+        $clockss_xml = $this->generate_clockss_xml($post_id);
+        update_post_meta( $post_id, $post_type . '_clockss_xml', wp_slash($clockss_xml) ); // see https://codex.wordpress.org/Function_Reference/update_post_meta for why we have to used wp_slash() here and not addslashes()
+        if(strpos($clockss_xml, 'ERROR') !== false)
+            $validation_result .= $clockss_xml . "\n";
+
         if( strpos($validation_result, 'ERROR') === false and strpos($validation_result, 'REVIEW') === false) {
 
                 //Upload meta-data to crossref
@@ -425,6 +432,8 @@ abstract class O3PO_PublicationType {
                                                                      $crossref_url
                                                                      );
             update_post_meta( $post_id, $post_type . '_crossref_response', $crossref_response );
+            if(!empty($crossref_response) && strpos($crossref_response, 'ERROR') !== false )
+                $validation_result .= $crossref_response;
 
                 //Upload meta-data to DOAJ
             if (get_post_status($post_id) === 'publish' && !$this->environment->is_test_environment())
@@ -435,6 +444,25 @@ abstract class O3PO_PublicationType {
             else
                 $doaj_response = NULL;
             update_post_meta( $post_id, $post_type . '_doaj_response', $doaj_response );
+            if(!empty($doaj_response) && strpos($doaj_response, 'ERROR') !== false )
+                $validation_result .= $doaj_response;
+
+                //Upload meta-data and fulltext to CLOCKSS (only if a fulltext exists)
+            $fulltext_pdf_path = static::get_fulltext_pdf_path($post_id);
+            $doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
+            $remote_filename_without_extension = $doi_suffix;
+
+            if (get_post_status($post_id) === 'publish' && !empty($fulltext_pdf_path) )// && !$this->environment->is_test_environment())
+                $clockss_response = $this->upload_meta_data_and_pdf_to_clockss($clockss_xml, $fulltext_pdf_path, $remote_filename_without_extension,
+                                                                               $this->get_journal_property('clockss_ftp_url'),
+                                                                               $this->get_journal_property('clockss_username'),
+                                                                               $this->get_journal_property('clockss_password')
+                                                                               );
+            else
+                $clockss_response = NULL;
+            update_post_meta( $post_id, $post_type . '_clockss_response', $clockss_response );
+            if(!empty($clockss_response) && strpos($clockss_response, 'ERROR') !== false )
+                $validation_result .= $clockss_response;
 
             if( get_post_status( $post_id ) === 'publish' )
                 $validation_result .= $this->on_post_actually_published($post_id);
@@ -1303,6 +1331,65 @@ abstract class O3PO_PublicationType {
     }
 
 
+            /**
+         * Submit meta-data to DOAJ:
+         *
+         * From the command line you could do rouhgly the smame via:
+         *
+         * curl -X POST --header "Content-Type: application/json" --header "Accept: application/json" -d "[json goes here]" "https://doaj.org/api/v1/articles?api_key=XXX"
+         * see https://doaj.org/api/v1/docs#/ for more infomation.
+         *
+         * DOAJ has no test system, so that we can only get a response from the real system once we publish the final and actual record.
+         *
+         * This function must be private since we do no longer check internally whether we are running on the test system.
+         *
+         * @since    0.1.0
+         * @access   private
+         * @param    string     $clockss_xml      The xml encoded meta-data to upload.
+         * @param    string     $clockss_ftp_url  The url of the CLOCKSS ftp server.
+         * @param    string     $clockss_username The CLOCKSS username
+         * @param    string     $clockss_password The CLOCKSS password
+         */
+    private static function upload_meta_data_and_pdf_to_clockss( $clockss_xml, $pdf_path, $remote_filename_without_extension, $clockss_ftp_url, $clockss_username, $clockss_password ) {
+
+        $trackErrors = ini_get('track_errors');
+        $ftp_connection = null;
+        $clockss_response = '';
+        try
+        {
+            set_error_handler(function($errno, $errstr, $errfile, $errline, array $errcontext) {
+                    throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
+                });
+
+            $tmpfile_clockss_xml = tempnam(sys_get_temp_dir(), $remote_filename_without_extension );
+            file_put_contents($tmpfile_clockss_xml, $clockss_xml);
+
+            $ftp_connection = ftp_connect($clockss_ftp_url);
+            $login_result = ftp_login($ftp_connection, $clockss_username, $clockss_password);
+
+            if (ftp_put($ftp_connection, $remote_filename_without_extension . '.xml', $tmpfile_clockss_xml, FTP_ASCII))
+                $clockss_response .= "INFO: successfully uploaded the meta-data xml to CLOCKSS.\n";
+            else
+                $clockss_response .= "ERROR: There was an error uploading the meta-data xml to CLOCKSS: " . $php_errormsg . "\n";
+
+            if (ftp_put($ftp_connection, $remote_filename_without_extension . '.pdf', $pdf_path, FTP_ASCII))
+                $clockss_response .= "INFO: successfully uploaded the fulltext pdf to CLOCKSS.\n";
+            else
+                $clockss_response .= "ERROR: There was an error uploading the fulltext pdf to CLOCKSS: " . $php_errormsg . "\n";
+
+
+        } catch(Exception $e) {
+            $clockss_response .= "ERROR: There was an exception during the ftp transfer to CLOCKSS. " . $e->getMessage() . "\n";
+        }
+        ini_set('track_errors', $trackErrors);
+        restore_error_handler();
+        if($ftp_connection !== null)
+            ftp_close($ftp_connection);
+
+        return $clockss_response;
+    }
+
+
         /**
          * Generate xml suitable for the submission to CLOCKSS
          *
@@ -1953,7 +2040,7 @@ abstract class O3PO_PublicationType {
 
 
         /**
-         * Echo the DAJ information for the admin panel.
+         * Echo the DOAJ information for the admin panel.
          *
          * @since 0.1.0
          * @param int    $post_id    Id of the post.
@@ -1978,6 +2065,38 @@ abstract class O3PO_PublicationType {
 			echo '		<th><label for="' . $post_type . '_doaj_response" class="' . $post_type . '_doaj_response_label">' . 'DOAJ response' . '</label></th>';
 			echo '		<td>';
 			echo '			<textarea rows="' . (substr_count( $doaj_response, "\n" )+2) . '" style="width:100%;" readonly>' . esc_attr__( $doaj_response ) . '</textarea><p>(The response we got from DOAJ when uploading the metadata.)</p>';
+			echo '		</td>';
+			echo '	</tr>';
+		}
+
+    }
+
+        /**
+         * Echo the CLOCKSS information for the admin panel.
+         *
+         * @since 0.1.0
+         * @param int    $post_id    Id of the post.
+         */
+    protected static function the_admin_panel_clockss($post_id) {
+
+        $post_type = get_post_type($post_id);
+		$clockss_xml = get_post_meta( $post_id, $post_type . '_clockss_xml', true );
+		$clockss_response = get_post_meta( $post_id, $post_type . '_clockss_response', true );
+
+		if ( !empty($clockss_xml) ) {
+			echo '	<tr>';
+			echo '		<th><label for="' . $post_type . '_clockss_xml" class="' . $post_type . '_clockss_xml_label">' . 'CLOCKSS xml' . '</label></th>';
+			echo '		<td>';
+			echo '			<textarea rows="16" style="width:100%;" readonly>' . esc_attr__( $clockss_xml ) . '</textarea><p>(The CLOCKSS xml is automatically calculated from the above meta data.)</p>';
+			echo '		</td>';
+			echo '	</tr>';
+		}
+
+		if ( !empty($clockss_response) ) {
+			echo '	<tr>';
+			echo '		<th><label for="' . $post_type . '_clockss_response" class="' . $post_type . '_clockss_response_label">' . 'CLOCKSS response' . '</label></th>';
+			echo '		<td>';
+			echo '			<textarea rows="' . (substr_count( $clockss_response, "\n" )+2) . '" style="width:100%;" readonly>' . esc_attr__( $clockss_response ) . '</textarea><p>(The response we got from CLOCKSS when uploading the metadata and full text pdf, if available.)</p>';
 			echo '		</td>';
 			echo '	</tr>';
 		}
@@ -2664,5 +2783,18 @@ abstract class O3PO_PublicationType {
         echo '}' . "\n";
         echo '</style>' . "\n";
     }
+
+        /**
+         * Get the path of the fulltext pdf.
+         *
+         * To be overwerites in subclasses. May return null if the subclass
+         * has no fulltext pdf.
+         *
+         * @since 0.2.0
+         * @access    public
+         * @param     int     $post_id     Id of the post.
+         */
+    abstract public static function get_fulltext_pdf_path( $post_id );
+
 
 }

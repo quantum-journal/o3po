@@ -82,6 +82,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $this->the_admin_panel_bibliography($post_id);
         $this->the_admin_panel_crossref($post_id);
         $this->the_admin_panel_doaj($post_id);
+        $this->the_admin_panel_clockss($post_id);
         $this->the_admin_panel_arxiv($post_id);
         echo '</table>';
 
@@ -969,6 +970,20 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         }
 
         return $last_path;
+    }
+
+        /**
+         * Get the path of the fulltext pdf.
+         *
+         * Overwerites a method in the base class.
+         *
+         * @since 0.2.0
+         * @access    public
+         * @param     int     $post_id     Id of the post.
+         */
+    public static function get_fulltext_pdf_path( $post_id ) {
+
+        return static::get_last_arxiv_pdf_path( $post_id );
     }
 
         /**

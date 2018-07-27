@@ -126,6 +126,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         $this->the_admin_panel_bibliography($post_id);
         $this->the_admin_panel_crossref($post_id);
         $this->the_admin_panel_doaj($post_id);
+        $this->the_admin_panel_clockss($post_id);
         echo '</table>';
     }
 
@@ -919,6 +920,20 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
     protected static function get_default_number_reviewers() {
 
         return 4;
+    }
+
+        /**
+         * Get the path of the fulltext pdf.
+         *
+         * In this class there is nothing to return. So we don't return anything.
+         *
+         * @since 0.2.0
+         * @access    public
+         * @param     int     $post_id     Id of the post.
+         */
+    public static function get_fulltext_pdf_path( $post_id ) {
+
+        return null;
     }
 
 }
