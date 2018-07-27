@@ -91,6 +91,7 @@ class O3PO_Settings extends O3PO_Singleton {
         'crossref_get_forward_links_url' => 'https://doi.crossref.org/servlet/getForwardLinks',
         'crossref_deposite_url' => 'https://doi.crossref.org/servlet/deposit',
         'crossref_test_deposite_url' => 'https://test.crossref.org/servlet/deposit',
+        'clockss_ftp_url' => 'ftp.clockss.org',
         'arxiv_doi_feed_identifier' => 'arxiv_paper_doi_feed',
         'arxiv_url_abs_prefix' => 'https://arxiv.org/abs/',
         'arxiv_url_pdf_prefix' => 'https://arxiv.org/pdf/',
@@ -162,6 +163,7 @@ class O3PO_Settings extends O3PO_Singleton {
         do_settings_sections('plugin_settings');
         do_settings_sections('journal_settings');
         do_settings_sections('crossref_settings');
+        do_settings_sections('clockss_settings');
         do_settings_sections('doaj_settings');
         do_settings_sections('arxiv_settings');
         do_settings_sections('other_service_settings');
@@ -215,6 +217,11 @@ class O3PO_Settings extends O3PO_Singleton {
         add_settings_field('crossref_test_deposite_url', 'Crossref deposite url for testing', array( $this, 'render_crossref_test_deposite_url_setting' ), 'crossref_settings', 'crossref_settings');
         add_settings_field('crossref_email', 'Email for communication with Crossref', array( $this, 'render_crossref_email_setting' ), 'crossref_settings', 'crossref_settings');
         add_settings_field('crossref_archive_locations', 'Archive locations', array( $this, 'render_crossref_archive_locations_setting' ), 'crossref_settings', 'crossref_settings');
+
+        add_settings_section('clockss_settings', 'Clockss settings', array( $this, 'render_clockss_settings' ), 'clockss_settings');
+        add_settings_field('clockss_ftp_url', 'Clockss FTP URL', array( $this, 'render_clockss_ftp_url_setting' ), 'clockss_settings', 'clockss_settings');
+        add_settings_field('clockss_username', 'Clockss Username', array( $this, 'render_clockss_username_setting' ), 'clockss_settings', 'clockss_settings');
+        add_settings_field('clockss_password', 'Clockss Password', array( $this, 'render_clockss_password_setting' ), 'clockss_settings', 'clockss_settings');
 
         add_settings_section('doaj_settings', 'DOAJ settings', array( $this, 'render_doaj_settings' ), 'doaj_settings');
         add_settings_field('doaj_api_url', 'DOAJ API url', array( $this, 'render_doaj_api_url_setting' ), 'doaj_settings', 'doaj_settings');
@@ -270,6 +277,16 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_crossref_settings() {
         echo '<p>Settings for interaction with Crossref.</p>';
+    }
+
+        /**
+         * Render the head of the clockss settings part.
+         *
+         * @since    0.1.0
+         * @access   public
+         */
+    public function render_clockss_settings() {
+        echo '<p>Settings for interaction with CLOCKSS.</p>';
     }
 
         /**
@@ -595,6 +612,37 @@ class O3PO_Settings extends O3PO_Singleton {
     }
 
         /**
+         * Render the setting for the CLOCKSS ftp url.
+         *
+         * @since    0.1.0
+         * @access   public
+         */
+    public function render_clockss_ftp_url_setting() {
+        $this->render_setting('clockss_ftp_url');
+    }
+
+        /**
+         * Render the setting for the CLOCKSS username.
+         *
+         * @since    0.1.0
+         * @access   public
+         */
+    public function render_clockss_username_setting() {
+        $this->render_setting('clockss_username');
+    }
+
+        /**
+         * Render the setting for the CLOCKSS password.
+         *
+         * @since    0.1.0
+         * @access   public
+         */
+    public function render_clockss_password_setting() {
+        $this->render_setting('clockss_password');
+    }
+
+
+        /**
          * Render the setting for the URL of the DOAJ API.
          *
          * @since    0.1.0
@@ -852,6 +900,9 @@ class O3PO_Settings extends O3PO_Singleton {
                 'crossref_test_deposite_url' => 'trim',
                 'crossref_email' => 'trim',
                 'crossref_archive_locations' => 'trim',
+                'clockss_ftp_url' => 'trim',
+                'clockss_username' => 'trim',
+                'clockss_password' => 'trim',
                 'arxiv_url_abs_prefix' => 'trim',
                 'arxiv_url_pdf_prefix' => 'trim',
                 'arxiv_url_source_prefix' => 'trim',

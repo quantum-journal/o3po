@@ -93,6 +93,9 @@ class O3PO_Journal {
             'publisher_country',
             'publisher_email',
             'scholastica_manuscripts_url', //from primary
+            'clockss_ftp_url',
+            'clockss_username',
+            'clockss_password',
 
             'publication_type_name', //not in in settings
             'publication_type_name_plural', //not in in settings

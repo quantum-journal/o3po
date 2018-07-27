@@ -276,11 +276,13 @@ class O3PO {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'plugin_action_links', $plugin_admin, 'add_plugin_action_links' );
+        $this->loader->add_action( 'admin_head', $plugin_admin, 'enable_mathjax' );
 
         $this->loader->add_action( 'admin_menu', $settings, 'add_settings_page_to_menu' );
         $this->loader->add_action( 'admin_init', $settings, 'register_settings' );
 
-        $this->loader->add_action( 'wp_head', $this->environment, 'modify_css_if_in_test_environment' );
+        $this->loader->add_action( 'admin_head', $this->environment, 'modify_css_if_in_test_environment' );
+
         $this->loader->add_action( 'upload_mimes', $this->environment, 'custom_upload_mimes' );
         $this->loader->add_action( 'load-post.php', $this->primary_publication_type, 'init_metabox' );
         $this->loader->add_action( 'load-post-new.php', $this->primary_publication_type, 'init_metabox' );
