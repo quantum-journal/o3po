@@ -202,6 +202,8 @@ $posts = array(
             'paper_arxiv_fetch_results' => 'fake_paper_arxiv_fetch_results',
             'paper_arxiv_source_attach_ids' => array(),
             'paper_doi_suffix_was_changed_on_last_save' => false,
+            'paper_clockss_xml' => '',
+            'paper_clockss_response' => '',
                         ),
                ),
     2 => array(
@@ -273,6 +275,8 @@ $posts = array(
             'paper_arxiv_fetch_results' => 'fake_paper_arxiv_fetch_results',
             'paper_arxiv_source_attach_ids' => array(),
             'paper_doi_suffix_was_changed_on_last_save' => false,
+            'paper_clockss_xml' => '',
+            'paper_clockss_response' => '',
                         )
                ),
     6 => array(
@@ -336,6 +340,8 @@ $posts = array(
             'paper_arxiv_fetch_results' => 'fake_paper_arxiv_fetch_results',
             'paper_arxiv_source_attach_ids' => array(4),
             'paper_doi_suffix_was_changed_on_last_save' => false,
+            'paper_clockss_xml' => '',
+            'paper_clockss_response' => '',
                         ),
                ),
     9 => array(
@@ -394,6 +400,8 @@ $posts = array(
             'view_doaj_response' => '',
             'view_doi_suffix_was_changed_on_last_save' => false,
             'view_abstract' => '',
+            'view_clockss_xml' => '',
+            'view_clockss_response' => '',
                         )
                ),
     10 => array(
@@ -452,6 +460,8 @@ $posts = array(
             'view_doaj_response' => '',
             'view_doi_suffix_was_changed_on_last_save' => false,
             'view_abstract' => '',
+            'view_clockss_xml' => '',
+            'view_clockss_response' => '',
                         )
                 ),
                );
