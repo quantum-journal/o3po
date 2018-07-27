@@ -734,7 +734,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
 
 
-            /**
+        /**
          * @runInSeparateProcess
          * @dataProvider save_metabox_provider
          * @depends test_create_secondary_publication_type
@@ -765,5 +765,43 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     public function test_cleanup_at_the_very_end() {
         exec('git checkout ' . dirname(__File__) . '/resources/arxiv/0809.2542v4.pdf');
     }
+
+        /**
+         * @depends test_create_primary_publication_type
+         * @depends test_create_secondary_publication_type
+         */
+    public function test_register_as_custom_post_type( $primary_publication_type, $secondary_publication_type) {
+        $primary_publication_type->register_as_custom_post_type();
+        $secondary_publication_type->register_as_custom_post_type();
+    }
+
+        /**
+         * @depends test_create_primary_publication_type
+         * @depends test_create_secondary_publication_type
+         */
+    public function test_init_metabox( $primary_publication_type, $secondary_publication_type) {
+        $primary_publication_type->init_metabox();
+        $secondary_publication_type->init_metabox();
+    }
+
+        /**
+         * @depends test_create_primary_publication_type
+         * @depends test_create_secondary_publication_type
+         */
+    public function test_add_metabox( $primary_publication_type, $secondary_publication_type) {
+        $primary_publication_type->add_metabox();
+        $secondary_publication_type->add_metabox();
+    }
+
+
+        /**
+         * @depends test_create_primary_publication_type
+         * @depends test_create_secondary_publication_type
+         */
+    public function test_add_custom_post_types_to_query( $primary_publication_type, $secondary_publication_type) {
+        $primary_publication_type->add_custom_post_types_to_query( new WP_query() );
+        $secondary_publication_type->add_custom_post_types_to_query( new WP_query() );
+    }
+
 
 }

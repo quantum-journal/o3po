@@ -514,15 +514,17 @@ class WP_Post
 class WP_Query
 {
     private $posts;
+    private $query;
 
-    function __construct( $input ) {
+    function __construct( $input=null ) {
         global $posts;
+
+        $this->query = $input;
 
         if(is_array($input))
             $array = $input;
         else
             $array = array($input);
-
 
         $this->posts = array();
         foreach($posts as $id => $post)
@@ -542,6 +544,10 @@ class WP_Query
             if($include_post)
                 $this->posts[$id] = $post;
         }
+    }
+
+    function get($key) {
+        return $this->query[$key];
     }
 
     function have_posts() {
@@ -836,3 +842,7 @@ function wp_generate_password( $length ) {
 }
 
 function wp_remote_post( $url, $args = array() ) {}
+
+function register_post_type( $post_type, $args ) {}
+
+function add_meta_box( $id, $title, $callback, $screen = null, $context = 'advanced', $priority = 'default', $callback_args = null ) {}
