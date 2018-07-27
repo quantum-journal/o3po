@@ -856,3 +856,16 @@ function wp_remote_post( $url, $args = array() ) {}
 function register_post_type( $post_type, $args ) {}
 
 function add_meta_box( $id, $title, $callback, $screen = null, $context = 'advanced', $priority = 'default', $callback_args = null ) {}
+
+
+$is_home = false;
+function is_home() {
+    global $is_home;
+    return $is_home;
+}
+
+$is_category = false;
+function is_category() {
+    global $is_category;
+    return $is_category;
+}
