@@ -452,7 +452,7 @@ abstract class O3PO_PublicationType {
             $doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
             $remote_filename_without_extension = $doi_suffix;
 
-            if (get_post_status($post_id) === 'publish' && !empty($fulltext_pdf_path) )// && !$this->environment->is_test_environment())
+            if (get_post_status($post_id) === 'publish' && !empty($fulltext_pdf_path) && !$this->environment->is_test_environment())
                 $clockss_response = $this->upload_meta_data_and_pdf_to_clockss($clockss_xml, $fulltext_pdf_path, $remote_filename_without_extension,
                                                                                $this->get_journal_property('clockss_ftp_url'),
                                                                                $this->get_journal_property('clockss_username'),
