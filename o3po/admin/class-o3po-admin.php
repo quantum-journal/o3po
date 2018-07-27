@@ -57,6 +57,8 @@ class O3PO_Admin {
         /**
          * Register the stylesheets for the admin area.
          *
+         * To be added to the 'admin_enqueue_scripts' action.
+         *
          * @since    0.1.0
          */
 	public function enqueue_styles() {
@@ -79,6 +81,8 @@ class O3PO_Admin {
 
         /**
          * Register the JavaScript for the admin area.
+         *
+         * To be added to the 'admin_enqueue_scripts' action.
          *
          * @since    0.1.0
          */
@@ -108,7 +112,7 @@ class O3PO_Admin {
          * @since    0.2.0
          * @param    array     $links    Array of links to filter
          */
-    function add_plugin_action_links( $actions )
+    public function add_plugin_action_links( $actions )
     {
         static $plugin;
 
@@ -120,16 +124,19 @@ class O3PO_Admin {
     }
 
         /**
-         * Enable MathJax and some extra functionality on admin pages. This allows
-         * us to show a live preview of titles and abstracts containing mathematical
-         * formulas and save their MathML representation when a post is saved. This
-         * would be very hard (impossible?) to do with just php, so we have to resort
+         * Enable MathJax and some extra functionality on admin pages.
+         *
+         * This allows us to show a live preview of titles and abstracts containing
+         * mathematical formulas and save their MathML representation when a post is saved.
+         * This would be very hard (impossible?) to do with just php, so we have to resort
          * to running some code in the browser of the person adding the manuscript to the
          * website. Concretely, the following adds a live preview and MathML output
          * to all text fields of with css class "preview_and_mathml". The MathML
          * output is itself a textfield and gets and id that is derived from that of
          * the input field. When the post is saved its content hence ends up in POST
          * and can be captured by our PHP code in the custom post types.
+         *
+         * To be added to the 'admin_head' action.
          *
          * @since    0.1.0
          */
