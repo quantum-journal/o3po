@@ -38,7 +38,7 @@ class O3PO_Environment {
          * @param    string    $production_site_url    Site URL of the production site.
          */
 	public function __construct( $production_site_url ) {
-        
+
 		$this->production_site_url = $production_site_url;
 
         if($this->is_test_environment()) error_reporting(E_ALL);
@@ -51,11 +51,11 @@ class O3PO_Environment {
          * @access   public
          * */
     public function is_test_environment() {
-        
+
         if(empty($this->production_site_url))
             return true;
         else
-            return get_site_url() === $this->production_site_url ? false : true; 
+            return get_site_url() === $this->production_site_url ? false : true;
     }
 
         /**
@@ -63,12 +63,12 @@ class O3PO_Environment {
          * look ugly to avoid confusion.
          *
          * To be added to the 'wp_head' action.
-         * 
+         *
          * @since    0.1.0
          * @access   public
          * */
     public function modify_css_if_in_test_environment() {
-        
+
         if($this->is_test_environment())
         {
 ?>
@@ -78,14 +78,14 @@ class O3PO_Environment {
             }
             </style>
 <?php
-        }   
+        }
     }
 
         /**
          * Returns a filename that is unique in the given directory.
          *
          * This fuction is based on wp_unique_filename() from
-         * https://core.trac.wordpress.org/browser/tags/4.7.3/src/wp-includes/functions.php#L0 
+         * https://core.trac.wordpress.org/browser/tags/4.7.3/src/wp-includes/functions.php#L0
          * but it treats .tar.gz as a single extension.
          *
          * @since    0.1.0
@@ -95,7 +95,7 @@ class O3PO_Environment {
          * @param    string     $ext        Desired extension.
          * */
     private function unique_filename_callback( $dir, $filename, $ext ) {
-        
+
         $ext = strtolower($ext);
         if($ext === '.gz' && substr($filename, -7) === '.tar.gz' ) $ext = '.tar.gz';
         $number = '';
@@ -108,7 +108,7 @@ class O3PO_Environment {
             }
             $number = $new_number;
         }
-        return $filename;	
+        return $filename;
     }
 
         /**
@@ -121,11 +121,11 @@ class O3PO_Environment {
          * @param    array    $mime_types    Array of mime types.
          * */
     public function custom_upload_mimes( $mime_types=array() ) {
-        
+
         $mime_types['pdf'] = 'application/pdf';
         $mime_types['tex'] = 'text/x-tex';
         $mime_types['tar.gz'] = 'application/x-tar';
-        
+
         return $mime_types;
     }
 
@@ -137,7 +137,7 @@ class O3PO_Environment {
          * guessed based on the mime type. If the mime type is provided and
          * the downloaded file does not actually have that mime type, an
          * error is returned.
-         * 
+         *
          * @since    0.1.0
          * @access   public
          * @param    string    $url               Url to download from.
@@ -147,7 +147,7 @@ class O3PO_Environment {
          * @param    int       $parent_post_id    Id of post to which to link the download.
          * */
     public function download_to_media_library( $url, $filename, $extension, $mime_type, $parent_post_id ) {
-        
+
         $extension = ltrim($extension, '.');
 
             // Gives us access to the download_url() and wp_handle_sideload() functions
@@ -164,13 +164,13 @@ class O3PO_Environment {
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
             $actual_mime_type = finfo_file($finfo, $temp_file);
             finfo_close($finfo);
-        
+
             if( empty($mime_type) ) {
                 $mime_type = $actual_mime_type;
             }
             elseif($mime_type !== $actual_mime_type)
                 return array( 'error' => "Instead of the mime type " . $mime_type . " we were expecting, the remote server provided a file of mime type " . $actual_mime_type );
-                
+
             if (empty($extension)) {
                 if( preg_match('#text/.*tex#', $mime_type) )
                     $extension = 'tex';
@@ -182,7 +182,7 @@ class O3PO_Environment {
                     $extension = 'unknown';
             }
             $filename = $filename . '.' . $extension;
-        
+
                 // Array based on $_FILE as seen in PHP file uploads
             $file = array(
                 'name'     => $filename,
@@ -209,7 +209,7 @@ class O3PO_Environment {
                     // we want the propper file-1.tar.gz
                 'unique_filename_callback' => array($this, 'unique_filename_callback'),
                                );
-		
+
                 // Move the temporary file into the uploads directory
             $results = wp_handle_sideload( $file, $overrides );
 
@@ -226,7 +226,7 @@ class O3PO_Environment {
                     'post_content'   => '',
                     'post_status'    => 'inherit'
                                     );
- 
+
                     // Insert the attachment.
                 $attach_id = wp_insert_attachment( $attachment, $filepath, $parent_post_id );
 
@@ -237,7 +237,7 @@ class O3PO_Environment {
                     //$local_url = $results['url'];  // URL to the file in the uploads dir
                     //$mime_type = $results['type']; // MIME type of the file
 
-                $results[ 'attach_id' ] = $attach_id;
+                $results['attach_id'] = $attach_id;
                 return $results;
             }
         }
@@ -247,7 +247,7 @@ class O3PO_Environment {
 
         /**
          * Recursively remove a directory.
-         * 
+         *
          * PHP itself does not offer a reasonable way to recursively remove
          * directories. This is a subtle issue as links and nasty file names can be
          * inlolved. We don't want to be hackble by uploading a malicious manuscript
@@ -261,20 +261,20 @@ class O3PO_Environment {
          * @param    string    $root    Root folder to which to restric the deleting.
          * */
     public function save_recursive_remove_dir( $path, $root ) {
-        
+
         $path = rtrim($path, '/').'/';
         $root = rtrim($root, '/').'/';
-        
+
         if ($root === '/' || $path === '/' || $root !== substr($path, 0, strlen($root)) )
             return false;
-        
+
         foreach(new RecursiveIteratorIterator( new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS), 	RecursiveIteratorIterator::CHILD_FIRST) as $entry ) {
-        	if($entry->isDir() && !$entry->isLink()) 
+        	if($entry->isDir() && !$entry->isLink())
                 rmdir($entry->getPathname());
             else
                 unlink($entry->getPathname());
         }
-        
+
         rmdir($path);
     }
 
@@ -283,23 +283,23 @@ class O3PO_Environment {
          * some .tex files when they are read with the standard
          * file_get_contents() functinon (is this expected?). The following
          * has turned out to work in all cases I have tested.
-         * 
+         *
          * @since    0.1.0
          * @access   public
          * @param    string     $path    Path to the file to get.
          * */
     public function file_get_contents_utf8( $path ) {
-        
+
         $content = file_get_contents($path);
         $encoding = mb_detect_encoding($content, 'UTF-8, ISO-8859-1', true);
         $content = mb_convert_encoding($content, 'UTF-8', $encoding);
-        
+
         return $content;
     }
 
         /**
          * Get the path of a feature image of a post
-         * 
+         *
          * Returns the path of the feature image, insired by
          * https://stackoverflow.com/questions/27306882/actual-file-location-of-a-wordpress-featured-image
          *
@@ -308,7 +308,7 @@ class O3PO_Environment {
          * @param    int    $post_id   Id of the post.
          * */
     public function get_feature_image_path( $post_id ) {
-        
+
         $thumb_id = get_post_thumbnail_id($post_id);
         if(empty($thumb_id))
             return '';
@@ -319,13 +319,13 @@ class O3PO_Environment {
         $base_dir = $upload_dir['basedir'];
         $base_url = $upload_dir['baseurl'];
         $imagepath= str_replace($base_url, $base_dir, $image[0]);
-        
+
         if (file_exists( $imagepath))
             return $imagepath;
         else
             return '';
     }
-    
-    
+
+
 }
 
