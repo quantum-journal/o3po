@@ -110,7 +110,7 @@ class O3PO_Admin {
          * To be added to the 'plugin_action_links' filter.
          *
          * @since    0.2.0
-         * @param    array     $links    Array of links to filter
+         * @param    array     $actions    Array of links to filter
          */
     public function add_plugin_action_links( $actions )
     {

@@ -1358,6 +1358,8 @@ abstract class O3PO_PublicationType {
          * @since    0.1.0
          * @access   private
          * @param    string     $clockss_xml      The xml encoded meta-data to upload.
+         * @param    string     $pdf_path         Path to the local fulltext pdf
+         * @param    string     $remote_filename_without_extension Filename without extension under which the files are to be deposited on the remore server
          * @param    string     $clockss_ftp_url  The url of the CLOCKSS ftp server.
          * @param    string     $clockss_username The CLOCKSS username
          * @param    string     $clockss_password The CLOCKSS password
