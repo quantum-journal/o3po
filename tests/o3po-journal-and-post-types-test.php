@@ -574,7 +574,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         if(!empty($POST_args['_fetch_metadata_from_arxiv']))
         {
-                print( "\n fetch_results " . $post_id . ": " . get_post_meta( $post_id, $post_type . '_arxiv_fetch_results', true) . "\n" );
+                //print( "\n fetch_results " . $post_id . ": " . get_post_meta( $post_id, $post_type . '_arxiv_fetch_results', true) . "\n" );
 
             foreach($expections as $expection)
             {
@@ -709,9 +709,9 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             return;
 
         $method = $class->getMethod('save_metabox'); //calls save_meta_data() but also does some further things
-            //Call it again to trigger a post actually published
-        $method = $class->getMethod('save_metabox');
         $method->setAccessible(true);
+        $method->invokeArgs($primary_publication_type, array($post_id, new WP_Post($post_id) ));
+            //call it again to trigger a post actually published event
         $method->invokeArgs($primary_publication_type, array($post_id, new WP_Post($post_id) ));
 
             //print( "\n validation_results: " . get_post_meta( $post_id, $post_type . '_validation_result', true) . "\n" );
@@ -754,11 +754,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             return;
 
         $method = $class->getMethod('save_metabox'); //calls save_meta_data() but also does some further things
-            //Call it again to trigger a post actually published
-        $method = $class->getMethod('save_metabox');
         $method->setAccessible(true);
         $method->invokeArgs($secondary_publication_type, array($post_id, new WP_Post($post_id) ));
-
+            //call it again to trigger a post actually published event
+        $method->invokeArgs($secondary_publication_type, array($post_id, new WP_Post($post_id) ));
     }
 
     public function test_cleanup_at_the_very_end() {
@@ -800,6 +799,15 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     public function test_add_custom_post_types_to_query( $primary_publication_type, $secondary_publication_type) {
         $primary_publication_type->add_custom_post_types_to_query( new WP_query() );
         $secondary_publication_type->add_custom_post_types_to_query( new WP_query() );
+    }
+
+
+        /**
+         * @depends test_create_primary_publication_type
+         */
+    public function test_single_paper_template( $primary_publication_type ) {
+
+//        include( dirname(__File__) . '/../o3po/public/templates/single-paper.php');
     }
 
 
