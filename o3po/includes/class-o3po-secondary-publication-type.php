@@ -936,4 +936,19 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         return null;
     }
 
+
+        /**
+         * Get the pretty permalink of the pdf associated with a post.
+         *
+         * In this class there is nothing to return. So we don't return anything.
+         *
+         * @since 0.2.0
+         * @access    public
+         * @param     int     $post_id     Id of the post.
+         */
+    public function get_pdf_pretty_permalink( $post_id ) {
+
+        return null;
+    }
+
 }

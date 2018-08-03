@@ -1063,6 +1063,7 @@ abstract class O3PO_PublicationType {
         $bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
         $post_url = get_permalink( $post_id );
         if(empty($post_url)) return 'ERROR: Unable to generate XML for Crossref, url is empty';
+        $pdf_pretty_permalink = $this->get_pdf_pretty_permalink($post_id);
 
         $xml  = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         $xml .= '<doi_batch version="4.4.0" xmlns="http://www.crossref.org/schema/4.4.0" xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:jats="http://www.ncbi.nlm.nih.gov/JATS1" xmlns:ai="http://www.crossref.org/AccessIndicators.xsd">' . "\n";
@@ -1197,6 +1198,17 @@ abstract class O3PO_PublicationType {
         $xml .= '	  <resource content_version="am" mime_type="text/html">' . esc_url($post_url) . '</resource>' . "\n";
             // think we don't need this
             // $xml .= '	  <collection multi-resolution="" property="">{0,unbounded}</collection>' . "\n";
+            // add full text link for text-mining
+        if(!empty($pdf_pretty_permalink))
+        {
+            $xml .= '<collection property="text-mining">' . "\n";
+            $xml .= '<item>' . "\n";
+            $xml .= '<resource>' . "\n";
+            $xml .= esc_url($pdf_pretty_permalink) . "\n";
+            $xml .= '</resource>' . "\n";
+            $xml .= '</item>' . "\n";
+            $xml .= '</collection>' . "\n";
+        }
         $xml .= '	</doi_data>' . "\n";
             // the references
         if( !empty($bbl) ) {
@@ -2796,5 +2808,17 @@ abstract class O3PO_PublicationType {
          */
     abstract public static function get_fulltext_pdf_path( $post_id );
 
+
+        /**
+         * Get the pretty permalink of the pdf associated with a post.
+         *
+         * To be overwerites in subclasses. May return null if the subclass
+         * has no fulltext pdf.
+         *
+         * @since     0.2.0
+         * @access    public
+         * @param     int     $post_id     Id of the post.
+         */
+    abstract public function get_pdf_pretty_permalink( $post_id );
 
 }
