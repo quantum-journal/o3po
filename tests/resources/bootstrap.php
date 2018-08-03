@@ -202,8 +202,8 @@ $posts = array(
             'paper_arxiv_fetch_results' => 'fake_paper_arxiv_fetch_results',
             'paper_arxiv_source_attach_ids' => array(),
             'paper_doi_suffix_was_changed_on_last_save' => false,
-            'paper_clockss_xml' => '',
-            'paper_clockss_response' => '',
+            'paper_clockss_xml' => 'fake clocks xml',
+            'paper_clockss_response' => 'fake clocks response',
                         ),
                ),
     2 => array(
@@ -646,7 +646,7 @@ function wp_get_attachment_url($id) {
     $post_id = $id;
 
     if(!isset($posts[$post_id]['attachment_url']))
-        throw new Exception("Post with id=" . $post_id . " has no attachment_url.");
+        throw new Exception("Post with id=" . $post_id . " has no attachment_url." . json_encode($posts[$post_id]));
 
     return $posts[$post_id]['attachment_url'];
 }
@@ -734,6 +734,7 @@ function wp_insert_attachment( $attachment, $filepath, $parent_post_id ) {
         'post_content' => $attachment['post_content'],
         'post_status' => $post_status,
         'attachment_path' => $filepath,
+        'attachment_url' => 'fake_attachment_url',
     );
 
 //    $posts[$parent_post_id][] = max(array_keys($posts));
@@ -868,4 +869,17 @@ $is_category = false;
 function is_category() {
     global $is_category;
     return $is_category;
+}
+
+
+function get_header() {
+    return "";
+}
+
+function get_theme_mod() {
+    return "";
+}
+
+function onepress_breadcrumb() {
+    return "";
 }
