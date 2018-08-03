@@ -14,7 +14,7 @@ all:
 	@echo "Please specify a target to make:\ndocs:\t\tgenerate the documentation\nlint:\t\trun php in lint mode\nrun-tests:\trun phpunit unit tests"
 
 docs: $(shell find . -type f -name '*.php') $(PHPDOCUMENTORPHAR)
-	@$(PHP) $(PHPDOCUMENTORPHAR) --force --validate --sourcecode -vv -d $(SRC) -t $(DOCS)
+	@$(PHP) $(PHPDOCUMENTORPHAR) -i index.php -i display.php --force --validate --sourcecode -vv -d $(SRC) -t $(DOCS)
 
 $(PHPDOCUMENTORPHAR):
 	@wget -O $(PHPDOCUMENTORPHAR) http://www.phpdoc.org/$(PHPDOCUMENTORPHAR)
