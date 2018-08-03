@@ -115,6 +115,8 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         include( dirname(__File__) . '/../o3po/public/templates/single-paper.php');
         $output = ob_get_contents();
         ob_end_clean();
+        $output = preg_replace('#(main|header)#', 'div', $output); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
+            //print($output);
 
         $dom = new DOMDocument;
         $dom->loadHTML($output);

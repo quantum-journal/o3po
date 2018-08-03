@@ -968,7 +968,7 @@ function is_category() {
 
 
 function get_header() {
-    echo '<!DOCTYPE html5>
+    echo '<!DOCTYPE html>
 <html lang="en-GB">
 <head><title>fake title</title></head><body>';
 }
