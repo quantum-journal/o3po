@@ -2476,7 +2476,12 @@ abstract class O3PO_PublicationType {
         $volume = get_post_meta( $post_id, $post_type . '_volume', true );
         $authors = $this->get_formated_authors_bibtex($post_id);
         $date_published = get_post_meta( $post_id, $post_type . '_date_published', true );
-        $month = O3PO_Latex::get_month_string(substr( $date_published, 5, 2 ));
+        $month = substr( $date_published, 5, 2 );
+        if( !empty($month) and 1 <= $month and $month <= 13 )
+            $month = O3PO_Latex::get_month_string($month);
+        else
+            $month = '';
+
         $year = substr( $date_published, 0, 4 );
         $author_surnames = get_post_meta( $post_id, $post_type . '_author_surnames', true );
         $doi = $this->get_doi($post_id);
@@ -2500,7 +2505,8 @@ abstract class O3PO_PublicationType {
             $bibtex .= '  publisher = {' . $publisher . '},' . "\n";
         $bibtex .= '  volume = {' . $volume . '},' . "\n";
         $bibtex .= '  pages = {' . $pages . '},' . "\n";
-        $bibtex .= '  month = ' . $month . ',' . "\n";
+        if(!empty($month))
+            $bibtex .= '  month = ' . $month . ',' . "\n";
         $bibtex .= '  year = {' . $year . '}' . "\n";
         $bibtex .= '}';
 
