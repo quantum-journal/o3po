@@ -98,6 +98,29 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         return new O3PO_SecondaryPublicationType($primary_publication_type->get_publication_type_name(), $primary_publication_type->get_publication_type_name_plural(), $journal, $environment);
     }
 
+        /**
+         * @depends test_create_primary_publication_type
+         */
+    public function test_single_paper_template( $primary_publication_type ) {
+        /* global $global_query; */
+        /* $global_query = new WP_Query(array('post_type' => 'paper')); */
+        /* print('after setting global_query=' . json_encode($global_query)); */
+
+        $query = new WP_Query(array('ID' => 1));
+        $query->have_posts();
+        set_global_query($query);
+        have_posts();
+
+        ob_start();
+        include( dirname(__File__) . '/../o3po/public/templates/single-paper.php');
+        $output = ob_get_contents();
+        ob_end_clean();
+
+        $dom = new DOMDocument;
+        $dom->loadHTML($output);
+            //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
+    }
+
     public function primary_the_admin_components_provider() {
 
         return [
@@ -147,7 +170,8 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             ob_end_clean();
 
             $dom = new DOMDocument;
-            $dom->loadHTML('<div>' . $output . '</div>');
+
+            $dom->loadHTML('<div>' . $output . '<div>');
                 //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
         }
     }
@@ -797,18 +821,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          * @depends test_create_secondary_publication_type
          */
     public function test_add_custom_post_types_to_query( $primary_publication_type, $secondary_publication_type) {
-        $primary_publication_type->add_custom_post_types_to_query( new WP_query() );
-        $secondary_publication_type->add_custom_post_types_to_query( new WP_query() );
+        $primary_publication_type->add_custom_post_types_to_query( new WP_Query() );
+        $secondary_publication_type->add_custom_post_types_to_query( new WP_Query() );
     }
 
-
-        /**
-         * @depends test_create_primary_publication_type
-         */
-    public function test_single_paper_template( $primary_publication_type ) {
-
-//        include( dirname(__File__) . '/../o3po/public/templates/single-paper.php');
-    }
 
 
 }

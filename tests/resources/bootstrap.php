@@ -152,6 +152,7 @@ $post_data = array();
 $posts = array(
     1 => array(
         'post_type' => 'paper',
+        'post_content' => 'fake_post_content1',
         'paper_nonce' => 'fake_nonce',
         'thumbnail_id' => 2,
         'post_status' => 'private',
@@ -226,6 +227,7 @@ $posts = array(
                ),
     5 => array(
         'post_type' => 'paper',
+        'post_content' => 'fake_post_content5',
         'paper_nonce' => 'fake_nonce',
         'thumbnail_id' => 2,
         'post_status' => 'private',
@@ -291,6 +293,7 @@ $posts = array(
                ),
     8 => array(
         'post_type' => 'paper',
+        'post_content' => 'fake_post_content8',
         'paper_nonce' => 'fake_nonce',
         'thumbnail_id' => 2,
         'post_status' => 'publish',
@@ -346,6 +349,7 @@ $posts = array(
                ),
     9 => array(
         'post_type' => 'view',
+        'post_content' => 'fake_post_content9',
         'paper_nonce' => 'fake_nonce',
         'thumbnail_id' => 2,
         'post_status' => 'publish',
@@ -406,6 +410,7 @@ $posts = array(
                ),
     10 => array(
         'post_type' => 'view',
+        'post_content' => 'fake_post_content10',
         'paper_nonce' => 'fake_nonce',
         'thumbnail_id' => 2,
         'post_status' => 'publish',
@@ -537,22 +542,28 @@ class WP_Query
             $array = array($input);
 
         $this->posts = array();
-        foreach($posts as $id => $post)
+        if(!empty($posts))
         {
-            $include_post = true;
-            foreach($array as $key => $value)
+            foreach($posts as $id => $post)
             {
-                if(!is_array($value))
-                    $value = array($value);
-
-                if(!isset($posts[$id][$key]) or !in_array ($posts[$id][$key], $value))
+                $include_post = true;
+                foreach($array as $key => $value)
                 {
-                    $include_post = false;
-                    break;
+                    if(!is_array($value))
+                        $value = array($value);
+
+                    if($key === 'ID' and in_array($id, $value))
+                        break;
+
+                    if(!isset($posts[$id][$key]) or !in_array ($posts[$id][$key], $value))
+                    {
+                        $include_post = false;
+                        break;
+                    }
                 }
+                if($include_post)
+                    $this->posts[$id] = $post;
             }
-            if($include_post)
-                $this->posts[$id] = $post;
         }
     }
 
@@ -570,8 +581,6 @@ class WP_Query
         if(empty($this->posts))
         {
             throw new Exception("the_post() called with no posts left");
-            /* $post_data = array(); */
-            /* return; */
         }
 
         $keys = array_keys($this->posts);
@@ -583,6 +592,46 @@ class WP_Query
 
         $post_data = array('current' => $current, 'ID' => $min_key);
     }
+}
+
+$global_query = new WP_Query();
+function set_global_query( $wp_query ) {
+    global $global_query;
+
+    $global_query = $wp_query;
+}
+
+function have_posts() {
+    global $global_query;
+
+    if(!($global_query instanceof WP_Query))
+        throw(new Exception('You must fist set the $global_query before you can use have_posts()'));
+
+    return $global_query->have_posts();
+}
+
+function the_post() {
+    global $global_query;
+
+    if(!($global_query instanceof WP_Query))
+        throw(new Exception('You must fist set the $global_query before you can use have_posts()'));
+
+    return $global_query->the_post();
+}
+
+
+function has_post_thumbnail() {
+        $post_id = get_the_ID();
+
+    return !empty($posts[$post_id]['thumbnail_id']);
+}
+
+function the_post_thumbnail() {
+    global $posts;
+
+    $post_id = get_the_ID();
+
+    return '<img src="' . esc_url($posts[$posts[$post_id]['thumbnail_id']]['attachment_url']) . '" >';
 }
 
 function get_the_ID() {
@@ -622,22 +671,22 @@ function get_post_status( $ID = '' ) {
 
 function esc_html( $text ) {
 
-    return '(esc_html does nothing useful in the bootstaped fake WordPress)' . $text;
+    return 'esc_html' . $text;
 }
 
 function esc_attr__( $text ) {
 
-    return '(esc_attr__ does nothing useful in the bootstaped fake WordPress)' . $text;
+    return 'esc_attr__' . $text;
 }
 
 function esc_attr( $text ) {
 
-    return '(esc_attr does nothing useful in the bootstaped fake WordPress)' . $text;
+    return 'esc_attr' . $text;
 }
 
 function esc_url( $text ) {
 
-    return '(esc_url does nothing useful in the bootstaped fake WordPress)' . $text;
+    return 'esc_url' . $text;
 }
 
 function wp_get_attachment_url($id) {
@@ -791,11 +840,49 @@ function get_the_title( $post_id ) {
     return $posts[$post_id]['post_title'];
 }
 
+function the_content() {
+    echo get_the_content();
+}
+
+function the_category() {
+    echo get_the_category();
+}
+function get_the_category() {
+    return "fake category";
+}
+
+function comments_open( $post_id=null ) {
+    return false;
+}
+
+function get_comments_number( $post_id=null ) {
+    return 0;
+}
+
+
+function get_the_content() {
+    global $posts;
+
+    $post_id = get_the_ID();
+
+    return $posts[$post_id]['post_content'];
+}
+
 function get_permalink( $post_id ) {
     global $posts;
 
     return $posts[$post_id]['permalink'];
 }
+
+
+function get_sidebar() {
+    echo '<div>Sidebar</div>';
+}
+function get_footer() {
+    echo '</body>
+</html>';
+}
+
 
 function wp_mail( $to, $subject, $body, $headers, $attach=null) {
     return true;
@@ -803,22 +890,30 @@ function wp_mail( $to, $subject, $body, $headers, $attach=null) {
 
 function delete_transient() {}
 
+function get_transient() {
+    return false;
+}
+
+function set_transient( $transient, $value, $expiration ) {}
+
+
 function sanitize_text_field( $string ) {
 
     return $string;
 }
 
-function wp_remote_get( $url, $args ) {
+function wp_remote_get( $url, $args=array() ) {
         //return http_get( $url, $args );
 
-    $special_urls = array(
+    $local_file_urls = array(
         'https://arxiv.org/abs/0809.2542v4' => dirname(__FILE__) . '/arxiv/0809.2542v4.html',
         'https://arxiv.org/abs/1609.09584v4' => dirname(__FILE__) . '/arxiv/1609.09584v4.html',
         'https://arxiv.org/abs/0908.2921v2' => dirname(__FILE__) . '/arxiv/0908.2921v2.html',
                           );
-
-    if(!empty($special_urls[$url]))
-        return array('headers'=>'' ,'body'=> file_get_contents($special_urls[$url]) );
+    if(!empty($local_file_urls[$url]))
+        return array('headers'=>'' ,'body'=> file_get_contents($local_file_urls[$url]) );
+    elseif(strpos($url, get_option('o3po-setttings')['crossref_get_forward_links_url']) === 0)
+        return array('body' => 'fake respose form crossref forward links url');
     else
         throw new Exception('Fake wp_remote_get() does not know how to handle ' . $url);
 }
@@ -873,7 +968,9 @@ function is_category() {
 
 
 function get_header() {
-    return "";
+    echo '<!DOCTYPE html5>
+<html lang="en-GB">
+<head><title>fake title</title></head><body>';
 }
 
 function get_theme_mod() {
