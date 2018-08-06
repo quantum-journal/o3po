@@ -98,13 +98,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         return new O3PO_SecondaryPublicationType($primary_publication_type->get_publication_type_name(), $primary_publication_type->get_publication_type_name_plural(), $journal, $environment);
     }
 
-        /**
-         * @depends test_create_primary_publication_type
-         */
-    public function test_single_paper_template( $primary_publication_type ) {
-        /* global $global_query; */
-        /* $global_query = new WP_Query(array('post_type' => 'paper')); */
-        /* print('after setting global_query=' . json_encode($global_query)); */
+    public function test_single_paper_template() {
 
         $query = new WP_Query(array('ID' => 1));
         $query->have_posts();
