@@ -98,12 +98,25 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         return new O3PO_SecondaryPublicationType($primary_publication_type->get_publication_type_name(), $primary_publication_type->get_publication_type_name_plural(), $journal, $environment);
     }
 
-    public function test_single_paper_template() {
+    public function single_paper_template_provider() {
 
-        $query = new WP_Query(array('ID' => 1));
-        $query->have_posts();
+        return [
+            [1],
+            [5],
+        ];
+    }
+
+        /**
+         * Remeber: This test depends on the post types being active, not
+         * directly, because it doesn't need them as an imput, but
+         * indirecty, as the template only works if they are already active.
+         *
+         * @dataProvider single_paper_template_provider
+         */
+    public function test_single_paper_template( $post_id ) {
+
+        $query = new WP_Query(array('ID' => $post_id));
         set_global_query($query);
-        have_posts();
 
         ob_start();
         include( dirname(__File__) . '/../o3po/public/templates/single-paper.php');

@@ -222,7 +222,7 @@ class WP_Query
             $array = array($input);
 
         $this->posts = array();
-        if(!empty($posts))
+        if(!empty($posts) and $input !== null)
         {
             foreach($posts as $id => $post)
             {
@@ -232,8 +232,12 @@ class WP_Query
                     if(!is_array($value))
                         $value = array($value);
 
-                    if($key === 'ID' and in_array($id, $value))
+                    if($key === 'ID')
+                    {
+                        $include_post = in_array($id, $value);
                         break;
+                    }
+
 
                     if(!isset($posts[$id][$key]) or !in_array ($posts[$id][$key], $value))
                     {
@@ -281,11 +285,24 @@ function set_global_query( $wp_query ) {
     $global_query = $wp_query;
 }
 
+$global_search_query = '';
+function set_global_search_query( $string ) {
+    global $global_search_query;
+
+    $global_search_query = $string;
+}
+
+function get_search_query() {
+    global $global_search_query;
+
+    return $global_search_query;
+}
+
 function have_posts() {
     global $global_query;
 
     if(!($global_query instanceof WP_Query))
-        throw(new Exception('You must fist set the $global_query before you can use have_posts()'));
+        throw(new Exception('You must first set the $global_query before you can use have_posts()'));
 
     return $global_query->have_posts();
 }
@@ -661,4 +678,25 @@ function get_theme_mod() {
 
 function onepress_breadcrumb() {
     return "";
+}
+
+function get_search_form() {
+
+echo '<form role="search" method="get" class="search-form" action="' . 'http://some.url.org' . '">
+				<label>
+					<span class="screen-reader-text">Search for:</span>
+					<input type="search" class="search-field" placeholder="Search &hellip;" value="' . get_search_query() . '" name="s" />
+				</label>
+				<input type="submit" class="search-submit" value="Search" />
+			</form>';
+}
+
+function get_template_part() {
+
+    echo '';
+}
+
+function the_posts_navigation() {
+
+    echo '';
 }
