@@ -112,8 +112,9 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          * indirecty, as the template only works if they are already active.
          *
          * @dataProvider single_paper_template_provider
+         * @depends test_create_primary_publication_type
          */
-    public function test_single_paper_template( $post_id ) {
+    public function test_single_paper_template( $post_id, $primary_publication_type ) {
 
         $query = new WP_Query(array('ID' => $post_id));
         set_global_query($query);

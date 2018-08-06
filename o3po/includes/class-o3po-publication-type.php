@@ -174,7 +174,7 @@ abstract class O3PO_PublicationType {
     public static function get_active_publication_types($name=Null) {
 
         if(!isset(self::$active_publication_types))
-            return array();
+            return Null;
 
         if(empty($name))
             return self::$active_publication_types;
