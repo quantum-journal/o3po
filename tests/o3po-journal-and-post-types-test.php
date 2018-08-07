@@ -298,6 +298,50 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         }
     }
 
+        /**
+         * @depends test_create_secondary_publication_type
+         */
+    public function test_secondary_get_the_content( $secondary_publication_type ) {
+        global $posts;
+        global $post;
+        global $global_query;
+
+        foreach($posts as $post_id => $post_data)
+        {
+            $post = new WP_Post($post_id);
+            $global_query = new WP_Query(array('ID' => $post_id));
+            the_post();
+
+            if(isset($posts[$post_id]['post_content']))
+                $orig_content = $posts[$post_id]['post_content'];
+            else
+                $orig_content = '';
+            $content = $secondary_publication_type->get_the_content($orig_content);
+
+                //print("\n\n" . $content ."\n\n");
+
+            if(isset($posts[$post_id]['meta']['view_type']) && $posts[$post_id]['meta']['view_type'] === 'Leap')
+            {
+                $settings = O3PO_Settings::instance();
+                foreach( array(
+                         '#popular science#',
+                         '#' . $settings->get_plugin_option('license_url')  . '#',
+                         '#' . $settings->get_plugin_option('publisher')  . '#',
+                           )
+                         as $regexp)
+                    $this->assertRegexp($regexp, $content);
+            }
+            else
+                $this->assertSame($orig_content, $content);
+
+
+            $dom = new DOMDocument;
+            $result = $dom->loadHTML('<div>' . $content . '</div>');
+//            $this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
+            $this->assertNotFalse($result);
+        }
+    }
+
 
     public function download_to_media_library_provider() {
 

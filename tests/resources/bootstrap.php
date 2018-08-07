@@ -211,11 +211,11 @@ class WP_Error
 
 class WP_Post
 {
+    public $ID;
+
     public function __construct( $post_id ) {
         $this->ID = $post_id;
     }
-
-    public $ID;
 }
 
 class WP_Query
@@ -343,6 +343,12 @@ function the_post_thumbnail() {
     $post_id = get_the_ID();
 
     return '<img src="' . esc_url($posts[$posts[$post_id]['thumbnail_id']]['attachment_url']) . '" >';
+}
+
+function get_the_post_thumbnail_url( $post_id = null, $size = 'post-thumbnail') {
+    global $posts;
+
+    return $posts[$posts[$post_id]['thumbnail_id']]['attachment_url'];
 }
 
 function get_the_ID() {
