@@ -40,7 +40,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $journal_config['publication_type_name_plural'] = $settings->get_plugin_option('primary_publication_type_name_plural');
 
             //create the journal
-        return new O3PO_Journal($journal_config);
+        $journal = new O3PO_Journal($journal_config);
+        $this->assertInstanceOf(O3PO_Journal::class, $journal);
+
+        return $journal;
     }
 
 
@@ -68,7 +71,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
 
             //create the journal
-        return new O3PO_Journal($journal_config);
+        $journal = new O3PO_Journal($journal_config);
+        $this->assertInstanceOf(O3PO_Journal::class, $journal);
+
+        return $journal;
     }
 
         /**
@@ -76,7 +82,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          */
     public function test_setup_environment( $settings ) {
 
-        return new O3PO_Environment($settings->get_plugin_option("production_site_url"));
+        $environment = new O3PO_Environment($settings->get_plugin_option("production_site_url"));
+        $this->assertInstanceOf(O3PO_Environment::class, $environment);
+
+        return $environment;
     }
 
         /**
@@ -86,7 +95,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     public function test_create_primary_publication_type( $journal, $environment )
     {
 
-        return new O3PO_PrimaryPublicationType($journal, $environment);
+        $primary_publication_type = new O3PO_PrimaryPublicationType($journal, $environment);
+        $this->assertInstanceOf(O3PO_PrimaryPublicationType::class, $primary_publication_type);
+
+        return $primary_publication_type;
     }
 
         /**
@@ -97,7 +109,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     public function test_create_secondary_publication_type( $primary_publication_type, $journal, $environment )
     {
 
-        return new O3PO_SecondaryPublicationType($primary_publication_type->get_publication_type_name(), $primary_publication_type->get_publication_type_name_plural(), $journal, $environment);
+        $secondary_publication_type = new O3PO_SecondaryPublicationType($primary_publication_type->get_publication_type_name(), $primary_publication_type->get_publication_type_name_plural(), $journal, $environment);
+        $this->assertInstanceOf(O3PO_SecondaryPublicationType::class, $secondary_publication_type);
+
+        return $secondary_publication_type;
     }
 
     public function single_paper_template_provider() {
@@ -129,8 +144,9 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             //print($output);
 
         $dom = new DOMDocument;
-        $dom->loadHTML($output);
+        $result = $dom->loadHTML($output);
             //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
+        $this->assertNotFalse($result);
     }
 
     public function primary_the_admin_components_provider() {
@@ -183,14 +199,11 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
             $dom = new DOMDocument;
 
-            $dom->loadHTML('<div>' . $output . '<div>');
+            $result = $dom->loadHTML('<div>' . $output . '<div>');
                 //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
+            $this->assertNotFalse($result);
         }
     }
-
-
-
-
 
     public function secondary_the_admin_components_provider() {
 
@@ -237,8 +250,9 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             ob_end_clean();
 
             $dom = new DOMDocument;
-            $dom->loadHTML('<div>' . $output . '</div>');
+            $result = $dom->loadHTML('<div>' . $output . '</div>');
                 //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
+            $this->assertNotFalse($result);
         }
     }
 
@@ -257,8 +271,9 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             ob_end_clean();
 
             $dom = new DOMDocument;
-            $dom->loadHTML('<div>' . $output . '</div>');
+            $result = $dom->loadHTML('<div>' . $output . '</div>');
 //            $this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
+            $this->assertNotFalse($result);
         }
     }
 
@@ -277,8 +292,9 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             ob_end_clean();
 
             $dom = new DOMDocument;
-            $dom->loadHTML('<div>' . $output . '</div>');
+            $result = $dom->loadHTML('<div>' . $output . '</div>');
 //            $this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
+            $this->assertNotFalse($result);
         }
     }
 
