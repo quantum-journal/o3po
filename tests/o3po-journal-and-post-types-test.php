@@ -687,7 +687,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                  '_date_published' => current_time("Y-m-d"),
                  '_journal' => 'q',
                  '_volume' => '1',
-                 '_pages' => 's',
+                 '_pages' => '1',
                  '_corresponding_author_email' => 't',
                  '_buffer_email' => 'u',
                  '_buffer_special_text' => 'v',
@@ -698,7 +698,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                  '#ERROR: Eprint is empty\.#',
                  '#ERROR: Abstract is empty\.#',
                  '#ERROR: Cannot add licensing information, no pdf attached to post.*#',
-                 '#WARNING: The page number s of this paper is not exactly one larger#',
+                 '#WARNING: The page number .* of this paper is not exactly one larger#',
                  '#ERROR: ORCID of author .* is malformed\.#',
                  '#ERROR: Corresponding author email is malformed\.#',
                  '#ERROR: Unable to generate XML for Crossref#',
@@ -710,7 +710,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                  '#ERROR: Eprint is empty\.#',
                  '#ERROR: Abstract is empty\.#',
                  '#ERROR: Cannot add licensing information, no pdf attached to post.*#',
-                 '#WARNING: The page number s of this paper is not exactly one larger#',
+                 '#WARNING: The page number .* of this paper is not exactly one larger#',
                  '#ERROR: ORCID of author .* is malformed\.#',
                  '#ERROR: Corresponding author email is malformed\.#',
                  '#ERROR: Unable to generate XML for Crossref#',
@@ -803,6 +803,8 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $method = $class->getMethod('save_metabox'); //calls save_meta_data() but also does some further things
         $method->setAccessible(true);
         $method->invokeArgs($primary_publication_type, array($post_id, new WP_Post($post_id) ));
+
+        print("\npost_id=" . $post_id . ' paper_arxiv_pdf_attach_ids=' . json_encode(get_post_meta( $post_id, $post_type . '_arxiv_pdf_attach_ids')));
 
         $validation_result = get_post_meta( $post_id, $post_type . '_validation_result');
         foreach($expections_first as $expection)
