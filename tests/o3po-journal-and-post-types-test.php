@@ -397,7 +397,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         $post_type = get_post_type($post_id);
         if ( $primary_publication_type->get_publication_type_name() !== $post_type )
+        {
+            $this->addToAssertionCount(1);
             return;
+        }
 
         $method = $primary_publication_type_class->getMethod('validate_and_process_data');
         $method->setAccessible(true);
@@ -424,7 +427,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         $post_type = get_post_type($post_id);
         if ( $secondary_publication_type->get_publication_type_name() !== $post_type )
+        {
+            $this->addToAssertionCount(1);
             return;
+        }
 
         $method = $secondary_publication_type_class->getMethod('validate_and_process_data');
         $method->setAccessible(true);
@@ -460,7 +466,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         $post_type = get_post_type($post_id);
         if ( $primary_publication_type->get_publication_type_name() !== $post_type )
+        {
+            $this->addToAssertionCount(1);
             return;
+        }
 
         $method = $class->getMethod('on_post_actually_published');
         $method->setAccessible(true);
@@ -480,7 +489,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         $post_type = get_post_type($post_id);
         if ( $secondary_publication_type->get_publication_type_name() !== $post_type )
+        {
+            $this->addToAssertionCount(1);
             return;
+        }
 
         $method = $class->getMethod('on_post_actually_published');
         $method->setAccessible(true);
@@ -573,7 +585,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         $post_type = get_post_type($post_id);
         if ( $primary_publication_type->get_publication_type_name() !== $post_type )
+        {
+            $this->addToAssertionCount(1);
             return;
+        }
 
         $method = $class->getMethod('save_meta_data');
         $method->setAccessible(true);
@@ -617,7 +632,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         $post_type = get_post_type($post_id);
         if ( $secondary_publication_type->get_publication_type_name() !== $post_type )
+        {
+            $this->addToAssertionCount(1);
             return;
+        }
 
         $method = $class->getMethod('save_meta_data');
         $method->setAccessible(true);
@@ -758,7 +776,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         $post_type = get_post_type($post_id);
         if ( $primary_publication_type->get_publication_type_name() !== $post_type )
+        {
+            $this->addToAssertionCount(1);
             return;
+        }
 
         $method = $class->getMethod('save_metabox'); //calls save_meta_data() but also does some further things
         $method->setAccessible(true);
@@ -766,22 +787,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             //call it again to trigger a post actually published event
         $method->invokeArgs($primary_publication_type, array($post_id, new WP_Post($post_id) ));
 
-            //print( "\n validation_results: " . get_post_meta( $post_id, $post_type . '_validation_result', true) . "\n" );
-
-        /* if(!empty($POST_args['_fetch_metadata_from_arxiv'])) */
-        /* { */
-        /*         //print( "\n fetch_results: " . get_post_meta( $post_id, $post_type . '_arxiv_fetch_results', true) . "\n" ); */
-
-        /*     foreach($expections as $expection) */
-        /*     { */
-        /*         $this->assertRegexp($expection, get_post_meta( $post_id, $post_type . '_arxiv_fetch_results', true)); */
-        /*     } */
-        /* } */
-        /* else */
-        /* { */
-        /*     foreach($POST_args as $key => $value) */
-        /*         $this->assertSame($value, get_post_meta( $post_id, $post_type . $key, true), 'Property ' . $post_type . $key . ' was not set correctly.'); */
-        /* } */
     }
 
 
@@ -803,7 +808,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         $post_type = get_post_type($post_id);
         if ( $secondary_publication_type->get_publication_type_name() !== $post_type )
+        {
+            $this->addToAssertionCount(1);
             return;
+        }
 
         $method = $class->getMethod('save_metabox'); //calls save_meta_data() but also does some further things
         $method->setAccessible(true);
@@ -852,7 +860,4 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $primary_publication_type->add_custom_post_types_to_query( new WP_Query() );
         $secondary_publication_type->add_custom_post_types_to_query( new WP_Query() );
     }
-
-
-
 }
