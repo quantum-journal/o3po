@@ -62,7 +62,7 @@ class O3PO_Environment {
          * Modify the css if we are in a test environment to make the website
          * look ugly to avoid confusion.
          *
-         * To be added to the 'wp_head' action.
+         * To be added to the 'wp_head' and 'admin_head' action.
          *
          * @since    0.1.0
          * @access   public
@@ -73,8 +73,8 @@ class O3PO_Environment {
         {
 ?>
             <style>
-            .site-header {
-                background-color: #cf4944;
+            .site-header, div#wpadminbar {
+                background-color: #49cf44;
             }
             </style>
 <?php
