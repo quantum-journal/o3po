@@ -1057,7 +1057,7 @@ abstract class O3PO_PublicationType {
         $affiliations = get_post_meta( $post_id, $post_type . '_affiliations', true );
         $journal = get_post_meta( $post_id, $post_type . '_journal', true );
         if(empty($journal)) return 'ERROR: Unable to generate XML for Crossref, journal is empty';
-        if($journal !== $this->get_journal_property('journal_title')) return 'ERROR: Unable to generate XML for Crossref, journal of the post and publication tpye do not match';
+        if($journal !== $this->get_journal_property('journal_title')) return 'ERROR: Unable to generate XML for Crossref, journal of the post and publication type do not match';
         $volume = get_post_meta( $post_id, $post_type . '_volume', true );
         if(empty($volume)) return 'ERROR: Unable to generate XML for Crossref, volume is empty';
         $bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
@@ -1441,7 +1441,7 @@ abstract class O3PO_PublicationType {
         $affiliations = get_post_meta( $post_id, $post_type . '_affiliations', true );
         $journal = get_post_meta( $post_id, $post_type . '_journal', true );
         if(empty($journal)) return 'ERROR: Unable to generate XML for CLOCKSS, journal is empty';
-        if($journal !== $this->get_journal_property('journal_title')) return 'ERROR: Unable to generate XML for CLOCKSS, journal of the post and publication tpye do not match';
+        if($journal !== $this->get_journal_property('journal_title')) return 'ERROR: Unable to generate XML for CLOCKSS, journal of the post and publication type do not match';
         $volume = get_post_meta( $post_id, $post_type . '_volume', true );
         if(empty($volume)) return 'ERROR: Unable to generate XML for CLOCKSS, volume is empty';
         $bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
@@ -1564,7 +1564,7 @@ abstract class O3PO_PublicationType {
         $affiliations = get_post_meta( $post_id, $post_type . '_affiliations', true );
         $journal = get_post_meta( $post_id, $post_type . '_journal', true );
         if(empty($journal)) return 'ERROR: Unable to generate JSON for DOAJ, journal is empty';
-        if($journal !== $this->get_journal_property('journal_title')) return 'ERROR: Unable to generate JSON for DOAJ, journal of the post and publication tpye do not match';
+        if($journal !== $this->get_journal_property('journal_title')) return 'ERROR: Unable to generate JSON for DOAJ, journal of the post and publication type do not match';
         $volume = get_post_meta( $post_id, $post_type . '_volume', true );
         if(empty($volume)) return 'ERROR: Unable to generate JSON for DOAJ, volume is empty';
         $bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
