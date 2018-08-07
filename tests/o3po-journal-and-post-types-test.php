@@ -736,22 +736,24 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                  '_nonce' => 'fake_nonce',
                  '_doi_suffix' => 'fake doi_suffix',
                  '_pages' => '2',
-                 '_date_published' => '2018-01-01',
+                 '_date_published' => current_time("Y-m-d"),
                  '_volume' => '2',
                  '_corresponding_author_email' => 'foo@bar.com',
                  '_journal' => $settings->get_plugin_option('journal_title'),
                    ),
              array(
                  '#WARNING: It seems like 0809.2542v4 is not published under a creative commons license on the arXiv\.#',
+                 '#REVIEW: The pdf was downloaded successfully from the arXiv\.#',
+                 '#REVIEW: The source was downloaded successfully from the arXiv .* and is of mime-type application/x-gzip#',
                  '#REVIEW: Found BibTeX or manually formated bibliographic information#',
                  '#REVIEW: Affiliations, ORCIDs, and author URLs updated from arxiv source#',
                  '#REVIEW: The doi suffix was set#',
-                   ),
-             array(
                  '#WARNING: Not yet published.#',
                    ),
+             array(
+                 '#INFO: This paper was publicly published\.#',
+                   ),
              ],
-
             [8,
              array(
                  '_eprint' => '0908.2921v2',
@@ -799,9 +801,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $post_type = get_post_type($post_id);
 
         foreach($POST_args as $key => $value)
-        {
             $_POST[ $post_type . $key ] = $value;
-        }
 
         $class = new ReflectionClass('O3PO_PrimaryPublicationType');
 
@@ -816,15 +816,16 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $method->setAccessible(true);
         $method->invokeArgs($primary_publication_type, array($post_id, new WP_Post($post_id) ));
 
-            //print("\npost_id=" . $post_id . ' paper_arxiv_pdf_attach_ids=' . json_encode(get_post_meta( $post_id, $post_type . '_arxiv_pdf_attach_ids')));
-
         $validation_result = get_post_meta( $post_id, $post_type . '_validation_result');
         foreach($expections_first as $expection)
         {
             $this->assertRegexp($expection, $validation_result);
         }
 
-            //call it again to trigger a post actually published event
+            //call it again to potentially trigger a post actually published event
+        foreach(get_all_post_metas($post_id) as $key => $value)
+            $_POST[ $key ] = $value;
+        schedule_post_for_publication($post_id);
         $method->invokeArgs($primary_publication_type, array($post_id, new WP_Post($post_id) ));
 
         $validation_result = get_post_meta( $post_id, $post_type . '_validation_result');

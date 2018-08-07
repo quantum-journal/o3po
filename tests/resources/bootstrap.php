@@ -178,6 +178,18 @@ function get_post_meta( $post_id, $key, $single = false ) {
     return $posts[$post_id]['meta'][$key];
 }
 
+function get_all_post_metas( $post_id ) {
+    global $posts;
+
+    return $posts[$post_id]['meta'];
+}
+
+function schedule_post_for_publication($post_id) {
+    global $posts;
+
+    return $posts[$post_id]['post_status'] = 'publish';
+}
+
 function wp_nonce_field( $action, $name, $referer=true, $echo=true ) {}
 
 class WP_Error
