@@ -538,7 +538,9 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                  '_fetch_metadata_from_arxiv' => 'checked',
                  '_nonce' => 'fake_nonce',
                    ),
-             array('#WARNING: It seems like 0809.2542v4 is not published under a creative commons license on the arXiv\.#'),
+             array(
+                 '#WARNING: It seems like 0809.2542v4 is not published under a creative commons license on the arXiv\.#',
+                   ),
              ],
             [8,
              array(
@@ -547,7 +549,9 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                  '_fetch_metadata_from_arxiv' => 'checked',
                  '_nonce' => 'fake_nonce',
                    ),
-             array('#SUCCESS: Fetched metadata from https://arxiv.org/abs/1609\.09584v4#'),
+             array(
+                 '#SUCCESS: Fetched metadata from https://arxiv.org/abs/1609\.09584v4#',
+                   ),
              ],
             [9,
              array(
@@ -698,8 +702,22 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                  '#ERROR: ORCID of author .* is malformed\.#',
                  '#ERROR: Corresponding author email is malformed\.#',
                  '#ERROR: Unable to generate XML for Crossref#',
+                 '#ERROR: Unable to generate JSON for DOAJ#',
+                 '#ERROR: Unable to generate XML for CLOCKSS#',
                  '#WARNING: Not yet published.#'
                    ),
+             array(
+                 '#ERROR: Eprint is empty\.#',
+                 '#ERROR: Abstract is empty\.#',
+                 '#ERROR: Cannot add licensing information, no pdf attached to post.*#',
+                 '#WARNING: The page number s of this paper is not exactly one larger#',
+                 '#ERROR: ORCID of author .* is malformed\.#',
+                 '#ERROR: Corresponding author email is malformed\.#',
+                 '#ERROR: Unable to generate XML for Crossref#',
+                 '#ERROR: Unable to generate JSON for DOAJ#',
+                 '#ERROR: Unable to generate XML for CLOCKSS#',
+                 '#WARNING: Not yet published.#'
+             ),
              ],
             [5,
              array(
@@ -720,7 +738,11 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                  '#REVIEW: Affiliations, ORCIDs, and author URLs updated from arxiv source#',
                  '#REVIEW: The doi suffix was set#',
                    ),
+             array(
+                 '#WARNING: Not yet published.#',
+                   ),
              ],
+
             [8,
              array(
                  '_eprint' => '0908.2921v2',
@@ -745,16 +767,13 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                    ),
              array(
                  '#WARNING: It seems like .* not published .* creative commons license#',
-                 '#SUCCESS: Fetched metadata from https://arxiv.org/abs/1609\.09584v4#',
+                 '#INFO: ORCID of author 1 is empty\.#',
                  '#INFO: This paper was publicly published\.#',
                  '#INFO: Emails to buffer.com sent correctly\.#',
                    ),
-             ],
-            [9,
              array(
-
-                      ),
-             array(),
+                 '#INFO: This paper was publicly published\.#',
+             ),
              ],
                 ];
     }
@@ -764,7 +783,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          * @dataProvider save_metabox_provider
          * @depends test_create_primary_publication_type
          */
-    public function test_primary_save_metabox( $post_id, $POST_args, $expections, $primary_publication_type ) {
+    public function test_primary_save_metabox( $post_id, $POST_args, $expections_first, $expections_second, $primary_publication_type ) {
         $post_type = get_post_type($post_id);
 
         foreach($POST_args as $key => $value)
@@ -784,8 +803,22 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $method = $class->getMethod('save_metabox'); //calls save_meta_data() but also does some further things
         $method->setAccessible(true);
         $method->invokeArgs($primary_publication_type, array($post_id, new WP_Post($post_id) ));
+
+        $validation_result = get_post_meta( $post_id, $post_type . '_validation_result');
+        foreach($expections_first as $expection)
+        {
+            $this->assertRegexp($expection, $validation_result);
+        }
+
             //call it again to trigger a post actually published event
         $method->invokeArgs($primary_publication_type, array($post_id, new WP_Post($post_id) ));
+
+        $validation_result = get_post_meta( $post_id, $post_type . '_validation_result');
+        foreach($expections_second as $expection)
+        {
+            $this->assertRegexp($expection, $validation_result);
+        }
+
 
     }
 
@@ -796,7 +829,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          * @dataProvider save_metabox_provider
          * @depends test_create_secondary_publication_type
          */
-    public function test_secondary_save_metabox( $post_id, $POST_args, $expections, $secondary_publication_type ) {
+    public function test_secondary_save_metabox( $post_id, $POST_args, $expections_first, $expections_second, $secondary_publication_type ) {
         $post_type = get_post_type($post_id);
 
         foreach($POST_args as $key => $value)
@@ -816,15 +849,32 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $method = $class->getMethod('save_metabox'); //calls save_meta_data() but also does some further things
         $method->setAccessible(true);
         $method->invokeArgs($secondary_publication_type, array($post_id, new WP_Post($post_id) ));
+        $validation_result = get_post_meta( $post_id, $post_type . '_validation_result');
+        foreach($expections_first as $expection)
+        {
+            $this->assertRegexp($expection, $validation_result);
+        }
+
             //call it again to trigger a post actually published event
-        $method->invokeArgs($secondary_publication_type, array($post_id, new WP_Post($post_id) ));
+        $method->invokeArgs($primary_publication_type, array($post_id, new WP_Post($post_id) ));
+
+        $validation_result = get_post_meta( $post_id, $post_type . '_validation_result');
+        foreach($expections_second as $expection)
+        {
+            $this->assertRegexp($expection, $validation_result);
+        }
     }
 
+
+        /**
+         * @doesNotPerformAssertions
+         */
     public function test_cleanup_at_the_very_end() {
         exec('git checkout ' . dirname(__File__) . '/resources/arxiv/0809.2542v4.pdf');
     }
 
         /**
+         * @doesNotPerformAssertions
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
@@ -834,6 +884,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     }
 
         /**
+         * @doesNotPerformAssertions
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
@@ -843,6 +894,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     }
 
         /**
+         * @doesNotPerformAssertions
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
@@ -853,6 +905,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
 
         /**
+         * @doesNotPerformAssertions
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
