@@ -20,6 +20,8 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $settings = O3PO_Settings::instance();
         $settings->configure($file_data['Text Domain'], $file_data['Plugin Name'], $file_data['Version'], 'O3PO_PublicationType::get_active_publication_type_names');
 
+        $this->assertInstanceOf(O3PO_Settings::class, $settings);
+
         return $settings;
     }
 
