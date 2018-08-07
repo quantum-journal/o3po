@@ -307,6 +307,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     }
 
         /**
+         * @runInSeparateProcess
          * @dataProvider download_to_media_library_provider
          * @depends test_setup_environment
          */
@@ -314,6 +315,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         if(!defined('ABSPATH'))
             define( 'ABSPATH', dirname( __FILE__ ) . '/resources/' );
+
         $results = $environment->download_to_media_library($url, $filename, $extension, $mime_type, $parent_post_id);
 
         if(empty($results['error']))
@@ -388,10 +390,14 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     }
 
         /**
+         * @runInSeparateProcess
          * @dataProvider posts_for_validate_and_process_data_provider
          * @depends test_create_primary_publication_type
          */
     public function test_primary_validate_and_process_data( $post_id, $post_data, $expections, $primary_publication_type ) {
+
+        if(!defined('ABSPATH'))
+            define( 'ABSPATH', dirname( __FILE__ ) . '/resources/' );
 
         $primary_publication_type_class = new ReflectionClass('O3PO_PrimaryPublicationType');
 
@@ -418,6 +424,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
 
         /**
+         * @runInSeparateProcess
          * @dataProvider posts_for_validate_and_process_data_provider
          * @depends test_create_secondary_publication_type
          */
@@ -458,6 +465,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     }
 
         /**
+         * @runInSeparateProcess
          * @dataProvider on_post_actually_published_provider
          * @depends test_create_primary_publication_type
          */
@@ -480,7 +488,8 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     }
 
 
-            /**
+        /**
+         * @runInSeparateProcess
          * @dataProvider on_post_actually_published_provider
          * @depends test_create_secondary_publication_type
          */
@@ -784,6 +793,9 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          * @depends test_create_primary_publication_type
          */
     public function test_primary_save_metabox( $post_id, $POST_args, $expections_first, $expections_second, $primary_publication_type ) {
+        if(!defined('ABSPATH'))
+            define( 'ABSPATH', dirname( __FILE__ ) . '/resources/' );
+
         $post_type = get_post_type($post_id);
 
         foreach($POST_args as $key => $value)
@@ -804,7 +816,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $method->setAccessible(true);
         $method->invokeArgs($primary_publication_type, array($post_id, new WP_Post($post_id) ));
 
-        print("\npost_id=" . $post_id . ' paper_arxiv_pdf_attach_ids=' . json_encode(get_post_meta( $post_id, $post_type . '_arxiv_pdf_attach_ids')));
+            //print("\npost_id=" . $post_id . ' paper_arxiv_pdf_attach_ids=' . json_encode(get_post_meta( $post_id, $post_type . '_arxiv_pdf_attach_ids')));
 
         $validation_result = get_post_meta( $post_id, $post_type . '_validation_result');
         foreach($expections_first as $expection)
@@ -867,14 +879,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         }
     }
 
-
-        /**
-         * @doesNotPerformAssertions
-         */
-    public function test_cleanup_at_the_very_end() {
-        exec('git checkout ' . dirname(__File__) . '/resources/arxiv/0809.2542v4.pdf');
-    }
-
         /**
          * @doesNotPerformAssertions
          * @depends test_create_primary_publication_type
@@ -915,4 +919,18 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $primary_publication_type->add_custom_post_types_to_query( new WP_Query() );
         $secondary_publication_type->add_custom_post_types_to_query( new WP_Query() );
     }
+
+
+
+
+
+
+        /**
+         * @doesNotPerformAssertions
+         */
+    public function test_cleanup_at_the_very_end() {
+        exec('git checkout ' . dirname(__File__) . '/resources/arxiv/0809.2542v4.pdf');
+    }
+
+
 }
