@@ -5,6 +5,11 @@ require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-settings.php');
 class O3PO_SettingsTest extends PHPUnit_Framework_TestCase
 {
 
+    public function fake_get_active_publication_type_names() {
+
+        return array("fake_publication_type_name_1", "fake_publication_type_name_2");
+    }
+
     public function test_initialize_settings()
     {
         $file_data = get_file_data(dirname( __FILE__ ) . '/../o3po/o3po.php', array(
@@ -14,38 +19,24 @@ class O3PO_SettingsTest extends PHPUnit_Framework_TestCase
                                                    ));
 
         $settings = O3PO_Settings::instance();
-        $settings->configure($file_data['Text Domain'], $file_data['Plugin Name'], $file_data['Version'], 'O3PO_PublicationType::get_active_publication_type_names');
+        $settings->configure($file_data['Text Domain'], $file_data['Plugin Name'], $file_data['Version'], array( $this, 'fake_get_active_publication_type_names'));
 
         $this->assertInstanceOf(O3PO_Settings::class, $settings);
 
         return $settings;
     }
 
+
         /**
-         * @doesNotPerformAssertions
          * @depends test_initialize_settings
          */
-    public function test_register_settings( $settings ) {
-
+    public function test_register_and_render_settings_page( $settings ) {
         $settings->register_settings();
-
-        return true;
-    }
-
-
-        /**
-         * @depends test_initialize_settings
-         * @depends test_register_settings
-         */
-    public function test_render_settings_page( $settings, $settings_registered ) {
-        $settings->register_settings(); //Without process isolation changes recorded in global variables by the fake WP environment for testing should be persisted from when when this was called arelady in test_register_settings(). For some reason I do not understand this is not the case, so we call it again...
 
         ob_start();
         $settings->render_settings_page();
         $output = ob_get_contents();
         ob_end_clean();
-
-            //print($output);
 
         $dom = new DOMDocument;
         $result = $dom->loadHTML($output);
