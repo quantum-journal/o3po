@@ -718,3 +718,71 @@ function the_posts_navigation() {
 
     echo '';
 }
+
+$global_settings = array();
+function register_setting( $option_group, $option_name, $args = array() ) {
+    global $global_settings;
+
+    if(!isset($global_settings[$option_group]))
+        $global_settings[$option_group] = array();
+
+    if(!isset($global_settings[$option_group][$option_name]))
+        $global_settings[$option_group][$option_name] = $args;
+}
+
+function add_settings_section( $id, $title, $callback, $page ) {
+    global $global_settings;
+
+    if(empty($global_settings['sections']))
+        $global_settings['sections'] = array();
+
+    $global_settings['sections'][$id] = array(
+        'title' => $title,
+        'callback' => $callback,
+        'page' => $page,
+        'fields' => array(),
+                                               );
+}
+
+function add_settings_field( $id, $title, $callback, $page ) {
+    global $global_settings;
+
+    $keys = array_keys($global_settings['sections']);
+    $last_settings_section_id = end($keys);
+        //$current_section = end($global_settings['sections']);
+
+    $global_settings['sections'][$last_settings_section_id]['fields'][$id] = array(
+        'title' => $title,
+        'callback' => $callback,
+        'page' => $page,
+                                                                                   );
+
+//    print("\nglobal_settings=" . json_encode($global_settings['sections']) . "\n" );
+}
+
+function settings_fields( $option_group ) {
+
+}
+
+function do_settings_sections( $id ) {
+    global $global_settings;
+
+    call_user_func($global_settings['sections'][$id]['callback']);
+    foreach($global_settings['sections'][$id]['fields'] as $id => $properties)
+    {
+        call_user_func($properties['callback']);
+    }
+}
+
+
+function checked( $helper, $current=true, $echo=true, $type='checked' ) {
+    if ( (string) $helper === (string) $current )
+        $result = " $type='$type'";
+    else
+        $result = '';
+
+    if ( $echo )
+        echo $result;
+
+    return $result;
+}
