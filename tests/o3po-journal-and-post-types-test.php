@@ -300,8 +300,9 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         /**
          * @depends test_create_secondary_publication_type
+         * @depends test_initialize_settings
          */
-    public function test_secondary_get_the_content( $secondary_publication_type ) {
+    public function test_secondary_get_the_content( $secondary_publication_type, $settings ) {
         global $posts;
         global $post;
         global $global_query;
@@ -322,7 +323,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
             if(isset($posts[$post_id]['meta']['view_type']) && $posts[$post_id]['meta']['view_type'] === 'Leap')
             {
-                $settings = O3PO_Settings::instance();
                 foreach( array(
                          '#popular science#',
                          '#' . $settings->get_plugin_option('license_url')  . '#',
@@ -352,6 +352,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         /**
          * @runInSeparateProcess
+         * @preserveGlobalState disabled
          * @dataProvider download_to_media_library_provider
          * @depends test_setup_environment
          */
@@ -435,6 +436,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         /**
          * @runInSeparateProcess
+         * @preserveGlobalState disabled
          * @dataProvider posts_for_validate_and_process_data_provider
          * @depends test_create_primary_publication_type
          */
@@ -469,6 +471,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         /**
          * @runInSeparateProcess
+         * @preserveGlobalState disabled
          * @dataProvider posts_for_validate_and_process_data_provider
          * @depends test_create_secondary_publication_type
          */
@@ -510,6 +513,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         /**
          * @runInSeparateProcess
+         * @preserveGlobalState disabled
          * @dataProvider on_post_actually_published_provider
          * @depends test_create_primary_publication_type
          */
@@ -534,6 +538,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         /**
          * @runInSeparateProcess
+         * @preserveGlobalState disabled
          * @dataProvider on_post_actually_published_provider
          * @depends test_create_secondary_publication_type
          */
@@ -627,6 +632,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         /**
          * @runInSeparateProcess
+         * @preserveGlobalState disabled
          * @dataProvider save_meta_data_provider
          * @depends test_create_primary_publication_type
          */
@@ -674,6 +680,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         /**
          * @runInSeparateProcess
+         * @preserveGlobalState disabled
          * @dataProvider save_meta_data_provider
          * @depends test_create_secondary_publication_type
          */
@@ -835,6 +842,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         /**
          * @runInSeparateProcess
+         * @preserveGlobalState disabled
          * @dataProvider save_metabox_provider
          * @depends test_create_primary_publication_type
          */
@@ -885,6 +893,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         /**
          * @runInSeparateProcess
+         * @preserveGlobalState disabled
          * @dataProvider save_metabox_provider
          * @depends test_create_secondary_publication_type
          */
@@ -964,11 +973,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $primary_publication_type->add_custom_post_types_to_query( new WP_Query() );
         $secondary_publication_type->add_custom_post_types_to_query( new WP_Query() );
     }
-
-
-
-
-
 
         /**
          * @doesNotPerformAssertions
