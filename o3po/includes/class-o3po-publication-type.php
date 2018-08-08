@@ -174,7 +174,7 @@ abstract class O3PO_PublicationType {
     public static function get_active_publication_types($name=Null) {
 
         if(!isset(self::$active_publication_types))
-            return array();
+            return Null;
 
         if(empty($name))
             return self::$active_publication_types;
@@ -448,7 +448,7 @@ abstract class O3PO_PublicationType {
                 $validation_result .= $doaj_response;
 
                 //Upload meta-data and fulltext to CLOCKSS (only if a fulltext exists)
-            $fulltext_pdf_path = static::get_fulltext_pdf_path($post_id);
+            $fulltext_pdf_path = $this->get_fulltext_pdf_path($post_id);
             $doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
             $remote_filename_without_extension = $doi_suffix;
 
@@ -1057,7 +1057,7 @@ abstract class O3PO_PublicationType {
         $affiliations = get_post_meta( $post_id, $post_type . '_affiliations', true );
         $journal = get_post_meta( $post_id, $post_type . '_journal', true );
         if(empty($journal)) return 'ERROR: Unable to generate XML for Crossref, journal is empty';
-        if($journal !== $this->get_journal_property('journal_title')) return 'ERROR: Unable to generate XML for Crossref, journal of the post and publication tpye do not match';
+        if($journal !== $this->get_journal_property('journal_title')) return 'ERROR: Unable to generate XML for Crossref, journal of the post and publication type do not match';
         $volume = get_post_meta( $post_id, $post_type . '_volume', true );
         if(empty($volume)) return 'ERROR: Unable to generate XML for Crossref, volume is empty';
         $bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
@@ -1443,7 +1443,7 @@ abstract class O3PO_PublicationType {
         $affiliations = get_post_meta( $post_id, $post_type . '_affiliations', true );
         $journal = get_post_meta( $post_id, $post_type . '_journal', true );
         if(empty($journal)) return 'ERROR: Unable to generate XML for CLOCKSS, journal is empty';
-        if($journal !== $this->get_journal_property('journal_title')) return 'ERROR: Unable to generate XML for CLOCKSS, journal of the post and publication tpye do not match';
+        if($journal !== $this->get_journal_property('journal_title')) return 'ERROR: Unable to generate XML for CLOCKSS, journal of the post and publication type do not match';
         $volume = get_post_meta( $post_id, $post_type . '_volume', true );
         if(empty($volume)) return 'ERROR: Unable to generate XML for CLOCKSS, volume is empty';
         $bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
@@ -1566,7 +1566,7 @@ abstract class O3PO_PublicationType {
         $affiliations = get_post_meta( $post_id, $post_type . '_affiliations', true );
         $journal = get_post_meta( $post_id, $post_type . '_journal', true );
         if(empty($journal)) return 'ERROR: Unable to generate JSON for DOAJ, journal is empty';
-        if($journal !== $this->get_journal_property('journal_title')) return 'ERROR: Unable to generate JSON for DOAJ, journal of the post and publication tpye do not match';
+        if($journal !== $this->get_journal_property('journal_title')) return 'ERROR: Unable to generate JSON for DOAJ, journal of the post and publication type do not match';
         $volume = get_post_meta( $post_id, $post_type . '_volume', true );
         if(empty($volume)) return 'ERROR: Unable to generate JSON for DOAJ, volume is empty';
         $bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
@@ -2478,7 +2478,12 @@ abstract class O3PO_PublicationType {
         $volume = get_post_meta( $post_id, $post_type . '_volume', true );
         $authors = $this->get_formated_authors_bibtex($post_id);
         $date_published = get_post_meta( $post_id, $post_type . '_date_published', true );
-        $month = O3PO_Latex::get_month_string(substr( $date_published, 5, 2 ));
+        $month = substr( $date_published, 5, 2 );
+        if( !empty($month) and 1 <= $month and $month <= 13 )
+            $month = O3PO_Latex::get_month_string($month);
+        else
+            $month = '';
+
         $year = substr( $date_published, 0, 4 );
         $author_surnames = get_post_meta( $post_id, $post_type . '_author_surnames', true );
         $doi = $this->get_doi($post_id);
@@ -2502,7 +2507,8 @@ abstract class O3PO_PublicationType {
             $bibtex .= '  publisher = {' . $publisher . '},' . "\n";
         $bibtex .= '  volume = {' . $volume . '},' . "\n";
         $bibtex .= '  pages = {' . $pages . '},' . "\n";
-        $bibtex .= '  month = ' . $month . ',' . "\n";
+        if(!empty($month))
+            $bibtex .= '  month = ' . $month . ',' . "\n";
         $bibtex .= '  year = {' . $year . '}' . "\n";
         $bibtex .= '}';
 
@@ -2808,8 +2814,7 @@ abstract class O3PO_PublicationType {
          * @access    public
          * @param     int     $post_id     Id of the post.
          */
-    abstract public static function get_fulltext_pdf_path( $post_id );
-
+    abstract public function get_fulltext_pdf_path( $post_id );
 
         /**
          * Get the pretty permalink of the pdf associated with a post.

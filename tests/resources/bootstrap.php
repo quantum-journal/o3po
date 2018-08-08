@@ -7,6 +7,8 @@
  * the plugin calls.
  */
 
+include(dirname( __FILE__ ) . '/posts.php');
+
 if(!class_exists('PHPUnit_Framework_TestCase')){
         /**
          * Make sure the class PHPUnit_Framework_TestCase is always defined
@@ -149,323 +151,6 @@ function flush_rewrite_rules( $hard=false ) {}
 
 $post_data = array();
 
-$posts = array(
-    1 => array(
-        'post_type' => 'paper',
-        'paper_nonce' => 'fake_nonce',
-        'thumbnail_id' => 2,
-        'post_status' => 'private',
-        'post_title' => 'Fake title',
-        'permalink' => 'Fake permalink',
-        'meta' => array(
-            'paper_abstract' => 'This is a test abstract that contains not math so far and no special characters.',
-            'paper_abstract_mathml' => 'This is a test abstract that contains not math so far and no special characters.',
-            'paper_eprint' => '0908.2921v2',
-            'paper_eprint_was_changed_on_last_save' => false,
-//            'paper_arxiv_pdf_attach_ids' => array(4),
-            'paper_arxiv_pdf_attach_ids' => array(),
-            'paper_popular_summary' => 'Some random fake summary.',
-            'paper_feature_image_caption' => 'Some random fake cation.',
-            'paper_fermats_library' => 'checked',
-            'paper_validation_result' => 'fake_validation_result',
-            'paper_title' => 'Fake title',
-            'paper_title_mathml' => 'Fake title',
-            'paper_corresponding_author_email' => 'mal_formed_corresponding_author_email',
-            'paper_corresponding_author_has_been_notifed_date' => '',
-            'paper_buffer_email' => 'fake_paper_buffer_email',
-            'paper_buffer_email_was_sent_date' => '',
-            'paper_buffer_special_text' => 'fake_paper_buffer_special_text',
-            'paper_fermats_library_permalink' => 'fake_paper_fermats_library_permalink',
-            'paper_fermats_library_permalink_worked' => 'fake_paper_fermats_library_permalink_worked',
-            'paper_fermats_library_has_been_notifed_date' => '',
-            'paper_number_authors' => 2,
-            'paper_author_given_names' => ['Foo', 'Baz'],
-            'paper_author_surnames' => ['Bar', 'Boo'],
-            'paper_author_name_styles' => ["western", "western"],
-            'paper_author_affiliations' => ['1,2','2'],
-            'paper_author_orcids' => ['',''],
-            'paper_author_urls' => ['',''],
-            'paper_number_affiliations' => 2,
-            'paper_affiliations' => ['Foo University', 'Bar Institut'],
-            'paper_date_published' => '',
-            'paper_journal' => 'fake_paper_journal',
-            'paper_volume' => '1',
-            'paper_pages' => '1',
-            'paper_doi_prefix' => 'fake_paper_doi_prefix',
-            'paper_doi_suffix' => 'fake_paper_doi_suffix',
-            'paper_bbl' => 'fake_paper_bbl',
-            'paper_author_latex_macro_definitions' => array(),
-            'paper_crossref_xml' => 'fake_paper_crossref_xml',
-            'paper_crossref_response' => 'fake_paper_crossref_response',
-            'paper_doaj_json' => 'fake_paper_doaj_json',
-            'paper_doaj_response' => 'fake_paper_doaj_response',
-            'paper_arxiv_fetch_results' => 'fake_paper_arxiv_fetch_results',
-            'paper_arxiv_source_attach_ids' => array(),
-            'paper_doi_suffix_was_changed_on_last_save' => false,
-            'paper_clockss_xml' => 'fake clocks xml',
-            'paper_clockss_response' => 'fake clocks response',
-                        ),
-               ),
-    2 => array(
-        'post_type' => 'attachment',
-        'attachment_image_src' => 'fake_attachment_image_src',
-        'thumbnail_id' => 3,
-        'attachment_url' => "Fake attachment_url",
-        'meta' => array(),
-               ),
-    3 => array(
-        'post_type' => 'attachment',
-        'attachment_image_src' => 'fake_attachment_image_src',
-        'attachment_url' => "Fake attachment_url",
-        'attachment_path' => dirname(__FILE__) . '/arxiv/0809.2542v4.pdf',
-               ),
-    4 => array(
-        'post_type' => 'attachment',
-        'attachment_url' => 'fake_attachment_url',
-        'attachment_path' => 'fake_attachment_path',
-               ),
-    5 => array(
-        'post_type' => 'paper',
-        'paper_nonce' => 'fake_nonce',
-        'thumbnail_id' => 2,
-        'post_status' => 'private',
-        'post_title' => 'Fake title 2',
-        'permalink' => 'Fake permalink',
-        'meta' => array(
-            'paper_abstract' => 'This is a test abstract 2 that contains not math so far and no special characters.',
-            'paper_abstract_mathml' => 'This is a test abstract 2 that contains not math so far and no special characters.',
-            'paper_eprint' => '0809.2542v4',
-            'paper_eprint_was_changed_on_last_save' => false,
-            'paper_arxiv_pdf_attach_ids' => array(),
-            'paper_popular_summary' => 'Some random fake summary.',
-            'paper_feature_image_caption' => 'Some random fake cation.',
-            'paper_fermats_library' => '',
-            'paper_validation_result' => 'fake_validation_result',
-            'paper_title' => 'Fake title 2',
-            'paper_title_mathml' => 'Fake title 2',
-            'paper_corresponding_author_email' => 'validemail@quantum-journal.org',
-            'paper_corresponding_author_has_been_notifed_date' => '',
-            'paper_buffer_email' => 'fake_paper_buffer_email',
-            'paper_buffer_email_was_sent_date' => '',
-            'paper_buffer_special_text' => 'fake_paper_buffer_special_text',
-            'paper_fermats_library_permalink' => 'fake_paper_fermats_library_permalink',
-            'paper_fermats_library_permalink_worked' => 'fake_paper_fermats_library_permalink_worked',
-            'paper_fermats_library_has_been_notifed_date' => '',
-            'paper_number_authors' => 1,
-            'paper_author_given_names' => ['Foo'],
-            'paper_author_surnames' => ['Bar'],
-            'paper_author_name_styles' => ["western"],
-            'paper_author_affiliations' => ['1'],
-            'paper_author_orcids' => ['0000-0003-0290-4698'],
-            'paper_author_urls' => [''],
-            'paper_number_affiliations' => 1,
-            'paper_affiliations' => ['Foo Institute'],
-            'paper_date_published' => '',
-            'paper_journal' => 'fake_paper_journal',
-            'paper_volume' => '1',
-            'paper_pages' => '2',
-            'paper_doi_prefix' => 'fake_paper_doi_prefix',
-            'paper_doi_suffix' => 'fake_paper_doi_suffix',
-            'paper_bbl' => 'fake_paper_bbl',
-            'paper_author_latex_macro_definitions' => array(),
-            'paper_crossref_xml' => 'fake_paper_crossref_xml',
-            'paper_crossref_response' => 'fake_paper_crossref_response',
-            'paper_doaj_json' => 'fake_paper_doaj_json',
-            'paper_doaj_response' => 'fake_paper_doaj_response',
-            'paper_arxiv_fetch_results' => 'fake_paper_arxiv_fetch_results',
-            'paper_arxiv_source_attach_ids' => array(),
-            'paper_doi_suffix_was_changed_on_last_save' => false,
-            'paper_clockss_xml' => '',
-            'paper_clockss_response' => '',
-                        )
-               ),
-    6 => array(
-        'post_type' => 'attachment',
-        'attachment_url' => 'fake_attachment_url',
-        'attachment_path' => dirname(__FILE__) . '/arxiv/0809.2542v4.pdf',
-               ),
-    7 => array(
-        'post_type' => 'attachment',
-        'attachment_url' => 'fake_attachment_url',
-        'attachment_path' => dirname(__FILE__) . '/arxiv/0809.2542v4.tar.gz',
-               ),
-    8 => array(
-        'post_type' => 'paper',
-        'paper_nonce' => 'fake_nonce',
-        'thumbnail_id' => 2,
-        'post_status' => 'publish',
-        'post_title' => 'Fake title',
-        'permalink' => 'Fake permalink',
-        'meta' => array(
-            'paper_abstract' => 'This is a test abstract that contains not math so far and no special characters.',
-            'paper_abstract_mathml' => 'This is a test abstract that contains not math so far and no special characters.',
-            'paper_eprint' => '0908.2921v2',
-            'paper_eprint_was_changed_on_last_save' => false,
-            'paper_arxiv_pdf_attach_ids' => array(3),
-            'paper_popular_summary' => 'Some random fake summary.',
-            'paper_feature_image_caption' => 'Some random fake cation.',
-            'paper_fermats_library' => '',
-            'paper_validation_result' => 'fake_validation_result',
-            'paper_title' => 'Fake title',
-            'paper_title_mathml' => 'Fake title',
-            'paper_corresponding_author_email' => 'mal_formed_corresponding_author_email',
-            'paper_corresponding_author_has_been_notifed_date' => '',
-            'paper_buffer_email' => '',
-            'paper_buffer_email_was_sent_date' => '',
-            'paper_buffer_special_text' => 'fake_paper_buffer_special_text',
-            'paper_fermats_library_permalink' => 'fake_paper_fermats_library_permalink',
-            'paper_fermats_library_permalink_worked' => 'fake_paper_fermats_library_permalink_worked',
-            'paper_fermats_library_has_been_notifed_date' => '',
-            'paper_number_authors' => 2,
-            'paper_author_given_names' => ['Foo', 'Baz'],
-            'paper_author_surnames' => ['Bar', 'Boo'],
-            'paper_author_name_styles' => ["western", "western"],
-            'paper_author_affiliations' => ['1,2','2'],
-            'paper_author_orcids' => ['',''],
-            'paper_author_urls' => ['',''],
-            'paper_number_affiliations' => 2,
-            'paper_affiliations' => ['Foo University', 'Bar Institut'],
-            'paper_date_published' => current_time("Y-m-d"),
-            'paper_journal' => 'fake_paper_journal',
-            'paper_volume' => '2',
-            'paper_pages' => '3',
-            'paper_doi_prefix' => 'fake_paper_doi_prefix',
-            'paper_doi_suffix' => 'fake_journal_level_doi_suffix-' . current_time("Y-m-d") . '-3',
-            'paper_bbl' => 'fake_paper_bbl',
-            'paper_author_latex_macro_definitions' => array(),
-            'paper_crossref_xml' => 'fake_paper_crossref_xml',
-            'paper_crossref_response' => 'fake_paper_crossref_response',
-            'paper_doaj_json' => 'fake_paper_doaj_json',
-            'paper_doaj_response' => 'fake_paper_doaj_response',
-            'paper_arxiv_fetch_results' => 'fake_paper_arxiv_fetch_results',
-            'paper_arxiv_source_attach_ids' => array(4),
-            'paper_doi_suffix_was_changed_on_last_save' => false,
-            'paper_clockss_xml' => '',
-            'paper_clockss_response' => '',
-                        ),
-               ),
-    9 => array(
-        'post_type' => 'view',
-        'paper_nonce' => 'fake_nonce',
-        'thumbnail_id' => 2,
-        'post_status' => 'publish',
-        'post_title' => 'Fake title',
-        'permalink' => 'Fake permalink',
-        'meta' => array(
-            'view_type' => 'Leap',
-            'view_number_target_dois' => '0',
-            'view_title' => 'A leaping title',
-            'view_corresponding_author_email' => 'author@leap.me',
-            'view_buffer_email' => 'checked',
-            'view_number_authors' => '1',
-            'view_number_affiliations' => '1',
-            'view_date_published' => current_time("Y-m-d"),
-            'view_doi_prefix' => 'fake',
-            'view_reviewers_summary' => 'A nice summary.',
-            'view_number_reviewers' => '2',
-            'view_number_reviewer_institutions' => 1,
-            'view_author_commentary' => 'A not so nice reply.',
-            'view_validation_result' => '',
-            'view_target_dois' => array(),
-            'view_title_mathml' => '',
-            'view_corresponding_author_has_been_notifed_date' => '',
-            'view_buffer_email_was_sent_date' => '',
-            'view_author_given_names' => array('Foo'),
-            'view_affiliations' => array('Affiliation'),
-            'view_journal' => '',
-            'view_doi_suffix' => '',
-            'view_reviewer_given_names' => array(),
-            'view_reviewer_institutions' => array(),
-            'view_about_the_author' => 'Some text about the author',
-            'view_buffer_special_text' => 'Special buffer message',
-            'view_author_surnames' => array('Bar'),
-            'view_volume' => '1',
-            'view_reviewer_surnames' => array(),
-            'view_author_name_styles' => array('western', 'western'),
-            'view_pages' => '1',
-            'view_reviewer_name_styles' => array(),
-            'view_author_affiliations' => array(),
-            'view_reviewer_affiliations' => array(),
-            'view_author_orcids' => array('', ''),
-            'view_reviewer_orcids' => array(),
-            'view_author_urls' => array('', ''),
-            'view_reviewer_urls' => array(),
-            'view_reviewer_ages' => array(),
-            'view_reviewer_grades' => array(),
-            'view_bbl' => '',
-            'view_author_latex_macro_definitions' => array(),
-            'view_crossref_xml' => '',
-            'view_crossref_response' => '',
-            'view_doaj_json' => '',
-            'view_doaj_response' => '',
-            'view_doi_suffix_was_changed_on_last_save' => false,
-            'view_abstract' => '',
-            'view_clockss_xml' => '',
-            'view_clockss_response' => '',
-                        )
-               ),
-    10 => array(
-        'post_type' => 'view',
-        'paper_nonce' => 'fake_nonce',
-        'thumbnail_id' => 2,
-        'post_status' => 'publish',
-        'post_title' => 'Fake title',
-        'permalink' => 'Fake permalink',
-        'meta' => array(
-            'view_type' => 'Leap',
-            'view_number_target_dois' => '1',
-            'view_title' => 'A leaping title',
-            'view_corresponding_author_email' => 'author@leap.me',
-            'view_buffer_email' => 'checked',
-            'view_number_authors' => '1',
-            'view_number_affiliations' => '1',
-            'view_date_published' => current_time("Y-m-d"),
-            'view_doi_prefix' => 'fake',
-            'view_reviewers_summary' => 'A nice summary.',
-            'view_number_reviewers' => '2',
-            'view_number_reviewer_institutions' => 1,
-            'view_author_commentary' => 'A not so nice reply.',
-            'view_validation_result' => '',
-            'view_target_dois' => array('a-doi-that-does-not-exist'),
-            'view_title_mathml' => '',
-            'view_corresponding_author_has_been_notifed_date' => '',
-            'view_buffer_email_was_sent_date' => '',
-            'view_author_given_names' => array('Baz'),
-            'view_affiliations' => array('Foo Instiute'),
-            'view_journal' => '',
-            'view_doi_suffix' => '',
-            'view_reviewer_given_names' => array(),
-            'view_reviewer_institutions' => array(),
-            'view_about_the_author' => 'Some text about the author',
-            'view_buffer_special_text' => 'Special buffer message',
-            'view_author_surnames' => array('Bazzz'),
-            'view_volume' => '1',
-            'view_reviewer_surnames' => array(),
-            'view_author_name_styles' => array('western'),
-            'view_pages' => '2',
-            'view_reviewer_name_styles' => array(),
-            'view_author_affiliations' => array('1'),
-            'view_reviewer_affiliations' => array(),
-            'view_author_orcids' => array(''),
-            'view_reviewer_orcids' => array(),
-            'view_author_urls' => array('http://www.baz.baz'),
-            'view_reviewer_urls' => array(),
-            'view_reviewer_ages' => array(),
-            'view_reviewer_grades' => array(),
-            'view_bbl' => '',
-            'view_author_latex_macro_definitions' => array(),
-            'view_crossref_xml' => '',
-            'view_crossref_response' => '',
-            'view_doaj_json' => '',
-            'view_doaj_response' => '',
-            'view_doi_suffix_was_changed_on_last_save' => false,
-            'view_abstract' => '',
-            'view_clockss_xml' => '',
-            'view_clockss_response' => '',
-                        )
-                ),
-               );
-
 function get_post_type( $post_id ) {
     global $posts;
 
@@ -493,6 +178,18 @@ function get_post_meta( $post_id, $key, $single = false ) {
     return $posts[$post_id]['meta'][$key];
 }
 
+function get_all_post_metas( $post_id ) {
+    global $posts;
+
+    return $posts[$post_id]['meta'];
+}
+
+function schedule_post_for_publication($post_id) {
+    global $posts;
+
+    return $posts[$post_id]['post_status'] = 'publish';
+}
+
 function wp_nonce_field( $action, $name, $referer=true, $echo=true ) {}
 
 class WP_Error
@@ -514,11 +211,11 @@ class WP_Error
 
 class WP_Post
 {
+    public $ID;
+
     public function __construct( $post_id ) {
         $this->ID = $post_id;
     }
-
-    public $ID;
 }
 
 class WP_Query
@@ -537,22 +234,32 @@ class WP_Query
             $array = array($input);
 
         $this->posts = array();
-        foreach($posts as $id => $post)
+        if(!empty($posts) and $input !== null)
         {
-            $include_post = true;
-            foreach($array as $key => $value)
+            foreach($posts as $id => $post)
             {
-                if(!is_array($value))
-                    $value = array($value);
-
-                if(!isset($posts[$id][$key]) or !in_array ($posts[$id][$key], $value))
+                $include_post = true;
+                foreach($array as $key => $value)
                 {
-                    $include_post = false;
-                    break;
+                    if(!is_array($value))
+                        $value = array($value);
+
+                    if($key === 'ID')
+                    {
+                        $include_post = in_array($id, $value);
+                        break;
+                    }
+
+
+                    if(!isset($posts[$id][$key]) or !in_array ($posts[$id][$key], $value))
+                    {
+                        $include_post = false;
+                        break;
+                    }
                 }
+                if($include_post)
+                    $this->posts[$id] = $post;
             }
-            if($include_post)
-                $this->posts[$id] = $post;
         }
     }
 
@@ -570,8 +277,6 @@ class WP_Query
         if(empty($this->posts))
         {
             throw new Exception("the_post() called with no posts left");
-            /* $post_data = array(); */
-            /* return; */
         }
 
         $keys = array_keys($this->posts);
@@ -583,6 +288,67 @@ class WP_Query
 
         $post_data = array('current' => $current, 'ID' => $min_key);
     }
+}
+
+$global_query = new WP_Query();
+function set_global_query( $wp_query ) {
+    global $global_query;
+
+    $global_query = $wp_query;
+}
+
+$global_search_query = '';
+function set_global_search_query( $string ) {
+    global $global_search_query;
+
+    $global_search_query = $string;
+}
+
+function get_search_query() {
+    global $global_search_query;
+
+    return $global_search_query;
+}
+
+function have_posts() {
+    global $global_query;
+
+    if(!($global_query instanceof WP_Query))
+        throw(new Exception('You must first set the $global_query before you can use have_posts()'));
+
+    return $global_query->have_posts();
+}
+
+function the_post() {
+    global $global_query;
+
+    if(!($global_query instanceof WP_Query))
+        throw(new Exception('You must fist set the $global_query before you can use have_posts()'));
+
+    return $global_query->the_post();
+}
+
+
+function has_post_thumbnail() {
+    global $posts;
+
+    $post_id = get_the_ID();
+
+    return !empty($posts[$post_id]['thumbnail_id']);
+}
+
+function the_post_thumbnail() {
+    global $posts;
+
+    $post_id = get_the_ID();
+
+    return '<img src="' . esc_url($posts[$posts[$post_id]['thumbnail_id']]['attachment_url']) . '" >';
+}
+
+function get_the_post_thumbnail_url( $post_id = null, $size = 'post-thumbnail') {
+    global $posts;
+
+    return $posts[$posts[$post_id]['thumbnail_id']]['attachment_url'];
 }
 
 function get_the_ID() {
@@ -622,22 +388,22 @@ function get_post_status( $ID = '' ) {
 
 function esc_html( $text ) {
 
-    return '(esc_html does nothing useful in the bootstaped fake WordPress)' . $text;
+    return 'esc_html' . $text;
 }
 
 function esc_attr__( $text ) {
 
-    return '(esc_attr__ does nothing useful in the bootstaped fake WordPress)' . $text;
+    return 'esc_attr__' . $text;
 }
 
 function esc_attr( $text ) {
 
-    return '(esc_attr does nothing useful in the bootstaped fake WordPress)' . $text;
+    return 'esc_attr' . $text;
 }
 
 function esc_url( $text ) {
 
-    return '(esc_url does nothing useful in the bootstaped fake WordPress)' . $text;
+    return 'esc_url' . $text;
 }
 
 function wp_get_attachment_url($id) {
@@ -791,11 +557,49 @@ function get_the_title( $post_id ) {
     return $posts[$post_id]['post_title'];
 }
 
+function the_content() {
+    echo get_the_content();
+}
+
+function the_category() {
+    echo get_the_category();
+}
+function get_the_category() {
+    return "fake category";
+}
+
+function comments_open( $post_id=null ) {
+    return false;
+}
+
+function get_comments_number( $post_id=null ) {
+    return 0;
+}
+
+
+function get_the_content() {
+    global $posts;
+
+    $post_id = get_the_ID();
+
+    return $posts[$post_id]['post_content'];
+}
+
 function get_permalink( $post_id ) {
     global $posts;
 
     return $posts[$post_id]['permalink'];
 }
+
+
+function get_sidebar() {
+    echo '<div>Sidebar</div>';
+}
+function get_footer() {
+    echo '</body>
+</html>';
+}
+
 
 function wp_mail( $to, $subject, $body, $headers, $attach=null) {
     return true;
@@ -803,22 +607,30 @@ function wp_mail( $to, $subject, $body, $headers, $attach=null) {
 
 function delete_transient() {}
 
+function get_transient() {
+    return false;
+}
+
+function set_transient( $transient, $value, $expiration ) {}
+
+
 function sanitize_text_field( $string ) {
 
     return $string;
 }
 
-function wp_remote_get( $url, $args ) {
+function wp_remote_get( $url, $args=array() ) {
         //return http_get( $url, $args );
 
-    $special_urls = array(
+    $local_file_urls = array(
         'https://arxiv.org/abs/0809.2542v4' => dirname(__FILE__) . '/arxiv/0809.2542v4.html',
         'https://arxiv.org/abs/1609.09584v4' => dirname(__FILE__) . '/arxiv/1609.09584v4.html',
         'https://arxiv.org/abs/0908.2921v2' => dirname(__FILE__) . '/arxiv/0908.2921v2.html',
                           );
-
-    if(!empty($special_urls[$url]))
-        return array('headers'=>'' ,'body'=> file_get_contents($special_urls[$url]) );
+    if(!empty($local_file_urls[$url]))
+        return array('headers'=>'' ,'body'=> file_get_contents($local_file_urls[$url]) );
+    elseif(strpos($url, get_option('o3po-setttings')['crossref_get_forward_links_url']) === 0)
+        return array('body' => 'fake respose form crossref forward links url');
     else
         throw new Exception('Fake wp_remote_get() does not know how to handle ' . $url);
 }
@@ -873,7 +685,9 @@ function is_category() {
 
 
 function get_header() {
-    return "";
+    echo '<!DOCTYPE html>
+<html lang="en-GB">
+<head><title>fake title</title></head><body>';
 }
 
 function get_theme_mod() {
@@ -882,4 +696,93 @@ function get_theme_mod() {
 
 function onepress_breadcrumb() {
     return "";
+}
+
+function get_search_form() {
+
+echo '<form role="search" method="get" class="search-form" action="' . 'http://some.url.org' . '">
+				<label>
+					<span class="screen-reader-text">Search for:</span>
+					<input type="search" class="search-field" placeholder="Search &hellip;" value="' . get_search_query() . '" name="s" />
+				</label>
+				<input type="submit" class="search-submit" value="Search" />
+			</form>';
+}
+
+function get_template_part() {
+
+    echo '';
+}
+
+function the_posts_navigation() {
+
+    echo '';
+}
+
+$global_settings = array();
+function register_setting( $option_group, $option_name, $args = array() ) {
+    global $global_settings;
+
+    if(!isset($global_settings[$option_group]))
+        $global_settings[$option_group] = array();
+
+    if(!isset($global_settings[$option_group][$option_name]))
+        $global_settings[$option_group][$option_name] = $args;
+}
+
+function add_settings_section( $id, $title, $callback, $page ) {
+    global $global_settings;
+
+    if(empty($global_settings['sections']))
+        $global_settings['sections'] = array();
+
+    $global_settings['sections'][$id] = array(
+        'title' => $title,
+        'callback' => $callback,
+        'page' => $page,
+        'fields' => array(),
+                                               );
+}
+
+function add_settings_field( $id, $title, $callback, $page ) {
+    global $global_settings;
+
+    $keys = array_keys($global_settings['sections']);
+    $last_settings_section_id = end($keys);
+        //$current_section = end($global_settings['sections']);
+
+    $global_settings['sections'][$last_settings_section_id]['fields'][$id] = array(
+        'title' => $title,
+        'callback' => $callback,
+        'page' => $page,
+                                                                                   );
+
+//    print("\nglobal_settings=" . json_encode($global_settings['sections']) . "\n" );
+}
+
+function settings_fields( $option_group ) {
+
+}
+
+function do_settings_sections( $id ) {
+    global $global_settings;
+
+    call_user_func($global_settings['sections'][$id]['callback']);
+    foreach($global_settings['sections'][$id]['fields'] as $id => $properties)
+    {
+        call_user_func($properties['callback']);
+    }
+}
+
+
+function checked( $helper, $current=true, $echo=true, $type='checked' ) {
+    if ( (string) $helper === (string) $current )
+        $result = " $type='$type'";
+    else
+        $result = '';
+
+    if ( $echo )
+        echo $result;
+
+    return $result;
 }

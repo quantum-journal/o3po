@@ -312,6 +312,8 @@ class O3PO {
         $this->loader->add_action( 'loop_start', $plugin_public, 'extended_search_and_navigation_at_loop_start' );
         $this->loader->add_action( 'loop_start', $plugin_public, 'secondary_journal_help_text' );
 
+        $this->loader->add_action( 'wp_head', $this->environment, 'modify_css_if_in_test_environment' );
+
         $this->loader->add_action( 'init', $this->journal, 'add_volumes_endpoint' );
         $this->loader->add_action( 'parse_request', $this->journal, 'handle_volumes_endpoint_request' );
 

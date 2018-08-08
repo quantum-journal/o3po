@@ -20,6 +20,8 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $settings = O3PO_Settings::instance();
         $settings->configure($file_data['Text Domain'], $file_data['Plugin Name'], $file_data['Version'], 'O3PO_PublicationType::get_active_publication_type_names');
 
+        $this->assertInstanceOf(O3PO_Settings::class, $settings);
+
         return $settings;
     }
 
@@ -38,7 +40,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $journal_config['publication_type_name_plural'] = $settings->get_plugin_option('primary_publication_type_name_plural');
 
             //create the journal
-        return new O3PO_Journal($journal_config);
+        $journal = new O3PO_Journal($journal_config);
+        $this->assertInstanceOf(O3PO_Journal::class, $journal);
+
+        return $journal;
     }
 
 
@@ -66,7 +71,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
 
             //create the journal
-        return new O3PO_Journal($journal_config);
+        $journal = new O3PO_Journal($journal_config);
+        $this->assertInstanceOf(O3PO_Journal::class, $journal);
+
+        return $journal;
     }
 
         /**
@@ -74,7 +82,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          */
     public function test_setup_environment( $settings ) {
 
-        return new O3PO_Environment($settings->get_plugin_option("production_site_url"));
+        $environment = new O3PO_Environment($settings->get_plugin_option("production_site_url"));
+        $this->assertInstanceOf(O3PO_Environment::class, $environment);
+
+        return $environment;
     }
 
         /**
@@ -84,7 +95,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     public function test_create_primary_publication_type( $journal, $environment )
     {
 
-        return new O3PO_PrimaryPublicationType($journal, $environment);
+        $primary_publication_type = new O3PO_PrimaryPublicationType($journal, $environment);
+        $this->assertInstanceOf(O3PO_PrimaryPublicationType::class, $primary_publication_type);
+
+        return $primary_publication_type;
     }
 
         /**
@@ -95,7 +109,44 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     public function test_create_secondary_publication_type( $primary_publication_type, $journal, $environment )
     {
 
-        return new O3PO_SecondaryPublicationType($primary_publication_type->get_publication_type_name(), $primary_publication_type->get_publication_type_name_plural(), $journal, $environment);
+        $secondary_publication_type = new O3PO_SecondaryPublicationType($primary_publication_type->get_publication_type_name(), $primary_publication_type->get_publication_type_name_plural(), $journal, $environment);
+        $this->assertInstanceOf(O3PO_SecondaryPublicationType::class, $secondary_publication_type);
+
+        return $secondary_publication_type;
+    }
+
+    public function single_paper_template_provider() {
+
+        return [
+            [1],
+            [5],
+        ];
+    }
+
+        /**
+         * Remeber: This test depends on the post types being active, not
+         * directly, because it doesn't need them as an imput, but
+         * indirecty, as the template only works if they are already active.
+         *
+         * @dataProvider single_paper_template_provider
+         * @depends test_create_primary_publication_type
+         */
+    public function test_single_paper_template( $post_id, $primary_publication_type ) {
+
+        $query = new WP_Query(array('ID' => $post_id));
+        set_global_query($query);
+
+        ob_start();
+        include( dirname(__File__) . '/../o3po/public/templates/single-paper.php');
+        $output = ob_get_contents();
+        ob_end_clean();
+        $output = preg_replace('#(main|header)#', 'div', $output); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
+            //print($output);
+
+        $dom = new DOMDocument;
+        $result = $dom->loadHTML($output);
+            //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
+        $this->assertNotFalse($result);
     }
 
     public function primary_the_admin_components_provider() {
@@ -147,14 +198,12 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             ob_end_clean();
 
             $dom = new DOMDocument;
-            $dom->loadHTML('<div>' . $output . '</div>');
+
+            $result = $dom->loadHTML('<div>' . $output . '<div>');
                 //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
+            $this->assertNotFalse($result);
         }
     }
-
-
-
-
 
     public function secondary_the_admin_components_provider() {
 
@@ -201,8 +250,9 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             ob_end_clean();
 
             $dom = new DOMDocument;
-            $dom->loadHTML('<div>' . $output . '</div>');
+            $result = $dom->loadHTML('<div>' . $output . '</div>');
                 //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
+            $this->assertNotFalse($result);
         }
     }
 
@@ -221,8 +271,9 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             ob_end_clean();
 
             $dom = new DOMDocument;
-            $dom->loadHTML('<div>' . $output . '</div>');
+            $result = $dom->loadHTML('<div>' . $output . '</div>');
 //            $this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
+            $this->assertNotFalse($result);
         }
     }
 
@@ -241,8 +292,53 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             ob_end_clean();
 
             $dom = new DOMDocument;
-            $dom->loadHTML('<div>' . $output . '</div>');
+            $result = $dom->loadHTML('<div>' . $output . '</div>');
 //            $this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
+            $this->assertNotFalse($result);
+        }
+    }
+
+        /**
+         * @depends test_create_secondary_publication_type
+         * @depends test_initialize_settings
+         */
+    public function test_secondary_get_the_content( $secondary_publication_type, $settings ) {
+        global $posts;
+        global $post;
+        global $global_query;
+
+        foreach($posts as $post_id => $post_data)
+        {
+            $post = new WP_Post($post_id);
+            $global_query = new WP_Query(array('ID' => $post_id));
+            the_post();
+
+            if(isset($posts[$post_id]['post_content']))
+                $orig_content = $posts[$post_id]['post_content'];
+            else
+                $orig_content = '';
+            $content = $secondary_publication_type->get_the_content($orig_content);
+
+                //print("\n\n" . $content ."\n\n");
+
+            if(isset($posts[$post_id]['meta']['view_type']) && $posts[$post_id]['meta']['view_type'] === 'Leap')
+            {
+                foreach( array(
+                         '#popular science#',
+                         '#' . $settings->get_plugin_option('license_url')  . '#',
+                         '#' . $settings->get_plugin_option('publisher')  . '#',
+                           )
+                         as $regexp)
+                    $this->assertRegexp($regexp, $content);
+            }
+            else
+                $this->assertSame($orig_content, $content);
+
+
+            $dom = new DOMDocument;
+            $result = $dom->loadHTML('<div>' . $content . '</div>');
+//            $this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
+            $this->assertNotFalse($result);
         }
     }
 
@@ -255,6 +351,8 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     }
 
         /**
+         * @runInSeparateProcess
+         * @preserveGlobalState disabled
          * @dataProvider download_to_media_library_provider
          * @depends test_setup_environment
          */
@@ -262,6 +360,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         if(!defined('ABSPATH'))
             define( 'ABSPATH', dirname( __FILE__ ) . '/resources/' );
+
         $results = $environment->download_to_media_library($url, $filename, $extension, $mime_type, $parent_post_id);
 
         if(empty($results['error']))
@@ -336,16 +435,24 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     }
 
         /**
+         * @runInSeparateProcess
+         * @preserveGlobalState disabled
          * @dataProvider posts_for_validate_and_process_data_provider
          * @depends test_create_primary_publication_type
          */
     public function test_primary_validate_and_process_data( $post_id, $post_data, $expections, $primary_publication_type ) {
 
+        if(!defined('ABSPATH'))
+            define( 'ABSPATH', dirname( __FILE__ ) . '/resources/' );
+
         $primary_publication_type_class = new ReflectionClass('O3PO_PrimaryPublicationType');
 
         $post_type = get_post_type($post_id);
         if ( $primary_publication_type->get_publication_type_name() !== $post_type )
+        {
+            $this->addToAssertionCount(1);
             return;
+        }
 
         $method = $primary_publication_type_class->getMethod('validate_and_process_data');
         $method->setAccessible(true);
@@ -363,6 +470,8 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
 
         /**
+         * @runInSeparateProcess
+         * @preserveGlobalState disabled
          * @dataProvider posts_for_validate_and_process_data_provider
          * @depends test_create_secondary_publication_type
          */
@@ -372,7 +481,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         $post_type = get_post_type($post_id);
         if ( $secondary_publication_type->get_publication_type_name() !== $post_type )
+        {
+            $this->addToAssertionCount(1);
             return;
+        }
 
         $method = $secondary_publication_type_class->getMethod('validate_and_process_data');
         $method->setAccessible(true);
@@ -400,6 +512,8 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     }
 
         /**
+         * @runInSeparateProcess
+         * @preserveGlobalState disabled
          * @dataProvider on_post_actually_published_provider
          * @depends test_create_primary_publication_type
          */
@@ -408,7 +522,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         $post_type = get_post_type($post_id);
         if ( $primary_publication_type->get_publication_type_name() !== $post_type )
+        {
+            $this->addToAssertionCount(1);
             return;
+        }
 
         $method = $class->getMethod('on_post_actually_published');
         $method->setAccessible(true);
@@ -419,7 +536,9 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     }
 
 
-            /**
+        /**
+         * @runInSeparateProcess
+         * @preserveGlobalState disabled
          * @dataProvider on_post_actually_published_provider
          * @depends test_create_secondary_publication_type
          */
@@ -428,7 +547,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         $post_type = get_post_type($post_id);
         if ( $secondary_publication_type->get_publication_type_name() !== $post_type )
+        {
+            $this->addToAssertionCount(1);
             return;
+        }
 
         $method = $class->getMethod('on_post_actually_published');
         $method->setAccessible(true);
@@ -474,7 +596,9 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                  '_fetch_metadata_from_arxiv' => 'checked',
                  '_nonce' => 'fake_nonce',
                    ),
-             array('#WARNING: It seems like 0809.2542v4 is not published under a creative commons license on the arXiv\.#'),
+             array(
+                 '#WARNING: It seems like 0809.2542v4 is not published under a creative commons license on the arXiv\.#',
+                   ),
              ],
             [8,
              array(
@@ -483,7 +607,9 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                  '_fetch_metadata_from_arxiv' => 'checked',
                  '_nonce' => 'fake_nonce',
                    ),
-             array('#SUCCESS: Fetched metadata from https://arxiv.org/abs/1609\.09584v4#'),
+             array(
+                 '#SUCCESS: Fetched metadata from https://arxiv.org/abs/1609\.09584v4#',
+                   ),
              ],
             [9,
              array(
@@ -506,6 +632,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         /**
          * @runInSeparateProcess
+         * @preserveGlobalState disabled
          * @dataProvider save_meta_data_provider
          * @depends test_create_primary_publication_type
          */
@@ -521,7 +648,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         $post_type = get_post_type($post_id);
         if ( $primary_publication_type->get_publication_type_name() !== $post_type )
+        {
+            $this->addToAssertionCount(1);
             return;
+        }
 
         $method = $class->getMethod('save_meta_data');
         $method->setAccessible(true);
@@ -550,6 +680,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         /**
          * @runInSeparateProcess
+         * @preserveGlobalState disabled
          * @dataProvider save_meta_data_provider
          * @depends test_create_secondary_publication_type
          */
@@ -565,7 +696,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         $post_type = get_post_type($post_id);
         if ( $secondary_publication_type->get_publication_type_name() !== $post_type )
+        {
+            $this->addToAssertionCount(1);
             return;
+        }
 
         $method = $class->getMethod('save_meta_data');
         $method->setAccessible(true);
@@ -613,7 +747,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                  '_date_published' => current_time("Y-m-d"),
                  '_journal' => 'q',
                  '_volume' => '1',
-                 '_pages' => 's',
+                 '_pages' => '1',
                  '_corresponding_author_email' => 't',
                  '_buffer_email' => 'u',
                  '_buffer_special_text' => 'v',
@@ -624,12 +758,26 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                  '#ERROR: Eprint is empty\.#',
                  '#ERROR: Abstract is empty\.#',
                  '#ERROR: Cannot add licensing information, no pdf attached to post.*#',
-                 '#WARNING: The page number s of this paper is not exactly one larger#',
+                 '#WARNING: The page number .* of this paper is not exactly one larger#',
                  '#ERROR: ORCID of author .* is malformed\.#',
                  '#ERROR: Corresponding author email is malformed\.#',
                  '#ERROR: Unable to generate XML for Crossref#',
+                 '#ERROR: Unable to generate JSON for DOAJ#',
+                 '#ERROR: Unable to generate XML for CLOCKSS#',
                  '#WARNING: Not yet published.#'
                    ),
+             array(
+                 '#ERROR: Eprint is empty\.#',
+                 '#ERROR: Abstract is empty\.#',
+                 '#ERROR: Cannot add licensing information, no pdf attached to post.*#',
+                 '#WARNING: The page number .* of this paper is not exactly one larger#',
+                 '#ERROR: ORCID of author .* is malformed\.#',
+                 '#ERROR: Corresponding author email is malformed\.#',
+                 '#ERROR: Unable to generate XML for Crossref#',
+                 '#ERROR: Unable to generate JSON for DOAJ#',
+                 '#ERROR: Unable to generate XML for CLOCKSS#',
+                 '#WARNING: Not yet published.#'
+             ),
              ],
             [5,
              array(
@@ -639,16 +787,22 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                  '_nonce' => 'fake_nonce',
                  '_doi_suffix' => 'fake doi_suffix',
                  '_pages' => '2',
-                 '_date_published' => '2018-01-01',
+                 '_date_published' => current_time("Y-m-d"),
                  '_volume' => '2',
                  '_corresponding_author_email' => 'foo@bar.com',
                  '_journal' => $settings->get_plugin_option('journal_title'),
                    ),
              array(
                  '#WARNING: It seems like 0809.2542v4 is not published under a creative commons license on the arXiv\.#',
+                 '#REVIEW: The pdf was downloaded successfully from the arXiv\.#',
+                 '#REVIEW: The source was downloaded successfully from the arXiv .* and is of mime-type application/x-gzip#',
                  '#REVIEW: Found BibTeX or manually formated bibliographic information#',
                  '#REVIEW: Affiliations, ORCIDs, and author URLs updated from arxiv source#',
                  '#REVIEW: The doi suffix was set#',
+                 '#WARNING: Not yet published.#',
+                   ),
+             array(
+                 '#INFO: This paper was publicly published\.#',
                    ),
              ],
             [8,
@@ -675,71 +829,75 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                    ),
              array(
                  '#WARNING: It seems like .* not published .* creative commons license#',
-                 '#SUCCESS: Fetched metadata from https://arxiv.org/abs/1609\.09584v4#',
+                 '#INFO: ORCID of author 1 is empty\.#',
                  '#INFO: This paper was publicly published\.#',
                  '#INFO: Emails to buffer.com sent correctly\.#',
                    ),
-             ],
-            [9,
              array(
-
-                      ),
-             array(),
+                 '#INFO: This paper was publicly published\.#',
+             ),
              ],
                 ];
     }
 
         /**
          * @runInSeparateProcess
+         * @preserveGlobalState disabled
          * @dataProvider save_metabox_provider
          * @depends test_create_primary_publication_type
          */
-    public function test_primary_save_metabox( $post_id, $POST_args, $expections, $primary_publication_type ) {
+    public function test_primary_save_metabox( $post_id, $POST_args, $expections_first, $expections_second, $primary_publication_type ) {
+        if(!defined('ABSPATH'))
+            define( 'ABSPATH', dirname( __FILE__ ) . '/resources/' );
+
         $post_type = get_post_type($post_id);
 
         foreach($POST_args as $key => $value)
-        {
             $_POST[ $post_type . $key ] = $value;
-        }
 
         $class = new ReflectionClass('O3PO_PrimaryPublicationType');
 
         $post_type = get_post_type($post_id);
         if ( $primary_publication_type->get_publication_type_name() !== $post_type )
+        {
+            $this->addToAssertionCount(1);
             return;
+        }
 
         $method = $class->getMethod('save_metabox'); //calls save_meta_data() but also does some further things
         $method->setAccessible(true);
         $method->invokeArgs($primary_publication_type, array($post_id, new WP_Post($post_id) ));
-            //call it again to trigger a post actually published event
+
+        $validation_result = get_post_meta( $post_id, $post_type . '_validation_result');
+        foreach($expections_first as $expection)
+        {
+            $this->assertRegexp($expection, $validation_result);
+        }
+
+            //call it again to potentially trigger a post actually published event
+        foreach(get_all_post_metas($post_id) as $key => $value)
+            $_POST[ $key ] = $value;
+        schedule_post_for_publication($post_id);
         $method->invokeArgs($primary_publication_type, array($post_id, new WP_Post($post_id) ));
 
-            //print( "\n validation_results: " . get_post_meta( $post_id, $post_type . '_validation_result', true) . "\n" );
+        $validation_result = get_post_meta( $post_id, $post_type . '_validation_result');
+        foreach($expections_second as $expection)
+        {
+            $this->assertRegexp($expection, $validation_result);
+        }
 
-        /* if(!empty($POST_args['_fetch_metadata_from_arxiv'])) */
-        /* { */
-        /*         //print( "\n fetch_results: " . get_post_meta( $post_id, $post_type . '_arxiv_fetch_results', true) . "\n" ); */
 
-        /*     foreach($expections as $expection) */
-        /*     { */
-        /*         $this->assertRegexp($expection, get_post_meta( $post_id, $post_type . '_arxiv_fetch_results', true)); */
-        /*     } */
-        /* } */
-        /* else */
-        /* { */
-        /*     foreach($POST_args as $key => $value) */
-        /*         $this->assertSame($value, get_post_meta( $post_id, $post_type . $key, true), 'Property ' . $post_type . $key . ' was not set correctly.'); */
-        /* } */
     }
 
 
 
         /**
          * @runInSeparateProcess
+         * @preserveGlobalState disabled
          * @dataProvider save_metabox_provider
          * @depends test_create_secondary_publication_type
          */
-    public function test_secondary_save_metabox( $post_id, $POST_args, $expections, $secondary_publication_type ) {
+    public function test_secondary_save_metabox( $post_id, $POST_args, $expections_first, $expections_second, $secondary_publication_type ) {
         $post_type = get_post_type($post_id);
 
         foreach($POST_args as $key => $value)
@@ -751,20 +909,32 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         $post_type = get_post_type($post_id);
         if ( $secondary_publication_type->get_publication_type_name() !== $post_type )
+        {
+            $this->addToAssertionCount(1);
             return;
+        }
 
         $method = $class->getMethod('save_metabox'); //calls save_meta_data() but also does some further things
         $method->setAccessible(true);
         $method->invokeArgs($secondary_publication_type, array($post_id, new WP_Post($post_id) ));
-            //call it again to trigger a post actually published event
-        $method->invokeArgs($secondary_publication_type, array($post_id, new WP_Post($post_id) ));
-    }
+        $validation_result = get_post_meta( $post_id, $post_type . '_validation_result');
+        foreach($expections_first as $expection)
+        {
+            $this->assertRegexp($expection, $validation_result);
+        }
 
-    public function test_cleanup_at_the_very_end() {
-        exec('git checkout ' . dirname(__File__) . '/resources/arxiv/0809.2542v4.pdf');
+            //call it again to trigger a post actually published event
+        $method->invokeArgs($primary_publication_type, array($post_id, new WP_Post($post_id) ));
+
+        $validation_result = get_post_meta( $post_id, $post_type . '_validation_result');
+        foreach($expections_second as $expection)
+        {
+            $this->assertRegexp($expection, $validation_result);
+        }
     }
 
         /**
+         * @doesNotPerformAssertions
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
@@ -774,6 +944,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     }
 
         /**
+         * @doesNotPerformAssertions
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
@@ -783,6 +954,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     }
 
         /**
+         * @doesNotPerformAssertions
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
@@ -793,21 +965,20 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
 
         /**
+         * @doesNotPerformAssertions
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
     public function test_add_custom_post_types_to_query( $primary_publication_type, $secondary_publication_type) {
-        $primary_publication_type->add_custom_post_types_to_query( new WP_query() );
-        $secondary_publication_type->add_custom_post_types_to_query( new WP_query() );
+        $primary_publication_type->add_custom_post_types_to_query( new WP_Query() );
+        $secondary_publication_type->add_custom_post_types_to_query( new WP_Query() );
     }
 
-
         /**
-         * @depends test_create_primary_publication_type
+         * @doesNotPerformAssertions
          */
-    public function test_single_paper_template( $primary_publication_type ) {
-
-//        include( dirname(__File__) . '/../o3po/public/templates/single-paper.php');
+    public function test_cleanup_at_the_very_end() {
+        exec('git checkout ' . dirname(__File__) . '/resources/arxiv/0809.2542v4.pdf');
     }
 
 

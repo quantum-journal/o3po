@@ -837,7 +837,7 @@ class O3PO_Settings extends O3PO_Singleton {
 
         $option = $this->get_plugin_option($id);
 
-        echo '<input id="' . $this->plugin_name . '-setttings" name="' . $this->plugin_name . '-setttings[' . $id . ']" style="width: 80%" type="text" value="' . $option . '" />';
+        echo '<input id="' . $this->plugin_name . '-setttings-' . $id . '" name="' . $this->plugin_name . '-setttings[' . $id . ']" style="width: 80%" type="text" value="' . $option . '" />';
 
     }
 

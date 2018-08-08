@@ -453,7 +453,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
     static private $additional_default_macros = array(
         array('', '\\newcommand', '\\\@firstoftwo', '[2]', '', '#1'),
         array('', '\\newcommand', '\\\@secondoftwo', '[2]', '', '#2'),
-                                                     );
+                                                      );
         /**
          * Get special macros we sometimes want to ignore in expansion.
          *
