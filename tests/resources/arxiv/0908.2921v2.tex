@@ -1,0 +1,461 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%                                                     % 
+% Einselection                                        %
+%                                                     % 
+% Christian Gogolin 2009                              %
+%                                                     % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\documentclass[aps,prl,twocolumn,showpacs,showkeys,a4paper]{revtex4}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+% Custom packages
+\usepackage[english]{babel}
+\usepackage{dsfont}
+\usepackage{bbm}
+\usepackage{hyperref} 
+\usepackage{amsmath, amsthm, amssymb, mathrsfs}
+
+%PDFTeX
+\usepackage[pdftex,usenames]{color}
+
+% Theorems
+\newtheorem{lemma}{Lemma}
+\newtheorem{theorem}{Theorem}
+
+% Shortcuts
+\DeclareMathOperator{\Tr}{\mathrm{Tr}}%trace2
+\DeclareMathOperator{\probability}{\mathrm{Pr}}%trace2
+\DeclareMathOperator{\tracedistance}{\mathcal{D}}
+\DeclareMathOperator{\ee}{\mathrm{e}}%Euler e
+\DeclareMathOperator{\iu}{\mathrm{i}}%imaginary unit
+\DeclareMathOperator{\hiH}{\mathcal{H}}%Hilbert spaces
+\DeclareMathOperator{\haH}{\mathscr{H}}%Hamiltonians
+
+
+% Dirac notation and expectation values
+\newcommand{\bra}[1]{\langle #1|}
+\newcommand{\ket}[1]{|#1\rangle}
+\newcommand{\braket}[2]{\langle #1|#2\rangle}
+\newcommand{\ketbra}[2]{| #1 \rangle \langle #2 |}
+\newcommand{\expect}[1]{\langle #1\rangle}
+
+
+\begin{document}
+\title{Einselection without pointer states}
+\author{Christian Gogolin\footnote{publications@cgogolin.de}}
+%\author{Haye Hinrichsen}
+\affiliation{Fakult{\"{a}}t f\"{u}r Physik und Astronomie, Universit\"{a}t W\"{u}rzburg, Am Hubland, 97074 W\"{u}rzburg, Germany}
+%\author{Andreas Winter}
+%\affiliation{Department of Mathematics, University of Bristol, University Walk, Bristol BS8 1TW, U.K.}
+%\affiliation{Centre for Quantum Technologies, National University of Singapore, 2 Science Drive 3, Singapore 117542}
+
+\begin{abstract}
+  We show that the existence of a basis of pointer states is not necessary for environment-induced super selection.
+  This is achieved by using recent results on equilibration of small subsystems of large, closed quantum systems evolving according to the Von~Neumann equation.
+  We prove that for almost all initial states and almost all times all off-diagonal elements of the density matrix of the subsystem, when represented in the eigenbasis of its local Hamiltonian, must be small if the energies of the corresponding eigenstates differ by more than the interaction energy.
+\end{abstract}
+
+\pacs{03.65.-w, 05.30.-d, 03.65.Yz}
+% Explanation of PACS numbers:
+% 03.65.-w      Quantum mechanics
+% 05.30.-d      Quantum statistical mechanics
+% 03.65.Yz      Decoherence; open systems; quantum statistical methods
+\keywords{open quantum systems, einselection, pointer states, entanglement}
+
+\maketitle
+
+
+\section{Introduction}
+\label{sec:introduction}
+%
+Quantum Mechanics claims to be a fundamental theory.
+As such, it should be able to provide us with a microscopic explanation for all phenomena we observe in macroscopic systems, including irreversible processes like thermalization.
+But its unitary time development seems to be incompatible with irreversibility, leading to an apparent contradiction between Quantum Mechanics and Thermodynamics.
+
+To overcome this problem many authors have suggested to modify Quantum Theory, for example by adding non-linear terms to the Von~Neumann equation, or by postulating a periodic spontaneous collapse of the wave function \cite{Bassi03}.
+Others have considered Markovian, non unitary, time evolution \cite{Breuer02} and it has been shown that system bath models that evolve under a special type of Hamiltonian tend to evolve into states that are classical superpositions of so called \emph{pointer states} \cite{RevModPhys.75.715} --- a phenomenon called \emph{einselection}.
+These approaches, which are subsumed under the term \emph{decoherence theory}, are able to reproduce many of the features of dissipative systems and are undoubtedly very valuable for applications.
+
+But, in face of the enormous success of standard Quantum Mechanics in explaining microscopic phenomena and the existence of macroscopic quantum systems on the one hand and the broad applicability of Statistical Mechanics and Thermodynamics on the other, we feel that neither a modification of Quantum Theory, nor considerations restricted to special Hamiltonians can provide a satisfactory explanation for the classical, statistical and thermodynamic behavior of the macroscopic world.
+
+Recently there has been remarkable success in explaining macroscopic, seemingly irreversible behavior from standard Quantum Mechanics.
+It has been shown that it is possible to explain the phenomenon of equilibration \cite{gemmermichelmahler04,Reimann08,Linden09,0907.1267v1} and to justify the applicability of the canonical ensemble \cite{Popescu06} without added randomness and ensemble averages, from nothing but pure Quantum Mechanics and the randomness due to entanglement with the environment. 
+
+We make use of the results obtained in these papers and connect this approach with the research on decoherence.
+We consider the case of decoherence due to weak interaction with an environment, which is of particular interest for quantum information processing and quantum computing.
+Our main result is that decoherence with respect to a fixed basis is a natural property of weakly coupled systems and that the existence of a pointer basis is not necessary for einselection.
+
+
+\section{Setup and notation}
+\label{sec:setupanddefinitions}
+% 
+We consider arbitrary quantum systems which can be described using a Hilbert space $\hiH$ of finite dimension $d$ and which can be divided into two parts which we will call the bath $B$ and the subsystem $S$.
+If the Hilbert space of a real system is infinite dimensional it should always be possible to find an effective description in a finite dimensional Hilbert space by introducing a high energy cut-off. 
+It should be emphasized that we will note make any special a priori assumptions about the size and structure of the bath and subsystem.
+We use the terms bath and subsystem only because in the end we will be interested in situations where the dimension $d_B$ of the Hilbert space of the bath $\hiH_B$ is much larger than the dimension $d_S$ of the Hilbert space $\hiH_S$ of the subsystem.
+
+We assume that the Hamiltonian $\haH$ of the joint system has \emph{non-degenerate energy gaps}.
+This assumption already appears in the work of Von~Neumann~\cite{vonneumann1929} and later in \cite{Linden09,Reimann08,0907.0108v1} and means that for any four energy eigenvalues $E_k,E_l,E_m,E_n$ equality of the gaps $E_k - E_l = E_m - E_n$ implies that either $k=l$ and $m=n$ or $k=m$ and $l=n$.
+It shall be emphasized that this is an extremely weak restriction.
+Every Hamiltonian can be made to have non-degenerate energy gaps by adding an arbitrary small perturbation; therefore, every realistic Hamiltonian can be expected to satisfy this constraint.
+The physical meaning of this assumption is that the Hamiltonian is \emph{fully interactive} in the sense that there exists no partition of the system into a subsystem and a bath such that the Hamiltonian can be written as a sum $\haH = \haH_S \otimes \mathds{1} + \mathds{1} \otimes \haH_B$ where $\haH_S$ and $\haH_B$ act on the system and bath alone.
+
+We use $\rho$ for the density matrix of possibly mixed states and $\psi$ if the state is pure.
+Their reduced states on the bath and subsystem are denoted using superscript letters like in $\rho^B =\Tr_S[\rho]$ and $\rho^S =\Tr_B[\rho]$.
+We write the trace norm of a density matrix $\rho$ as
+\begin{equation}
+  \|\rho\|_1 = \Tr[\sqrt{\rho^\dagger\,\rho}] = \Tr|\rho| ,
+\end{equation}
+and the trace distance as
+\begin{equation}
+  \label{eq:definitiontracedistance}
+  \tracedistance(\rho,\sigma) = \frac{1}{2} \|\rho -\sigma \|_1 .
+\end{equation}
+We denote the operator norm of a hermitian operator $A$ acting on some Hilbert space $\hiH$ by
+\begin{equation}
+  \|A\|_\infty = \max_{\psi \in \mathcal{P}_1(\hiH)} \Tr[A\,\psi] ,
+\end{equation}
+where $\mathcal{P}_1(\hiH)$ is the set of rank one projectors on $\hiH$.
+We use the letter $\omega$ to denote the time average of time dependent states $\rho_t$
+\begin{equation}
+  \omega = \expect{\rho_t}_t = \lim_{\tau\to\infty} \frac{1}{\tau} \int_0^\tau \rho_t\,dt .
+\end{equation}
+
+\section{Equilibration}
+\label{sec:equilibration}
+% 
+In a time reversal invariant theory equilibration in the usual sense is impossible.
+We therefore use an extended notion of equilibration and say that a system is in equilibrium when its density matrix stays close to some state for almost all times, and say that it evolves towards equilibrium if it approaches such a state and then stays close to it if started in a state far from equilibrium.
+
+Recently it as been shown that, under the above assumptions, the dynamics of almost every large quantum system is such that for almost every pure initial state every small subsystem equilibrates in this extended sens \cite{Linden09,Reimann08}.
+The argument consists of two parts:
+
+The first result establishes a bound on the expectation value of the distance of the systems state from its time average in terms of the \emph{effective dimension}
+\begin{equation}
+  d^{\mathrm{eff}}(\omega) = \frac{1}{\Tr[\omega^2]}
+\end{equation}
+of the time averaged state $\omega = \expect{\rho_t}_t$:
+\begin{theorem}
+  \label{theorem:distancefromtimeaverage}
+  {\bf (Theorem 1 in \cite{Linden09})}
+  Consider any pure state $\psi_t$ evolving under a Hamiltonian with non-degenerate energy gaps.
+  Then the average distance between $\rho^S_t = \Tr_B\psi_t$ and its time average $\omega^S = \expect{\rho^S_t}_t$ is bounded by
+  \begin{equation}
+    \expect{\tracedistance(\rho^S_t,\omega^S)}_t \leq \frac{1}{2} \sqrt{\frac{d_S}{d^\mathrm{eff}(\omega^B)}} \leq \frac{1}{2} \sqrt{\frac{d_S^2}{d^\mathrm{eff}(\omega)}}
+  \end{equation}
+\end{theorem}
+
+The second result shows that the effective dimension of the time averaged states is large for almost all pure states:
+\begin{theorem}
+  \label{theorem:highaveragedeffectivedimensionisgeneric}
+  {\bf (Theorem 2 in \cite{Linden09})}
+  i) The average effective dimension $\expect{d^{\mathrm{eff}}(\omega)}_{\psi_0}$, where the average is computed over uniformly random pure initial states $\psi_0 \in \mathcal{P}_1(\hiH_R)$ chosen from a subspace $\hiH_R$ of dimension $d_R$, is such that
+  \begin{equation}
+    \expect{d^{\mathrm{eff}}(\omega)}_{\psi_0} \geq \frac{d_R}{2} .
+  \end{equation}
+  ii) For a random pure initial state $\psi_0 \in \mathcal{P}_1(\hiH_R)$, the probability that $d^{\mathrm{eff}}(\omega)$ is smaller than $d_R/4$ is exponentially small, namely
+  \begin{equation}
+    \probability\left\{d^{\mathrm{eff}}(\omega) < \frac{d_R}{4}\right\} \leq 2 \ee^{-C\,\sqrt{d_R}}
+  \end{equation}
+  with a constant $C = \ln(2)^2/(72\,\pi^3)$.
+\end{theorem}
+
+These two theorems prove that for almost all initial states of a sufficiently large quantum system all small subsystems equilibrate.
+
+
+\section{Speed of fluctuations around equilibrium}
+\label{sec:speedoffluctuationsaroudequilibrium}
+%
+Knowing that, under suitable conditions, subsystems of large quantum mechanical system will equilibrate, it is natural to ask: How fast will the fluctuations around the equilibrium state typically be? 
+This question was investigated very recently in \cite{0907.1267v1}.
+
+The first step is to introduce a meaningful notion of \emph{speed}.
+This is achieved by defining the time derivative \cite{0907.1267v1}
+\begin{equation}
+  v_S(t) = \lim_{\delta t \to 0} \frac{\tracedistance(\rho^S_t,\rho^S_{t+\delta t})}{\delta t} = \frac{1}{2} \left\| \frac{d\rho^S_t}{dt} \right\|_1 ,
+\end{equation}
+with 
+\begin{equation}
+  \frac{d\rho^S_t}{dt} = \iu\,\Tr_B[\rho_t,\haH] .
+\end{equation}
+As the choice of the origin of the energy scale does not influence the speed it is convenient to split up the Hamiltonian $\haH$ of the system in a part $\haH_0$ proportional to the identity and the traceless operators $\haH_S$, $\haH_B$ and $\haH_{SB}$ as follows:
+\begin{equation}
+  \label{eq:generalhamiltonianwithconstanttermabsorbed1}
+  \haH = \haH_0 + \haH_S \otimes \mathds{1} + \mathds{1} \otimes \haH_B + \haH_{SB}
+\end{equation}
+
+Using a result from \cite{Reimann08} it is shown in \cite{0907.1267v1} that:
+\begin{theorem}
+  \label{theorem:averagespeedisslow}
+  {\bf \cite{0907.1267v1}}
+  For every initial state $\rho_0$ of a composite system evolving under a Hamiltonian of the form \eqref{eq:generalhamiltonianwithconstanttermabsorbed1} and with non-degenerate energy gaps, it holds that:
+  \begin{equation}
+    \expect{v_S(t)}_t \leq \| \haH_S \otimes \mathds{1} + \haH_{SB}\|_\infty \sqrt{\frac{d_S^3}{d^{\mathrm{eff}}(\omega)}}
+    \end{equation}
+\end{theorem}
+
+From theorem~\ref{theorem:highaveragedeffectivedimensionisgeneric} we know that the average effective dimensions $d^{\mathrm{eff}}(\omega)$ is typically very large in realistic situations.
+In particular, as all dimensions grow exponentially with the number of constituents of the system it will usually be much larger than any fixed power of $d_S$.
+Therefore, the speed of the subsystem will, most of the time, be much smaller than $\| \haH_S \otimes \mathds{1} + \haH_{SB}\|_\infty$, which can be expected to grow at most polynomial with the number of constituents of the subsystem \cite{0907.1267v1}.
+
+
+\section{Einselection in a nutshell}
+\label{sec:einselectioninanutshell}
+%
+The term \emph{einselection}, which stands for \emph{environment-induced super selection}, is due to Zurek \cite{PhysRevD.26.18,RevModPhys.75.715}.
+Einselection is known to occur in situations where the Hamiltonian of the composite system leaves a certain orthonormal basis of the subsystem, spanned by so called \emph{pointer states} $\ket{p}$, invariant \cite{Hornberger09}.
+If this is the case, the Hamiltonian and the time evolution operator have the form
+\begin{align}
+  \label{eq:einselectionhamiltonian}
+  \haH &= \sum_p \ketbra{p}{p} \otimes \haH^{(p)} \\
+  U_t &= \sum_p \ketbra{p}{p} \otimes U^{(p)}_t ,
+\end{align}
+where $U^{(p)}_t = \ee^{-\iu\,\haH^{(p)}\,t}$ and the $\haH_p$ are arbitrate hermitian matrices.
+One finds that the system part of an initial product state of the form $\rho_0 = \rho^S_0 \otimes \psi^B_0$, where the state of the bath can be assumed to be pure without loss of generality, evolves into
+\begin{equation}
+  \rho^S_t = \sum_{pp'} \ketbra{p}{p}\rho^S_0\ketbra{p'}{p'}\,\bra{\psi^B_0}{U^{(p')}_t}^\dagger\,U^{(p)}_t\ket{\psi^B_0}
+\end{equation}
+Under the evolution induced by such a Hamiltonian the diagonal entries of $\rho^S_0$, when expressed in the pointer basis, remain unchanged while the off-diagonal entries are suppressed by a factor of $\bra{\psi^B_0}{U^{(p')}_t}^\dagger\,U^{(p)}_t\ket{\psi^B_0} \leq 1$.
+%\begin{equation}
+%  \bra{p}\rho^S_t\ket{p'} = \bra{p}\rho^S_0\ket{p'}\,\bra{\psi^B_0}{U^{(p')}_t}^\dagger\,U^{(p)}_t\ket{\psi^B_0}
+%\end{equation}
+The actual time development of the $\bra{\psi^B_0}{U^{(p')}_t}^\dagger\,U^{(p)}_t\ket{\psi^B_0}$ depends on the explicit model under consideration, but for many models they have been found to decrease rapidly over short time scales \cite{Hornberger09,RevModPhys.75.715,PhysRevD.26.18}.
+If some of the $\haH^{(p)}$ lead to an identical time development for the chosen initial bath state there exist subspaces of $\hiH_S$ in which coherence is preserved.
+
+Note that, the diagonal entries, which survive the decoherence, are completely determined by $\rho^S_0$ and do not depend on the initial state of the bath $\psi^B_0$ at all.
+The direct opposite situation is the thermodynamic case where the final state is completely determined by the properties of the bath.
+Most realistic situations surely lie between these two extremes.
+
+
+\section{Equilibration and einselection}
+\label{sec:equilibrationandeinselection}
+%
+Using the results discussed in the preceding sections it is possible to get rid of the quite limiting assumptions on the Hamiltonian and to shown that einselection, i.e. decoherence with respect to a fixed basis, naturally occurs in situations where the interaction Hamiltonian $\haH_{SB}$ is weak.
+It shall be noted however, that at the moment we don't know much about the time scales on which this decoherence mechanism works \cite{0907.1267v1}.
+
+According to \cite{0907.1267v1} the velocity can be written as
+\begin{equation}
+  \frac{d\rho^S_t}{dt} = \sum_{k=1}^{d_S^2} c_k(t)\,e_k
+\end{equation}
+where the $d_S^2$ operators $e_k$ form a hermitian orthonormal basis for $\hiH_S$ such that $\Tr[e_k\,e_l] = \delta_{kl}$ and
+\begin{equation}
+  c_k(t) = \Tr\big[\rho(t)\,\iu\,[\haH_S + \haH_{SB},e_k\otimes \mathds{1}]\big] .
+\end{equation}
+The velocity depends on $\haH_B$ only implicitly through the trajectory $\rho_t$, but for an arbitrary fixed state $\rho$ the velocity is solely determined by $\haH_S$ and $\haH_{SB}$:
+\begin{equation}
+  \label{eq:subsystemstatevelocity}
+  \frac{d\rho^S}{dt} = \iu\,[\rho^S,\haH_S] + \iu\,\Tr_B[\rho,\haH_{SB}]
+\end{equation}
+Now if $\haH_{SB}$ is much weaker than $\haH_S$, \eqref{eq:subsystemstatevelocity} is dominated by the first term.
+Consequently, the system can only become slow when $[\rho^S,\haH_S]$ is small.
+
+To see when this happens we first establish a general lower bound on the norm of commutators between states and arbitrary hermitian matrices:
+\begin{lemma}
+  \label{lemma:lowerboundonnormsofcommuators}
+  Let $\rho$ be a normalized state and $A$ a hermitian observable with eigenvalues $a_k$ and eigenvectors $\ket{a_k}$, then
+  \begin{equation}
+    \| [\rho,A] \|_1 = \| \iu\,[\rho,A] \|_1 \geq 2\,\max_{k \neq l} |a_k - a_l|\,|\rho_{kl}|.
+  \end{equation}
+  where $\rho_{kl} = \bra{a_k}\rho\ket{a_l}$.
+\end{lemma}
+\begin{proof}
+  The first equality is trivial.
+  For all traceless, hermitian operators $B$ on some Hilbert space $\hiH$ it holds that \cite{nielsenm.a.c}
+  \begin{equation}
+    \|B\|_1 = 2\,\max_{P \in \mathcal{P}(\hiH)} \Tr[P\,B] ,
+  \end{equation}
+  where $\mathcal{P}(\hiH)$ is the set of all projectors on $\hiH$ and the maximum is obtained when $P$ is the projector onto the positive subspace of $B$.
+  By expanding $\rho$ in the eigenbasis of $A$, using the above equality for $B=[\rho,A]$ and considering all rank one projectors $P$ that project onto
+  \begin{equation}
+    \frac{1}{\sqrt{2}}(\ket{a_k} + \ee^{\iu \phi} \ket{a_l}) ,
+  \end{equation}
+  where $\phi$ is a phase factor, one easily verifies the above inequality.
+\end{proof}
+We can now prove the main result of this paper:
+\begin{theorem}
+  \label{theorem:slowstatesmustdecohere}
+  Consider a physical system evolving under a Hamiltonian of the form given in \eqref{eq:generalhamiltonianwithconstanttermabsorbed1} and with non-degenerate energy gaps.
+  All reduced states $\rho^S$ that are slow in the sense that 
+  \begin{equation}
+    \left\|\frac{d\rho^S}{dt}\right\|_1 \leq \epsilon
+  \end{equation}
+  satisfy
+  \begin{equation}
+    \max_{k \neq l} 2\,|E^S_k - E^S_l|\,|\rho^S_{kl}| \leq 2\,\|\haH_{SB}\|_{\infty} + \epsilon
+  \end{equation}
+  where $\rho^S_{kl} = \bra{E^S_k} \rho^S \ket{E^S_l}$ and $E^S_k$ and $\ket{E^S_k}$ are the eigenvalues and eigenstates of $\haH_S$.
+\end{theorem}
+\begin{proof}
+  Using the inverse triangle inequality and \eqref{eq:subsystemstatevelocity} we see that
+  \begin{equation}
+    | \| \iu\,[\rho^S,\haH_S] \|_1 - \| \iu\,\Tr_B[\rho,\haH_{SB}] \|_1 | \leq \left\|\frac{d\rho^S}{dt}\right\|_1 \leq \epsilon .
+  \end{equation}
+  For $\|d\rho^S/dt\|_1$ to become small the norms of the two commutators must be approximately equal.
+  Applying lemma~\ref{lemma:lowerboundonnormsofcommuators} to the norm of the first commutator yields:
+  \begin{equation}
+    \| \iu\,[\rho^S,\haH_S] \|_1 \geq 2\,\max_{k \neq l} |E^S_k - E^S_l|\,|\rho^S_{kl}|
+  \end{equation}
+  The norm of the second commutator can be upper bounded, using the well known fact that the trace norm of traceless, hermitian matrices is non-increasing under completely positive, hermitian, trace-non-increasing maps \cite{nielsenm.a.c} as follows:
+  \begin{equation}
+    \| \iu\,\Tr_B[\rho,\haH_{SB}] \|_1 \leq \| [\rho,\haH_{SB}] \|_1 \leq 2\,\|\haH_{SB}\|_{\infty}
+  \end{equation}
+%  This completes the proof.
+\end{proof}
+
+The assertion of Theorem~\ref{theorem:slowstatesmustdecohere} is almost intuitively clear, but combined with theorem~\ref{theorem:highaveragedeffectivedimensionisgeneric} and \ref{theorem:averagespeedisslow} it allows to draw the following interesting conclusions:
+For almost all initial states coherent superpositions of eigenstates of $\haH_S$ with eigenvalue differences that are much larger than $\|\haH_{SB}\|_\infty$ may not contribute significantly to the state of the subsystem most of the time.
+That is, the corresponding off-diagonal elements in the $\haH_S$ eigenbasis representation of the reduced state must be small.
+Coherence can only be retained between eigenstates of $\haH_S$ whose energies differ by less than $\|\haH_{SB}\|_\infty$.
+
+In particular, if the interaction Hamiltonian is weak compared to the energy gaps of the subsystem Hamiltonian, the state of the subsystem must, most of the time, be approximately diagonal in the eigenbasis of $\haH_S$.
+A similar behavior was already observed for a specific model in \cite{PhysRevLett.82}.
+
+\vspace{1cm}
+\section{Interpretation and conclusions}
+\label{sec:conclusions}
+%
+We showed that quantum systems which interact weakly with the environment tend to evolve into convex combinations of energy eigenstates of their Hamiltonian without making assumptions on the details of the interaction.
+In particular, we do not need to make the assumption that the interaction with the environment leaves a certain set of pure pointer states invariant.
+This proves that decoherence with respect to a fixed basis is a very natural property of weakly interacting quantum systems.
+%However, at the moment, we are unable to make assertions about the time scale on which this decoherence mechanism works.
+Our result establishes a link between decoherence theory and the research on equilibration and Quantum Thermodynamics.
+
+Besides intentionally isolated systems for quantum information processing there exist numerous situations where our result can be applied two of which are:
+i) Electronic excitations of gases at moderate temperature.
+The energy gaps between the ground state and the first few excited states are typically much larger than the thermal energy.
+ii) Radioactive decay. 
+The binding energy before and after the decay typically differ by much more than the interaction energy with the environment.
+It is therefore very unlikely to observe coherent superpositions between the ground state and the first excited states in such a gas or between a decayed and an undecayed atom. 
+
+The author acknowledges the fruitful discussions with Andreas Winter, Peter Janotta, Haye Hinrichsen and Alexander Streltsov.
+
+
+% arXiv comment:
+% revised introduction and conclusions, two references fixed and one added, minor editorial changes
+
+%%%% Bibliography%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\bibliography{bibliography}
+%\bibliographystyle{plain}
+%\bibliographystyle{utphys}
+%\bibliographystyle{h-physrev}
+%\bibliographystyle{apsrev}
+
+\begin{thebibliography}{14}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\expandafter\ifx\csname bibnamefont\endcsname\relax
+  \def\bibnamefont#1{#1}\fi
+\expandafter\ifx\csname bibfnamefont\endcsname\relax
+  \def\bibfnamefont#1{#1}\fi
+\expandafter\ifx\csname citenamefont\endcsname\relax
+  \def\citenamefont#1{#1}\fi
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{\texttt{#1}}\fi
+\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
+\providecommand{\bibinfo}[2]{#2}
+\providecommand{\eprint}[2][]{\url{#2}}
+
+\bibitem[{\citenamefont{Bassi and Ghirardi}(2003)}]{Bassi03}
+\bibinfo{author}{\bibfnamefont{A.}~\bibnamefont{Bassi}} \bibnamefont{and}
+  \bibinfo{author}{\bibfnamefont{G.}~\bibnamefont{Ghirardi}},
+  \bibinfo{journal}{Physics Reports} \textbf{\bibinfo{volume}{379}},
+  \bibinfo{pages}{257} (\bibinfo{year}{2003}).
+
+\bibitem[{\citenamefont{Breuer and Petruccione}(2002)}]{Breuer02}
+\bibinfo{author}{\bibfnamefont{H.-P.} \bibnamefont{Breuer}} \bibnamefont{and}
+  \bibinfo{author}{\bibfnamefont{F.}~\bibnamefont{Petruccione}},
+  \emph{\bibinfo{title}{The Theory of Open Quantum Systems}}
+  (\bibinfo{publisher}{Oxford University Press}, \bibinfo{year}{2002}).
+
+\bibitem[{\citenamefont{Zurek}(2003)}]{RevModPhys.75.715}
+\bibinfo{author}{\bibfnamefont{W.~H.} \bibnamefont{Zurek}},
+  \bibinfo{journal}{Rev. Mod. Phys.} pp. \bibinfo{pages}{715--775}
+  (\bibinfo{year}{2003}).
+
+\bibitem[{\citenamefont{Reimann}(2008)}]{Reimann08}
+\bibinfo{author}{\bibfnamefont{P.}~\bibnamefont{Reimann}},
+  \bibinfo{journal}{Physical Review Letters} \textbf{\bibinfo{volume}{101}},
+  \bibinfo{pages}{190403} (\bibinfo{year}{2008}).
+
+\bibitem[{\citenamefont{Linden et~al.}(2009{\natexlab{a}})\citenamefont{Linden,
+  Popescu, Short, and Winter}}]{Linden09}
+\bibinfo{author}{\bibfnamefont{N.}~\bibnamefont{Linden}},
+  \bibinfo{author}{\bibfnamefont{S.}~\bibnamefont{Popescu}},
+  \bibinfo{author}{\bibfnamefont{A.~J.} \bibnamefont{Short}}, \bibnamefont{and}
+  \bibinfo{author}{\bibfnamefont{A.}~\bibnamefont{Winter}},
+  \bibinfo{journal}{Physical Review E} \textbf{\bibinfo{volume}{79}},
+  \bibinfo{pages}{061103} (\bibinfo{year}{2009}{\natexlab{a}}),
+  \eprint{0812.2385v1}.
+
+\bibitem[{\citenamefont{Linden et~al.}(2009{\natexlab{b}})\citenamefont{Linden,
+  Popescu, Short, and Winter}}]{0907.1267v1}
+\bibinfo{author}{\bibfnamefont{N.}~\bibnamefont{Linden}},
+  \bibinfo{author}{\bibfnamefont{S.}~\bibnamefont{Popescu}},
+  \bibinfo{author}{\bibfnamefont{A.~J.} \bibnamefont{Short}}, \bibnamefont{and}
+  \bibinfo{author}{\bibfnamefont{A.}~\bibnamefont{Winter}}
+  (\bibinfo{year}{2009}{\natexlab{b}}), \eprint{0907.1267v1}.
+
+\bibitem[{\citenamefont{Gemmer et~al.}(2004)\citenamefont{Gemmer, Michel, and
+  Mahler}}]{gemmermichelmahler04}
+\bibinfo{author}{\bibfnamefont{J.}~\bibnamefont{Gemmer}},
+  \bibinfo{author}{\bibfnamefont{M.}~\bibnamefont{Michel}}, \bibnamefont{and}
+  \bibinfo{author}{\bibfnamefont{G.}~\bibnamefont{Mahler}},
+  \emph{\bibinfo{title}{Quantum Thermodynamics}}, vol. \bibinfo{volume}{657} of
+  \emph{\bibinfo{series}{Lecture Notes in Physics}}
+  (\bibinfo{publisher}{Springer-Verlag}, \bibinfo{address}{Berlin},
+  \bibinfo{year}{2004}).
+
+\bibitem[{\citenamefont{Popescu et~al.}(2006)\citenamefont{Popescu, Short, and
+  Winter}}]{Popescu06}
+\bibinfo{author}{\bibfnamefont{S.}~\bibnamefont{Popescu}},
+  \bibinfo{author}{\bibfnamefont{A.~J.} \bibnamefont{Short}}, \bibnamefont{and}
+  \bibinfo{author}{\bibfnamefont{A.}~\bibnamefont{Winter}},
+  \bibinfo{journal}{Nature Physics} \textbf{\bibinfo{volume}{2}},
+  \bibinfo{pages}{754} (\bibinfo{year}{2006}).
+
+\bibitem[{\citenamefont{Von~Neumann}(1929)}]{vonneumann1929}
+\bibinfo{author}{\bibfnamefont{J.}~\bibnamefont{Von~Neumann}},
+  \bibinfo{journal}{Zeitschrift f{\"{u}}r Physik A}
+  \textbf{\bibinfo{volume}{57}}, \bibinfo{pages}{30} (\bibinfo{year}{1929}).
+
+\bibitem[{\citenamefont{Goldstein et~al.}(2009)\citenamefont{Goldstein,
+  Lebowitz, Mastrodonato, Tumulka, and Zanghi}}]{0907.0108v1}
+\bibinfo{author}{\bibfnamefont{S.}~\bibnamefont{Goldstein}},
+  \bibinfo{author}{\bibfnamefont{J.~L.} \bibnamefont{Lebowitz}},
+  \bibinfo{author}{\bibfnamefont{C.}~\bibnamefont{Mastrodonato}},
+  \bibinfo{author}{\bibfnamefont{R.}~\bibnamefont{Tumulka}}, \bibnamefont{and}
+  \bibinfo{author}{\bibfnamefont{N.}~\bibnamefont{Zanghi}}
+  (\bibinfo{year}{2009}), \eprint{0907.0108v1}.
+
+\bibitem[{\citenamefont{Zurek}(1982)}]{PhysRevD.26.18}
+\bibinfo{author}{\bibfnamefont{W.~H.} \bibnamefont{Zurek}},
+  \bibinfo{journal}{Phys. Rev. D} pp. \bibinfo{pages}{1862--1880}
+  (\bibinfo{year}{1982}).
+
+\bibitem[{\citenamefont{Hornberger}(2009)}]{Hornberger09}
+\bibinfo{author}{\bibfnamefont{K.}~\bibnamefont{Hornberger}},
+  \bibinfo{journal}{LECT.NOTES PHYS.} \textbf{\bibinfo{volume}{768}},
+  \bibinfo{pages}{221} (\bibinfo{year}{2009}), \eprint{quant-ph/0612118v3}.
+
+\bibitem[{\citenamefont{Nielsen and Chuang}(2007)}]{nielsenm.a.c}
+\bibinfo{author}{\bibfnamefont{M.~A.} \bibnamefont{Nielsen}} \bibnamefont{and}
+  \bibinfo{author}{\bibfnamefont{I.~L.} \bibnamefont{Chuang}},
+  \emph{\bibinfo{title}{Quantum Computation and Quantum Information}}
+  (\bibinfo{publisher}{Cambridge University Press}, \bibinfo{year}{2007}).
+
+\bibitem[{\citenamefont{Paz and Zurek}(1999)}]{PhysRevLett.82}
+\bibinfo{author}{\bibfnamefont{J.~P.} \bibnamefont{Paz}} \bibnamefont{and}
+  \bibinfo{author}{\bibfnamefont{W.~H.} \bibnamefont{Zurek}},
+  \bibinfo{journal}{Phys. Rev. Lett.} pp. \bibinfo{pages}{5181--5185}
+  (\bibinfo{year}{1999}).
+
+\end{thebibliography}
+
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 
