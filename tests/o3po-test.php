@@ -1,10 +1,11 @@
 <?php
 
-/**
- * @runTestsInSeparateProcesses
- */
 class O3PO_Test extends PHPUnit_Framework_TestCase
 {
+        /**
+         * @runInSeparateProcess
+         * @preserveGlobalState disabled
+         */
     public function test_o3po() {
         define( 'WPINC', 'wp-includes' );
         include(dirname( __FILE__ ) . '/../o3po/o3po.php');
@@ -32,6 +33,8 @@ class O3PO_Test extends PHPUnit_Framework_TestCase
     }
 
         /**
+         * @runInSeparateProcess
+         * @preserveGlobalState disabled
          * @doesNotPerformAssertions
          */
     public function test_uninstall_o3po() {
