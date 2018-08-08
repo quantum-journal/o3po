@@ -306,7 +306,7 @@ class O3PO {
 		$this->loader->add_action( 'wp_head', $plugin_public, 'add_open_graph_meta_tags_for_social_media' );
         $this->loader->add_action( 'wp_head', $plugin_public, 'enable_mathjax' );
         $this->loader->add_action( 'get_custom_logo', $plugin_public, 'fix_custom_logo_html' );
-        if($settings->get_plugin_option('custom_search_page')==1)
+        if($settings->get_plugin_option('custom_search_page')==='checked')
             $this->loader->add_action( 'template_include', $plugin_public, 'install_custom_search_page_template' );
         $this->loader->add_action( 'single_template', $plugin_public, 'primary_publication_type_template' );
         $this->loader->add_action( 'loop_start', $plugin_public, 'extended_search_and_navigation_at_loop_start' );

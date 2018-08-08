@@ -103,7 +103,7 @@ class O3PO_Settings extends O3PO_Singleton {
         'fermats_library_url_prefix' => 'https://fermatslibrary.com/s/',
         'doaj_api_url' => "https://doaj.org/api/v1/articles",
         'doaj_language_code' => "EN",
-        'custom_search_page' => "1",
+        'custom_search_page' => "checked",
             /* The options below are currently not customizable.
              *
              * Warning: The name of the paper-single.php templare must match
@@ -340,8 +340,7 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_custom_search_page_setting() {
 
-        $this->render_checkbox_setting('custom_search_page');
-        echo '<p>(Uncheck to disable the custom search page provided by this plugin.)</p>';
+        $this->render_checkbox_setting('custom_search_page', 'Uncheck to disable the custom search page with extra information for users lookig for a published paper that is provided by this plugin.');
 
     }
 
@@ -847,12 +846,15 @@ class O3PO_Settings extends O3PO_Singleton {
          * @since    0.1.0
          * @access   public
          * @param    string   $id    Id of the setting.
+         * @param    string   $label Label of the setting.
          */
-    public function render_checkbox_setting( $id ) {
+    public function render_checkbox_setting( $id, $label='') {
 
         $option = $this->get_plugin_option($id);
 
-        echo '<input type="checkbox" id="' . $this->plugin_name . '-setttings" name="' . $this->plugin_name . '-setttings[' . $id . ']" value="1"' . checked( 1, $option, false ) . '/>';
+        echo '<input type="hidden" name="' . $this->plugin_name . '-setttings[' . $id . ']" value="unchecked">'; //To have a 0 in POST when the checkbox is unticked
+        echo '<input type="checkbox" id="' . $this->plugin_name . '-setttings-' . $id . '" name="' . $this->plugin_name . '-setttings[' . $id . ']" value="checked"' . checked( 'checked', $option, false ) . '/>';
+        echo '<label for="' . $this->plugin_name . '-setttings-' . $id . '">' . $label . '</label>';
 
     }
 
@@ -1005,8 +1007,11 @@ class O3PO_Settings extends O3PO_Singleton {
     public function validate_settings( $input ) {
 
         foreach($this->get_all_settings_fields_map() as $field => $callable)
+        {
             if(isset($input[$field]))
                 $newinput[$field] = call_user_func($callable, $input[$field]);
+        }
+
         return $newinput;
     }
 
