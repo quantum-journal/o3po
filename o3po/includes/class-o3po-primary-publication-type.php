@@ -981,7 +981,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
          * @access    public
          * @param     int     $post_id     Id of the post.
          */
-    abstract public function get_fulltext_pdf_path( $post_id ); {
+    public function get_fulltext_pdf_path( $post_id ) {
 
         return static::get_last_arxiv_pdf_path( $post_id );
     }
