@@ -448,7 +448,7 @@ abstract class O3PO_PublicationType {
                 $validation_result .= $doaj_response;
 
                 //Upload meta-data and fulltext to CLOCKSS (only if a fulltext exists)
-            $fulltext_pdf_path = static::get_fulltext_pdf_path($post_id);
+            $fulltext_pdf_path = $this->get_fulltext_pdf_path($post_id);
             $doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
             $remote_filename_without_extension = $doi_suffix;
 
@@ -2812,8 +2812,7 @@ abstract class O3PO_PublicationType {
          * @access    public
          * @param     int     $post_id     Id of the post.
          */
-    abstract public static function get_fulltext_pdf_path( $post_id );
-
+    abstract public function get_fulltext_pdf_path( $post_id );
 
         /**
          * Get the pretty permalink of the pdf associated with a post.

@@ -931,7 +931,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @access    public
          * @param     int     $post_id     Id of the post.
          */
-    public static function get_fulltext_pdf_path( $post_id ) {
+    public function get_fulltext_pdf_path( $post_id ) {
 
         return null;
     }
