@@ -1,5 +1,7 @@
 <?php
 
+require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-settings.php');
+
 class O3PO_SearchTemplateTest extends PHPUnit_Framework_TestCase
 {
 
