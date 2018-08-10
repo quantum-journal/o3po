@@ -223,8 +223,8 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
         $doi_suffix_was_changed_on_last_save = get_post_meta( $post_id, $post_type . '_doi_suffix_was_changed_on_last_save', true );
         $arxiv_fetch_results = get_post_meta( $post_id, $post_type . '_arxiv_fetch_results', true );
-        $arxiv_pdf_attach_ids = get_post_meta( $post_id, $post_type . '_arxiv_pdf_attach_ids', true );
-        $arxiv_source_attach_ids = get_post_meta( $post_id, $post_type . '_arxiv_source_attach_ids', true );
+        $arxiv_pdf_attach_ids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_arxiv_pdf_attach_ids');
+        $arxiv_source_attach_ids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_arxiv_source_attach_ids');
         $fermats_library = get_post_meta( $post_id, $post_type . '_fermats_library', true );
         $fermats_library_permalink = get_post_meta( $post_id, $post_type . '_fermats_library_permalink', true );
         $fermats_library_has_been_notifed_date = get_post_meta( $post_id, $post_type . '_fermats_library_has_been_notifed_date', true );
@@ -329,7 +329,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                     $phar_tar = new PharData($path_tar);
                     $phar_tar->extractTo($path_folder);
 
-                    $old_author_orcids = get_post_meta( $post_id, $post_type . '_author_orcids', true );
+                    $old_author_orcids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_orcids');
 
                         //Loop over the relevant files
                     foreach(new RecursiveIteratorIterator( new RecursiveDirectoryIterator($path_folder, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST) as $entry ) {
@@ -527,7 +527,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             return $exiftool_not_found_message;
 
         $post_type = get_post_type($post_id);
-        $arxiv_pdf_attach_ids = get_post_meta( $post_id, $post_type . '_arxiv_pdf_attach_ids', true );
+        $arxiv_pdf_attach_ids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_arxiv_pdf_attach_ids');
         if(empty($arxiv_pdf_attach_ids))
             return "ERROR: Cannot add licensing information, no pdf attached to post " . $post_id ;
         $path = get_attached_file(end($arxiv_pdf_attach_ids));
@@ -723,7 +723,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $post_type = get_post_type($post_id);
 
         $eprint = get_post_meta( $post_id, $post_type . '_eprint', true );
-		$arxiv_pdf_attach_ids = get_post_meta( $post_id, $post_type . '_arxiv_pdf_attach_ids', true );
+		$arxiv_pdf_attach_ids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_arxiv_pdf_attach_ids');
         $popular_summary = get_post_meta( $post_id, $post_type . '_popular_summary', true );
         $feature_image_caption = get_post_meta( $post_id, $post_type . '_feature_image_caption', true );
         $feature_image_path = $this->environment->get_feature_image_path($post_id);
@@ -892,8 +892,8 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $post_type = get_post_type($post_id);
 
         $arxiv_fetch_results = get_post_meta( $post_id, $post_type . '_arxiv_fetch_results', true );
-		$arxiv_pdf_attach_ids = get_post_meta( $post_id, $post_type . '_arxiv_pdf_attach_ids', true );
-		$arxiv_source_attach_ids = get_post_meta( $post_id, $post_type . '_arxiv_source_attach_ids', true );
+		$arxiv_pdf_attach_ids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_arxiv_pdf_attach_ids');
+		$arxiv_source_attach_ids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_arxiv_source_attach_ids');
 
 		if ( !empty($arxiv_fetch_results) ) {
 			echo '	<tr>';
@@ -940,7 +940,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 
         $post_type = get_post_type($post_id);
 
-        $arxiv_pdf_attach_ids = get_post_meta( $post_id, $post_type . '_arxiv_pdf_attach_ids', true );
+        $arxiv_pdf_attach_ids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_arxiv_pdf_attach_ids');
         if ( empty($arxiv_pdf_attach_ids) )
             return '';
         $last_url = '';
@@ -961,7 +961,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
     public static function get_last_arxiv_pdf_path( $post_id ) {
         $post_type = get_post_type($post_id);
 
-        $arxiv_pdf_attach_ids = get_post_meta( $post_id, $post_type . '_arxiv_pdf_attach_ids', true );
+        $arxiv_pdf_attach_ids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_arxiv_pdf_attach_ids');
         if ( empty($arxiv_pdf_attach_ids) )
             return '';
         $last_path = '';
@@ -996,7 +996,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
     protected static function get_last_arxiv_source_url( $post_id ) {
         $post_type = get_post_type($post_id);
 
-        $arxiv_source_attach_ids = get_post_meta( $post_id, $post_type . '_arxiv_source_attach_ids', true );
+        $arxiv_source_attach_ids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_arxiv_source_attach_ids');
         if ( empty($arxiv_source_attach_ids) )
             return '';
         $last_url = '';

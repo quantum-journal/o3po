@@ -212,7 +212,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 
         $type = get_post_meta( $post_id, $post_type . '_type', true );
         $number_target_dois = get_post_meta( $post_id, $post_type . '_number_target_dois', true );
-        $target_dois = get_post_meta( $post_id, $post_type . '_target_dois', true );
+        $target_dois = static::get_post_meta_field_containing_array( $post_id, $post_type . '_target_dois');
 
             // Set the category from $type
         $term_id = term_exists( $type, 'category' );
@@ -281,7 +281,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 
             // Send trackbacks to the arXiv and ourselves
         $number_target_dois = get_post_meta( $post_id, $post_type . '_number_target_dois', true );
-        $target_dois = get_post_meta( $post_id, $post_type . '_target_dois', true );
+        $target_dois = static::get_post_meta_field_containing_array( $post_id, $post_type . '_target_dois');
         for ($x = 0; $x < $number_target_dois; $x++) {
             if( substr($target_dois[$x], 0, 8) === $this->get_journal_property('doi_prefix') )
             {
@@ -435,7 +435,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         $post_type = get_post_type($post_id);
 
         $number_target_dois = get_post_meta( $post_id, $post_type . '_number_target_dois', true );
-        $target_dois = get_post_meta( $post_id, $post_type . '_target_dois', true );
+        $target_dois = static::get_post_meta_field_containing_array( $post_id, $post_type . '_target_dois');
 
         if( empty( $number_target_dois ) && $number_target_dois !== '0' )
             $number_target_dois = 1;
@@ -492,14 +492,14 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         $post_type = get_post_type($post_id);
 
         $number_reviewers = get_post_meta( $post_id, $post_type . '_number_reviewers', true );
-		$reviewer_given_names = get_post_meta( $post_id, $post_type . '_reviewer_given_names', true );
-		$reviewer_surnames = get_post_meta( $post_id, $post_type . '_reviewer_surnames', true );
-		$reviewer_name_styles = get_post_meta( $post_id, $post_type . '_reviewer_name_styles', true );
-		$reviewer_affiliations = get_post_meta( $post_id, $post_type . '_reviewer_affiliations', true );
-		$reviewer_orcids = get_post_meta( $post_id, $post_type . '_reviewer_orcids', true );
-        $reviewer_urls = get_post_meta( $post_id, $post_type . '_reviewer_urls', true );
-        $reviewer_ages = get_post_meta( $post_id, $post_type . '_reviewer_ages', true );
-        $reviewer_grades = get_post_meta( $post_id, $post_type . '_reviewer_grades', true );
+		$reviewer_given_names = static::get_post_meta_field_containing_array( $post_id, $post_type . '_reviewer_given_names');
+		$reviewer_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_reviewer_surnames');
+		$reviewer_name_styles = static::get_post_meta_field_containing_array( $post_id, $post_type . '_reviewer_name_styles');
+		$reviewer_affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_reviewer_affiliations');
+		$reviewer_orcids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_reviewer_orcids');
+        $reviewer_urls = static::get_post_meta_field_containing_array( $post_id, $post_type . '_reviewer_urls');
+        $reviewer_ages = static::get_post_meta_field_containing_array( $post_id, $post_type . '_reviewer_ages');
+        $reviewer_grades = static::get_post_meta_field_containing_array( $post_id, $post_type . '_reviewer_grades');
         if( empty( $number_reviewers ) ) $number_reviewers = static::get_default_number_reviewers();
 		if( empty( $reviewer_given_names ) ) $reviewer_given_names = array();
 		if( empty( $reviewer_surnames ) ) $reviewer_surnames = array();
@@ -550,7 +550,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 
         $post_type = get_post_type($post_id);
         $number_reviewer_institutions = get_post_meta( $post_id, $post_type . '_number_reviewer_institutions', true );
-		$reviewer_institutions = get_post_meta( $post_id, $post_type . '_reviewer_institutions', true );
+		$reviewer_institutions = static::get_post_meta_field_containing_array( $post_id, $post_type . '_reviewer_institutions');
 
         if( empty( $number_reviewer_institutions ) && $number_reviewer_institutions !== '0' ) $number_reviewer_institutions = 1;
 		if( empty( $reviewer_institutions ) ) $reviewer_institutions = array();
@@ -634,18 +634,18 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         $post_type = get_post_type($post_id);
 
         $number_reviewers = get_post_meta( $post_id, $post_type . '_number_reviewers', true );
-		$reviewer_given_names = get_post_meta( $post_id, $post_type . '_reviewer_given_names', true );
-		$reviewer_surnames = get_post_meta( $post_id, $post_type . '_reviewer_surnames', true );
-		$reviewer_name_styles = get_post_meta( $post_id, $post_type . '_reviewer_name_styles', true );
-		$reviewer_affiliations = get_post_meta( $post_id, $post_type . '_reviewer_affiliations', true );
-		$reviewer_orcids = get_post_meta( $post_id, $post_type . '_reviewer_orcids', true );
-        $reviewer_urls = get_post_meta( $post_id, $post_type . '_reviewer_urls', true );
-        $reviewer_ages = get_post_meta( $post_id, $post_type . '_reviewer_ages', true );
-        $reviewer_grades = get_post_meta( $post_id, $post_type . '_reviewer_grades', true );
+		$reviewer_given_names = static::get_post_meta_field_containing_array( $post_id, $post_type . '_reviewer_given_names');
+		$reviewer_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_reviewer_surnames');
+		$reviewer_name_styles = static::get_post_meta_field_containing_array( $post_id, $post_type . '_reviewer_name_styles');
+		$reviewer_affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_reviewer_affiliations');
+		$reviewer_orcids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_reviewer_orcids');
+        $reviewer_urls = static::get_post_meta_field_containing_array( $post_id, $post_type . '_reviewer_urls');
+        $reviewer_ages = static::get_post_meta_field_containing_array( $post_id, $post_type . '_reviewer_ages');
+        $reviewer_grades = static::get_post_meta_field_containing_array( $post_id, $post_type . '_reviewer_grades');
 
 
         $number_institutions = get_post_meta( $post_id, $post_type . '_number_reviewer_institutions', true );
-        $reviewer_institutions = get_post_meta( $post_id, $post_type . '_reviewer_institutions', true );
+        $reviewer_institutions = static::get_post_meta_field_containing_array( $post_id, $post_type . '_reviewer_institutions');
 
         $reviewers_html = '';
         $reviewers_html .= '<h3>Reviewed by</h3>';
@@ -751,13 +751,13 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
             $authors = static::get_formated_authors($post_id);
             $type = get_post_meta( $post_id, $post_type . '_type', true );
             $number_target_dois = get_post_meta( $post_id, $post_type . '_number_target_dois', true );
-            $target_dois = get_post_meta( $post_id, $post_type . '_target_dois', true );
+            $target_dois = static::get_post_meta_field_containing_array( $post_id, $post_type . '_target_dois');
             $number_authors = get_post_meta( $post_id, $post_type . '_number_authors', true );
-            $author_given_names = get_post_meta( $post_id, $post_type . '_author_given_names', true );
-            $author_surnames = get_post_meta( $post_id, $post_type . '_author_surnames', true );
-            $author_urls = get_post_meta( $post_id, $post_type . '_author_urls', true );
-            $author_affiliations = get_post_meta( $post_id, $post_type . '_author_affiliations', true );
-            $affiliations = get_post_meta( $post_id, $post_type . '_affiliations', true );
+            $author_given_names = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_given_names');
+            $author_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
+            $author_urls = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_urls');
+            $author_affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_affiliations');
+            $affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_affiliations');
             $citation = rtrim(static::get_formated_citation($post_id), '.');
             $journal = get_post_meta( $post_id, $post_type . '_journal', true );
 
@@ -860,7 +860,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         $post_type = get_post_type($post_id);
         $type = get_post_meta( $post_id, $post_type . '_type', true );
         $number_target_dois = get_post_meta( $post_id, $post_type . '_number_target_dois', true );
-        $target_dois = get_post_meta( $post_id, $post_type . '_target_dois', true );
+        $target_dois = static::get_post_meta_field_containing_array( $post_id, $post_type . '_target_dois');
         $journal = get_post_meta( $post_id, $post_type . '_journal', true );
 
         $content = '';
