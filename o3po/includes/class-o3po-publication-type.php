@@ -580,13 +580,13 @@ abstract class O3PO_PublicationType {
         $doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
         $number_authors = get_post_meta( $post_id, $post_type . '_number_authors', true );
         $number_affiliations = get_post_meta( $post_id, $post_type . '_number_affiliations', true );
-        $affiliations = get_post_meta( $post_id, $post_type . '_affiliations', true );
-        $author_given_names = get_post_meta( $post_id, $post_type . '_author_given_names', true );
-        $author_surnames = get_post_meta( $post_id, $post_type . '_author_surnames', true );
-        $author_name_styles = get_post_meta( $post_id, $post_type . '_author_name_styles', true );
-        $author_affiliations = get_post_meta( $post_id, $post_type . '_author_affiliations', true );
-        $author_orcids = get_post_meta( $post_id, $post_type . '_author_orcids', true );
-        $author_urls = get_post_meta( $post_id, $post_type . '_author_urls', true );
+        $affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_affiliations');
+        $author_given_names = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_given_names');
+        $author_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
+        $author_name_styles = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_name_styles');
+        $author_affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_affiliations');
+        $author_orcids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_orcids');
+        $author_urls = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_urls');
         $corresponding_author_email = get_post_meta( $post_id, $post_type . '_corresponding_author_email', true );
         $corresponding_author_has_been_notifed_date = get_post_meta( $post_id, $post_type . '_corresponding_author_has_been_notifed_date', true );
         $doi_suffix_was_changed_on_last_save = get_post_meta( $post_id, $post_type . '_doi_suffix_was_changed_on_last_save', true );
@@ -893,10 +893,10 @@ abstract class O3PO_PublicationType {
         $volume = get_post_meta( $post_id, $post_type . '_volume', true );
         $number_authors = get_post_meta( $post_id, $post_type . '_number_authors', true );
         $number_affiliations = get_post_meta( $post_id, $post_type . '_number_affiliations', true );
-        $affiliations = get_post_meta( $post_id, $post_type . '_affiliations', true );
-        $author_given_names = get_post_meta( $post_id, $post_type . '_author_given_names', true );
-        $author_surnames = get_post_meta( $post_id, $post_type . '_author_surnames', true );
-        $author_affiliations = get_post_meta( $post_id, $post_type . '_author_affiliations', true );
+        $affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_affiliations');
+        $author_given_names = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_given_names');
+        $author_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
+        $author_affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_affiliations');
         $journal = get_post_meta( $post_id, $post_type . '_journal', true );
         $volume = get_post_meta( $post_id, $post_type . '_volume', true );
         $pages = get_post_meta( $post_id, $post_type . '_pages', true );
@@ -1040,21 +1040,21 @@ abstract class O3PO_PublicationType {
         $abstract_mathml = get_post_meta( $post_id, $post_type . '_abstract_mathml', true );
         $number_authors = get_post_meta( $post_id, $post_type . '_number_authors', true );
         if(empty($number_authors)) return 'ERROR: Unable to generate XML for Crossref, number_authors is empty';
-        $author_given_names = get_post_meta( $post_id, $post_type . '_author_given_names', true );
+        $author_given_names = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_given_names');
         if(empty($author_given_names)) return 'ERROR: Unable to generate XML for Crossref, author_given_names is empty';
-        $author_surnames = get_post_meta( $post_id, $post_type . '_author_surnames', true );
+        $author_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
         if(empty($author_surnames)) return 'ERROR: Unable to generate XML for Crossref, author_surnames is empty';
-        $author_name_styles = get_post_meta( $post_id, $post_type . '_author_name_styles', true );
+        $author_name_styles = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_name_styles');
         if(empty($author_name_styles)) return 'ERROR: Unable to generate XML for Crossref, author_name_styles is empty';
-        $author_orcids = get_post_meta( $post_id, $post_type . '_author_orcids', true );
-        $author_affiliations = get_post_meta( $post_id, $post_type . '_author_affiliations', true );
+        $author_orcids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_orcids');
+        $author_affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_affiliations');
         $date_published = get_post_meta( $post_id, $post_type . '_date_published', true );
         if(empty($date_published)) return 'ERROR: Unable to generate XML for Crossref, date_published is empty';
         $pages = get_post_meta( $post_id, $post_type . '_pages', true );
         if(empty($pages)) return 'ERROR: Unable to generate XML for Crossref, pages is empty';
         $doi = static::get_doi($post_id);
         if(empty($doi)) return 'ERROR: Unable to generate XML for Crossref, doi is empty';
-        $affiliations = get_post_meta( $post_id, $post_type . '_affiliations', true );
+        $affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_affiliations');
         $journal = get_post_meta( $post_id, $post_type . '_journal', true );
         if(empty($journal)) return 'ERROR: Unable to generate XML for Crossref, journal is empty';
         if($journal !== $this->get_journal_property('journal_title')) return 'ERROR: Unable to generate XML for Crossref, journal of the post and publication type do not match';
@@ -1426,21 +1426,21 @@ abstract class O3PO_PublicationType {
         $abstract_mathml = get_post_meta( $post_id, $post_type . '_abstract_mathml', true );
         $number_authors = get_post_meta( $post_id, $post_type . '_number_authors', true );
         if(empty($number_authors)) return 'ERROR: Unable to generate XML for CLOCKSS, number_authors is empty';
-        $author_given_names = get_post_meta( $post_id, $post_type . '_author_given_names', true );
+        $author_given_names = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_given_names');
         if(empty($author_given_names)) return 'ERROR: Unable to generate XML for CLOCKSS, author_given_names is empty';
-        $author_surnames = get_post_meta( $post_id, $post_type . '_author_surnames', true );
+        $author_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
         if(empty($author_surnames)) return 'ERROR: Unable to generate XML for CLOCKSS, author_surnames is empty';
-        $author_name_styles = get_post_meta( $post_id, $post_type . '_author_name_styles', true );
+        $author_name_styles = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_name_styles');
         if(empty($author_name_styles)) return 'ERROR: Unable to generate XML for CLOCKSS, author_name_styles is empty';
-        $author_orcids = get_post_meta( $post_id, $post_type . '_author_orcids', true );
-        $author_affiliations = get_post_meta( $post_id, $post_type . '_author_affiliations', true );
+        $author_orcids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_orcids');
+        $author_affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_affiliations');
         $date_published = get_post_meta( $post_id, $post_type . '_date_published', true );
         if(empty($date_published)) return 'ERROR: Unable to generate XML for CLOCKSS, date_published is empty';
         $pages = get_post_meta( $post_id, $post_type . '_pages', true );
         if(empty($pages)) return 'ERROR: Unable to generate XML for CLOCKSS, pages is empty';
         $doi = static::get_doi($post_id);
         if(empty($doi)) return 'ERROR: Unable to generate XML for CLOCKSS, doi is empty';
-        $affiliations = get_post_meta( $post_id, $post_type . '_affiliations', true );
+        $affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_affiliations');
         $journal = get_post_meta( $post_id, $post_type . '_journal', true );
         if(empty($journal)) return 'ERROR: Unable to generate XML for CLOCKSS, journal is empty';
         if($journal !== $this->get_journal_property('journal_title')) return 'ERROR: Unable to generate XML for CLOCKSS, journal of the post and publication type do not match';
@@ -1549,21 +1549,21 @@ abstract class O3PO_PublicationType {
         $abstract_mathml = get_post_meta( $post_id, $post_type . '_abstract_mathml', true );
         $number_authors = get_post_meta( $post_id, $post_type . '_number_authors', true );
         if(empty($number_authors)) return 'ERROR: Unable to generate JSON for DOAJ, number_authors is empty';
-        $author_given_names = get_post_meta( $post_id, $post_type . '_author_given_names', true );
+        $author_given_names = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_given_names');
         if(empty($author_given_names)) return 'ERROR: Unable to generate JSON for DOAJ, author_given_names is empty';
-        $author_surnames = get_post_meta( $post_id, $post_type . '_author_surnames', true );
+        $author_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
         if(empty($author_surnames)) return 'ERROR: Unable to generate JSON for DOAJ, author_surnames is empty';
-        $author_name_styles = get_post_meta( $post_id, $post_type . '_author_name_styles', true );
+        $author_name_styles = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_name_styles');
         if(empty($author_name_styles)) return 'ERROR: Unable to generate JSON for DOAJ, author_name_styles is empty';
-        $author_orcids = get_post_meta( $post_id, $post_type . '_author_orcids', true );
-        $author_affiliations = get_post_meta( $post_id, $post_type . '_author_affiliations', true );
+        $author_orcids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_orcids');
+        $author_affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_affiliations');
         $date_published = get_post_meta( $post_id, $post_type . '_date_published', true );
         if(empty($date_published)) return 'ERROR: Unable to generate JSON for DOAJ, date_published is empty';
         $pages = get_post_meta( $post_id, $post_type . '_pages', true );
         if(empty($pages)) return 'ERROR: Unable to generate JSON for DOAJ, pages is empty';
         $doi = static::get_doi($post_id);
         if(empty($doi)) return 'ERROR: Unable to generate JSON for DOAJ, doi is empty';
-        $affiliations = get_post_meta( $post_id, $post_type . '_affiliations', true );
+        $affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_affiliations');
         $journal = get_post_meta( $post_id, $post_type . '_journal', true );
         if(empty($journal)) return 'ERROR: Unable to generate JSON for DOAJ, journal is empty';
         if($journal !== $this->get_journal_property('journal_title')) return 'ERROR: Unable to generate JSON for DOAJ, journal of the post and publication type do not match';
@@ -1800,12 +1800,12 @@ abstract class O3PO_PublicationType {
 
         $post_type = get_post_type($post_id);
         $number_authors = get_post_meta( $post_id, $post_type . '_number_authors', true );
-		$author_given_names = get_post_meta( $post_id, $post_type . '_author_given_names', true );
-		$author_surnames = get_post_meta( $post_id, $post_type . '_author_surnames', true );
-		$author_name_styles = get_post_meta( $post_id, $post_type . '_author_name_styles', true );
-		$author_affiliations = get_post_meta( $post_id, $post_type . '_author_affiliations', true );
-		$author_orcids = get_post_meta( $post_id, $post_type . '_author_orcids', true );
-        $author_urls = get_post_meta( $post_id, $post_type . '_author_urls', true );
+		$author_given_names = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_given_names');
+		$author_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
+		$author_name_styles = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_name_styles');
+		$author_affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_affiliations');
+		$author_orcids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_orcids');
+        $author_urls = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_urls');
         if( empty( $number_authors ) ) $number_authors = $this->default_number_authors;
 		if( empty( $author_given_names ) ) $author_given_names = array();
 		if( empty( $author_surnames ) ) $author_surnames = array();
@@ -1852,7 +1852,7 @@ abstract class O3PO_PublicationType {
 
         $post_type = get_post_type($post_id);
         $number_affiliations = get_post_meta( $post_id, $post_type . '_number_affiliations', true );
-		$affiliations = get_post_meta( $post_id, $post_type . '_affiliations', true );
+		$affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_affiliations');
 
         if( empty( $number_affiliations ) && $number_affiliations !== '0' ) $number_affiliations = 4;
 		if( empty( $affiliations ) ) $affiliations = array();
@@ -1970,7 +1970,7 @@ abstract class O3PO_PublicationType {
 
         $post_type = get_post_type($post_id);
 		$bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
-        $author_latex_macro_definitions = get_post_meta( $post_id, $post_type . '_author_latex_macro_definitions', true );
+        $author_latex_macro_definitions = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_latex_macro_definitions');
 
         echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_bbl" class="' . $post_type . '_bbl_label">' . 'Bibliography' . '</label></th>';
@@ -2485,7 +2485,7 @@ abstract class O3PO_PublicationType {
             $month = '';
 
         $year = substr( $date_published, 0, 4 );
-        $author_surnames = get_post_meta( $post_id, $post_type . '_author_surnames', true );
+        $author_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
         $doi = $this->get_doi($post_id);
         $doi_url_prefix = $this->get_journal_property('doi_url_prefix');
 
@@ -2591,8 +2591,8 @@ abstract class O3PO_PublicationType {
     public static function get_formated_authors( $post_id ) {
         $post_type = get_post_type($post_id);
         $number_authors = get_post_meta( $post_id, $post_type . '_number_authors', true );
-        $author_given_names = get_post_meta( $post_id, $post_type . '_author_given_names', true );
-        $author_surnames = get_post_meta( $post_id, $post_type . '_author_surnames', true );
+        $author_given_names = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_given_names');
+        $author_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
         $author_names = array();
         for ($x = 0; $x < $number_authors; $x++) {
             $author_names[] = $author_given_names[$x] . " " . $author_surnames[$x];
@@ -2612,8 +2612,8 @@ abstract class O3PO_PublicationType {
 
         $post_type = get_post_type($post_id);
         $number_authors = get_post_meta( $post_id, $post_type . '_number_authors', true );
-        $author_given_names = get_post_meta( $post_id, $post_type . '_author_given_names', true );
-        $author_surnames = get_post_meta( $post_id, $post_type . '_author_surnames', true );
+        $author_given_names = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_given_names');
+        $author_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
         $formated_authors = "";
         for ($x = 0; $x < $number_authors; $x++) {
             $formated_authors .= $author_surnames[$x] . ', ' . $author_given_names[$x] ;
@@ -2666,11 +2666,11 @@ abstract class O3PO_PublicationType {
 
         $post_type = get_post_type($post_id);
         $number_authors = get_post_meta( $post_id, $post_type . '_number_authors', true );
-        $author_given_names = get_post_meta( $post_id, $post_type . '_author_given_names', true );
-        $author_surnames = get_post_meta( $post_id, $post_type . '_author_surnames', true );
-        $author_orcids = get_post_meta( $post_id, $post_type . '_author_orcids', true );
+        $author_given_names = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_given_names');
+        $author_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
+        $author_orcids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_orcids');
         $number_affiliations = get_post_meta( $post_id, $post_type . '_number_affiliations', true );
-        $author_affiliations = get_post_meta( $post_id, $post_type . '_author_affiliations', true );
+        $author_affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_affiliations');
 
         $all_authors_have_same_affiliation = true;
         if ( !empty($author_affiliations) ) {
@@ -2712,9 +2712,9 @@ abstract class O3PO_PublicationType {
     public static function get_formated_affiliations_html( $post_id ) {
 
         $post_type = get_post_type($post_id);
-        $affiliations = get_post_meta( $post_id, $post_type . '_affiliations', true );
+        $affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_affiliations');
         $number_affiliations = get_post_meta( $post_id, $post_type . '_number_affiliations', true );
-        $author_affiliations = get_post_meta( $post_id, $post_type . '_author_affiliations', true );
+        $author_affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_affiliations');
 
         $all_authors_have_same_affiliation = true;
         if ( !empty($author_affiliations) ) {
@@ -2802,6 +2802,28 @@ abstract class O3PO_PublicationType {
         echo 'height: 100px !important;' . "\n";
         echo '}' . "\n";
         echo '</style>' . "\n";
+    }
+
+
+        /**
+         * Get a post meta field that is expected to contain an array.
+         *
+         * Contrary to get_post_meta($post_id, $key, true ) this returns an
+         * emty array() if the key is unset. This allows to directly add to
+         * the array with the [] notation even on php >= 7.1, wich no longer
+         * allows this notation on strings.
+         *
+         * @since 0.2.1
+         * @param int     $post_id    The Id of the post whose meta field is to be retreived.
+         * @param string  $key        The key that is to be retreived.
+         */
+    public static function get_post_meta_field_containing_array( $post_id, $key ) {
+
+        $result = get_post_meta($post_id, $key, true );
+        if($result === '')
+            return array();
+        else
+            return $result;
     }
 
         /**
