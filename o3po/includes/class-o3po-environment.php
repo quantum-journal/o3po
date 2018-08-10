@@ -73,7 +73,7 @@ class O3PO_Environment {
         {
 ?>
             <style>
-            .site-header, div#wpadminbar {
+            div#wpadminbar {
                 background-color: #49cf44;
             }
             </style>
