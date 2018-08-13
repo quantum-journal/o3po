@@ -836,7 +836,7 @@ class O3PO_Settings extends O3PO_Singleton {
 
         $option = $this->get_plugin_option($id);
 
-        echo '<input id="' . $this->plugin_name . '-setttings-' . $id . '" name="' . $this->plugin_name . '-setttings[' . $id . ']" style="width: 80%" type="text" value="' . $option . '" />';
+        echo '<input type="text" id="' . $this->plugin_name . '-setttings-' . $id . '" name="' . $this->plugin_name . '-setttings[' . $id . ']" style="width: 80%" value="' . $option . '" />';
 
     }
 
@@ -851,7 +851,7 @@ class O3PO_Settings extends O3PO_Singleton {
 
         $option = $this->get_plugin_option($id);
 
-        echo '<input type="password" id="' . $this->plugin_name . '-setttings-' . $id . '" name="' . $this->plugin_name . '-setttings[' . $id . ']" style="width: 80%" type="text" value="' . $option . '" />';
+        echo '<input type="password" id="' . $this->plugin_name . '-setttings-' . $id . '" name="' . $this->plugin_name . '-setttings[' . $id . ']" style="width: 80%" value="' . $option . '" />';
         echo '<input type="checkbox" onclick="(function myFunction() {
     var x = document.getElementById(\'' . $this->plugin_name . '-setttings-' . $id . '\');
     if (x.type === \'password\') {
