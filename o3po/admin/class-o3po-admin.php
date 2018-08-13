@@ -107,17 +107,14 @@ class O3PO_Admin {
         /**
          * Add links
          *
-         * To be added to the 'plugin_action_links' filter.
+         * To be added to the 'plugin_action_links_[plugin-name]/[plugin-name].php' filter.
          *
          * @since    0.2.0
          * @param    array     $actions    Array of links to filter
          */
-    public function add_plugin_action_links( $actions )
-    {
-        static $plugin;
+    public function add_plugin_action_links( $actions ) {
 
         $settings = array('settings' => '<a href="' . esc_url('options-general.php?page=' . $this->plugin_name . '-settings' ) . '">' . 'Settings</a>');
-
         $actions = array_merge($actions, $settings);
 
 		return $actions;
