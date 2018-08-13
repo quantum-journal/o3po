@@ -1381,12 +1381,12 @@ abstract class O3PO_PublicationType {
             $ftp_connection = ftp_connect($clockss_ftp_url);
             $login_result = ftp_login($ftp_connection, $clockss_username, $clockss_password);
 
-            if (ftp_put($ftp_connection, $remote_filename_without_extension . '.xml', $tmpfile_clockss_xml, FTP_ASCII))
+            if (ftp_put($ftp_connection, $remote_filename_without_extension . '.xml', $tmpfile_clockss_xml, FTP_BINARY))
                 $clockss_response .= "INFO: successfully uploaded the meta-data xml to CLOCKSS.\n";
             else
                 $clockss_response .= "ERROR: There was an error uploading the meta-data xml to CLOCKSS: " . $php_errormsg . "\n";
 
-            if (ftp_put($ftp_connection, $remote_filename_without_extension . '.pdf', $pdf_path, FTP_ASCII))
+            if (ftp_put($ftp_connection, $remote_filename_without_extension . '.pdf', $pdf_path, FTP_BINARY))
                 $clockss_response .= "INFO: successfully uploaded the fulltext pdf to CLOCKSS.\n";
             else
                 $clockss_response .= "ERROR: There was an error uploading the fulltext pdf to CLOCKSS: " . $php_errormsg . "\n";
