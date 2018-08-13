@@ -556,7 +556,7 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_crossref_pw_setting() {
-        $this->render_setting('crossref_pw');
+        $this->render_password_setting('crossref_pw');
     }
 
         /**
@@ -637,7 +637,7 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_clockss_password_setting() {
-        $this->render_setting('clockss_password');
+        $this->render_password_setting('clockss_password');
     }
 
 
@@ -658,7 +658,7 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_doaj_api_key_setting() {
-        $this->render_setting('doaj_api_key');
+        $this->render_password_setting('doaj_api_key');
     }
 
         /**
@@ -819,7 +819,7 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_buffer_secret_email_setting() {
 
-        $this->render_setting('buffer_secret_email');
+        $this->render_password_setting('buffer_secret_email');
         $post_types = O3PO_Utility::oxford_comma_implode(call_user_func($this->active_post_type_names_callback));
         echo '<p>(If this is set, new ' . $post_types . ' posts are <a target="_blank" href="https://faq.buffer.com/article/272-is-it-possible-to-add-a-post-to-buffer-through-email">automatically submitted</a> to the buffer.com queue associated with the secret email)</p>';
 
@@ -836,8 +836,30 @@ class O3PO_Settings extends O3PO_Singleton {
 
         $option = $this->get_plugin_option($id);
 
-        echo '<input id="' . $this->plugin_name . '-setttings-' . $id . '" name="' . $this->plugin_name . '-setttings[' . $id . ']" style="width: 80%" type="text" value="' . $option . '" />';
+        echo '<input type="text" id="' . $this->plugin_name . '-setttings-' . $id . '" name="' . $this->plugin_name . '-setttings[' . $id . ']" style="width: 80%" value="' . $option . '" />';
 
+    }
+
+        /**
+         * Render a password setting.
+         *
+         * @since    0.1.0
+         * @access   public
+         * @param    string    $id   Id of the setting.
+         */
+    public function render_password_setting( $id ) {
+
+        $option = $this->get_plugin_option($id);
+
+        echo '<input type="password" id="' . $this->plugin_name . '-setttings-' . $id . '" name="' . $this->plugin_name . '-setttings[' . $id . ']" style="width: 80%" value="' . $option . '" />';
+        echo '<input type="checkbox" onclick="(function myFunction() {
+    var x = document.getElementById(\'' . $this->plugin_name . '-setttings-' . $id . '\');
+    if (x.type === \'password\') {
+        x.type = \'text\';
+    } else {
+        x.type = \'password\';
+    }
+})();">Show Password';
     }
 
         /**

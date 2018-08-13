@@ -88,25 +88,20 @@ It is obviously a play on the name of humanoid robot character from a series of 
 
 ## Changelog
 
-# 0.2.1
+### 0.2.2
+* Settings page now uses password text fields for sensitive settings.
+* Fixed file name of full text pdf download.
+### 0.2.1
 * Fix for an additional incompatibility with PHP >=7.1.
 * Restrict visible indication of test system to adminbar to allow setup on production system.
-# 0.2.0
+### 0.2.0
 * Now compatible with and tested on multiple PHP versions ranging from 5.6 to 7.2.8.
 * CLOCKSS interface activated.
 * Search page template with extra feedback to users can now be deactivated in settings.
 * Many smaller bug fixes.
 * Test coverage massively increased.
 
-# 0.1.0
-* First publicly available version.
-
-## Upgrade Notice
-
-# 0.2.0
-* No incompatibilities with previous versions. Be aware that this is beta software that is unsuitable for use in a production environment!
-
-# 0.1.0
+### 0.1.0
 * First publicly available version.
 
 ## License
