@@ -55,7 +55,7 @@ if ( $publication_type_paper->show_fermats_library_permalink($post_id) ) {
 echo '<tr><td>Citation:</td><td>' . esc_html($publication_type_paper->get_formated_citation($post_id)) . '</td></tr>';
 echo '</table>';
 //echo '<a id="fulltext" class="btn-theme-primary" href="' . esc_attr($publication_type_paper->get_pdf_pretty_permalink($post_id)) . '">full text pdf</a>';
-echo '<form action="' . esc_attr($publication_type_paper->get_pdf_pretty_permalink($post_id)) . '" method="post">';
+echo '<form action="' . esc_attr($publication_type_paper->get_pdf_pretty_permalink($post_id)) . '" method="get">';
 echo '<input id="fulltext" type="submit" value="full text pdf">';
 echo '</form>';
 

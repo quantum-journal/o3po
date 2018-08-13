@@ -1175,9 +1175,15 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             echo "ERROR: file_path is empty";
             exit();
         }
+        if ( empty($doi_suffix) )
+        {
+            header('Content-Type: text/plain');
+            echo "ERROR: doi_suffix is empty";
+            exit();
+        }
 
         header('Content-Type: application/pdf');
-        header("Content-Disposition: inline; filename=" . $doi_suffix . ".pdf" );//always return the same file name even if local revision number has changed
+        header('Content-Disposition: inline; filename="' . esc_html($doi_suffix) . '.pdf"' );//always return the same file name even if local revision number has changed
         readfile($file_path);
         exit();
 
