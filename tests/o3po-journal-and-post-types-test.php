@@ -415,11 +415,11 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         return [
             [1, $posts[1], array(
                     '#REVIEW: The pdf was downloaded successfully from the arXiv#',
-                    '#REVIEW: The source was downloaded successfully from the arXiv to [^ ]*' . get_post_meta( 1, 'paper_doi_suffix', true) . '\.tex and is of mime-type text/x-tex#',
+                    '#REVIEW: The source was downloaded successfully from the arXiv to [^ ]*' . get_post_meta( 1, 'paper_doi_suffix', true) . '[0-9-]*\.tex and is of mime-type text/x-tex#',
                     '#REVIEW: Found bibliographic information#',
                     '#REVIEW: Bibliographic information updated.#',
                     '#ERROR: Corresponding author email is malformed#',
-                    '#(INFO: Licensing information .* and meta-data of .*' . get_post_meta( 1, 'paper_doi_suffix', true) . '\.pdf added/updated|ERROR: Adding meta-data to pdfs requires the external programm exiftool but the exiftool binary was not found)#',
+                    '#(INFO: Licensing information .* and meta-data of .*' . get_post_meta( 1, 'paper_doi_suffix', true) . '[0-9-]*\.pdf added/updated|ERROR: Adding meta-data to pdfs requires the external programm exiftool but the exiftool binary was not found)#',
                     '#ERROR: Corresponding author email is malformed#',
                                  )],
             [5, $posts[5], array(

@@ -472,7 +472,14 @@ function wp_handle_sideload( $file, $overrides ) {
     if(!file_exists($oldname))
         return array('error' => 'The file ' . $oldname . 'does not exist.');
 
-    $newname = dirname($file['tmp_name']) . '/' . $file['name'];
+    $newfilename = $file['name'];
+    $newdir = dirname($file['tmp_name']) . '/';
+    $newext = '.' . pathinfo($newfilename, PATHINFO_EXTENSION);
+
+    if(!empty($overrides['unique_filename_callback']))
+        $newfilename = call_user_func($overrides['unique_filename_callback'], $newdir, $newfilename, $newext);
+
+    $newname = $newdir . $newfilename;
     if(strpos($newname, ABSPATH) === false)
         throw new Exception('Target file ' . $newname . ' path would be outside of ABSPATH ' . ABSPATH . '. Aborting for security reasons.');
     rename($oldname, $newname);

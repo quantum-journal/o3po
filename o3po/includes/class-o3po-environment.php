@@ -94,7 +94,7 @@ class O3PO_Environment {
          * @param    string     $filename   Base Filename.
          * @param    string     $ext        Desired extension.
          * */
-    private function unique_filename_callback( $dir, $filename, $ext ) {
+    public function unique_filename_callback( $dir, $filename, $ext ) {
 
         $ext = strtolower($ext);
         if($ext === '.gz' && substr($filename, -7) === '.tar.gz' ) $ext = '.tar.gz';
