@@ -88,6 +88,9 @@ It is obviously a play on the name of humanoid robot character from a series of 
 
 ## Changelog
 
+### 0.2.2
+* Settings page now uses password text fields for sensitive settings.
+* Fixed file name of full text pdf download.
 ### 0.2.1
 * Fix for an additional incompatibility with PHP >=7.1.
 * Restrict visible indication of test system to adminbar to allow setup on production system.
