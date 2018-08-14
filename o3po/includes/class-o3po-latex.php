@@ -98,7 +98,29 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
     }
 
         /**
-         * Parser for bbl code
+         * Parse bbl code of potentially multiple bibliographies.
+         *
+         * Parses bbl code produced by either bibtex or biblatex as well as
+         * such written by authors by hand. $bbl may be a concatenation of
+         * multiple bibliographies.
+         *
+         * @since    0.1.0
+         * @access   public
+         * @param    string    $bbl    Bibliography or concatenation of bibliographies in .bbl format as it is produced by BibTeX, Biber, and BibLaTeX.
+         */
+    static public function parse_bbl( $bbl ) {
+
+        $citations = array();
+        $bbls = preg_split('/(% \$ biblatex auxiliary file \$|\\\\begin{thebibliography}|\\\\begin{references})/', $bbl, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        foreach($bbls as $individual_bbl)
+            $citations = array_merge($citations, static::parse_single_bbl($individual_bbl));
+
+        return $citations;
+    }
+
+
+        /**
+         * Parse bbl code of an individual bibliography.
          *
          * Parses bbl code produced by either bibtex or biblatex as well as
          * such written by authors by hand.
@@ -107,7 +129,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
          * @access   public
          * @param    string    $bbl    Bibliography in .bbl format as it is produced by BibTeX, Biber, and BibLaTeX.
          */
-    static public function parse_bbl( $bbl ) {
+    static public function parse_single_bbl( $bbl ) {
 
         preg_match('/% \$ (biblatex bbl format|biblatex) version ([0-9.]*) \$/' , $bbl, $version);
         if( !empty($version[1]))
