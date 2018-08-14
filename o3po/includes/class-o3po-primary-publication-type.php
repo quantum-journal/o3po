@@ -300,178 +300,39 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             finfo_close($finfo);
             $validation_result .= "REVIEW: The source was downloaded successfully from the arXiv to " . $path_source . " and is of mime-type " . $mime_type . "\n";
 
-                /* We now start parsing the downloaded source code.
-                 * Depending on the manuscript we either got a single uncompressed .tex file
-                 * or a tar.gz archive which we have to extract and then analyse.
-                 *
-                 * TODO: The following should be broken up into several functions to make it easer to understand and reuse the code. */
-            $bbl = '';
-            if ( preg_match('#text/.*tex#', $mime_type) && substr($path_source, -4) === '.tex' ) { // We got a single file
-                try {
-                    $filecontents = $this->environment->file_get_contents_utf8($path_source);
-                    preg_match('/(\\\\begin{thebibliography}.*\\\\end{thebibliography}|\\\\begin{references}.*\\\\end{references})/s', $filecontents  , $bib);
-                    if(!empty($bib[0])) {
-                        $bbl .= $bib[0] . "\n";
-                        $validation_result .= "REVIEW: Found bibliographic information.\n";
-                    }
-                } catch (Exception $e) {
-                    $validation_result .= "WARNING: While processing the source tex file " . $path_source . " an exception occurred: " . $e->getMessage() . "\n";
+            $parse_publication_source_result = $this->parse_publication_source($path_source, $mime_type);
+
+            $validation_result .= $parse_publication_source_result['validation_result'];
+
+            $new_author_latex_macro_definitions = $parse_publication_source_result['author_latex_macro_definitions'];
+            if(!empty($new_author_latex_macro_definitions))
+            {
+                    //add slashes before update_post_meta()
+                $new_author_latex_macro_definitions_with_slashes = array();
+                for($i=0; $i < count($new_author_latex_macro_definitions); $i++)
+                {
+                    $new_author_latex_macro_definitions_with_slashes[$i] = array_map('addslashes', $new_author_latex_macro_definitions[$i]);
                 }
-            } else if ( preg_match('#application/.*(tar|gz|gzip)#', $mime_type) && substr($path_source, -7) === '.tar.gz' ) { // We got an archive
-                try {
-
-                        //Unpack
-                    $path_tar = preg_replace('/\.gz$/', '', $path_source);
-                    $path_folder = preg_replace('/\.tar$/', '', $path_tar) . '_extracted/';
-
-                    $phar_gz = new PharData($path_source);
-                    $phar_gz->decompress(); // *.tar.gz -> *.tar
-                    $phar_tar = new PharData($path_tar);
-                    $phar_tar->extractTo($path_folder);
-
-                    $old_author_orcids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_orcids');
-
-                        //Loop over the relevant files
-                    foreach(new RecursiveIteratorIterator( new RecursiveDirectoryIterator($path_folder, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST) as $entry ) {
-                        if($entry->isFile() && ( substr($entry->getPathname(), -4) === '.bbl' || substr($entry->getPathname(), -4) === '.tex' ) )
-                        {
-                            $filecontents = $this->environment->file_get_contents_utf8($entry->getPathname());
-                            $filecontents_without_comments = preg_replace('#(?<!\\\\)%.*#', '', $filecontents);//remove all comments
-
-                                //Extract all the user defined tex macros and collect them
-                            $author_latex_macro_definitions_from_this_file = O3PO_Latex::extract_latex_macros($filecontents_without_comments);
-                            if(!empty($author_latex_macro_definitions_from_this_file))
-                            {
-                                if(!isset($new_author_latex_macro_definitions))
-                                    $new_author_latex_macro_definitions = array();
-                                $new_author_latex_macro_definitions = array_merge_recursive($new_author_latex_macro_definitions, $author_latex_macro_definitions_from_this_file);
-                            }
-
-                                //Look for a bibliography and extract it
-                            preg_match('/\\\\begin{thebibliography}.*\\\\end{thebibliography}/s', $filecontents_without_comments  , $bib);//we search the fiel with comments removed to not accidentially pic up a commented out bibliography
-                            if(!empty($bib[0])) {
-                                $bbl .= $bib[0] . "\n";
-                                $validation_result .= "REVIEW: Found BibTeX or manually formated bibliographic information in " . $entry->getPathname() . ".\n";
-                            } else if( substr($entry->getPathname(), -4) === '.bbl' && strpos( $filecontents, 'biblatex auxiliary file' ) != false )  {
-                                $bbl .= $filecontents . "\n";//here comments must be preserved as they contain clues for parsing
-                                $validation_result .= "REVIEW: Found BibLaTeX formated bibliographic information in " . $entry . "\n";
-                            }
-                                /* We expand the latex macros in $bbl after we have gone through all files and then
-                                 * add slashes just before saving $bbl with update_post_meta() */
-
-                                // Extract author, affiliation and similar information from the source
-                            preg_match_all('#\\\\(author|affiliation|affil|orcid|homepage)([^{]*)(?=\{((?:[^{}]++|\{(?3)\})*)\})#', $filecontents_without_comments, $author_info);//matches balanced parenthesis (Note the use of (?3) here!) to test changes go here https://regex101.com/r/bVHadc/1
-                            if(!empty($author_info[0]) && !empty($author_info[3]))
-                            {
-                                $validation_result .= "REVIEW: Affiliations, ORCIDs, and author URLs updated from arxiv source. Please check.\n";
-
-                                $new_author_orcids = array();
-                                $new_author_urls = array();
-                                $new_author_affiliations = array();
-                                $new_affiliations = array();
-                                $author_number = -1;
-                                $authors_since_last_affiliation = array();
-                                $was_affiliation_since_last_author = false;
-
-                                for($x = 0; $x < count($author_info[1]) ; $x++) {
-                                    if( $author_info[1][$x] === 'author')
-                                    {
-                                        $author_number += 1;
-
-                                            /* It is difficult to extract the author name from the source
-                                             * as the LaTeX \author macro gives no clue about what is the
-                                             * given name and what is the surname. We hence ignore
-                                             * $author_info[3][$x] for now and rely on the information
-                                             * fetched from the abstrract page of the arXiv.*/
-
-                                        if($was_affiliation_since_last_author)
-                                            $authors_since_last_affiliation = array();
-                                        $authors_since_last_affiliation[] = $author_number;
-
-                                            // we interpret the optional argument of \author[1,2]{Foo Bar} as the list of affiliation numbers for compatibility with autblk
-                                        if(!empty($author_info[2][$x]) )
-                                        {
-                                            preg_match_all('/\[([0-9,]*)\]/', $author_info[2][$x], $affiliations_from_optional_argument);
-                                            if(!empty($affiliations_from_optional_argument[1][0]))
-                                                $new_author_affiliations[$author_number] = $affiliations_from_optional_argument[1][0];
-                                        }
-                                    }
-                                    else if( $author_info[1][$x] === 'orcid')
-                                        $new_author_orcids[$author_number] = empty($old_author_orcids[$x]) ? $author_info[3][$x] : $old_author_orcids[$x];
-                                    else if( $author_info[1][$x] === 'homepage')
-                                        $new_author_urls[$author_number] = $author_info[3][$x];
-                                    else if( $author_info[1][$x] === 'affiliation')
-                                    {
-                                        $current_affiliation = trim($author_info[3][$x], ' {}');
-                                        if(!empty($new_author_latex_macro_definitions))
-                                            $current_affiliation = O3PO_Latex::expand_latex_macros($new_author_latex_macro_definitions, $current_affiliation); //We only expand the macros defined in the current file and those we have previously seen hoping that this is enough
-                                        $current_affiliation = O3PO_Latex::latex_to_utf8_outside_math_mode($current_affiliation);
-                                        $current_affiliation = trim(preg_replace('#\s\s+#', ' ', $current_affiliation), ' ');
-                                        if(!in_array($current_affiliation, $new_affiliations))
-                                            $new_affiliations[] = $current_affiliation;
-
-                                        foreach($authors_since_last_affiliation as $author_number_since_last_affiliation)
-                                        {
-                                            if(empty($new_author_affiliations[$author_number_since_last_affiliation]))
-                                                $new_author_affiliations[$author_number_since_last_affiliation] = '';
-                                            else
-                                                $new_author_affiliations[$author_number_since_last_affiliation] .= ',';
-                                            $new_author_affiliations[$author_number_since_last_affiliation] .= (array_search($current_affiliation, $new_affiliations , true)+1);
-                                        }
-                                        $was_affiliation_since_last_author = true;
-                                    }
-                                    else if( $author_info[1][$x] === 'affil')
-                                    {
-                                        $current_affiliation = trim($author_info[3][$x], ' {}');
-                                        if(!empty($new_author_latex_macro_definitions))
-                                            $current_affiliation = O3PO_Latex::expand_latex_macros($new_author_latex_macro_definitions, $current_affiliation); //We only expand the macros defined in the current file and those we have previously seen hoping that this is enough
-                                        $current_affiliation = O3PO_Latex::latex_to_utf8_outside_math_mode($current_affiliation);
-
-                                        preg_match('/[0-9]*/', $author_info[2][$x], $affiliation_symb_from_optional_argument);
-                                        if(!empty($affiliation_symb_from_optional_argument[0]) && is_int($affiliation_symb_from_optional_argument[0]))
-                                            $current_affiliation_num = intval($affiliation_symb_from_optional_argument[0])-1;
-                                        else
-                                            $current_affiliation_num = count($new_affiliations);
-
-                                        $new_affiliations[$current_affiliation_num] = $current_affiliation;
-                                    }
-                                }
-
-                                if(!empty($new_author_orcids))
-                                    update_post_meta( $post_id, $post_type . '_author_orcids', $new_author_orcids );
-                                if(!empty($new_author_affiliations))
-                                    update_post_meta( $post_id, $post_type . '_author_affiliations', $new_author_affiliations);
-                                if(!empty($new_affiliations)) {
-                                    update_post_meta( $post_id, $post_type . '_affiliations',  array_map('addslashes', $new_affiliations));
-                                    update_post_meta( $post_id, $post_type . '_number_affiliations', count($new_affiliations) );
-                                }
-                            }
-                        }
-                    }
-                    if(!empty($new_author_latex_macro_definitions))
-                    {
-                            //add slashes before update_post_meta()
-                        $new_author_latex_macro_definitions_with_slashes = array();
-                        for($i=0; $i < count($new_author_latex_macro_definitions); $i++)
-                        {
-                            $new_author_latex_macro_definitions_with_slashes[$i] = array_map('addslashes', $new_author_latex_macro_definitions[$i]);
-                        }
-                        update_post_meta( $post_id, $post_type . '_author_latex_macro_definitions', $new_author_latex_macro_definitions_with_slashes);
-                    }
-                } catch (Exception $e) {
-                    $validation_result .= "ERROR: While processing the source files an exception occurred: " . $e->getMessage() . "\n";
-                } finally {
-                    try {
-                        unlink($path_tar);
-                        $this->environment->save_recursive_remove_dir($path_folder, $path_folder);
-                    } catch (Exception $e) {
-                        $validation_result .= "ERROR: While processing the source files an exception occurred: " . $e->getMessage() . "\n";
-                    }
-                }
-            } else {
-                $validation_result .= "ERROR: Extension of source file " . $path_source . " and mime-type " . $mime_type . " do not match or are neither .tex nor .tar.gz.\n";
-
+                update_post_meta( $post_id, $post_type . '_author_latex_macro_definitions', $new_author_latex_macro_definitions_with_slashes);
             }
+            $old_author_orcids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_orcids');
+            $new_author_orcids = $parse_publication_source_result['author_orcids'];
+            foreach($new_author_orcids as $key => $value)
+                if(empty($value) and !empty($old_author_orcids[$key]))
+                    $new_author_orcids[$key] = $old_author_orcids[$key];
+            $new_author_affiliations = $parse_publication_source_result['author_affiliations'];
+            $new_affiliations = $parse_publication_source_result['affiliations'];
+
+            if(!empty($new_author_orcids))
+                update_post_meta( $post_id, $post_type . '_author_orcids', $new_author_orcids );
+            if(!empty($new_author_affiliations))
+                update_post_meta( $post_id, $post_type . '_author_affiliations', $new_author_affiliations);
+            if(!empty($new_affiliations)) {
+                update_post_meta( $post_id, $post_type . '_affiliations',  array_map('addslashes', $new_affiliations));
+                update_post_meta( $post_id, $post_type . '_number_affiliations', count($new_affiliations) );
+            }
+
+            $bbl = $parse_publication_source_result['bbl'];
             if(!empty($bbl)) {
                 $validation_result .= "REVIEW: Bibliographic information updated.\n";
 
@@ -483,7 +344,6 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                 }
                 $bbl = addslashes($bbl);
                 update_post_meta( $post_id, $post_type . '_bbl', $bbl );
-
             }
         }
 
@@ -1342,4 +1202,201 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         if(!empty($eprint)) echo '<meta name="citation_arxiv_id" content="' . $eprint . '">'."\n";
 
     }
+
+        /**
+         * Extract all bibliographies from latex code.
+         *
+         * @since   0.2.2+
+         * @access  public
+         * @param   string    $latex   Latex code to search for bibliographies.
+         *
+         */
+    public function extract_bibliographies( $latex ) {
+
+        $bbl = '';
+
+        preg_match('/(\\\\begin{thebibliography}.*?\\\\end{thebibliography}|\\\\begin{references}.*?\\\\end{references})/s', $latex, $bib);
+        if(!empty($bib[0])) {
+            $i = 0;
+            while(isset($bib[$i]))
+            {
+                $bbl .= $bib[$i] . "\n";
+                $i++;
+            }
+            return $bbl;
+        }
+        else
+            return '';
+    }
+
+
+        /**
+         * Parse the source files.
+         *
+         * Depending on the manuscript we either got a single uncompressed .tex file
+         * or a tar.gz archive from the arXivm which we have to extract and then analyse.
+         *
+         * @since   0.2.2+
+         * @access  private
+         * @param   string     $path_source    Path to the source file.
+         * @param   string     $mime_type      Mime type of the source file.
+         */
+    private function parse_publication_source( $path_source, $mime_type )
+    {
+        $phar_tar = null;
+        $path_folder = null;
+        $validation_result = '';
+        $bbl = '';
+        $new_author_orcids = array();
+        $new_author_affiliations = array();
+        $new_affiliations = array();
+
+        try {
+            if ( preg_match('#text/.*tex#', $mime_type) && substr($path_source, -4) === '.tex' ) // We got a single file
+                $source_files = array(new SplFileInfo($path_source));
+            else if ( preg_match('#application/.*(tar|gz|gzip)#', $mime_type) && substr($path_source, -7) === '.tar.gz' ) { // We got an archive
+                    //Unpack
+                $path_tar = preg_replace('/\.gz$/', '', $path_source);
+                $path_folder = preg_replace('/\.tar$/', '', $path_tar) . '_extracted/';
+
+                $phar_gz = new PharData($path_source);
+                $phar_gz->decompress(); // *.tar.gz -> *.tar
+                $phar_tar = new PharData($path_tar);
+                $phar_tar->extractTo($path_folder);
+
+                $source_files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator($path_folder, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
+            } else {
+                $validation_result .= "ERROR: Extension of source file " . $path_source . " and mime-type " . $mime_type . " do not match or are neither .tex nor .tar.gz.\n";
+            }
+
+                //Loop over the source files
+            foreach($source_files as $entry ) {
+                if($entry->isFile() && ( substr($entry->getPathname(), -4) === '.bbl' || substr($entry->getPathname(), -4) === '.tex' ) )
+                {
+                    $filecontents = $this->environment->file_get_contents_utf8($entry->getPathname());
+                    $filecontents_without_comments = preg_replace('#(?<!\\\\)%.*#', '', $filecontents);//remove all comments
+
+                        //Extract all the user defined tex macros and collect them
+                    $author_latex_macro_definitions_from_this_file = O3PO_Latex::extract_latex_macros($filecontents_without_comments);
+                    if(!empty($author_latex_macro_definitions_from_this_file))
+                    {
+                        if(!isset($new_author_latex_macro_definitions))
+                            $new_author_latex_macro_definitions = array();
+                        $new_author_latex_macro_definitions = array_merge_recursive($new_author_latex_macro_definitions, $author_latex_macro_definitions_from_this_file);
+                    }
+
+                        //Look for bibliographies and extract them
+                    $bbl .= $this->extract_bibliographies($filecontents_without_comments);//we search the file with comments removed to not accidentially pic up a commented out bibliography
+                    if(!empty($bbl)) {
+                        $validation_result .= "REVIEW: Found BibTeX or manually formated bibliographic information in " . $entry->getPathname() . ".\n";
+                    } else if( substr($entry->getPathname(), -4) === '.bbl' && strpos( $filecontents, 'biblatex auxiliary file' ) != false )  {
+                        $bbl .= $filecontents . "\n";//here comments must be preserved as they contain clues for parsing
+                        $validation_result .= "REVIEW: Found BibLaTeX formated bibliographic information in " . $entry . "\n";
+                    }
+                }
+            }
+            foreach($source_files as $entry ) {
+                if($entry->isFile() && ( substr($entry->getPathname(), -4) === '.tex' ) )
+                {
+                        // Extract author, affiliation and similar information from the source
+                    preg_match_all('#\\\\(author|affiliation|affil|orcid|homepage)([^{]*)(?=\{((?:[^{}]++|\{(?3)\})*)\})#', $filecontents_without_comments, $author_info);//matches balanced parenthesis (Note the use of (?3) here!) to test changes go here https://regex101.com/r/bVHadc/1
+                    if(!empty($author_info[0]) && !empty($author_info[3]))
+                    {
+                        $validation_result .= "REVIEW: Affiliations, ORCIDs, and author URLs updated from arxiv source. Please check.\n";
+
+                        $new_author_orcids = array();
+                        $new_author_urls = array();
+                        $new_author_affiliations = array();
+                        $new_affiliations = array();
+                        $author_number = -1;
+                        $authors_since_last_affiliation = array();
+                        $was_affiliation_since_last_author = false;
+
+                        for($x = 0; $x < count($author_info[1]) ; $x++) {
+                            if( $author_info[1][$x] === 'author')
+                            {
+                                $author_number += 1;
+
+                                    /* It is difficult to extract the author name from the source
+                                     * as the LaTeX \author macro gives no clue about what is the
+                                     * given name and what is the surname. We hence ignore
+                                     * $author_info[3][$x] for now and rely on the information
+                                     * fetched from the abstract page of the arXiv.*/
+
+                                if($was_affiliation_since_last_author)
+                                    $authors_since_last_affiliation = array();
+                                $authors_since_last_affiliation[] = $author_number;
+
+                                    // we interpret the optional argument of \author[1,2]{Foo Bar} as the list of affiliation numbers for compatibility with autblk
+                                if(!empty($author_info[2][$x]) )
+                                {
+                                    preg_match_all('/\[([0-9,]*)\]/', $author_info[2][$x], $affiliations_from_optional_argument);
+                                    if(!empty($affiliations_from_optional_argument[1][0]))
+                                        $new_author_affiliations[$author_number] = $affiliations_from_optional_argument[1][0];
+                                }
+                            }
+                            else if( $author_info[1][$x] === 'orcid')
+                                $new_author_orcids[$author_number] = $author_info[3][$x];
+                            else if( $author_info[1][$x] === 'homepage')
+                                $new_author_urls[$author_number] = $author_info[3][$x];
+                            else if( $author_info[1][$x] === 'affiliation' or $author_info[1][$x] === 'affil')
+                            {
+                                $current_affiliation = trim($author_info[3][$x], ' {}');
+                                $current_affiliation = O3PO_Latex::expand_latex_macros($new_author_latex_macro_definitions, $current_affiliation);
+                                $current_affiliation = O3PO_Latex::latex_to_utf8_outside_math_mode($current_affiliation);
+                                $current_affiliation = O3PO_Latex::normalize_whitespace_and_linebreak_characters($current_affiliation);
+
+                                if( $author_info[1][$x] === 'affiliation')
+                                {
+                                    if(!in_array($current_affiliation, $new_affiliations))
+                                        $new_affiliations[] = $current_affiliation;
+
+                                    foreach($authors_since_last_affiliation as $author_number_since_last_affiliation)
+                                    {
+                                        if(empty($new_author_affiliations[$author_number_since_last_affiliation]))
+                                            $new_author_affiliations[$author_number_since_last_affiliation] = '';
+                                        else
+                                            $new_author_affiliations[$author_number_since_last_affiliation] .= ',';
+                                        $new_author_affiliations[$author_number_since_last_affiliation] .= (array_search($current_affiliation, $new_affiliations , true)+1);
+                                    }
+                                    $was_affiliation_since_last_author = true;
+                                }
+                                if( $author_info[1][$x] === 'affil')
+                                {
+                                    preg_match('/[0-9]*/', $author_info[2][$x], $affiliation_symb_from_optional_argument);
+                                    if(!empty($affiliation_symb_from_optional_argument[0]) && is_int($affiliation_symb_from_optional_argument[0]))
+                                        $current_affiliation_num = intval($affiliation_symb_from_optional_argument[0])-1;
+                                    else
+                                        $current_affiliation_num = count($new_affiliations);
+
+                                    $new_affiliations[$current_affiliation_num] = $current_affiliation;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception $e) {
+            $validation_result .= "ERROR: While processing the source files an exception occurred: '" . $e->getMessage() . "' in " . $e->getFile() . ":" . $e->getLine() . "\n";
+        } finally {
+            try {
+                if(!empty($phar_tar))
+                    unlink($path_tar);
+                if(!empty($path_folder))
+                    $this->environment->save_recursive_remove_dir($path_folder, $path_folder);
+            } catch (Exception $e) {
+                $validation_result .= "ERROR: While processing the source files an exception occurred: " . $e->getMessage() . "\n";
+            }
+        }
+        return array(
+            'validation_result' => $validation_result,
+            'author_latex_macro_definitions' => $new_author_latex_macro_definitions,
+            'author_orcids' => $new_author_orcids,
+            'author_affiliations' => $new_author_affiliations,
+            'affiliations' => $new_affiliations,
+            'bbl' => $bbl,
+                     );
+    }
+
+
 }

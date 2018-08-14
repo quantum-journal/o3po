@@ -416,7 +416,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             [1, $posts[1], array(
                     '#REVIEW: The pdf was downloaded successfully from the arXiv#',
                     '#REVIEW: The source was downloaded successfully from the arXiv to [^ ]*' . get_post_meta( 1, 'paper_doi_suffix', true) . '[0-9-]*\.tex and is of mime-type text/x-tex#',
-                    '#REVIEW: Found bibliographic information#',
+                    '#REVIEW: Found BibTeX or manually formated bibliographic information in.*\.tex#',
                     '#REVIEW: Bibliographic information updated.#',
                     '#ERROR: Corresponding author email is malformed#',
                     '#(INFO: Licensing information .* and meta-data of .*' . get_post_meta( 1, 'paper_doi_suffix', true) . '[0-9-]*\.pdf added/updated|ERROR: Adding meta-data to pdfs requires the external programm exiftool but the exiftool binary was not found)#',
