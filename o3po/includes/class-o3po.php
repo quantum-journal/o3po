@@ -338,6 +338,7 @@ class O3PO {
 
             //add hooks for the secondary publication type...
         $this->loader->add_filter( 'the_author', $this->secondary_publication_type, 'get_the_author', PHP_INT_MAX, 1 );
+        $this->loader->add_filter( 'author_link', $this->secondary_publication_type, 'get_the_author_posts_link', PHP_INT_MAX, 1 );
         $this->loader->add_filter( 'the_content', $this->secondary_publication_type, 'get_the_content' );
         $this->loader->add_filter( 'get_the_excerpt', $this->secondary_publication_type, 'get_the_excerpt' );//Use this filter instead of 'the_excerpt' to also affect get_the_excerpt()
             //...and those inherited from publicationtype

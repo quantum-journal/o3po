@@ -724,6 +724,31 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         }
     }
 
+        /**
+         * Fake the author post link.
+         *
+         * To be added to the 'the_author_posts_link' filter.
+         *
+         * @since    0.1.0
+         * @access   pulic
+         * @param    string    $display_name   Display name to be filtered.
+         */
+    public function get_the_author_posts_link( $link ) {
+
+        global $post;
+
+        $post_id = $post->ID;
+        $post_type = get_post_type($post_id);
+
+        if ( $post_type === $this->get_publication_type_name() ) {
+            $slug = $this->get_publication_type_name_plural();
+            return '/' . $slug;
+        }
+        else
+        {
+            return $link;
+        }
+    }
 
         /**
          * Construct the content.
