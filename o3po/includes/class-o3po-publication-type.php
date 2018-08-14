@@ -781,10 +781,19 @@ abstract class O3PO_PublicationType {
          */
     public final function add_custom_post_types_to_query( $query ) {
 
+            //unify because $query->get('post_type') can be both an array or a string
         if(is_array($query->get('post_type')))
             $get_post_type_as_array = $query->get('post_type');
         else
             $get_post_type_as_array = array($query->get('post_type'));
+
+            //On the main query 'post' is not set
+        if ( is_home() && $query->is_main_query() )
+            $get_post_type_as_array = array_merge( $get_post_type_as_array, array('post'));
+
+            //only add custom post type to queries that contain regular 'post's
+        if(empty($get_post_type_as_array) or !in_array('post', $get_post_type_as_array))
+            return;
 
         if ( is_home() && $query->is_main_query() )
             $query->set( 'post_type', array_merge( $get_post_type_as_array, array($this->get_publication_type_name()) ) );
@@ -792,15 +801,6 @@ abstract class O3PO_PublicationType {
             $query->set( 'post_type', array_merge( $get_post_type_as_array, array($this->get_publication_type_name()) ) );
 
     }
-        /* Should we use query->get() here, make this non static and then only add the current post type? */
-        /*     /\* We want custom post types to appear in the main query. */
-        /*      * We do this my adding this function to the 'pre_get_posts' hook. *\/ */
-        /* public static final function add_custom_post_types_to_query( $query ) { */
-        /*     if ( is_home() && $query->is_main_query() ) */
-        /*         $query->set( 'post_type', array_merge( array( 'post' ) , static::get_active_publication_type_names() ) ); */
-        /*     if( is_category() )  */
-        /*         $query->set( 'post_type', array_merge( array( 'nav_menu_item', 'post' ) , static::get_active_publication_type_names() ) ); */
-        /* } */
 
         /**
          * Add the custom post type of this publication to the rss feed.
@@ -817,7 +817,6 @@ abstract class O3PO_PublicationType {
             $query['post_type'] = array_merge( array( 'post' ), array($this->get_publication_type_name()) );
         return $query;
     }
-        /* Should we use query->get() here, make this non static and then only add the current post type? */
         /*     /\* We want custom posts to appear in the rss feed. We do this by */
         /*      * adding this function to the 'request' filter.*\/ */
         /* public static final function add_custom_post_types_to_rss_feed($qv) { */
