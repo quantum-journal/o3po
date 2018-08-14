@@ -411,10 +411,26 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 
         $command .= ' ' . escapeshellarg($path);
 
-        exec($command, $output, $exit_code); // We can not use escapeshellcmd() here as it escapes even the content of arguments enclosed in '' and this breaks things. In PHP safe mode escapeshellcmd() is forcefully run inside exec(), which is why we cannot add licencing information in safe mode.
+        try
+        {
+            exec($command, $output, $exit_code); // We can not use escapeshellcmd() here as it escapes even the content of arguments enclosed in '' and this breaks things. In PHP safe mode escapeshellcmd() is forcefully run inside exec(), which is why we cannot add licencing information in safe mode.
+        } catch (Exception $e) {
+            return "ERROR: Running exiftool resulted in the exception: " + $e->getText();
+        }
 
-        if($exit_code!=0)
+        if($exit_code != 0)
             return "ERROR: Exiftool (" . $command . ") finished with exit code=" . $exit_code . " for file " . $path . " the output was: " . implode($output," ");
+        else {
+            $command  = $exiftool_binary_path;
+            $command .= ' -delete_original!';
+            $command .= ' ' . escapeshellarg($path);
+            try
+            {
+                exec($command, $output, $exit_code);
+            } catch (Exception $e) {
+                return "ERROR: Running exiftool to delete temporary files resulted in the exception: " + $e->getText();
+            }
+        }
 
         return "INFO: Licensing information (" . $this->get_journal_property('license_type') . ' ' . $this->get_journal_property('license_version') . ") and meta-data of " . $path . " added/updated";
     }
