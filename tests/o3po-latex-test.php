@@ -239,4 +239,35 @@ ab' , 'äb'],
     }
 
 
+    public function normalize_whitespace_and_linebreak_characters_provider() {
+        return [
+            [["abc", true] , "abc"],
+            [["a \t c", true] , "a c"],
+            [["ab  c  ", true] , "ab c"],
+            [["  a  bc", true] , "a bc"],
+            [["ab\nc", false] , "ab\nc"],
+            [["ab\nc", true] , "ab c"],
+            [["ab\\newline c", true] , "ab c"],
+            [["ab\\newline c", False] , "ab\nc"],
+            [["ab\\linebreak c", true] , "ab c"],
+            [["ab\\linebreak c", False] , "ab\nc"],
+            [["ab\\\\ c", true] , "ab c"],
+            [["ab\\\\ c", False] , "ab\nc"],
+            [["ab\\newlinec", false] , "ab\\newlinec"],
+            [["ab\\newlinec", true] , "ab\\newlinec"],
+            [["ab\\newline", false] , "ab\n"],
+            [["\\newline ab", false] , "\nab"],
+            [["a\\\\b", false] , "a\nb"],
+            [["a\\\\\\newline b", false] , "a\n\nb"],
+            [["a\\hspace{2cm}b", false] , "a b"],
+                ];
+    }
+
+        /**
+         * @dataProvider normalize_whitespace_and_linebreak_characters_provider
+         */
+    public function test_normalize_whitespace_and_linebreak_characters( $input, $expected ) {
+        $this->assertSame($expected, O3PO_Latex::normalize_whitespace_and_linebreak_characters($input[0], $input[1]));
+    }
+
 }

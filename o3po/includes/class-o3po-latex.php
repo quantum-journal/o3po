@@ -1327,4 +1327,32 @@ class O3PO_Latex_Dictionary_Provider
         return $text;
     }
 
+        /**
+         * Normalized white space and line break characters.
+         *
+         * @sine     0.2.2+
+         * @access   public
+         * @param    string   $text          LaTeX text to normalize.
+         * @param    string   $single_line   Whether to output a single-line text.
+         */
+    static public function normalize_whitespace_and_linebreak_characters( $text, $single_line=true) {
+
+        foreach(array(
+                    '\\\\\\\\( *|\s*\[.*?\])' => "\n",
+                    '\\\\linebreak(?![a-zA-Z]) *' => "\n",
+                    '\\\\newline(?![a-zA-Z]) *' => "\n",
+                    '\\\\(hfill|break|smallskip|medskip|bigskip)(?![a-zA-Z]) *'  => "\n",
+                    '\\\\(h|v)space\s*{.*?} *' => " ",
+                      ) as $target => $replacement )
+            $text = preg_replace('#' . $target . '#', $replacement, $text);
+
+        if($single_line)
+            $text = str_replace("\n", ' ', $text);
+
+        $text = preg_replace('#\t#', ' ', $text);
+        $text = trim(preg_replace('#  +#', ' ', $text), ' ');
+
+        return $text;
+    }
+
 }
