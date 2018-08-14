@@ -260,7 +260,7 @@ class O3PO_Environment {
          * @param    string    $path    Path to file/folder to delete.
          * @param    string    $root    Root folder to which to restric the deleting.
          * */
-    public function save_recursive_remove_dir( $path, $root ) {
+    public static function save_recursive_remove_dir( $path, $root ) {
 
         $path = rtrim($path, '/').'/';
         $root = rtrim($root, '/').'/';
