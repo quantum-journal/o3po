@@ -1352,7 +1352,7 @@ class O3PO_Latex_Dictionary_Provider
         /**
          * Normalized white space and line break characters.
          *
-         * @sine     0.2.2+
+         * @since    0.2.2+
          * @access   public
          * @param    string   $text          LaTeX text to normalize.
          * @param    string   $single_line   Whether to output a single-line text.
