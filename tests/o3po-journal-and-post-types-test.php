@@ -984,7 +984,14 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             [dirname(__FILE__) . '/resources/arxiv/1711.04662v3.tar.gz', "application/gzip", array()],
             [dirname(__FILE__) . '/resources/arxiv/0809.2542v4.tar.gz', "application/x-tar", array()],
             [dirname(__FILE__) . '/resources/arxiv/1708.05489v2.tar.gz', "application/gz", array()],
-            [dirname(__FILE__) . '/resources/arxiv/0908.2921v2.tex', "text/tex", array()],
+            [dirname(__FILE__) . '/resources/arxiv/0908.2921v2.tex', "text/tex", array(
+                    "validation_result" => '#Found BibTeX or manually formated bibliograph#',
+                    #"author_latex_macro_definitions" => '#\\\\newcommand{\\\\bra}#',
+                        /*"author_orcids" => , */
+                    "author_affiliations" => '#1#',
+                    "affiliations" => '#Fakultät für Physik und Astronomie, Universität Würzburg, Am Hubland, 97074 Würzburg, Germany#',
+                    "bbl" => '#\\\\begin{thebibliography}#',
+                                                                                       )],
 
             ];
     }
@@ -1003,9 +1010,22 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         $parse_publication_source_result = $method->invokeArgs($primary_publication_type, array($path_source, $mime_type));
 
-        $bbl = $parse_publication_source_result['bbl'];
-
-        echo("\n\n" . $bbl . "\n\n");
+        foreach(array("validation_result","author_latex_macro_definitions","author_orcids","author_affiliations","affiliations","bbl") as $key)
+        {
+            if(isset($expectation[$key]))
+            {
+                if(is_array($parse_publication_source_result[$key]))
+                    $result = implode("###", $parse_publication_source_result[$key]);
+                else
+                    $result = $parse_publication_source_result[$key];
+                if(!is_array($expectation[$key]))
+                    $expectations = array($expectation[$key]);
+                else
+                    $expectations = $expectation[$key] ;
+                foreach($expectations as $expect)
+                    $this->assertRegexp($expect, $result);
+            }
+        }
 
         echo(json_encode($parse_publication_source_result));
 
