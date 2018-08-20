@@ -983,6 +983,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         return [
             [dirname(__FILE__) . '/resources/arxiv/1711.04662v3.tar.gz', "application/gzip", array()],
             [dirname(__FILE__) . '/resources/arxiv/0809.2542v4.tar.gz', "application/x-tar", array()],
+            [dirname(__FILE__) . '/resources/arxiv/1708.05489v2.tar.gz', "application/gz", array()],
             [dirname(__FILE__) . '/resources/arxiv/0908.2921v2.tex', "text/tex", array()],
 
             ];

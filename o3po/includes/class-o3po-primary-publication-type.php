@@ -1231,12 +1231,12 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 
         $bbl = '';
 
-        preg_match('/(\\\\begin{thebibliography}.*?\\\\end{thebibliography}|\\\\begin{references}.*?\\\\end{references})/s', $latex, $bib);
-        if(!empty($bib[0])) {
+        preg_match_all('/(\\\\begin{thebibliography}.*?\\\\end{thebibliography}|\\\\begin{references}.*?\\\\end{references})/s', $latex, $mathes, PREG_PATTERN_ORDER);
+        if(!empty($mathes[0])) {
             $i = 0;
-            while(isset($bib[$i]))
+            while(isset($mathes[0][$i]))
             {
-                $bbl .= $bib[$i] . "\n";
+                $bbl .= $mathes[0][$i] . "\n";
                 $i++;
             }
             return $bbl;
