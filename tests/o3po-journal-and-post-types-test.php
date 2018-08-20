@@ -974,6 +974,43 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $secondary_publication_type->add_custom_post_types_to_query( new WP_Query() );
     }
 
+
+
+
+    public function parse_publication_source_provider() {
+        $settings = O3PO_Settings::instance();
+
+        return [
+            [dirname(__FILE__) . '/resources/arxiv/1711.04662v3.tar.gz', "application/gzip", array()],
+            [dirname(__FILE__) . '/resources/arxiv/0809.2542v4.tar.gz', "application/x-tar", array()],
+            [dirname(__FILE__) . '/resources/arxiv/0908.2921v2.tex', "text/tex", array()],
+
+            ];
+    }
+
+        /**
+         * @runInSeparateProcess
+         * @preserveGlobalState disabled
+         * @dataProvider parse_publication_source_provider
+         * @depends test_create_primary_publication_type
+         */
+    public function test_parse_publication_source( $path_source, $mime_type, $expectation, $primary_publication_type ) {
+
+        $class = new ReflectionClass('O3PO_PrimaryPublicationType');
+        $method = $class->getMethod('parse_publication_source');
+        $method->setAccessible(true);
+
+        $parse_publication_source_result = $method->invokeArgs($primary_publication_type, array($path_source, $mime_type));
+
+        $bbl = $parse_publication_source_result['bbl'];
+
+        echo("\n\n" . $bbl . "\n\n");
+
+        echo(json_encode($parse_publication_source_result));
+
+    }
+
+
         /**
          * @doesNotPerformAssertions
          */
