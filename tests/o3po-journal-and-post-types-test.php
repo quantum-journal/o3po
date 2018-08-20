@@ -985,7 +985,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             [dirname(__FILE__) . '/resources/arxiv/0809.2542v4.tar.gz', "application/x-tar", array()],
             [dirname(__FILE__) . '/resources/arxiv/1708.05489v2.tar.gz', "application/gz", array()],
             [dirname(__FILE__) . '/resources/arxiv/0908.2921v2.tex', "text/tex", array(
-                    "validation_result" => '#Found BibTeX or manually formated bibliograph#',
+                    "validation_result" => array('#Found BibTeX or manually formated bibliograph#', '#Affiliations, ORCIDs, and author URLs updated from arxiv#'),
                     #"author_latex_macro_definitions" => '#\\\\newcommand{\\\\bra}#',
                         /*"author_orcids" => , */
                     "author_affiliations" => '#1#',
