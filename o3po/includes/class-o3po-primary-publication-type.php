@@ -1266,11 +1266,34 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $new_author_orcids = array();
         $new_author_affiliations = array();
         $new_affiliations = array();
+        $new_author_latex_macro_definitions = array();
 
         try {
             if ( preg_match('#text/.*tex#', $mime_type) && substr($path_source, -4) === '.tex' ) // We got a single file
                 $source_files = array(new SplFileInfo($path_source));
             else if ( preg_match('#application/.*(tar|gz|gzip)#', $mime_type) && substr($path_source, -7) === '.tar.gz' ) { // We got an archive
+
+                    /**
+                     * PHP cannot correctly handle file names with dots, see this bug: https://bugs.php.net/bug.php?id=58852
+                     * Thus, if the filename contains dots, we need to copy the source file to a new, not already exisiting file without additional dots in the name.
+                     * In the following we rely on the fact that we know that the path ends with '.tar.gz'.
+                     */
+                $basename = pathinfo($path_source, PATHINFO_BASENAME);
+                $basename_without_tar_gz = substr($basename, 0, -7);
+                $path_source_copy_to_unlik_later = Null;
+                if(strpos($basename_without_tar_gz, '.') !== false)
+                {
+                    $orig_path_source = $path_source;
+                    $extra = 0;
+                    while(file_exists($path_source)) {
+                        $path_source = pathinfo($path_source, PATHINFO_DIRNAME) . '/' . str_replace('.', '_', $basename_without_tar_gz) . ($extra === 0 ? '' : '-' . $extra) . '.tar.gz';
+
+                        $extra += 1;
+                    }
+                    copy($orig_path_source, $path_source);
+                    $path_source_copy_to_unlik_later = $path_source;
+                }
+
                     //Unpack
                 $path_tar = preg_replace('/\.gz$/', '', $path_source);
                 $path_folder = preg_replace('/\.tar$/', '', $path_tar) . '_extracted/';
@@ -1279,6 +1302,9 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                 $phar_gz->decompress(); // *.tar.gz -> *.tar
                 $phar_tar = new PharData($path_tar);
                 $phar_tar->extractTo($path_folder);
+
+                if(!empty($path_source_copy_to_unlik_later))
+                    unlink($path_source_copy_to_unlik_later);
 
                 $source_files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator($path_folder, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
             } else {
@@ -1296,16 +1322,19 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                     $author_latex_macro_definitions_from_this_file = O3PO_Latex::extract_latex_macros($filecontents_without_comments);
                     if(!empty($author_latex_macro_definitions_from_this_file))
                     {
-                        if(!isset($new_author_latex_macro_definitions))
-                            $new_author_latex_macro_definitions = array();
                         $new_author_latex_macro_definitions = array_merge_recursive($new_author_latex_macro_definitions, $author_latex_macro_definitions_from_this_file);
                     }
 
                         //Look for bibliographies and extract them
-                    $bbl .= $this->extract_bibliographies($filecontents_without_comments);//we search the file with comments removed to not accidentially pic up a commented out bibliography
-                    if(!empty($bbl)) {
+                    $thisbbl = $this->extract_bibliographies($filecontents_without_comments);//we search the file with comments removed to not accidentially pic up a commented out bibliography
+                    if(!empty($thisbbl)) {
                         $validation_result .= "REVIEW: Found BibTeX or manually formated bibliographic information in " . $entry->getPathname() . ".\n";
-                    } else if( substr($entry->getPathname(), -4) === '.bbl' && strpos( $filecontents, 'biblatex auxiliary file' ) != false )  {
+                        if(!empty($bbl))
+                            $bbl .= "\n";
+                        $bbl .= $thisbbl;
+                    } else if( substr($entry->getPathname(), -4) === '.bbl' && strpos( $filecontents, 'biblatex auxiliary file' ) !== false )  {
+                        if(!empty($bbl))
+                            $bbl .= "\n";
                         $bbl .= $filecontents . "\n";//here comments must be preserved as they contain clues for parsing
                         $validation_result .= "REVIEW: Found BibLaTeX formated bibliographic information in " . $entry . "\n";
                     }
