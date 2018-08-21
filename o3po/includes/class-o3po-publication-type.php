@@ -1715,6 +1715,11 @@ abstract class O3PO_PublicationType {
                 echo '<div style="color:' . $color . ';">' . esc_html($line) . '</div>';
             }
             echo "</div></div>";
+
+            if( get_post_status( $post_id ) === 'publish' && strpos($validation_result, 'ERROR') !== false )
+            {
+                echo '<script>alert("There were ERRORs during the final stage of the publication of this post. Please check.");</script>';
+            }
         }
 
     }
