@@ -1231,12 +1231,12 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 
         $bbl = '';
 
-        preg_match('/(\\\\begin{thebibliography}.*?\\\\end{thebibliography}|\\\\begin{references}.*?\\\\end{references})/s', $latex, $bib);
-        if(!empty($bib[0])) {
+        preg_match_all('/(\\\\begin{thebibliography}.*?\\\\end{thebibliography}|\\\\begin{references}.*?\\\\end{references})/s', $latex, $mathes, PREG_PATTERN_ORDER);
+        if(!empty($mathes[0])) {
             $i = 0;
-            while(isset($bib[$i]))
+            while(isset($mathes[0][$i]))
             {
-                $bbl .= $bib[$i] . "\n";
+                $bbl .= $mathes[0][$i] . "\n";
                 $i++;
             }
             return $bbl;
@@ -1266,19 +1266,49 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $new_author_orcids = array();
         $new_author_affiliations = array();
         $new_affiliations = array();
+        $new_author_latex_macro_definitions = array();
 
         try {
             if ( preg_match('#text/.*tex#', $mime_type) && substr($path_source, -4) === '.tex' ) // We got a single file
                 $source_files = array(new SplFileInfo($path_source));
             else if ( preg_match('#application/.*(tar|gz|gzip)#', $mime_type) && substr($path_source, -7) === '.tar.gz' ) { // We got an archive
-                    //Unpack
-                $path_tar = preg_replace('/\.gz$/', '', $path_source);
-                $path_folder = preg_replace('/\.tar$/', '', $path_tar) . '_extracted/';
 
-                $phar_gz = new PharData($path_source);
-                $phar_gz->decompress(); // *.tar.gz -> *.tar
-                $phar_tar = new PharData($path_tar);
-                $phar_tar->extractTo($path_folder);
+                    /**
+                     * PHP cannot correctly handle file names with dots, see this bug: https://bugs.php.net/bug.php?id=58852
+                     * Thus, if the filename contains dots, we need to copy the source file to a new, not already exisiting file without additional dots in the name.
+                     * In the following we rely on the fact that we know that the path ends with '.tar.gz'.
+                     */
+                try
+                {
+                    $basename = pathinfo($path_source, PATHINFO_BASENAME);
+                    $basename_without_tar_gz = substr($basename, 0, -7);
+                    $path_source_copy_to_unlik_later = Null;
+                    if(strpos($basename_without_tar_gz, '.') !== false)
+                    {
+                        $orig_path_source = $path_source;
+                        $extra = 0;
+                        while(file_exists($path_source)) {
+                            $path_source = pathinfo($path_source, PATHINFO_DIRNAME) . '/' . str_replace('.', '_', $basename_without_tar_gz) . ($extra === 0 ? '' : '-' . $extra) . '.tar.gz';
+
+                            $extra += 1;
+                        }
+                        copy($orig_path_source, $path_source);
+                        $path_source_copy_to_unlik_later = $path_source;
+                    }
+
+                        //Unpack
+                    $path_tar = preg_replace('/\.gz$/', '', $path_source);
+                    $path_folder = preg_replace('/\.tar$/', '', $path_tar) . '_extracted/';
+
+                    $phar_gz = new PharData($path_source);
+                    $phar_gz->decompress(); // *.tar.gz -> *.tar
+                    $phar_tar = new PharData($path_tar);
+                    $phar_tar->extractTo($path_folder);
+
+                } finally {
+                    if(!empty($path_source_copy_to_unlik_later))
+                        unlink($path_source_copy_to_unlik_later);
+                }
 
                 $source_files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator($path_folder, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
             } else {
@@ -1296,38 +1326,53 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                     $author_latex_macro_definitions_from_this_file = O3PO_Latex::extract_latex_macros($filecontents_without_comments);
                     if(!empty($author_latex_macro_definitions_from_this_file))
                     {
-                        if(!isset($new_author_latex_macro_definitions))
-                            $new_author_latex_macro_definitions = array();
                         $new_author_latex_macro_definitions = array_merge_recursive($new_author_latex_macro_definitions, $author_latex_macro_definitions_from_this_file);
                     }
 
                         //Look for bibliographies and extract them
-                    $bbl .= $this->extract_bibliographies($filecontents_without_comments);//we search the file with comments removed to not accidentially pic up a commented out bibliography
-                    if(!empty($bbl)) {
+                    $thisbbl = $this->extract_bibliographies($filecontents_without_comments);//we search the file with comments removed to not accidentially pic up a commented out bibliography
+                    if(!empty($thisbbl)) {
                         $validation_result .= "REVIEW: Found BibTeX or manually formated bibliographic information in " . $entry->getPathname() . ".\n";
-                    } else if( substr($entry->getPathname(), -4) === '.bbl' && strpos( $filecontents, 'biblatex auxiliary file' ) != false )  {
+                        if(!empty($bbl))
+                            $bbl .= "\n";
+                        $bbl .= $thisbbl;
+                    } else if( substr($entry->getPathname(), -4) === '.bbl' && strpos( $filecontents, 'biblatex auxiliary file' ) !== false )  {
+                        if(!empty($bbl))
+                            $bbl .= "\n";
                         $bbl .= $filecontents . "\n";//here comments must be preserved as they contain clues for parsing
                         $validation_result .= "REVIEW: Found BibLaTeX formated bibliographic information in " . $entry . "\n";
                     }
                 }
             }
+
+            $new_author_orcids = array();
+            $new_author_urls = array();
+            $new_author_affiliations = array();
+            $new_affiliations = array();
+            $author_number = -1;
+            $authors_since_last_affiliation = array();
+
             foreach($source_files as $entry ) {
                 if($entry->isFile() && ( substr($entry->getPathname(), -4) === '.tex' ) )
                 {
+                    $filecontents = $this->environment->file_get_contents_utf8($entry->getPathname());
+                    $filecontents_without_comments = preg_replace('#(?<!\\\\)%.*#', '', $filecontents);//remove all comments
+
                         // Extract author, affiliation and similar information from the source
-                    preg_match_all('#\\\\(author|affiliation|affil|orcid|homepage)([^{]*)(?=\{((?:[^{}]++|\{(?3)\})*)\})#', $filecontents_without_comments, $author_info);//matches balanced parenthesis (Note the use of (?3) here!) to test changes go here https://regex101.com/r/bVHadc/1
-                    if(!empty($author_info[0]) && !empty($author_info[3]))
+                    preg_match_all('#\\\\(author|affiliation|affil|orcid|homepage)\s*([^{]*)\s*(?=\{((?:[^{}]++|\{(?3)\})*)\})#', $filecontents_without_comments, $author_info);//matches balanced parenthesis (Note the use of (?3) here!) to test changes go here https://regex101.com/r/bVHadc/1
+                    if(!empty($author_info[0]) && !empty($author_info[1]))
                     {
-                        $validation_result .= "REVIEW: Affiliations, ORCIDs, and author URLs updated from arxiv source. Please check.\n";
+                        if($author_number !== -1)
+                            $validation_result .= "WARNING: Found affiliations, ORCIDs, or author URLs in more than one file. Please check.\n";
 
-                        $new_author_orcids = array();
-                        $new_author_urls = array();
-                        $new_author_affiliations = array();
-                        $new_affiliations = array();
-                        $author_number = -1;
-                        $authors_since_last_affiliation = array();
+                        if(in_array('author', $author_info[1]) or in_array('affiliation', $author_info[1]) or in_array('affil', $author_info[1]))
+                            $validation_result .= "REVIEW: Author and affiliations data updated from arxiv source. Please check.\n";
+                        if(in_array('orcid', $author_info[1]))
+                            $validation_result .= "REVIEW: ORCID data updated from arxiv source. Please check.\n";
+                        if(in_array('homepage', $author_info[1]))
+                            $validation_result .= "REVIEW: Author homepage data updated from arxiv source. Please check.\n";
+
                         $was_affiliation_since_last_author = false;
-
                         for($x = 0; $x < count($author_info[1]) ; $x++) {
                             if( $author_info[1][$x] === 'author')
                             {
@@ -1351,9 +1396,9 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                                         $new_author_affiliations[$author_number] = $affiliations_from_optional_argument[1][0];
                                 }
                             }
-                            else if( $author_info[1][$x] === 'orcid')
+                            else if( $author_info[1][$x] === 'orcid' and !empty($author_info[3][$x]))
                                 $new_author_orcids[$author_number] = $author_info[3][$x];
-                            else if( $author_info[1][$x] === 'homepage')
+                            else if( $author_info[1][$x] === 'homepage' and !empty($author_info[3][$x]))
                                 $new_author_urls[$author_number] = $author_info[3][$x];
                             else if( $author_info[1][$x] === 'affiliation' or $author_info[1][$x] === 'affil')
                             {
