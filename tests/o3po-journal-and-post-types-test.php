@@ -468,6 +468,8 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                     $expectations = $expectation[$key] ;
                 foreach($expectations as $expect)
                     $this->assertRegexp($expect, $result);
+
+                #echo("\n" . $result . "\n");
             }
         }
     }
@@ -827,7 +829,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                  '#ERROR: Unable to generate XML for Crossref#',
                  '#ERROR: Unable to generate JSON for DOAJ#',
                  '#ERROR: Unable to generate XML for CLOCKSS#',
-                 '#WARNING: Not yet published.#'
                    ),
              array(
                  '#ERROR: Eprint is empty\.#',
@@ -839,7 +840,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                  '#ERROR: Unable to generate XML for Crossref#',
                  '#ERROR: Unable to generate JSON for DOAJ#',
                  '#ERROR: Unable to generate XML for CLOCKSS#',
-                 '#WARNING: Not yet published.#'
              ),
              ],
             [5,
