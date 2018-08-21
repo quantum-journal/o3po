@@ -409,6 +409,69 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $this->assertSame($expected, $journal->pages_still_free_info( $post_id_to_exclude, $pages, array($primary_publication_type->get_publication_type_name()) ));
     }
 
+    public function parse_publication_source_provider() {
+        $settings = O3PO_Settings::instance();
+
+        return [
+            [dirname(__FILE__) . '/resources/arxiv/1711.04662v3.tar.gz', "application/gzip", array(
+                    "affiliations" => array('#Aix-Marseille Univ, Université de Toulon, CNRS, LIS, Marseille, and IXXI, Lyon, France#', '#Aix-Marseille Univ, Université de Toulon, CNRS, LIS, Marseille, France and Departamento de Física Teórica and IFIC, Universidad de Valencia-CSIC, Dr. Moliner 50, 46100-Burjassot, Spain#', '#Aix-Marseille Univ, Université de Toulon, CNRS, LIS, Marseille, France#'),
+                    "validation_result" => array("#REVIEW: Found BibTeX or manually formated bibliographic information#", "#REVIEW: Author homepage data updated from arxiv source#"),
+                    "bbl" => array('#\\\\begin{thebibliography}#', '#ahlbrecht2012molecular#', '#venegas2012quantum#'),
+            )],
+            [dirname(__FILE__) . '/resources/arxiv/0809.2542v4.tar.gz', "application/x-tar", array(
+                    "validation_result" => "#REVIEW: Found BibTeX or manually formated bibliographic information#",
+                    "author_affiliations" => '#1#',
+                    "affiliations" => '#Fakultät für Physik und Astronomie, Universität Würzburg, Am Hubland, 97074 Würzburg, Germany#',
+                    "bbl" => array('#\\\\begin{thebibliography}#', '#DeGennes#', '#Ising#'),
+            )],
+            [dirname(__FILE__) . '/resources/arxiv/1708.05489v2.tar.gz', "application/gz", array(
+                    "validation_result" => array("#REVIEW: Found BibTeX or manually formated bibliographic information#", '#REVIEW: Author and affiliations data updated from arxiv source.#'),
+                    "author_affiliations" => array('#1#', '#2#'),
+                    "affiliations" => array('#Institute of Theoretical Physics, Faculty of Physics, University of Warsaw, Pasteura 5, 02-093 Warsaw, Poland#', '#Department of Physics, Saint Anselm College, Manchester, NH 03102, USA#'),
+                    "bbl" => array('#\\\\begin{thebibliography}#', '#\\[Abdolrahimi\\(2014\\)\\]{Abdolrahimi:2014aa}#', '#\\\\end{thebibliography}#'),                                                                             )],
+            [dirname(__FILE__) . '/resources/arxiv/0908.2921v2.tex', "text/tex", array(
+                    "validation_result" => array('#Found BibTeX or manually formated bibliograph#', '#Author and affiliations data updated from arxiv source#'),
+                    #"author_latex_macro_definitions" => '#\\\\newcommand{\\\\bra}#',
+                        /*"author_orcids" => , */
+                    "author_affiliations" => '#1#',
+                    "affiliations" => '#Fakultät für Physik und Astronomie, Universität Würzburg, Am Hubland, 97074 Würzburg, Germany#',
+                    "bbl" => '#\\\\begin{thebibliography}#',
+                                                                                       )],
+            ];
+    }
+
+        /**
+         * @runInSeparateProcess
+         * @preserveGlobalState disabled
+         * @dataProvider parse_publication_source_provider
+         * @depends test_create_primary_publication_type
+         */
+    public function test_parse_publication_source( $path_source, $mime_type, $expectation, $primary_publication_type ) {
+
+        $class = new ReflectionClass('O3PO_PrimaryPublicationType');
+        $method = $class->getMethod('parse_publication_source');
+        $method->setAccessible(true);
+
+        $parse_publication_source_result = $method->invokeArgs($primary_publication_type, array($path_source, $mime_type));
+
+        foreach(array("validation_result","author_latex_macro_definitions","author_orcids","author_affiliations","affiliations","bbl") as $key)
+        {
+            if(isset($expectation[$key]))
+            {
+                if(is_array($parse_publication_source_result[$key]))
+                    $result = implode("###", $parse_publication_source_result[$key]);
+                else
+                    $result = $parse_publication_source_result[$key];
+                if(!is_array($expectation[$key]))
+                    $expectations = array($expectation[$key]);
+                else
+                    $expectations = $expectation[$key] ;
+                foreach($expectations as $expect)
+                    $this->assertRegexp($expect, $result);
+            }
+        }
+    }
+
     public function posts_for_validate_and_process_data_provider() {
         global $posts;
 
@@ -974,73 +1037,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $primary_publication_type->add_custom_post_types_to_query( new WP_Query() );
         $secondary_publication_type->add_custom_post_types_to_query( new WP_Query() );
     }
-
-    public function parse_publication_source_provider() {
-        $settings = O3PO_Settings::instance();
-
-        return [
-            [dirname(__FILE__) . '/resources/arxiv/1711.04662v3.tar.gz', "application/gzip", array(
-                    "affiliations" => array('#Aix-Marseille Univ, Université de Toulon, CNRS, LIS, Marseille, and IXXI, Lyon, France#', '#Aix-Marseille Univ, Université de Toulon, CNRS, LIS, Marseille, France and Departamento de Física Teórica and IFIC, Universidad de Valencia-CSIC, Dr. Moliner 50, 46100-Burjassot, Spain#', '#Aix-Marseille Univ, Université de Toulon, CNRS, LIS, Marseille, France#'),
-                    "validation_result" => array("#REVIEW: Found BibTeX or manually formated bibliographic information#", "#REVIEW: Author homepage data updated from arxiv source#"),
-                    "bbl" => array('#\\\\begin{thebibliography}#', '#ahlbrecht2012molecular#', '#venegas2012quantum#'),
-            )],
-            [dirname(__FILE__) . '/resources/arxiv/0809.2542v4.tar.gz', "application/x-tar", array(
-                    "validation_result" => "#REVIEW: Found BibTeX or manually formated bibliographic information#",
-                    "author_affiliations" => '#1#',
-                    "affiliations" => '#Fakultät für Physik und Astronomie, Universität Würzburg, Am Hubland, 97074 Würzburg, Germany#',
-                    "bbl" => array('#\\\\begin{thebibliography}#', '#DeGennes#', '#Ising#'),
-            )],
-            [dirname(__FILE__) . '/resources/arxiv/1708.05489v2.tar.gz', "application/gz", array(
-                    "validation_result" => array("#REVIEW: Found BibTeX or manually formated bibliographic information#", '#REVIEW: Author and affiliations data updated from arxiv source.#'),
-                    "author_affiliations" => array('#1#', '#2#'),
-                    "affiliations" => array('#Institute of Theoretical Physics, Faculty of Physics, University of Warsaw, Pasteura 5, 02-093 Warsaw, Poland#', '#Department of Physics, Saint Anselm College, Manchester, NH 03102, USA#'),
-                    "bbl" => array('#\\\\begin{thebibliography}#', '#\\[Abdolrahimi\\(2014\\)\\]{Abdolrahimi:2014aa}#', '#\\\\end{thebibliography}#'),                                                                             )],
-            [dirname(__FILE__) . '/resources/arxiv/0908.2921v2.tex', "text/tex", array(
-                    "validation_result" => array('#Found BibTeX or manually formated bibliograph#', '#Author and affiliations data updated from arxiv source#'),
-                    #"author_latex_macro_definitions" => '#\\\\newcommand{\\\\bra}#',
-                        /*"author_orcids" => , */
-                    "author_affiliations" => '#1#',
-                    "affiliations" => '#Fakultät für Physik und Astronomie, Universität Würzburg, Am Hubland, 97074 Würzburg, Germany#',
-                    "bbl" => '#\\\\begin{thebibliography}#',
-                                                                                       )],
-            ];
-    }
-
-        /**
-         * @runInSeparateProcess
-         * @preserveGlobalState disabled
-         * @dataProvider parse_publication_source_provider
-         * @depends test_create_primary_publication_type
-         */
-    public function test_parse_publication_source( $path_source, $mime_type, $expectation, $primary_publication_type ) {
-
-        $class = new ReflectionClass('O3PO_PrimaryPublicationType');
-        $method = $class->getMethod('parse_publication_source');
-        $method->setAccessible(true);
-
-        $parse_publication_source_result = $method->invokeArgs($primary_publication_type, array($path_source, $mime_type));
-
-        foreach(array("validation_result","author_latex_macro_definitions","author_orcids","author_affiliations","affiliations","bbl") as $key)
-        {
-            if(isset($expectation[$key]))
-            {
-                if(is_array($parse_publication_source_result[$key]))
-                    $result = implode("###", $parse_publication_source_result[$key]);
-                else
-                    $result = $parse_publication_source_result[$key];
-                if(!is_array($expectation[$key]))
-                    $expectations = array($expectation[$key]);
-                else
-                    $expectations = $expectation[$key] ;
-                foreach($expectations as $expect)
-                    $this->assertRegexp($expect, $result);
-            }
-        }
-
-        echo(json_encode($parse_publication_source_result));
-
-    }
-
 
         /**
          * @doesNotPerformAssertions
