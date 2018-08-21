@@ -1278,33 +1278,37 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                      * Thus, if the filename contains dots, we need to copy the source file to a new, not already exisiting file without additional dots in the name.
                      * In the following we rely on the fact that we know that the path ends with '.tar.gz'.
                      */
-                $basename = pathinfo($path_source, PATHINFO_BASENAME);
-                $basename_without_tar_gz = substr($basename, 0, -7);
-                $path_source_copy_to_unlik_later = Null;
-                if(strpos($basename_without_tar_gz, '.') !== false)
+                try
                 {
-                    $orig_path_source = $path_source;
-                    $extra = 0;
-                    while(file_exists($path_source)) {
-                        $path_source = pathinfo($path_source, PATHINFO_DIRNAME) . '/' . str_replace('.', '_', $basename_without_tar_gz) . ($extra === 0 ? '' : '-' . $extra) . '.tar.gz';
+                    $basename = pathinfo($path_source, PATHINFO_BASENAME);
+                    $basename_without_tar_gz = substr($basename, 0, -7);
+                    $path_source_copy_to_unlik_later = Null;
+                    if(strpos($basename_without_tar_gz, '.') !== false)
+                    {
+                        $orig_path_source = $path_source;
+                        $extra = 0;
+                        while(file_exists($path_source)) {
+                            $path_source = pathinfo($path_source, PATHINFO_DIRNAME) . '/' . str_replace('.', '_', $basename_without_tar_gz) . ($extra === 0 ? '' : '-' . $extra) . '.tar.gz';
 
-                        $extra += 1;
+                            $extra += 1;
+                        }
+                        copy($orig_path_source, $path_source);
+                        $path_source_copy_to_unlik_later = $path_source;
                     }
-                    copy($orig_path_source, $path_source);
-                    $path_source_copy_to_unlik_later = $path_source;
+
+                        //Unpack
+                    $path_tar = preg_replace('/\.gz$/', '', $path_source);
+                    $path_folder = preg_replace('/\.tar$/', '', $path_tar) . '_extracted/';
+
+                    $phar_gz = new PharData($path_source);
+                    $phar_gz->decompress(); // *.tar.gz -> *.tar
+                    $phar_tar = new PharData($path_tar);
+                    $phar_tar->extractTo($path_folder);
+
+                } finally {
+                    if(!empty($path_source_copy_to_unlik_later))
+                        unlink($path_source_copy_to_unlik_later);
                 }
-
-                    //Unpack
-                $path_tar = preg_replace('/\.gz$/', '', $path_source);
-                $path_folder = preg_replace('/\.tar$/', '', $path_tar) . '_extracted/';
-
-                $phar_gz = new PharData($path_source);
-                $phar_gz->decompress(); // *.tar.gz -> *.tar
-                $phar_tar = new PharData($path_tar);
-                $phar_tar->extractTo($path_folder);
-
-                if(!empty($path_source_copy_to_unlik_later))
-                    unlink($path_source_copy_to_unlik_later);
 
                 $source_files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator($path_folder, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
             } else {
