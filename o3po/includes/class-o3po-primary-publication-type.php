@@ -1340,23 +1340,35 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                     }
                 }
             }
+
+            $new_author_orcids = array();
+            $new_author_urls = array();
+            $new_author_affiliations = array();
+            $new_affiliations = array();
+            $author_number = -1;
+            $authors_since_last_affiliation = array();
+
             foreach($source_files as $entry ) {
                 if($entry->isFile() && ( substr($entry->getPathname(), -4) === '.tex' ) )
                 {
+                    $filecontents = $this->environment->file_get_contents_utf8($entry->getPathname());
+                    $filecontents_without_comments = preg_replace('#(?<!\\\\)%.*#', '', $filecontents);//remove all comments
+
                         // Extract author, affiliation and similar information from the source
-                    preg_match_all('#\\\\(author|affiliation|affil|orcid|homepage)([^{]*)(?=\{((?:[^{}]++|\{(?3)\})*)\})#', $filecontents_without_comments, $author_info);//matches balanced parenthesis (Note the use of (?3) here!) to test changes go here https://regex101.com/r/bVHadc/1
-                    if(!empty($author_info[0]) && !empty($author_info[3]))
+                    preg_match_all('#\\\\(author|affiliation|affil|orcid|homepage)\s*([^{]*)\s*(?=\{((?:[^{}]++|\{(?3)\})*)\})#', $filecontents_without_comments, $author_info);//matches balanced parenthesis (Note the use of (?3) here!) to test changes go here https://regex101.com/r/bVHadc/1
+                    if(!empty($author_info[0]) && !empty($author_info[1]))
                     {
-                        $validation_result .= "REVIEW: Affiliations, ORCIDs, and author URLs updated from arxiv source. Please check.\n";
+                        if($author_number !== -1)
+                            $validation_result .= "WARNING: Found affiliations, ORCIDs, or author URLs in more than one file. Please check.\n";
 
-                        $new_author_orcids = array();
-                        $new_author_urls = array();
-                        $new_author_affiliations = array();
-                        $new_affiliations = array();
-                        $author_number = -1;
-                        $authors_since_last_affiliation = array();
+                        if(in_array('author', $author_info[1]) or in_array('affiliation', $author_info[1]) or in_array('affil', $author_info[1]))
+                            $validation_result .= "REVIEW: Author and affiliations data updated from arxiv source. Please check.\n";
+                        if(in_array('orcid', $author_info[1]))
+                            $validation_result .= "REVIEW: ORCID data updated from arxiv source. Please check.\n";
+                        if(in_array('homepage', $author_info[1]))
+                            $validation_result .= "REVIEW: Author homepage data updated from arxiv source. Please check.\n";
+
                         $was_affiliation_since_last_author = false;
-
                         for($x = 0; $x < count($author_info[1]) ; $x++) {
                             if( $author_info[1][$x] === 'author')
                             {
@@ -1380,9 +1392,9 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                                         $new_author_affiliations[$author_number] = $affiliations_from_optional_argument[1][0];
                                 }
                             }
-                            else if( $author_info[1][$x] === 'orcid')
+                            else if( $author_info[1][$x] === 'orcid' and !empty($author_info[3][$x]))
                                 $new_author_orcids[$author_number] = $author_info[3][$x];
-                            else if( $author_info[1][$x] === 'homepage')
+                            else if( $author_info[1][$x] === 'homepage' and !empty($author_info[3][$x]))
                                 $new_author_urls[$author_number] = $author_info[3][$x];
                             else if( $author_info[1][$x] === 'affiliation' or $author_info[1][$x] === 'affil')
                             {
