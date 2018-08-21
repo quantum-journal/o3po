@@ -277,7 +277,7 @@ abstract class O3PO_PublicationType {
     }
 
         /**
-         * Init the meta box of the publication type and add hooks for its save action.
+         * Init the meta box for all publication types and add hooks for its save action.
          *
          * Normally all hooks should be added in class-o3po.php. This method is special
          * in that it adds two extra hooks. We do this, because we need to unhook one
@@ -287,7 +287,7 @@ abstract class O3PO_PublicationType {
          * @since      0.1.0
          * @access     public
          * */
-	public final function init_metabox() {
+	public static final function init_metabox() {
 
         foreach(self::$active_publication_types as $active_publication_type)
         {
@@ -389,96 +389,123 @@ abstract class O3PO_PublicationType {
         $this->save_meta_data($post_id);
 
             // Unhook this function to prevent infinite looping because in the remainder of this function we will be calling update_post() which triggers 'save_post'
-        remove_action( 'save_post', array( $this, 'save_metabox' ), 10, 2 );
+        try
+        {
+            remove_action( 'save_post', array( $this, 'save_metabox' ), 10, 2 );
 
-        $validation_result = $this->validate_and_process_data($post_id);
+            $validation_result = $this->validate_and_process_data($post_id);
 
+                /* Maybe it would be cleaner to move the two following generate
+                 * functions to validate_and_process_data(), but we need things
+                 * like the $doi_batch_id, wich we do not want to save
+                 * individually when uploading the meta data a little bit further
+                 * down, and then would need to pass these around...
+                 */
 
-            /* Maybe it would be cleaner to move the two following generate
-             * functions to validate_and_process_data(), but we need things
-             * like the $doi_batch_id, wich we do not want to save
-             * individually when uploading the meta data a little bit further
-             * down, and then would need to pass these around...
-             */
-
-            // Generate Crossref xml
-        $timestamp = time();
-        $doi_batch_id = $this->generate_crossref_xml_doi_batch_id($post_id, $timestamp);
-        $crossref_xml = $this->generate_crossref_xml($post_id, $doi_batch_id, $timestamp);
-        update_post_meta( $post_id, $post_type . '_crossref_xml', $crossref_xml );
-        if(strpos($crossref_xml, 'ERROR') !== false)
-            $validation_result .= $crossref_xml . "\n";
-
-            // Generate DOAJ json
-        $doaj_json = $this->generate_doaj_json($post_id);
-        update_post_meta( $post_id, $post_type . '_doaj_json', wp_slash($doaj_json) ); // see https://codex.wordpress.org/Function_Reference/update_post_meta for why we have to used wp_slash() here and not addslashes()
-        if(strpos($doaj_json, 'ERROR') !== false)
-            $validation_result .= $doaj_json . "\n";
+                // Generate Crossref xml
+            $timestamp = time();
+            $doi_batch_id = $this->generate_crossref_xml_doi_batch_id($post_id, $timestamp);
+            $crossref_xml = $this->generate_crossref_xml($post_id, $doi_batch_id, $timestamp);
+            update_post_meta( $post_id, $post_type . '_crossref_xml', $crossref_xml );
+            if(strpos($crossref_xml, 'ERROR') !== false)
+                $validation_result .= $crossref_xml . "\n";
 
 
-            // Generate CLOCKSS xml
-        $clockss_xml = $this->generate_clockss_xml($post_id);
-        update_post_meta( $post_id, $post_type . '_clockss_xml', wp_slash($clockss_xml) ); // see https://codex.wordpress.org/Function_Reference/update_post_meta for why we have to used wp_slash() here and not addslashes()
-        if(strpos($clockss_xml, 'ERROR') !== false)
-            $validation_result .= $clockss_xml . "\n";
+                // Generate DOAJ json
+            $doaj_json = $this->generate_doaj_json($post_id);
+            update_post_meta( $post_id, $post_type . '_doaj_json', wp_slash($doaj_json) ); // see https://codex.wordpress.org/Function_Reference/update_post_meta for why we have to used wp_slash() here and not addslashes()
+            if(strpos($doaj_json, 'ERROR') !== false)
+                $validation_result .= $doaj_json . "\n";
 
-        if( strpos($validation_result, 'ERROR') === false and strpos($validation_result, 'REVIEW') === false) {
 
-                //Upload meta-data to crossref
-            $crossref_url = (get_post_status($post_id) === 'publish' && !$this->environment->is_test_environment()) ? $this->get_journal_property('crossref_deposite_url') : $this->get_journal_property('crossref_test_deposite_url'); // Send it to the test system or the real system
-            $crossref_response = $this->upload_meta_data_to_crossref($doi_batch_id, $crossref_xml,
-                                                                     $this->get_journal_property('crossref_id'),
-                                                                     $this->get_journal_property('crossref_pw'),
-                                                                     $crossref_url
+                // Generate CLOCKSS xml
+            $clockss_xml = $this->generate_clockss_xml($post_id);
+            update_post_meta( $post_id, $post_type . '_clockss_xml', wp_slash($clockss_xml) ); // see https://codex.wordpress.org/Function_Reference/update_post_meta for why we have to used wp_slash() here and not addslashes()
+            if(strpos($clockss_xml, 'ERROR') !== false)
+                $validation_result .= $clockss_xml . "\n";
+
+                /*
+                 * Now we start interfacing with external services.
+                 *
+                 * We only do this if no errors have occurd and there are
+                 * no outstanding reviews.
+                 *
+                 * Crossref is the most critical and we hence we do it first.
+                 * We want the published status of the post to track the
+                 * registration of the DOI as closely as possible. Hence, if
+                 * there are any ERRORs or REVIEWs from before or during the
+                 * Crossref phase, we force the post private.
+                 */
+            try
+            {
+                if( strpos($validation_result, 'ERROR') === false and strpos($validation_result, 'REVIEW') === false) {
+
+                        //Upload meta-data to crossref
+                    $crossref_url = (get_post_status($post_id) === 'publish' && !$this->environment->is_test_environment()) ? $this->get_journal_property('crossref_deposite_url') : $this->get_journal_property('crossref_test_deposite_url'); // Send it to the test system or the real system
+                    $crossref_response = $this->upload_meta_data_to_crossref($doi_batch_id, $crossref_xml,
+                                                                             $this->get_journal_property('crossref_id'),
+                                                                             $this->get_journal_property('crossref_pw'),
+                                                                             $crossref_url
+                                                                             );
+                    update_post_meta( $post_id, $post_type . '_crossref_response', $crossref_response );
+                    if(!empty($crossref_response) && strpos($crossref_response, 'ERROR') !== false )
+                        $validation_result .= $crossref_response;
+                }
+            } catch(Exception $e) {
+                $validation_result .= "ERROR: There was an exception while registering the DOI with Corssres: " . $e->getMessage() . "\n";
+            } finally {
+                    //Force the post private until everything validates has
+                    //been reviewd and the corssref registation was successful.
+                if( strpos($validation_result, 'ERROR') !== false or strpos($validation_result, 'REVIEW') !== false) {
+                    if ( get_post_status( $post_id ) === 'publish' or get_post_status( $post_id ) === 'future' )
+                        wp_update_post(array('ID' => $post_id, 'post_status' => 'private'));
+                }
+            }
+
+                //If all is still well, we do all the other external services
+            if( strpos($validation_result, 'ERROR') === false or strpos($validation_result, 'REVIEW') === false)
+            {
+                    //Upload meta-data to DOAJ
+                if (get_post_status($post_id) === 'publish' && !$this->environment->is_test_environment())
+                    $doaj_response = $this->upload_meta_data_to_doaj($doaj_json,
+                                                                     $this->get_journal_property('doaj_api_url'),
+                                                                     $this->get_journal_property('doaj_api_key')
                                                                      );
-            update_post_meta( $post_id, $post_type . '_crossref_response', $crossref_response );
-            if(!empty($crossref_response) && strpos($crossref_response, 'ERROR') !== false )
-                $validation_result .= $crossref_response;
+                else
+                    $doaj_response = NULL;
+                update_post_meta( $post_id, $post_type . '_doaj_response', $doaj_response );
+                if(!empty($doaj_response) && strpos($doaj_response, 'ERROR') !== false )
+                    $validation_result .= $doaj_response;
 
-                //Upload meta-data to DOAJ
-            if (get_post_status($post_id) === 'publish' && !$this->environment->is_test_environment())
-                $doaj_response = $this->upload_meta_data_to_doaj($doaj_json,
-                                                                 $this->get_journal_property('doaj_api_url'),
-                                                                 $this->get_journal_property('doaj_api_key')
-                                                                 );
-            else
-                $doaj_response = NULL;
-            update_post_meta( $post_id, $post_type . '_doaj_response', $doaj_response );
-            if(!empty($doaj_response) && strpos($doaj_response, 'ERROR') !== false )
-                $validation_result .= $doaj_response;
+                    //Upload meta-data and fulltext to CLOCKSS (only if a fulltext exists)
+                $fulltext_pdf_path = $this->get_fulltext_pdf_path($post_id);
+                $doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
+                $remote_filename_without_extension = $doi_suffix;
 
-                //Upload meta-data and fulltext to CLOCKSS (only if a fulltext exists)
-            $fulltext_pdf_path = $this->get_fulltext_pdf_path($post_id);
-            $doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
-            $remote_filename_without_extension = $doi_suffix;
+                if (get_post_status($post_id) === 'publish' && !empty($fulltext_pdf_path) && !$this->environment->is_test_environment())
+                    $clockss_response = $this->upload_meta_data_and_pdf_to_clockss($clockss_xml, $fulltext_pdf_path, $remote_filename_without_extension,
+                                                                                   $this->get_journal_property('clockss_ftp_url'),
+                                                                                   $this->get_journal_property('clockss_username'),
+                                                                                   $this->get_journal_property('clockss_password')
+                                                                                   );
+                else
+                    $clockss_response = NULL;
+                update_post_meta( $post_id, $post_type . '_clockss_response', $clockss_response );
+                if(!empty($clockss_response) && strpos($clockss_response, 'ERROR') !== false )
+                    $validation_result .= $clockss_response;
 
-            if (get_post_status($post_id) === 'publish' && !empty($fulltext_pdf_path) && !$this->environment->is_test_environment())
-                $clockss_response = $this->upload_meta_data_and_pdf_to_clockss($clockss_xml, $fulltext_pdf_path, $remote_filename_without_extension,
-                                                                               $this->get_journal_property('clockss_ftp_url'),
-                                                                               $this->get_journal_property('clockss_username'),
-                                                                               $this->get_journal_property('clockss_password')
-                                                                               );
-            else
-                $clockss_response = NULL;
-            update_post_meta( $post_id, $post_type . '_clockss_response', $clockss_response );
-            if(!empty($clockss_response) && strpos($clockss_response, 'ERROR') !== false )
-                $validation_result .= $clockss_response;
+                if( get_post_status( $post_id ) === 'publish' )
+                    $validation_result .= $this->on_post_actually_published($post_id);
+            }
+        } catch(Exception $e) {
+            $validation_result .= "ERROR: There was an exception while interfacing with external services: " . $e->getMessage() . "\n";
+        } finally {
+            if ( get_post_status( $post_id ) !== 'publish' ) $validation_result .= "WARNING: Not yet published.\n";
+            update_post_meta( $post_id, $post_type . '_validation_result', $validation_result );
 
-            if( get_post_status( $post_id ) === 'publish' )
-                $validation_result .= $this->on_post_actually_published($post_id);
+                // Rehock this function
+            add_action( 'save_post', array( $this, 'save_metabox' ), 10, 2 );
         }
-        else if ( get_post_status( $post_id ) === 'publish' or get_post_status( $post_id ) === 'future' ) {
-                //Keep the post private until everything validates and has
-                //been reviewd.
-            wp_update_post(array('ID' => $post_id, 'post_status' => 'private'));
-        }
-
-        if ( get_post_status( $post_id ) !== 'publish' ) $validation_result .= "WARNING: Not yet published.\n";
-
-        update_post_meta( $post_id, $post_type . '_validation_result', $validation_result );
-
-            // Rehock this function
-        add_action( 'save_post', array( $this, 'save_metabox' ), 10, 2 );
     }
 
         /**
