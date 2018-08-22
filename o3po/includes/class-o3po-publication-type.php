@@ -474,7 +474,7 @@ abstract class O3PO_PublicationType {
                 else
                     $doaj_response = NULL;
                 update_post_meta( $post_id, $post_type . '_doaj_response', $doaj_response );
-                if(!empty($doaj_response) && strpos($doaj_response, 'ERROR') !== false )
+                if(!empty($doaj_response) && (strpos($doaj_response, 'ERROR') !== false || strpos($doaj_response, 'WARNING') !== false))
                     $validation_result .= $doaj_response;
 
                     //Upload meta-data and fulltext to CLOCKSS (only if a fulltext exists)
@@ -491,7 +491,7 @@ abstract class O3PO_PublicationType {
                 else
                     $clockss_response = NULL;
                 update_post_meta( $post_id, $post_type . '_clockss_response', $clockss_response );
-                if(!empty($clockss_response) && strpos($clockss_response, 'ERROR') !== false )
+                if(!empty($clockss_response) && ( strpos($clockss_response, 'ERROR') !== false || strpos($clockss_response, 'WARNING') !== false))
                     $validation_result .= $clockss_response;
 
                 if( get_post_status( $post_id ) === 'publish' )
@@ -1360,9 +1360,12 @@ abstract class O3PO_PublicationType {
 
         $doaj_response = $doaj_api_url . " responded at " . date('Y-m-d H:i:s') . " with:\n";
         if ( is_wp_error( $response ) ) {
-            $doaj_response .= 'ERROR: ' . $response->get_error_message();
+            $doaj_response .= 'ERROR: While submitting meta-data to DOAJ the following error occured: ' . $response->get_error_message() . "\n";
         } else {
             $doaj_response .= trim($response['body']);
+            if(strpos($doaj_response, 'created') === false)
+                $doaj_response = 'ERROR: Did not get the expected response from DOAJ. This may indicate a problem with the meta-data upload, please check manually:' . "\n" . $doaj_response . "\n";
+
         }
 
         return $doaj_response;
