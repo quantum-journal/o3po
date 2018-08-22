@@ -729,7 +729,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          *
          * To be added to the 'the_author_posts_link' filter.
          *
-         * @since    0.1.0
+         * @since    0.2.2+
          * @access   pulic
          * @param    string    $display_name   Display name to be filtered.
          */
