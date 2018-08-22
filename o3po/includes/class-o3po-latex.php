@@ -144,7 +144,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 '\\bibinitdelim ' => ' ',
                                       );
             $preg_replacements = array(
-                '\\\\\s' => ' ',
+                '\\\\\s+' => ' ',
                 '(?<!\\\\)%.*' => '', //remove all comments
                                        );
 
@@ -185,6 +185,13 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 if(!empty($doi[1]))
                     $citations[$n]['doi'] = $doi[1];
 
+                if(empty($citations[$n]['doi']))
+                {
+                    preg_match('#\\\\verb{url}\s*?\\\\verb ([^\s]*)\s*\\\\endverb#', $entry, $url);
+                    if(!empty($url[1]))
+                        $citations[$n]['url'] = $url[1];
+                }
+
                 preg_match('#\\\\verb{eprint}\s*?\\\\verb ([^\s]*)\s*\\\\endverb#', $entry, $eprint);
                 if(!empty($eprint[1]))
                     $citations[$n]['eprint'] = $eprint[1];
@@ -194,12 +201,14 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                     'title',
                     'volume',
     				'journaltitle',
-    				'eprinttype',
-    				'eprintclass',
     				'month',
                     'year',
                     'chapter',
                     'note',
+                    'institution',
+                    'organization',
+                    'howpublished',
+                    'editor',
                                 );
                 foreach( $fields as $field) {
                     preg_match('#\\\\field{' . $field .'}{*([^}]*)}*#', $entry, $arg);
@@ -221,11 +230,18 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                         if($num_authors > 2) $text .= ", ";
                         if($i === $num_authors-1 ) $text .= "and ";
                     }
+                    $text .= ' ';
                 }
                 switch ($citations[$n]['type']) {
                     case 'article':
                     case 'unpublished':
-				        if(!empty($citations[$n]['title'])) $text .= " ``" . $citations[$n]['title'] . "''";
+                    case 'periodical':
+                    case 'suppperiodical':
+                    case 'proceedings':
+                    case 'mvproceedings':
+                    case 'inproceedings':
+                    case 'conference':
+				        if(!empty($citations[$n]['title'])) $text .= "``" . $citations[$n]['title'] . "''";
 				        if(!empty($citations[$n]['journaltitle'])) $text .= " " . $citations[$n]['journaltitle'];
 				        if(!empty($citations[$n]['volume'])) $text .= " " . $citations[$n]['volume'];
                         if(!empty($citations[$n]['volume']) && !empty($citations[$n]['pages'])) $text .= ",";
@@ -234,14 +250,54 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                         if(!empty($citations[$n]['note'])) $text .= " " . $citations[$n]['note'];
                         break;
                     case 'book':
+                    case 'mvbook':
                     case 'inbook':
-				        if(!empty($citations[$n]['title'])) $text .= " ``" . $citations[$n]['title'] . "''";
+                    case 'bookinbook':
+                    case 'suppbook':
+                    case 'booklet':
+                    case 'collection':
+                    case 'mvcollection':
+                    case 'incollection':
+                    case 'suppcollection':
+                    case 'reference':
+                    case 'mvreference':
+                    case 'inreference':
+                        if(!empty($text) && !empty($citations[$n]['editor'])) $text .= ' ';
+                        if(!empty($citations[$n]['editor'])) $text .= $citations[$n]['editor'] . " (eds.) ";
+				        if(!empty($citations[$n]['title'])) $text .= "``" . $citations[$n]['title'] . "''";
 				        if(!empty($citations[$n]['publisher'])) $text .= " " . $citations[$n]['publisher'];
-                            //if(!empty($citations[$n]['chapter'])) $text .= " " . $citations[$n]['chapter'];
+                        if(!empty($citations[$n]['howpublished'])) $text .= " " . $citations[$n]['howpublished'];
+                        if(!empty($citations[$n]['chapter'])) $text .= " chapter " . $citations[$n]['chapter'];
+				        if(!empty($citations[$n]['year'])) $text .= " (" . $citations[$n]['year'] . ")";
+                        break;
+                    case 'thesis':
+                    case 'mastersthesis':
+                    case 'phdthesis':
+                    case 'manual':
+                    case 'patent':
+                    case 'report':
+                    case 'techreport':
+                        if(!empty($citations[$n]['title'])) $text .= "``" . $citations[$n]['title'] . "''";
+				        if(!empty($citations[$n]['type'])) $text .= " " . $citations[$n]['type'];
+                        if(!empty($citations[$n]['number'])) $text .= " " . $citations[$n]['number'];
+                        if(!empty($citations[$n]['institution'])) $text .= " " . $citations[$n]['institution'];
+                        if(!empty($citations[$n]['organization'])) $text .= " " . $citations[$n]['organization'];
+                        if(!empty($citations[$n]['location'])) $text .= " " . $citations[$n]['location'];
+				        if(!empty($citations[$n]['year'])) $text .= " (" . $citations[$n]['year'] . ")";
+                        break;
+                    case 'misc':
+                    case 'online':
+                    case 'electronic':
+                    case 'www':
+                        if(!empty($text) && !empty($citations[$n]['editor'])) $text .= ' ';
+                        if(!empty($citations[$n]['editor'])) $text .= $citations[$n]['editor'] . " (eds.) ";
+				        if(!empty($citations[$n]['title'])) $text .= "``" . $citations[$n]['title'] . "''";
+                        if(!empty($citations[$n]['howpublished'])) $text .= " " . $citations[$n]['howpublished'];
 				        if(!empty($citations[$n]['year'])) $text .= " (" . $citations[$n]['year'] . ")";
                         break;
                     default:
-				        $text .= "Type " . $citations[$n]['type'] . " not implemented!\\";
+                        if(!empty($citations[$n]['title'])) $text .= "``" . $citations[$n]['title'] . "''";
+                        if(!empty($citations[$n]['year'])) $text .= " (" . $citations[$n]['year'] . ")";
                         break;
                 }
                 foreach ($str_replacements as $target => $substitute)
@@ -740,8 +796,10 @@ class O3PO_Latex_Dictionary_Provider
                 '\\\\spacefactor[0-9]*' => '',
                 '\\\\relax(?![a-zA-Z])' => '',
                 '\\\\space(?![a-zA-Z])' => ' ',
+                '\\\\bibnamedelim[abcdi](?![a-zA-Z])' => ' ',
                 '\\\\textemdash(?![a-zA-Z])' => '—',
                 '\\\\textendash(?![a-zA-Z])' => '–',
+                '\\\\&' => '&',
                 '\\\\ss(\s*\{\s*\}|\s+|(?![a-zA-Z]))' => 'ß',
                 '\\\\L(\s*\{\s*\}|\s+|(?![a-zA-Z]))' => 'Ł',
                 '\\\\l(\s*\{\s*\}|\s+|(?![a-zA-Z]))' => 'ł',
@@ -749,7 +807,6 @@ class O3PO_Latex_Dictionary_Provider
                 '\\\\O(\s*\{\s*\}|\s+|(?![a-zA-Z]))' => 'Ø',
                 '\\\\aa(\s*\{\s*\}|\s+|(?![a-zA-Z]))' => 'å',
                 '\\\\AA(\s*\{\s*\}|\s+|(?![a-zA-Z]))' => 'Å',
-
                 '\\\\"'.self::match_single_non_character_makro_regexp_fragment('A') => 'Ä',
                 '\\\\"'.self::match_single_non_character_makro_regexp_fragment('E') => 'Ë',
                 '\\\\"'.self::match_single_non_character_makro_regexp_fragment('I') => 'Ï',
