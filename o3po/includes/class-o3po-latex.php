@@ -201,6 +201,8 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                     'title',
                     'volume',
     				'journaltitle',
+                    'booktitle',
+                    'issuetitle',
     				'month',
                     'year',
                     'chapter',
@@ -243,6 +245,8 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                     case 'conference':
 				        if(!empty($citations[$n]['title'])) $text .= "``" . $citations[$n]['title'] . "''";
 				        if(!empty($citations[$n]['journaltitle'])) $text .= " " . $citations[$n]['journaltitle'];
+                        if(!empty($citations[$n]['booktitle'])) $text .= " " . $citations[$n]['booktitle'];
+                        if(!empty($citations[$n]['issuetitle'])) $text .= " " . $citations[$n]['issuetitle'];
 				        if(!empty($citations[$n]['volume'])) $text .= " " . $citations[$n]['volume'];
                         if(!empty($citations[$n]['volume']) && !empty($citations[$n]['pages'])) $text .= ",";
 				        if(!empty($citations[$n]['pages'])) $text .= " " . $citations[$n]['pages'];
