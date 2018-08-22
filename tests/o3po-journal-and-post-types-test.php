@@ -437,7 +437,19 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                     "affiliations" => '#Fakultät für Physik und Astronomie, Universität Würzburg, Am Hubland, 97074 Würzburg, Germany#',
                     "bbl" => '#\\\\begin{thebibliography}#',
                                                                                        )],
+
+
+        [dirname(__FILE__) . '/resources/arxiv/1704.02130v3.tar.gz', "application/x-tar", array(
+                    "validation_result" => array('#REVIEW: Found BibLaTeX formated bibliographic information#', '#Author and affiliations data updated from arxiv source#'),
+                    #"author_latex_macro_definitions" => '#\\\\newcommand{\\\\bra}#',
+                        /*"author_orcids" => , */
+                    "author_affiliations" => '#1#',
+                    "affiliations" => '#Laboratoire d\'Information Quantique, CP 224, Université libre de Bruxelles \(ULB\), 1050 Brussels, Belgium#',
+                    "bbl" => array( '#biblatex auxiliary file#', '#entry{AM16}{article}{}#', '#verb 10\.1109/ISIT\.2002\.1023345#' ),
+                                                                                       )],
             ];
+
+
     }
 
         /**
