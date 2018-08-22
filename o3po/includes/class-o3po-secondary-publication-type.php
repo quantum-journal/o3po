@@ -731,7 +731,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          *
          * @since    0.2.2+
          * @access   pulic
-         * @param    string    $display_name   Display name to be filtered.
+         * @param    string    $link   Link to be filtered.
          */
     public function get_the_author_posts_link( $link ) {
 
