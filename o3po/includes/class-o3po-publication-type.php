@@ -450,6 +450,8 @@ abstract class O3PO_PublicationType {
                     update_post_meta( $post_id, $post_type . '_crossref_response', $crossref_response );
                     if(!empty($crossref_response) && strpos($crossref_response, 'ERROR') !== false )
                         $validation_result .= $crossref_response;
+                    else
+                        $validation_result .= "INFO: DOI successfully registered/updated at " . $crossref_url . "\n";
                 }
             } catch(Exception $e) {
                 $validation_result .= "ERROR: There was an exception while registering the DOI with Corssres: " . $e->getMessage() . "\n";
@@ -476,6 +478,8 @@ abstract class O3PO_PublicationType {
                 update_post_meta( $post_id, $post_type . '_doaj_response', $doaj_response );
                 if(!empty($doaj_response) && (strpos($doaj_response, 'ERROR') !== false || strpos($doaj_response, 'WARNING') !== false))
                     $validation_result .= $doaj_response;
+                else
+                    $validation_result .= "INFO: Meta-data successfully uploaded to DOAJ.\n";
 
                     //Upload meta-data and fulltext to CLOCKSS (only if a fulltext exists)
                 $fulltext_pdf_path = $this->get_fulltext_pdf_path($post_id);
@@ -493,6 +497,8 @@ abstract class O3PO_PublicationType {
                 update_post_meta( $post_id, $post_type . '_clockss_response', $clockss_response );
                 if(!empty($clockss_response) && ( strpos($clockss_response, 'ERROR') !== false || strpos($clockss_response, 'WARNING') !== false))
                     $validation_result .= $clockss_response;
+                else
+                    $validation_result .= "INFO: Meta-data and fulltext successfully uploaded to CLOCKSS.\n";
 
                 if( get_post_status( $post_id ) === 'publish' )
                     $validation_result .= $this->on_post_actually_published($post_id);
@@ -1281,6 +1287,9 @@ abstract class O3PO_PublicationType {
          * */
     private static function upload_meta_data_to_crossref( $doi_batch_id, $crossref_xml, $crossref_id, $crossref_pw, $crossref_url ) {
 
+        if(empty($crossref_id) || empty($crossref_pw))
+            return "WARNING: Crossref credential incomplete. Meta-data was not uploaded to Corssref.\n";
+
             // Construct the HTTP POST call
 		$boundary = wp_generate_password(24);
 		$headers = array( 'content-type' => 'multipart/form-data; boundary=' . $boundary );
@@ -1345,6 +1354,9 @@ abstract class O3PO_PublicationType {
          */
     private static function upload_meta_data_to_doaj( $doaj_json, $doaj_api_url, $doaj_api_key ) {
 
+        if(empty($doaj_api_url) || empty($doaj_api_key))
+            return "WARNING: DOAJ credential incomplete. Meta-data was not uploaded to DOAJ.\n";
+
             // Construct the HTTP POST call
 		$headers = array( 'content-type' => 'application/json', 'accept' => 'application/json');
         $payload = $doaj_json;
@@ -1394,6 +1406,9 @@ abstract class O3PO_PublicationType {
          * @param    string     $clockss_password The CLOCKSS password
          */
     private static function upload_meta_data_and_pdf_to_clockss( $clockss_xml, $pdf_path, $remote_filename_without_extension, $clockss_ftp_url, $clockss_username, $clockss_password ) {
+
+        if(empty($clockss_username) || empty($clockss_password))
+            return "WARNING: CLOCKKS credential incomplete. Meta-data and full text was not uploaded to CLOCKSS.\n";
 
         $trackErrors = ini_get('track_errors');
         $ftp_connection = null;
