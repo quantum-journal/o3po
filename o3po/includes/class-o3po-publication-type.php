@@ -438,10 +438,13 @@ abstract class O3PO_PublicationType {
                  */
             try
             {
+                    /* If there were no errors and there are no outstadning requests
+                     * to review we attept to submit meta-data to Crossref. */
                 if( strpos($validation_result, 'ERROR') === false and strpos($validation_result, 'REVIEW') === false) {
-
-                        //Upload meta-data to crossref
+                        /* On the test system and in case the post is not yet going to be
+                         * publicly published we submit to their test system and not to the real system.*/
                     $crossref_url = (get_post_status($post_id) === 'publish' && !$this->environment->is_test_environment()) ? $this->get_journal_property('crossref_deposite_url') : $this->get_journal_property('crossref_test_deposite_url'); // Send it to the test system or the real system
+                        //Upload meta-data to crossref
                     $crossref_response = $this->upload_meta_data_to_crossref($doi_batch_id, $crossref_xml,
                                                                              $this->get_journal_property('crossref_id'),
                                                                              $this->get_journal_property('crossref_pw'),
@@ -456,10 +459,11 @@ abstract class O3PO_PublicationType {
                     $crossref_response = NULL;
                 update_post_meta( $post_id, $post_type . '_crossref_response', $crossref_response );
             } catch(Exception $e) {
-                $validation_result .= "ERROR: There was an exception while registering the DOI with Corssres: " . $e->getMessage() . "\n";
+                $validation_result .= "ERROR: There was an exception while registering the DOI with Crossref: " . $e->getMessage() . "\n";
             } finally {
-                    //Force the post private until everything validates has
-                    //been reviewd and the corssref registation was successful.
+                    /* Force the post private until everything validates without errors,
+                     * there are no outstadning requests to review, and the corssref
+                     * registation was successful. */
                 if( strpos($validation_result, 'ERROR') !== false or strpos($validation_result, 'REVIEW') !== false) {
                     if ( get_post_status( $post_id ) === 'publish' or get_post_status( $post_id ) === 'future' )
                         wp_update_post(array('ID' => $post_id, 'post_status' => 'private'));
