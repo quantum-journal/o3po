@@ -17,6 +17,7 @@
  */
 
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-utility.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-crossref.php';
 
 /**
  * Base class for types of publications.
@@ -1302,39 +1303,7 @@ abstract class O3PO_PublicationType {
         if(empty($crossref_id) || empty($crossref_pw))
             return "WARNING: Crossref credential incomplete. Meta-data was not uploaded to Corssref.\n";
 
-            // Construct the HTTP POST call
-		$boundary = wp_generate_password(24);
-		$headers = array( 'content-type' => 'multipart/form-data; boundary=' . $boundary );
-		$post_fields = array(
-			'operation' => 'doMDUpload',
- 			'login_id' => $crossref_id,
- 			'login_passwd' => $crossref_pw,
-                             );
-        $payload = '';
-            // Add the standard POST fields
-		foreach ( $post_fields as $name => $value ) {
-            $payload .= '--' . $boundary;
-            $payload .= "\r\n";
-            $payload .= 'Content-Disposition: form-data; name="' . $name . '"' . "\r\n\r\n";
-            $payload .= $value;
-            $payload .= "\r\n";
-		}
-            // Attach the xml data
-		if ( !empty($crossref_xml) && !empty($doi_batch_id) ) {
-            $payload .= '--' . $boundary;
-            $payload .= "\r\n";
-            $payload .= 'Content-Disposition: form-data; name="' . 'fname' . '"; filename="' . $doi_batch_id . '.xml' . '"' . "\r\n";
-            $payload .= 'Content-Type: text/xml' . "\r\n";
-            $payload .= "\r\n";
-            $payload .= $crossref_xml;
-            $payload .= "\r\n";
-		}
-		$payload .= '--' . $boundary . '--';
-
-		$response = wp_remote_post( $crossref_url, array(
-                                        'headers' => $headers,
-                                        'body' => $payload,
-                                                         ) );
+        $response = O3PO_Crossref::remote_post_meta_data_to_crossref($doi_batch_id, $crossref_xml, $crossref_id, $crossref_pw, $crossref_url);
 
 		$crossref_response = $crossref_url . " responded at " . date('Y-m-d H:i:s') . " with:\n";
 		if ( is_wp_error( $response ) ) {
@@ -1347,7 +1316,7 @@ abstract class O3PO_PublicationType {
     }
 
         /**
-         * Submit meta-data to DOAJ:
+         * Submit meta-data to DOAJ.
          *
          * From the command line you could do rouhgly the smame via:
          *
@@ -1369,18 +1338,7 @@ abstract class O3PO_PublicationType {
         if(empty($doaj_api_url) || empty($doaj_api_key))
             return "WARNING: DOAJ credential incomplete. Meta-data was not uploaded to DOAJ.\n";
 
-            // Construct the HTTP POST call
-		$headers = array( 'content-type' => 'application/json', 'accept' => 'application/json');
-        $payload = $doaj_json;
-
-        $doaj_api_url = $doaj_api_url;
-        $doaj_api_url_with_key = $doaj_api_url . '?api_key=' . $doaj_api_key;
-
-        $response = wp_remote_post( $doaj_api_url_with_key, array(
-                                        'headers' => $headers,
-                                        'body' => $payload,
-                                        'method'    => 'POST'
-                                                                  ) );
+        $response = O3PO_Doaj::remote_post_meta_data_to_doaj( $doaj_json, $doaj_api_url, $doaj_api_key );
 
         $doaj_response = $doaj_api_url . " responded at " . date('Y-m-d H:i:s') . " with:\n";
         if ( is_wp_error( $response ) ) {
@@ -1396,15 +1354,12 @@ abstract class O3PO_PublicationType {
     }
 
 
-            /**
-         * Submit meta-data to DOAJ:
+        /**
+         * Submit meta-data and full text to CLOCKSS.
          *
-         * From the command line you could do rouhgly the smame via:
+         * Upload an xml file with the meta-data and the full text pdf to CLOCKSS.
          *
-         * curl -X POST --header "Content-Type: application/json" --header "Accept: application/json" -d "[json goes here]" "https://doaj.org/api/v1/articles?api_key=XXX"
-         * see https://doaj.org/api/v1/docs#/ for more infomation.
-         *
-         * DOAJ has no test system, so that we can only get a response from the real system once we publish the final and actual record.
+         * CLOCKSS has no test system, so that we can only get a response from the real system once we publish the final and actual record.
          *
          * This function must be private since we do no longer check internally whether we are running on the test system.
          *
@@ -1422,39 +1377,7 @@ abstract class O3PO_PublicationType {
         if(empty($clockss_username) || empty($clockss_password))
             return "WARNING: CLOCKKS credential incomplete. Meta-data and full text was not uploaded to CLOCKSS.\n";
 
-        $trackErrors = ini_get('track_errors');
-        $ftp_connection = null;
-        $clockss_response = '';
-        try
-        {
-            set_error_handler(function($errno, $errstr, $errfile, $errline, array $errcontext) {
-                    throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
-                });
-
-            $tmpfile_clockss_xml = tempnam(sys_get_temp_dir(), $remote_filename_without_extension );
-            file_put_contents($tmpfile_clockss_xml, $clockss_xml);
-
-            $ftp_connection = ftp_connect($clockss_ftp_url);
-            $login_result = ftp_login($ftp_connection, $clockss_username, $clockss_password);
-
-            if (ftp_put($ftp_connection, $remote_filename_without_extension . '.xml', $tmpfile_clockss_xml, FTP_BINARY))
-                $clockss_response .= "INFO: successfully uploaded the meta-data xml to CLOCKSS.\n";
-            else
-                $clockss_response .= "ERROR: There was an error uploading the meta-data xml to CLOCKSS: " . $php_errormsg . "\n";
-
-            if (ftp_put($ftp_connection, $remote_filename_without_extension . '.pdf', $pdf_path, FTP_BINARY))
-                $clockss_response .= "INFO: successfully uploaded the fulltext pdf to CLOCKSS.\n";
-            else
-                $clockss_response .= "ERROR: There was an error uploading the fulltext pdf to CLOCKSS: " . $php_errormsg . "\n";
-
-
-        } catch(Exception $e) {
-            $clockss_response .= "ERROR: There was an exception during the ftp transfer to CLOCKSS. " . $e->getMessage() . "\n";
-        }
-        ini_set('track_errors', $trackErrors);
-        restore_error_handler();
-        if($ftp_connection !== null)
-            ftp_close($ftp_connection);
+        $clockss_response = O3PO_Clockss::ftp_upload_meta_data_and_pdf_to_clockss($clockss_xml, $pdf_path, $remote_filename_without_extension, $clockss_ftp_url, $clockss_username, $clockss_password);
 
         return $clockss_response;
     }
@@ -2367,8 +2290,8 @@ abstract class O3PO_PublicationType {
         $crossref_url = $this->get_journal_property('crossref_get_forward_links_url');
         $doi_url_prefix = $this->get_journal_property('doi_url_prefix');
 
-        $request_url = $crossref_url . '?usr=' . urlencode($login_id).  '&pwd=' . urlencode($login_passwd) . '&doi=' . urlencode($doi) . '&include_postedcontent=true';
-        $response = wp_remote_get($request_url);
+        $response = O3PO_Crossref::remote_get_cited_by($crossref_url, $login_id, $login_passwd, $doi);
+
         if ( is_wp_error($response) || empty($response['body']) ) {
             return '<p>Error ' . $response['response']['code'] . ' ' .
                 $response['response']['message'] . '</p>';
