@@ -447,12 +447,14 @@ abstract class O3PO_PublicationType {
                                                                              $this->get_journal_property('crossref_pw'),
                                                                              $crossref_url
                                                                              );
-                    update_post_meta( $post_id, $post_type . '_crossref_response', $crossref_response );
                     if(!empty($crossref_response) && strpos($crossref_response, 'ERROR') !== false )
                         $validation_result .= $crossref_response;
                     else
                         $validation_result .= "INFO: DOI successfully registered/updated at " . $crossref_url . "\n";
                 }
+                else
+                    $crossref_response = NULL;
+                update_post_meta( $post_id, $post_type . '_crossref_response', $crossref_response );
             } catch(Exception $e) {
                 $validation_result .= "ERROR: There was an exception while registering the DOI with Corssres: " . $e->getMessage() . "\n";
             } finally {
@@ -469,17 +471,20 @@ abstract class O3PO_PublicationType {
             {
                     //Upload meta-data to DOAJ
                 if (get_post_status($post_id) === 'publish' && !$this->environment->is_test_environment())
+                {
                     $doaj_response = $this->upload_meta_data_to_doaj($doaj_json,
                                                                      $this->get_journal_property('doaj_api_url'),
                                                                      $this->get_journal_property('doaj_api_key')
                                                                      );
+                    if(!empty($doaj_response) && (strpos($doaj_response, 'ERROR') !== false || strpos($doaj_response, 'WARNING') !== false))
+                        $validation_result .= $doaj_response;
+                    else
+                        $validation_result .= "INFO: Meta-data successfully uploaded to DOAJ.\n";
+                }
                 else
                     $doaj_response = NULL;
                 update_post_meta( $post_id, $post_type . '_doaj_response', $doaj_response );
-                if(!empty($doaj_response) && (strpos($doaj_response, 'ERROR') !== false || strpos($doaj_response, 'WARNING') !== false))
-                    $validation_result .= $doaj_response;
-                else
-                    $validation_result .= "INFO: Meta-data successfully uploaded to DOAJ.\n";
+
 
                     //Upload meta-data and fulltext to CLOCKSS (only if a fulltext exists)
                 $fulltext_pdf_path = $this->get_fulltext_pdf_path($post_id);
@@ -487,18 +492,21 @@ abstract class O3PO_PublicationType {
                 $remote_filename_without_extension = $doi_suffix;
 
                 if (get_post_status($post_id) === 'publish' && !empty($fulltext_pdf_path) && !$this->environment->is_test_environment())
+                {
+
                     $clockss_response = $this->upload_meta_data_and_pdf_to_clockss($clockss_xml, $fulltext_pdf_path, $remote_filename_without_extension,
                                                                                    $this->get_journal_property('clockss_ftp_url'),
                                                                                    $this->get_journal_property('clockss_username'),
                                                                                    $this->get_journal_property('clockss_password')
                                                                                    );
+                    if(!empty($clockss_response) && ( strpos($clockss_response, 'ERROR') !== false || strpos($clockss_response, 'WARNING') !== false))
+                        $validation_result .= $clockss_response;
+                    else
+                        $validation_result .= "INFO: Meta-data and fulltext successfully uploaded to CLOCKSS.\n";
+                }
                 else
                     $clockss_response = NULL;
                 update_post_meta( $post_id, $post_type . '_clockss_response', $clockss_response );
-                if(!empty($clockss_response) && ( strpos($clockss_response, 'ERROR') !== false || strpos($clockss_response, 'WARNING') !== false))
-                    $validation_result .= $clockss_response;
-                else
-                    $validation_result .= "INFO: Meta-data and fulltext successfully uploaded to CLOCKSS.\n";
 
                 if( get_post_status( $post_id ) === 'publish' )
                     $validation_result .= $this->on_post_actually_published($post_id);

@@ -957,6 +957,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $method->invokeArgs($primary_publication_type, array($post_id, new WP_Post($post_id) ));
 
         $validation_result = get_post_meta( $post_id, $post_type . '_validation_result');
+        #echo("\n" . $validation_result . "\n");
         foreach($expections_second as $expection)
         {
             $this->assertRegexp($expection, $validation_result);
