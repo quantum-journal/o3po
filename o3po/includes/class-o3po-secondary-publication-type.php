@@ -6,7 +6,7 @@
  * Each publication type is connected to a WordPress custom post type and
  * individual publications are represented by posts of that type.
  *
- * @link       http://example.com
+ * @link       https://quantum-journal.org/o3po/
  * @since      0.1.0
  *
  * @package    O3PO

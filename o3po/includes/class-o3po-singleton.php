@@ -2,10 +2,10 @@
 
 /**
  * A modern implementation of the Singleton Pattern in php.
- * 
+ *
  * Code taken from https://stackoverflow.com/a/37800033/3424521
- * 
- * @link       http://example.com
+ *
+ * @link       https://quantum-journal.org/o3po/
  * @since      0.1.0
  *
  * @package    O3PO
