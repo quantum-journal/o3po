@@ -16,6 +16,7 @@
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-utility.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-latex.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-publication-type.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-email-templates.php';
 
 /**
  * Class representing the primary publication type.
@@ -460,22 +461,32 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
         $title = get_post_meta( $post_id, $post_type . '_title', true );
         $journal = get_post_meta( $post_id, $post_type . '_journal', true );
-		$post_url = get_permalink( $post_id );
+        $post_url = get_permalink( $post_id );
 
             // Send Emails about the submission to us
         $to = ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') );
         $headers = array( 'From: ' . $this->get_journal_property('publisher_email'));
-        $subject  = ($this->environment->is_test_environment() ? 'TEST ' : '') . 'A ' . $this->get_publication_type_name() . ' has been published/updated by ' . $journal;
-        $message  = ($this->environment->is_test_environment() ? 'TEST ' : '') . $journal . " has published/updated the following " . $this->get_publication_type_name() . ":\n\n";
-        $message .= "Title:  " . $title . "\n";
-        $message .= "Authos: " . static::get_formated_authors($post_id) . "\n";
-        $message .= "URL:    " . $post_url . "\n";
-        $message .= "DOI:    " . $this->get_journal_property('doi_url_prefix') . $doi . "\n";
+
+        $subject  = ($this->environment->is_test_environment() ? 'TEST ' : '') 
+                  . O3PO_Email_Templates::self_notification_subject(
+                              O3PO_Email_Templates::default_self_notification_subject
+                            , $journal
+                            , $this->get_publication_type_name());
+
+        $message  = ($this->environment->is_test_environment() ? 'TEST ' : '') 
+                  . O3PO_Email_Templates::self_notification_body(
+                              O3PO_Email_Templates::default_self_notification_body_template
+                            , $journal
+                            , $this->get_publication_type_name()
+                            , $title
+                            , static::get_formated_authors($post_id)
+                            , $post_url,$this->get_journal_property('doi_url_prefix') . $doi);
 
         $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
-        if(!$successfully_sent)
+        if(!$successfully_sent) {
             $validation_result .= 'WARNING: Error sending email notifation of publication to publisher.' . "\n";
+        }
 
             /* We do not send trackbacks for Papers as it is against arXiv's policies.
              * Instead we have a doi feed through wich arXiv can automatically
@@ -488,25 +499,27 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         /* } */
 
             // Send email notifying authors of publication
-		if( empty($corresponding_author_has_been_notifed_date) ) {
+        if( empty($corresponding_author_has_been_notifed_date) ) {
 
             $to = ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $corresponding_author_email);
-			$headers = array( 'Cc: ' . ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') ), 'From: ' . $this->get_journal_property('publisher_email'));
-			$subject  = ($this->environment->is_test_environment() ? 'TEST ' : '') . $journal . " has published your " . $this->get_publication_type_name();
-			$message  = ($this->environment->is_test_environment() ? 'TEST ' : '') . "Dear " . static::get_formated_authors($post_id) . ",\n\n";
-			$message .= "Congratulations! Your " . $this->get_publication_type_name() . " '" . $title . "' has been published by " . $journal . " and is now available under:\n\n";
-			$message .= $post_url . "\n\n";
-			$message .= "Your work has been assigned the following journal reference and DOI\n\n";
-			$message .= "Journal reference: " . static::get_formated_citation($post_id) . "\n";
-			$message .= "DOI:               " . $this->get_journal_property('doi_url_prefix') . $doi . "\n\n";
-			$message .= "We kindly ask you to log in on the arXiv under https://arxiv.org/user/login and add this information to the page of your work there. Thank you very much!\n\n";
-			$message .= "In case you have an ORCID you can go to http://search.crossref.org/?q=" . str_replace('/', '%2F', $doi)  . " to conveniently add your new publication to your profile.\n\n";
-			$message .= "Please be patient, it can take several hours until the DOI has been activated by Crossref.\n\n";
-			$message .= "If you have any feedback or ideas for how to improve the peer-review and publishing process, or any other question, please let us know under " . $this->get_journal_property('publisher_email') . ".\n\n";
-			$message .= "Best regards,\n\n";
-			$message .= "Christian, Lídia, and Marcus\n";
-			$message .= "Executive Board\n";
-			$successfully_sent = wp_mail( $to, $subject, $message, $headers);
+            $headers = array( 'Cc: ' . ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') ), 'From: ' . $this->get_journal_property('publisher_email'));
+            $subject  = ($this->environment->is_test_environment() ? 'TEST ' : '')
+                       . O3PO_Email_Templates::author_notification_subject(
+                             O3PO::default_author_notification_subject_template
+                            , $journal
+                            , $this->get_publication_type_name());
+
+            $executive_board = "Christian, Lídia, and Marcus\n";
+
+            $message  = ($this->environment->is_test_environment() ? 'TEST ' : '') 
+                       . O3PO_Email_Templates::author_notification_body(
+                                      $email_template
+                                    , $journal, $executive_board, $this->get_journal_property('publisher_email')
+                                    , $this->get_publication_type_name(), $title, static::get_formated_authors($post_id)
+                                    , $post_url, $this->get_journal_property('doi_url_prefix') . $doi
+                                    , static::get_formated_citation($post_id), str_replace('/', '%2F', $doi))
+
+            $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
             if($successfully_sent) {
                 update_post_meta( $post_id, $post_type . '_corresponding_author_has_been_notifed_date', date("Y-m-d") );
@@ -515,28 +528,31 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             {
                 $validation_result .= 'WARNING: Sending email to corresponding author failed.' . "\n";
             }
-		}
+        }
 
             // Send email to Fermat's library
-		if(($fermats_library === "checked" && empty($fermats_library_has_been_notifed_date))) {
+        if(($fermats_library === "checked" && empty($fermats_library_has_been_notifed_date))) {
 
             $fermats_library_permalink = $this->get_journal_property('fermats_library_url_prefix') . $doi_suffix;
 
             $to = ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('fermats_library_email'));
-			$headers = array( 'Cc: ' . ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') ), 'From: ' . $this->get_journal_property('publisher_email'));
-			$subject  = ($this->environment->is_test_environment() ? 'TEST ' : '') . $journal . " has a new " . $this->get_publication_type_name() . " for Fermat's library";
-			$message  = ($this->environment->is_test_environment() ? 'TEST ' : '') . "Dear team at Fermat's library,\n\n";
-			$message .= $journal . " has published the following " . $this->get_publication_type_name() . ":\n\n";
-			$message .= "Title:     " . $title . "\n";
-			$message .= "Author(s): " . static::get_formated_authors($post_id) . "\n";
-			$message .= "URL:       " . $post_url . "\n";
-			$message .= "DOI:       " . $this->get_journal_property('doi_url_prefix') . $doi . "\n";
-			$message .= "\n";
-			$message .= "Please post it on Fermat's library under the permalink: " . $fermats_library_permalink . "\n";
-			$message .= "Thank you very much!\n\n";
-			$message .= "Kind regards,\n\n";
-			$message .= "The Executive Board\n";
-			$successfully_sent = wp_mail( $to, $subject, $message, $headers);
+            $headers = array( 'Cc: ' . ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') ), 'From: ' . $this->get_journal_property('publisher_email'));
+            $subject  = ($this->environment->is_test_environment() ? 'TEST ' : '') 
+                . O3PO_Email_Templates::fermats_library_notification_subject(
+                        O3PO_Email_Templates::default_fermats_library_subject
+                      , $journal
+                      , $this->get_publication_type_name());
+            $message  = ($this->environment->is_test_environment() ? 'TEST ' : '') 
+                . O3PO_Email_Templates::fermats_library_notification_body(
+                        O3PO_Email_Templates::default_fermats_library_body 
+                      , $journal
+                      , $this->get_publication_type_name()
+                      , $title, static::get_formated_authors($post_id)
+                      , $post_url
+                      , $this->get_journal_property('doi_url_prefix') . $doi
+                      , $fermats_library_permalink);
+
+            $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
             if($successfully_sent) {
                 update_post_meta( $post_id, $post_type . '_fermats_library_permalink', $fermats_library_permalink );
