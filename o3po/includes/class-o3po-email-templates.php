@@ -108,10 +108,10 @@ class O3PO_Email_Templates {
    public static function fermats_library_notification_body($email_template
                                     , $journal
                                     , $publication_type_name, $title, $authors, $url, $doi, $fermats_library_permalink){
-       return preg_replace(array("/#JOURNAL#/", "/#PUBLISHER_EMAIL#/"
+       return preg_replace(array("/#JOURNAL#/"
                                , "/#PUBLICATION_TYPE_NAME#/", "/#TITLE#/", "/#AUTHORS#/"
                                , "/#POST_URL#/", "/#DOI#/", "/#FERMATS_LIBRARY_PERMALINK#/")
-                         , array($journal, $publisher_email
+                         , array($journal
                                , $publication_type_name, $title, $authors
                                , $url, $doi, $fermats_library_permalink)
                          , $email_template);
