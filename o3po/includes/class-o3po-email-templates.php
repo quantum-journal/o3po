@@ -23,7 +23,7 @@ class O3PO_Email_Templates {
    public static $default_self_notification_subject_template =
                  "A #PUBLICATION_TYPE_NAME# has been published/updated by #JOURNAL#";
 
-   public static $default_self_notification_body_template = 
+   public static $default_self_notification_body_template =
                  "#JOURNAL# has published/updated the following #PUBLICATION_TYPE_NAME#\n"
                . "Title:   #TITLE# \n"
                . "Authors: #AUTHORS# \n"
@@ -33,7 +33,7 @@ class O3PO_Email_Templates {
    public static $default_author_notification_subject_template =
                  "#JOURNAL# has published your #PUBLICATION_TYPE_NAME#";
 
-   public static $default_author_notification_body_template = 
+   public static $default_author_notification_body_template =
                  "Dear #AUTHORS#\n\n"
                . "Congratulations! Your #PUBLICATION_TYPE_NAME# '#TITLE#' has been published by #JOURNAL# and is now available under:\n\n"
                . "#POST_URL#\n\n"
@@ -48,10 +48,10 @@ class O3PO_Email_Templates {
                . "#EXECUTIVE_BOARD#\n"
                . "Executive Board\n";
 
-   public static $default_fermats_library_subject = "";
+   public static $default_fermats_library_subject =
                  "#JOURNAL# has a new #PUBLICATION_TYPE_NAME# for Fermat's library";
 
-   public static $default_fermats_library_body = 
+   public static $default_fermats_library_body =
                  "Dear team at Fermat's library,\n\n"
                . "#JOURNAL$ has published the following #PUBLICATION_TYPE_NAME#:\n\n"
                . "Title:     #TITLE#\n"
