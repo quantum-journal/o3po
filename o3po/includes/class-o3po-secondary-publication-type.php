@@ -269,12 +269,12 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         $to = $this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email');
         $headers = array( 'From: ' . $this->get_journal_property('publisher_email'));
         $subject  = $this->environment->is_test_environment() ? 'TEST ' : ''
-                  . O3PO_Email_Templates::self_notification_subject(
-                      O3PO_Email_Templates::default_self_notification_subject_template
+                  . O3PO_EmailTemplates::self_notification_subject(
+                      O3PO_EmailTemplates::default_self_notification_subject_template
                     , $journal, strtolower($type));
         $message  = $this->environment->is_test_environment() ? 'TEST ' : '' 
-                  . O3PO_Email_Templates::self_notification_body(
-                      O3PO_Email_Templates::default_self_notification_body_template
+                  . O3PO_EmailTemplates::self_notification_body(
+                      O3PO_EmailTemplates::default_self_notification_body_template
                     , $journal, strtolower($type), $title
                     , static::get_formated_authors($post_id), $post_url, $this->get_journal_property('doi_url_prefix') . $doi);
 
@@ -312,12 +312,12 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
             $headers = array( 'Cc: ' . ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') ), 'From: ' . $this->get_journal_property('publisher_email'));
 
             $subject  = $this->environment->is_test_environment() ? 'TEST ' : ''
-                . O3PO_Email_Templates::author_notification_subject(
-                     O3PO_Email_Templates::$default_author_notification_subject_template
+                . O3PO_EmailTemplates::author_notification_subject(
+                     O3PO_EmailTemplates::$default_author_notification_subject_template
                    , $journal, $type);
             $message  = $this->environment->is_test_environment() ? 'TEST ' : '' 
-                      . O3PO_Email_Templates::author_notification_body(
-                           O3PO_Email_Templates::$default_author_notification_secondary_body_template
+                      . O3PO_EmailTemplates::author_notification_body(
+                           O3PO_EmailTemplates::$default_author_notification_secondary_body_template
                          , $journal, $executive_board, $this->get_journal_property('publisher_email')
                          , $type, $title, "", $post_url
                          , $this->get_journal_property('doi_url_prefix') . $doi

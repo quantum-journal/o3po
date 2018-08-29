@@ -18,7 +18,7 @@
  * @subpackage O3PO/includes
  * @author     Johannes Drever <drever@lrz.uni-muenchen.de>
  */
-class O3PO_Email_Templates {
+class O3PO_EmailTemplates {
 
    public static $default_self_notification_subject_template =
                  "A #PUBLICATION_TYPE_NAME# has been published/updated by #JOURNAL#";
