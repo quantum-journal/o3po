@@ -46,7 +46,8 @@ class O3PO_EmailTemplates {
                . "If you have any feedback or ideas for how to improve the peer-review and publishing process, or any other question, please let us know under #PUBLISHER_EMAIL#\n\n"
                . "Best regards,\n\n"
                . "#EXECUTIVE_BOARD#\n"
-               . "Executive Board\n";
+               . "Executive Board\n"
+               ;
 
    public static $default_author_notification_secondary_body_template =
                  "Dear #AUTHORS#\n\n"
@@ -68,11 +69,11 @@ class O3PO_EmailTemplates {
 
    public static $default_fermats_library_body =
                  "Dear team at Fermat's library,\n\n"
-               . "#JOURNAL$ has published the following #PUBLICATION_TYPE_NAME#:\n\n"
+               . "#JOURNAL# has published the following #PUBLICATION_TYPE_NAME#:\n\n"
                . "Title:     #TITLE#\n"
                . "Author(s): #AUTHORS#\n"
-               . "URL:       #POST_URL$\n"
-               . "DOI:       #DOI\n"
+               . "URL:       #POST_URL#\n"
+               . "DOI:       #DOI#\n"
                . "\n"
                . "Please post it on Fermat's library under the permalink: #FERMATS_LIBRARY_PERMALINK#\n"
                . "Thank you very much!\n\n"
