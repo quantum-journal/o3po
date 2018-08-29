@@ -48,6 +48,21 @@ class O3PO_Email_Templates {
                . "#EXECUTIVE_BOARD#\n"
                . "Executive Board\n";
 
+   public static $default_author_notification_secondary_body_template =
+                 "Dear #AUTHORS#\n\n"
+               . "Congratulations! Your #PUBLICATION_TYPE_NAME# '#TITLE#' has been published by #JOURNAL# and is now available under:\n\n"
+               . "#POST_URL#\n\n"
+               . "Your #PUBLICATION_TYPE_NAME# has been assigned the following journal reference and DOI\n\n"
+               . "Journal reference: #JOURNAL_REFERENCE#\n"
+               . "DOI:               #DOI#\n\n"
+               . "In case you have an ORCID you can go to http://search.crossref.org/?q=#ORCID# to conveniently add your new publication to your profile.\n\n"
+               . "Please be patient, it can take several hours before the above link works.\n\n"
+               . "If you have any feedback or ideas for how to improve the peer-review and publishing process, or any other question, please let us know under #PUBLISHER_EMAIL#\n\n"
+               . "Thank you for writing this #PUBLICATION_TYPE_NAME# for #JOUNRAL#!\n\n"
+               . "Best regards,\n\n"
+               . "#EXECUTIVE_BOARD#\n"
+               . "Executive Board\n";
+
    public static $default_fermats_library_subject =
                  "#JOURNAL# has a new #PUBLICATION_TYPE_NAME# for Fermat's library";
 

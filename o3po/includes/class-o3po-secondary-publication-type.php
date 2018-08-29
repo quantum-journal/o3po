@@ -15,6 +15,7 @@
 
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-publication-type.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-latex.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-email-templates.php';
 
 /**
  * Class representing the secondary publication type.
@@ -262,17 +263,20 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         $doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
         $title = get_post_meta( $post_id, $post_type . '_title', true );
         $journal = get_post_meta( $post_id, $post_type . '_journal', true );
-		$post_url = get_permalink( $post_id );
+        $post_url = get_permalink( $post_id );
 
             // Send Emails about the submission to us
-        $to = ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email'));
+        $to = $this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email');
         $headers = array( 'From: ' . $this->get_journal_property('publisher_email'));
-        $subject  = ($this->environment->is_test_environment() ? 'TEST ' : '') . 'A ' . strtolower($type) . ' has been published/updated by ' . $journal;
-        $message  = ($this->environment->is_test_environment() ? 'TEST ' : '') . $journal . " has published/updated the following " . strtolower($type) . ":\n\n";
-        $message .= "Title:  " . $title . "\n";
-        $message .= "Authos: " . static::get_formated_authors($post_id) . "\n";
-        $message .= "URL:    " . $post_url . "\n";
-        $message .= "DOI:    " . $this->get_journal_property('doi_url_prefix') . $doi . "\n";
+        $subject  = $this->environment->is_test_environment() ? 'TEST ' : ''
+                  . O3PO_Email_Templates::self_notification_subject(
+                      O3PO_Email_Templates::default_self_notification_subject_template
+                    , $journal, strtolower($type));
+        $message  = $this->environment->is_test_environment() ? 'TEST ' : '' 
+                  . O3PO_Email_Templates::self_notification_body(
+                      O3PO_Email_Templates::default_self_notification_body_template
+                    , $journal, strtolower($type), $title
+                    , static::get_formated_authors($post_id), $post_url, $this->get_journal_property('doi_url_prefix') . $doi);
 
         $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
@@ -301,24 +305,25 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         }
 
             // Send email notifying authors of publication
-		if( empty($corresponding_author_has_been_notifed_date) || $this->environment->is_test_environment()) {
+        if( empty($corresponding_author_has_been_notifed_date) || $this->environment->is_test_environment()) {
+            $executive_board = "Christian, Lídia, and Marcus\n";
 
             $to = ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $corresponding_author_email);
-			$headers = array( 'Cc: ' . ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') ), 'From: ' . $this->get_journal_property('publisher_email'));
-			$subject  = ($this->environment->is_test_environment() ? 'TEST ' : '') . $journal . " has published your " . $type;
-			$message  = ($this->environment->is_test_environment() ? 'TEST ' : '') . "Dear " . static::get_formated_authors($post_id) . ",\n\n";
-			$message .= "Congratulations! Your " . $type . " '" . $title . "' has been published by " . $journal . " and is now available under:\n\n";
-			$message .= $post_url . "\n\n";
-			$message .= "Your " . $type . " has been assigned the following journal reference and DOI\n\n";
-			$message .= "Journal reference: " . static::get_formated_citation($post_id) . "\n";
-			$message .= "DOI:               " . $this->get_journal_property('doi_url_prefix') . $doi . "\n\n";
-			$message .= "In case you have an ORCID you can go to http://search.crossref.org/?q=" . str_replace('/', '%2F', $doi) . " to conveniently add your new publication to your profile.\n\n";
-			$message .= "Please be patient, it can take several hours before the above link works.\n\n";
-            $message .= "Thank you for writing this " . $type . " for " . $journal . "!\n\n";
-			$message .= "Best regards,\n\n";
-			$message .= "Christian, Lídia, and Marcus\n";
-			$message .= "Executive Board\n";
-			$successfully_sent = wp_mail( $to, $subject, $message, $headers);
+            $headers = array( 'Cc: ' . ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') ), 'From: ' . $this->get_journal_property('publisher_email'));
+
+            $subject  = $this->environment->is_test_environment() ? 'TEST ' : ''
+                . O3PO_Email_Templates::author_notification_subject(
+                     O3PO_Email_Templates::$default_author_notification_subject_template
+                   , $journal, $type);
+            $message  = $this->environment->is_test_environment() ? 'TEST ' : '' 
+                      . O3PO_Email_Templates::author_notification_body(
+                           O3PO_Email_Templates::$default_author_notification_secondary_body_template
+                         , $journal, $executive_board, $this->get_journal_property('publisher_email')
+                         , $type, $title, "", $post_url
+                         , $this->get_journal_property('doi_url_prefix') . $doi
+                         , static::get_formated_citation($post_id), str_replace('/', '%2F', $doi));
+
+            $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
             if($successfully_sent) {
                 update_post_meta( $post_id, $post_type . '_corresponding_author_has_been_notifed_date', date("Y-m-d") );
@@ -327,7 +332,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
             {
                 $validation_result .= 'WARNING: Sending email to corresponding author failed.' . "\n";
             }
-		}
+        }
 
         return $validation_result;
     }
