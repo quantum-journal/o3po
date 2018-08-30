@@ -285,9 +285,9 @@ class O3PO_Settings extends O3PO_Singleton {
           , array($this, 'author_notification_subject_template_settings')
           , 'email_settings', 'email_settings');
         add_settings_field(
-            'self_notification_body_template'
-          , 'Self notification body template'
-          , array($this, 'self_notification_body_template_settings')
+            'author_notification_body_template'
+          , 'Author notification body template'
+          , array($this, 'author_notification_body_template_settings')
           , 'email_settings', 'email_settings');
         add_settings_field(
             'author_notification_secondary_body_template'

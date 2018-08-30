@@ -8,7 +8,7 @@ class O3PO_EmailTemplatesTest extends PHPUnit_Framework_TestCase
   public function test_self_notification_subject(){
 
       $message = O3PO_EmailTemplates::self_notification_subject(
-                   O3PO_EmailTemplatesTest::getTemplate('default_self_notification_subject_template')
+                   O3PO_EmailTemplatesTest::getTemplate('self_notification_subject_template')
                  , "test-journal", "test-publication-type-name");
       $this->assertEquals($message
                         , "A test-publication-type-name has been published/updated by test-journal");
@@ -16,7 +16,7 @@ class O3PO_EmailTemplatesTest extends PHPUnit_Framework_TestCase
 
   public function test_self_notification_body(){
       $message = O3PO_EmailTemplates::self_notification_body(
-                   O3PO_EmailTemplatesTest::getTemplate('default_self_notification_body_template')
+                   O3PO_EmailTemplatesTest::getTemplate('self_notification_body_template')
                  , "test-journal", "test-publication-name", "test-title", "test-authors", "test-url", "test-doi");
       $this->assertEquals($message
                         , "test-journal has published/updated the following test-publication-name\n"
@@ -28,7 +28,7 @@ class O3PO_EmailTemplatesTest extends PHPUnit_Framework_TestCase
 
   public function test_author_notification_subject() {
       $message = O3PO_EmailTemplates::author_notification_subject(
-                   O3PO_EmailTemplatesTest::getTemplate('default_author_notification_subject_template')
+                   O3PO_EmailTemplatesTest::getTemplate('author_notification_subject_template')
                  , "test-journal", "test-publication-type-name"
                  );
 
@@ -38,7 +38,7 @@ class O3PO_EmailTemplatesTest extends PHPUnit_Framework_TestCase
 
   public function test_author_notification_body(){
     $message = O3PO_EmailTemplates::author_notification_body(
-                   O3PO_EmailTemplatesTest::getTemplate('default_author_notification_body_template')
+                   O3PO_EmailTemplatesTest::getTemplate('author_notification_body_template')
                  , "test-journal", "test-executive-board", "test-publisher-email", "test-publication-type-name", "test-title", "test-authors", "test-post-url", "test-doi", "test-journal-reference", "test-orcid"
                  );
     $this->assertEquals($message
