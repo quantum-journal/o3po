@@ -81,7 +81,7 @@ class O3PO_EmailTemplatesTest extends PHPUnit_Framework_TestCase
   }
    public function test_fermats_library_notification_subject(){
        $message = O3PO_EmailTemplates::fermats_library_notification_subject(
-                     O3PO_EmailTemplatesTest::getTemplate('fermats_library_subject_template')
+                     O3PO_EmailTemplatesTest::getTemplate('fermats_library_notification_subject_template')
                   , "test-journal", "test-publication-type-name"
                   );
        $this->assertEquals($message
@@ -90,7 +90,7 @@ class O3PO_EmailTemplatesTest extends PHPUnit_Framework_TestCase
 
    public function test_fermats_library_notification_body(){
        $message = O3PO_EmailTemplates::fermats_library_notification_body(
-                     O3PO_EmailTemplatesTest::getTemplate('fermats_library_body_template')
+                     O3PO_EmailTemplatesTest::getTemplate('fermats_library_notification_body_template')
                   , "test-journal"
                   , "test-publication-type-name", "test-title", "test-authors"
                   , "test-post-url", "test-doi", "test-fermats-library-permalink"

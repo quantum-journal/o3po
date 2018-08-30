@@ -540,12 +540,12 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             $headers = array( 'Cc: ' . ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') ), 'From: ' . $this->get_journal_property('publisher_email'));
             $subject  = ($this->environment->is_test_environment() ? 'TEST ' : '') 
                 . O3PO_EmailTemplates::fermats_library_notification_subject(
-                        $settings->get_plugin_option('fermats_library_subject_template')
+                        $settings->get_plugin_option('fermats_library_notification_subject_template')
                       , $journal
                       , $this->get_publication_type_name());
             $message  = ($this->environment->is_test_environment() ? 'TEST ' : '') 
                 . O3PO_EmailTemplates::fermats_library_notification_body(
-                        $settings->get_plugin_option('fermats_library_body_template')
+                        $settings->get_plugin_option('fermats_library_notification_body_template')
                       , $journal
                       , $this->get_publication_type_name()
                       , $title, static::get_formated_authors($post_id)

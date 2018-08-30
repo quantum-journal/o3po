@@ -143,9 +143,9 @@ class O3PO_Settings extends O3PO_Singleton {
                . "Best regards,\n\n"
                . "#EXECUTIVE_BOARD#\n"
                . "Executive Board\n"
-        , 'fermats_library_subject_template' =>
+        , 'fermats_library_notification_subject_template' =>
                  "#JOURNAL# has a new #PUBLICATION_TYPE_NAME# for Fermat's library"
-        , 'fermats_library_body_template' =>
+        , 'fermats_library_notification_body_template' =>
                  "Dear team at Fermat's library,\n\n"
                . "#JOURNAL# has published the following #PUBLICATION_TYPE_NAME#:\n\n"
                . "Title:     #TITLE#\n"
