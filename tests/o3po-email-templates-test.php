@@ -10,7 +10,7 @@ class O3PO_EmailTemplatesTest extends PHPUnit_Framework_TestCase
       $message = O3PO_EmailTemplates::self_notification_subject(
                    O3PO_EmailTemplatesTest::getTemplate('self_notification_subject_template')
                  , "test-journal", "test-publication-type-name");
-      $this->assertEquals($message
+      $this->assertEquals($message['result']
                         , "A test-publication-type-name has been published/updated by test-journal");
   }
 
