@@ -16,6 +16,7 @@
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-publication-type.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-latex.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-email-templates.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
 
 /**
  * Class representing the secondary publication type.
@@ -64,6 +65,8 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
     public function __construct( $targe_publication_type_name, $targe_publication_type_name_plural, $journal, $environment ) {
 
         parent::__construct($journal, 1, $environment);
+
+        $settings = O3PO_Settings::instance();
 
         $this->targe_publication_type_name = $targe_publication_type_name;
         $this->targe_publication_type_name_plural = $targe_publication_type_name_plural;
@@ -270,11 +273,11 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         $headers = array( 'From: ' . $this->get_journal_property('publisher_email'));
         $subject  = $this->environment->is_test_environment() ? 'TEST ' : ''
                   . O3PO_EmailTemplates::self_notification_subject(
-                      O3PO_EmailTemplates::default_self_notification_subject_template
+                      $this->settings->get_plugin_option('self_notification_subject_template')
                     , $journal, strtolower($type));
         $message  = $this->environment->is_test_environment() ? 'TEST ' : '' 
                   . O3PO_EmailTemplates::self_notification_body(
-                      O3PO_EmailTemplates::default_self_notification_body_template
+                      $this->settings->get_plugin_option('self_notification_body_template')
                     , $journal, strtolower($type), $title
                     , static::get_formated_authors($post_id), $post_url, $this->get_journal_property('doi_url_prefix') . $doi);
 
@@ -313,11 +316,11 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 
             $subject  = $this->environment->is_test_environment() ? 'TEST ' : ''
                 . O3PO_EmailTemplates::author_notification_subject(
-                     O3PO_EmailTemplates::$default_author_notification_subject_template
+                     $this->settings->get_plugin_option('author_notification_subject_template')
                    , $journal, $type);
             $message  = $this->environment->is_test_environment() ? 'TEST ' : '' 
                       . O3PO_EmailTemplates::author_notification_body(
-                           O3PO_EmailTemplates::$default_author_notification_secondary_body_template
+                           $this->settings->get_plugin_option('author_notification_secondary_body_template')
                          , $journal, $executive_board, $this->get_journal_property('publisher_email')
                          , $type, $title, "", $post_url
                          , $this->get_journal_property('doi_url_prefix') . $doi

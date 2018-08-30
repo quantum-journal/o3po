@@ -17,6 +17,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-utili
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-latex.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-publication-type.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-email-templates.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
 
 /**
  * Class representing the primary publication type.
@@ -45,6 +46,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 
         parent::__construct($journal, 4, $environment);
 
+        $settings = O3PO_Settings::instance();
     }
 
         /**
@@ -469,13 +471,13 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 
         $subject  = ($this->environment->is_test_environment() ? 'TEST ' : '')
                   . O3PO_EmailTemplates::self_notification_subject(
-                              O3PO_EmailTemplates::$default_self_notification_subject_template
+                              $this->settings->get_plugin_option('self_notification_subject_template')
                             , $journal
                             , $this->get_publication_type_name());
 
         $message  = ($this->environment->is_test_environment() ? 'TEST ' : '') 
                   . O3PO_EmailTemplates::self_notification_body(
-                              O3PO_EmailTemplates::$default_self_notification_body_template
+                              $this->settings->get_plugin_option('self_notification_body_template')
                             , $journal
                             , $this->get_publication_type_name()
                             , $title
@@ -505,7 +507,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             $headers = array( 'Cc: ' . ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') ), 'From: ' . $this->get_journal_property('publisher_email'));
             $subject  = ($this->environment->is_test_environment() ? 'TEST ' : '')
                        . O3PO_EmailTemplates::author_notification_subject(
-                             O3PO_EmailTemplates::$default_author_notification_subject_template
+                              $this->settings->get_plugin_option('author_notification_subject_template')
                             , $journal
                             , $this->get_publication_type_name());
 
@@ -513,7 +515,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 
             $message  = ($this->environment->is_test_environment() ? 'TEST ' : '') 
                        . O3PO_EmailTemplates::author_notification_body(
-                                      O3PO_EmailTemplates::$default_author_notification_body_template
+                                      $this->settings->get_plugin_option('author_notification_body_template')
                                     , $journal, $executive_board, $this->get_journal_property('publisher_email')
                                     , $this->get_publication_type_name(), $title, static::get_formated_authors($post_id)
                                     , $post_url, $this->get_journal_property('doi_url_prefix') . $doi
@@ -539,12 +541,12 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             $headers = array( 'Cc: ' . ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') ), 'From: ' . $this->get_journal_property('publisher_email'));
             $subject  = ($this->environment->is_test_environment() ? 'TEST ' : '') 
                 . O3PO_EmailTemplates::fermats_library_notification_subject(
-                        O3PO_EmailTemplates::$default_fermats_library_subject
+                        $this->settings->get_plugin_option('fermats_library_subject_template')
                       , $journal
                       , $this->get_publication_type_name());
             $message  = ($this->environment->is_test_environment() ? 'TEST ' : '') 
                 . O3PO_EmailTemplates::fermats_library_notification_body(
-                        O3PO_EmailTemplates::$default_fermats_library_body 
+                        $this->settings->get_plugin_option('fermats_library_body_template')
                       , $journal
                       , $this->get_publication_type_name()
                       , $title, static::get_formated_authors($post_id)
