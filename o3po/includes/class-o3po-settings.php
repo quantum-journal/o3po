@@ -356,6 +356,16 @@ class O3PO_Settings extends O3PO_Singleton {
         echo '<p>Settings of the plugin.</p>';
     }
 
+    /**
+     * Render the head of the plugin settings page.
+     *
+     * @since    0.2.2
+     * @access   public
+     */
+    public function render_email_settings() {
+        echo '<p> Settings of email templates.</p>';
+    }
+
         /**
          * Render the head of the journal settings part.
          *
