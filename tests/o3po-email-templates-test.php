@@ -1,12 +1,14 @@
 <?php
 
 require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-email-templates.php';
+require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-settings.php';
 
 class O3PO_EmailTemplatesTest extends PHPUnit_Framework_TestCase
 {
   public function test_self_notification_subject(){
+
       $message = O3PO_EmailTemplates::self_notification_subject(
-                   O3PO_EmailTemplates::$default_self_notification_subject_template
+                   O3PO_EmailTemplatesTest::getTemplate('default_self_notification_subject_template')
                  , "test-journal", "test-publication-type-name");
       $this->assertEquals($message
                         , "A test-publication-type-name has been published/updated by test-journal");
@@ -14,7 +16,7 @@ class O3PO_EmailTemplatesTest extends PHPUnit_Framework_TestCase
 
   public function test_self_notification_body(){
       $message = O3PO_EmailTemplates::self_notification_body(
-                   O3PO_EmailTemplates::$default_self_notification_body_template
+                   O3PO_EmailTemplatesTest::getTemplate('default_self_notification_body_template')
                  , "test-journal", "test-publication-name", "test-title", "test-authors", "test-url", "test-doi");
       $this->assertEquals($message
                         , "test-journal has published/updated the following test-publication-name\n"
@@ -26,7 +28,7 @@ class O3PO_EmailTemplatesTest extends PHPUnit_Framework_TestCase
 
   public function test_author_notification_subject() {
       $message = O3PO_EmailTemplates::author_notification_subject(
-                   O3PO_EmailTemplates::$default_author_notification_subject_template
+                   O3PO_EmailTemplatesTest::getTemplate('default_author_notification_subject_template')
                  , "test-journal", "test-publication-type-name"
                  );
 
@@ -36,7 +38,7 @@ class O3PO_EmailTemplatesTest extends PHPUnit_Framework_TestCase
 
   public function test_author_notification_body(){
     $message = O3PO_EmailTemplates::author_notification_body(
-                   O3PO_EmailTemplates::$default_author_notification_body_template
+                   O3PO_EmailTemplatesTest::getTemplate('default_author_notification_body_template')
                  , "test-journal", "test-executive-board", "test-publisher-email", "test-publication-type-name", "test-title", "test-authors", "test-post-url", "test-doi", "test-journal-reference", "test-orcid"
                  );
     $this->assertEquals($message
@@ -56,9 +58,30 @@ class O3PO_EmailTemplatesTest extends PHPUnit_Framework_TestCase
                       );
   }
 
+  public function test_author_notification_secondary_body(){
+    $message = O3PO_EmailTemplates::author_notification_body(
+                   O3PO_EmailTemplatesTest::getTemplate('author_notification_secondary_body_template')
+                 , "test-journal", "test-executive-board", "test-publisher-email", "test-publication-type-name", "test-title", "test-authors", "test-post-url", "test-doi", "test-journal-reference", "test-orcid"
+                 );
+    $this->assertEquals($message
+                      , "Dear test-authors\n\n"
+                      . "Congratulations! Your test-publication-type-name 'test-title' has been published by test-journal and is now available under:\n\n"
+                      . "test-post-url\n\n"
+                      . "Your test-publication-type-name has been assigned the following journal reference and DOI\n\n"
+                      . "Journal reference: test-journal-reference\n"
+                      . "DOI:               test-doi\n\n"
+                      . "In case you have an ORCID you can go to http://search.crossref.org/?q=test-orcid to conveniently add your new publication to your profile.\n\n"
+                      . "Please be patient, it can take several hours before the above link works.\n\n"
+                      . "If you have any feedback or ideas for how to improve the peer-review and publishing process, or any other question, please let us know under test-publisher-email\n\n"
+                      . "Thank you for writing this test-publication-type-name for test-journal!\n\n"
+                      . "Best regards,\n\n"
+                      . "test-executive-board\n"
+                      . "Executive Board\n"
+                      );
+  }
    public function test_fermats_library_notification_subject(){
        $message = O3PO_EmailTemplates::fermats_library_notification_subject(
-                     O3PO_EmailTemplates::$default_fermats_library_subject
+                     O3PO_EmailTemplatesTest::getTemplate('fermats_library_subject_template')
                   , "test-journal", "test-publication-type-name"
                   );
        $this->assertEquals($message
@@ -67,7 +90,7 @@ class O3PO_EmailTemplatesTest extends PHPUnit_Framework_TestCase
 
    public function test_fermats_library_notification_body(){
        $message = O3PO_EmailTemplates::fermats_library_notification_body(
-                     O3PO_EmailTemplates::$default_fermats_library_body
+                     O3PO_EmailTemplatesTest::getTemplate('fermats_library_body_template')
                   , "test-journal"
                   , "test-publication-type-name", "test-title", "test-authors"
                   , "test-post-url", "test-doi", "test-fermats-library-permalink"
@@ -84,6 +107,11 @@ class O3PO_EmailTemplatesTest extends PHPUnit_Framework_TestCase
                . "Thank you very much!\n\n"
                . "Kind regards,\n\n"
                . "The Executive Board\n");
+   }
+
+   private static function getTemplate($template_name){
+       $settings = O3PO_Settings::instance();
+       return $settings->get_plugin_option($template_name);
    }
 }
 ?>
