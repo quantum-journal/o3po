@@ -273,11 +273,11 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         $headers = array( 'From: ' . $this->get_journal_property('publisher_email'));
         $subject  = $this->environment->is_test_environment() ? 'TEST ' : ''
                   . O3PO_EmailTemplates::self_notification_subject(
-                      $this->settings->get_plugin_option('self_notification_subject_template')
+                      $this->$settings->get_plugin_option('self_notification_subject_template')
                     , $journal, strtolower($type));
         $message  = $this->environment->is_test_environment() ? 'TEST ' : '' 
                   . O3PO_EmailTemplates::self_notification_body(
-                      $this->settings->get_plugin_option('self_notification_body_template')
+                      $this->$settings->get_plugin_option('self_notification_body_template')
                     , $journal, strtolower($type), $title
                     , static::get_formated_authors($post_id), $post_url, $this->get_journal_property('doi_url_prefix') . $doi);
 
@@ -316,11 +316,11 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 
             $subject  = $this->environment->is_test_environment() ? 'TEST ' : ''
                 . O3PO_EmailTemplates::author_notification_subject(
-                     $this->settings->get_plugin_option('author_notification_subject_template')
+                     $this->$settings->get_plugin_option('author_notification_subject_template')
                    , $journal, $type);
             $message  = $this->environment->is_test_environment() ? 'TEST ' : '' 
                       . O3PO_EmailTemplates::author_notification_body(
-                           $this->settings->get_plugin_option('author_notification_secondary_body_template')
+                           $this->$settings->get_plugin_option('author_notification_secondary_body_template')
                          , $journal, $executive_board, $this->get_journal_property('publisher_email')
                          , $type, $title, "", $post_url
                          , $this->get_journal_property('doi_url_prefix') . $doi
