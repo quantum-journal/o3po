@@ -272,37 +272,37 @@ class O3PO_Settings extends O3PO_Singleton {
         add_settings_field(
               'self_notification_subject_template'
             , 'Self notification subject template'
-            , array($this, 'self_notification_subject_template_settings')
+            , array($this, 'render_self_notification_subject_template_settings')
             , 'email_settings', 'email_settings');
         add_settings_field(
              'self_notification_body_template'
            , 'Self notification body template'
-           , array($this, 'self_notification_body_template_settings')
+           , array($this, 'render_self_notification_body_template_settings')
            , 'email_settings', 'email_settings');
         add_settings_field(
             'author_notification_subject_template'
           , 'Self author notification subject template'
-          , array($this, 'author_notification_subject_template_settings')
+          , array($this, 'render_author_notification_subject_template_settings')
           , 'email_settings', 'email_settings');
         add_settings_field(
             'author_notification_body_template'
           , 'Author notification body template'
-          , array($this, 'author_notification_body_template_settings')
+          , array($this, 'render_author_notification_body_template_settings')
           , 'email_settings', 'email_settings');
         add_settings_field(
             'author_notification_secondary_body_template'
           , 'Author notification secondary body template'
-          , array($this, 'author_notification_secondary_body_template_settings')
+          , array($this, 'render_author_notification_secondary_body_template_settings')
           , 'email_settings', 'email_settings');
         add_settings_field(
             'fermats_library_subject_template'
           , 'Fermats library subject template'
-          , array($this, 'fermats_library_subject_template_settings')
+          , array($this, 'render_fermats_library_subject_template_settings')
           , 'email_settings', 'email_settings');
         add_settings_field(
             'fermats_library_body_template'
           , 'Fermats library body template'
-          , array($this, 'fermats_library_body_template_settings')
+          , array($this, 'render_fermats_library_body_template_settings')
           , 'email_settings', 'email_settings');
 
 
@@ -580,6 +580,76 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_first_volume_year_setting() {
         $this->render_setting('first_volume_year');
+    }
+
+    /**
+     * Render the email template for the self notification subject
+     *
+     * @since    0.2.2
+     * @access   public
+     */
+    public function render_self_notification_subject_template_settings() {
+        $this->render_setting('self_notification_subject_template');
+    }
+
+    /**
+     * Render the email template for the self notification body
+     *
+     * @since    0.2.2
+     * @access   public
+     */
+    public function render_self_notification_body_template_settings() {
+        $this->render_setting('self_notification_body_template');
+    }
+
+    /**
+     * Render the email template for the author notification subject
+     *
+     * @since    0.2.2
+     * @access   public
+     */
+    public function render_author_notification_subject_template_settings() {
+        $this->render_setting('author_notification_subject_template');
+    }
+
+    /**
+     * Render the email template for the author notification body
+     *
+     * @since    0.2.2
+     * @access   public
+     */
+    public function render_author_notification_body_template_settings() {
+        $this->render_setting('author_notification_body_template');
+    }
+
+    /**
+     * Render the email template for the author notification secondary body
+     *
+     * @since    0.2.2
+     * @access   public
+     */
+    public function render_author_notification_secondary_body_template_settings() {
+        $this->render_setting('author_notification_secondary_body_template');
+    }
+
+    /**
+     * Render the email template for the fermats library notification subject
+     *
+     * @since    0.2.2
+     * @access   public
+     */
+    public function render_fermats_library_subject_template_settings() {
+        $this->render_setting('fermats_library_notification_subject_template');
+    }
+
+    /**
+     * Render the email template for the fermats library notification body
+     *
+     * @since    0.2.2
+     * @access   public
+     */
+    public function render_fermats_library_body_template_settings() {
+        $this->render_setting('fermats_library_notification_body_template');
     }
 
         /**
