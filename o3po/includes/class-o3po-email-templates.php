@@ -95,7 +95,7 @@ class O3PO_EmailTemplates {
                           , "/#AUTHORS#/" => "The names of the authors"
                           , "/#POST_URL#/" => "The url where the publication can be found"
                           , "/#DOI#/" => "The DOI"
-                          , "/#FERMATS_LIBRARY_PERMALINK#/" => "The journal reference");
+                          , "/#FERMATS_LIBRARY_PERMALINK#/" => "The permalink in fermats library");
        return array('short_codes' => $short_codes
                   , 'result' => preg_replace(array_keys($short_codes)
                          , array($journal
