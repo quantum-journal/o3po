@@ -23,6 +23,7 @@
 
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-singleton.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-utility.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-email-templates.php';
 
 
 /**
@@ -590,6 +591,7 @@ class O3PO_Settings extends O3PO_Singleton {
      */
     public function render_self_notification_subject_template_settings() {
         $this->render_setting('self_notification_subject_template');
+        echo O3PO_EmailTemplates::render_short_codes('self_notification_subject');
     }
 
     /**
@@ -600,6 +602,7 @@ class O3PO_Settings extends O3PO_Singleton {
      */
     public function render_self_notification_body_template_settings() {
         $this->render_setting('self_notification_body_template');
+        echo O3PO_EmailTemplates::render_short_codes('self_notification_body');
     }
 
     /**
@@ -610,6 +613,7 @@ class O3PO_Settings extends O3PO_Singleton {
      */
     public function render_author_notification_subject_template_settings() {
         $this->render_setting('author_notification_subject_template');
+        echo O3PO_EmailTemplates::render_short_codes('author_notification_subject');
     }
 
     /**
@@ -620,6 +624,7 @@ class O3PO_Settings extends O3PO_Singleton {
      */
     public function render_author_notification_body_template_settings() {
         $this->render_setting('author_notification_body_template');
+        echo O3PO_EmailTemplates::render_short_codes('author_notification_body');
     }
 
     /**
@@ -630,6 +635,7 @@ class O3PO_Settings extends O3PO_Singleton {
      */
     public function render_author_notification_secondary_body_template_settings() {
         $this->render_setting('author_notification_secondary_body_template');
+        echo O3PO_EmailTemplates::render_short_codes('author_notification_body');
     }
 
     /**
@@ -640,6 +646,7 @@ class O3PO_Settings extends O3PO_Singleton {
      */
     public function render_fermats_library_subject_template_settings() {
         $this->render_setting('fermats_library_notification_subject_template');
+        echo O3PO_EmailTemplates::render_short_codes('fermats_library_notification_subject');
     }
 
     /**
@@ -650,6 +657,7 @@ class O3PO_Settings extends O3PO_Singleton {
      */
     public function render_fermats_library_body_template_settings() {
         $this->render_setting('fermats_library_notification_body_template');
+        echo O3PO_EmailTemplates::render_short_codes('fermats_library_notification_body');
     }
 
         /**
