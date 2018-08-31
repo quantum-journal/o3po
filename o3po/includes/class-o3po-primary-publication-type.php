@@ -481,7 +481,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                             , $this->get_publication_type_name()
                             , $title
                             , static::get_formated_authors($post_id)
-                            , $post_url,$this->get_journal_property('doi_url_prefix') . $doi);
+                            , $post_url,$this->get_journal_property('doi_url_prefix') . $doi)['result'];
 
         $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
@@ -508,7 +508,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                        . O3PO_EmailTemplates::author_notification_subject(
                               $settings->get_plugin_option('author_notification_subject_template')
                             , $journal
-                            , $this->get_publication_type_name());
+                            , $this->get_publication_type_name())['result'];
 
             $executive_board = "Christian, Lídia, and Marcus\n";
 
@@ -518,7 +518,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                                     , $journal, $executive_board, $this->get_journal_property('publisher_email')
                                     , $this->get_publication_type_name(), $title, static::get_formated_authors($post_id)
                                     , $post_url, $this->get_journal_property('doi_url_prefix') . $doi
-                                    , static::get_formated_citation($post_id), str_replace('/', '%2F', $doi));
+                                    , static::get_formated_citation($post_id), str_replace('/', '%2F', $doi))['result'];
 
             $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
@@ -542,7 +542,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                 . O3PO_EmailTemplates::fermats_library_notification_subject(
                         $settings->get_plugin_option('fermats_library_notification_subject_template')
                       , $journal
-                      , $this->get_publication_type_name());
+                      , $this->get_publication_type_name())['result'];
             $message  = ($this->environment->is_test_environment() ? 'TEST ' : '') 
                 . O3PO_EmailTemplates::fermats_library_notification_body(
                         $settings->get_plugin_option('fermats_library_notification_body_template')
@@ -551,7 +551,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                       , $title, static::get_formated_authors($post_id)
                       , $post_url
                       , $this->get_journal_property('doi_url_prefix') . $doi
-                      , $fermats_library_permalink);
+                      , $fermats_library_permalink)['result'];
 
             $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
