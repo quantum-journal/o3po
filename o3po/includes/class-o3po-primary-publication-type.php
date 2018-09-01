@@ -468,21 +468,21 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $to = ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') );
         $headers = array( 'From: ' . $this->get_journal_property('publisher_email'));
 
-        $subject  = ($this->environment->is_test_environment() ? 'TEST ' : '')
-                  . O3PO_EmailTemplates::self_notification_subject(
-                              $settings->get_plugin_option('self_notification_subject_template')
-                            , $journal
-                            , $this->get_publication_type_name())['result'];
+        $subject  = ($this->environment->is_test_environment() ? 'TEST ' : '').
+                    O3PO_EmailTemplates::self_notification_subject(
+                              $settings->get_plugin_option('self_notification_subject_template').
+                              $journal.
+                              $this->get_publication_type_name())['result'];
 
-        $message  = ($this->environment->is_test_environment() ? 'TEST ' : '') 
-                  . O3PO_EmailTemplates::self_notification_body(
-                              $settings->get_plugin_option('self_notification_body_template')
-                            , $journal
-                            , $this->get_publication_type_name()
-                            , $title
-                            , static::get_formated_authors($post_id)
-                            , $post_url
-                            , $this->get_journal_property('doi_url_prefix') . $doi)['result'];
+        $message  = ($this->environment->is_test_environment() ? 'TEST ' : '') .
+                    O3PO_EmailTemplates::self_notification_body(
+                              $settings->get_plugin_option('self_notification_body_template'),
+                            $journal,
+                            $this->get_publication_type_name(),
+                            $title,
+                            static::get_formated_authors($post_id),
+                            $post_url,
+                            $this->get_journal_property('doi_url_prefix') . $doi)['result'];
 
         $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
@@ -505,21 +505,21 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 
             $to = ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $corresponding_author_email);
             $headers = array( 'Cc: ' . ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') ), 'From: ' . $this->get_journal_property('publisher_email'));
-            $subject  = ($this->environment->is_test_environment() ? 'TEST ' : '')
-                       . O3PO_EmailTemplates::author_notification_subject(
-                              $settings->get_plugin_option('author_notification_subject_template')
-                            , $journal
-                            , $this->get_publication_type_name())['result'];
+            $subject  = ($this->environment->is_test_environment() ? 'TEST ' : '').
+                         O3PO_EmailTemplates::author_notification_subject(
+                              $settings->get_plugin_option('author_notification_subject_template'),
+                            $journal,
+                            $this->get_publication_type_name())['result'];
 
             $executive_board = "Christian, Lídia, and Marcus\n";
 
-            $message  = ($this->environment->is_test_environment() ? 'TEST ' : '') 
-                       . O3PO_EmailTemplates::author_notification_body(
-                                      $settings->get_plugin_option('author_notification_body_template')
-                                    , $journal, $executive_board, $this->get_journal_property('publisher_email')
-                                    , $this->get_publication_type_name(), $title, static::get_formated_authors($post_id)
-                                    , $post_url, $this->get_journal_property('doi_url_prefix'), $doi
-                                    , static::get_formated_citation($post_id))['result'];
+            $message  = ($this->environment->is_test_environment() ? 'TEST ' : '') .
+                         O3PO_EmailTemplates::author_notification_body(
+                                      $settings->get_plugin_option('author_notification_body_template'),
+                                    $journal, $executive_board, $this->get_journal_property('publisher_email'),
+                                    $this->get_publication_type_name(), $title, static::get_formated_authors($post_id),
+                                    $post_url, $this->get_journal_property('doi_url_prefix'), $doi,
+                                    static::get_formated_citation($post_id))['result'];
 
             $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
@@ -539,20 +539,20 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 
             $to = ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('fermats_library_email'));
             $headers = array( 'Cc: ' . ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') ), 'From: ' . $this->get_journal_property('publisher_email'));
-            $subject  = ($this->environment->is_test_environment() ? 'TEST ' : '') 
-                . O3PO_EmailTemplates::fermats_library_notification_subject(
-                        $settings->get_plugin_option('fermats_library_notification_subject_template')
-                      , $journal
-                      , $this->get_publication_type_name())['result'];
-            $message  = ($this->environment->is_test_environment() ? 'TEST ' : '') 
-                . O3PO_EmailTemplates::fermats_library_notification_body(
-                        $settings->get_plugin_option('fermats_library_notification_body_template')
-                      , $journal
-                      , $this->get_publication_type_name()
-                      , $title, static::get_formated_authors($post_id)
-                      , $post_url
-                      , $this->get_journal_property('doi_url_prefix') . $doi
-                      , $fermats_library_permalink)['result'];
+            $subject  = ($this->environment->is_test_environment() ? 'TEST ' : '') .
+                  O3PO_EmailTemplates::fermats_library_notification_subject(
+                      $settings->get_plugin_option('fermats_library_notification_subject_template'),
+                      $journal,
+                      $this->get_publication_type_name())['result'];
+            $message  = ($this->environment->is_test_environment() ? 'TEST ' : '') .
+                  O3PO_EmailTemplates::fermats_library_notification_body(
+                      $settings->get_plugin_option('fermats_library_notification_body_template'),
+                      $journal,
+                      $this->get_publication_type_name(),
+                      $title, static::get_formated_authors($post_id),
+                      $post_url,
+                      $this->get_journal_property('doi_url_prefix') . $doi,
+                      $fermats_library_permalink)['result'];
 
             $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 

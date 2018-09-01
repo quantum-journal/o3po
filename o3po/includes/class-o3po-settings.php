@@ -104,67 +104,67 @@ class O3PO_Settings extends O3PO_Singleton {
         'fermats_library_url_prefix' => 'https://fermatslibrary.com/s/',
         'doaj_api_url' => "https://doaj.org/api/v1/articles",
         'doaj_language_code' => "EN",
-        'custom_search_page' => "checked"
+        'custom_search_page' => "checked",
 
-        , 'self_notification_subject_template' => 
-                 "A [publication_type_name] has been published/updated by [journal]"
-        , 'self_notification_body_template' => 
-                 "[journal] has published/updated the following [publication_type_name]\n"
-               . "Title:   [title] \n"
-               . "Authors: [authors] \n"
-               . "URL:     [url]\n"
-               . "DOI:     [doi]\n"
-        , 'author_notification_subject_template' =>
-               "[journal] has published your [publication_type_name]"
-        , 'author_notification_body_template' =>
-                 "Dear [authors],\n\n"
-               . "Congratulations! Your [publication_type_name] '[title]' has been published by [journal] and is now available under:\n\n"
-               . "[post_url]\n\n"
-               . "Your work has been assigned the following journal reference and DOI\n\n"
-               . "Journal reference: [journal_reference]\n"
-               . "DOI:               [doi_url_prefix][doi]\n\n"
-               . "We kindly ask you to log in on the arXiv under https://arxiv.org/user/login and add this information to the page of your work there. Thank you very much!\n\n"
-               . "In case you have an ORCID you can go to http://search.crossref.org/?q=[doi] to conveniently add your new publication to your profile.\n\n"
-               . "Please be patient, it can take several hours until the DOI has been activated by Crossref.\n\n"
-               . "If you have any feedback or ideas for how to improve the peer-review and publishing process, or any other question, please let us know under [publisher_email]\n\n"
-               . "Best regards,\n\n"
-               . "[executive_board]\n"
-               . "Executive Board\n"
-         , 'author_notification_secondary_body_template' =>
-                 "Dear [authors],\n\n"
-               . "Congratulations! Your [publication_type_name] '[title]' has been published by [journal] and is now available under:\n\n"
-               . "[post_url]\n\n"
-               . "Your [publication_type_name] has been assigned the following journal reference and DOI\n\n"
-               . "Journal reference: [journal_reference]\n"
-               . "DOI:               [doi_url_prefix][doi]\n\n"
-               . "In case you have an ORCID you can go to http://search.crossref.org/?q=[doi] to conveniently add your new publication to your profile.\n\n"
-               . "Please be patient, it can take several hours before the above link works.\n\n"
-               . "If you have any feedback or ideas for how to improve the peer-review and publishing process, or any other question, please let us know under [publisher_email]\n\n"
-               . "Thank you for writing this [publication_type_name] for [journal]!\n\n"
-               . "Best regards,\n\n"
-               . "[executive_board]\n"
-               . "Executive Board\n"
-        , 'fermats_library_notification_subject_template' =>
-                 "[journal] has a new [publication_type_name] for Fermat's library"
-        , 'fermats_library_notification_body_template' =>
-                 "Dear team at Fermat's library,\n\n"
-               . "[journal] has published the following [publication_type_name]:\n\n"
-               . "Title:     [title]\n"
-               . "Author(s): [authors]\n"
-               . "URL:       [post_url]\n"
-               . "DOI:       [doi]\n"
-               . "\n"
-               . "Please post it on Fermat's library under the permalink: [fermats_library_permalink]\n"
-               . "Thank you very much!\n\n"
-               . "Kind regards,\n\n"
-               . "The Executive Board\n"
+        'self_notification_subject_template' => 
+                 "A [publication_type_name] has been published/updated by [journal]",
+        'self_notification_body_template' => 
+                 "[journal] has published/updated the following [publication_type_name]\n".
+                 "Title:   [title] \n".
+                 "Authors: [authors] \n".
+                 "URL:     [url]\n".
+                 "DOI:     [doi]\n",
+        'author_notification_subject_template' =>
+               "[journal] has published your [publication_type_name]",
+        'author_notification_body_template' =>
+                 "Dear [authors],\n\n".
+                 "Congratulations! Your [publication_type_name] '[title]' has been published by [journal] and is now available under:\n\n".
+                 "[post_url]\n\n".
+                 "Your work has been assigned the following journal reference and DOI\n\n".
+                 "Journal reference: [journal_reference]\n".
+                 "DOI:               [doi_url_prefix][doi]\n\n".
+                 "We kindly ask you to log in on the arXiv under https://arxiv.org/user/login and add this information to the page of your work there. Thank you very much!\n\n".
+                 "In case you have an ORCID you can go to http://search.crossref.org/?q=[doi] to conveniently add your new publication to your profile.\n\n".
+                 "Please be patient, it can take several hours until the DOI has been activated by Crossref.\n\n".
+                 "If you have any feedback or ideas for how to improve the peer-review and publishing process, or any other question, please let us know under [publisher_email]\n\n".
+                 "Best regards,\n\n".
+                 "[executive_board]\n".
+                 "Executive Board\n",
+         'author_notification_secondary_body_template' =>
+                 "Dear [authors],\n\n".
+                 "Congratulations! Your [publication_type_name] '[title]' has been published by [journal] and is now available under:\n\n".
+                 "[post_url]\n\n".
+                 "Your [publication_type_name] has been assigned the following journal reference and DOI\n\n".
+                 "Journal reference: [journal_reference]\n".
+                 "DOI:               [doi_url_prefix][doi]\n\n".
+                 "In case you have an ORCID you can go to http://search.crossref.org/?q=[doi] to conveniently add your new publication to your profile.\n\n".
+                 "Please be patient, it can take several hours before the above link works.\n\n".
+                 "If you have any feedback or ideas for how to improve the peer-review and publishing process, or any other question, please let us know under [publisher_email]\n\n".
+                 "Thank you for writing this [publication_type_name] for [journal]!\n\n".
+                 "Best regards,\n\n".
+                 "[executive_board]\n".
+                 "Executive Board\n",
+        'fermats_library_notification_subject_template' =>
+                 "[journal] has a new [publication_type_name] for Fermat's library",
+        'fermats_library_notification_body_template' =>
+                 "Dear team at Fermat's library,\n\n".
+                 "[journal] has published the following [publication_type_name]:\n\n".
+                 "Title:     [title]\n".
+                 "Author(s): [authors]\n".
+                 "URL:       [post_url]\n".
+                 "DOI:       [doi]\n".
+                 "\n".
+                 "Please post it on Fermat's library under the permalink: [fermats_library_permalink]\n".
+                 "Thank you very much!\n\n".
+                 "Kind regards,\n\n".
+                 "The Executive Board\n",
 
             /* The options below are currently not customizable.
              *
              * Warning: The name of the paper-single.php templare must match
              * the primary_publication_type_name!
              */
-        , 'primary_publication_type_name' => 'paper',
+        'primary_publication_type_name' => 'paper',
         'primary_publication_type_name_plural' => 'papers',
         'secondary_publication_type_name' => 'view',
         'secondary_publication_type_name_plural' => 'views',
@@ -264,48 +264,15 @@ class O3PO_Settings extends O3PO_Singleton {
         add_settings_field('license_version', 'License version', array( $this, 'render_license_version_setting' ), 'journal_settings', 'journal_settings');
         add_settings_field('license_url', 'License url', array( $this, 'render_license_url_setting' ), 'journal_settings', 'journal_settings');
         add_settings_field('license_explanation', 'License explanation string', array( $this, 'render_license_explanation_setting' ), 'journal_settings', 'journal_settings');
-
-        add_settings_section(
-              'email_settings'
-            , 'Email settings'
-            , array($this , 'render_email_settings')
-            , 'email_settings');
-        add_settings_field(
-              'self_notification_subject_template'
-            , 'Self notification subject template'
-            , array($this, 'render_self_notification_subject_template_settings')
-            , 'email_settings', 'email_settings');
-        add_settings_field(
-             'self_notification_body_template'
-           , 'Self notification body template'
-           , array($this, 'render_self_notification_body_template_settings')
-           , 'email_settings', 'email_settings');
-        add_settings_field(
-            'author_notification_subject_template'
-          , 'Self author notification subject template'
-          , array($this, 'render_author_notification_subject_template_settings')
-          , 'email_settings', 'email_settings');
-        add_settings_field(
-            'author_notification_body_template'
-          , 'Author notification body template'
-          , array($this, 'render_author_notification_body_template_settings')
-          , 'email_settings', 'email_settings');
-        add_settings_field(
-            'author_notification_secondary_body_template'
-          , 'Author notification secondary body template'
-          , array($this, 'render_author_notification_secondary_body_template_settings')
-          , 'email_settings', 'email_settings');
-        add_settings_field(
-            'fermats_library_subject_template'
-          , 'Fermats library subject template'
-          , array($this, 'render_fermats_library_subject_template_settings')
-          , 'email_settings', 'email_settings');
-        add_settings_field(
-            'fermats_library_body_template'
-          , 'Fermats library body template'
-          , array($this, 'render_fermats_library_body_template_settings')
-          , 'email_settings', 'email_settings');
-
+        
+        add_settings_section('email_settings', 'Email settings', array($this , 'render_email_settings'), 'email_settings');
+        add_settings_field('self_notification_subject_template', 'Self notification subject template', array($this, 'render_self_notification_subject_template_settings'),'email_settings', 'email_settings');
+        add_settings_field('self_notification_body_template', 'Self notification body template', array($this, 'render_self_notification_body_template_settings'), 'email_settings', 'email_settings');
+        add_settings_field('author_notification_subject_template', 'Self author notification subject template', array($this, 'render_author_notification_subject_template_settings'), 'email_settings', 'email_settings');
+        add_settings_field('author_notification_body_template' , 'Author notification body template' , array($this, 'render_author_notification_body_template_settings') , 'email_settings', 'email_settings');
+        add_settings_field('author_notification_secondary_body_template' , 'Author notification secondary body template' , array($this, 'render_author_notification_secondary_body_template_settings') , 'email_settings', 'email_settings');
+        add_settings_field('fermats_library_subject_template' , 'Fermats library subject template' , array($this, 'render_fermats_library_subject_template_settings') , 'email_settings', 'email_settings');
+        add_settings_field('fermats_library_body_template' , 'Fermats library body template' , array($this, 'render_fermats_library_body_template_settings') , 'email_settings', 'email_settings');
 
         add_settings_section('crossref_settings', 'Crossref settings', array( $this, 'render_crossref_settings' ), 'crossref_settings');
         add_settings_field('crossref_id', 'Crossref ID', array( $this, 'render_crossref_id_setting' ), 'crossref_settings', 'crossref_settings');

@@ -270,15 +270,15 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
             // Send Emails about the submission to us
         $to = $this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email');
         $headers = array( 'From: ' . $this->get_journal_property('publisher_email'));
-        $subject  = $this->environment->is_test_environment() ? 'TEST ' : ''
-                  . O3PO_EmailTemplates::self_notification_subject(
-                      $settings->get_plugin_option('self_notification_subject_template')
-                    , $journal, strtolower($type))['result'];
-        $message  = $this->environment->is_test_environment() ? 'TEST ' : '' 
-                  . O3PO_EmailTemplates::self_notification_body(
-                      $settings->get_plugin_option('self_notification_body_template')
-                    , $journal, strtolower($type), $title
-                    , static::get_formated_authors($post_id), $post_url, $this->get_journal_property('doi_url_prefix') . $doi)['result'];
+        $subject  = $this->environment->is_test_environment() ? 'TEST ' : ''.
+                    O3PO_EmailTemplates::self_notification_subject(
+                      $settings->get_plugin_option('self_notification_subject_template'),
+                    $journal, strtolower($type))['result'];
+        $message  = $this->environment->is_test_environment() ? 'TEST ' : '' .
+                    O3PO_EmailTemplates::self_notification_body(
+                      $settings->get_plugin_option('self_notification_body_template').
+                      $journal, strtolower($type), $title.
+                      static::get_formated_authors($post_id), $post_url, $this->get_journal_property('doi_url_prefix') . $doi)['result'];
 
         $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
@@ -313,17 +313,17 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
             $to = ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $corresponding_author_email);
             $headers = array( 'Cc: ' . ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') ), 'From: ' . $this->get_journal_property('publisher_email'));
 
-            $subject  = $this->environment->is_test_environment() ? 'TEST ' : ''
-                . O3PO_EmailTemplates::author_notification_subject(
-                     $settings->get_plugin_option('author_notification_subject_template')
-                   , $journal, $type)['result'];
-            $message  = $this->environment->is_test_environment() ? 'TEST ' : '' 
-                      . O3PO_EmailTemplates::author_notification_body(
-                           $settings->get_plugin_option('author_notification_secondary_body_template')
-                         , $journal, $executive_board, $this->get_journal_property('publisher_email')
-                         , $type, $title, "", $post_url
-                         , $this->get_journal_property('doi_url_prefix'), $doi
-                         , static::get_formated_citation($post_id)
+            $subject  = $this->environment->is_test_environment() ? 'TEST ' : ''.
+                  O3PO_EmailTemplates::author_notification_subject(
+                     $settings->get_plugin_option('author_notification_subject_template').
+                     $journal, $type)['result'];
+            $message  = $this->environment->is_test_environment() ? 'TEST ' : '' .
+                        O3PO_EmailTemplates::author_notification_body(
+                           $settings->get_plugin_option('author_notification_secondary_body_template'),
+                         $journal, $executive_board, $this->get_journal_property('publisher_email'),
+                         $type, $title, "", $post_url,
+                         $this->get_journal_property('doi_url_prefix'), $doi,
+                         static::get_formated_citation($post_id)
                          )['result'];
 
             $successfully_sent = wp_mail( $to, $subject, $message, $headers);
