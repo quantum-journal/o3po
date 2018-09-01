@@ -57,7 +57,7 @@ class O3PO_EmailTemplates {
 
    public static function author_notification_body($email_template
                                     , $journal, $executive_board, $publisher_email
-                                    , $publication_type_name, $title, $authors, $url, $doi, $journal_reference, $orcid){
+                                    , $publication_type_name, $title, $authors, $url, $doi_url_prefix, $doi, $journal_reference){
        $short_codes = array("[journal]" => "The journal name"
                           , "[executive_board]" => "Names of the executive board members"
                           , "[publisher_email]" => "Email address of the publisher"
@@ -65,14 +65,15 @@ class O3PO_EmailTemplates {
                           , "[title]" => "The title of the article"
                           , "[authors]" => "The names of the authors"
                           , "[post_url]" => "The url where the publication can be found"
+                          , "[doi_url_prefix]" => "The DOI url prefix"
                           , "[doi]" => "The DOI"
                           , "[journal_reference]" => "The journal reference"
-                          , "[orcid]" => "The ORCID");
+                        );
        return array('short_codes' => $short_codes
                   , 'result' => str_replace(array_keys($short_codes)
                          , array($journal, $executive_board, $publisher_email
                                , $publication_type_name, $title, $authors
-                               , $url, $doi, $journal_reference, $orcid)
+                               , $url, $doi_url_prefix, $doi, $journal_reference)
                          , $email_template));
    }
 

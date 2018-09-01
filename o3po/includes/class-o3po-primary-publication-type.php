@@ -481,7 +481,8 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                             , $this->get_publication_type_name()
                             , $title
                             , static::get_formated_authors($post_id)
-                            , $post_url,$this->get_journal_property('doi_url_prefix') . $doi)['result'];
+                            , $post_url
+                            , $this->get_journal_property('doi_url_prefix') . $doi)['result'];
 
         $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
@@ -517,8 +518,8 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                                       $settings->get_plugin_option('author_notification_body_template')
                                     , $journal, $executive_board, $this->get_journal_property('publisher_email')
                                     , $this->get_publication_type_name(), $title, static::get_formated_authors($post_id)
-                                    , $post_url, $this->get_journal_property('doi_url_prefix') . $doi
-                                    , static::get_formated_citation($post_id), str_replace('/', '%2F', $doi))['result'];
+                                    , $post_url, $this->get_journal_property('doi_url_prefix'), $doi
+                                    , static::get_formated_citation($post_id))['result'];
 
             $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 

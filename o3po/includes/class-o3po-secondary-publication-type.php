@@ -322,8 +322,9 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                            $settings->get_plugin_option('author_notification_secondary_body_template')
                          , $journal, $executive_board, $this->get_journal_property('publisher_email')
                          , $type, $title, "", $post_url
-                         , $this->get_journal_property('doi_url_prefix') . $doi
-                         , static::get_formated_citation($post_id), str_replace('/', '%2F', $doi))['result'];
+                         , $this->get_journal_property('doi_url_prefix'), $doi
+                         , static::get_formated_citation($post_id)
+                         )['result'];
 
             $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
