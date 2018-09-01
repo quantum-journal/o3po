@@ -2290,89 +2290,69 @@ abstract class O3PO_PublicationType {
         $crossref_url = $this->get_journal_property('crossref_get_forward_links_url');
         $doi_url_prefix = $this->get_journal_property('doi_url_prefix');
 
-        $response = O3PO_Crossref::remote_get_cited_by($crossref_url, $login_id, $login_passwd, $doi);
+        $body = O3PO_Crossref::get_cited_by_xml_body($crossref_url, $login_id, $login_passwd, $doi);
 
-        if ( is_wp_error($response) || empty($response['body']) ) {
-            return '<p>Error ' . $response['response']['code'] . ' ' .
-                $response['response']['message'] . '</p>';
-        } else {
-            try {
-                $use_errors=libxml_use_internal_errors(true);
-                $xml = simplexml_load_string($response['body']);
-                libxml_use_internal_errors($use_errors);
-            } catch (Exception $e) {
-                $xml = false;
+        if ( is_wp_error($body) )
+            return '<p>' . $body->get_error_code() . ' ' . $body->get_error_message() . '</p>';
+
+        if( empty($body) )
+            return '<p>Crossref\'s <a href="https://www.crossref.org/services/cited-by/">cited-by service</a> has no data on citing works. Unfortunately not all publishers provide suitable citation data.</p>';
+
+        $cited_by_html = '';
+        $citation_number = 0;
+        foreach ($body->forward_link as $f_link) {
+            $citation_number += 1;
+            $citation_journal_title = $f_link->journal_cite->journal_title;
+            $citation_article_title = $f_link->journal_cite->article_title;
+            $citation_volume = $f_link->journal_cite->volume;
+            $citation_issue = $f_link->journal_cite->issue;
+            $citation_first_page = $f_link->journal_cite->first_page;
+            $citation_item_number = $f_link->journal_cite->item_number;
+            $citation_page = !empty($citation_first_page) ? $citation_first_page : $citation_item_number;
+            $citation_year = $f_link->journal_cite->year;
+            $citation_doi = $f_link->journal_cite->doi;
+            $citation_publication_type = $f_link->journal_cite->publication_type;
+
+
+            $cited_by_html .= '<p class="break-at-all-cost">' . '[' . $citation_number . '] ';
+            foreach ($f_link->journal_cite->contributors->contributor as $contributor) {
+                    /* $citation_contributor_given_name[] = $contributor->given_name; */
+                    /* $citation_contributor_surname[] = $contributor->surname; */
+                if(!empty($contributor->given_name))
+                    $cited_by_html .= $contributor->given_name . ' ';
+                if(!empty($contributor->surname))
+                    $cited_by_html .= $contributor->surname;
+                $cited_by_html .= ', ';
             }
-            if ($xml === false) {
-                $error = "<p>Failed loading cited-by data from Crossref (maybe the DOI is not yet active)";
-                foreach(libxml_get_errors() as $error) {
-                    $error .= "<br>" . $error->message;
-                }
-                return $error . '</p>';
-            } else {
-                $cited_by_html = '';
-                $body = $xml->query_result->body[0];
-                if( !(bool)$body ) //check if <body> is empty
-                    return '<p>Crossref\'s <a href="https://www.crossref.org/services/cited-by/">cited-by service</a> has no data on citing works. Unfortunately not all publishers provide suitable citation data.</p>';
+            if(!empty($citation_article_title))
+                $cited_by_html .= '"' . $citation_article_title . '", ';
 
-                $citation_number = 0;
-                foreach ($body->forward_link as $f_link) {
-                    $citation_number += 1;
-                    $citation_journal_title = $f_link->journal_cite->journal_title;
-                    $citation_article_title = $f_link->journal_cite->article_title;
-                    $citation_volume = $f_link->journal_cite->volume;
-                    $citation_issue = $f_link->journal_cite->issue;
-                    $citation_first_page = $f_link->journal_cite->first_page;
-                    $citation_item_number = $f_link->journal_cite->item_number;
-                    $citation_page = !empty($citation_first_page) ? $citation_first_page : $citation_item_number;
-                    $citation_year = $f_link->journal_cite->year;
-                    $citation_doi = $f_link->journal_cite->doi;
-                    $citation_publication_type = $f_link->journal_cite->publication_type;
+            $citation_cite_as = '';
+            if(!empty($citation_journal_title))
+                $citation_cite_as .= $citation_journal_title . " ";
+            if(!empty($citation_volume))
+                $citation_cite_as .= $citation_volume;
+            if(!empty($citation_volume) && !empty($citation_page))
+                $citation_cite_as .= ', ';
+            if(!empty($citation_volume) && empty($citation_page))
+                $citation_cite_as .= ' ';
+            if(!empty($citation_page))
+                $citation_cite_as .= $citation_page . " ";
+            if(empty($citation_cite_as))
+                $citation_cite_as = $citation_doi . ' ';
+            if(!empty($citation_year))
+                $citation_cite_as .= '('. $citation_year . ')';
 
-
-                    $cited_by_html .= '<p class="break-at-all-cost">' . '[' . $citation_number . '] ';
-                    foreach ($f_link->journal_cite->contributors->contributor as $contributor) {
-                            /* $citation_contributor_given_name[] = $contributor->given_name; */
-                            /* $citation_contributor_surname[] = $contributor->surname; */
-                        if(!empty($contributor->given_name))
-                            $cited_by_html .= $contributor->given_name . ' ';
-                        if(!empty($contributor->surname))
-                            $cited_by_html .= $contributor->surname;
-                        $cited_by_html .= ', ';
-                    }
-                    if(!empty($citation_article_title))
-                        $cited_by_html .= '"' . $citation_article_title . '", ';
-
-                    $citation_cite_as = '';
-                    if(!empty($citation_journal_title))
-                        $citation_cite_as .= $citation_journal_title . " ";
-                    if(!empty($citation_volume))
-                        $citation_cite_as .= $citation_volume;
-                    if(!empty($citation_volume) && !empty($citation_page))
-                        $citation_cite_as .= ', ';
-                    if(!empty($citation_volume) && empty($citation_page))
-                        $citation_cite_as .= ' ';
-                    if(!empty($citation_page))
-                        $citation_cite_as .= $citation_page . " ";
-                    if(empty($citation_cite_as))
-                        $citation_cite_as = $citation_doi . ' ';
-                    if(!empty($citation_year))
-                        $citation_cite_as .= '('. $citation_year . ')';
-
-                    if(!empty($citation_doi))
-                        $cited_by_html .= '<a href="' . $doi_url_prefix . $citation_doi . '">' . $citation_cite_as . '</a>.' . '</p>' . "\n";
-                }
-
-                $cited_by_html .= '<p>(The above data is from Crossref\'s <a href="https://www.crossref.org/services/cited-by/">cited-by service</a>. Unfortunately not all publishers provide suitable and complete citation data so that some citing works or bibliographic details may be missing.)</p>';
-
-                return $cited_by_html;
-            }
+            if(!empty($citation_doi))
+                $cited_by_html .= '<a href="' . $doi_url_prefix . $citation_doi . '">' . $citation_cite_as . '</a>.' . '</p>' . "\n";
         }
+        $cited_by_html .= '<p>(The above data is from Crossref\'s <a href="https://www.crossref.org/services/cited-by/">cited-by service</a>. Unfortunately not all publishers provide suitable and complete citation data so that some citing works or bibliographic details may be missing.)</p>';
 
+        return $cited_by_html;
     }
 
         /**
-         * Echo the html formted cited by information.
+         * Echo the html formated cited by information.
          *
          * @since    0.1.0
          * @access   public

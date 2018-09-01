@@ -22,8 +22,18 @@
 class O3PO_Clockss {
 
         /**
+         * Upload xml meta-data and pdf to CLOCKSS.
          *
+         * Uploads xml meta-data and pdf to CLOCKSS for permanent archiving.
          *
+         * @since    0.2.2+
+         * @access   public
+         * @param    string     $clockss_xml      The xml encoded meta-data to upload.
+         * @param    string     $pdf_path         Path to the local fulltext pdf
+         * @param    string     $remote_filename_without_extension Filename without extension under which the files are to be deposited on the remore server
+         * @param    string     $clockss_ftp_url  The url of the CLOCKSS ftp server.
+         * @param    string     $clockss_username The CLOCKSS username
+         * @param    string     $clockss_password The CLOCKSS password
          */
     public static function ftp_upload_meta_data_and_pdf_to_clockss( $clockss_xml, $pdf_path, $remote_filename_without_extension, $clockss_ftp_url, $clockss_username, $clockss_password ) {
 
@@ -59,11 +69,14 @@ class O3PO_Clockss {
             ini_set('track_errors', $trackErrors);
             restore_error_handler();
             if($ftp_connection !== null)
+            {
                 try
                 {
                     ftp_close($ftp_connection);
-                } catch(Exception $e)
+                } catch(Exception $e) {
                     $clockss_response .= "ERROR: There was an exception while closing the ftp connection to CLOCKSS. " . $e->getMessage() . "\n";
+                }
+            }
         }
 
         return $clockss_response;

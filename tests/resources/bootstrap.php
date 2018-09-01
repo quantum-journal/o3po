@@ -207,6 +207,10 @@ class WP_Error
     function get_error_message() {
         return $this->message;
     }
+
+    function get_error_code() {
+        return $this->code;
+    }
 }
 
 class WP_Post
