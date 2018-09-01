@@ -471,7 +471,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $subject  = ($this->environment->is_test_environment() ? 'TEST ' : '').
                     O3PO_EmailTemplates::self_notification_subject(
                               $settings->get_plugin_option('self_notification_subject_template').
-                              $journal.
+                              $journal,
                               $this->get_publication_type_name())['result'];
 
         $message  = ($this->environment->is_test_environment() ? 'TEST ' : '') .
