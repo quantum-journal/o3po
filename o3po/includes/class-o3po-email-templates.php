@@ -22,10 +22,10 @@ class O3PO_EmailTemplates {
 
    public static function self_notification_subject($template
                                    , $journal, $publication_type_name){
-       $short_codes = array("/#JOURNAL#/" => "The journal name"
-                          , "/#PUBLICATION_TYPE_NAME#/" => "The type of the publication.");
+       $short_codes = array("[journal]" => "The journal name"
+                          , "[publication_type_name]" => "The type of the publication.");
        return array('short_codes' => $short_codes
-                  , 'result' => preg_replace(array_keys($short_codes)
+                  , 'result' => str_replace(array_keys($short_codes)
                          , array($journal, $publication_type_name)
                          , $template));
    }
@@ -33,24 +33,24 @@ class O3PO_EmailTemplates {
    public static function self_notification_body($email_template
                                     , $journal
                                     , $publication_type_name, $title, $authors, $url, $doi){
-       $short_codes = array("/#JOURNAL#/" => "The journal name"
-                         , "/#PUBLICATION_TYPE_NAME#/" => "The type of the publication"
-                         , "/#TITLE#/" => "The title of the publication"
-                         , "/#AUTHORS#/" => "The list of authors"
-                         , "/#URL#/" => "The publication URL"
-                         , "/#DOI#/" => "The DOI");
+       $short_codes = array("[journal]" => "The journal name"
+                         , "[publication_type_name]" => "The type of the publication"
+                         , "[title]" => "The title of the publication"
+                         , "[authors]" => "The list of authors"
+                         , "[url]" => "The publication URL"
+                         , "[doi]" => "The DOI");
        return array('short_codes' => $short_codes
-                  , 'result' => preg_replace(array_keys($short_codes)
+                  , 'result' => str_replace(array_keys($short_codes)
                          , array($journal, $publication_type_name, $title, $authors, $url, $doi)
                          , $email_template));
    }
 
    public static function author_notification_subject($template
                                    , $journal, $publication_type_name){
-       $short_codes = array("/#JOURNAL#/" => "The journal name"
-                          , "/#PUBLICATION_TYPE_NAME#/" => "The type of the publication");
+       $short_codes = array("[journal]" => "The journal name"
+                          , "[publication_type_name]" => "The type of the publication");
        return array('short_codes' => $short_codes
-                  , 'result' => preg_replace(array_keys($short_codes)
+                  , 'result' => str_replace(array_keys($short_codes)
                          , array($journal, $publication_type_name)
                          , $template));
    }
@@ -58,18 +58,18 @@ class O3PO_EmailTemplates {
    public static function author_notification_body($email_template
                                     , $journal, $executive_board, $publisher_email
                                     , $publication_type_name, $title, $authors, $url, $doi, $journal_reference, $orcid){
-       $short_codes = array("/#JOURNAL#/" => "The journal name"
-                          , "/#EXECUTIVE_BOARD#/" => "Names of the executive board members"
-                          , "/#PUBLISHER_EMAIL#/" => "Email address of the publisher"
-                          , "/#PUBLICATION_TYPE_NAME#/" => "The type of the publication"
-                          , "/#TITLE#/" => "The title of the article"
-                          , "/#AUTHORS#/" => "The names of the authors"
-                          , "/#POST_URL#/" => "The url where the publication can be found"
-                          , "/#DOI#/" => "The DOI"
-                          , "/#JOURNAL_REFERENCE#/" => "The journal reference"
-                          , "/#ORCID#/" => "The ORCID");
+       $short_codes = array("[journal]" => "The journal name"
+                          , "[executive_board]" => "Names of the executive board members"
+                          , "[publisher_email]" => "Email address of the publisher"
+                          , "[publication_type_name]" => "The type of the publication"
+                          , "[title]" => "The title of the article"
+                          , "[authors]" => "The names of the authors"
+                          , "[post_url]" => "The url where the publication can be found"
+                          , "[doi]" => "The DOI"
+                          , "[journal_reference]" => "The journal reference"
+                          , "[orcid]" => "The ORCID");
        return array('short_codes' => $short_codes
-                  , 'result' => preg_replace(array_keys($short_codes)
+                  , 'result' => str_replace(array_keys($short_codes)
                          , array($journal, $executive_board, $publisher_email
                                , $publication_type_name, $title, $authors
                                , $url, $doi, $journal_reference, $orcid)
@@ -78,10 +78,10 @@ class O3PO_EmailTemplates {
 
    public static function fermats_library_notification_subject($template
                                    , $journal, $publication_type_name){
-       $short_codes = array("/#JOURNAL#/" => "The journal name"
-                          , "/#PUBLICATION_TYPE_NAME#/" => "The type of the publication");
+       $short_codes = array("[journal]" => "The journal name"
+                          , "[publication_type_name]" => "The type of the publication");
        return array('short_codes' => $short_codes
-                  , 'result' => preg_replace(array_keys($short_codes)
+                  , 'result' => str_replace(array_keys($short_codes)
                          , array($journal, $publication_type_name)
                          , $template));
    }
@@ -89,15 +89,15 @@ class O3PO_EmailTemplates {
    public static function fermats_library_notification_body($email_template
                                     , $journal
                                     , $publication_type_name, $title, $authors, $url, $doi, $fermats_library_permalink){
-       $short_codes = array("/#JOURNAL#/" => "The type of the publication"
-                          , "/#PUBLICATION_TYPE_NAME#/" => "The type of the publication"
-                          , "/#TITLE#/" => "The title of the article"
-                          , "/#AUTHORS#/" => "The names of the authors"
-                          , "/#POST_URL#/" => "The url where the publication can be found"
-                          , "/#DOI#/" => "The DOI"
-                          , "/#FERMATS_LIBRARY_PERMALINK#/" => "The permalink in fermats library");
+       $short_codes = array("[journal]" => "The type of the publication"
+                          , "[publication_type_name]" => "The type of the publication"
+                          , "[title]" => "The title of the article"
+                          , "[authors]" => "The names of the authors"
+                          , "[post_url]" => "The url where the publication can be found"
+                          , "[doi]" => "The DOI"
+                          , "[fermats_library_permalink]" => "The permalink in fermats library");
        return array('short_codes' => $short_codes
-                  , 'result' => preg_replace(array_keys($short_codes)
+                  , 'result' => str_replace(array_keys($short_codes)
                          , array($journal
                                , $publication_type_name, $title, $authors
                                , $url, $doi, $fermats_library_permalink)
@@ -118,8 +118,7 @@ class O3PO_EmailTemplates {
 
          $result = '<ul>';
          foreach($short_codes as $short_code => $description) {
-               $cleaned_short_code = substr($short_code, 1, strlen($short_code) - 2);
-               $result .= "<li><i>$cleaned_short_code</i>:$description</li>";
+               $result .= "<li><i>$short_code</i>:$description</li>";
          }
          return $result . '</ul>';
    }
