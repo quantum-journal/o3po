@@ -464,6 +464,9 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $journal = get_post_meta( $post_id, $post_type . '_journal', true );
         $post_url = get_permalink( $post_id );
 
+        $executive_board = $this->get_journal_property('executive_board');
+        $editor_in_chief = $this->get_journal_property('editor_in_chief');
+
             // Send Emails about the submission to us
         $to = ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') );
         $headers = array( 'From: ' . $this->get_journal_property('publisher_email'));
@@ -511,9 +514,6 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                               $settings->get_plugin_option('author_notification_subject_template'),
                             $journal,
                             $this->get_publication_type_name())['result'];
-
-            $executive_board = "Christian, Lídia, and Marcus\n";
-            $editor_in_chief = "";
 
             $message  = ($this->environment->is_test_environment() ? 'TEST ' : '') .
                          O3PO_EmailTemplates::author_notification_body(

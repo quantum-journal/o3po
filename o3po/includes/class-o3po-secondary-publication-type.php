@@ -258,6 +258,9 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 
         $post_type = get_post_type($post_id);
 
+        $executive_board = $this->get_journal_property('executive_board');
+        $editor_in_chief = $this->get_journal_property('editor_in_chief');
+
         $corresponding_author_has_been_notifed_date = get_post_meta( $post_id, $post_type . '_corresponding_author_has_been_notifed_date', true );
         $corresponding_author_email = get_post_meta( $post_id, $post_type . '_corresponding_author_email', true );
         $type = get_post_meta( $post_id, $post_type . '_type', true );
@@ -308,9 +311,6 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 
             // Send email notifying authors of publication
         if( empty($corresponding_author_has_been_notifed_date) || $this->environment->is_test_environment()) {
-            $executive_board = "Christian, Lídia, and Marcus\n";
-            $editor_in_chief = "";
-
             $to = ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $corresponding_author_email);
             $headers = array( 'Cc: ' . ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') ), 'From: ' . $this->get_journal_property('publisher_email'));
 
