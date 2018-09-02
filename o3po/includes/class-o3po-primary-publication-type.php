@@ -482,7 +482,8 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                             $title,
                             static::get_formated_authors($post_id),
                             $post_url,
-                            $this->get_journal_property('doi_url_prefix') . $doi)['result'];
+                            $this->get_journal_property('doi_url_prefix') . $doi,
+                            $this->get_journal_property('doi_url_prefix') . str_replace('/', '%2F', $doi))['result'];
 
         $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
@@ -512,13 +513,14 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                             $this->get_publication_type_name())['result'];
 
             $executive_board = "Christian, Lídia, and Marcus\n";
+            $editor_in_chief = "";
 
             $message  = ($this->environment->is_test_environment() ? 'TEST ' : '') .
                          O3PO_EmailTemplates::author_notification_body(
                                       $settings->get_plugin_option('author_notification_body_template'),
-                                    $journal, $executive_board, $this->get_journal_property('publisher_email'),
+                                    $journal, $executive_board, $editor_in_chief, $this->get_journal_property('publisher_email'),
                                     $this->get_publication_type_name(), $title, static::get_formated_authors($post_id),
-                                    $post_url, $this->get_journal_property('doi_url_prefix'), $doi,
+                                    $post_url, $this->get_journal_property('doi_url_prefix'), $doi, str_replace('/', '%2F', $doi),
                                     static::get_formated_citation($post_id))['result'];
 
             $successfully_sent = wp_mail( $to, $subject, $message, $headers);
@@ -552,6 +554,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                       $title, static::get_formated_authors($post_id),
                       $post_url,
                       $this->get_journal_property('doi_url_prefix') . $doi,
+                      $this->get_journal_property('doi_url_prefix') . str_replace('/', '%2F', $doi),
                       $fermats_library_permalink)['result'];
 
             $successfully_sent = wp_mail( $to, $subject, $message, $headers);

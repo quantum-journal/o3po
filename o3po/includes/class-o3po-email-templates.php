@@ -32,16 +32,17 @@ class O3PO_EmailTemplates {
 
    public static function self_notification_body($email_template,
                                     $journal,
-                                    $publication_type_name, $title, $authors, $url, $doi){
+                                    $publication_type_name, $title, $authors, $url, $doi, $doi_hex_encoded){
        $short_codes = array("[journal]" => "The journal name",
                          "[publication_type_name]" => "The type of the publication",
                          "[title]" => "The title of the publication",
                          "[authors]" => "The list of authors",
                          "[url]" => "The publication URL",
-                         "[doi]" => "The DOI");
+                         "[doi]" => "The DOI",
+                         "[doi_hex_encoded]" => "The DOI encoded in hex (use this when escaping problems uccur)");
        return array('short_codes' => $short_codes,
                   'result' => str_replace(array_keys($short_codes),
-                         array($journal, $publication_type_name, $title, $authors, $url, $doi),
+                         array($journal, $publication_type_name, $title, $authors, $url, $doi, $doi_hex_encoded),
                          $email_template));
    }
 
@@ -56,10 +57,11 @@ class O3PO_EmailTemplates {
    }
 
    public static function author_notification_body($email_template,
-                                    $journal, $executive_board, $publisher_email,
-                                    $publication_type_name, $title, $authors, $url, $doi_url_prefix, $doi, $journal_reference){
+                                    $journal, $executive_board, $editor_in_chief, $publisher_email,
+                                    $publication_type_name, $title, $authors, $url, $doi_url_prefix, $doi, $doi_hex_encoded, $journal_reference){
        $short_codes = array("[journal]" => "The journal name",
                           "[executive_board]" => "Names of the executive board members",
+                          "[editor_in_chief]" => "Names of the editor in chief",
                           "[publisher_email]" => "Email address of the publisher",
                           "[publication_type_name]" => "The type of the publication",
                           "[title]" => "The title of the article",
@@ -67,13 +69,14 @@ class O3PO_EmailTemplates {
                           "[post_url]" => "The url where the publication can be found",
                           "[doi_url_prefix]" => "The DOI url prefix",
                           "[doi]" => "The DOI",
+                          "[doi_hex_encoded]" => "The DOI encoded in hex (use this when escaping problems uccur)",
                           "[journal_reference]" => "The journal reference"
                         );
        return array('short_codes' => $short_codes,
                   'result' => str_replace(array_keys($short_codes),
-                         array($journal, $executive_board, $publisher_email,
+                         array($journal, $executive_board, $editor_in_chief, $publisher_email,
                                $publication_type_name, $title, $authors,
-                               $url, $doi_url_prefix, $doi, $journal_reference),
+                               $url, $doi_url_prefix, $doi, $doi_hex_encoded, $journal_reference),
                          $email_template));
    }
 
@@ -89,19 +92,20 @@ class O3PO_EmailTemplates {
 
    public static function fermats_library_notification_body($email_template
                                     , $journal
-                                    , $publication_type_name, $title, $authors, $url, $doi, $fermats_library_permalink){
+                                    , $publication_type_name, $title, $authors, $url, $doi, $doi_hex_encoded, $fermats_library_permalink){
        $short_codes = array("[journal]" => "The type of the publication",
                           "[publication_type_name]" => "The type of the publication",
                           "[title]" => "The title of the article",
                           "[authors]" => "The names of the authors",
                           "[post_url]" => "The url where the publication can be found",
                           "[doi]" => "The DOI",
+                          "[doi_hex_encoded]" => "The DOI encoded in hex (use this when escaping problems uccur)",
                           "[fermats_library_permalink]" => "The permalink in fermats library");
        return array('short_codes' => $short_codes,
                   'result' => str_replace(array_keys($short_codes),
                          array($journal,
                                $publication_type_name, $title, $authors,
-                               $url, $doi, $fermats_library_permalink),
+                               $url, $doi, $doi_hex_encoded, $fermats_library_permalink),
                          $email_template));
    }
 

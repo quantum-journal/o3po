@@ -278,7 +278,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                     O3PO_EmailTemplates::self_notification_body(
                       $settings->get_plugin_option('self_notification_body_template').
                       $journal, strtolower($type), $title.
-                      static::get_formated_authors($post_id), $post_url, $this->get_journal_property('doi_url_prefix') . $doi)['result'];
+                      static::get_formated_authors($post_id), $post_url, $this->get_journal_property('doi_url_prefix') . $doi, str_replace('/', '%2F', $doi))['result'];
 
         $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
@@ -309,6 +309,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
             // Send email notifying authors of publication
         if( empty($corresponding_author_has_been_notifed_date) || $this->environment->is_test_environment()) {
             $executive_board = "Christian, Lídia, and Marcus\n";
+            $editor_in_chief = "";
 
             $to = ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $corresponding_author_email);
             $headers = array( 'Cc: ' . ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') ), 'From: ' . $this->get_journal_property('publisher_email'));
@@ -320,9 +321,9 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
             $message  = $this->environment->is_test_environment() ? 'TEST ' : '' .
                         O3PO_EmailTemplates::author_notification_body(
                            $settings->get_plugin_option('author_notification_secondary_body_template'),
-                         $journal, $executive_board, $this->get_journal_property('publisher_email'),
+                         $journal, $executive_board, $editor_in_chief, $this->get_journal_property('publisher_email'),
                          $type, $title, "", $post_url,
-                         $this->get_journal_property('doi_url_prefix'), $doi,
+                         $this->get_journal_property('doi_url_prefix'), $doi, str_replace('/', '%2F', $doi),
                          static::get_formated_citation($post_id)
                          )['result'];
 
