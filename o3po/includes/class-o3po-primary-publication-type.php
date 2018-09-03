@@ -464,8 +464,8 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $journal = get_post_meta( $post_id, $post_type . '_journal', true );
         $post_url = get_permalink( $post_id );
 
-        $executive_board = $this->get_plugin_option('executive_board');
-        $editor_in_chief = $this->get_plugin_option('editor_in_chief');
+        $executive_board = $settings->get_plugin_option('executive_board');
+        $editor_in_chief = $settings->get_plugin_option('editor_in_chief');
 
             // Send Emails about the submission to us
         $to = ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') );

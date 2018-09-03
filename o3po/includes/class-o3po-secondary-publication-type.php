@@ -258,8 +258,8 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 
         $post_type = get_post_type($post_id);
 
-        $executive_board = $this->get_plugin_option('executive_board');
-        $editor_in_chief = $this->get_plugin_option('editor_in_chief');
+        $executive_board = $settings->get_plugin_option('executive_board');
+        $editor_in_chief = $settings->get_plugin_option('editor_in_chief');
 
         $corresponding_author_has_been_notifed_date = get_post_meta( $post_id, $post_type . '_corresponding_author_has_been_notifed_date', true );
         $corresponding_author_email = get_post_meta( $post_id, $post_type . '_corresponding_author_email', true );
