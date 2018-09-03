@@ -159,6 +159,9 @@ class O3PO_Settings extends O3PO_Singleton {
                  "Kind regards,\n\n".
                  "The Executive Board\n",
 
+         'executive_board' => "",
+         'editor_in_chief' => "",
+
             /* The options below are currently not customizable.
              *
              * Warning: The name of the paper-single.php templare must match
@@ -273,6 +276,8 @@ class O3PO_Settings extends O3PO_Singleton {
         add_settings_field('author_notification_secondary_body_template' , 'Author notification secondary body template' , array($this, 'render_author_notification_secondary_body_template_settings') , 'email_settings', 'email_settings');
         add_settings_field('fermats_library_subject_template' , 'Fermats library subject template' , array($this, 'render_fermats_library_subject_template_settings') , 'email_settings', 'email_settings');
         add_settings_field('fermats_library_body_template' , 'Fermats library body template' , array($this, 'render_fermats_library_body_template_settings') , 'email_settings', 'email_settings');
+        add_settings_field('executive_board' , 'The names of the executive board members' , array($this, 'render_executive_board') , 'email_settings', 'email_settings');
+        add_settings_field('editor_in_chief' , 'The name of the editor in chief' , array($this, 'render_editor_in_chief') , 'email_settings', 'email_settings');
 
         add_settings_section('crossref_settings', 'Crossref settings', array( $this, 'render_crossref_settings' ), 'crossref_settings');
         add_settings_field('crossref_id', 'Crossref ID', array( $this, 'render_crossref_id_setting' ), 'crossref_settings', 'crossref_settings');
@@ -614,6 +619,26 @@ class O3PO_Settings extends O3PO_Singleton {
     public function render_fermats_library_subject_template_settings() {
         $this->render_setting('fermats_library_notification_subject_template');
         echo O3PO_EmailTemplates::render_short_codes('fermats_library_notification_subject');
+    }
+
+    /**
+     * Render the executive board of the email settings
+     *
+     * @since    0.2.2
+     * @access   public
+     */
+    public function render_executive_board() {
+        $this->render_setting('executive_board');
+    }
+
+    /**
+     * Render the editor in chief of the email settings
+     *
+     * @since    0.2.2
+     * @access   public
+     */
+    public function render_editor_in_chief() {
+        $this->render_setting('editor_in_chief');
     }
 
     /**
