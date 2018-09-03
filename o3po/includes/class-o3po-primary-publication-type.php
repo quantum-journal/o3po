@@ -777,13 +777,13 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 		echo '	</tr>';
     }
 
-        /**
-         * Echo the arXiv part of the admin panel.
-         *
-         * @since     0.1.0
-         * @access    public
-         * @param     int     $post_id     Id of the post.
-         */
+    /**
+     * Echo the arXiv part of the admin panel.
+     *
+     * @since     0.1.0
+     * @access    public
+     * @param     int     $post_id     Id of the post.
+     */
     protected function the_admin_panel_arxiv( $post_id ) {
 
         $post_type = get_post_type($post_id);
