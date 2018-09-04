@@ -16,14 +16,14 @@ class O3PO_EmailTemplatesTest extends PHPUnit_Framework_TestCase
 
   public function test_self_notification_body(){
       $message = O3PO_EmailTemplates::self_notification_body(
-                   O3PO_EmailTemplatesTest::getTemplate('self_notification_body_template'). "NOT IN TEMPLATE! [doi_hex_encoded]",
-                 "test-journal", "test-publication-name", "test-title", "test-authors", "test-url", "test-doi", "test-doi-hex-encoded");
+          O3PO_EmailTemplatesTest::getTemplate('self_notification_body_template'). "NOT IN TEMPLATE! [doi_hex_encoded]",
+          "test-journal", "test-publication-name", "test-title", "test-authors", "test-url", "test-doi-prefix", "test-doi/with-special-char");
       $this->assertEquals("test-journal has published/updated the following test-publication-name\n".
                           "Title:   test-title \n".
                           "Authors: test-authors \n".
                           "URL:     test-url\n".
-                          "DOI:     test-doi\n".
-                          "NOT IN TEMPLATE! test-doi-hex-encoded",
+                          "DOI:     test-doi/with-special-char\n".
+                          "NOT IN TEMPLATE! test-doi%2Fwith-special-char",
                           $message['result']);
   }
 
@@ -40,7 +40,7 @@ class O3PO_EmailTemplatesTest extends PHPUnit_Framework_TestCase
   public function test_author_notification_body(){
     $message = O3PO_EmailTemplates::author_notification_body(
                    O3PO_EmailTemplatesTest::getTemplate('author_notification_body_template'). "NOT IN TEMPLATE! [doi_hex_encoded]" . "NOT IN TEMPLATE! [editor_in_chief]",
-                 "test-journal", "test-executive-board", "test-editor-in-chief", "test-publisher-email", "test-publication-type-name", "test-title", "test-authors", "test-post-url", "https://doi.org/", "10.22331/q-2018-08-27-87", "test-doi-hex-encoded", "test-journal-reference"
+                 "test-journal", "test-executive-board", "test-editor-in-chief", "test-publisher-email", "test-publication-type-name", "test-title", "test-authors", "test-post-url", "https://doi.org/", "10.22331/q-2018-08-27-87", "test-journal-reference"
                  );
     $this->assertEquals("Dear test-authors,\n\n".
                         "Congratulations! Your test-publication-type-name 'test-title' has been published by test-journal and is now available under:\n\n".
@@ -55,7 +55,7 @@ class O3PO_EmailTemplatesTest extends PHPUnit_Framework_TestCase
                         "Best regards,\n\n".
                         "test-executive-board\n".
                         "Executive Board\n".
-                        "NOT IN TEMPLATE! test-doi-hex-encoded".
+                        "NOT IN TEMPLATE! 10.22331%2Fq-2018-08-27-87".
                         "NOT IN TEMPLATE! test-editor-in-chief",
                         $message['result']
                       );
@@ -64,7 +64,7 @@ class O3PO_EmailTemplatesTest extends PHPUnit_Framework_TestCase
   public function test_author_notification_secondary_body(){
     $message = O3PO_EmailTemplates::author_notification_body(
                    O3PO_EmailTemplatesTest::getTemplate('author_notification_secondary_body_template'),
-                 "test-journal", "test-executive-board", "test-editor-in-chief", "test-publisher-email", "test-publication-type-name", "test-title", "test-authors", "test-post-url", "test-doi-prefix", "test-doi", "test-doi-hex-encoded", "test-journal-reference"
+                 "test-journal", "test-executive-board", "test-editor-in-chief", "test-publisher-email", "test-publication-type-name", "test-title", "test-authors", "test-post-url", "test-doi-prefix", "test-doi", "test-journal-reference"
                  );
     $this->assertEquals("Dear test-authors,\n\n".
                         "Congratulations! Your test-publication-type-name 'test-title' has been published by test-journal and is now available under:\n\n".
@@ -96,7 +96,7 @@ class O3PO_EmailTemplatesTest extends PHPUnit_Framework_TestCase
                      O3PO_EmailTemplatesTest::getTemplate('fermats_library_notification_body_template'). "NOT IN TEMPLATE! [doi_hex_encoded]",
                   "test-journal",
                   "test-publication-type-name", "test-title", "test-authors",
-                  "test-post-url", "test-doi", "test-doi-hex-encoded", "test-fermats-library-permalink"
+                  "test-post-url", "test-doi", "test-fermats-library-permalink"
                   );
        $this->assertEquals("Dear team at Fermat's library,\n\n".
                  "test-journal has published the following test-publication-type-name:\n\n".
@@ -109,7 +109,7 @@ class O3PO_EmailTemplatesTest extends PHPUnit_Framework_TestCase
                  "Thank you very much!\n\n".
                  "Kind regards,\n\n".
                  "The Executive Board\n".
-                 "NOT IN TEMPLATE! test-doi-hex-encoded",
+                 "NOT IN TEMPLATE! test-doi",
                $message['result']);
    }
 
