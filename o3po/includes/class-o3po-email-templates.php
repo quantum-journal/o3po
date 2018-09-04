@@ -121,9 +121,10 @@ class O3PO_EmailTemplates {
          $template_result = eval($render_function);
          $short_codes = $template_result['short_codes'];
 
-         $result = '<ul>';
+         $result = '<p>The following shortcodes are available:</p>';
+         $result .= '<ul>';
          foreach($short_codes as $short_code => $description) {
-               $result .= '<li>' . esc_html( $short_code) . ': ' . esc_html($description) . '</li>';
+               $result .= '<li>' . esc_html($short_code) . ': ' . esc_html($description) . '</li>';
          }
          return $result . '</ul>';
    }
