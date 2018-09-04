@@ -123,7 +123,7 @@ class O3PO_EmailTemplates {
 
          $result = '<ul>';
          foreach($short_codes as $short_code => $description) {
-               $result .= "<li><i>$short_code</i>:$description</li>";
+               $result .= '<li>' . esc_html( $short_code) . ': ' . esc_html($description) . '</li>';
          }
          return $result . '</ul>';
    }
