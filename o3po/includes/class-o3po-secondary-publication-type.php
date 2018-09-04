@@ -281,7 +281,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                     O3PO_EmailTemplates::self_notification_body(
                       $settings->get_plugin_option('self_notification_body_template').
                       $journal, strtolower($type), $title.
-                      static::get_formated_authors($post_id), $post_url, $this->get_journal_property('doi_url_prefix') . $doi, str_replace('/', '%2F', $doi))['result'];
+                      static::get_formated_authors($post_id), $post_url, $this->get_journal_property('doi_url_prefix'), $doi)['result'];
 
         $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
@@ -323,7 +323,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                            $settings->get_plugin_option('author_notification_secondary_body_template'),
                          $journal, $executive_board, $editor_in_chief, $this->get_journal_property('publisher_email'),
                          $type, $title, "", $post_url,
-                         $this->get_journal_property('doi_url_prefix'), $doi, str_replace('/', '%2F', $doi),
+                         $this->get_journal_property('doi_url_prefix'), $doi,
                          static::get_formated_citation($post_id)
                          )['result'];
 
@@ -452,14 +452,14 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         echo '	<tr>';
         echo '		<th><label for="' . $post_type . '_number_target_dois" class="' . $post_type . '_number_target_dois_label">' . 'Number of target dois' . '</label></th>';
 		echo '		<td>';
-		echo '			<input style="width:4rem" type="number" id="' . $post_type . '_number_target_dois" name="' . $post_type . '_number_target_dois" class="' . $post_type . '_number_target_dois_field required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( $number_target_dois ) . '"><p>(Please put here the total number of other DOIs this ' . $this->get_publication_type_name() . ' is on. To update the number of fields below, please save the post.)</p>';
+		echo '			<input style="width:4rem" type="number" id="' . $post_type . '_number_target_dois" name="' . $post_type . '_number_target_dois" class="' . $post_type . '_number_target_dois_field required" placeholder="' . '' . '" value="' . esc_attr($number_target_dois) . '"><p>(Please put here the total number of other DOIs this ' . $this->get_publication_type_name() . ' is on. To update the number of fields below, please save the post.)</p>';
 		echo '		</td>';
 		echo '	</tr>';
 		for ($x = 0; $x < $number_target_dois; $x++) {
 			echo '	<tr>';
 			echo '		<th><label for="' . $post_type . '_target_doi" class="' . $post_type . '_target_doi_label">' . "Target doi " . ($x+1) . '</label></th>';
 			echo '		<td>';
-			echo '			<input type="text" name="' . $post_type . '_target_dois[]" class="' . $post_type . '_target_dois required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( isset($target_dois[$x]) ? $target_dois[$x] : '' ) . '" />';
+			echo '			<input type="text" name="' . $post_type . '_target_dois[]" class="' . $post_type . '_target_dois required" placeholder="' . '' . '" value="' . esc_attr( isset($target_dois[$x]) ? $target_dois[$x] : '' ) . '" />';
 
 			echo '		</td>';
 			echo '	</tr>';
@@ -484,7 +484,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_reviewers_summary" class="' . $post_type . '_reviewers_summary_label">' . 'Reviewers summary' . '</label></th>';
 		echo '		<td>';
-		echo '			<textarea rows="6" style="width:100%;" name="' . $post_type . '_reviewers_summary" id="' . $post_type . '_reviewers_summary">' . esc_attr__( $reviewers_summary ) . '</textarea><p>(Summary of the reviewers.)</p>';
+		echo '			<textarea rows="6" style="width:100%;" name="' . $post_type . '_reviewers_summary" id="' . $post_type . '_reviewers_summary">' . esc_html($reviewers_summary) . '</textarea><p>(Summary of the reviewers.)</p>';
 		echo '		</td>';
 		echo '	</tr>';
     }
@@ -522,7 +522,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_number_reviewers" class="' . $post_type . '_number_reviewers_label">' . 'Number of reviewers' . '</label></th>';
 		echo '		<td>';
-		echo '			<input style="width:4rem" type="number" id="' . $post_type . '_number_reviewers" name="' . $post_type . '_number_reviewers" class="' . $post_type . '_number_reviewers_field required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( $number_reviewers ) . '"><p>(Please put here the actual number of reviewers. To update the number of entries in the list below please save the post. Give affiliations as a comma separated list referring to the affiliations below, e.g., 1,2,5,7. As with the title, special characters are allowed and must be entered as í or é and so on.)</p>';
+		echo '			<input style="width:4rem" type="number" id="' . $post_type . '_number_reviewers" name="' . $post_type . '_number_reviewers" class="' . $post_type . '_number_reviewers_field required" placeholder="' . '' . '" value="' . esc_attr($number_reviewers) . '"><p>(Please put here the actual number of reviewers. To update the number of entries in the list below please save the post. Give affiliations as a comma separated list referring to the affiliations below, e.g., 1,2,5,7. As with the title, special characters are allowed and must be entered as í or é and so on.)</p>';
 		echo '		</td>';
 		echo '	</tr>';
 
@@ -531,17 +531,17 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 			echo '	<tr>';
 			echo '		<th><label for="' . $post_type . '_reviewer" class="' . $post_type . '_reviewer_label">' . "Reviewer  $y" . '</label></th>';
 			echo '		<td>';
-			echo '			<div style="float:left"><input type="text" name="' . $post_type . '_reviewer_given_names[]" class="' . $post_type . '_reviewer_given_names_field" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( isset($reviewer_given_names[$x]) ? $reviewer_given_names[$x] : '' ) . '" /><br /><label for="' . $post_type . '_reviewer_given_names" class="' . $post_type . '_reviewer_given_names_label">Given name</label></div>';
-			echo '			<div style="float:left"><input type="text" name="' . $post_type . '_reviewer_surnames[]" class="' . $post_type . '_reviewer_surnames_field required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( isset($reviewer_surnames[$x]) ? $reviewer_surnames[$x] : '' ) . '" /><br /><label for="' . $post_type . '_reviewer_surnames" class="' . $post_type . '_reviewer_surnames_label">Surname</label></div>';
+			echo '			<div style="float:left"><input type="text" name="' . $post_type . '_reviewer_given_names[]" class="' . $post_type . '_reviewer_given_names_field" placeholder="' . '' . '" value="' . esc_attr( isset($reviewer_given_names[$x]) ? $reviewer_given_names[$x] : '' ) . '" /><br /><label for="' . $post_type . '_reviewer_given_names" class="' . $post_type . '_reviewer_given_names_label">Given name</label></div>';
+			echo '			<div style="float:left"><input type="text" name="' . $post_type . '_reviewer_surnames[]" class="' . $post_type . '_reviewer_surnames_field required" placeholder="' . '' . '" value="' . esc_attr( isset($reviewer_surnames[$x]) ? $reviewer_surnames[$x] : '' ) . '" /><br /><label for="' . $post_type . '_reviewer_surnames" class="' . $post_type . '_reviewer_surnames_label">Surname</label></div>';
 			echo '			<div style="float:left"><select name="' . $post_type . '_reviewer_name_styles[]">';
 			foreach(array("western", "eastern", "islensk", "given-only") as $style)
                 echo '<option value="' . $style . '"' . ( (isset($reviewer_name_styles[$x]) && $reviewer_name_styles[$x] === $style) ? " selected" : "" ) . '>' . $style . '</option>';
 			echo '</select><br /><label for="' . $post_type . '_reviewer_name_styles" class="' . $post_type . '_reviewer_name_styles_label">Name style</label></div>';
-			echo '			<div style="float:left"><input style="width:5rem" type="text" name="' . $post_type . '_reviewer_affiliations[]" class="' . $post_type . '_reviewer_affiliations_field" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( isset($reviewer_affiliations[$x]) ? $reviewer_affiliations[$x] : '' ) . '" /><br /><label for="' . $post_type . '_reviewer_affiliations" class="' . $post_type . '_reviewer_affiliations">Institutions</label></div>';
-//			echo '			<div style="float:left"><input style="width:11rem" type="text" name="' . $post_type . '_reviewer_orcids[]" class="' . $post_type . '_reviewer_orcids" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( isset($reviewer_orcids[$x]) ? $reviewer_orcids[$x] : '' ) . '" /><br /><label for="' . $post_type . '_reviewer_orcids" class="' . $post_type . '_reviewer_orcids_label">ORCID</label></div>';
-//            echo '			<div style="float:left"><input style="width:20rem" type="text" name="' . $post_type . '_reviewer_urls[]" class="' . $post_type . '_reviewer_urls" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( isset($reviewer_urls[$x]) ? $reviewer_urls[$x] : '' ) . '" /><br /><label for="' . $post_type . '_reviewer_urls" class="' . $post_type . '_reviewer_urls_label">URL</label></div>';
-            echo '			<div style="float:left"><input style="width:20rem" type="text" name="' . $post_type . '_reviewer_ages[]" class="' . $post_type . '_reviewer_ages" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( isset($reviewer_ages[$x]) ? $reviewer_ages[$x] : '' ) . '" /><br /><label for="' . $post_type . '_reviewer_ages" class="' . $post_type . '_reviewer_ages_label">Age</label></div>';
-            echo '			<div style="float:left"><input style="width:20rem" type="text" name="' . $post_type . '_reviewer_grades[]" class="' . $post_type . '_reviewer_grades" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( isset($reviewer_grades[$x]) ? $reviewer_grades[$x] : '' ) . '" /><br /><label for="' . $post_type . '_reviewer_grades" class="' . $post_type . '_reviewer_grades_label">Grade</label></div>';
+			echo '			<div style="float:left"><input style="width:5rem" type="text" name="' . $post_type . '_reviewer_affiliations[]" class="' . $post_type . '_reviewer_affiliations_field" placeholder="' . '' . '" value="' . esc_attr( isset($reviewer_affiliations[$x]) ? $reviewer_affiliations[$x] : '' ) . '" /><br /><label for="' . $post_type . '_reviewer_affiliations" class="' . $post_type . '_reviewer_affiliations">Institutions</label></div>';
+//			echo '			<div style="float:left"><input style="width:11rem" type="text" name="' . $post_type . '_reviewer_orcids[]" class="' . $post_type . '_reviewer_orcids" placeholder="' . '' . '" value="' . esc_attr( isset($reviewer_orcids[$x]) ? $reviewer_orcids[$x] : '' ) . '" /><br /><label for="' . $post_type . '_reviewer_orcids" class="' . $post_type . '_reviewer_orcids_label">ORCID</label></div>';
+//            echo '			<div style="float:left"><input style="width:20rem" type="text" name="' . $post_type . '_reviewer_urls[]" class="' . $post_type . '_reviewer_urls" placeholder="' . '' . '" value="' . esc_attr( isset($reviewer_urls[$x]) ? $reviewer_urls[$x] : '' ) . '" /><br /><label for="' . $post_type . '_reviewer_urls" class="' . $post_type . '_reviewer_urls_label">URL</label></div>';
+            echo '			<div style="float:left"><input style="width:20rem" type="text" name="' . $post_type . '_reviewer_ages[]" class="' . $post_type . '_reviewer_ages" placeholder="' . '' . '" value="' . esc_attr( isset($reviewer_ages[$x]) ? $reviewer_ages[$x] : '' ) . '" /><br /><label for="' . $post_type . '_reviewer_ages" class="' . $post_type . '_reviewer_ages_label">Age</label></div>';
+            echo '			<div style="float:left"><input style="width:20rem" type="text" name="' . $post_type . '_reviewer_grades[]" class="' . $post_type . '_reviewer_grades" placeholder="' . '' . '" value="' . esc_attr( isset($reviewer_grades[$x]) ? $reviewer_grades[$x] : '' ) . '" /><br /><label for="' . $post_type . '_reviewer_grades" class="' . $post_type . '_reviewer_grades_label">Grade</label></div>';
 			echo '		</td>';
 			echo '	</tr>';
 		}
@@ -567,7 +567,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 		echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_number_reviewer_institutions" class="' . $post_type . '_number_reviewer_institutions_label">' . 'Number of reviewer institutions' . '</label></th>';
 		echo '		<td>';
-		echo '			<input style="width:4rem" type="number" id="' . $post_type . '_number_reviewer_institutions" name="' . $post_type . '_number_reviewer_institutions" class="' . $post_type . '_number_reviewer_institutions_field required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( $number_reviewer_institutions ) . '"><p>(Please put here the total number of reviewer institutions. To update the number of Reviewer instition fields save the post.)</p>';
+		echo '			<input style="width:4rem" type="number" id="' . $post_type . '_number_reviewer_institutions" name="' . $post_type . '_number_reviewer_institutions" class="' . $post_type . '_number_reviewer_institutions_field required" placeholder="' . '' . '" value="' . esc_attr($number_reviewer_institutions) . '"><p>(Please put here the total number of reviewer institutions. To update the number of Reviewer instition fields save the post.)</p>';
 		echo '		</td>';
 		echo '	</tr>';
 		for ($x = 0; $x < $number_reviewer_institutions; $x++) {
@@ -575,7 +575,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 			echo '	<tr>';
 			echo '		<th><label for="' . $post_type . '_reviewer_institutions" class="' . $post_type . '_reviewer_institutions_label">' . "Reviewer institution  $y" . '</label></th>';
 			echo '		<td>';
-			echo '			<input style="width:100%" type="text" name="' . $post_type . '_reviewer_institutions[]" class="' . $post_type . '_reviewer_institutions required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( isset($reviewer_institutions[$x]) ? $reviewer_institutions[$x] : '' ) . '" />';
+			echo '			<input style="width:100%" type="text" name="' . $post_type . '_reviewer_institutions[]" class="' . $post_type . '_reviewer_institutions required" placeholder="' . '' . '" value="' . esc_attr( isset($reviewer_institutions[$x]) ? $reviewer_institutions[$x] : '' ) . '" />';
 
 			echo '		</td>';
 			echo '	</tr>';
@@ -603,9 +603,9 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_author_commentary" class="' . $post_type . '_author_commentary_label">' . 'Author commentary' . '</label></th>';
 		echo '		<td>';
-		echo '			<textarea rows="6" style="width:100%;" name="' . $post_type . '_author_commentary" id="' . $post_type . '_author_commentary">' . esc_attr__( $author_commentary ) . '</textarea><p>(Commentary of the author(s).)</p>';
+		echo '			<textarea rows="6" style="width:100%;" name="' . $post_type . '_author_commentary" id="' . $post_type . '_author_commentary">' . esc_html( $author_commentary ) . '</textarea><p>(Commentary of the author(s).)</p>';
 
-        echo '			<textarea rows="6" style="width:100%;" name="' . $post_type . '_about_the_author" id="' . $post_type . '_about_the_author">' . esc_attr__( $about_the_author ) . '</textarea><p>(Some text about the author(s).)</p>';
+        echo '			<textarea rows="6" style="width:100%;" name="' . $post_type . '_about_the_author" id="' . $post_type . '_about_the_author">' . esc_html( $about_the_author ) . '</textarea><p>(Some text about the author(s).)</p>';
 
 		echo '		</td>';
 		echo '	</tr>';

@@ -478,15 +478,15 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                               $this->get_publication_type_name())['result'];
 
         $message  = ($this->environment->is_test_environment() ? 'TEST ' : '') .
-                    O3PO_EmailTemplates::self_notification_body(
-                              $settings->get_plugin_option('self_notification_body_template'),
-                            $journal,
-                            $this->get_publication_type_name(),
-                            $title,
-                            static::get_formated_authors($post_id),
-                            $post_url,
-                            $this->get_journal_property('doi_url_prefix') . $doi,
-                            $this->get_journal_property('doi_url_prefix') . str_replace('/', '%2F', $doi))['result'];
+            O3PO_EmailTemplates::self_notification_body(
+                $settings->get_plugin_option('self_notification_body_template'),
+                $journal,
+                $this->get_publication_type_name(),
+                $title,
+                static::get_formated_authors($post_id),
+                $post_url,
+                $this->get_journal_property('doi_url_prefix'),
+                $doi)['result'];
 
         $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
@@ -520,7 +520,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                                       $settings->get_plugin_option('author_notification_body_template'),
                                     $journal, $executive_board, $editor_in_chief, $this->get_journal_property('publisher_email'),
                                     $this->get_publication_type_name(), $title, static::get_formated_authors($post_id),
-                                    $post_url, $this->get_journal_property('doi_url_prefix'), $doi, str_replace('/', '%2F', $doi),
+                                    $post_url, $this->get_journal_property('doi_url_prefix'), $doi,
                                     static::get_formated_citation($post_id))['result'];
 
             $successfully_sent = wp_mail( $to, $subject, $message, $headers);
@@ -553,8 +553,8 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                       $this->get_publication_type_name(),
                       $title, static::get_formated_authors($post_id),
                       $post_url,
-                      $this->get_journal_property('doi_url_prefix') . $doi,
-                      $this->get_journal_property('doi_url_prefix') . str_replace('/', '%2F', $doi),
+                      $this->get_journal_property('doi_url_prefix'),
+                      $doi,
                       $fermats_library_permalink)['result'];
 
             $successfully_sent = wp_mail( $to, $subject, $message, $headers);
@@ -667,7 +667,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 		echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_eprint" class="' . $post_type . '_eprint_label">' . 'Eprint' . '</label></th>';
 		echo '		<td>';
-		echo '			<input type="text" id="' . $post_type . '_eprint" name="' . $post_type . '_eprint" class="' . $post_type . '_eprint_field required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( $eprint ) . '">';
+		echo '			<input type="text" id="' . $post_type . '_eprint" name="' . $post_type . '_eprint" class="' . $post_type . '_eprint_field required" placeholder="" value="' . esc_attr($eprint) . '">';
 		echo '                  <input type="checkbox" name="' . $post_type . '_fetch_metadata_from_arxiv"' . (empty($eprint) ? 'checked' : '' ) . '>Fetch title, authors, and abstract from the arXiv upon next Save/Update';
 		echo '			<p>(The arXiv identifier including the version and, for old eprints, the the prefix, so this should look like 1701.1234v5 or quant-ph/123456v3.)</p>';
 		echo '		</td>';
@@ -698,7 +698,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 		echo '		<th><label for="' . $post_type . '_fermats_library" class="' . $post_type . '_fermats_library_label">' . 'Fermat&#39;s library' . '</label></th>';
 		echo '		<td>';
 		echo '                  <input type="checkbox" name="' . $post_type . '_fermats_library" value="checked"' . $fermats_library . '>Opt-in for Fermat&#39;s library.' . ( !empty($fermats_library_has_been_notifed_date) ? " Fermat&#39;s library has been automatically notified on " . $fermats_library_has_been_notifed_date . '.' : ' Fermat&#39;s library has not been notified so far.' ) . '<br />';
-		echo '			<input ' . (!empty($fermats_library_has_been_notifed_date) ? 'readonly' : '' ) . ' style="width:100%;" type="text" id="' . $post_type . '_fermats_library_permalink" name="' . $post_type . '_fermats_library_permalink" class="' . $post_type . '_fermats_library_permalink_field" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( $fermats_library_permalink ) . '"><br />(If you leave blank the permalink field it is automatically generated when the email is sent and can then no longer be modified.)';
+		echo '			<input ' . (!empty($fermats_library_has_been_notifed_date) ? 'readonly' : '' ) . ' style="width:100%;" type="text" id="' . $post_type . '_fermats_library_permalink" name="' . $post_type . '_fermats_library_permalink" class="' . $post_type . '_fermats_library_permalink_field" placeholder="' . '' . '" value="' . esc_attr($fermats_library_permalink) . '"><br />(If you leave blank the permalink field it is automatically generated when the email is sent and can then no longer be modified.)';
 		echo '		</td>';
 		echo '	</tr>';
 
@@ -748,7 +748,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 		echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_feature_image_caption" class="' . $post_type . '_feature_image_caption_label">' . 'Feature image caption' . '</label></th>';
 		echo '		<td>';
-		echo '			<textarea rows="6" style="width:100%;" name="' . $post_type . '_feature_image_caption" id="' . $post_type . '_feature_image_caption">' . esc_attr__( $feature_image_caption ) . '</textarea><p>(Please upload images sent by the authors as feature image via the button on the right. Please add here a caption in case the ' . $this->get_publication_type_name() . ' has a feature image.)</p>';
+		echo '			<textarea rows="6" style="width:100%;" name="' . $post_type . '_feature_image_caption" id="' . $post_type . '_feature_image_caption">' . esc_html($feature_image_caption) . '</textarea><p>(Please upload images sent by the authors as feature image via the button on the right. Please add here a caption in case the ' . $this->get_publication_type_name() . ' has a feature image.)</p>';
 		echo '		</td>';
 		echo '	</tr>';
 
@@ -772,7 +772,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_popular_summary" class="' . $post_type . '_popular_summary_label">' . 'Popular summary' . '</label></th>';
 		echo '		<td>';
-		echo '			<textarea rows="6" style="width:100%;" name="' . $post_type . '_popular_summary" id="' . $post_type . '_popular_summary">' . esc_attr__( $popular_summary ) . '</textarea><p>(Popular summary if provided by the authors.)</p>';
+		echo '			<textarea rows="6" style="width:100%;" name="' . $post_type . '_popular_summary" id="' . $post_type . '_popular_summary">' . esc_html($popular_summary) . '</textarea><p>(Popular summary if provided by the authors.)</p>';
 		echo '		</td>';
 		echo '	</tr>';
     }
@@ -796,7 +796,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 			echo '	<tr>';
 			echo '		<th><label for="' . $post_type . '_arxiv_fetch_results" class="' . $post_type . '_arxiv_fetch_results_label">' . 'ArXiv fetch result' . '</label></th>';
 			echo '		<td>';
-			echo '			<textarea rows="' . (substr_count( $arxiv_fetch_results, "\n" )+1) . '" cols="65" readonly>' . esc_attr__( $arxiv_fetch_results ) . '</textarea><p>(The result of fetching metadata from the arXiv.)</p>';
+			echo '			<textarea rows="' . (substr_count( $arxiv_fetch_results, "\n" )+1) . '" cols="65" readonly>' . esc_html($arxiv_fetch_results) . '</textarea><p>(The result of fetching metadata from the arXiv.)</p>';
 			echo '		</td>';
 			echo '	</tr>';
 		}
