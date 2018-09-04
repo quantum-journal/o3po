@@ -31,8 +31,9 @@ class O3PO_EmailTemplates {
    }
 
    public static function self_notification_body($email_template,
-                                    $journal,
-                                    $publication_type_name, $title, $authors, $url, $doi, $doi_hex_encoded){
+                                                 $journal,
+                                                 $publication_type_name, $title, $authors, $url, $doi_url_prefix, $doi){
+       $doi_hex_encoded = static::hex_encode($doi);
        $short_codes = array("[journal]" => "The journal name",
                          "[publication_type_name]" => "The type of the publication",
                          "[title]" => "The title of the publication",
@@ -58,7 +59,8 @@ class O3PO_EmailTemplates {
 
    public static function author_notification_body($email_template,
                                     $journal, $executive_board, $editor_in_chief, $publisher_email,
-                                    $publication_type_name, $title, $authors, $url, $doi_url_prefix, $doi, $doi_hex_encoded, $journal_reference){
+                                    $publication_type_name, $title, $authors, $url, $doi_url_prefix, $doi, $journal_reference){
+       $doi_hex_encoded = static::hex_encode($doi);
        $short_codes = array("[journal]" => "The journal name",
                           "[executive_board]" => "Names of the executive board members",
                           "[editor_in_chief]" => "Names of the editor in chief",
@@ -92,7 +94,8 @@ class O3PO_EmailTemplates {
 
    public static function fermats_library_notification_body($email_template
                                     , $journal
-                                    , $publication_type_name, $title, $authors, $url, $doi, $doi_hex_encoded, $fermats_library_permalink){
+                                    , $publication_type_name, $title, $authors, $url, $doi, $fermats_library_permalink){
+       $doi_hex_encoded = static::hex_encode($doi);
        $short_codes = array("[journal]" => "The type of the publication",
                           "[publication_type_name]" => "The type of the publication",
                           "[title]" => "The title of the article",
@@ -128,6 +131,10 @@ class O3PO_EmailTemplates {
          }
          return $result . '</ul>';
    }
-}
 
-?>
+   private static function hex_encode($doi) {
+
+       return rawurlencode($doi);
+   }
+
+}
