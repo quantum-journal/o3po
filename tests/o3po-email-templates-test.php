@@ -119,7 +119,7 @@ class O3PO_EmailTemplatesTest extends PHPUnit_Framework_TestCase
      $expectedDom->preserveWhiteSpace = false;
 
      $actualDom = new DomDocument();
-     $actualDom->loadHTML("<ul><li><i>[journal]</i>:The journal name</li><li><i>[publication_type_name]</i>:The type of the publication.</li></ul>");
+     $actualDom->loadHTML("<p>The following shortcodes are available:</p><ul><li>[journal]: The journal name</li><li>[publication_type_name]: The type of the publication.</li></ul>");
      $actualDom->preserveWhiteSpace = false;
 
      $this->assertEquals($expectedDom->saveHTML(), $actualDom->saveHTML());
@@ -131,4 +131,3 @@ class O3PO_EmailTemplatesTest extends PHPUnit_Framework_TestCase
    }
 }
 ?>
-
