@@ -39,49 +39,49 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-email
  */
 class O3PO_Settings extends O3PO_Singleton {
 
-	/**
-	 * The unique identifier of this plugin.
-	 *
-	 * @since    0.1.0
-	 * @access   protected
-	 * @var      string    $plugin_name    The string used to uniquely identify this plugin.
-	 */
+        /**
+         * The unique identifier of this plugin.
+         *
+         * @since    0.1.0
+         * @access   protected
+         * @var      string    $plugin_name    The string used to uniquely identify this plugin.
+         */
 	protected $plugin_name;
 
-	 /**
-	 * The human readable name of this plugin.
-	 *
-	 * @since    0.1.0
-	 * @access   protected
-	 * @var      string    $plugin_pretty_name    The human readable name of this plugin.
-	 */
+        /**
+         * The human readable name of this plugin.
+         *
+         * @since    0.1.0
+         * @access   protected
+         * @var      string    $plugin_pretty_name    The human readable name of this plugin.
+         */
 	protected $plugin_pretty_name;
 
-     /**
-	 * The current version of the plugin.
-	 *
-	 * @since    0.1.0
-	 * @access   protected
-	 * @var      string    $version    The current version of the plugin.
-	 */
+        /**
+         * The current version of the plugin.
+         *
+         * @since    0.1.0
+         * @access   protected
+         * @var      string    $version    The current version of the plugin.
+         */
 	protected $version;
 
-     /**
-	 * The callback from which to get the active post type names.
-	 *
-	 * @since    0.1.0
-	 * @access   protected
-	 * @var      mixed     $active_post_type_names_callback    The callback from which to get the active post type names.
-	 */
+        /**
+         * The callback from which to get the active post type names.
+         *
+         * @since    0.1.0
+         * @access   protected
+         * @var      mixed     $active_post_type_names_callback    The callback from which to get the active post type names.
+         */
 	protected $active_post_type_names_callback;
 
-     /**
-	 * The dafaults for various options
-	 *
-	 * @since    0.1.0
-	 * @access   private
-	 * @var      array    $option_defaults    Array of the defaults for various options.
-	 */
+        /**
+         * The dafaults for various options
+         *
+         * @since    0.1.0
+         * @access   private
+         * @var      array    $option_defaults    Array of the defaults for various options.
+         */
     private $option_defaults = array(
         'license_name' => 'Creative Commons Attribution 4.0 International (CC BY 4.0)',
         'license_type' => 'CC BY',
@@ -106,61 +106,61 @@ class O3PO_Settings extends O3PO_Singleton {
         'doaj_language_code' => "EN",
         'custom_search_page' => "checked",
 
-        'self_notification_subject_template' => 
-                 "A [publication_type_name] has been published/updated by [journal]",
-        'self_notification_body_template' => 
-                 "[journal] has published/updated the following [publication_type_name]\n".
-                 "Title:   [title] \n".
-                 "Authors: [authors] \n".
-                 "URL:     [url]\n".
-                 "DOI:     [doi]\n",
+        'self_notification_subject_template' =>
+        "A [publication_type_name] has been published/updated by [journal]",
+        'self_notification_body_template' =>
+        "[journal] has published/updated the following [publication_type_name]\n".
+        "Title:   [title] \n".
+        "Authors: [authors] \n".
+        "URL:     [url]\n".
+        "DOI:     [doi]\n",
         'author_notification_subject_template' =>
-               "[journal] has published your [publication_type_name]",
+        "[journal] has published your [publication_type_name]",
         'author_notification_body_template' =>
-                 "Dear [authors],\n\n".
-                 "Congratulations! Your [publication_type_name] '[title]' has been published by [journal] and is now available under:\n\n".
-                 "[post_url]\n\n".
-                 "Your work has been assigned the following journal reference and DOI\n\n".
-                 "Journal reference: [journal_reference]\n".
-                 "DOI:               [doi_url_prefix][doi]\n\n".
-                 "We kindly ask you to log in on the arXiv under https://arxiv.org/user/login and add this information to the page of your work there. Thank you very much!\n\n".
-                 "In case you have an ORCID you can go to http://search.crossref.org/?q=[doi] to conveniently add your new publication to your profile.\n\n".
-                 "Please be patient, it can take several hours until the DOI has been activated by Crossref.\n\n".
-                 "If you have any feedback or ideas for how to improve the peer-review and publishing process, or any other question, please let us know under [publisher_email]\n\n".
-                 "Best regards,\n\n".
-                 "[executive_board]\n".
-                 "Executive Board\n",
-         'author_notification_secondary_body_template' =>
-                 "Dear [authors],\n\n".
-                 "Congratulations! Your [publication_type_name] '[title]' has been published by [journal] and is now available under:\n\n".
-                 "[post_url]\n\n".
-                 "Your [publication_type_name] has been assigned the following journal reference and DOI\n\n".
-                 "Journal reference: [journal_reference]\n".
-                 "DOI:               [doi_url_prefix][doi]\n\n".
-                 "In case you have an ORCID you can go to http://search.crossref.org/?q=[doi] to conveniently add your new publication to your profile.\n\n".
-                 "Please be patient, it can take several hours before the above link works.\n\n".
-                 "If you have any feedback or ideas for how to improve the peer-review and publishing process, or any other question, please let us know under [publisher_email]\n\n".
-                 "Thank you for writing this [publication_type_name] for [journal]!\n\n".
-                 "Best regards,\n\n".
-                 "[executive_board]\n".
-                 "Executive Board\n",
+        "Dear [authors],\n\n".
+        "Congratulations! Your [publication_type_name] '[title]' has been published by [journal] and is now available under:\n\n".
+        "[post_url]\n\n".
+        "Your work has been assigned the following journal reference and DOI\n\n".
+        "Journal reference: [journal_reference]\n".
+        "DOI:               [doi_url_prefix][doi]\n\n".
+        "We kindly ask you to log in on the arXiv under https://arxiv.org/user/login and add this information to the page of your work there. Thank you very much!\n\n".
+        "In case you have an ORCID you can go to http://search.crossref.org/?q=[doi] to conveniently add your new publication to your profile.\n\n".
+        "Please be patient, it can take several hours until the DOI has been activated by Crossref.\n\n".
+        "If you have any feedback or ideas for how to improve the peer-review and publishing process, or any other question, please let us know under [publisher_email]\n\n".
+        "Best regards,\n\n".
+        "[executive_board]\n".
+        "Executive Board\n",
+        'author_notification_secondary_body_template' =>
+        "Dear [authors],\n\n".
+        "Congratulations! Your [publication_type_name] '[title]' has been published by [journal] and is now available under:\n\n".
+        "[post_url]\n\n".
+        "Your [publication_type_name] has been assigned the following journal reference and DOI\n\n".
+        "Journal reference: [journal_reference]\n".
+        "DOI:               [doi_url_prefix][doi]\n\n".
+        "In case you have an ORCID you can go to http://search.crossref.org/?q=[doi] to conveniently add your new publication to your profile.\n\n".
+        "Please be patient, it can take several hours before the above link works.\n\n".
+        "If you have any feedback or ideas for how to improve the peer-review and publishing process, or any other question, please let us know under [publisher_email]\n\n".
+        "Thank you for writing this [publication_type_name] for [journal]!\n\n".
+        "Best regards,\n\n".
+        "[executive_board]\n".
+        "Executive Board\n",
         'fermats_library_notification_subject_template' =>
-                 "[journal] has a new [publication_type_name] for Fermat's library",
+        "[journal] has a new [publication_type_name] for Fermat's library",
         'fermats_library_notification_body_template' =>
-                 "Dear team at Fermat's library,\n\n".
-                 "[journal] has published the following [publication_type_name]:\n\n".
-                 "Title:     [title]\n".
-                 "Author(s): [authors]\n".
-                 "URL:       [post_url]\n".
-                 "DOI:       [doi]\n".
-                 "\n".
-                 "Please post it on Fermat's library under the permalink: [fermats_library_permalink]\n".
-                 "Thank you very much!\n\n".
-                 "Kind regards,\n\n".
-                 "The Executive Board\n",
+        "Dear team at Fermat's library,\n\n".
+        "[journal] has published the following [publication_type_name]:\n\n".
+        "Title:     [title]\n".
+        "Author(s): [authors]\n".
+        "URL:       [post_url]\n".
+        "DOI:       [doi]\n".
+        "\n".
+        "Please post it on Fermat's library under the permalink: [fermats_library_permalink]\n".
+        "Thank you very much!\n\n".
+        "Kind regards,\n\n".
+        "The Executive Board\n",
 
-         'executive_board' => "",
-         'editor_in_chief' => "",
+        'executive_board' => "",
+        'editor_in_chief' => "",
 
             /* The options below are currently not customizable.
              *
@@ -174,15 +174,15 @@ class O3PO_Settings extends O3PO_Singleton {
         'volumes_endpoint' => 'volumes',
                                      );
 
-    /**
-	 * Configure the settings singleton.
-	 *
-	 * @since    0.1.0
-	 * @param    string    $plugin_name                      Simple name of this plugin.
-	 * @param    string    $plugin_pretty_name               Pretty name of this plugin.
-	 * @param    string    $version                          Version of this plugin.
-	 * @param    callback  $active_post_type_names_callback  The callback from which to get the active post type names.
-	 */
+        /**
+         * Configure the settings singleton.
+         *
+         * @since    0.1.0
+         * @param    string    $plugin_name                      Simple name of this plugin.
+         * @param    string    $plugin_pretty_name               Pretty name of this plugin.
+         * @param    string    $version                          Version of this plugin.
+         * @param    callback  $active_post_type_names_callback  The callback from which to get the active post type names.
+         */
 	public function configure( $plugin_name, $plugin_pretty_name, $version, $active_post_type_names_callback ) {
 
         $this->plugin_name = $plugin_name;
@@ -267,8 +267,10 @@ class O3PO_Settings extends O3PO_Singleton {
         add_settings_field('license_version', 'License version', array( $this, 'render_license_version_setting' ), 'journal_settings', 'journal_settings');
         add_settings_field('license_url', 'License url', array( $this, 'render_license_url_setting' ), 'journal_settings', 'journal_settings');
         add_settings_field('license_explanation', 'License explanation string', array( $this, 'render_license_explanation_setting' ), 'journal_settings', 'journal_settings');
-        
+
         add_settings_section('email_settings', 'Email settings', array($this , 'render_email_settings'), 'email_settings');
+                add_settings_field('executive_board' , 'The names of the executive board members' , array($this, 'render_executive_board') , 'email_settings', 'email_settings');
+        add_settings_field('editor_in_chief' , 'The name of the editor in chief' , array($this, 'render_editor_in_chief') , 'email_settings', 'email_settings');
         add_settings_field('self_notification_subject_template', 'Self notification subject template', array($this, 'render_self_notification_subject_template_settings'),'email_settings', 'email_settings');
         add_settings_field('self_notification_body_template', 'Self notification body template', array($this, 'render_self_notification_body_template_settings'), 'email_settings', 'email_settings');
         add_settings_field('author_notification_subject_template', 'Self author notification subject template', array($this, 'render_author_notification_subject_template_settings'), 'email_settings', 'email_settings');
@@ -276,8 +278,6 @@ class O3PO_Settings extends O3PO_Singleton {
         add_settings_field('author_notification_secondary_body_template' , 'Author notification secondary body template' , array($this, 'render_author_notification_secondary_body_template_settings') , 'email_settings', 'email_settings');
         add_settings_field('fermats_library_subject_template' , 'Fermats library subject template' , array($this, 'render_fermats_library_subject_template_settings') , 'email_settings', 'email_settings');
         add_settings_field('fermats_library_body_template' , 'Fermats library body template' , array($this, 'render_fermats_library_body_template_settings') , 'email_settings', 'email_settings');
-        add_settings_field('executive_board' , 'The names of the executive board members' , array($this, 'render_executive_board') , 'email_settings', 'email_settings');
-        add_settings_field('editor_in_chief' , 'The name of the editor in chief' , array($this, 'render_editor_in_chief') , 'email_settings', 'email_settings');
 
         add_settings_section('crossref_settings', 'Crossref settings', array( $this, 'render_crossref_settings' ), 'crossref_settings');
         add_settings_field('crossref_id', 'Crossref ID', array( $this, 'render_crossref_id_setting' ), 'crossref_settings', 'crossref_settings');
@@ -329,12 +329,12 @@ class O3PO_Settings extends O3PO_Singleton {
         echo '<p>Settings of the plugin.</p>';
     }
 
-    /**
-     * Render the head of the plugin settings page.
-     *
-     * @since    0.2.2
-     * @access   public
-     */
+        /**
+         * Render the head of the plugin settings page.
+         *
+         * @since    0.2.2
+         * @access   public
+         */
     public function render_email_settings() {
         echo '<p> Settings of email templates.</p>';
     }
@@ -555,100 +555,101 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->render_setting('first_volume_year');
     }
 
-    /**
-     * Render the email template for the self notification subject
-     *
-     * @since    0.2.2
-     * @access   public
-     */
+        /**
+         * Render the executive board of the email settings
+         *
+         * @since    0.2.2
+         * @access   public
+         */
+    public function render_executive_board() {
+        $this->render_setting('executive_board');
+    }
+
+        /**
+         * Render the editor in chief of the email settings
+         *
+         * @since    0.2.2
+         * @access   public
+         */
+    public function render_editor_in_chief() {
+        $this->render_setting('editor_in_chief');
+    }
+
+
+        /**
+         * Render the email template for the self notification subject
+         *
+         * @since    0.2.2
+         * @access   public
+         */
     public function render_self_notification_subject_template_settings() {
         $this->render_setting('self_notification_subject_template');
         echo O3PO_EmailTemplates::render_short_codes('self_notification_subject');
     }
 
-    /**
-     * Render the email template for the self notification body
-     *
-     * @since    0.2.2
-     * @access   public
-     */
+        /**
+         * Render the email template for the self notification body
+         *
+         * @since    0.2.2
+         * @access   public
+         */
     public function render_self_notification_body_template_settings() {
-        $this->render_setting('self_notification_body_template');
+        $this->render_multi_line_setting('self_notification_body_template');
         echo O3PO_EmailTemplates::render_short_codes('self_notification_body');
     }
 
-    /**
-     * Render the email template for the author notification subject
-     *
-     * @since    0.2.2
-     * @access   public
-     */
+        /**
+         * Render the email template for the author notification subject
+         *
+         * @since    0.2.2
+         * @access   public
+         */
     public function render_author_notification_subject_template_settings() {
         $this->render_setting('author_notification_subject_template');
         echo O3PO_EmailTemplates::render_short_codes('author_notification_subject');
     }
 
-    /**
-     * Render the email template for the author notification body
-     *
-     * @since    0.2.2
-     * @access   public
-     */
+        /**
+         * Render the email template for the author notification body
+         *
+         * @since    0.2.2
+         * @access   public
+         */
     public function render_author_notification_body_template_settings() {
-        $this->render_setting('author_notification_body_template');
+        $this->render_multi_line_setting('author_notification_body_template');
         echo O3PO_EmailTemplates::render_short_codes('author_notification_body');
     }
 
-    /**
-     * Render the email template for the author notification secondary body
-     *
-     * @since    0.2.2
-     * @access   public
-     */
+        /**
+         * Render the email template for the author notification secondary body
+         *
+         * @since    0.2.2
+         * @access   public
+         */
     public function render_author_notification_secondary_body_template_settings() {
-        $this->render_setting('author_notification_secondary_body_template');
+        $this->render_multi_line_setting('author_notification_secondary_body_template');
         echo O3PO_EmailTemplates::render_short_codes('author_notification_body');
     }
 
-    /**
-     * Render the email template for the fermats library notification subject
-     *
-     * @since    0.2.2
-     * @access   public
-     */
+        /**
+         * Render the email template for the fermats library notification subject
+         *
+         * @since    0.2.2
+         * @access   public
+         */
     public function render_fermats_library_subject_template_settings() {
         $this->render_setting('fermats_library_notification_subject_template');
         echo O3PO_EmailTemplates::render_short_codes('fermats_library_notification_subject');
     }
 
-    /**
-     * Render the executive board of the email settings
-     *
-     * @since    0.2.2
-     * @access   public
-     */
-    public function render_executive_board() {
-        $this->render_setting('executive_board');
-    }
-
-    /**
-     * Render the editor in chief of the email settings
-     *
-     * @since    0.2.2
-     * @access   public
-     */
-    public function render_editor_in_chief() {
-        $this->render_setting('editor_in_chief');
-    }
-
-    /**
-     * Render the email template for the fermats library notification body
-     *
-     * @since    0.2.2
-     * @access   public
-     */
+        /**
+         * Render the email template for the fermats library notification body
+         *
+         * @since    0.2.2
+         * @access   public
+         */
     public function render_fermats_library_body_template_settings() {
-        $this->render_setting('fermats_library_notification_body_template');
+        $this->render_multi_line_setting('fermats_library_notification_body_template');
         echo O3PO_EmailTemplates::render_short_codes('fermats_library_notification_body');
     }
 
@@ -1013,7 +1014,22 @@ class O3PO_Settings extends O3PO_Singleton {
 
         $option = $this->get_plugin_option($id);
 
-        echo '<input type="text" id="' . $this->plugin_name . '-setttings-' . $id . '" name="' . $this->plugin_name . '-setttings[' . $id . ']" style="width: 80%" value="' . $option . '" />';
+        echo '<input type="text" id="' . $this->plugin_name . '-setttings-' . $id . '" name="' . $this->plugin_name . '-setttings[' . $id . ']" value="' . esc_attr($option) . '" />';
+
+    }
+
+        /**
+         * Render a multi line text box type setting.
+         *
+         * @since    0.1.0
+         * @access   public
+         * @param    string    $id   Id of the setting.
+         */
+    public function render_multi_line_setting( $id ) {
+
+        $option = $this->get_plugin_option($id);
+
+        echo '<textarea id="' . $this->plugin_name . '-setttings-' . $id . '" name="' . $this->plugin_name . '-setttings[' . $id . ']" rows="' . (substr_count( $option, "\n" )+1) . '">' . esc_html($option) . '</textarea>';
 
     }
 
@@ -1028,7 +1044,7 @@ class O3PO_Settings extends O3PO_Singleton {
 
         $option = $this->get_plugin_option($id);
 
-        echo '<input type="password" id="' . $this->plugin_name . '-setttings-' . $id . '" name="' . $this->plugin_name . '-setttings[' . $id . ']" style="width: 80%" value="' . $option . '" />';
+        echo '<input type="password" id="' . $this->plugin_name . '-setttings-' . $id . '" name="' . $this->plugin_name . '-setttings[' . $id . ']" value="' . esc_attr($option) . '" />';
         echo '<input type="checkbox" onclick="(function myFunction() {
     var x = document.getElementById(\'' . $this->plugin_name . '-setttings-' . $id . '\');
     if (x.type === \'password\') {
@@ -1057,13 +1073,13 @@ class O3PO_Settings extends O3PO_Singleton {
 
     }
 
-     /**
-	 * An array of all option names to the respective functions used when cleaning user input for these options.
-	 *
-	 * @since    0.1.0
-	 * @access   private
-	 * @var      array    $all_settings_fields_map    Aarray of all option names to the respective functions used when cleaning user input for these options.
-	 */
+        /**
+         * An array of all option names to the respective functions used when cleaning user input for these options.
+         *
+         * @since    0.1.0
+         * @access   private
+         * @var      array    $all_settings_fields_map    Aarray of all option names to the respective functions used when cleaning user input for these options.
+         */
     private static $all_settings_fields_map = Null;
 
         /**
