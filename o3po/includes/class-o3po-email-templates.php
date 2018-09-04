@@ -39,7 +39,7 @@ class O3PO_EmailTemplates {
                          "[authors]" => "The list of authors",
                          "[url]" => "The publication URL",
                          "[doi]" => "The DOI",
-                         "[doi_hex_encoded]" => "The DOI encoded in hex (use this when escaping problems uccur)");
+                         "[doi_hex_encoded]" => "The DOI encoded in hex (use this when escaping problems occur)");
        return array('short_codes' => $short_codes,
                   'result' => str_replace(array_keys($short_codes),
                          array($journal, $publication_type_name, $title, $authors, $url, $doi, $doi_hex_encoded),
