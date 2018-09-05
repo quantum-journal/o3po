@@ -1140,10 +1140,10 @@ class O3PO_Settings extends O3PO_Singleton {
                 'doaj_language_code' => 'trim',
                 'custom_search_page' => 'trim',
                 'volumes_endpoint' => 'trim',
-                'doi_prefix' => array($this, 'clean_doi_prefix'),
-                'eissn' => array($this, 'clean_eissn'),
-                'secondary_journal_eissn' => array($this, 'clean_secondary_journal_eissn'),
-                'first_volume_year' => array($this, 'clean_first_volume_year'),
+                'doi_prefix' => array($this, 'sanitize_doi_prefix'),
+                'eissn' => array($this, 'sanitize_eissn'),
+                'secondary_journal_eissn' => array($this, 'sanitize_secondary_journal_eissn'),
+                'first_volume_year' => array($this, 'sanitize_first_volume_year'),
                 'executive_board' => 'trim',
                 'editor_in_chief' => 'trim',
                 'self_notification_subject_template' => 'trim',
@@ -1160,16 +1160,16 @@ class O3PO_Settings extends O3PO_Singleton {
     }
 
         /**
-         * Cleam user input to the doi_prefix setting
+         * Clean user input to the doi_prefix setting
          *
          * @since    0.1.0
          * @access   private
          * @param    string   $doi_prefix    User input.
          */
-    private function clean_doi_prefix( $doi_prefix ) {
+    private function sanitize_doi_prefix( $doi_prefix ) {
 
         $doi_prefix = trim($doi_prefix);
-        if(preg_match('/^[0-9.]*$/', $doi_prefix))
+        if(preg_match('/^[-0-9]*$/', $doi_prefix))
             return $doi_prefix;
         else
             "";
@@ -1182,7 +1182,7 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   private
          * @param    string   $eissn    User input.
          */
-    private function clean_eissn( $eissn ) {
+    private function sanitize_eissn( $eissn ) {
 
         $eissn = trim($eissn);
         if(preg_match('/^[0-9]{4}-[0-9]{3}[0-9xX]$/', $eissn))
@@ -1198,7 +1198,7 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   private
          * @param    string   $secondary_journal_eissn    User input.
          */
-    private function clean_secondary_journal_eissn( $secondary_journal_eissn ) {
+    private function sanitize_secondary_journal_eissn( $secondary_journal_eissn ) {
         $secondary_journal_eissn = trim($secondary_journal_eissn);
         if(preg_match('/^[0-9]{4}-[0-9]{3}[0-9xX]$/', $secondary_journal_eissn))
             return $secondary_journal_eissn;
@@ -1213,7 +1213,7 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   private
          * @param    string   $first_volume_year    User input.
          */
-    private function clean_first_volume_year( $first_volume_year ) {
+    private function sanitize_first_volume_year( $first_volume_year ) {
 
         $first_volume_year = trim($first_volume_year);
         if(preg_match('/^[0-9]{4}$/', $first_volume_year)) //this will cause a year 10000 bug
