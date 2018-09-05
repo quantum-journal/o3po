@@ -1144,6 +1144,16 @@ class O3PO_Settings extends O3PO_Singleton {
                 'eissn' => array($this, 'clean_eissn'),
                 'secondary_journal_eissn' => array($this, 'clean_secondary_journal_eissn'),
                 'first_volume_year' => array($this, 'clean_first_volume_year'),
+                'executive_board' => 'trim',
+                'editor_in_chief' => 'trim',
+                'self_notification_subject_template' => 'trim',
+                'self_notification_body_template' => 'trim',
+                'author_notification_subject_template' => 'trim',
+                'author_notification_body_template' => 'trim',
+                #'author_notification_secondary_subject_template' => 'trim',
+                'author_notification_secondary_body_template' => 'trim',
+                'fermats_library_notification_subject_template' => 'trim',
+                'fermats_library_notification_body_template' => 'trim',
                                                    );
 
         return self::$all_settings_fields_map;
@@ -1260,4 +1270,14 @@ class O3PO_Settings extends O3PO_Singleton {
         throw new Exception('The non existing plugin option '. $id . ' was requested.');
     }
 
+        /**
+         * Get the plugin_name.
+         *
+         * @since 2.2.2+
+         * @access public
+         */
+    public function get_plugin_name() {
+
+        return $this->plugin_name;
+    }
 }
