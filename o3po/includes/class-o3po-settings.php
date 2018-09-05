@@ -1150,7 +1150,7 @@ class O3PO_Settings extends O3PO_Singleton {
                 'self_notification_body_template' => 'trim',
                 'author_notification_subject_template' => 'trim',
                 'author_notification_body_template' => 'trim',
-                #'author_notification_secondary_subject_template' => 'trim',
+                'author_notification_secondary_subject_template' => 'trim',
                 'author_notification_secondary_body_template' => 'trim',
                 'fermats_library_notification_subject_template' => 'trim',
                 'fermats_library_notification_body_template' => 'trim',
