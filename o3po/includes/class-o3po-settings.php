@@ -130,6 +130,8 @@ class O3PO_Settings extends O3PO_Singleton {
         "Best regards,\n\n".
         "[executive_board]\n".
         "Executive Board\n",
+        'author_notification_secondary_subject_template' =>
+        "[journal] has published your [publication_type_name]",
         'author_notification_secondary_body_template' =>
         "Dear [authors],\n\n".
         "Congratulations! Your [publication_type_name] '[title]' has been published by [journal] and is now available under:\n\n".
@@ -275,6 +277,7 @@ class O3PO_Settings extends O3PO_Singleton {
         add_settings_field('self_notification_body_template', 'Self notification body template', array($this, 'render_self_notification_body_template_settings'), 'email_settings', 'email_settings');
         add_settings_field('author_notification_subject_template', 'Self author notification subject template', array($this, 'render_author_notification_subject_template_settings'), 'email_settings', 'email_settings');
         add_settings_field('author_notification_body_template' , 'Author notification body template' , array($this, 'render_author_notification_body_template_settings') , 'email_settings', 'email_settings');
+        add_settings_field('author_notification_secondary_subject_template' , 'Author notification secondary subject template' , array($this, 'render_author_notification_secondary_subject_template_settings') , 'email_settings', 'email_settings');
         add_settings_field('author_notification_secondary_body_template' , 'Author notification secondary body template' , array($this, 'render_author_notification_secondary_body_template_settings') , 'email_settings', 'email_settings');
         add_settings_field('fermats_library_subject_template' , 'Fermats library subject template' , array($this, 'render_fermats_library_subject_template_settings') , 'email_settings', 'email_settings');
         add_settings_field('fermats_library_body_template' , 'Fermats library body template' , array($this, 'render_fermats_library_body_template_settings') , 'email_settings', 'email_settings');
@@ -618,6 +621,17 @@ class O3PO_Settings extends O3PO_Singleton {
     public function render_author_notification_body_template_settings() {
         $this->render_multi_line_setting('author_notification_body_template');
         echo O3PO_EmailTemplates::render_short_codes('author_notification_body');
+    }
+
+        /**
+         * Render the email template for the author notification secondary subject
+         *
+         * @since    0.2.2
+         * @access   public
+         */
+    public function render_author_notification_secondary_subject_template_settings() {
+        $this->render_multi_line_setting('author_notification_secondary_subject_template');
+        echo O3PO_EmailTemplates::render_short_codes('author_notification_subject');
     }
 
         /**
