@@ -4,7 +4,7 @@
  * Class representing the email templates
  *
  * @link       http://example.com
- * @since      0.2.3
+ * @since      2.2.2+
  *
  * @package    O3PO
  * @subpackage O3PO/includes
@@ -13,13 +13,23 @@
 /**
  * Class representing the email templates
  *
- * @since      0.2.3
+ * @since      2.2.2+
  * @package    O3PO
  * @subpackage O3PO/includes
  * @author     Johannes Drever <drever@lrz.uni-muenchen.de>
  */
 class O3PO_EmailTemplates {
 
+        /**
+         * Replace the short codes in the self notification subject template.
+         *
+         * @since    2.2.2+
+         * @access   public
+         * @param    String $template The template with the self notification subject. Short codes will be replaced by the values of the following variables. Please refer to return['short_codes'] for further reference.
+         * @return   Mixed The function returns a map with two keys.
+         *                result: The template in which the short codes were replaced.
+         *                short_codes: A map where the keys are the short codes and the values are the descriptions of the short codes.
+         */
    public static function self_notification_subject($template
                                    , $journal, $publication_type_name){
        $short_codes = array("[journal]" => "The journal name",
@@ -30,6 +40,16 @@ class O3PO_EmailTemplates {
                          $template));
    }
 
+        /**
+         * Replace the short codes in the self notification body template.
+         *
+         * @since    2.2.2+
+         * @access   public
+         * @param    String $template The template with the self notification body. Short codes will be replaced by the values of the following variables. Please refer to return['short_codes'] for further reference.
+         * @return   Mixed The function returns a map with two keys.
+         *                result: The template in which the short codes were replaced.
+         *                short_codes: A map where the keys are the short codes and the values are the descriptions of the short codes.
+         */
    public static function self_notification_body($email_template,
                                                  $journal,
                                                  $publication_type_name, $title, $authors, $url, $doi_url_prefix, $doi){
@@ -47,6 +67,16 @@ class O3PO_EmailTemplates {
                          $email_template));
    }
 
+        /**
+         * Replace the short codes in the author notification subject template.
+         *
+         * @since    2.2.2+
+         * @access   public
+         * @param    String $template The template with the author notification subject. Short codes will be replaced by the values of the following variables. Please refer to return['short_codes'] for further reference.
+         * @return   Mixed The function returns a map with two keys.
+         *                result: The template in which the short codes were replaced.
+         *                short_codes: A map where the keys are the short codes and the values are the descriptions of the short codes.
+         */
    public static function author_notification_subject($template,
                                    $journal, $publication_type_name){
        $short_codes = array("[journal]" => "The journal name",
@@ -56,6 +86,16 @@ class O3PO_EmailTemplates {
                          array($journal, $publication_type_name),
                          $template));
    }
+        /**
+         * Replace the short codes in the author notification body template.
+         *
+         * @since    2.2.2+
+         * @access   public
+         * @param    String $template The template with the author notification body. Short codes will be replaced by the values of the following variables. Please refer to return['short_codes'] for further reference.
+         * @return   Mixed The function returns a map with two keys.
+         *                result: The template in which the short codes were replaced.
+         *                short_codes: A map where the keys are the short codes and the values are the descriptions of the short codes.
+         */
 
    public static function author_notification_body($email_template,
                                     $journal, $executive_board, $editor_in_chief, $publisher_email,
@@ -81,6 +121,16 @@ class O3PO_EmailTemplates {
                                $url, $doi_url_prefix, $doi, $doi_hex_encoded, $journal_reference),
                          $email_template));
    }
+        /**
+         * Replace the short codes in the fermats library notification subject template.
+         *
+         * @since    2.2.2+
+         * @access   public
+         * @param    String $template The template with the fermats library notification subject. Short codes will be replaced by the values of the following variables. Please refer to return['short_codes'] for further reference.
+         * @return   Mixed The function returns a map with two keys.
+         *                result: The template in which the short codes were replaced.
+         *                short_codes: A map where the keys are the short codes and the values are the descriptions of the short codes.
+         */
 
    public static function fermats_library_notification_subject($template,
                                    $journal, $publication_type_name){
@@ -91,6 +141,16 @@ class O3PO_EmailTemplates {
                          array($journal, $publication_type_name),
                          $template));
    }
+        /**
+         * Replace the short codes in the fermats library notification body template.
+         *
+         * @since    2.2.2+
+         * @access   public
+         * @param    String $template The template with the fermats library notification body. Short codes will be replaced by the values of the following variables. Please refer to return['short_codes'] for further reference.
+         * @return   Mixed The function returns a map with two keys.
+         *                result: The template in which the short codes were replaced.
+         *                short_codes: A map where the keys are the short codes and the values are the descriptions of the short codes.
+         */
 
    public static function fermats_library_notification_body($email_template
                                     , $journal
@@ -112,6 +172,14 @@ class O3PO_EmailTemplates {
                          $email_template));
    }
 
+       /**
+        * Render the short codes for a specific template to an HTML list.
+        *
+        * @since    2.2.2+
+        * @access   public
+        * @param String $template The name of the O3PO_EmailTemplates class method.
+        * @return String An HTML list of the short codes.
+        */
    public static function render_short_codes($template){
          $rfc = new ReflectionClass("O3PO_EmailTemplates");
          $rf = $rfc->getMethod($template);
@@ -132,6 +200,14 @@ class O3PO_EmailTemplates {
          return $result . '</ul>';
    }
 
+       /**
+        * Encode the DOI into hex to escape URL parameters.
+        *
+        * @since    2.2.2+
+        * @access   public
+        * @param String $doi The DOI that should be encoded
+        * @return String The hex encoded DOI
+        */
    private static function hex_encode($doi) {
 
        return rawurlencode($doi);
