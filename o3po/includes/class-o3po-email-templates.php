@@ -25,7 +25,9 @@ class O3PO_EmailTemplates {
          *
          * @since    2.2.2+
          * @access   public
-         * @param    String $template The template with the self notification subject. Short codes will be replaced by the values of the following variables. Please refer to return['short_codes'] for further reference.
+         * @param    String $template The template with the self notification subject.
+         * @param    String $journal The journal name
+         * @param    String $publication_type_name The type of the publication.
          * @return   Mixed The function returns a map with two keys.
          *                result: The template in which the short codes were replaced.
          *                short_codes: A map where the keys are the short codes and the values are the descriptions of the short codes.
@@ -45,7 +47,14 @@ class O3PO_EmailTemplates {
          *
          * @since    2.2.2+
          * @access   public
-         * @param    String $template The template with the self notification body. Short codes will be replaced by the values of the following variables. Please refer to return['short_codes'] for further reference.
+         * @param    String $email_template The template with the self notification body.
+         * @param    String $journal The journal name
+         * @param    String $publication_type_name The type of the publication
+         * @param    String $title The title of the publication
+         * @param    String $authors The list of authors
+         * @param    String $url The publication URL
+         * @param    String $doi_url_prefix The DOI URL prefix
+         * @param    String $doi The DOI
          * @return   Mixed The function returns a map with two keys.
          *                result: The template in which the short codes were replaced.
          *                short_codes: A map where the keys are the short codes and the values are the descriptions of the short codes.
@@ -59,11 +68,12 @@ class O3PO_EmailTemplates {
                          "[title]" => "The title of the publication",
                          "[authors]" => "The list of authors",
                          "[url]" => "The publication URL",
+                         "[doi_url_prefix]" => "The DOI url prefix",
                          "[doi]" => "The DOI",
                          "[doi_hex_encoded]" => "The DOI encoded in hex (use this when escaping problems occur)");
        return array('short_codes' => $short_codes,
                   'result' => str_replace(array_keys($short_codes),
-                         array($journal, $publication_type_name, $title, $authors, $url, $doi, $doi_hex_encoded),
+                         array($journal, $publication_type_name, $title, $authors, $url, $doi_url_prefix, $doi, $doi_hex_encoded),
                          $email_template));
    }
 
@@ -72,7 +82,9 @@ class O3PO_EmailTemplates {
          *
          * @since    2.2.2+
          * @access   public
-         * @param    String $template The template with the author notification subject. Short codes will be replaced by the values of the following variables. Please refer to return['short_codes'] for further reference.
+         * @param    String $template The template with the author notification subject.
+         * @param    String $journal The journal name
+         * @param    String $publication_type_name The type of the publication"
          * @return   Mixed The function returns a map with two keys.
          *                result: The template in which the short codes were replaced.
          *                short_codes: A map where the keys are the short codes and the values are the descriptions of the short codes.
@@ -91,7 +103,17 @@ class O3PO_EmailTemplates {
          *
          * @since    2.2.2+
          * @access   public
-         * @param    String $template The template with the author notification body. Short codes will be replaced by the values of the following variables. Please refer to return['short_codes'] for further reference.
+         * @param    String $email_template The template with the author notification body.
+         * @param    String $journal The journal name
+         * @param    String $executive_board Names of the executive board members
+         * @param    String $editor_in_chief Names of the editor in chief
+         * @param    String $publisher_email Email address of the publisher
+         * @param    String $publication_type_name The type of the publication
+         * @param    String $title The title of the article
+         * @param    String $authors The names of the authors
+         * @param    String $url The url where the publication can be found
+         * @param    String $doi_url_prefix The DOI url prefix
+         * @param    String $doi The DOI
          * @return   Mixed The function returns a map with two keys.
          *                result: The template in which the short codes were replaced.
          *                short_codes: A map where the keys are the short codes and the values are the descriptions of the short codes.
@@ -126,7 +148,9 @@ class O3PO_EmailTemplates {
          *
          * @since    2.2.2+
          * @access   public
-         * @param    String $template The template with the fermats library notification subject. Short codes will be replaced by the values of the following variables. Please refer to return['short_codes'] for further reference.
+         * @param    String $template The template with the fermats library notification subject.
+         * @param    String $journal The journal name
+         * @param    String $publication_type_name The type of the publication"
          * @return   Mixed The function returns a map with two keys.
          *                result: The template in which the short codes were replaced.
          *                short_codes: A map where the keys are the short codes and the values are the descriptions of the short codes.
@@ -146,7 +170,15 @@ class O3PO_EmailTemplates {
          *
          * @since    2.2.2+
          * @access   public
-         * @param    String $template The template with the fermats library notification body. Short codes will be replaced by the values of the following variables. Please refer to return['short_codes'] for further reference.
+         * @param    String $email_template The template with the fermats library notification body.
+         * @param    String $journal The type of the publication
+         * @param    String $publication_type_name The type of the publication
+         * @param    String $title The title of the article
+         * @param    String $authors The names of the authors
+         * @param    String $url The url where the publication can be found
+         * @param    String $doi_url_prefix The DOI URL prefix
+         * @param    String $doi The DOI
+         * @param    String $fermats_library_permalink The permalink in fermats library"
          * @return   Mixed The function returns a map with two keys.
          *                result: The template in which the short codes were replaced.
          *                short_codes: A map where the keys are the short codes and the values are the descriptions of the short codes.
@@ -154,13 +186,14 @@ class O3PO_EmailTemplates {
 
    public static function fermats_library_notification_body($email_template
                                     , $journal
-                                    , $publication_type_name, $title, $authors, $url, $doi, $fermats_library_permalink){
+                                    , $publication_type_name, $title, $authors, $url, $doi_url_prefix, $doi, $fermats_library_permalink){
        $doi_hex_encoded = static::hex_encode($doi);
        $short_codes = array("[journal]" => "The type of the publication",
                           "[publication_type_name]" => "The type of the publication",
                           "[title]" => "The title of the article",
                           "[authors]" => "The names of the authors",
                           "[post_url]" => "The url where the publication can be found",
+                          "[doi_url_prefix]" => "The DOI url prefix",
                           "[doi]" => "The DOI",
                           "[doi_hex_encoded]" => "The DOI encoded in hex (use this when escaping problems uccur)",
                           "[fermats_library_permalink]" => "The permalink in fermats library");
@@ -168,7 +201,7 @@ class O3PO_EmailTemplates {
                   'result' => str_replace(array_keys($short_codes),
                          array($journal,
                                $publication_type_name, $title, $authors,
-                               $url, $doi, $doi_hex_encoded, $fermats_library_permalink),
+                               $url, $doi_url_prefix, $doi, $doi_hex_encoded, $fermats_library_permalink),
                          $email_template));
    }
 

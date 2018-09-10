@@ -22,7 +22,7 @@ class O3PO_EmailTemplatesTest extends PHPUnit_Framework_TestCase
                           "Title:   test-title \n".
                           "Authors: test-authors \n".
                           "URL:     test-url\n".
-                          "DOI:     test-doi/with-special-char\n".
+                          "DOI:     test-doi-prefixtest-doi/with-special-char\n".
                           "NOT IN TEMPLATE! test-doi%2Fwith-special-char",
                           $message['result']);
   }
@@ -96,14 +96,14 @@ class O3PO_EmailTemplatesTest extends PHPUnit_Framework_TestCase
                      O3PO_EmailTemplatesTest::getTemplate('fermats_library_notification_body_template'). "NOT IN TEMPLATE! [doi_hex_encoded]",
                   "test-journal",
                   "test-publication-type-name", "test-title", "test-authors",
-                  "test-post-url", "test-doi", "test-fermats-library-permalink"
+                  "test-post-url", "test-doi-url-prefix", "test-doi", "test-fermats-library-permalink"
                   );
        $this->assertEquals("Dear team at Fermat's library,\n\n".
                  "test-journal has published the following test-publication-type-name:\n\n".
                  "Title:     test-title\n".
                  "Author(s): test-authors\n".
                  "URL:       test-post-url\n".
-                 "DOI:       test-doi\n".
+                 "DOI:       test-doi-url-prefixtest-doi\n".
                  "\n".
                  "Please post it on Fermat's library under the permalink: test-fermats-library-permalink\n".
                  "Thank you very much!\n\n".

@@ -113,7 +113,7 @@ class O3PO_Settings extends O3PO_Singleton {
         "Title:   [title] \n".
         "Authors: [authors] \n".
         "URL:     [url]\n".
-        "DOI:     [doi]\n",
+        "DOI:     [doi_url_prefix][doi]\n",
         'author_notification_subject_template' =>
         "[journal] has published your [publication_type_name]",
         'author_notification_body_template' =>
@@ -154,7 +154,7 @@ class O3PO_Settings extends O3PO_Singleton {
         "Title:     [title]\n".
         "Author(s): [authors]\n".
         "URL:       [post_url]\n".
-        "DOI:       [doi]\n".
+        "DOI:       [doi_url_prefix][doi]\n".
         "\n".
         "Please post it on Fermat's library under the permalink: [fermats_library_permalink]\n".
         "Thank you very much!\n\n".
