@@ -114,6 +114,7 @@ class O3PO_EmailTemplates {
          * @param    String $url The url where the publication can be found
          * @param    String $doi_url_prefix The DOI url prefix
          * @param    String $doi The DOI
+         * @param    String $journal_reference The journal reference
          * @return   Mixed The function returns a map with two keys.
          *                result: The template in which the short codes were replaced.
          *                short_codes: A map where the keys are the short codes and the values are the descriptions of the short codes.
