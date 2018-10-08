@@ -105,6 +105,7 @@ class O3PO_Settings extends O3PO_Singleton {
         'doaj_api_url' => "https://doaj.org/api/v1/articles",
         'doaj_language_code' => "EN",
         'custom_search_page' => "checked",
+        'maintenance_mode' => 'unchecked',
 
         'self_notification_subject_template' =>
         "A [publication_type_name] has been published/updated by [journal]",
@@ -248,6 +249,7 @@ class O3PO_Settings extends O3PO_Singleton {
         add_settings_section('plugin_settings', 'Plugin settings', array( $this, 'render_plugin_settings' ), 'plugin_settings');
         add_settings_field('production_site_url', 'Production site url', array( $this, 'render_production_site_url_setting' ), 'plugin_settings', 'plugin_settings');
         add_settings_field('custom_search_page', 'Use custom search page', array( $this, 'render_custom_search_page_setting' ), 'plugin_settings', 'plugin_settings');
+        add_settings_field('maintenance_mode', 'Maintenance mode', array( $this, 'render_maintenance_mode_setting' ), 'plugin_settings', 'plugin_settings');
 
         add_settings_section('journal_settings', 'Journal settings', array( $this, 'render_journal_settings' ), 'journal_settings');
         add_settings_field('doi_prefix', 'Doi prefix', array( $this, 'render_doi_prefix_setting' ), 'journal_settings', 'journal_settings');
@@ -424,6 +426,20 @@ class O3PO_Settings extends O3PO_Singleton {
     public function render_custom_search_page_setting() {
 
         $this->render_checkbox_setting('custom_search_page', 'Uncheck to disable the custom search page with extra information for users lookig for a published paper that is provided by this plugin.');
+
+    }
+
+        /**
+         * Render the setting to enabled maintenance mode.
+         *
+         * @since    0.1.0
+         * @access   public
+         */
+    public function render_maintenance_mode_setting() {
+
+        $this->render_checkbox_setting('maintenance_mode', 'Enable maintenance mode.');
+        $post_types = O3PO_Utility::oxford_comma_implode(call_user_func($this->active_post_type_names_callback));
+        echo('<p>(In maintenance mode, modifying any of the meta-data of ' . $post_types . ' posts as well as publishing is inhibited and a warning message is shown on their edit post screen in the admin area. All public facing aspects of the website will continue to work normally.)</p>');
 
     }
 
@@ -1153,6 +1169,7 @@ class O3PO_Settings extends O3PO_Singleton {
                 'doaj_api_key' => 'trim',
                 'doaj_language_code' => 'trim',
                 'custom_search_page' => 'trim',
+                'maintenance_mode' => 'trim',
                 'volumes_endpoint' => 'trim',
                 'doi_prefix' => array($this, 'sanitize_doi_prefix'),
                 'eissn' => array($this, 'sanitize_eissn'),
@@ -1293,5 +1310,16 @@ class O3PO_Settings extends O3PO_Singleton {
     public function get_plugin_name() {
 
         return $this->plugin_name;
+    }
+
+        /**
+         * Get the plugin_pretty_name.
+         *
+         * @since 2.2.2+
+         * @access public
+         */
+    public function get_plugin_pretty_name() {
+
+        return $this->plugin_pretty_name;
     }
 }

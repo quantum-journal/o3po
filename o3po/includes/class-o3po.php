@@ -286,6 +286,7 @@ class O3PO {
 
         $this->loader->add_action( 'load-post.php', Null, 'O3PO_PublicationType::init_metabox' );
         $this->loader->add_action( 'load-post-new.php', Null, 'O3PO_PublicationType::init_metabox' );
+
 	}
 
         /**
