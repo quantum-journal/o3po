@@ -1028,7 +1028,7 @@ class O3PO_Settings extends O3PO_Singleton {
 
         $option = $this->get_plugin_option($id);
 
-        echo '<input type="text" id="' . $this->plugin_name . '-setttings-' . $id . '" name="' . $this->plugin_name . '-setttings[' . $id . ']" value="' . esc_attr($option) . '" />';
+        echo '<input class="regular-text ltr o3po-setting o3po-setting-text" type="text" id="' . $this->plugin_name . '-setttings-' . $id . '" name="' . $this->plugin_name . '-setttings[' . $id . ']" value="' . esc_attr($option) . '" />';
 
     }
 
@@ -1043,7 +1043,7 @@ class O3PO_Settings extends O3PO_Singleton {
 
         $option = $this->get_plugin_option($id);
 
-        echo '<textarea id="' . $this->plugin_name . '-setttings-' . $id . '" name="' . $this->plugin_name . '-setttings[' . $id . ']" rows="' . (substr_count( $option, "\n" )+1) . '">' . esc_html($option) . '</textarea>';
+        echo '<textarea class="regular-text ltr o3po-setting o3po-setting-text-multi-line" id="' . $this->plugin_name . '-setttings-' . $id . '" name="' . $this->plugin_name . '-setttings[' . $id . ']" rows="' . (substr_count( $option, "\n" )+1) . '">' . esc_html($option) . '</textarea>';
 
     }
 
@@ -1058,7 +1058,7 @@ class O3PO_Settings extends O3PO_Singleton {
 
         $option = $this->get_plugin_option($id);
 
-        echo '<input type="password" id="' . $this->plugin_name . '-setttings-' . $id . '" name="' . $this->plugin_name . '-setttings[' . $id . ']" value="' . esc_attr($option) . '" />';
+        echo '<input class="regular-text ltr o3po-setting o3po-setting-password" type="password" id="' . $this->plugin_name . '-setttings-' . $id . '" name="' . $this->plugin_name . '-setttings[' . $id . ']" value="' . esc_attr($option) . '" />';
         echo '<input type="checkbox" onclick="(function myFunction() {
     var x = document.getElementById(\'' . $this->plugin_name . '-setttings-' . $id . '\');
     if (x.type === \'password\') {
@@ -1082,7 +1082,7 @@ class O3PO_Settings extends O3PO_Singleton {
         $option = $this->get_plugin_option($id);
 
         echo '<input type="hidden" name="' . $this->plugin_name . '-setttings[' . $id . ']" value="unchecked">'; //To have a 0 in POST when the checkbox is unticked
-        echo '<input type="checkbox" id="' . $this->plugin_name . '-setttings-' . $id . '" name="' . $this->plugin_name . '-setttings[' . $id . ']" value="checked"' . checked( 'checked', $option, false ) . '/>';
+        echo '<input class="o3po-setting o3po-setting-checkbox" type="checkbox" id="' . $this->plugin_name . '-setttings-' . $id . '" name="' . $this->plugin_name . '-setttings[' . $id . ']" value="checked"' . checked( 'checked', $option, false ) . '/>';
         echo '<label for="' . $this->plugin_name . '-setttings-' . $id . '">' . $label . '</label>';
 
     }
