@@ -830,24 +830,30 @@ abstract class O3PO_PublicationType {
          */
     public final function add_custom_post_types_to_query( $query ) {
 
-            //unify because $query->get('post_type') can be both an array or a string
+            //$query->get('post_type') can either an array or a string
         if(is_array($query->get('post_type')))
             $get_post_type_as_array = $query->get('post_type');
         else
             $get_post_type_as_array = array($query->get('post_type'));
 
-            //On the main query 'post' is not set
-        if ( is_home() && $query->is_main_query() )
+            /* Wordpress shows all posts of type 'post' when $query->get('post_type') is empty
+             * and also when it contains only the empty string ''.
+             * We want to add the custom post type and not loose regular posts, so we have to
+             * add 'post' explicitly.
+             * See also: https://wordpress.stackexchange.com/questions/311446/adding-custom-post-type-to-queries-doing-it-the-right-way */
+        if ( empty($get_post_type_as_array))
+            $get_post_type_as_array = array('post');
+        if(in_array('', $get_post_type_as_array) and !in_array('post', $get_post_type_as_array))
             $get_post_type_as_array = array_merge( $get_post_type_as_array, array('post'));
 
             //only add custom post type to queries that contain regular 'post's
-        if(empty($get_post_type_as_array) or !in_array('post', $get_post_type_as_array))
+        if(!in_array('post', $get_post_type_as_array))
             return;
 
-        if ( is_home() && $query->is_main_query() )
-            $query->set( 'post_type', array_merge( $get_post_type_as_array, array($this->get_publication_type_name()) ) );
-        if( is_category() )
-            $query->set( 'post_type', array_merge( $get_post_type_as_array, array($this->get_publication_type_name()) ) );
+        $new_post_type = array_merge( $get_post_type_as_array, array($this->get_publication_type_name()) );
+
+        if ( (is_home() && $query->is_main_query()) or is_category() )
+            $query->set( 'post_type', $new_post_type );
 
     }
 
