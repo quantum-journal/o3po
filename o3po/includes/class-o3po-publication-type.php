@@ -17,6 +17,7 @@
  */
 
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-utility.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
 
 /**
  * Base class for types of publications.
@@ -332,7 +333,23 @@ abstract class O3PO_PublicationType {
 		$nonce_name   = $this->get_publication_type_name() . '_nonce';
 		$nonce_action = $this->get_publication_type_name() . '_nonce_action';
 
+        $this->render_maintenance_mode_warning($post);
+
 		wp_nonce_field( $nonce_action, $nonce_name );
+    }
+
+        /**
+         * Render the maintenance_mode warning if appropriate.
+         *
+         * @since    0.2.2+
+         * @access   public
+         * @param    WP_Post     $post   The post for which to render the metabox.
+         * */
+    public static final function render_maintenance_mode_warning( $post ) {
+
+        $settings = O3PO_Settings::instance();
+        if($settings->get_plugin_option('maintenance_mode')!=='unchecked')
+            echo '<script>alert("' . esc_html($settings->get_plugin_pretty_name()) . ' has been put in maintenance mode. Modification of publication-meta data is inhibited. Maintenance mode can be disabled in the plugin settings. Please contact your site administrator(s).");</script>' . "\n";
 
     }
 
@@ -383,6 +400,11 @@ abstract class O3PO_PublicationType {
 
             // We do not validate and process newly created posts
         if ( get_post_status( $post_id ) === 'auto-draft' )
+            return;
+
+            // Do nothing if in maintenance mode
+        $settings = O3PO_Settings::instance();
+        if($settings->get_plugin_option('maintenance_mode')!=='unchecked')
             return;
 
             //Save the entered meta data
