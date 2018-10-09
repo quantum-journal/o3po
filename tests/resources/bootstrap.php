@@ -8,6 +8,8 @@
  */
 
 include(dirname( __FILE__ ) . '/posts.php');
+include(dirname( __FILE__ ) . '/formatting.php');
+include(dirname( __FILE__ ) . '/kses.php');
 
 if(!class_exists('PHPUnit_Framework_TestCase')){
         /**
@@ -390,26 +392,6 @@ function get_post_status( $ID = '' ) {
     return $posts[$post_id]['post_status'];
 }
 
-function esc_html( $text ) {
-
-    return 'esc_html' . $text;
-}
-
-function esc_attr__( $text ) {
-
-    return 'esc_attr__' . $text;
-}
-
-function esc_attr( $text ) {
-
-    return 'esc_attr' . $text;
-}
-
-function esc_url( $text ) {
-
-    return 'esc_url' . $text;
-}
-
 function wp_get_attachment_url($id) {
     global $posts;
 
@@ -626,12 +608,6 @@ function get_transient() {
 
 function set_transient( $transient, $value, $expiration ) {}
 
-
-function sanitize_text_field( $string ) {
-
-    return $string;
-}
-
 function wp_remote_get( $url, $args=array() ) {
         //return http_get( $url, $args );
 
@@ -665,10 +641,6 @@ function wp_is_post_revision() {
 }
 
 function remove_action() {}
-
-function wp_slash( $input ) {
-    return $input;
-}
 
 function wp_generate_password( $length ) {
     $string = '';
@@ -798,4 +770,37 @@ function checked( $helper, $current=true, $echo=true, $type='checked' ) {
         echo $result;
 
     return $result;
+}
+
+function apply_filters( $hook, $orig_text, $text )
+{
+    return $text;
+}
+
+/**
+ * Stripped down version of the original wp_allowed_protocols()
+ */
+function wp_allowed_protocols() {
+    static $protocols = array();
+
+    if ( empty( $protocols ) ) {
+        $protocols = array( 'http', 'https', 'ftp', 'ftps', 'mailto', 'news', 'irc', 'gopher', 'nntp', 'feed', 'telnet', 'mms', 'rtsp', 'svn', 'tel', 'fax', 'xmpp', 'webcal', 'urn' );
+    }
+
+    /* if ( ! did_action( 'wp_loaded' ) ) { */
+    /*     /\** */
+    /*      * Filters the list of protocols allowed in HTML attributes. */
+    /*      * */
+    /*      * @since 3.0.0 */
+    /*      * */
+    /*      * @param array $protocols Array of allowed protocols e.g. 'http', 'ftp', 'tel', and more. */
+    /*      *\/ */
+    /*     $protocols = array_unique( (array) apply_filters( 'kses_allowed_protocols', $protocols ) ); */
+    /* } */
+
+    return $protocols;
+}
+
+function wp_load_alloptions() {
+    return array();
 }

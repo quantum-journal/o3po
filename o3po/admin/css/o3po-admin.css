@@ -11,3 +11,6 @@
 #metadata_metabox textarea.required:invalid{
     border-color: red;
 }
+.o3po-setting {
+    min-width: 80%;
+}
