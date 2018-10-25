@@ -807,11 +807,11 @@ abstract class O3PO_PublicationType {
 
                 if($successfully_sent) {
                     update_post_meta( $post_id, $post_type . '_buffer_email_was_sent_date', date("Y-m-d"));
-                    $validation_result .= 'INFO: Emails to buffer.com sent correctly.' . "\n";
+                    $validation_result .= 'INFO: Email to buffer.com sent correctly.' . "\n";
                 }
                 else
                 {
-                    $validation_result .= 'WARNING: Sending emails to buffer.com failed.' . "\n";
+                    $validation_result .= 'WARNING: Sending email to buffer.com failed.' . "\n";
                 }
             }
         }
