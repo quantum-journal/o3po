@@ -16,6 +16,8 @@
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-utility.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-latex.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-publication-type.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-email-templates.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
 
 /**
  * Class representing the primary publication type.
@@ -43,7 +45,6 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
     public function __construct( $journal, $environment ) {
 
         parent::__construct($journal, 4, $environment);
-
     }
 
         /**
@@ -444,6 +445,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
          * @param     int     $post_id     Id of the post that is actually published publicly.
          */
     protected function on_post_actually_published( $post_id ) {
+        $settings = O3PO_Settings::instance();
 
         $validation_result = parent::on_post_actually_published($post_id);
 
@@ -459,22 +461,37 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
         $title = get_post_meta( $post_id, $post_type . '_title', true );
         $journal = get_post_meta( $post_id, $post_type . '_journal', true );
-		$post_url = get_permalink( $post_id );
+        $post_url = get_permalink( $post_id );
+
+        $executive_board = $settings->get_plugin_option('executive_board');
+        $editor_in_chief = $settings->get_plugin_option('editor_in_chief');
 
             // Send Emails about the submission to us
         $to = ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') );
         $headers = array( 'From: ' . $this->get_journal_property('publisher_email'));
-        $subject  = ($this->environment->is_test_environment() ? 'TEST ' : '') . 'A ' . $this->get_publication_type_name() . ' has been published/updated by ' . $journal;
-        $message  = ($this->environment->is_test_environment() ? 'TEST ' : '') . $journal . " has published/updated the following " . $this->get_publication_type_name() . ":\n\n";
-        $message .= "Title:  " . $title . "\n";
-        $message .= "Authos: " . static::get_formated_authors($post_id) . "\n";
-        $message .= "URL:    " . $post_url . "\n";
-        $message .= "DOI:    " . $this->get_journal_property('doi_url_prefix') . $doi . "\n";
+
+        $subject  = ($this->environment->is_test_environment() ? 'TEST ' : '').
+                    O3PO_EmailTemplates::self_notification_subject(
+                              $settings->get_plugin_option('self_notification_subject_template'),
+                              $journal,
+                              $this->get_publication_type_name())['result'];
+
+        $message  = ($this->environment->is_test_environment() ? 'TEST ' : '') .
+            O3PO_EmailTemplates::self_notification_body(
+                $settings->get_plugin_option('self_notification_body_template'),
+                $journal,
+                $this->get_publication_type_name(),
+                $title,
+                static::get_formated_authors($post_id),
+                $post_url,
+                $this->get_journal_property('doi_url_prefix'),
+                $doi)['result'];
 
         $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
-        if(!$successfully_sent)
+        if(!$successfully_sent) {
             $validation_result .= 'WARNING: Error sending email notifation of publication to publisher.' . "\n";
+        }
 
             /* We do not send trackbacks for Papers as it is against arXiv's policies.
              * Instead we have a doi feed through wich arXiv can automatically
@@ -487,25 +504,25 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         /* } */
 
             // Send email notifying authors of publication
-		if( empty($corresponding_author_has_been_notifed_date) ) {
+        if( empty($corresponding_author_has_been_notifed_date) ) {
 
             $to = ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $corresponding_author_email);
-			$headers = array( 'Cc: ' . ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') ), 'From: ' . $this->get_journal_property('publisher_email'));
-			$subject  = ($this->environment->is_test_environment() ? 'TEST ' : '') . $journal . " has published your " . $this->get_publication_type_name();
-			$message  = ($this->environment->is_test_environment() ? 'TEST ' : '') . "Dear " . static::get_formated_authors($post_id) . ",\n\n";
-			$message .= "Congratulations! Your " . $this->get_publication_type_name() . " '" . $title . "' has been published by " . $journal . " and is now available under:\n\n";
-			$message .= $post_url . "\n\n";
-			$message .= "Your work has been assigned the following journal reference and DOI\n\n";
-			$message .= "Journal reference: " . static::get_formated_citation($post_id) . "\n";
-			$message .= "DOI:               " . $this->get_journal_property('doi_url_prefix') . $doi . "\n\n";
-			$message .= "We kindly ask you to log in on the arXiv under https://arxiv.org/user/login and add this information to the page of your work there. Thank you very much!\n\n";
-			$message .= "In case you have an ORCID you can go to http://search.crossref.org/?q=" . str_replace('/', '%2F', $doi)  . " to conveniently add your new publication to your profile.\n\n";
-			$message .= "Please be patient, it can take several hours until the DOI has been activated by Crossref.\n\n";
-			$message .= "If you have any feedback or ideas for how to improve the peer-review and publishing process, or any other question, please let us know under " . $this->get_journal_property('publisher_email') . ".\n\n";
-			$message .= "Best regards,\n\n";
-			$message .= "Christian, Lídia, and Marcus\n";
-			$message .= "Executive Board\n";
-			$successfully_sent = wp_mail( $to, $subject, $message, $headers);
+            $headers = array( 'Cc: ' . ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') ), 'From: ' . $this->get_journal_property('publisher_email'));
+            $subject  = ($this->environment->is_test_environment() ? 'TEST ' : '').
+                         O3PO_EmailTemplates::author_notification_subject(
+                              $settings->get_plugin_option('author_notification_subject_template'),
+                            $journal,
+                            $this->get_publication_type_name())['result'];
+
+            $message  = ($this->environment->is_test_environment() ? 'TEST ' : '') .
+                         O3PO_EmailTemplates::author_notification_body(
+                                      $settings->get_plugin_option('author_notification_body_template'),
+                                    $journal, $executive_board, $editor_in_chief, $this->get_journal_property('publisher_email'),
+                                    $this->get_publication_type_name(), $title, static::get_formated_authors($post_id),
+                                    $post_url, $this->get_journal_property('doi_url_prefix'), $doi,
+                                    static::get_formated_citation($post_id))['result'];
+
+            $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
             if($successfully_sent) {
                 update_post_meta( $post_id, $post_type . '_corresponding_author_has_been_notifed_date', date("Y-m-d") );
@@ -514,28 +531,32 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             {
                 $validation_result .= 'WARNING: Sending email to corresponding author failed.' . "\n";
             }
-		}
+        }
 
             // Send email to Fermat's library
-		if(($fermats_library === "checked" && empty($fermats_library_has_been_notifed_date))) {
+        if(($fermats_library === "checked" && empty($fermats_library_has_been_notifed_date))) {
 
             $fermats_library_permalink = $this->get_journal_property('fermats_library_url_prefix') . $doi_suffix;
 
             $to = ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('fermats_library_email'));
-			$headers = array( 'Cc: ' . ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') ), 'From: ' . $this->get_journal_property('publisher_email'));
-			$subject  = ($this->environment->is_test_environment() ? 'TEST ' : '') . $journal . " has a new " . $this->get_publication_type_name() . " for Fermat's library";
-			$message  = ($this->environment->is_test_environment() ? 'TEST ' : '') . "Dear team at Fermat's library,\n\n";
-			$message .= $journal . " has published the following " . $this->get_publication_type_name() . ":\n\n";
-			$message .= "Title:     " . $title . "\n";
-			$message .= "Author(s): " . static::get_formated_authors($post_id) . "\n";
-			$message .= "URL:       " . $post_url . "\n";
-			$message .= "DOI:       " . $this->get_journal_property('doi_url_prefix') . $doi . "\n";
-			$message .= "\n";
-			$message .= "Please post it on Fermat's library under the permalink: " . $fermats_library_permalink . "\n";
-			$message .= "Thank you very much!\n\n";
-			$message .= "Kind regards,\n\n";
-			$message .= "The Executive Board\n";
-			$successfully_sent = wp_mail( $to, $subject, $message, $headers);
+            $headers = array( 'Cc: ' . ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') ), 'From: ' . $this->get_journal_property('publisher_email'));
+            $subject  = ($this->environment->is_test_environment() ? 'TEST ' : '') .
+                  O3PO_EmailTemplates::fermats_library_notification_subject(
+                      $settings->get_plugin_option('fermats_library_notification_subject_template'),
+                      $journal,
+                      $this->get_publication_type_name())['result'];
+            $message  = ($this->environment->is_test_environment() ? 'TEST ' : '') .
+                  O3PO_EmailTemplates::fermats_library_notification_body(
+                      $settings->get_plugin_option('fermats_library_notification_body_template'),
+                      $journal,
+                      $this->get_publication_type_name(),
+                      $title, static::get_formated_authors($post_id),
+                      $post_url,
+                      $this->get_journal_property('doi_url_prefix'),
+                      $doi,
+                      $fermats_library_permalink)['result'];
+
+            $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
             if($successfully_sent) {
                 update_post_meta( $post_id, $post_type . '_fermats_library_permalink', $fermats_library_permalink );
@@ -645,7 +666,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 		echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_eprint" class="' . $post_type . '_eprint_label">' . 'Eprint' . '</label></th>';
 		echo '		<td>';
-		echo '			<input type="text" id="' . $post_type . '_eprint" name="' . $post_type . '_eprint" class="' . $post_type . '_eprint_field required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( $eprint ) . '">';
+		echo '			<input type="text" id="' . $post_type . '_eprint" name="' . $post_type . '_eprint" class="' . $post_type . '_eprint_field required" placeholder="" value="' . esc_attr($eprint) . '">';
 		echo '                  <input type="checkbox" name="' . $post_type . '_fetch_metadata_from_arxiv"' . (empty($eprint) ? 'checked' : '' ) . '>Fetch title, authors, and abstract from the arXiv upon next Save/Update';
 		echo '			<p>(The arXiv identifier including the version and, for old eprints, the the prefix, so this should look like 1701.1234v5 or quant-ph/123456v3.)</p>';
 		echo '		</td>';
@@ -676,7 +697,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 		echo '		<th><label for="' . $post_type . '_fermats_library" class="' . $post_type . '_fermats_library_label">' . 'Fermat&#39;s library' . '</label></th>';
 		echo '		<td>';
 		echo '                  <input type="checkbox" name="' . $post_type . '_fermats_library" value="checked"' . $fermats_library . '>Opt-in for Fermat&#39;s library.' . ( !empty($fermats_library_has_been_notifed_date) ? " Fermat&#39;s library has been automatically notified on " . $fermats_library_has_been_notifed_date . '.' : ' Fermat&#39;s library has not been notified so far.' ) . '<br />';
-		echo '			<input ' . (!empty($fermats_library_has_been_notifed_date) ? 'readonly' : '' ) . ' style="width:100%;" type="text" id="' . $post_type . '_fermats_library_permalink" name="' . $post_type . '_fermats_library_permalink" class="' . $post_type . '_fermats_library_permalink_field" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( $fermats_library_permalink ) . '"><br />(If you leave blank the permalink field it is automatically generated when the email is sent and can then no longer be modified.)';
+		echo '			<input ' . (!empty($fermats_library_has_been_notifed_date) ? 'readonly' : '' ) . ' style="width:100%;" type="text" id="' . $post_type . '_fermats_library_permalink" name="' . $post_type . '_fermats_library_permalink" class="' . $post_type . '_fermats_library_permalink_field" placeholder="' . '' . '" value="' . esc_attr($fermats_library_permalink) . '"><br />(If you leave blank the permalink field it is automatically generated when the email is sent and can then no longer be modified.)';
 		echo '		</td>';
 		echo '	</tr>';
 
@@ -726,7 +747,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 		echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_feature_image_caption" class="' . $post_type . '_feature_image_caption_label">' . 'Feature image caption' . '</label></th>';
 		echo '		<td>';
-		echo '			<textarea rows="6" style="width:100%;" name="' . $post_type . '_feature_image_caption" id="' . $post_type . '_feature_image_caption">' . esc_attr__( $feature_image_caption ) . '</textarea><p>(Please upload images sent by the authors as feature image via the button on the right. Please add here a caption in case the ' . $this->get_publication_type_name() . ' has a feature image.)</p>';
+		echo '			<textarea rows="6" style="width:100%;" name="' . $post_type . '_feature_image_caption" id="' . $post_type . '_feature_image_caption">' . esc_html($feature_image_caption) . '</textarea><p>(Please upload images sent by the authors as feature image via the button on the right. Please add here a caption in case the ' . $this->get_publication_type_name() . ' has a feature image.)</p>';
 		echo '		</td>';
 		echo '	</tr>';
 
@@ -750,18 +771,18 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_popular_summary" class="' . $post_type . '_popular_summary_label">' . 'Popular summary' . '</label></th>';
 		echo '		<td>';
-		echo '			<textarea rows="6" style="width:100%;" name="' . $post_type . '_popular_summary" id="' . $post_type . '_popular_summary">' . esc_attr__( $popular_summary ) . '</textarea><p>(Popular summary if provided by the authors.)</p>';
+		echo '			<textarea rows="6" style="width:100%;" name="' . $post_type . '_popular_summary" id="' . $post_type . '_popular_summary">' . esc_html($popular_summary) . '</textarea><p>(Popular summary if provided by the authors.)</p>';
 		echo '		</td>';
 		echo '	</tr>';
     }
 
-        /**
-         * Echo the arXiv part of the admin panel.
-         *
-         * @since     0.1.0
-         * @access    public
-         * @param     int     $post_id     Id of the post.
-         */
+    /**
+     * Echo the arXiv part of the admin panel.
+     *
+     * @since     0.1.0
+     * @access    public
+     * @param     int     $post_id     Id of the post.
+     */
     protected function the_admin_panel_arxiv( $post_id ) {
 
         $post_type = get_post_type($post_id);
@@ -774,7 +795,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 			echo '	<tr>';
 			echo '		<th><label for="' . $post_type . '_arxiv_fetch_results" class="' . $post_type . '_arxiv_fetch_results_label">' . 'ArXiv fetch result' . '</label></th>';
 			echo '		<td>';
-			echo '			<textarea rows="' . (substr_count( $arxiv_fetch_results, "\n" )+1) . '" cols="65" readonly>' . esc_attr__( $arxiv_fetch_results ) . '</textarea><p>(The result of fetching metadata from the arXiv.)</p>';
+			echo '			<textarea rows="' . (substr_count( $arxiv_fetch_results, "\n" )+1) . '" cols="65" readonly>' . esc_html($arxiv_fetch_results) . '</textarea><p>(The result of fetching metadata from the arXiv.)</p>';
 			echo '		</td>';
 			echo '	</tr>';
 		}

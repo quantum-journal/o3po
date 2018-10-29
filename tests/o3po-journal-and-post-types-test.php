@@ -907,7 +907,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                  '#WARNING: It seems like .* not published .* creative commons license#',
                  '#INFO: ORCID of author 1 is empty\.#',
                  '#INFO: This paper was publicly published\.#',
-                 '#INFO: Emails to buffer.com sent correctly\.#',
+                 '#INFO: Email to buffer.com sent correctly\.#',
                    ),
              array(
                  '#INFO: This paper was publicly published\.#',
