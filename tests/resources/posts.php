@@ -263,6 +263,7 @@ $posts = array(
             'view_doaj_response' => '',
             'view_doi_suffix_was_changed_on_last_save' => false,
             'view_abstract' => '',
+            'view_abstract_mathml' => '',
             'view_clockss_xml' => '',
             'view_clockss_response' => '',
                         )
@@ -324,6 +325,7 @@ $posts = array(
             'view_doaj_response' => '',
             'view_doi_suffix_was_changed_on_last_save' => false,
             'view_abstract' => '',
+            'view_abstract_mathml' => '',
             'view_clockss_xml' => '',
             'view_clockss_response' => '',
                         )
