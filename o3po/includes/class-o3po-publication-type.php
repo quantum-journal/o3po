@@ -414,7 +414,7 @@ abstract class O3PO_PublicationType {
             //Save the entered meta data
         $this->save_meta_data($post_id);
 
-            // Unhook this function to prevent infinite looping because in the remainder of this function we will be calling update_post() which triggers 'save_post'
+            // Unhook this function to prevent infinite looping because in the remainder of this function (especially in validate_and_process_data()) we will be calling update_post() which triggers 'save_post'
         try
         {
             remove_action( 'save_post', array( $this, 'save_metabox' ), 10, 2 );
@@ -425,7 +425,8 @@ abstract class O3PO_PublicationType {
             $validation_result .= "ERROR: There was an exception while saving and processing the entered meta-data: " . $e->getMessage() . "\n";
         }
         finally {
-            if ( get_post_status( $post_id ) !== 'publish' ) $validation_result .= "WARNING: Not yet published.\n";
+            if ( get_post_status( $post_id ) !== 'publish' )
+                $validation_result .= "WARNING: Not yet published.\n";
             update_post_meta( $post_id, $post_type . '_validation_result', $validation_result );
 
                 // Rehock this function
@@ -664,8 +665,8 @@ abstract class O3PO_PublicationType {
             /*
              * Now we start interfacing with external services.
              *
-             * We only do this if no errors have occurred and there are
-             * no outstanding reviews.
+             * We only do this if no ERRORs have occurred and there are
+             * no outstanding REVIEWs.
              *
              * Crossref is the most critical and we hence we do it first.
              * We want the published status of the post to track the
