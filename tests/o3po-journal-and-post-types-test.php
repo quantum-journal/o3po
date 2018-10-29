@@ -685,7 +685,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                  '_nonce' => 'fake_nonce',
                    ),
              array(
-                 '#SUCCESS: Fetched metadata from https://arxiv.org/abs/1609\.09584v4#',
+                 '#SUCCESS: Fetched meta-data from https://arxiv.org/abs/1609\.09584v4#',
                    ),
              ],
             [9,
@@ -912,6 +912,27 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
              array(
                  '#INFO: This paper was publicly published\.#',
              ),
+             ],
+            [11,
+             array(
+                 '_eprint' => '1806.02820v3',
+                 '_number_authors' => 4,
+                 '_fetch_metadata_from_arxiv' => 'checked',
+                 '_nonce' => 'fake_nonce',
+                 '_doi_suffix' => 'fake doi_suffix',
+                 '_pages' => '4',
+                 '_date_published' => current_time("Y-m-d"),
+                 '_volume' => '2',
+                 '_corresponding_author_email' => 'foo@bar.com',
+                 '_journal' => $settings->get_plugin_option('journal_title'),
+                   ),
+             array(
+                 '#REVIEW: Author and affiliations data updated from arxiv source. Please check\.#',
+                 '#SUCCESS: Fetched meta-data from.*#',
+                   ),
+             array(
+                 '#INFO: This paper was publicly published\.#',
+                   ),
              ],
                 ];
     }

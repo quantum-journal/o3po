@@ -143,7 +143,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                         if ( !empty($arxiv_author_names[1]) )
                             $new_author_surnames[$x] = $arxiv_author_names[1];
                         else
-                            $arxiv_fetch_results .= "ERROR: Failed to fetch surname of author ".($x+1)." from the arXiv.\n";
+                            $arxiv_fetch_results .= "WARNING: Failed to fetch surname of author ".($x+1)." from the arXiv.\n";
                         $new_number_authors = $x+1;
                     }
                     if(isset($new_number_authors)) update_post_meta( $post_id, $post_type . '_number_authors', $new_number_authors );
@@ -151,7 +151,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                     if(isset($new_author_surnames)) update_post_meta( $post_id, $post_type . '_author_surnames', $new_author_surnames );
                 }
                 else
-                    $arxiv_fetch_results .= "ERROR: Failed to fetch author information of ".$new_eprint." from the arXiv.\n";
+                    $arxiv_fetch_results .= "WARNING: Failed to fetch author information of ".$new_eprint." from the arXiv.\n";
 
 				$arxiv_titles = $x_path->query("/html/body//h1[contains(@class, 'title')]/text()[last()]");
 
@@ -162,9 +162,9 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                     update_post_meta( $post_id, $post_type . '_title', $new_title );
                 }
 				else
-					$arxiv_fetch_results .= "ERROR: Failed to fetch title of ".$new_eprint." from the arXiv.\n";
+					$arxiv_fetch_results .= "WARNING: Failed to fetch title of ".$new_eprint." from the arXiv.\n";
 
-				$arxiv_abstracts = $x_path->query("/html/body//blockquote[contains(@class, 'abstract')]/text()[position()>1]");
+				$arxiv_abstracts = $x_path->query("/html/body//blockquote[contains(@class, 'abstract')]/text()[position()>0]");
                 $arxiv_abstract_text = "";
                 foreach($arxiv_abstracts as $arxiv_abstract_par)
                     $arxiv_abstract_text .= preg_replace('!\s+!', ' ', trim($arxiv_abstract_par->nodeValue)) . "\n";
@@ -173,7 +173,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                 if ( !empty($arxiv_abstract_text) )
 					$new_abstract = addslashes( O3PO_Latex::latex_to_utf8_outside_math_mode($arxiv_abstract_text) );
 				else
-					$arxiv_fetch_results .= "ERROR: Failed to fetch abstract of ".$new_eprint." from the arXiv.\n";
+					$arxiv_fetch_results .= "WARNING: Failed to fetch abstract of ".$new_eprint." from the arXiv.\n";
 
 				$arxiv_license_urls = $x_path->query("/html/body//div[contains(@class, 'abs-license')]/a/@href");
 				if( !empty($arxiv_license_urls) )
@@ -191,7 +191,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 			{
 				$arxiv_fetch_results .= "ERROR: Failed to fetch html from " . $this->get_journal_property('arxiv_url_abs_prefix') . $new_eprint . " " . $response->get_error_message() . "\n";
 			}
-			if ( empty($arxiv_fetch_results) ) $arxiv_fetch_results .= "SUCCESS: Fetched metadata from " . $this->get_journal_property('arxiv_url_abs_prefix') . $new_eprint . "\n";
+			if ( empty($arxiv_fetch_results) ) $arxiv_fetch_results .= "SUCCESS: Fetched meta-data from " . $this->get_journal_property('arxiv_url_abs_prefix') . $new_eprint . "\n";
             update_post_meta( $post_id, $post_type . '_arxiv_fetch_results', $arxiv_fetch_results );
 		}
 
@@ -241,8 +241,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         wp_set_post_terms( $post_id, $term_id, 'category' );
 
         $validation_result = '';
-        if( strpos($arxiv_fetch_results, 'ERROR') !== false or strpos($arxiv_fetch_results, 'REVIEW') !== false or strpos($arxiv_fetch_results, 'WARNING') !== false)
-            $validation_result .= $arxiv_fetch_results;
+        $validation_result .= $arxiv_fetch_results;
 
         $post_date = get_the_date( 'Y-m-d', $post_id );
         $today_date = current_time( 'Y-m-d' );

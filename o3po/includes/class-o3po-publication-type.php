@@ -428,7 +428,7 @@ abstract class O3PO_PublicationType {
                 /*
                  * Now we start interfacing with external services.
                  *
-                 * We only do this if no errors have occurd and there are
+                 * We only do this if no errors have occurred and there are
                  * no outstanding reviews.
                  *
                  * Crossref is the most critical and we hence we do it first.
