@@ -16,9 +16,12 @@
  * @subpackage O3PO/includes
  */
 
-require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-utility.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-clockss.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-crossref.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-doaj.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-latex.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-utility.php';
 
 /**
  * Base class for types of publications.
