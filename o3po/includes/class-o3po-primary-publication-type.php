@@ -123,6 +123,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 		$new_fermats_library_permalink = isset( $_POST[ $post_type . '_fermats_library_permalink' ] ) ? sanitize_text_field( $_POST[ $post_type . '_fermats_library_permalink' ] ) : '';
 		$new_feature_image_caption = isset( $_POST[ $post_type . '_feature_image_caption' ] ) ? $_POST[ $post_type . '_feature_image_caption' ] : '';
 		$new_popular_summary = isset( $_POST[ $post_type . '_popular_summary' ] ) ? $_POST[ $post_type . '_popular_summary' ] : '';
+        $old_arxiv_fetch_results = get_post_meta( $post_id, $post_type . '_arxiv_fetch_results', true );
 
         $arxiv_fetch_results = '';
 		if ( ( isset($_POST[$post_type . '_fetch_metadata_from_arxiv'] ) or $old_eprint !== $new_eprint ) and !empty($new_eprint) and preg_match("/^(quant-ph\/[0-9]{6,}|[0-9]{4}\.[0-9]{4,})v[0-9]*$/", $new_eprint) === 1 ) {
@@ -193,9 +194,11 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 				$arxiv_fetch_results .= "ERROR: Failed to fetch html from " . $this->get_journal_property('arxiv_url_abs_prefix') . $new_eprint . " " . $response->get_error_message() . "\n";
 			}
 			if ( empty($arxiv_fetch_results) ) $arxiv_fetch_results .= "SUCCESS: Fetched meta-data from " . $this->get_journal_property('arxiv_url_abs_prefix') . $new_eprint . "\n";
-            update_post_meta( $post_id, $post_type . '_arxiv_fetch_results', $arxiv_fetch_results );
 		}
+        else if(strpos($old_arxiv_fetch_results, 'ERROR') !== false or strpos($old_arxiv_fetch_results, 'WARNING') !== false)
+            $arxiv_fetch_results .= "WARNING: No meta-data was fetched from the arXiv this time, but there were errors or warnings during the last fetch. Please make sure to resolve all of them manually or trigger a new fetch attempt by ticking the corresponding box below.\n";
 
+        update_post_meta( $post_id, $post_type . '_arxiv_fetch_results', $arxiv_fetch_results );
 		update_post_meta( $post_id, $post_type . '_abstract', $new_abstract );
 		update_post_meta( $post_id, $post_type . '_abstract_mathml', $new_abstract_mathml );
 		update_post_meta( $post_id, $post_type . '_eprint', $new_eprint );
