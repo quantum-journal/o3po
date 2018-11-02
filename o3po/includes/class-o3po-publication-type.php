@@ -371,7 +371,7 @@ abstract class O3PO_PublicationType {
          *
          * @since    0.1.0
          * @access   public
-         * @param    int         $post_id  The id of the post for which to save the metabox
+         * @param    int         $post_id  The id of the post for which to save the metabox.
          * @param    WP_Post     $post     The post for which to save the metabox.
          * */
     public final function save_metabox( $post_id, $post ) {
@@ -442,7 +442,9 @@ abstract class O3PO_PublicationType {
          *
          * @since    0.2.2+
          * @access   public
-         * @param    int         $post_id  The id of the post for which to save the metabox
+         * @param    string      $new      The new post status after this transition.
+         * @param    string      $old      The old post status before this transition.
+         * @param    int         $post_id  The id of the post that transitions.
          */
     public final function on_transition_post_status( $new, $old, $post ) {
 
