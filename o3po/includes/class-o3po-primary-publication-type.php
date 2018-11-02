@@ -492,9 +492,10 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 
         $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
-        if(!$successfully_sent) {
-            $validation_result .= 'WARNING: Error sending email notifation of publication to publisher.' . "\n";
-        }
+        if(!$successfully_sent)
+            $validation_result .= 'WARNING: Error sending email notification of publication to publisher.' . "\n";
+        else
+            $validation_result .= 'INFO: Email notification of publication sent to publisher.' . "\n";
 
             /* We do not send trackbacks for Papers as it is against arXiv's policies.
              * Instead we have a doi feed through wich arXiv can automatically
@@ -529,6 +530,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 
             if($successfully_sent) {
                 update_post_meta( $post_id, $post_type . '_corresponding_author_has_been_notifed_date', date("Y-m-d") );
+                $validation_result .= 'INFO: Email to corresponding author sent.' . "\n";
             }
             else
             {
@@ -564,6 +566,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             if($successfully_sent) {
                 update_post_meta( $post_id, $post_type . '_fermats_library_permalink', $fermats_library_permalink );
                 update_post_meta( $post_id, $post_type . '_fermats_library_has_been_notifed_date', date("Y-m-d") );
+                $validation_result .= "INFO: Email to fermat's library sent." . "\n";
             }
             else
                 $validation_result .= "WARNING: Error sending email to fermat's library." . "\n";

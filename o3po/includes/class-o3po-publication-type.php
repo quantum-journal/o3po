@@ -425,13 +425,46 @@ abstract class O3PO_PublicationType {
             $validation_result .= "ERROR: There was an exception while saving and processing the entered meta-data: " . $e->getMessage() . "\n";
         }
         finally {
-            if ( get_post_status( $post_id ) !== 'publish' )
+            if ( get_post_status( $post_id ) !== 'publish' and  get_post_status( $post_id ) !== 'future' )
                 $validation_result .= "WARNING: Not yet published.\n";
             update_post_meta( $post_id, $post_type . '_validation_result', $validation_result );
 
                 // Rehock this function
             add_action( 'save_post', array( $this, 'save_metabox' ), 10, 2 );
         }
+    }
+
+
+        /**
+         * Handle post status transitions
+         *
+         * To be added to the 'transition_post_status' hook.
+         *
+         * @since    0.2.2+
+         * @access   public
+         * @param    int         $post_id  The id of the post for which to save the metabox
+         */
+    public final function on_transition_post_status( $new, $old, $post ) {
+
+        $post_id = $post->ID;
+        $post_type = $post->post_type;
+
+            // If the post type doesn't fit do nothing
+        if ( $this->get_publication_type_name() !== $post_type )
+            return;
+
+        if ( $old == 'future' && $new == 'publish')
+        {
+            $validation_result = get_post_meta( $post_id, $post_type . '_validation_result', true);
+            $validation_result .= "INFO: Publication of this scheduled " . $post_type . " was triggered on " . date('Y-m-d H:i:s') . ".\n";
+
+            $validation_result .= "INFO: During that the post status is " . get_post_status($post_id) . "\n";
+
+            $validation_result .= $this->validate_and_process_data($post_id);
+
+            update_post_meta( $post_id, $post_type . '_validation_result', $validation_result );
+        }
+
     }
 
         /**
@@ -516,6 +549,9 @@ abstract class O3PO_PublicationType {
 
         /**
          * Validate and process the meta-data that was saved in save_meta_data().
+         *
+         * We also trigger interactions with external services (Crossref, DOAJ,
+         * CLOCKSS) here.
          *
          * @since    0.1.0
          * @access   protected
@@ -753,6 +789,8 @@ abstract class O3PO_PublicationType {
 
             if( get_post_status( $post_id ) === 'publish' )
                 $validation_result .= $this->on_post_actually_published($post_id);
+            else if( get_post_status( $post_id ) === 'future' )
+                $validation_result .= "WARNING: This " . $post_type . " was scheduled for publication.\n";
         }
 
 
