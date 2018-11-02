@@ -459,9 +459,6 @@ abstract class O3PO_PublicationType {
         {
             $validation_result = get_post_meta( $post_id, $post_type . '_validation_result', true);
             $validation_result .= "INFO: Publication of this scheduled " . $post_type . " was triggered on " . date('Y-m-d H:i:s') . ".\n";
-
-            $validation_result .= "INFO: During that the post status is " . get_post_status($post_id) . "\n";
-
             $validation_result .= $this->validate_and_process_data($post_id);
 
             update_post_meta( $post_id, $post_type . '_validation_result', $validation_result );
