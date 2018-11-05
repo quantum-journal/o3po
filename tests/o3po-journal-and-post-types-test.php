@@ -141,7 +141,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $output = ob_get_contents();
         ob_end_clean();
         $output = preg_replace('#(main|header)#', 'div', $output); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
-            //print($output);
 
         $dom = new DOMDocument;
         $result = $dom->loadHTML($output);
@@ -319,8 +318,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                 $orig_content = '';
             $content = $secondary_publication_type->get_the_content($orig_content);
 
-                //print("\n\n" . $content ."\n\n");
-
             if(isset($posts[$post_id]['meta']['view_type']) && $posts[$post_id]['meta']['view_type'] === 'Leap')
             {
                 foreach( array(
@@ -480,8 +477,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                     $expectations = $expectation[$key] ;
                 foreach($expectations as $expect)
                     $this->assertRegexp($expect, $result);
-
-                #echo("\n" . $result . "\n");
             }
         }
     }
@@ -535,8 +530,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $method->setAccessible(true);
         $validation_result = $method->invokeArgs($primary_publication_type, array($post_id));
 
-            //print("\n\n" . $validation_result . "\n\n");
-
         foreach($expections as $expection)
         {
             $this->assertRegexp($expection, $validation_result);
@@ -566,8 +559,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $method = $secondary_publication_type_class->getMethod('validate_and_process_data');
         $method->setAccessible(true);
         $validation_result = $method->invokeArgs($secondary_publication_type, array($post_id));
-
-            //print("\n\n" . $validation_result . "\n\n");
 
         foreach($expections as $expection)
         {
@@ -737,8 +728,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         if(!empty($POST_args['_fetch_metadata_from_arxiv']))
         {
-                //print( "\n fetch_results: " . get_post_meta( $post_id, $post_type . '_arxiv_fetch_results', true) . "\n" );
-
             foreach($expections as $expection)
             {
                 $this->assertRegexp($expection, get_post_meta( $post_id, $post_type . '_arxiv_fetch_results', true));
@@ -785,8 +774,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         if(!empty($POST_args['_fetch_metadata_from_arxiv']))
         {
-                //print( "\n fetch_results " . $post_id . ": " . get_post_meta( $post_id, $post_type . '_arxiv_fetch_results', true) . "\n" );
-
             foreach($expections as $expection)
             {
                 $this->assertRegexp($expection, get_post_meta( $post_id, $post_type . '_arxiv_fetch_results', true));
@@ -942,27 +929,23 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          * @preserveGlobalState disabled
          * @dataProvider save_metabox_provider
          * @depends test_create_primary_publication_type
+         * @depends test_create_secondary_publication_type
          */
-    public function test_primary_save_metabox( $post_id, $POST_args, $expections_first, $expections_second, $primary_publication_type ) {
+    public function test_save_metabox( $post_id, $POST_args, $expections_first, $expections_second, $primary_publication_type, $secondary_publication_type ) {
         if(!defined('ABSPATH'))
             define( 'ABSPATH', dirname( __FILE__ ) . '/resources/' );
 
         $post_type = get_post_type($post_id);
+        if ( $primary_publication_type->get_publication_type_name() == $post_type )
+            $class = new ReflectionClass('O3PO_PrimaryPublicationType');
+        else
+            $class = new ReflectionClass('O3PO_SecondaryPublicationType');
+
+        $method = $class->getMethod('save_metabox');
+        $method->setAccessible(true);
 
         foreach($POST_args as $key => $value)
             $_POST[ $post_type . $key ] = $value;
-
-        $class = new ReflectionClass('O3PO_PrimaryPublicationType');
-
-        $post_type = get_post_type($post_id);
-        if ( $primary_publication_type->get_publication_type_name() !== $post_type )
-        {
-            $this->addToAssertionCount(1);
-            return;
-        }
-
-        $method = $class->getMethod('save_metabox'); //calls save_meta_data() but also does some further things
-        $method->setAccessible(true);
         $method->invokeArgs($primary_publication_type, array($post_id, new WP_Post($post_id) ));
 
         $validation_result = get_post_meta( $post_id, $post_type . '_validation_result');
@@ -972,13 +955,12 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         }
 
             //call it again to potentially trigger a post actually published event
+        set_post_status($post_id, 'publish');
         foreach(get_all_post_metas($post_id) as $key => $value)
             $_POST[ $key ] = $value;
-        schedule_post_for_publication($post_id);
         $method->invokeArgs($primary_publication_type, array($post_id, new WP_Post($post_id) ));
 
         $validation_result = get_post_meta( $post_id, $post_type . '_validation_result');
-        #echo("\n" . $validation_result . "\n");
         foreach($expections_second as $expection)
         {
             $this->assertRegexp($expection, $validation_result);
@@ -987,49 +969,63 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
     }
 
-
-
         /**
+         * Tests whether publishing via scheduling has the same final outcome as publishing directly.
+         *
          * @runInSeparateProcess
          * @preserveGlobalState disabled
          * @dataProvider save_metabox_provider
+         * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
-    public function test_secondary_save_metabox( $post_id, $POST_args, $expections_first, $expections_second, $secondary_publication_type ) {
-        $post_type = get_post_type($post_id);
-
-        foreach($POST_args as $key => $value)
-        {
-            $_POST[ $post_type . $key ] = $value;
-        }
-
-        $class = new ReflectionClass('O3PO_SecondaryPublicationType');
+    public function test_on_transition_post_status( $post_id, $POST_args, $expections_first, $expections_second, $primary_publication_type, $secondary_publication_type ) {
+        if(!defined('ABSPATH'))
+            define( 'ABSPATH', dirname( __FILE__ ) . '/resources/' );
 
         $post_type = get_post_type($post_id);
-        if ( $secondary_publication_type->get_publication_type_name() !== $post_type )
-        {
-            $this->addToAssertionCount(1);
-            return;
-        }
+        if ( $primary_publication_type->get_publication_type_name() == $post_type )
+            $class = new ReflectionClass('O3PO_PrimaryPublicationType');
+        else
+            $class = new ReflectionClass('O3PO_SecondaryPublicationType');
 
         $method = $class->getMethod('save_metabox'); //calls save_meta_data() but also does some further things
         $method->setAccessible(true);
-        $method->invokeArgs($secondary_publication_type, array($post_id, new WP_Post($post_id) ));
-        $validation_result = get_post_meta( $post_id, $post_type . '_validation_result');
-        foreach($expections_first as $expection)
-        {
-            $this->assertRegexp($expection, $validation_result);
-        }
 
-            //call it again to trigger a post actually published event
-        $method->invokeArgs($primary_publication_type, array($post_id, new WP_Post($post_id) ));
+        set_post_status($post_id, 'private');
+        foreach($POST_args as $key => $value)
+            $_POST[ $post_type . $key ] = $value;
+        $method->invokeArgs($primary_publication_type, array($post_id, new WP_Post($post_id, $post_type) ));
+
+        set_post_status($post_id, 'future');
+        foreach(get_all_post_metas($post_id) as $key => $value)
+            $_POST[ $key ] = $value;
+
+        $method->invokeArgs($primary_publication_type, array($post_id, new WP_Post($post_id, $post_type) ));
+        $method = $class->getMethod('on_transition_post_status');
+
+        foreach(get_all_post_metas($post_id) as $key => $value)
+            $_POST[ $key ] = $value;
+        $method->invokeArgs($primary_publication_type, array("future", "private", new WP_Post($post_id, $post_type) ));
+
+            //call it again to potentially trigger a post actually published event
+        set_post_status($post_id, 'publish');
+        foreach(get_all_post_metas($post_id) as $key => $value)
+            $_POST[ $key ] = $value;
+        $method->invokeArgs($primary_publication_type, array('publish', 'future', new WP_Post($post_id, $post_type) ));
 
         $validation_result = get_post_meta( $post_id, $post_type . '_validation_result');
         foreach($expections_second as $expection)
         {
             $this->assertRegexp($expection, $validation_result);
         }
+
+
     }
+
+
+
+
+
 
         /**
          * @doesNotPerformAssertions

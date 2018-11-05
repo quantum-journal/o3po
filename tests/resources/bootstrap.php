@@ -186,10 +186,10 @@ function get_all_post_metas( $post_id ) {
     return $posts[$post_id]['meta'];
 }
 
-function schedule_post_for_publication($post_id) {
+function set_post_status($post_id, $status) {
     global $posts;
 
-    return $posts[$post_id]['post_status'] = 'publish';
+    return $posts[$post_id]['post_status'] = $status;
 }
 
 function wp_nonce_field( $action, $name, $referer=true, $echo=true ) {}
@@ -218,9 +218,11 @@ class WP_Error
 class WP_Post
 {
     public $ID;
+    public $post_type;
 
-    public function __construct( $post_id ) {
+    public function __construct( $post_id, $post_type='post' ) {
         $this->ID = $post_id;
+        $this->post_type = $post_type;
     }
 }
 
