@@ -714,11 +714,10 @@ abstract class O3PO_PublicationType {
         {
                 /* If there were no errors and there are no outstadning requests
                  * to review we attept to submit meta-data to Crossref. */
-            if( strpos($validation_result, 'ERROR') === false and strpos($validation_result, 'REVIEW') === false) {
-                    /* On the test system and in case the post is not yet going to be
-                     * publicly published we submit to their test system and not to the real system.*/
-                $crossref_url = (get_post_status($post_id) === 'publish' && !$this->environment->is_test_environment()) ? $this->get_journal_property('crossref_deposite_url') : $this->get_journal_property('crossref_test_deposite_url'); // Send it to the test system or the real system
-                    //Upload meta-data to crossref
+            if( get_post_status($post_id) === 'publish' and strpos($validation_result, 'ERROR') === false and strpos($validation_result, 'REVIEW') === false) {
+                    /* On the test system we submit to the Crossref test system and not to the real system.*/
+                $crossref_url = $this->environment->is_test_environment() ? $this->get_journal_property('crossref_test_deposite_url') : $this->get_journal_property('crossref_deposite_url');
+                    //Upload meta-data to Crossref
                 $crossref_response = $this->upload_meta_data_to_crossref($crossref_xml_doi_batch_id, $crossref_xml,
                                                                          $this->get_journal_property('crossref_id'),
                                                                          $this->get_journal_property('crossref_pw'),
@@ -736,7 +735,7 @@ abstract class O3PO_PublicationType {
             $validation_result .= "ERROR: There was an exception while registering the DOI with Crossref: " . $e->getMessage() . "\n";
         } finally {
                 /* Force the post private until everything validates without errors,
-                 * there are no outstadning requests to review, and the corssref
+                 * there are no outstadning requests to review, and the Crossref
                  * registation was successful. */
             if( strpos($validation_result, 'ERROR') !== false or strpos($validation_result, 'REVIEW') !== false) {
                 if ( get_post_status( $post_id ) === 'publish' or get_post_status( $post_id ) === 'future' )
@@ -792,18 +791,13 @@ abstract class O3PO_PublicationType {
                 $validation_result .= "WARNING: This " . $post_type . " was scheduled for publication.\n";
         }
 
-
-
-
-
-
         return $validation_result;
     }
 
         /**
          * Do things when the post is finally published.
          *
-         * Is called from save_metabox().
+         * Is called from validate_and_process_data().
          *
          * @since     0.1.0
          * @access    protected
