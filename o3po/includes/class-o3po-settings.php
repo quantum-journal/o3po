@@ -220,7 +220,7 @@ class O3PO_Settings extends O3PO_Singleton {
         echo '<div>';
         echo '<h1>' . $this->plugin_pretty_name . ' settings (version ' . $this->version . ')</h1>';
         echo '<form action="options.php" method="post">';
-        settings_fields($this->plugin_name . '-setttings');
+        settings_fields($this->plugin_name . '-settings');
         do_settings_sections('plugin_settings');
         do_settings_sections('journal_settings');
         do_settings_sections('email_settings');
@@ -244,7 +244,7 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function register_settings() {
 
-        register_setting( $this->plugin_name . '-setttings', $this->plugin_name . '-setttings', array( $this, 'validate_settings' ) );
+        register_setting( $this->plugin_name . '-settings', $this->plugin_name . '-settings', array( $this, 'validate_settings' ) );
 
         add_settings_section('plugin_settings', 'Plugin settings', array( $this, 'render_plugin_settings' ), 'plugin_settings');
         add_settings_field('production_site_url', 'Production site url', array( $this, 'render_production_site_url_setting' ), 'plugin_settings', 'plugin_settings');
@@ -1045,7 +1045,7 @@ class O3PO_Settings extends O3PO_Singleton {
 
         $option = $this->get_plugin_option($id);
 
-        echo '<input class="regular-text ltr o3po-setting o3po-setting-text" type="text" id="' . $this->plugin_name . '-setttings-' . $id . '" name="' . $this->plugin_name . '-setttings[' . $id . ']" value="' . esc_attr($option) . '" />';
+        echo '<input class="regular-text ltr o3po-setting o3po-setting-text" type="text" id="' . $this->plugin_name . '-settings-' . $id . '" name="' . $this->plugin_name . '-settings[' . $id . ']" value="' . esc_attr($option) . '" />';
 
     }
 
@@ -1060,7 +1060,7 @@ class O3PO_Settings extends O3PO_Singleton {
 
         $option = $this->get_plugin_option($id);
 
-        echo '<textarea class="regular-text ltr o3po-setting o3po-setting-text-multi-line" id="' . $this->plugin_name . '-setttings-' . $id . '" name="' . $this->plugin_name . '-setttings[' . $id . ']" rows="' . (substr_count( $option, "\n" )+1) . '">' . esc_html($option) . '</textarea>';
+        echo '<textarea class="regular-text ltr o3po-setting o3po-setting-text-multi-line" id="' . $this->plugin_name . '-settings-' . $id . '" name="' . $this->plugin_name . '-settings[' . $id . ']" rows="' . (substr_count( $option, "\n" )+1) . '">' . esc_html($option) . '</textarea>';
 
     }
 
@@ -1075,9 +1075,9 @@ class O3PO_Settings extends O3PO_Singleton {
 
         $option = $this->get_plugin_option($id);
 
-        echo '<input class="regular-text ltr o3po-setting o3po-setting-password" type="password" id="' . $this->plugin_name . '-setttings-' . $id . '" name="' . $this->plugin_name . '-setttings[' . $id . ']" value="' . esc_attr($option) . '" />';
+        echo '<input class="regular-text ltr o3po-setting o3po-setting-password" type="password" id="' . $this->plugin_name . '-settings-' . $id . '" name="' . $this->plugin_name . '-settings[' . $id . ']" value="' . esc_attr($option) . '" />';
         echo '<input type="checkbox" onclick="(function myFunction() {
-    var x = document.getElementById(\'' . $this->plugin_name . '-setttings-' . $id . '\');
+    var x = document.getElementById(\'' . $this->plugin_name . '-settings-' . $id . '\');
     if (x.type === \'password\') {
         x.type = \'text\';
     } else {
@@ -1098,9 +1098,9 @@ class O3PO_Settings extends O3PO_Singleton {
 
         $option = $this->get_plugin_option($id);
 
-        echo '<input type="hidden" name="' . $this->plugin_name . '-setttings[' . $id . ']" value="unchecked">'; //To have a 0 in POST when the checkbox is unticked
-        echo '<input class="o3po-setting o3po-setting-checkbox" type="checkbox" id="' . $this->plugin_name . '-setttings-' . $id . '" name="' . $this->plugin_name . '-setttings[' . $id . ']" value="checked"' . checked( 'checked', $option, false ) . '/>';
-        echo '<label for="' . $this->plugin_name . '-setttings-' . $id . '">' . $label . '</label>';
+        echo '<input type="hidden" name="' . $this->plugin_name . '-settings[' . $id . ']" value="unchecked">'; //To have a 0 in POST when the checkbox is unticked
+        echo '<input class="o3po-setting o3po-setting-checkbox" type="checkbox" id="' . $this->plugin_name . '-settings-' . $id . '" name="' . $this->plugin_name . '-settings[' . $id . ']" value="checked"' . checked( 'checked', $option, false ) . '/>';
+        echo '<label for="' . $this->plugin_name . '-settings-' . $id . '">' . $label . '</label>';
 
     }
 
@@ -1281,11 +1281,12 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function get_plugin_option( $id ) {
 
-        $options = get_option($this->plugin_name . '-setttings');
+        $options = get_option($this->plugin_name . '-settings');
         if(!empty($options[$id]))
             return $options[$id];
 
-        $options = get_option('quantum-journal-plugin-setttings');
+            /*todo: Comment out this fallback*/
+        $options = get_option($this->plugin_name . '-setttings');
         if(!empty($options[$id]))
             return $options[$id];
 
