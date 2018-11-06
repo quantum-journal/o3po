@@ -292,7 +292,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         else if ( preg_match('/[<>]/', $abstract ) )
             $validation_result .= "WARNING: Abstract contains < or > signs. If they are meant to represent math, the formulas should be enclosed in dollar signs and they should be replaced with \\\\lt and \\\\gt respectively (similarly <= and >= should be replaced by \\\\leq and \\\\geq).\n" ;
         if ( empty($abstract_mathml) && preg_match('/[^\\\\]\$.*[^\\\\]\$/' , $abstract ) )
-            $validation_result .= "ERROR: Special characters in the abstract indicate that it contains formulas, but no MathML variant was saved so far. This is normal if meta-data has only just been fetched. If this warning does not disappear, please check that all formulas have appropriate LaTeX math mode delimiters.\n";
+            $validation_result .= "ERROR: Special characters in the abstract indicate that it contains formulas, but no MathML variant was saved so far. This is normal if meta-data has only just been fetched. If this error does not disappear, please check that all formulas have appropriate LaTeX math mode delimiters.\n";
 
         $add_licensing_information_result = static::add_licensing_information_to_last_pdf_from_arxiv($post_id);
         if(!empty($add_licensing_information_result))
