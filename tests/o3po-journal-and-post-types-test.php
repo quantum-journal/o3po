@@ -1022,11 +1022,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
     }
 
-
-
-
-
-
         /**
          * @doesNotPerformAssertions
          * @depends test_create_primary_publication_type
@@ -1074,6 +1069,31 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     public function test_cleanup_at_the_very_end() {
         exec('git checkout ' . dirname(__File__) . '/resources/arxiv/0809.2542v4.pdf');
         O3PO_Environment::save_recursive_remove_dir(dirname(__File__) . "/resources/tmp/", dirname(__File__));
+    }
+
+
+        /**
+         * @depends test_setup_primary_journal
+         * @depends test_setup_environment
+         */
+    public function test_volumes_endpoint( $journal, $environment )
+    {
+
+        $query_vars = array($journal->get_journal_property('volumes_endpoint') => "/");
+        $wp_query = new WP_Query(null , $query_vars);
+
+        ob_start();
+        $journal->handle_volumes_endpoint_request( $wp_query );
+        $output = ob_get_contents();
+        ob_end_clean();
+        $output = preg_replace('#(main|header)#', 'div', $output); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
+
+        echo($output);
+
+        $dom = new DOMDocument;
+        $result = $dom->loadHTML($output);
+            //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
+        $this->assertNotFalse($result);
     }
 
 

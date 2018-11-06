@@ -195,7 +195,7 @@ class O3PO_Journal {
 <div id="content-inside" class="container <?php echo esc_attr( $layout ); ?>">
 <div id="primary" class="content-area">
 <main id="main" class="site-main" role="main">
-<?
+<?php
 if ( empty($vol_num) or $vol_num < 1 ) {
     $last_volume = getdate()["year"] - ($settings->get_plugin_option('first_volume_year')-1);
     echo '<h1>Volumes published by ' . $settings->get_plugin_option('journal_title') . '</h1>';

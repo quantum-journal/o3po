@@ -73,7 +73,7 @@ function is_admin() {}
 
 function get_site_url() {
 
-    return 'https://foo.bar.com/';
+    return 'https://foo.bar.com';
 }
 
 function get_option( $option, $default = false ) {
@@ -230,11 +230,14 @@ class WP_Query
 {
     private $posts;
     private $query;
+    public $query_vars;
+    public $post_count;
 
-    function __construct( $input=null ) {
+    function __construct( $input=null, $query_vars=null ) {
         global $posts;
 
         $this->query = $input;
+        $this->query_vars = $query_vars;
 
         if(is_array($input))
             $array = $input;
@@ -269,6 +272,8 @@ class WP_Query
                     $this->posts[$id] = $post;
             }
         }
+
+        $this->post_count = count($this->posts);
     }
 
     function get($key) {
@@ -808,4 +813,28 @@ function wp_allowed_protocols() {
 
 function wp_load_alloptions() {
     return array();
+}
+
+function the_archive_title( $before = '', $after = '' ) {
+    $title = get_the_archive_title();
+
+    if ( ! empty( $title ) ) {
+        echo $before . $title . $after;
+    }
+}
+
+function get_the_archive_title() {
+    return "foo";
+}
+
+function the_archive_description( $before = '', $after = '' ) {
+    $title = get_the_archive_description();
+
+    if ( ! empty( $title ) ) {
+        echo $before . $title . $after;
+    }
+}
+
+function get_the_archive_description() {
+    return "bar";
 }
