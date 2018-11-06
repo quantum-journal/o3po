@@ -22,8 +22,15 @@
 class O3PO_Doaj {
 
         /**
+         * Post meta-data to DOAJ
          *
+         * Posts meta-data in json format to the DOAJ.
          *
+         * @since:    0.2.2+
+         * @access    public
+         * @param     string  $doaj_json     Json encoded meta-data in a format suitable for DOAJ
+         * @param     string  $doaj_api_url  The DOAJ API submission URL
+         * @param     string  $doaj_api_key  The DOAJ API key
          */
     public static function remote_post_meta_data_to_doaj( $doaj_json, $doaj_api_url, $doaj_api_key ) {
 

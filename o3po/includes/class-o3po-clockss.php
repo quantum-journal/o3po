@@ -37,7 +37,7 @@ class O3PO_Clockss {
          */
     public static function ftp_upload_meta_data_and_pdf_to_clockss( $clockss_xml, $pdf_path, $remote_filename_without_extension, $clockss_ftp_url, $clockss_username, $clockss_password ) {
 
-                $trackErrors = ini_get('track_errors');
+        $trackErrors = ini_get('track_errors');
         $ftp_connection = null;
         $clockss_response = '';
         try
