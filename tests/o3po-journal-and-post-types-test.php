@@ -485,7 +485,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         global $posts;
 
         return [
-            [1, $posts[1], array(
+            [1, array(
                     '#REVIEW: The pdf was downloaded successfully from the arXiv#',
                     '#REVIEW: The source was downloaded successfully from the arXiv to [^ ]*' . get_post_meta( 1, 'paper_doi_suffix', true) . '[0-9-]*\.tex and is of mime-type text/x-tex#',
                     '#REVIEW: Found BibTeX or manually formated bibliographic information in.*\.tex#',
@@ -494,13 +494,13 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                     '#(INFO: Licensing information .* and meta-data of .*' . get_post_meta( 1, 'paper_doi_suffix', true) . '[0-9-]*\.pdf added/updated|ERROR: Adding meta-data to pdfs requires the external programm exiftool but the exiftool binary was not found)#',
                     '#ERROR: Corresponding author email is malformed#',
                                  )],
-            [5, $posts[5], array(
+            [5, array(
                     '#INFO: URL of author 1 is empty\.#',
                                  )],
-            [9, $posts[9], array(
+            [9, array(
                     '#ERROR: Affiliation 1 is not associated to any authors.#',
                                  )],
-            [10, $posts[9], array(
+            [10, array(
 
                                  )],
                 ];
@@ -512,7 +512,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          * @dataProvider posts_for_validate_and_process_data_provider
          * @depends test_create_primary_publication_type
          */
-    public function test_primary_validate_and_process_data( $post_id, $post_data, $expections, $primary_publication_type ) {
+    public function test_primary_validate_and_process_data( $post_id, $expections, $primary_publication_type ) {
 
         if(!defined('ABSPATH'))
             define( 'ABSPATH', dirname( __FILE__ ) . '/resources/' );
@@ -545,7 +545,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          * @dataProvider posts_for_validate_and_process_data_provider
          * @depends test_create_secondary_publication_type
          */
-    public function test_secondary_validate_and_process_data( $post_id, $post_data, $expections, $secondary_publication_type ) {
+    public function test_secondary_validate_and_process_data( $post_id, $expections, $secondary_publication_type ) {
 
         $secondary_publication_type_class = new ReflectionClass('O3PO_SecondaryPublicationType');
 
