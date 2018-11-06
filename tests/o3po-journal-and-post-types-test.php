@@ -665,7 +665,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                  '_nonce' => 'fake_nonce',
                    ),
              array(
-                 '#WARNING: It seems like 0809.2542v4 is not published under a creative commons license on the arXiv\.#',
+                 '#ERROR: It seems like .* is not published under .* creative commons#',
                    ),
              ],
             [8,
@@ -855,7 +855,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                  '_journal' => $settings->get_plugin_option('journal_title'),
                    ),
              array(
-                 '#WARNING: It seems like 0809.2542v4 is not published under a creative commons license on the arXiv\.#',
+                 '#ERROR: It seems like .* is not published under .* creative commons#',
                  '#REVIEW: The pdf was downloaded successfully from the arXiv\.#',
                  '#REVIEW: The source was downloaded successfully from the arXiv .* and is of mime-type application/x-gzip#',
                  '#REVIEW: Found BibTeX or manually formated bibliographic information#',
@@ -891,7 +891,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                  '_buffer_email' => 'checked',
                    ),
              array(
-                 '#WARNING: It seems like .* not published .* creative commons license#',
+                 '#ERROR: It seems like .* not published .* creative commons license#',
                  '#INFO: ORCID of author 1 is empty\.#',
                  '#INFO: This paper was publicly published\.#',
                  '#INFO: Email to buffer.com sent correctly\.#',

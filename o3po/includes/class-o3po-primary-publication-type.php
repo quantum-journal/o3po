@@ -18,6 +18,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-latex
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-publication-type.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-email-templates.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-arxiv.php';
 
 /**
  * Class representing the primary publication type.
@@ -115,85 +116,29 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 		$new_abstract_mathml = isset( $_POST[ $post_type . '_abstract_mathml' ] ) ? $_POST[ $post_type . '_abstract_mathml' ] : '';
 		$new_eprint = isset( $_POST[ $post_type . '_eprint' ] ) ? sanitize_text_field( $_POST[ $post_type . '_eprint' ] ) : '';
         $old_eprint = get_post_meta( $post_id, $post_type . '_eprint', true );
-        if ($old_eprint === $new_eprint)
-			update_post_meta( $post_id, $post_type . '_eprint_was_changed_on_last_save', "false" );
-		else
-			update_post_meta( $post_id, $post_type . '_eprint_was_changed_on_last_save', "true" );
         $new_fermats_library = isset($_POST[ $post_type . '_fermats_library' ]) ? $_POST[ $post_type . '_fermats_library' ] : '';
 		$new_fermats_library_permalink = isset( $_POST[ $post_type . '_fermats_library_permalink' ] ) ? sanitize_text_field( $_POST[ $post_type . '_fermats_library_permalink' ] ) : '';
 		$new_feature_image_caption = isset( $_POST[ $post_type . '_feature_image_caption' ] ) ? $_POST[ $post_type . '_feature_image_caption' ] : '';
 		$new_popular_summary = isset( $_POST[ $post_type . '_popular_summary' ] ) ? $_POST[ $post_type . '_popular_summary' ] : '';
         $old_arxiv_fetch_results = get_post_meta( $post_id, $post_type . '_arxiv_fetch_results', true );
 
+        if ($old_eprint === $new_eprint)
+            update_post_meta( $post_id, $post_type . '_eprint_was_changed_on_last_save', "false" );
+		else
+			update_post_meta( $post_id, $post_type . '_eprint_was_changed_on_last_save', "true" );
+
         $arxiv_fetch_results = '';
 		if ( ( isset($_POST[$post_type . '_fetch_metadata_from_arxiv'] ) or $old_eprint !== $new_eprint ) and !empty($new_eprint) and preg_match("/^(quant-ph\/[0-9]{6,}|[0-9]{4}\.[0-9]{4,})v[0-9]*$/", $new_eprint) === 1 ) {
-			$response = wp_remote_get( $this->get_journal_property('arxiv_url_abs_prefix') . $new_eprint, array('timeout'=> 10) );
-			if( !is_wp_error($response) ) {
-                    // $header = $response['headers'];
-				$html = $response['body'];
-				$dom = new DOMDocument;
-				@$dom->loadHTML($html);
-				$x_path = new DOMXPath($dom);
 
-				$arxiv_author_links = $x_path->query("/html/body//div[@class='authors']/a");
-                if(!empty($arxiv_author_links))
-                {
-                    foreach ($arxiv_author_links as $x => $arxiv_author_link) {
-                        $arxiv_author_names = preg_split('/\s+(?=\S+$)/', $arxiv_author_link->nodeValue);
-                        if ( !empty($arxiv_author_names[0]) )
-                            $new_author_given_names[$x] = $arxiv_author_names[0];
-                        if ( !empty($arxiv_author_names[1]) )
-                            $new_author_surnames[$x] = $arxiv_author_names[1];
-                        else
-                            $arxiv_fetch_results .= "WARNING: Failed to fetch surname of author ".($x+1)." from the arXiv.\n";
-                        $new_number_authors = $x+1;
-                    }
-                    if(isset($new_number_authors)) update_post_meta( $post_id, $post_type . '_number_authors', $new_number_authors );
-                    if(isset($new_author_given_names)) update_post_meta( $post_id, $post_type . '_author_given_names', $new_author_given_names );
-                    if(isset($new_author_surnames)) update_post_meta( $post_id, $post_type . '_author_surnames', $new_author_surnames );
-                }
-                else
-                    $arxiv_fetch_results .= "WARNING: Failed to fetch author information of ".$new_eprint." from the arXiv.\n";
+            $fetch_meta_data_from_abstract_page_result = O3PO_Arxiv::fetch_meta_data_from_abstract_page($new_eprint);
+            $arxiv_fetch_results .= $fetch_meta_data_from_abstract_page_result['arxiv_fetch_results'];
 
-				$arxiv_titles = $x_path->query("/html/body//h1[contains(@class, 'title')]/text()[last()]");
+            $new_abstract = $fetch_meta_data_from_abstract_page_result['abstract'];
+            update_post_meta( $post_id, $post_type . '_title', $fetch_meta_data_from_abstract_page_result['title'] );
+            update_post_meta( $post_id, $post_type . '_number_authors', $fetch_meta_data_from_abstract_page_result['number_authors'] );
+            update_post_meta( $post_id, $post_type . '_author_given_names', $fetch_meta_data_from_abstract_page_result['author_given_names'] );
+            update_post_meta( $post_id, $post_type . '_author_surnames', $fetch_meta_data_from_abstract_page_result['author_surnames'] );
 
-                if( !empty($arxiv_titles->item(0)->nodeValue))
-                    $arxiv_title_text = preg_replace("/[\r\n\s]+/", " ", trim( $arxiv_titles->item(0)->nodeValue ) );
-				if ( !empty($arxiv_title_text) ) {
-					$new_title = addslashes( O3PO_Latex::latex_to_utf8_outside_math_mode($arxiv_title_text) );
-                    update_post_meta( $post_id, $post_type . '_title', $new_title );
-                }
-				else
-					$arxiv_fetch_results .= "WARNING: Failed to fetch title of ".$new_eprint." from the arXiv.\n";
-
-				$arxiv_abstracts = $x_path->query("/html/body//blockquote[contains(@class, 'abstract')]/text()[position()>0]");
-                $arxiv_abstract_text = "";
-                foreach($arxiv_abstracts as $arxiv_abstract_par)
-                    $arxiv_abstract_text .= preg_replace('!\s+!', ' ', trim($arxiv_abstract_par->nodeValue)) . "\n";
-                $arxiv_abstract_text = trim($arxiv_abstract_text);
-
-                if ( !empty($arxiv_abstract_text) )
-					$new_abstract = addslashes( O3PO_Latex::latex_to_utf8_outside_math_mode($arxiv_abstract_text) );
-				else
-					$arxiv_fetch_results .= "WARNING: Failed to fetch abstract of ".$new_eprint." from the arXiv.\n";
-
-				$arxiv_license_urls = $x_path->query("/html/body//div[contains(@class, 'abs-license')]/a/@href");
-				if( !empty($arxiv_license_urls) )
-					foreach ($arxiv_license_urls as $x => $arxiv_license_url) {
-						if( preg_match('#creativecommons.org/licenses/(by-nc-sa|by-sa|by)/4.0/#', $arxiv_license_url->nodeValue) !== 1)
-                            if(!$this->environment->is_test_environment())
-                                $arxiv_fetch_results .= "ERROR: It seems like ".$new_eprint." is not published under one of the three creative commons license (CC BY 4.0, CC BY-SA 4.0, or CC BY-NC-SA 4.0) on the arXiv. Please inform the authors that this is mandtory and remind them that we will publish under CC BY 4.0 and that, by our terms and conditions, they grant us the right to do so.\n";
-                            else
-                                $arxiv_fetch_results .= "WARNING: It seems like ".$new_eprint." is not published under a creative commons license on the arXiv.\n" ;
-					}
-				else
-                    $arxiv_fetch_results .= "ERROR: No license informatin found for ".$new_eprint." on the arXiv.\n";
-			}
-			else
-			{
-				$arxiv_fetch_results .= "ERROR: Failed to fetch html from " . $this->get_journal_property('arxiv_url_abs_prefix') . $new_eprint . " " . $response->get_error_message() . "\n";
-			}
-			if ( empty($arxiv_fetch_results) ) $arxiv_fetch_results .= "SUCCESS: Fetched meta-data from " . $this->get_journal_property('arxiv_url_abs_prefix') . $new_eprint . "\n";
 		}
         else if(strpos($old_arxiv_fetch_results, 'ERROR') !== false or strpos($old_arxiv_fetch_results, 'WARNING') !== false)
             $arxiv_fetch_results .= "WARNING: No meta-data was fetched from the arXiv this time, but there were errors or warnings during the last fetch. Please make sure to resolve all of them manually or trigger a new fetch attempt by ticking the corresponding box below.\n";
@@ -263,44 +208,30 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             // Download PDF form the arXiv
         if( !empty( $doi_suffix ) and !empty( $eprint ) and (isset($_POST[$post_type . '_download_arxiv_pdf']) or empty($arxiv_pdf_attach_ids) or $eprint_was_changed_on_last_save === "true" or $doi_suffix_was_changed_on_last_save === "true" ) )
         {
-            $pdf_download_url = $this->get_journal_property('arxiv_url_pdf_prefix') . $eprint;
-            $pdf_download_result = $this->environment->download_to_media_library($pdf_download_url, $doi_suffix, 'pdf', 'application/pdf', $post_id );
+            $pdf_download_result= O3PO_Arxiv::download_pdf($this->environment, $eprint, $doi_suffix, $post_id);
+        }
+        if ( !empty( $pdf_download_result['error'] ) ) {
+            $validation_result .= "ERROR: Exception while downloading the pdf of " . $eprint . " from the arXiv: " . $pdf_download_result['error'] . "\n";
+        } else if (!empty($pdf_download_result)) {
+            $arxiv_pdf_attach_ids[] = $pdf_download_result['attach_id'];
+            update_post_meta( $post_id, $post_type . '_arxiv_pdf_attach_ids', $arxiv_pdf_attach_ids );
+            $validation_result .= "REVIEW: The pdf was downloaded successfully from the arXiv.\n";
         }
 
             // Download SOURCE form the arXiv (This can yield either a .tex or a .tar.gz file!)
         if( !empty( $doi_suffix ) and !empty( $eprint ) and (isset($_POST[$post_type . '_download_arxiv_source']) or empty($arxiv_source_attach_ids) or $eprint_was_changed_on_last_save === "true" or $doi_suffix_was_changed_on_last_save === 'true') )
         {
-            $source_download_url = $this->get_journal_property('arxiv_url_source_prefix') . $eprint;
-            $source_download_result = $this->environment->download_to_media_library($source_download_url, $doi_suffix, '', '', $post_id );
-        }
-
-        if ( !empty( $pdf_download_result['error'] ) ) {
-            $validation_result .= "ERROR: Exception while downloading the pdf from the arXiv" . (!empty($pdf_download_url) ? " (".$pdf_download_url.")" : "") . ": " . $pdf_download_result['error'] . "\n";
-        } else if (!empty($pdf_download_result)) {
-                // $validation_result .= "The file is " . $pdf_download_result['file'] . "\n"; // Full path to the file
-                // $validation_result .= "The URL is " . $pdf_download_result['url'] . "\n";  // URL to the file in the uploads dir
-                // $validation_result .= "The mime/type is " . $pdf_download_result['type'] . "\n"; // MIME type of the file
-                // $validation_result .= "The attach_id is " . $pdf_download_result['attach_id'] . "\n";
-            $arxiv_pdf_attach_ids[] = $pdf_download_result['attach_id'];
-            update_post_meta( $post_id, $post_type . '_arxiv_pdf_attach_ids', $arxiv_pdf_attach_ids );
-            $validation_result .= "REVIEW: The pdf was downloaded successfully from the arXiv.\n";
+            $source_download_result = O3PO_Arxiv::download_source($this->environment, $eprint, $doi_suffix, $post_id );
         }
         if ( !empty( $source_download_result['error'] ) ) {
-            $validation_result .= "ERROR: Exception while downloading the source of the " . $this->get_publication_type_name() . " from the arXiv" . (!empty($source_download_url) ? " (".$source_download_url.")" : "") . ": " . $source_download_result['error'] . "\n";
+            $validation_result .= "ERROR: Exception while downloading the source of " . $eprint ." from the arXiv: " . $source_download_result['error'] . "\n";
         } else if (!empty($source_download_result)) {
-                // $validation_result .= "The file is " . $source_download_result['file'] . "\n"; // Full path to the file
-                // $validation_result .= "The URL is " . $source_download_result['url'] . "\n";  // URL to the file in the uploads dir
-                // $validation_result .= "The mime/type is " . $source_download_result['type'] . "\n"; // MIME type of the file
-                // $validation_result .= "The attach_id is " . $source_download_result['attach_id'] . "\n";
             $arxiv_source_attach_ids[] = $source_download_result['attach_id'];
             update_post_meta( $post_id, $post_type . '_arxiv_source_attach_ids', $arxiv_source_attach_ids );
 
-                // this is not always actually a tar.gz file! Sometimes the arXiv just gives us a .tex!
             $path_source = $source_download_result['file'];
+            $mime_type = $source_download_result['mime_type'];
 
-            $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            $mime_type = finfo_file($finfo, $path_source);
-            finfo_close($finfo);
             $validation_result .= "REVIEW: The source was downloaded successfully from the arXiv to " . $path_source . " and is of mime-type " . $mime_type . "\n";
 
             $parse_publication_source_result = $this->parse_publication_source($path_source, $mime_type);
@@ -448,6 +379,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
          * @param     int     $post_id     Id of the post that is actually published publicly.
          */
     protected function on_post_actually_published( $post_id ) {
+
         $settings = O3PO_Settings::instance();
 
         $validation_result = parent::on_post_actually_published($post_id);
