@@ -1416,26 +1416,87 @@ class O3PO_Latex_Dictionary_Provider
          * @since    0.2.2+
          * @access   public
          * @param    string   $text          LaTeX text to normalize.
-         * @param    string   $single_line   Whether to output a single-line text.
+         * @param    boolean  $single_line   Whether to output a single-line text.
+         * @param    boolean  $remove_extra_newlines If true, single newlines are replaced by space and any number of more than two successive newlines are replaced by exactly two newlines.
          */
-    static public function normalize_whitespace_and_linebreak_characters( $text, $single_line=true) {
+    static public function normalize_whitespace_and_linebreak_characters( $text, $single_line=true, $remove_extra_newlines=false) {
+        if($remove_extra_newlines)
+            $text = preg_replace('#(?<!\n)\n(?!\n)#', ' ', $text);
 
         foreach(array(
-                    '\\\\\\\\( *|\s*\[.*?\])' => "\n",
-                    '\\\\linebreak(?![a-zA-Z]) *' => "\n",
-                    '\\\\newline(?![a-zA-Z]) *' => "\n",
-                    '\\\\(hfill|break|smallskip|medskip|bigskip)(?![a-zA-Z]) *'  => "\n",
-                    '\\\\(h|v)space\s*{.*?} *' => " ",
+                    '\\\\\\\\(\s*|\s*\[.*?\])' => "\n",
+                    '\\\\linebreak(?![a-zA-Z])\h*' => "\n",
+                    '\\\\(newline|hfill|break)(?![a-zA-Z])\h*'  => "\n",
+                    '\\\\(hspace|vspace)\s*{[^}]*?}\h*' => " ",
+                    '\\\\(smallskip|medskip|bigskip)(?![a-zA-Z])\h*' => " ",
                       ) as $target => $replacement )
             $text = preg_replace('#' . $target . '#', $replacement, $text);
 
         if($single_line)
             $text = str_replace("\n", ' ', $text);
 
-        $text = preg_replace('#\t#', ' ', $text);
-        $text = trim(preg_replace('#  +#', ' ', $text), ' ');
+        $text = str_replace("\t", ' ', $text);
+        $text = join("\n", array_map("trim", explode("\n", $text)));
+        $text = trim(preg_replace('#\h\h+#', ' ', $text));
+
+        if($remove_extra_newlines)
+            $text = preg_replace('#\n\n\n+#', "\n\n", $text);
+
 
         return $text;
+    }
+
+
+        /**
+         * Extract all bibliographies from latex code.
+         *
+         * @since   0.2.2+
+         * @access  public
+         * @param   string    $latex   Latex code to search for bibliographies.
+         *
+         */
+    static public function extract_bibliographies( $latex ) {
+
+        $bbl = '';
+
+        preg_match_all('/(\\\\begin{thebibliography}.*?\\\\end{thebibliography}|\\\\begin{references}.*?\\\\end{references})/s', $latex, $matches, PREG_PATTERN_ORDER);
+        if(!empty($matches[0])) {
+            $i = 0;
+            while(isset($matches[0][$i]))
+            {
+                $bbl .= $matches[0][$i] . "\n";
+                $i++;
+            }
+            return $bbl;
+        }
+        else
+            return '';
+    }
+
+        /**
+         * Extract all abstracts from latex code.
+         *
+         * @since   0.2.2+
+         * @access  public
+         * @param   string    $latex   Latex code to search for abstracts.
+         *
+         */
+    static public function extract_abstracts( $latex ) {
+
+        $abstract = '';
+
+        preg_match_all('/\\\\begin{abstract}(.*?)\\\\end{abstract}/s', $latex, $matches, PREG_PATTERN_ORDER);
+        if(!empty($matches[1])) {
+            $i = 0;
+            while(isset($matches[1][$i]))
+            {
+                $abstract .= $matches[1][$i] . "\n";
+                $i++;
+            }
+            return $abstract;
+        }
+        else
+            return '';
     }
 
 }

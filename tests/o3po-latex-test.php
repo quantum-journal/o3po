@@ -241,25 +241,36 @@ ab' , 'äb'],
 
     public function normalize_whitespace_and_linebreak_characters_provider() {
         return [
-            [["abc", true] , "abc"],
-            [["a \t c", true] , "a c"],
-            [["ab  c  ", true] , "ab c"],
-            [["  a  bc", true] , "a bc"],
-            [["ab\nc", false] , "ab\nc"],
-            [["ab\nc", true] , "ab c"],
-            [["ab\\newline c", true] , "ab c"],
-            [["ab\\newline c", False] , "ab\nc"],
-            [["ab\\linebreak c", true] , "ab c"],
-            [["ab\\linebreak c", False] , "ab\nc"],
-            [["ab\\\\ c", true] , "ab c"],
-            [["ab\\\\ c", False] , "ab\nc"],
-            [["ab\\newlinec", false] , "ab\\newlinec"],
-            [["ab\\newlinec", true] , "ab\\newlinec"],
-            [["ab\\newline", false] , "ab\n"],
-            [["\\newline ab", false] , "\nab"],
-            [["a\\\\b", false] , "a\nb"],
-            [["a\\\\\\newline b", false] , "a\n\nb"],
-            [["a\\hspace{2cm}b", false] , "a b"],
+            [["abc", True, False] , "abc"],
+            [["a \t c", True, False] , "a c"],
+            [["a\smallskip c", True, False] , "a c"],
+            [["a\medskip c", True, False] , "a c"],
+            [["a\bigskip c", False, False] , "a c"],
+            [["ab  c  ", True, False] , "ab c"],
+            [["  a  bc", True, False] , "a bc"],
+            [["ab\nc", False, False] , "ab\nc"],
+            [["ab\nc", True, False] , "ab c"],
+            [["ab\\newline c", True, False] , "ab c"],
+            [["ab\\newline c", False, False] , "ab\nc"],
+            [["ab\\linebreak c", True, False] , "ab c"],
+            [["ab\\linebreak c", False, False] , "ab\nc"],
+            [["ab\\\\ c", True, False] , "ab c"],
+            [["ab\\\\ c", False, False] , "ab\nc"],
+            [["ab\\newlinec", false, False] , "ab\\newlinec"],
+            [["ab\\newlinec", True, False] , "ab\\newlinec"],
+            [["ab\\newline c", False, False] , "ab\nc"],
+            [["a\\newline ab", False, False] , "a\nab"],
+            [["a\\\\b", False, False] , "a\nb"],
+            [["a\\\\\\newline b", False, False] , "a\n\nb"],
+            [["a\\hspace{2cm}b", False, False] , "a b"],
+            [["a\nb", False, True] , "a b"],
+            [["a\n\nb", False, True] , "a\n\nb"],
+            [["a\\newline\n ab", False, True] , "a\nab"],
+            [["a\\newline\n\n ab", False, True] , "a\n\nab"],
+            [["a\\newline\n\n\n ab", False, True] , "a\n\nab"],
+            [["a\n\n\n\n\nb", False, True] , "a\n\nb"],
+            [["a\n", False, True] , "a"],
+            [["\nb", False, True] , "b"],
                 ];
     }
 
@@ -267,7 +278,7 @@ ab' , 'äb'],
          * @dataProvider normalize_whitespace_and_linebreak_characters_provider
          */
     public function test_normalize_whitespace_and_linebreak_characters( $input, $expected ) {
-        $this->assertSame($expected, O3PO_Latex::normalize_whitespace_and_linebreak_characters($input[0], $input[1]));
+        $this->assertSame($expected, O3PO_Latex::normalize_whitespace_and_linebreak_characters($input[0], $input[1], $input[2]));
     }
 
 }

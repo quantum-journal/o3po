@@ -266,6 +266,12 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                 update_post_meta( $post_id, $post_type . '_number_affiliations', count($new_affiliations) );
             }
 
+            $new_abstract = $parse_publication_source_result['abstract'];
+            if(!empty($new_abstract)) {
+                $abstract = $new_abstract;
+                update_post_meta( $post_id, $post_type . '_abstract',  addslashes($new_abstract));
+            }
+
             $bbl = $parse_publication_source_result['bbl'];
             if(!empty($bbl)) {
                 $validation_result .= "REVIEW: Bibliographic information updated.\n";
@@ -286,7 +292,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         else if ( preg_match('/[<>]/', $abstract ) )
             $validation_result .= "WARNING: Abstract contains < or > signs. If they are meant to represent math, the formulas should be enclosed in dollar signs and they should be replaced with \\\\lt and \\\\gt respectively (similarly <= and >= should be replaced by \\\\leq and \\\\geq).\n" ;
         if ( empty($abstract_mathml) && preg_match('/[^\\\\]\$.*[^\\\\]\$/' , $abstract ) )
-            $validation_result .= "ERROR: Abstract contains math but no MathML variant was saved so far. This is normal if you have only just added this manuscript, the error should go away the next time you press Update.\n";
+            $validation_result .= "ERROR: Special characters in the abstract indicate that it contains formulas, but no MathML variant was saved so far. This is normal if meta-data has only just been fetched. If this warning does not disappear, please check that all formulas have appropriate LaTeX math mode delimiters.\n";
 
         $add_licensing_information_result = static::add_licensing_information_to_last_pdf_from_arxiv($post_id);
         if(!empty($add_licensing_information_result))
@@ -1178,33 +1184,6 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
     }
 
         /**
-         * Extract all bibliographies from latex code.
-         *
-         * @since   0.2.2+
-         * @access  public
-         * @param   string    $latex   Latex code to search for bibliographies.
-         *
-         */
-    public function extract_bibliographies( $latex ) {
-
-        $bbl = '';
-
-        preg_match_all('/(\\\\begin{thebibliography}.*?\\\\end{thebibliography}|\\\\begin{references}.*?\\\\end{references})/s', $latex, $mathes, PREG_PATTERN_ORDER);
-        if(!empty($mathes[0])) {
-            $i = 0;
-            while(isset($mathes[0][$i]))
-            {
-                $bbl .= $mathes[0][$i] . "\n";
-                $i++;
-            }
-            return $bbl;
-        }
-        else
-            return '';
-    }
-
-
-        /**
          * Parse the source files.
          *
          * Depending on the manuscript we either got a single uncompressed .tex file
@@ -1221,6 +1200,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $path_folder = null;
         $validation_result = '';
         $bbl = '';
+        $abstract = '';
         $new_author_orcids = array();
         $new_author_affiliations = array();
         $new_affiliations = array();
@@ -1288,7 +1268,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                     }
 
                         //Look for bibliographies and extract them
-                    $thisbbl = $this->extract_bibliographies($filecontents_without_comments);//we search the file with comments removed to not accidentially pic up a commented out bibliography
+                    $thisbbl = O3PO_Latex::extract_bibliographies($filecontents_without_comments);//we search the file with comments removed to not accidentially pic up a commented out bibliography
                     if(!empty($thisbbl)) {
                         $validation_result .= "REVIEW: Found BibTeX or manually formated bibliographic information in " . $entry->getPathname() . ".\n";
                         if(!empty($bbl))
@@ -1393,6 +1373,18 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                             }
                         }
                     }
+
+                        //Look for abstracts and extract them
+                    $thisabstract = O3PO_Latex::extract_abstracts($filecontents_without_comments);//we search the file with comments removed to not accidentially pic up a commented out abstract
+                    $thisabstract = O3PO_Latex::expand_latex_macros($new_author_latex_macro_definitions, $thisabstract);
+                    $thisabstract = O3PO_Latex::latex_to_utf8_outside_math_mode($thisabstract);
+                    $thisabstract = O3PO_Latex::normalize_whitespace_and_linebreak_characters($thisabstract, false, true);
+                    if(!empty($thisabstract))
+                    {
+                        if(!empty($abstract))
+                            $abstract .= "\n\n";
+                        $abstract .= $thisabstract;
+                    }
                 }
             }
         } catch (Exception $e) {
@@ -1414,6 +1406,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             'author_affiliations' => $new_author_affiliations,
             'affiliations' => $new_affiliations,
             'bbl' => $bbl,
+            'abstract' => $abstract,
                      );
     }
 
