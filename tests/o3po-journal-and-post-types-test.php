@@ -495,7 +495,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                     '#ERROR: Corresponding author email is malformed#',
                                  )],
             [5, array(
-                    '#INFO: URL of author 1 is empty\.#',
                                  )],
             [9, array(
                     '#ERROR: Affiliation 1 is not associated to any authors.#',
@@ -892,7 +891,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                    ),
              array(
                  '#ERROR: It seems like .* not published .* creative commons license#',
-                 '#INFO: ORCID of author 1 is empty\.#',
                  '#INFO: This paper was publicly published\.#',
                  '#INFO: Email to buffer.com sent correctly\.#',
                    ),
