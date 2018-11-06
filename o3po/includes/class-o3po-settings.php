@@ -795,6 +795,7 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_crossref_test_deposite_url_setting() {
         $this->render_setting('crossref_test_deposite_url');
+        echo '<p>(This url is used in place of the real Crossref deposit url when registering dois if ' . $this->get_plugin_pretty_name() . ' is in test system mode. It should be the deposit url of Crossref\'s test system.)</p>';
     }
 
         /**

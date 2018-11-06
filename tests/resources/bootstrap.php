@@ -186,10 +186,10 @@ function get_all_post_metas( $post_id ) {
     return $posts[$post_id]['meta'];
 }
 
-function schedule_post_for_publication($post_id) {
+function set_post_status($post_id, $status) {
     global $posts;
 
-    return $posts[$post_id]['post_status'] = 'publish';
+    return $posts[$post_id]['post_status'] = $status;
 }
 
 function wp_nonce_field( $action, $name, $referer=true, $echo=true ) {}
@@ -209,14 +209,20 @@ class WP_Error
     function get_error_message() {
         return $this->message;
     }
+
+    function get_error_code() {
+        return $this->code;
+    }
 }
 
 class WP_Post
 {
     public $ID;
+    public $post_type;
 
-    public function __construct( $post_id ) {
+    public function __construct( $post_id, $post_type='post' ) {
         $this->ID = $post_id;
+        $this->post_type = $post_type;
     }
 }
 
@@ -430,6 +436,8 @@ function download_url( $url, $timeout_seconds ) {
         'https://arxiv.org/e-print/0809.2542v4' => dirname(__FILE__) . '/arxiv/0809.2542v4.tar.gz',
         'https://arxiv.org/e-print/1708.05489v2' => dirname(__FILE__) . '/arxiv/1708.05489v2.tar.gz',
         'https://arxiv.org/e-print/1711.04662v3' => dirname(__FILE__) . '/arxiv/1711.04662v3.tar.gz',
+        'https://arxiv.org/pdf/1806.02820v3' => dirname(__FILE__) . '/arxiv/1806.02820v3.pdf',
+        'https://arxiv.org/e-print/1806.02820v3' => dirname(__FILE__) . '/arxiv/1806.02820v3.tar.gz',
     );
     if(!empty($special_urls[$url]))
         copy($special_urls[$url], $tmpfile);
@@ -611,6 +619,7 @@ function wp_remote_get( $url, $args=array() ) {
         'https://arxiv.org/abs/0809.2542v4' => dirname(__FILE__) . '/arxiv/0809.2542v4.html',
         'https://arxiv.org/abs/1609.09584v4' => dirname(__FILE__) . '/arxiv/1609.09584v4.html',
         'https://arxiv.org/abs/0908.2921v2' => dirname(__FILE__) . '/arxiv/0908.2921v2.html',
+        'https://arxiv.org/abs/1806.02820v3' => dirname(__FILE__) . '/arxiv/1806.02820v3.html',
                           );
     if(!empty($local_file_urls[$url]))
         return array('headers'=>'' ,'body'=> file_get_contents($local_file_urls[$url]) );

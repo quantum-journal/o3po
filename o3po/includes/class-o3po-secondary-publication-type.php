@@ -286,7 +286,9 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
         if(!$successfully_sent)
-            $validation_result .= 'WARNING: Error sending email notifation of publication to publisher.' . "\n";
+            $validation_result .= 'WARNING: Error sending email notification of publication to publisher.' . "\n";
+        else
+            $validation_result .= 'INFO: Email notification of publication to publisher sent.' . "\n";
 
             // Send trackbacks to the arXiv and ourselves
         $number_target_dois = get_post_meta( $post_id, $post_type . '_number_target_dois', true );
@@ -303,9 +305,11 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                 if(!empty($target_eprint) && !$this->environment->is_test_environment()) {
                         //trachback to the arxiv
                     $trackback_result .= trackback( $this->get_journal_property('arxiv_url_trackback_prefix') . $eprint_without_version , $title, $trackback_excerpt, $post_id );
+                    $validation_result .= 'INFO: Trackback to the arXiv for ' . $eprint_without_version . ' sent.' . "\n";
                 }
                     //trachback to ourselves
                 trackback( get_site_url() . $suspected_post_url, $title, $trackback_excerpt, $post_id );
+                $validation_result .= 'INFO: Trackback to ' . $suspected_post_url . ' sent.' . "\n";
             }
         }
 
@@ -331,6 +335,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 
             if($successfully_sent) {
                 update_post_meta( $post_id, $post_type . '_corresponding_author_has_been_notifed_date', date("Y-m-d") );
+                $validation_result .= 'INFO: Email to corresponding author sent.' . "\n";
             }
             else
             {

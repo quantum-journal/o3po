@@ -22,6 +22,8 @@ $(PHPDOCUMENTORPHAR):
 lint:
 	@find . -type f -name '*.php' -exec php -l {} \;
 
+test: run-tests
+
 run-tests: $(shell find . -type f -name '*.php') $(PHPUNITPHAR) setsttysizenonzero
 	$(PHPUNITCOMMAND) --verbose --coverage-clover=coverage.xml --coverage-html=coverage-html --whitelist $(SRC) --bootstrap tests/resources/bootstrap.php --test-suffix 'test.php' tests/
 
