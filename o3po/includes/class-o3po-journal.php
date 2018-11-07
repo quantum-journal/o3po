@@ -166,21 +166,21 @@ class O3PO_Journal {
                 $content .= '  <li><a href="' . get_site_url() . '/volumes/' . $volume . '/">Volume ' . $volume . ' (' . ($volume+($settings->get_plugin_option('first_volume_year')-1)) . ') ' . $this->get_count_of_volume($volume, $this->get_journal_property('publication_type_name')) . ' ' . $this->get_journal_property('publication_type_name_plural') . '</a></li>';
             }
             $content .= '</ul>';
-            echo $content;
-            #query_posts(array('post__in' => array(0)));
         }
         else {
             $content .= '<h1>' . $this->get_count_of_volume($vol_num, $this->get_journal_property('publication_type_name')) . ' ' . $this->get_journal_property('publication_type_name_plural') . ' in Volume ' . $vol_num . ' (' . ($vol_num+($settings->get_plugin_option('first_volume_year')-1)) . ')</h1>';
             $content .= '<p>&larr; <a href="' . get_site_url() . '/volumes/">back to all volumes</a><p>';
-            echo $content;
         }
+
+        echo $content;
+
     }
 
     public function volume_endpoint_template( $template ) {
 
         global $wp_query;
 
-        if ( !isset( $wp_query->query_vars[ $this->get_journal_property('volumes_endpoint') ] ) )
+        if ( !isset( $wp_query->query_vars[ $this->get_journal_property('volumes_endpoint') . '_add_fake_post' ] ) )
             return $template;
 
         return locate_template( array( 'page.php' ) );
