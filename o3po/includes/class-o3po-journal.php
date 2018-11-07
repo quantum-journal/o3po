@@ -329,7 +329,7 @@ class O3PO_Journal {
          *
          * @since  0.2.2+
          * @access public
-         * @para   WP_Query  $wp_query   The current Wordpress query.
+         * @param  WP_Query  $wp_query   The current Wordpress query.
          */
     public function compress_enteies_in_volume_view( $wp_query ) {
 
