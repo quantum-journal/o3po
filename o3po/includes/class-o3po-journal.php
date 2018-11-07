@@ -143,6 +143,98 @@ class O3PO_Journal {
     }
 
         /**
+         *
+         *
+         */
+    public function volume_navigation_at_loop_start( $wp_query ) {
+
+        $settings = O3PO_Settings::instance();
+
+        if ( !isset( $wp_query->query_vars[ $this->get_journal_property('volumes_endpoint') ] ) )
+            return;
+
+        $page = get_query_var('page');
+        $vol_num = get_query_var('vol_num');
+
+        $content = "";
+        if ( empty($vol_num) or $vol_num < 1 ) {
+            $last_volume = getdate()["year"] - ($settings->get_plugin_option('first_volume_year')-1);
+            $content .= '<h1>Volumes published by ' . $settings->get_plugin_option('journal_title') . '</h1>';
+            $content .= '<p>&larr; <a href="' . get_site_url() . '">back to main page</a><p>';
+            $content .= '<ul>';
+            for ($volume = 1; $volume <= $last_volume; $volume++) {
+                $content .= '  <li><a href="' . get_site_url() . '/volumes/' . $volume . '/">Volume ' . $volume . ' (' . ($volume+($settings->get_plugin_option('first_volume_year')-1)) . ') ' . $this->get_count_of_volume($volume, $this->get_journal_property('publication_type_name')) . ' ' . $this->get_journal_property('publication_type_name_plural') . '</a></li>';
+            }
+            $content .= '</ul>';
+            echo $content;
+            #query_posts(array('post__in' => array(0)));
+        }
+        else {
+            $content .= '<h1>' . $this->get_count_of_volume($vol_num, $this->get_journal_property('publication_type_name')) . ' ' . $this->get_journal_property('publication_type_name_plural') . ' in Volume ' . $vol_num . ' (' . ($vol_num+($settings->get_plugin_option('first_volume_year')-1)) . ')</h1>';
+            $content .= '<p>&larr; <a href="' . get_site_url() . '/volumes/">back to all volumes</a><p>';
+            echo $content;
+        }
+    }
+
+    public function volume_endpoint_template( $template ) {
+
+        global $wp_query;
+
+        if ( !isset( $wp_query->query_vars[ $this->get_journal_property('volumes_endpoint') ] ) )
+            return $template;
+
+        return locate_template( array( 'page.php' ) );
+    }
+
+    public function volume_fake_the_posts( $posts ) {
+
+        global $wp_query;
+
+        if ( count($posts) > 0 or !isset( $wp_query->query_vars[ $this->get_journal_property('volumes_endpoint') . '_add_fake_post' ] ) )
+            return $posts;
+
+            //create a fake post
+        $page_slug = $this->get_journal_property('volumes_endpoint');
+        $post = new stdClass;
+        $post->post_author = -1;
+        $post->post_name = $page_slug;
+        $post->guid = get_bloginfo( get_site_url() . $page_slug);
+        $post->post_title = '';
+        $post->post_content = '';
+        $post->ID = -1;
+        $post->post_status = 'static';
+        $post->comment_status = 'closed';
+        $post->ping_status = 'closed';
+        $post->comment_count = 0;
+        $post->post_date = current_time('mysql');
+        $post->post_date_gmt = current_time('mysql',1);
+        $post = (object) array_merge((array) $post, array());
+        $posts = NULL;
+        $posts[] = $post;
+
+        return $posts;
+    }
+
+    public function compress_enteies_in_volume_view( $wp_query ) {
+
+        if ( !isset( $wp_query->query_vars[ $this->get_journal_property('volumes_endpoint') ] ) )
+            return;
+
+        echo '<script type="text/javascript">
+var i;
+var elemets_to_not_display = document.querySelectorAll(".list-article-meta,.abstract-in-excerpt,.list-article-thumb");
+for (i = 0; i < elemets_to_not_display.length; i++) {
+    elemets_to_not_display[i].style.display = "none";
+}
+var elemets_to_condense = document.querySelectorAll(".list-article,.entry-title");
+for (i = 0; i < elemets_to_condense.length; i++) {
+    elemets_to_condense[i].style.padding = "0.2em 0";
+    elemets_to_condense[i].style.margin = "0";
+}
+</script>';
+    }
+
+        /**
          * The following creates the .../volumes/1 and so on pages. This is a quite
          * terrible hack and several things we are doing here are not OK or should
          * be done entirely differently. Notice for example the terrible java script
@@ -163,7 +255,6 @@ class O3PO_Journal {
 
         if ( !isset( $wp_query->query_vars[ $this->get_journal_property('volumes_endpoint') ] ) )
             return;
-        $extra = $wp_query->query_vars[ $this->get_journal_property('volumes_endpoint') ];
 
         $extras = preg_split('#/#' , $wp_query->query_vars[ $this->get_journal_property('volumes_endpoint') ]);
 
@@ -175,78 +266,18 @@ class O3PO_Journal {
         if(empty($page))
             $page = 1;
 
-        add_filter( 'body_class', function( $classes ) {
-                return array_merge( $classes, array( 'archive', 'post-type-archive', 'post-type-archive-' . $this->get_journal_property('publication_type_name') ) );
-            } );
-        get_header();
-        $layout = get_theme_mod( 'onepress_layout', 'right-sidebar' );
-?>
-        <div id="content" class="site-content">
+        if($vol_num>=1)
+            query_posts(array('post_status' => 'publish', 'post_type' => $this->get_journal_property('publication_type_name'), 'meta_key' => $this->get_journal_property('publication_type_name') . '_volume', 'meta_value' => $vol_num, 'paged' => $page, 'posts_per_page' => 9999 ));
+        else
+        {
+            query_posts(array('post_type' => 'page', 'post__in' => array(0), $this->get_journal_property('volumes_endpoint') . '_add_fake_post' => true)); //empty query but with $this->get_journal_property('volumes_endpoint') => true so that we know that we should inject a fake post
+        }
 
-		<div class="page-header">
-        <div class="container">
-<?php the_archive_title( '<h1 class="page-title">', '</h1>' ); ?>
-        <!--<?php the_archive_description( '<div class="taxonomy-description">', '</div>' ); ?>-->
-                  </div>
-</div>
+        set_query_var($this->get_journal_property('volumes_endpoint'), true);
+        set_query_var('page', $page);
+        if(isset($vol_num)) set_query_var('vol_num', $vol_num);
 
-<?php echo onepress_breadcrumb(); ?>
-
-<div id="content-inside" class="container <?php echo esc_attr( $layout ); ?>">
-<div id="primary" class="content-area">
-<main id="main" class="site-main" role="main">
-<?php
-if ( empty($vol_num) or $vol_num < 1 ) {
-    $last_volume = getdate()["year"] - ($settings->get_plugin_option('first_volume_year')-1);
-    echo '<h1>Volumes published by ' . $settings->get_plugin_option('journal_title') . '</h1>';
-    echo '<p>&larr; <a href="' . get_site_url() . '">back to main page</a><p>';
-    echo '<ul>';
-    for ($volume = 1; $volume <= $last_volume; $volume++) {
-        echo '  <li><a href="' . get_site_url() . '/volumes/' . $volume . '/">Volume ' . $volume . ' (' . ($volume+($settings->get_plugin_option('first_volume_year')-1)) . ') ' . $this->get_count_of_volume($volume, $this->get_journal_property('publication_type_name')) . ' ' . $this->get_journal_property('publication_type_name_plural') . '</a></li>';
-    }
-    echo '</ul>';
-}
-else {
-    echo '<h1>' . $this->get_count_of_volume($vol_num, $this->get_journal_property('publication_type_name')) . ' ' . $this->get_journal_property('publication_type_name_plural') . ' in Volume ' . $vol_num . ' (' . ($vol_num+($settings->get_plugin_option('first_volume_year')-1)) . ')</h1>';
-    echo '<p>&larr; <a href="' . get_site_url() . '/volumes/">back to all volumes</a><p>';
-
-    query_posts(array('post_status' => 'publish', 'post_type' => $this->get_journal_property('publication_type_name'), 'meta_key' => $this->get_journal_property('publication_type_name') . '_volume', 'meta_value' => $vol_num, 'paged' => $page, 'posts_per_page' => 9999 ));
-
-        // loop
-    while(have_posts()) {
-        the_post();
-        get_template_part( 'template-parts/content', get_post_format() );
-    }
-
-        //the_posts_navigation();
-
-    wp_reset_query();
-}
-?>
-</main><!-- #main -->
-      </div><!-- #primary -->
-<?php if ( $layout != 'no-sidebar' ) { ?>
-<?php get_sidebar(); ?>
-<?php } ?>
-      </div><!--#content-inside -->
-            </div><!-- #content -->
-
-<?php /* condense the list entries */ ?>
-            <script type="text/javascript">
-var i;
-var elemets_to_not_display = document.querySelectorAll(".list-article-meta,.abstract-in-excerpt,.list-article-thumb");
-for (i = 0; i < elemets_to_not_display.length; i++) {
-    elemets_to_not_display[i].style.display = "none";
-}
-var elemets_to_condense = document.querySelectorAll(".list-article,.entry-title");
-for (i = 0; i < elemets_to_condense.length; i++) {
-    elemets_to_condense[i].style.padding = "0.2em 0";
-    elemets_to_condense[i].style.margin = "0";
-}
-</script>
-
-<?php get_footer();
-exit();
+        return $wp_query;
     }
 
 

@@ -315,6 +315,12 @@ class O3PO {
 
         $this->loader->add_action( 'init', $this->journal, 'add_volumes_endpoint' );
         $this->loader->add_action( 'parse_request', $this->journal, 'handle_volumes_endpoint_request' );
+        $this->loader->add_filter( 'loop_start', $this->journal, 'volume_navigation_at_loop_start' );
+        $this->loader->add_filter( 'loop_end', $this->journal, 'compress_enteies_in_volume_view' );
+        #$this->loader->add_action('template_include', $this->journal, 'volume_endpoint_template');
+        $this->loader->add_action('the_posts', $this->journal, 'volume_fake_the_posts');
+
+        #$this->loader->add_action('get_template_part_template-parts/content', $this->journal, 'foo', 99, 2);
 
             //add hooks for the primary publication type...
         $this->loader->add_action('pre_get_posts', $this->primary_publication_type, 'add_custom_post_types_to_query' );
