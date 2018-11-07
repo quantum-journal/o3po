@@ -203,7 +203,7 @@ class O3PO_Journal {
         if(empty($page))
             $page = 1;
 
-        if($vol_num>=1)
+        if(isset($vol_num) and $vol_num>=1)
             query_posts(array('post_status' => 'publish', 'post_type' => $this->get_journal_property('publication_type_name'), 'meta_key' => $this->get_journal_property('publication_type_name') . '_volume', 'meta_value' => $vol_num, 'paged' => $page, 'posts_per_page' => 9999 ));
         else
         {

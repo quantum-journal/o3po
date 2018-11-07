@@ -310,6 +310,11 @@ function set_global_query( $wp_query ) {
     $global_query = $wp_query;
 }
 
+function query_posts( $args ) {
+    set_global_query(new WP_Query($args));
+}
+
+
 $global_search_query = '';
 function set_global_search_query( $string ) {
     global $global_search_query;
@@ -339,6 +344,25 @@ function the_post() {
         throw(new Exception('You must fist set the $global_query before you can use have_posts()'));
 
     return $global_query->the_post();
+}
+
+
+function set_query_var( $var, $val ) {
+    global $global_query;
+
+    if(!($global_query instanceof WP_Query))
+        throw(new Exception('You must first set the $global_query before you can use get_query_var()'));
+
+    $global_query->query_vars[$var] = $val;
+}
+
+function get_query_var( $var ) {
+    global $global_query;
+
+    if(!($global_query instanceof WP_Query))
+        throw(new Exception('You must first set the $global_query before you can use get_query_var()'));
+
+    return $global_query->query_vars[$var];
 }
 
 

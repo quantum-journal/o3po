@@ -1076,24 +1076,52 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          * @depends test_setup_primary_journal
          * @depends test_setup_environment
          */
-    public function test_volumes_endpoint( $journal, $environment )
+    public function test_volumes_endpoint_overview( $journal, $environment )
     {
 
         $query_vars = array($journal->get_journal_property('volumes_endpoint') => "/");
         $wp_query = new WP_Query(null , $query_vars);
 
+        $journal->handle_volumes_endpoint_request($wp_query);
+
         ob_start();
-        $journal->handle_volumes_endpoint_request( $wp_query );
+        $journal->volume_navigation_at_loop_start( $wp_query );
         $output = ob_get_contents();
         ob_end_clean();
         $output = preg_replace('#(main|header)#', 'div', $output); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
-
-        echo($output);
 
         $dom = new DOMDocument;
         $result = $dom->loadHTML($output);
             //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
         $this->assertNotFalse($result);
+
+    }
+
+
+        /**
+         * @depends test_setup_primary_journal
+         * @depends test_setup_environment
+         */
+    public function test_volumes_endpoint_volume_1( $journal, $environment )
+    {
+
+        $query_vars = array($journal->get_journal_property('volumes_endpoint') => "1/");
+        $wp_query = new WP_Query(null , $query_vars);
+
+        $journal->handle_volumes_endpoint_request($wp_query);
+
+        ob_start();
+        $journal->volume_navigation_at_loop_start( $wp_query );
+        $journal->compress_enteies_in_volume_view( $wp_query );
+        $output = ob_get_contents();
+        ob_end_clean();
+        $output = preg_replace('#(main|header)#', 'div', $output); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
+
+        $dom = new DOMDocument;
+        $result = $dom->loadHTML($output);
+            //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
+        $this->assertNotFalse($result);
+
     }
 
 

@@ -318,7 +318,7 @@ class O3PO {
         $this->loader->add_filter( 'loop_start', $this->journal, 'volume_navigation_at_loop_start' );
         $this->loader->add_filter( 'loop_end', $this->journal, 'compress_enteies_in_volume_view' );
         $this->loader->add_action('template_include', $this->journal, 'volume_endpoint_template');
-        $this->loader->add_action('the_posts', $this->journal, 'volume_fake_the_posts');
+        $this->loader->add_action('the_posts', $this->journal, 'add_fake_empty_post_to_volume_overview_page');
 
         #$this->loader->add_action('get_template_part_template-parts/content', $this->journal, 'foo', 99, 2);
 
