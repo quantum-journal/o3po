@@ -129,7 +129,7 @@ class O3PO_Journal {
     }
 
         /**
-         * Adds a rewrite endpoint for the .../volumes/1 and so on pages.
+         * Adds a rewrite endpoint for the /volumes/, /volumes/1, /volumes/2, ... pages.
          *
          * To be added to the 'init' action.
          *
@@ -142,112 +142,49 @@ class O3PO_Journal {
             // flush_rewrite_rules( true );  //// <---------- ONLY COMMENT IN WHILE TESTING
     }
 
-        /**
-         *
-         *
-         */
-    public function volume_navigation_at_loop_start( $wp_query ) {
-
-        $settings = O3PO_Settings::instance();
-
-        if ( !isset( $wp_query->query_vars[ $this->get_journal_property('volumes_endpoint') ] ) )
-            return;
-
-        $page = get_query_var('page');
-        $vol_num = get_query_var('vol_num');
-
-        $content = "";
-        if ( empty($vol_num) or $vol_num < 1 ) {
-            $last_volume = getdate()["year"] - ($settings->get_plugin_option('first_volume_year')-1);
-            $content .= '<h1>Volumes published by ' . $settings->get_plugin_option('journal_title') . '</h1>';
-            $content .= '<p>&larr; <a href="' . get_site_url() . '">back to main page</a><p>';
-            $content .= '<ul>';
-            for ($volume = 1; $volume <= $last_volume; $volume++) {
-                $content .= '  <li><a href="' . get_site_url() . '/volumes/' . $volume . '/">Volume ' . $volume . ' (' . ($volume+($settings->get_plugin_option('first_volume_year')-1)) . ') ' . $this->get_count_of_volume($volume, $this->get_journal_property('publication_type_name')) . ' ' . $this->get_journal_property('publication_type_name_plural') . '</a></li>';
-            }
-            $content .= '</ul>';
-        }
-        else {
-            $content .= '<h1>' . $this->get_count_of_volume($vol_num, $this->get_journal_property('publication_type_name')) . ' ' . $this->get_journal_property('publication_type_name_plural') . ' in Volume ' . $vol_num . ' (' . ($vol_num+($settings->get_plugin_option('first_volume_year')-1)) . ')</h1>';
-            $content .= '<p>&larr; <a href="' . get_site_url() . '/volumes/">back to all volumes</a><p>';
-        }
-
-        echo $content;
-
-    }
-
-    public function volume_endpoint_template( $template ) {
-
-        global $wp_query;
-
-        if ( !isset( $wp_query->query_vars[ $this->get_journal_property('volumes_endpoint') . '_add_fake_post' ] ) )
-            return $template;
-
-        return locate_template( array( 'page.php' ) );
-    }
-
-    public function volume_fake_the_posts( $posts ) {
-
-        global $wp_query;
-
-        if ( count($posts) > 0 or !isset( $wp_query->query_vars[ $this->get_journal_property('volumes_endpoint') . '_add_fake_post' ] ) )
-            return $posts;
-
-            //create a fake post
-        $page_slug = $this->get_journal_property('volumes_endpoint');
-        $post = new stdClass;
-        $post->post_author = -1;
-        $post->post_name = $page_slug;
-        $post->guid = get_bloginfo( get_site_url() . $page_slug);
-        $post->post_title = '';
-        $post->post_content = '';
-        $post->ID = -1;
-        $post->post_status = 'static';
-        $post->comment_status = 'closed';
-        $post->ping_status = 'closed';
-        $post->comment_count = 0;
-        $post->post_date = current_time('mysql');
-        $post->post_date_gmt = current_time('mysql',1);
-        $post = (object) array_merge((array) $post, array());
-        $posts = NULL;
-        $posts[] = $post;
-
-        return $posts;
-    }
-
-    public function compress_enteies_in_volume_view( $wp_query ) {
-
-        if ( !isset( $wp_query->query_vars[ $this->get_journal_property('volumes_endpoint') ] ) )
-            return;
-
-        echo '<script type="text/javascript">
-var i;
-var elemets_to_not_display = document.querySelectorAll(".list-article-meta,.abstract-in-excerpt,.list-article-thumb");
-for (i = 0; i < elemets_to_not_display.length; i++) {
-    elemets_to_not_display[i].style.display = "none";
-}
-var elemets_to_condense = document.querySelectorAll(".list-article,.entry-title");
-for (i = 0; i < elemets_to_condense.length; i++) {
-    elemets_to_condense[i].style.padding = "0.2em 0";
-    elemets_to_condense[i].style.margin = "0";
-}
-</script>';
-    }
 
         /**
-         * The following creates the .../volumes/1 and so on pages. This is a quite
-         * terrible hack and several things we are doing here are not OK or should
-         * be done entirely differently. Notice for example the terrible java script
-         * hack that we use to overwrite properties set in the theme.
-         * See also https://wordpress.stackexchange.com/questions/120407/how-to-fix-pagination-for-custom-loops/120408#120408 for more issue!
-         * The true solution to the problem we are solving here in an impropper way
-         * however are taxonomies. This is just a cludge for now.
+         * Handle the requests to the /volume/ endpoint.
+         *
+         * We want to display an overview of the available volumes and then sub-pages
+         * with lists for each volume. Here we set up appropriate queries to do that.
+         *
+         * We then want that Wordpress and the theme take care of turning these queries
+         * into actual pages without the need for further intervention from ours side
+         * to the extent possible in order to (i) make this plugin as theme independent
+         * as possible and (ii) have the volume page rendered with the global theme the
+         * users have chosen for their website.
+         *
+         * Unfortunately we run into several complications:
+         *
+         * - For the lists of publications in a given volume it is straight forward to
+         * generate the query and a navigation can be nicely added just above the list
+         * by hooking into 'loop_start' (see below).
+         *
+         * - For the overview page of all volumes we can add the navigation in the same
+         * way, but we don't want to display any entries.
+         * We thus set up an empty query and force the usage of the 'page' template (see
+         * the function volume_endpoint_template() below). Without any posts to show,
+         * however, even the 'page' template does not execute 'loop_start' and (depending
+         * on the theme) can fall back to the 'content-none' template. To prevent this we
+         * have to add a fake "empty" post. We do this in during the 'the_posts' action in
+         * add_fake_empty_post_to_volume_overview_page() (see below).
+         *
+         * - Finally, we want the entries in the list to appear more "compressed" than in
+         * other archive pages. This again could be solved with a custom theme or template,
+         * but we want to stay largely theme independent. We this insert some java script
+         * into the page to hide pars of the generated html and reduce the spacing between
+         * elements. This will not work with every theme, but at least is unlikely to cause
+         * serious unintended side-effects.
+         *
+         * The true long-term solution to the problem we are solving here could be taxonomies.
          *
          * To be added to the 'parse_request' action.
          *
          * @since    0.1.0
          * @access   public
          * @param    WP_Query     $wp_query   Query to act on.
+         * @return   Modified WP_Query object.
          * */
     public function handle_volumes_endpoint_request( $wp_query ) {
 
@@ -280,7 +217,138 @@ for (i = 0; i < elemets_to_condense.length; i++) {
         return $wp_query;
     }
 
+        /**
+         * Add navigation before the loop to the pages of the volume endpoint.
+         *
+         * To be added to 'loop_start'.
+         *
+         * @since  0.2.2+
+         * @access public
+         * @param  WP_Query  $wp_query   The current Wordpress query.
+         */
+    public function volume_navigation_at_loop_start( $wp_query ) {
 
+        $settings = O3PO_Settings::instance();
+
+        if ( !isset( $wp_query->query_vars[ $this->get_journal_property('volumes_endpoint') ] ) )
+            return;
+
+        $page = get_query_var('page');
+        $vol_num = get_query_var('vol_num');
+
+        $content = "";
+        if ( empty($vol_num) or $vol_num < 1 ) {
+            $last_volume = getdate()["year"] - ($settings->get_plugin_option('first_volume_year')-1);
+            $content .= '<h1>Volumes published by ' . $settings->get_plugin_option('journal_title') . '</h1>';
+            $content .= '<p>&larr; <a href="' . get_site_url() . '">back to main page</a><p>';
+            $content .= '<ul>';
+            for ($volume = 1; $volume <= $last_volume; $volume++) {
+                $content .= '  <li><a href="' . get_site_url() . '/volumes/' . $volume . '/">Volume ' . $volume . ' (' . ($volume+($settings->get_plugin_option('first_volume_year')-1)) . ') ' . $this->get_count_of_volume($volume, $this->get_journal_property('publication_type_name')) . ' ' . $this->get_journal_property('publication_type_name_plural') . '</a></li>';
+            }
+            $content .= '</ul>';
+        }
+        else {
+            $content .= '<h1>' . $this->get_count_of_volume($vol_num, $this->get_journal_property('publication_type_name')) . ' ' . $this->get_journal_property('publication_type_name_plural') . ' in Volume ' . $vol_num . ' (' . ($vol_num+($settings->get_plugin_option('first_volume_year')-1)) . ')</h1>';
+            $content .= '<p>&larr; <a href="' . get_site_url() . '/volumes/">back to all volumes</a><p>';
+        }
+
+        echo $content;
+
+    }
+
+        /**
+         * Force the usage of the page template on the volume overview page
+         *
+         * Checks for the presence of a query var ending in '_add_fake_post'
+         * to determine when to change the template.
+         *
+         * @since  0.2.2+
+         * @access public
+         * @param  string   $template   The template that would be used.
+         * @return string   Template that should be used.
+         */
+    public function volume_endpoint_template( $template ) {
+
+        global $wp_query;
+
+        if ( !isset( $wp_query->query_vars[ $this->get_journal_property('volumes_endpoint') . '_add_fake_post' ] ) )
+            return $template;
+
+        return locate_template( array( 'page.php' ) );
+    }
+
+        /**
+         * Add a fake "empty" post to make 'loop_start' fire on the volume overview page
+         *
+         * For queries that do not return any posts, the loop is never run.
+         * As we initiate an empty query for the top level volume endpoint
+         * that is supposed to serve the volume overview page, we must add
+         * at least a fake "empty" post to the $posts in order to allow us
+         * to inject content into the standard page template of the current
+         * theme.
+         *
+         * @since  0.2.2+
+         * @access public
+         * @param  array   $posts   Array of posts that would be returned if we do not intervene.
+         * @return array   Array of posts that are returned if we do intervene.
+         */
+    public function add_fake_empty_post_to_volume_overview_page( $posts ) {
+
+        global $wp_query;
+
+        if ( count($posts) > 0 or !isset( $wp_query->query_vars[ $this->get_journal_property('volumes_endpoint') . '_add_fake_post' ] ) )
+            return $posts;
+
+            //create a fake post
+        $page_slug = $this->get_journal_property('volumes_endpoint');
+        $post = new stdClass;
+        $post->post_author = -1;
+        $post->post_name = $page_slug;
+        $post->guid = get_bloginfo( get_site_url() . $page_slug);
+        $post->post_title = '';
+        $post->post_content = '';
+        $post->ID = -1;
+        $post->post_status = 'static';
+        $post->comment_status = 'closed';
+        $post->ping_status = 'closed';
+        $post->comment_count = 0;
+        $post->post_date = current_time('mysql');
+        $post->post_date_gmt = current_time('mysql',1);
+        $post = (object) array_merge((array) $post, array());
+        $posts = NULL;
+        $posts[] = $post;
+
+        return $posts;
+    }
+
+        /**
+         * Inject java script to compress the entries in the volume listings
+         *
+         * Inject some java script to change how the entries of
+         * individual publications are displayed in the list of a volume.
+         *
+         * @since  0.2.2+
+         * @access public
+         * @para   WP_Query  $wp_query   The current Wordpress query.
+         */
+    public function compress_enteies_in_volume_view( $wp_query ) {
+
+        if ( !isset( $wp_query->query_vars[ $this->get_journal_property('volumes_endpoint') ] ) )
+            return;
+
+        echo '<script type="text/javascript">
+var i;
+var elemets_to_not_display = document.querySelectorAll(".list-article-meta,.abstract-in-excerpt,.list-article-thumb");
+for (i = 0; i < elemets_to_not_display.length; i++) {
+    elemets_to_not_display[i].style.display = "none";
+}
+var elemets_to_condense = document.querySelectorAll(".list-article,.entry-title");
+for (i = 0; i < elemets_to_condense.length; i++) {
+    elemets_to_condense[i].style.padding = "0.2em 0";
+    elemets_to_condense[i].style.margin = "0";
+}
+</script>';
+    }
 
         /**
          * Returns information about the post with the highest page number.
