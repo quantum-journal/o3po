@@ -2593,7 +2593,7 @@ abstract class O3PO_PublicationType {
          * @param  int    $post_id     Id of the post.
          */
     public static function the_popular_summary( $post_id ) {
-        echo get_popular_summary( $post_id );
+        echo static::get_popular_summary( $post_id );
     }
 
         /**
