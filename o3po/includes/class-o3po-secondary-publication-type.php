@@ -715,8 +715,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         /**
          * Construct the content.
          *
-         * Contrary to posts of primary publication type, we are not using
-         * a single template here, but simply output some information
+         * Here we output dynamic information about the publication
          * alongside the standard content.
          *
          * To be added to the 'the_content' filter.

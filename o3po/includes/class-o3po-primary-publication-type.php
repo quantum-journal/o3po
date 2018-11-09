@@ -1410,5 +1410,88 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                      );
     }
 
+        /**
+         * Construct the content.
+         *
+         * Here we output dynamic information about the publication
+         * alongside the standard content.
+         *
+         * To be added to the 'the_content' filter.
+         *
+         * @since     0.1.0
+         * @access    public
+         * @param     string    $content     Content to be filtered.
+         */
+    public function get_the_content( $content ) {
+
+        global $post;
+
+        $settings = O3PO_Settings::instance();
+
+        $post_id = $post->ID;
+        $post_type = get_post_type($post_id);
+
+        if ( get_post_type($post_id) === $this->get_publication_type_name() ) {
+            $old_content = $content;
+            $content = '';
+
+            $content .= '<header class="entry-header">';
+#            $content .= '<h1 class="entry-title title citation_title">' . esc_html ( get_the_title( $post_id ) ) . '</h1>';
+            $content .= '<p class="authors citation_author">';
+            $content .= $this->get_formated_authors_html( $post_id );
+            $content .= '</p>';
+            $content .= '<p class="affiliations">';
+            $content .= $this->get_formated_affiliations_html( $post_id );
+            $content .= '</p>';
+            $content .= '<table class="meta-data-table">';
+            $content .= '<tr><td>Published:</td><td>' . esc_html($this->get_formated_date_published( $post_id )) .  ', ' . $this->get_formated_volume_html($post_id) . ', page ' . esc_html(get_post_meta( $post_id, 'paper_pages', true )) . '</td></tr>';
+            $content .= '<tr><td>Eprint:</td><td><a href="' . esc_attr($settings->get_plugin_option('arxiv_url_abs_prefix') . get_post_meta( $post_id, 'paper_eprint', true ) ) . '">arXiv:' . esc_html(get_post_meta( $post_id, 'paper_eprint', true )) . '</a></td></tr>';
+            $content .= '<tr><td>Scirate:</td><td><a href="' . esc_attr($settings->get_plugin_option('scirate_url_abs_prefix') . get_post_meta( $post_id, 'paper_eprint', true ) ) . '">' . esc_html($settings->get_plugin_option('scirate_url_abs_prefix') . get_post_meta( $post_id, 'paper_eprint', true )) . '</a></td></tr>';
+            $paper_doi = get_post_meta( $post_id, 'paper_doi_prefix', true ) . '/' .  get_post_meta( $post_id, 'paper_doi_suffix', true );
+            $content .= '<tr><td>Doi:</td><td><a href="' . esc_attr($settings->get_plugin_option('doi_url_prefix') . $paper_doi) . '">' . esc_html($settings->get_plugin_option('doi_url_prefix') . $paper_doi ) . '</a></td></tr>';
+            if ( $this->show_fermats_library_permalink($post_id) ) {
+                $paper_fermats_library_permalink = get_post_meta( $post_id, 'paper_fermats_library_permalink', true );
+                $content .= '<tr><td>Fermat&#39;s library:</td><td><a href="' . esc_attr($paper_fermats_library_permalink) . '">' . esc_html($paper_fermats_library_permalink) . '</a></td></tr>';
+            }
+            $content .= '<tr><td>Citation:</td><td>' . esc_html($this->get_formated_citation($post_id)) . '</td></tr>';
+            $content .= '</table>';
+//$content .= '<a id="fulltext" class="btn-theme-primary" href="' . esc_attr($this->get_pdf_pretty_permalink($post_id)) . '">full text pdf</a>';
+            $content .= '<form action="' . esc_attr($this->get_pdf_pretty_permalink($post_id)) . '" method="get">';
+            $content .= '<input id="fulltext" type="submit" value="full text pdf">';
+            $content .= '</form>';
+
+
+            $content .= '</header>';
+
+
+
+            $content .= '<div class="entry-content">';
+            $content .= '<p class="abstract">';
+            $content .= nl2br(esc_html( get_post_meta( $post_id, 'paper_abstract', true )) );
+            $content .= '</p>';
+            if ( has_post_thumbnail( ) ) {
+                $content .= '<div class="featured-image-box">';
+                $content .= '<div style="float:left; padding-right: 1rem; padding-bottom: 1rem">';
+                the_post_thumbnail( 'onepress-blog-small' );
+                $content .= '</div>';
+                $paper_feature_image_caption = get_post_meta( $post_id, 'paper_feature_image_caption', true );
+                if (!empty($paper_feature_image_caption))
+                    $content .= '<p class="feature-image-caption">' . "Featured image: " . nl2br(esc_html($paper_feature_image_caption)) . '</p>';
+                $content .= '<div style="clear:both;"></div>';
+                $content .= '</div>';
+            }
+
+            $content .= $old_content;
+            $content .= $this->get_popular_summary($post_id);
+            $content .= $this->get_bibtex_html($post_id);
+            $content .= $this->get_bibliography_html($post_id);
+            $content .= $this->get_cited_by($post_id);
+            $content .= $this->get_license_information($post_id);
+            $content .= '</div>';
+            return $content;
+        }
+        else
+            return $content;
+    }
 
 }

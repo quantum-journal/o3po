@@ -2583,27 +2583,41 @@ abstract class O3PO_PublicationType {
 
 
         /**
+         * Echo the polupar summary.
+         *
+         * Echo the popilar summary if available. To be used in the single
+         * templates.
+         *
+         * @since  0.1.0
+         * @access public
+         * @param  int    $post_id     Id of the post.
+         */
+    public static function the_popular_summary( $post_id ) {
+        echo get_popular_summary( $post_id );
+    }
+
+        /**
          * Get the polupar summary.
          *
          * Get the popilar summary if available. To be used in the single
          * templates.
          *
-         * @since 0.1.0
-         * @access   public
-         * @param    int    $post_id     Id of the post.
+         * @since  0.2.2+
+         * @access public
+         * @param  int    $post_id     Id of the post.
          */
-    public static function the_popular_summary( $post_id )
-    {
+    public static function get_popular_summary( $post_id ) {
+        $output = '';
         $post_type = get_post_type($post_id);
         $popular_summary = get_post_meta( $post_id, $post_type . '_popular_summary', true );
         if( !empty($popular_summary) ) {
-            echo '<h3 class="popular-summary additional-info"><a href="">Popular summary</a></h3>';
-            echo '<div>';
-            echo nl2br(esc_html($popular_summary));
-            echo '</div>';
+            $output .= '<h3 class="popular-summary additional-info"><a href="">Popular summary</a></h3>';
+            $output .= '<div>';
+            $output .= nl2br(esc_html($popular_summary));
+            $output .= '</div>';
         }
+        return $output;
     }
-
 
         /**
          * Get the formatted authors.
