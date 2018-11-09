@@ -2877,4 +2877,57 @@ abstract class O3PO_PublicationType {
          */
     abstract public function get_pdf_pretty_permalink( $post_id );
 
+
+        /**
+         * Fake the author.
+         *
+         * To be added to the 'the_author' filter.
+         *
+         * @since    0.1.0
+         * @access   pulic
+         * @param    string    $display_name   Display name to be filtered.
+         */
+    public function get_the_author( $display_name ) {
+
+        global $post;
+
+        $post_id = $post->ID;
+        $post_type = get_post_type($post_id);
+
+        if ( $post_type === $this->get_publication_type_name() ) {
+            $journal = get_post_meta( $post_id, $post_type . '_journal', true );
+            return $journal;
+        }
+        else
+        {
+            return $display_name;
+        }
+    }
+
+        /**
+         * Fake the author post link.
+         *
+         * To be added to the 'the_author_posts_link' filter.
+         *
+         * @since    0.2.2+
+         * @access   pulic
+         * @param    string    $link   Link to be filtered.
+         */
+    public function get_the_author_posts_link( $link ) {
+
+        global $post;
+
+        $post_id = $post->ID;
+        $post_type = get_post_type($post_id);
+
+        if ( $post_type === $this->get_publication_type_name() ) {
+            $slug = $this->get_publication_type_name_plural();
+            return '/' . $slug;
+        }
+        else
+        {
+            return $link;
+        }
+    }
+
 }
