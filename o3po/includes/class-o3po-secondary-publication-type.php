@@ -378,12 +378,12 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * Get the excerpt of a this publication type.
          *
          * As we modify the content in get_the_content() we
-         * construct the excerpt from stratch,
+         * construct the excerpt from scratch,
          *
          * To be added to the 'get_the_excerpt' filter.
          *
-         * @since     0.1.0
-         * @param     string    $content    Content to be filtered.
+         * @since 0.1.0
+         * @param string    $content    Content to be filtered.
          */
     public function get_the_excerpt( $content ) {
 
@@ -395,12 +395,10 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         if ( $post_type === $this->get_publication_type_name() ) {
             $content = '';
             $content .= '<p class="authors-in-excerpt">' . static::get_formated_authors( $post_id ) . ',</p>' . "\n";
-            $content .= '<p class="citation-in-excerpt">' . static::get_formated_citation($post_id) . ' <a href="' . $this->get_journal_property('doi_url_prefix') . static::get_doi($post_id) . '">' . $this->get_journal_property('doi_url_prefix') . static::get_doi($post_id) . '</a>' . "\n";
+            $content .= '<p class="citation-in-excerpt"><a href="' . $this->get_journal_property('doi_url_prefix') . static::get_doi($post_id) . '">' . static::get_formated_citation($post_id) . '</a></p>' . "\n";
             $content .= '<p><a href="' . get_permalink($post_id) . '" class="abstract-in-excerpt">';
             $bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
             $trimmer_abstract = wp_html_excerpt( do_shortcode(O3PO_Latex::expand_cite_to_html(get_post_field('post_content', $post_id), $bbl)), 190, '&#8230;');
-
-
             while( preg_match_all('/(?<!\\\\)\$/', $trimmer_abstract) % 2 !== 0 )
             {
                 empty($i) ? $i = 1 : $i += 1;
