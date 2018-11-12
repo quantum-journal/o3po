@@ -444,7 +444,7 @@ abstract class O3PO_PublicationType {
          * @access   public
          * @param    string      $new      The new post status after this transition.
          * @param    string      $old      The old post status before this transition.
-         * @param    int         $post_id  The id of the post that transitions.
+         * @param    int         $post     The post that is undergoing the transitions.
          */
     public final function on_transition_post_status( $new, $old, $post ) {
 
