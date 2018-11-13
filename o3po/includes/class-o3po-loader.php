@@ -3,7 +3,7 @@
 /**
  * Register all actions and filters for the plugin
  *
- * @link       http://example.com
+ * @link       https://quantum-journal.org/o3po/
  * @since      0.1.0
  *
  * @package    O3PO

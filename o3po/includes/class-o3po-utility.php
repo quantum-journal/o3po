@@ -3,7 +3,7 @@
 /**
  * A collection of various utility functions.
  *
- * @link       http://example.com
+ * @link       https://quantum-journal.org/o3po/
  * @since      0.1.0
  *
  * @package    O3PO
