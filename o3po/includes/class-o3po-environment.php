@@ -234,9 +234,7 @@ class O3PO_Environment {
                 $attach_data = wp_generate_attachment_metadata( $attach_id, $filename );
                 wp_update_attachment_metadata( $attach_id, $attach_data );
 
-                    //$local_url = $results['url'];  // URL to the file in the uploads dir
-                    //$mime_type = $results['type']; // MIME type of the file
-
+                $results['mime_type'] = $mime_type;
                 $results['attach_id'] = $attach_id;
                 return $results;
             }

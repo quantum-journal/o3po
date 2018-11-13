@@ -16,6 +16,11 @@
  * @subpackage O3PO/includes
  */
 
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-clockss.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-crossref.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-doaj.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-latex.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-utility.php';
 
 /**
@@ -332,7 +337,23 @@ abstract class O3PO_PublicationType {
 		$nonce_name   = $this->get_publication_type_name() . '_nonce';
 		$nonce_action = $this->get_publication_type_name() . '_nonce_action';
 
+        $this->render_maintenance_mode_warning($post);
+
 		wp_nonce_field( $nonce_action, $nonce_name );
+    }
+
+        /**
+         * Render the maintenance_mode warning if appropriate.
+         *
+         * @since    0.2.2+
+         * @access   public
+         * @param    WP_Post     $post   The post for which to render the metabox.
+         * */
+    public static final function render_maintenance_mode_warning( $post ) {
+
+        $settings = O3PO_Settings::instance();
+        if($settings->get_plugin_option('maintenance_mode')!=='unchecked')
+            echo '<script>alert("' . esc_html($settings->get_plugin_pretty_name()) . ' has been put in maintenance mode. Modification of publication-meta data is inhibited. Maintenance mode can be disabled in the plugin settings. Please contact your site administrator(s).");</script>' . "\n";
 
     }
 
@@ -350,7 +371,7 @@ abstract class O3PO_PublicationType {
          *
          * @since    0.1.0
          * @access   public
-         * @param    int         $post_id  The id of the post for which to save the metabox
+         * @param    int         $post_id  The id of the post for which to save the metabox.
          * @param    WP_Post     $post     The post for which to save the metabox.
          * */
     public final function save_metabox( $post_id, $post ) {
@@ -385,127 +406,64 @@ abstract class O3PO_PublicationType {
         if ( get_post_status( $post_id ) === 'auto-draft' )
             return;
 
+            // Do nothing if in maintenance mode
+        $settings = O3PO_Settings::instance();
+        if($settings->get_plugin_option('maintenance_mode')!=='unchecked')
+            return;
+
             //Save the entered meta data
         $this->save_meta_data($post_id);
 
-            // Unhook this function to prevent infinite looping because in the remainder of this function we will be calling update_post() which triggers 'save_post'
+            // Unhook this function to prevent infinite looping because in the remainder of this function (especially in validate_and_process_data()) we will be calling update_post() which triggers 'save_post'
         try
         {
             remove_action( 'save_post', array( $this, 'save_metabox' ), 10, 2 );
 
             $validation_result = $this->validate_and_process_data($post_id);
-
-                /* Maybe it would be cleaner to move the two following generate
-                 * functions to validate_and_process_data(), but we need things
-                 * like the $doi_batch_id, wich we do not want to save
-                 * individually when uploading the meta data a little bit further
-                 * down, and then would need to pass these around...
-                 */
-
-                // Generate Crossref xml
-            $timestamp = time();
-            $doi_batch_id = $this->generate_crossref_xml_doi_batch_id($post_id, $timestamp);
-            $crossref_xml = $this->generate_crossref_xml($post_id, $doi_batch_id, $timestamp);
-            update_post_meta( $post_id, $post_type . '_crossref_xml', $crossref_xml );
-            if(strpos($crossref_xml, 'ERROR') !== false)
-                $validation_result .= $crossref_xml . "\n";
-
-
-                // Generate DOAJ json
-            $doaj_json = $this->generate_doaj_json($post_id);
-            update_post_meta( $post_id, $post_type . '_doaj_json', wp_slash($doaj_json) ); // see https://codex.wordpress.org/Function_Reference/update_post_meta for why we have to used wp_slash() here and not addslashes()
-            if(strpos($doaj_json, 'ERROR') !== false)
-                $validation_result .= $doaj_json . "\n";
-
-
-                // Generate CLOCKSS xml
-            $clockss_xml = $this->generate_clockss_xml($post_id);
-            update_post_meta( $post_id, $post_type . '_clockss_xml', wp_slash($clockss_xml) ); // see https://codex.wordpress.org/Function_Reference/update_post_meta for why we have to used wp_slash() here and not addslashes()
-            if(strpos($clockss_xml, 'ERROR') !== false)
-                $validation_result .= $clockss_xml . "\n";
-
-                /*
-                 * Now we start interfacing with external services.
-                 *
-                 * We only do this if no errors have occurd and there are
-                 * no outstanding reviews.
-                 *
-                 * Crossref is the most critical and we hence we do it first.
-                 * We want the published status of the post to track the
-                 * registration of the DOI as closely as possible. Hence, if
-                 * there are any ERRORs or REVIEWs from before or during the
-                 * Crossref phase, we force the post private.
-                 */
-            try
-            {
-                if( strpos($validation_result, 'ERROR') === false and strpos($validation_result, 'REVIEW') === false) {
-
-                        //Upload meta-data to crossref
-                    $crossref_url = (get_post_status($post_id) === 'publish' && !$this->environment->is_test_environment()) ? $this->get_journal_property('crossref_deposite_url') : $this->get_journal_property('crossref_test_deposite_url'); // Send it to the test system or the real system
-                    $crossref_response = $this->upload_meta_data_to_crossref($doi_batch_id, $crossref_xml,
-                                                                             $this->get_journal_property('crossref_id'),
-                                                                             $this->get_journal_property('crossref_pw'),
-                                                                             $crossref_url
-                                                                             );
-                    update_post_meta( $post_id, $post_type . '_crossref_response', $crossref_response );
-                    if(!empty($crossref_response) && strpos($crossref_response, 'ERROR') !== false )
-                        $validation_result .= $crossref_response;
-                }
-            } catch(Exception $e) {
-                $validation_result .= "ERROR: There was an exception while registering the DOI with Corssres: " . $e->getMessage() . "\n";
-            } finally {
-                    //Force the post private until everything validates has
-                    //been reviewd and the corssref registation was successful.
-                if( strpos($validation_result, 'ERROR') !== false or strpos($validation_result, 'REVIEW') !== false) {
-                    if ( get_post_status( $post_id ) === 'publish' or get_post_status( $post_id ) === 'future' )
-                        wp_update_post(array('ID' => $post_id, 'post_status' => 'private'));
-                }
-            }
-
-                //If all is still well, we do all the other external services
-            if( strpos($validation_result, 'ERROR') === false or strpos($validation_result, 'REVIEW') === false)
-            {
-                    //Upload meta-data to DOAJ
-                if (get_post_status($post_id) === 'publish' && !$this->environment->is_test_environment())
-                    $doaj_response = $this->upload_meta_data_to_doaj($doaj_json,
-                                                                     $this->get_journal_property('doaj_api_url'),
-                                                                     $this->get_journal_property('doaj_api_key')
-                                                                     );
-                else
-                    $doaj_response = NULL;
-                update_post_meta( $post_id, $post_type . '_doaj_response', $doaj_response );
-                if(!empty($doaj_response) && strpos($doaj_response, 'ERROR') !== false )
-                    $validation_result .= $doaj_response;
-
-                    //Upload meta-data and fulltext to CLOCKSS (only if a fulltext exists)
-                $fulltext_pdf_path = $this->get_fulltext_pdf_path($post_id);
-                $doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
-                $remote_filename_without_extension = $doi_suffix;
-
-                if (get_post_status($post_id) === 'publish' && !empty($fulltext_pdf_path) && !$this->environment->is_test_environment())
-                    $clockss_response = $this->upload_meta_data_and_pdf_to_clockss($clockss_xml, $fulltext_pdf_path, $remote_filename_without_extension,
-                                                                                   $this->get_journal_property('clockss_ftp_url'),
-                                                                                   $this->get_journal_property('clockss_username'),
-                                                                                   $this->get_journal_property('clockss_password')
-                                                                                   );
-                else
-                    $clockss_response = NULL;
-                update_post_meta( $post_id, $post_type . '_clockss_response', $clockss_response );
-                if(!empty($clockss_response) && strpos($clockss_response, 'ERROR') !== false )
-                    $validation_result .= $clockss_response;
-
-                if( get_post_status( $post_id ) === 'publish' )
-                    $validation_result .= $this->on_post_actually_published($post_id);
-            }
-        } catch(Exception $e) {
-            $validation_result .= "ERROR: There was an exception while interfacing with external services: " . $e->getMessage() . "\n";
-        } finally {
-            if ( get_post_status( $post_id ) !== 'publish' ) $validation_result .= "WARNING: Not yet published.\n";
+        }
+        catch(Exception $e) {
+            $validation_result .= "ERROR: There was an exception while saving and processing the entered meta-data: " . $e->getMessage() . "\n";
+        }
+        finally {
+            if ( get_post_status( $post_id ) !== 'publish' and  get_post_status( $post_id ) !== 'future' )
+                $validation_result .= "WARNING: Not yet published.\n";
             update_post_meta( $post_id, $post_type . '_validation_result', $validation_result );
 
                 // Rehock this function
             add_action( 'save_post', array( $this, 'save_metabox' ), 10, 2 );
         }
+    }
+
+
+        /**
+         * Handle post status transitions
+         *
+         * To be added to the 'transition_post_status' hook.
+         *
+         * @since    0.2.2+
+         * @access   public
+         * @param    string      $new      The new post status after this transition.
+         * @param    string      $old      The old post status before this transition.
+         * @param    int         $post     The post that is undergoing the transitions.
+         */
+    public final function on_transition_post_status( $new, $old, $post ) {
+
+        $post_id = $post->ID;
+        $post_type = $post->post_type;
+
+            // If the post type doesn't fit do nothing
+        if ( $this->get_publication_type_name() !== $post_type )
+            return;
+
+        if ( $old == 'future' && $new == 'publish')
+        {
+            $validation_result = get_post_meta( $post_id, $post_type . '_validation_result', true);
+            $validation_result .= "INFO: Publication of this scheduled " . $post_type . " was triggered on " . date('Y-m-d H:i:s') . ".\n";
+            $validation_result .= $this->validate_and_process_data($post_id);
+
+            update_post_meta( $post_id, $post_type . '_validation_result', $validation_result );
+        }
+
     }
 
         /**
@@ -591,6 +549,9 @@ abstract class O3PO_PublicationType {
         /**
          * Validate and process the meta-data that was saved in save_meta_data().
          *
+         * We also trigger interactions with external services (Crossref, DOAJ,
+         * CLOCKSS) here.
+         *
          * @since    0.1.0
          * @access   protected
          * @param    int          $post_id   The id of the post.
@@ -673,15 +634,12 @@ abstract class O3PO_PublicationType {
                 $validation_result .= "ERROR: Author " . ($x+1) . " Surname is empty.\n" ;
             if ( empty( $author_name_styles[$x] ) )
                 $validation_result .= "WARNING: Author " . ($x+1) . " name style is empty.\n" ;
-            if ( empty( $author_orcids[$x] ) )
-                $validation_result .= "INFO: ORCID of author " . ($x+1) . " is empty.\n" ;
-            else {
+            if ( !empty( $author_orcids[$x] ) )
+            {
                 $check_orcid_result = O3PO_Utility::check_orcid( $author_orcids[$x]);
                 if( !($check_orcid_result === true) )
                     $validation_result .= "ERROR: ORCID of author " . ($x+1) . " " . $check_orcid_result . ".\n" ;
             }
-            if ( empty( $author_urls[$x] ) )
-                $validation_result .= "INFO: URL of author " . ($x+1) . " is empty.\n" ;
             if ( empty( $author_affiliations[$x] ) )
                 $validation_result .= "WARNING: Affiliations of author " . ($x+1) . " are empty.\n" ;
             else {
@@ -715,13 +673,128 @@ abstract class O3PO_PublicationType {
         else if(!O3PO_Utility::valid_email($corresponding_author_email))
             $validation_result .= "ERROR: Corresponding author email is malformed.\n" ;
 
+            // Generate Crossref xml
+        $timestamp = time();
+        $crossref_xml_doi_batch_id = $this->generate_crossref_xml_doi_batch_id($post_id, $timestamp);
+        $crossref_xml = $this->generate_crossref_xml($post_id, $crossref_xml_doi_batch_id, $timestamp);
+        update_post_meta( $post_id, $post_type . '_crossref_xml', wp_slash($crossref_xml) ); // see https://codex.wordpress.org/Function_Reference/update_post_meta for why we have to used wp_slash() here and not addslashes()
+        update_post_meta( $post_id, $post_type . '_crossref_xml_doi_batch_id', wp_slash($crossref_xml_doi_batch_id) ); // see https://codex.wordpress.org/Function_Reference/update_post_meta for why we have to used wp_slash() here and not addslashes()
+        if(strpos($crossref_xml, 'ERROR') !== false)
+            $validation_result .= $crossref_xml . "\n";
+
+            // Generate DOAJ json
+        $doaj_json = $this->generate_doaj_json($post_id);
+        update_post_meta( $post_id, $post_type . '_doaj_json', wp_slash($doaj_json) ); // see https://codex.wordpress.org/Function_Reference/update_post_meta for why we have to used wp_slash() here and not addslashes()
+        if(strpos($doaj_json, 'ERROR') !== false)
+            $validation_result .= $doaj_json . "\n";
+
+            // Generate CLOCKSS xml
+        $clockss_xml = $this->generate_clockss_xml($post_id);
+        update_post_meta( $post_id, $post_type . '_clockss_xml', wp_slash($clockss_xml) ); // see https://codex.wordpress.org/Function_Reference/update_post_meta for why we have to used wp_slash() here and not addslashes()
+        if(strpos($clockss_xml, 'ERROR') !== false)
+            $validation_result .= $clockss_xml . "\n";
+
+            /*
+             * Now we start interfacing with external services.
+             *
+             * We only do this if no ERRORs have occurred and there are
+             * no outstanding REVIEWs.
+             *
+             * Crossref is the most critical and we hence we do it first.
+             * We want the published status of the post to track the
+             * registration of the DOI as closely as possible. Hence, if
+             * there are any ERRORs or REVIEWs from before or during the
+             * Crossref phase, we force the post private.
+             */
+
+        try
+        {
+                /* If there were no errors and there are no outstadning requests
+                 * to review we attept to submit meta-data to Crossref. */
+            if( get_post_status($post_id) === 'publish' and strpos($validation_result, 'ERROR') === false and strpos($validation_result, 'REVIEW') === false) {
+                    /* On the test system we submit to the Crossref test system and not to the real system.*/
+                $crossref_url = $this->environment->is_test_environment() ? $this->get_journal_property('crossref_test_deposite_url') : $this->get_journal_property('crossref_deposite_url');
+                    //Upload meta-data to Crossref
+                $crossref_response = $this->upload_meta_data_to_crossref($crossref_xml_doi_batch_id, $crossref_xml,
+                                                                         $this->get_journal_property('crossref_id'),
+                                                                         $this->get_journal_property('crossref_pw'),
+                                                                         $crossref_url
+                                                                         );
+                if(!empty($crossref_response) && strpos($crossref_response, 'ERROR') !== false )
+                    $validation_result .= $crossref_response;
+                else
+                    $validation_result .= "INFO: DOI successfully registered/updated at " . $crossref_url . "\n";
+            }
+            else
+                $crossref_response = NULL;
+            update_post_meta( $post_id, $post_type . '_crossref_response', $crossref_response );
+        } catch(Exception $e) {
+            $validation_result .= "ERROR: There was an exception while registering the DOI with Crossref: " . $e->getMessage() . "\n";
+        } finally {
+                /* Force the post private until everything validates without errors,
+                 * there are no outstadning requests to review, and the Crossref
+                 * registation was successful. */
+            if( strpos($validation_result, 'ERROR') !== false or strpos($validation_result, 'REVIEW') !== false) {
+                if ( get_post_status( $post_id ) === 'publish' or get_post_status( $post_id ) === 'future' )
+                    wp_update_post(array('ID' => $post_id, 'post_status' => 'private'));
+            }
+        }
+
+            //If all is still well, we do all the other external services
+        if( strpos($validation_result, 'ERROR') === false or strpos($validation_result, 'REVIEW') === false)
+        {
+                //Upload meta-data to DOAJ
+            if (get_post_status($post_id) === 'publish' && !$this->environment->is_test_environment())
+            {
+                $doaj_response = $this->upload_meta_data_to_doaj($doaj_json,
+                                                                 $this->get_journal_property('doaj_api_url'),
+                                                                 $this->get_journal_property('doaj_api_key')
+                                                                 );
+                if(!empty($doaj_response) && (strpos($doaj_response, 'ERROR') !== false || strpos($doaj_response, 'WARNING') !== false))
+                    $validation_result .= $doaj_response;
+                else
+                    $validation_result .= "INFO: Meta-data successfully uploaded to DOAJ.\n";
+            }
+            else
+                $doaj_response = NULL;
+            update_post_meta( $post_id, $post_type . '_doaj_response', $doaj_response );
+
+
+                //Upload meta-data and fulltext to CLOCKSS (only if a fulltext exists)
+            $fulltext_pdf_path = $this->get_fulltext_pdf_path($post_id);
+            $doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
+            $remote_filename_without_extension = $doi_suffix;
+
+            if (get_post_status($post_id) === 'publish' && !empty($fulltext_pdf_path) && !$this->environment->is_test_environment())
+            {
+
+                $clockss_response = $this->upload_meta_data_and_pdf_to_clockss($clockss_xml, $fulltext_pdf_path, $remote_filename_without_extension,
+                                                                               $this->get_journal_property('clockss_ftp_url'),
+                                                                               $this->get_journal_property('clockss_username'),
+                                                                               $this->get_journal_property('clockss_password')
+                                                                               );
+                if(!empty($clockss_response) && ( strpos($clockss_response, 'ERROR') !== false || strpos($clockss_response, 'WARNING') !== false))
+                    $validation_result .= $clockss_response;
+                else
+                    $validation_result .= "INFO: Meta-data and fulltext successfully uploaded to CLOCKSS.\n";
+            }
+            else
+                $clockss_response = NULL;
+            update_post_meta( $post_id, $post_type . '_clockss_response', $clockss_response );
+
+            if( get_post_status( $post_id ) === 'publish' )
+                $validation_result .= $this->on_post_actually_published($post_id);
+            else if( get_post_status( $post_id ) === 'future' )
+                $validation_result .= "WARNING: This " . $post_type . " was scheduled for publication.\n";
+        }
+
         return $validation_result;
     }
 
         /**
          * Do things when the post is finally published.
          *
-         * Is called from save_metabox().
+         * Is called from validate_and_process_data().
          *
          * @since     0.1.0
          * @access    protected
@@ -785,11 +858,11 @@ abstract class O3PO_PublicationType {
 
                 if($successfully_sent) {
                     update_post_meta( $post_id, $post_type . '_buffer_email_was_sent_date', date("Y-m-d"));
-                    $validation_result .= 'INFO: Emails to buffer.com sent correctly.' . "\n";
+                    $validation_result .= 'INFO: Email to buffer.com sent correctly.' . "\n";
                 }
                 else
                 {
-                    $validation_result .= 'WARNING: Sending emails to buffer.com failed.' . "\n";
+                    $validation_result .= 'WARNING: Sending email to buffer.com failed.' . "\n";
                 }
             }
         }
@@ -808,24 +881,30 @@ abstract class O3PO_PublicationType {
          */
     public final function add_custom_post_types_to_query( $query ) {
 
-            //unify because $query->get('post_type') can be both an array or a string
+            //$query->get('post_type') can either an array or a string
         if(is_array($query->get('post_type')))
             $get_post_type_as_array = $query->get('post_type');
         else
             $get_post_type_as_array = array($query->get('post_type'));
 
-            //On the main query 'post' is not set
-        if ( is_home() && $query->is_main_query() )
+            /* Wordpress shows all posts of type 'post' when $query->get('post_type') is empty
+             * and also when it contains only the empty string ''.
+             * We want to add the custom post type and not loose regular posts, so we have to
+             * add 'post' explicitly.
+             * See also: https://wordpress.stackexchange.com/questions/311446/adding-custom-post-type-to-queries-doing-it-the-right-way */
+        if ( empty($get_post_type_as_array))
+            $get_post_type_as_array = array('post');
+        if(in_array('', $get_post_type_as_array) and !in_array('post', $get_post_type_as_array))
             $get_post_type_as_array = array_merge( $get_post_type_as_array, array('post'));
 
             //only add custom post type to queries that contain regular 'post's
-        if(empty($get_post_type_as_array) or !in_array('post', $get_post_type_as_array))
+        if(!in_array('post', $get_post_type_as_array))
             return;
 
-        if ( is_home() && $query->is_main_query() )
-            $query->set( 'post_type', array_merge( $get_post_type_as_array, array($this->get_publication_type_name()) ) );
-        if( is_category() )
-            $query->set( 'post_type', array_merge( $get_post_type_as_array, array($this->get_publication_type_name()) ) );
+        $new_post_type = array_merge( $get_post_type_as_array, array($this->get_publication_type_name()) );
+
+        if ( (is_home() && $query->is_main_query()) or is_category() )
+            $query->set( 'post_type', $new_post_type );
 
     }
 
@@ -1281,39 +1360,10 @@ abstract class O3PO_PublicationType {
          * */
     private static function upload_meta_data_to_crossref( $doi_batch_id, $crossref_xml, $crossref_id, $crossref_pw, $crossref_url ) {
 
-            // Construct the HTTP POST call
-		$boundary = wp_generate_password(24);
-		$headers = array( 'content-type' => 'multipart/form-data; boundary=' . $boundary );
-		$post_fields = array(
-			'operation' => 'doMDUpload',
- 			'login_id' => $crossref_id,
- 			'login_passwd' => $crossref_pw,
-                             );
-        $payload = '';
-            // Add the standard POST fields
-		foreach ( $post_fields as $name => $value ) {
-            $payload .= '--' . $boundary;
-            $payload .= "\r\n";
-            $payload .= 'Content-Disposition: form-data; name="' . $name . '"' . "\r\n\r\n";
-            $payload .= $value;
-            $payload .= "\r\n";
-		}
-            // Attach the xml data
-		if ( !empty($crossref_xml) && !empty($doi_batch_id) ) {
-            $payload .= '--' . $boundary;
-            $payload .= "\r\n";
-            $payload .= 'Content-Disposition: form-data; name="' . 'fname' . '"; filename="' . $doi_batch_id . '.xml' . '"' . "\r\n";
-            $payload .= 'Content-Type: text/xml' . "\r\n";
-            $payload .= "\r\n";
-            $payload .= $crossref_xml;
-            $payload .= "\r\n";
-		}
-		$payload .= '--' . $boundary . '--';
+        if(empty($crossref_id) || empty($crossref_pw))
+            return "WARNING: Crossref credential incomplete. Meta-data was not uploaded to Corssref.\n";
 
-		$response = wp_remote_post( $crossref_url, array(
-                                        'headers' => $headers,
-                                        'body' => $payload,
-                                                         ) );
+        $response = O3PO_Crossref::remote_post_meta_data_to_crossref($doi_batch_id, $crossref_xml, $crossref_id, $crossref_pw, $crossref_url);
 
 		$crossref_response = $crossref_url . " responded at " . date('Y-m-d H:i:s') . " with:\n";
 		if ( is_wp_error( $response ) ) {
@@ -1326,7 +1376,7 @@ abstract class O3PO_PublicationType {
     }
 
         /**
-         * Submit meta-data to DOAJ:
+         * Submit meta-data to DOAJ.
          *
          * From the command line you could do rouhgly the smame via:
          *
@@ -1345,39 +1395,31 @@ abstract class O3PO_PublicationType {
          */
     private static function upload_meta_data_to_doaj( $doaj_json, $doaj_api_url, $doaj_api_key ) {
 
-            // Construct the HTTP POST call
-		$headers = array( 'content-type' => 'application/json', 'accept' => 'application/json');
-        $payload = $doaj_json;
+        if(empty($doaj_api_url) || empty($doaj_api_key))
+            return "WARNING: DOAJ credential incomplete. Meta-data was not uploaded to DOAJ.\n";
 
-        $doaj_api_url = $doaj_api_url;
-        $doaj_api_url_with_key = $doaj_api_url . '?api_key=' . $doaj_api_key;
-
-        $response = wp_remote_post( $doaj_api_url_with_key, array(
-                                        'headers' => $headers,
-                                        'body' => $payload,
-                                        'method'    => 'POST'
-                                                                  ) );
+        $response = O3PO_Doaj::remote_post_meta_data_to_doaj( $doaj_json, $doaj_api_url, $doaj_api_key );
 
         $doaj_response = $doaj_api_url . " responded at " . date('Y-m-d H:i:s') . " with:\n";
         if ( is_wp_error( $response ) ) {
-            $doaj_response .= 'ERROR: ' . $response->get_error_message();
+            $doaj_response .= 'ERROR: While submitting meta-data to DOAJ the following error occured: ' . $response->get_error_message() . "\n";
         } else {
             $doaj_response .= trim($response['body']);
+            if(strpos($doaj_response, 'created') === false)
+                $doaj_response = 'ERROR: Did not get the expected response from DOAJ. This may indicate a problem with the meta-data upload, please check manually:' . "\n" . $doaj_response . "\n";
+
         }
 
         return $doaj_response;
     }
 
 
-            /**
-         * Submit meta-data to DOAJ:
+        /**
+         * Submit meta-data and full text to CLOCKSS.
          *
-         * From the command line you could do rouhgly the smame via:
+         * Upload an xml file with the meta-data and the full text pdf to CLOCKSS.
          *
-         * curl -X POST --header "Content-Type: application/json" --header "Accept: application/json" -d "[json goes here]" "https://doaj.org/api/v1/articles?api_key=XXX"
-         * see https://doaj.org/api/v1/docs#/ for more infomation.
-         *
-         * DOAJ has no test system, so that we can only get a response from the real system once we publish the final and actual record.
+         * CLOCKSS has no test system, so that we can only get a response from the real system once we publish the final and actual record.
          *
          * This function must be private since we do no longer check internally whether we are running on the test system.
          *
@@ -1392,39 +1434,10 @@ abstract class O3PO_PublicationType {
          */
     private static function upload_meta_data_and_pdf_to_clockss( $clockss_xml, $pdf_path, $remote_filename_without_extension, $clockss_ftp_url, $clockss_username, $clockss_password ) {
 
-        $trackErrors = ini_get('track_errors');
-        $ftp_connection = null;
-        $clockss_response = '';
-        try
-        {
-            set_error_handler(function($errno, $errstr, $errfile, $errline, array $errcontext) {
-                    throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
-                });
+        if(empty($clockss_username) || empty($clockss_password))
+            return "WARNING: CLOCKKS credential incomplete. Meta-data and full text was not uploaded to CLOCKSS.\n";
 
-            $tmpfile_clockss_xml = tempnam(sys_get_temp_dir(), $remote_filename_without_extension );
-            file_put_contents($tmpfile_clockss_xml, $clockss_xml);
-
-            $ftp_connection = ftp_connect($clockss_ftp_url);
-            $login_result = ftp_login($ftp_connection, $clockss_username, $clockss_password);
-
-            if (ftp_put($ftp_connection, $remote_filename_without_extension . '.xml', $tmpfile_clockss_xml, FTP_BINARY))
-                $clockss_response .= "INFO: successfully uploaded the meta-data xml to CLOCKSS.\n";
-            else
-                $clockss_response .= "ERROR: There was an error uploading the meta-data xml to CLOCKSS: " . $php_errormsg . "\n";
-
-            if (ftp_put($ftp_connection, $remote_filename_without_extension . '.pdf', $pdf_path, FTP_BINARY))
-                $clockss_response .= "INFO: successfully uploaded the fulltext pdf to CLOCKSS.\n";
-            else
-                $clockss_response .= "ERROR: There was an error uploading the fulltext pdf to CLOCKSS: " . $php_errormsg . "\n";
-
-
-        } catch(Exception $e) {
-            $clockss_response .= "ERROR: There was an exception during the ftp transfer to CLOCKSS. " . $e->getMessage() . "\n";
-        }
-        ini_set('track_errors', $trackErrors);
-        restore_error_handler();
-        if($ftp_connection !== null)
-            ftp_close($ftp_connection);
+        $clockss_response = O3PO_Clockss::ftp_upload_meta_data_and_pdf_to_clockss($clockss_xml, $pdf_path, $remote_filename_without_extension, $clockss_ftp_url, $clockss_username, $clockss_password);
 
         return $clockss_response;
     }
@@ -1742,7 +1755,7 @@ abstract class O3PO_PublicationType {
 		echo '	<tr>';
 		echo '          <th><label for="' . $post_type . '_corresponding_author_email" class="' . $post_type .'_corresponding_author_email_label">' . 'Email' . '</label></th>';
 		echo '          <td>';
-		echo '                  <input' . ($corresponding_author_has_been_notifed_date === '' ? " " : " readonly ") . 'type="text" id="' . $post_type . '_corresponding_author_email" name="' . $post_type . '_corresponding_author_email" class="' . $post_type . '_corresponding_author_email_field required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( $corresponding_author_email ) . '">' . ( !empty($corresponding_author_has_been_notifed_date) ? " The authors have been automatically notified on " . $corresponding_author_has_been_notifed_date . '.' : '' );
+		echo '                  <input' . ($corresponding_author_has_been_notifed_date === '' ? " " : " readonly ") . 'type="text" id="' . $post_type . '_corresponding_author_email" name="' . $post_type . '_corresponding_author_email" class="' . $post_type . '_corresponding_author_email_field required" placeholder="' . '' . '" value="' . esc_attr($corresponding_author_email) . '">' . ( !empty($corresponding_author_has_been_notifed_date) ? " The authors have been automatically notified on " . $corresponding_author_has_been_notifed_date . '.' : '' );
 		echo '                  <p>(The email of the corresponding author. They get sent an automatic notification of publication email when the post is first published.)</p>';
 		echo '          </td>';
 		echo '  </tr>';
@@ -1786,7 +1799,7 @@ abstract class O3PO_PublicationType {
             {
                 echo '		  <input type="checkbox"' . ($buffer_email_was_sent_date === '' ? " " : " disabled ") . ' name="' . $post_type . '_buffer_email" value="checked"' . $buffer_email . '>Put a post with a link to this ' . $post_type . ' into the queue on buffer.com during publication';
 
-                echo '		  <input style="width:100%;" type="text" id="' . $post_type . '_buffer_special_text" name="' . $post_type . '_buffer_special_text" class="' . $post_type . '_buffer_special_text_field" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( $buffer_special_text ) . '"><p>(You can specify a custom message for buffer.com in this text field. The url to this post, separated by a space, is automatically added. If left blank, the message is generated from a set of pre-defined texts)</p>';
+                echo '		  <input style="width:100%;" type="text" id="' . $post_type . '_buffer_special_text" name="' . $post_type . '_buffer_special_text" class="' . $post_type . '_buffer_special_text_field" placeholder="' . '' . '" value="' . esc_attr($buffer_special_text) . '"><p>(You can specify a custom message for buffer.com in this text field. The url to this post, separated by a space, is automatically added. If left blank, the message is generated from a set of pre-defined texts)</p>';
             }
         }
         else
@@ -1814,7 +1827,7 @@ abstract class O3PO_PublicationType {
         echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_title" class="' . $post_type . '_title_label">' . 'Title' . '</label></th>';
 		echo '		<td>';
-		echo '			<input style="width:100%;" type="text" id="' . $post_type . '_title" name="' . $post_type . '_title" class="' . $post_type . '_title_field preview_and_mathml required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( $title ) . '"><p>(The title may contain special characters. Type Č instead of \\v{C} for example. In contrary, mathematical formulas must be entered in LaTeX notation surrounded by $ signs. Write \\$ for an actual dollar sign. If a mathematical formula is detected, a live preview of how it will appear on the website and the MathML we submit to Crossref appears above this help text.)</p>';
+		echo '			<input style="width:100%;" type="text" id="' . $post_type . '_title" name="' . $post_type . '_title" class="' . $post_type . '_title_field preview_and_mathml required" placeholder="' . '' . '" value="' . esc_attr($title) . '"><p>(The title may contain special characters. Type Č instead of \\v{C} for example. In contrary, mathematical formulas must be entered in LaTeX notation surrounded by $ signs. Write \\$ for an actual dollar sign. If a mathematical formula is detected, a live preview of how it will appear on the website and the MathML we submit to Crossref appears above this help text.)</p>';
 		echo '		</td>';
 		echo '	</tr>';
 
@@ -1848,7 +1861,7 @@ abstract class O3PO_PublicationType {
         echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_number_authors" class="' . $post_type . '_number_authors_label">' . 'Number of authors' . '</label></th>';
 		echo '		<td>';
-		echo '			<input style="width:4rem" type="number" id="' . $post_type . '_number_authors" name="' . $post_type . '_number_authors" class="' . $post_type . '_number_authors_field required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( $number_authors ) . '"><p>(Please put here the actual number of authors. To update the number of entries in the list below please save the post. Give affiliations as a comma separated list referring to the affiliations below, e.g., 1,2,5,7. As with the title, special characters are allowed and must be entered as í or é and so on.)</p>';
+		echo '			<input style="width:4rem" type="number" id="' . $post_type . '_number_authors" name="' . $post_type . '_number_authors" class="' . $post_type . '_number_authors_field required" placeholder="' . '' . '" value="' . esc_attr($number_authors) . '"><p>(Please put here the actual number of authors. To update the number of entries in the list below please save the post. Give affiliations as a comma separated list referring to the affiliations below, e.g., 1,2,5,7. As with the title, special characters are allowed and must be entered as í or é and so on.)</p>';
 		echo '		</td>';
 		echo '	</tr>';
 
@@ -1857,15 +1870,15 @@ abstract class O3PO_PublicationType {
 			echo '	<tr>';
 			echo '		<th><label for="' . $post_type . '_author" class="' . $post_type . '_author_label">' . "Author  $y" . '</label></th>';
 			echo '		<td>';
-			echo '			<div style="float:left"><input type="text" name="' . $post_type . '_author_given_names[]" class="' . $post_type . '_author_given_names_field" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( isset($author_given_names[$x]) ? $author_given_names[$x] : '' ) . '" /><br /><label for="' . $post_type . '_author_given_names" class="' . $post_type . '_author_given_names_label">Given name</label></div>';
-			echo '			<div style="float:left"><input type="text" name="' . $post_type . '_author_surnames[]" class="' . $post_type . '_author_surnames_field required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( isset($author_surnames[$x]) ? $author_surnames[$x] : '' ) . '" /><br /><label for="' . $post_type . '_author_surnames" class="' . $post_type . '_author_surnames_label">Surname</label></div>';
+			echo '			<div style="float:left"><input type="text" name="' . $post_type . '_author_given_names[]" class="' . $post_type . '_author_given_names_field" placeholder="' . '' . '" value="' . esc_attr( isset($author_given_names[$x]) ? $author_given_names[$x] : '' ) . '" /><br /><label for="' . $post_type . '_author_given_names" class="' . $post_type . '_author_given_names_label">Given name</label></div>';
+			echo '			<div style="float:left"><input type="text" name="' . $post_type . '_author_surnames[]" class="' . $post_type . '_author_surnames_field required" placeholder="' . '' . '" value="' . esc_attr( isset($author_surnames[$x]) ? $author_surnames[$x] : '' ) . '" /><br /><label for="' . $post_type . '_author_surnames" class="' . $post_type . '_author_surnames_label">Surname</label></div>';
 			echo '			<div style="float:left"><select name="' . $post_type . '_author_name_styles[]">';
 			foreach(array("western", "eastern", "islensk", "given-only") as $style)
                 echo '<option value="' . $style . '"' . ( (isset($author_name_styles[$x]) && $author_name_styles[$x] === $style) ? " selected" : "" ) . '>' . $style . '</option>';
 			echo '</select><br /><label for="' . $post_type . '_author_name_styles" class="' . $post_type . '_author_name_styles_label">Name style</label></div>';
-			echo '			<div style="float:left"><input style="width:5rem" type="text" name="' . $post_type . '_author_affiliations[]" class="' . $post_type . '_author_affiliations_field" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( isset($author_affiliations[$x]) ? $author_affiliations[$x] : '' ) . '" /><br /><label for="' . $post_type . '_author_affiliations" class="' . $post_type . '_author_affiliations">Affiliations</label></div>';
-			echo '			<div style="float:left"><input style="width:11rem" type="text" name="' . $post_type . '_author_orcids[]" class="' . $post_type . '_author_orcids" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( isset($author_orcids[$x]) ? $author_orcids[$x] : '' ) . '" /><br /><label for="' . $post_type . '_author_orcids" class="' . $post_type . '_author_orcids_label">ORCID</label></div>';
-            echo '			<div style="float:left"><input style="width:20rem" type="text" name="' . $post_type . '_author_urls[]" class="' . $post_type . '_author_urls" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( isset($author_urls[$x]) ? $author_urls[$x] : '' ) . '" /><br /><label for="' . $post_type . '_author_urls" class="' . $post_type . '_author_urls_label">URL</label></div>';
+			echo '			<div style="float:left"><input style="width:5rem" type="text" name="' . $post_type . '_author_affiliations[]" class="' . $post_type . '_author_affiliations_field" placeholder="' . '' . '" value="' . esc_attr( isset($author_affiliations[$x]) ? $author_affiliations[$x] : '' ) . '" /><br /><label for="' . $post_type . '_author_affiliations" class="' . $post_type . '_author_affiliations">Affiliations</label></div>';
+			echo '			<div style="float:left"><input style="width:11rem" type="text" name="' . $post_type . '_author_orcids[]" class="' . $post_type . '_author_orcids" placeholder="' . '' . '" value="' . esc_attr( isset($author_orcids[$x]) ? $author_orcids[$x] : '' ) . '" /><br /><label for="' . $post_type . '_author_orcids" class="' . $post_type . '_author_orcids_label">ORCID</label></div>';
+            echo '			<div style="float:left"><input style="width:20rem" type="text" name="' . $post_type . '_author_urls[]" class="' . $post_type . '_author_urls" placeholder="' . '' . '" value="' . esc_attr( isset($author_urls[$x]) ? $author_urls[$x] : '' ) . '" /><br /><label for="' . $post_type . '_author_urls" class="' . $post_type . '_author_urls_label">URL</label></div>';
 			echo '		</td>';
 			echo '	</tr>';
 		}
@@ -1891,7 +1904,7 @@ abstract class O3PO_PublicationType {
 		echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_number_affiliations" class="' . $post_type . '_number_affiliations_label">' . 'Number of affiliations' . '</label></th>';
 		echo '		<td>';
-		echo '			<input style="width:4rem" type="number" id="' . $post_type . '_number_affiliations" name="' . $post_type . '_number_affiliations" class="' . $post_type . '_number_affiliations_field required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( $number_affiliations ) . '"><p>(Please put here the total number of affiliations. To update the number of Affiliation fields save the post.)</p>';
+		echo '			<input style="width:4rem" type="number" id="' . $post_type . '_number_affiliations" name="' . $post_type . '_number_affiliations" class="' . $post_type . '_number_affiliations_field required" placeholder="' . '' . '" value="' . esc_attr( $number_affiliations ) . '"><p>(Please put here the total number of affiliations. To update the number of Affiliation fields save the post.)</p>';
 		echo '		</td>';
 		echo '	</tr>';
 		for ($x = 0; $x < $number_affiliations; $x++) {
@@ -1899,7 +1912,7 @@ abstract class O3PO_PublicationType {
 			echo '	<tr>';
 			echo '		<th><label for="' . $post_type . '_affiliation" class="' . $post_type . '_affiliation_label">' . "Affiliation  $y" . '</label></th>';
 			echo '		<td>';
-			echo '			<input style="width:100%" type="text" name="' . $post_type . '_affiliations[]" class="' . $post_type . '_affiliations required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( isset($affiliations[$x]) ? $affiliations[$x] : '' ) . '" />';
+			echo '			<input style="width:100%" type="text" name="' . $post_type . '_affiliations[]" class="' . $post_type . '_affiliations required" placeholder="' . '' . '" value="' . esc_attr( isset($affiliations[$x]) ? $affiliations[$x] : '' ) . '" />';
 
 			echo '		</td>';
 			echo '	</tr>';
@@ -1941,21 +1954,21 @@ abstract class O3PO_PublicationType {
         echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_date_published" class="' . $post_type . '_date_published_label">' . 'Publication date' . '</label></th>';
 		echo '		<td>';
-		echo '			<input' . ($post_status !== 'publish' ? " " : " readonly ") .  'type="date" id="' . $post_type . '_date_published" name="' . $post_type . '_date_published" class="' . $post_type . '_date_published_field required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( $date_published ) . '">';
+		echo '			<input' . ($post_status !== 'publish' ? " " : " readonly ") .  'type="date" id="' . $post_type . '_date_published" name="' . $post_type . '_date_published" class="' . $post_type . '_date_published_field required" placeholder="' . '' . '" value="' . esc_attr($date_published) . '">';
 		echo '		</td>';
 		echo '	</tr>';
 
         echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_journal" class="' . $post_type . '_journal_label">' . 'Journal' . '</label></th>';
 		echo '		<td>';
-		echo '			<input readonly type="text" id="' . $post_type . '_journal" name="' . $post_type . '_journal" class="' . $post_type . '_journal_field required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( $journal ) . '">';
+		echo '			<input readonly type="text" id="' . $post_type . '_journal" name="' . $post_type . '_journal" class="' . $post_type . '_journal_field required" placeholder="' . '' . '" value="' . esc_attr( $journal ) . '">';
 		echo '		</td>';
 		echo '	</tr>';
 
 		echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_volume" class="' . $post_type . '_volume_label">' . 'Volume' . '</label></th>';
 		echo '		<td>';
-		echo '			<input' . ($post_status !== 'publish' ? " " : " readonly ") .  'type="number" id="' . $post_type . '_volume" name="' . $post_type . '_volume" class="' . $post_type . '_volume_field required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( $volume ) . '">';
+		echo '			<input' . ($post_status !== 'publish' ? " " : " readonly ") .  'type="number" id="' . $post_type . '_volume" name="' . $post_type . '_volume" class="' . $post_type . '_volume_field required" placeholder="' . '' . '" value="' . esc_attr($volume) . '">';
 		echo '			<p>(The volume number is the year of publication minus ' . ($this->get_journal_property('first_volume_year')-1) . '.)</p>';
 		echo '		</td>';
 		echo '	</tr>';
@@ -1963,7 +1976,7 @@ abstract class O3PO_PublicationType {
 		echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_pages" class="' . $post_type . '_pages_label">' . 'Pages' . '</label></th>';
 		echo '		<td>';
-		echo '			<input' . ($post_status !== 'publish' ? " " : " readonly ") .  'type="number" id="' . $post_type . '_pages" name="' . $post_type . '_pages" class="' . $post_type . '_pages_field required" placeholder="' . esc_attr__( '', 'qj-plugin' ) . '" value="' . esc_attr__( $pages ) . '">';
+		echo '			<input' . ($post_status !== 'publish' ? " " : " readonly ") .  'type="number" id="' . $post_type . '_pages" name="' . $post_type . '_pages" class="' . $post_type . '_pages_field required" placeholder="' . '' . '" value="' . esc_attr($pages) . '">';
 		echo '			<p>(This is our (fake) page number. Must be one larger than that of the last published work. Please double check the default value this is automatically set to. If it is -1, then publishing this post at the given date would break lexicographic ordering or DOIs.)</p>';
 		echo '		</td>';
 		echo '	</tr>';
@@ -1985,7 +1998,7 @@ abstract class O3PO_PublicationType {
 		echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_doi" class="' . $post_type . '_doi_label">' . 'Doi' . '</label></th>';
 		echo '		<td>';
-		echo '			<input type="text" readonly value="' . esc_attr__( $doi ) . '" ><br /><p>(The doi is automatically calculated from the above meta data and is of the form ' . $this->get_journal_property('journal_level_doi_suffix') . '-YYYY-MM-DD-pages. If not enough information is available, it is not set and the post is forced to private)</p>';
+		echo '			<input type="text" readonly value="' . esc_attr($doi) . '" ><br /><p>(The doi is automatically calculated from the above meta data and is of the form ' . $this->get_journal_property('journal_level_doi_suffix') . '-YYYY-MM-DD-pages. If not enough information is available, it is not set and the post is forced to private)</p>';
 		echo '		</td>';
 		echo '	</tr>';
 
@@ -2067,7 +2080,7 @@ abstract class O3PO_PublicationType {
 			echo '	<tr>';
 			echo '		<th><label for="' . $post_type . '_crossref_xml" class="' . $post_type . '_crossref_xml_label">' . 'Crossref xml' . '</label></th>';
 			echo '		<td>';
-			echo '			<textarea rows="16" style="width:100%;" readonly>' . esc_attr__( $crossref_xml ) . '</textarea><p>(The Crossref xml is automatically calculated from the above meta data.)</p>';
+			echo '			<textarea rows="16" style="width:100%;" readonly>' . esc_attr($crossref_xml) . '</textarea><p>(The Crossref xml is automatically calculated from the above meta data.)</p>';
 			echo '		</td>';
 			echo '	</tr>';
 		}
@@ -2076,7 +2089,7 @@ abstract class O3PO_PublicationType {
 			echo '	<tr>';
 			echo '		<th><label for="' . $post_type . '_crossref_response" class="' . $post_type . '_crossref_response_label">' . 'Crossref response' . '</label></th>';
 			echo '		<td>';
-			echo '			<textarea rows="' . (substr_count( $crossref_response, "\n" )+1) . '" style="width:100%;" readonly>' . esc_attr__( $crossref_response ) . '</textarea><p>(The response we got from Crossref when uploading the metadata.)</p>';
+			echo '			<textarea rows="' . (substr_count( $crossref_response, "\n" )+1) . '" style="width:100%;" readonly>' . esc_html($crossref_response) . '</textarea><p>(The response we got from Crossref when uploading the metadata.)</p>';
 			echo '		</td>';
 			echo '	</tr>';
 		}
@@ -2100,7 +2113,7 @@ abstract class O3PO_PublicationType {
 			echo '	<tr>';
 			echo '		<th><label for="' . $post_type . '_doaj_json" class="' . $post_type . '_doaj_json_label">' . 'DOAJ json' . '</label></th>';
 			echo '		<td>';
-			echo '			<textarea rows="16" style="width:100%;" readonly>' . esc_attr__( $doaj_json ) . '</textarea><p>(The DOAJ json is automatically calculated from the above meta data.)</p>';
+			echo '			<textarea rows="16" style="width:100%;" readonly>' . esc_attr($doaj_json) . '</textarea><p>(The DOAJ json is automatically calculated from the above meta data.)</p>';
 			echo '		</td>';
 			echo '	</tr>';
 		}
@@ -2109,7 +2122,7 @@ abstract class O3PO_PublicationType {
 			echo '	<tr>';
 			echo '		<th><label for="' . $post_type . '_doaj_response" class="' . $post_type . '_doaj_response_label">' . 'DOAJ response' . '</label></th>';
 			echo '		<td>';
-			echo '			<textarea rows="' . (substr_count( $doaj_response, "\n" )+2) . '" style="width:100%;" readonly>' . esc_attr__( $doaj_response ) . '</textarea><p>(The response we got from DOAJ when uploading the metadata.)</p>';
+			echo '			<textarea rows="' . (substr_count( $doaj_response, "\n" )+2) . '" style="width:100%;" readonly>' . esc_html($doaj_response) . '</textarea><p>(The response we got from DOAJ when uploading the metadata.)</p>';
 			echo '		</td>';
 			echo '	</tr>';
 		}
@@ -2132,7 +2145,7 @@ abstract class O3PO_PublicationType {
 			echo '	<tr>';
 			echo '		<th><label for="' . $post_type . '_clockss_xml" class="' . $post_type . '_clockss_xml_label">' . 'CLOCKSS xml' . '</label></th>';
 			echo '		<td>';
-			echo '			<textarea rows="16" style="width:100%;" readonly>' . esc_attr__( $clockss_xml ) . '</textarea><p>(The CLOCKSS xml is automatically calculated from the above meta data.)</p>';
+			echo '			<textarea rows="16" style="width:100%;" readonly>' . esc_html($clockss_xml) . '</textarea><p>(The CLOCKSS xml is automatically calculated from the above meta data.)</p>';
 			echo '		</td>';
 			echo '	</tr>';
 		}
@@ -2141,7 +2154,7 @@ abstract class O3PO_PublicationType {
 			echo '	<tr>';
 			echo '		<th><label for="' . $post_type . '_clockss_response" class="' . $post_type . '_clockss_response_label">' . 'CLOCKSS response' . '</label></th>';
 			echo '		<td>';
-			echo '			<textarea rows="' . (substr_count( $clockss_response, "\n" )+2) . '" style="width:100%;" readonly>' . esc_attr__( $clockss_response ) . '</textarea><p>(The response we got from CLOCKSS when uploading the metadata and full text pdf, if available.)</p>';
+			echo '			<textarea rows="' . (substr_count( $clockss_response, "\n" )+2) . '" style="width:100%;" readonly>' . esc_html($clockss_response) . '</textarea><p>(The response we got from CLOCKSS when uploading the metadata and full text pdf, if available.)</p>';
 			echo '		</td>';
 			echo '	</tr>';
 		}
@@ -2337,89 +2350,69 @@ abstract class O3PO_PublicationType {
         $crossref_url = $this->get_journal_property('crossref_get_forward_links_url');
         $doi_url_prefix = $this->get_journal_property('doi_url_prefix');
 
-        $request_url = $crossref_url . '?usr=' . urlencode($login_id).  '&pwd=' . urlencode($login_passwd) . '&doi=' . urlencode($doi) . '&include_postedcontent=true';
-        $response = wp_remote_get($request_url);
-        if ( is_wp_error($response) || empty($response['body']) ) {
-            return '<p>Error ' . $response['response']['code'] . ' ' .
-                $response['response']['message'] . '</p>';
-        } else {
-            try {
-                $use_errors=libxml_use_internal_errors(true);
-                $xml = simplexml_load_string($response['body']);
-                libxml_use_internal_errors($use_errors);
-            } catch (Exception $e) {
-                $xml = false;
+        $body = O3PO_Crossref::get_cited_by_xml_body($crossref_url, $login_id, $login_passwd, $doi);
+
+        if ( is_wp_error($body) )
+            return '<p>' . $body->get_error_code() . ' ' . $body->get_error_message() . '</p>';
+
+        if( empty($body) )
+            return '<p>Crossref\'s <a href="https://www.crossref.org/services/cited-by/">cited-by service</a> has no data on citing works. Unfortunately not all publishers provide suitable citation data.</p>';
+
+        $cited_by_html = '';
+        $citation_number = 0;
+        foreach ($body->forward_link as $f_link) {
+            $citation_number += 1;
+            $citation_journal_title = $f_link->journal_cite->journal_title;
+            $citation_article_title = $f_link->journal_cite->article_title;
+            $citation_volume = $f_link->journal_cite->volume;
+            $citation_issue = $f_link->journal_cite->issue;
+            $citation_first_page = $f_link->journal_cite->first_page;
+            $citation_item_number = $f_link->journal_cite->item_number;
+            $citation_page = !empty($citation_first_page) ? $citation_first_page : $citation_item_number;
+            $citation_year = $f_link->journal_cite->year;
+            $citation_doi = $f_link->journal_cite->doi;
+            $citation_publication_type = $f_link->journal_cite->publication_type;
+
+
+            $cited_by_html .= '<p class="break-at-all-cost">' . '[' . $citation_number . '] ';
+            foreach ($f_link->journal_cite->contributors->contributor as $contributor) {
+                    /* $citation_contributor_given_name[] = $contributor->given_name; */
+                    /* $citation_contributor_surname[] = $contributor->surname; */
+                if(!empty($contributor->given_name))
+                    $cited_by_html .= $contributor->given_name . ' ';
+                if(!empty($contributor->surname))
+                    $cited_by_html .= $contributor->surname;
+                $cited_by_html .= ', ';
             }
-            if ($xml === false) {
-                $error = "<p>Failed loading cited-by data from Crossref (maybe the DOI is not yet active)";
-                foreach(libxml_get_errors() as $error) {
-                    $error .= "<br>" . $error->message;
-                }
-                return $error . '</p>';
-            } else {
-                $cited_by_html = '';
-                $body = $xml->query_result->body[0];
-                if( !(bool)$body ) //check if <body> is empty
-                    return '<p>Crossref\'s <a href="https://www.crossref.org/services/cited-by/">cited-by service</a> has no data on citing works. Unfortunately not all publishers provide suitable citation data.</p>';
+            if(!empty($citation_article_title))
+                $cited_by_html .= '"' . $citation_article_title . '", ';
 
-                $citation_number = 0;
-                foreach ($body->forward_link as $f_link) {
-                    $citation_number += 1;
-                    $citation_journal_title = $f_link->journal_cite->journal_title;
-                    $citation_article_title = $f_link->journal_cite->article_title;
-                    $citation_volume = $f_link->journal_cite->volume;
-                    $citation_issue = $f_link->journal_cite->issue;
-                    $citation_first_page = $f_link->journal_cite->first_page;
-                    $citation_item_number = $f_link->journal_cite->item_number;
-                    $citation_page = !empty($citation_first_page) ? $citation_first_page : $citation_item_number;
-                    $citation_year = $f_link->journal_cite->year;
-                    $citation_doi = $f_link->journal_cite->doi;
-                    $citation_publication_type = $f_link->journal_cite->publication_type;
+            $citation_cite_as = '';
+            if(!empty($citation_journal_title))
+                $citation_cite_as .= $citation_journal_title . " ";
+            if(!empty($citation_volume))
+                $citation_cite_as .= $citation_volume;
+            if(!empty($citation_volume) && !empty($citation_page))
+                $citation_cite_as .= ', ';
+            if(!empty($citation_volume) && empty($citation_page))
+                $citation_cite_as .= ' ';
+            if(!empty($citation_page))
+                $citation_cite_as .= $citation_page . " ";
+            if(empty($citation_cite_as))
+                $citation_cite_as = $citation_doi . ' ';
+            if(!empty($citation_year))
+                $citation_cite_as .= '('. $citation_year . ')';
 
-
-                    $cited_by_html .= '<p class="break-at-all-cost">' . '[' . $citation_number . '] ';
-                    foreach ($f_link->journal_cite->contributors->contributor as $contributor) {
-                            /* $citation_contributor_given_name[] = $contributor->given_name; */
-                            /* $citation_contributor_surname[] = $contributor->surname; */
-                        if(!empty($contributor->given_name))
-                            $cited_by_html .= $contributor->given_name . ' ';
-                        if(!empty($contributor->surname))
-                            $cited_by_html .= $contributor->surname;
-                        $cited_by_html .= ', ';
-                    }
-                    if(!empty($citation_article_title))
-                        $cited_by_html .= '"' . $citation_article_title . '", ';
-
-                    $citation_cite_as = '';
-                    if(!empty($citation_journal_title))
-                        $citation_cite_as .= $citation_journal_title . " ";
-                    if(!empty($citation_volume))
-                        $citation_cite_as .= $citation_volume;
-                    if(!empty($citation_volume) && !empty($citation_page))
-                        $citation_cite_as .= ', ';
-                    if(!empty($citation_volume) && empty($citation_page))
-                        $citation_cite_as .= ' ';
-                    if(!empty($citation_page))
-                        $citation_cite_as .= $citation_page . " ";
-                    if(empty($citation_cite_as))
-                        $citation_cite_as = $citation_doi . ' ';
-                    if(!empty($citation_year))
-                        $citation_cite_as .= '('. $citation_year . ')';
-
-                    if(!empty($citation_doi))
-                        $cited_by_html .= '<a href="' . $doi_url_prefix . $citation_doi . '">' . $citation_cite_as . '</a>.' . '</p>' . "\n";
-                }
-
-                $cited_by_html .= '<p>(The above data is from Crossref\'s <a href="https://www.crossref.org/services/cited-by/">cited-by service</a>. Unfortunately not all publishers provide suitable and complete citation data so that some citing works or bibliographic details may be missing.)</p>';
-
-                return $cited_by_html;
-            }
+            if(!empty($citation_doi))
+                $cited_by_html .= '<a href="' . $doi_url_prefix . $citation_doi . '">' . $citation_cite_as . '</a>.' . '</p>' . "\n";
         }
+        $cited_by_html .= '<p>(The above data is from Crossref\'s <a href="https://www.crossref.org/services/cited-by/">cited-by service</a>. Unfortunately not all publishers provide suitable and complete citation data so that some citing works or bibliographic details may be missing.)</p>';
 
+        return $cited_by_html;
     }
 
         /**
-         * Echo the html formted cited by information.
+         * Echo the html formated cited by information.
          *
          * @since    0.1.0
          * @access   public

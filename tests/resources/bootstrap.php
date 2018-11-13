@@ -8,6 +8,8 @@
  */
 
 include(dirname( __FILE__ ) . '/posts.php');
+include(dirname( __FILE__ ) . '/formatting.php');
+include(dirname( __FILE__ ) . '/kses.php');
 
 if(!class_exists('PHPUnit_Framework_TestCase')){
         /**
@@ -71,7 +73,7 @@ function is_admin() {}
 
 function get_site_url() {
 
-    return 'https://foo.bar.com/';
+    return 'https://foo.bar.com';
 }
 
 function get_option( $option, $default = false ) {
@@ -184,10 +186,10 @@ function get_all_post_metas( $post_id ) {
     return $posts[$post_id]['meta'];
 }
 
-function schedule_post_for_publication($post_id) {
+function set_post_status($post_id, $status) {
     global $posts;
 
-    return $posts[$post_id]['post_status'] = 'publish';
+    return $posts[$post_id]['post_status'] = $status;
 }
 
 function wp_nonce_field( $action, $name, $referer=true, $echo=true ) {}
@@ -207,14 +209,20 @@ class WP_Error
     function get_error_message() {
         return $this->message;
     }
+
+    function get_error_code() {
+        return $this->code;
+    }
 }
 
 class WP_Post
 {
     public $ID;
+    public $post_type;
 
-    public function __construct( $post_id ) {
+    public function __construct( $post_id, $post_type='post' ) {
         $this->ID = $post_id;
+        $this->post_type = $post_type;
     }
 }
 
@@ -222,11 +230,14 @@ class WP_Query
 {
     private $posts;
     private $query;
+    public $query_vars;
+    public $post_count;
 
-    function __construct( $input=null ) {
+    function __construct( $input=null, $query_vars=null ) {
         global $posts;
 
         $this->query = $input;
+        $this->query_vars = $query_vars;
 
         if(is_array($input))
             $array = $input;
@@ -261,6 +272,8 @@ class WP_Query
                     $this->posts[$id] = $post;
             }
         }
+
+        $this->post_count = count($this->posts);
     }
 
     function get($key) {
@@ -297,6 +310,11 @@ function set_global_query( $wp_query ) {
     $global_query = $wp_query;
 }
 
+function query_posts( $args ) {
+    set_global_query(new WP_Query($args));
+}
+
+
 $global_search_query = '';
 function set_global_search_query( $string ) {
     global $global_search_query;
@@ -326,6 +344,25 @@ function the_post() {
         throw(new Exception('You must fist set the $global_query before you can use have_posts()'));
 
     return $global_query->the_post();
+}
+
+
+function set_query_var( $var, $val ) {
+    global $global_query;
+
+    if(!($global_query instanceof WP_Query))
+        throw(new Exception('You must first set the $global_query before you can use get_query_var()'));
+
+    $global_query->query_vars[$var] = $val;
+}
+
+function get_query_var( $var ) {
+    global $global_query;
+
+    if(!($global_query instanceof WP_Query))
+        throw(new Exception('You must first set the $global_query before you can use get_query_var()'));
+
+    return $global_query->query_vars[$var];
 }
 
 
@@ -386,26 +423,6 @@ function get_post_status( $ID = '' ) {
     return $posts[$post_id]['post_status'];
 }
 
-function esc_html( $text ) {
-
-    return 'esc_html' . $text;
-}
-
-function esc_attr__( $text ) {
-
-    return 'esc_attr__' . $text;
-}
-
-function esc_attr( $text ) {
-
-    return 'esc_attr' . $text;
-}
-
-function esc_url( $text ) {
-
-    return 'esc_url' . $text;
-}
-
 function wp_get_attachment_url($id) {
     global $posts;
 
@@ -448,6 +465,8 @@ function download_url( $url, $timeout_seconds ) {
         'https://arxiv.org/e-print/0809.2542v4' => dirname(__FILE__) . '/arxiv/0809.2542v4.tar.gz',
         'https://arxiv.org/e-print/1708.05489v2' => dirname(__FILE__) . '/arxiv/1708.05489v2.tar.gz',
         'https://arxiv.org/e-print/1711.04662v3' => dirname(__FILE__) . '/arxiv/1711.04662v3.tar.gz',
+        'https://arxiv.org/pdf/1806.02820v3' => dirname(__FILE__) . '/arxiv/1806.02820v3.pdf',
+        'https://arxiv.org/e-print/1806.02820v3' => dirname(__FILE__) . '/arxiv/1806.02820v3.tar.gz',
     );
     if(!empty($special_urls[$url]))
         copy($special_urls[$url], $tmpfile);
@@ -622,12 +641,6 @@ function get_transient() {
 
 function set_transient( $transient, $value, $expiration ) {}
 
-
-function sanitize_text_field( $string ) {
-
-    return $string;
-}
-
 function wp_remote_get( $url, $args=array() ) {
         //return http_get( $url, $args );
 
@@ -635,6 +648,7 @@ function wp_remote_get( $url, $args=array() ) {
         'https://arxiv.org/abs/0809.2542v4' => dirname(__FILE__) . '/arxiv/0809.2542v4.html',
         'https://arxiv.org/abs/1609.09584v4' => dirname(__FILE__) . '/arxiv/1609.09584v4.html',
         'https://arxiv.org/abs/0908.2921v2' => dirname(__FILE__) . '/arxiv/0908.2921v2.html',
+        'https://arxiv.org/abs/1806.02820v3' => dirname(__FILE__) . '/arxiv/1806.02820v3.html',
                           );
     if(!empty($local_file_urls[$url]))
         return array('headers'=>'' ,'body'=> file_get_contents($local_file_urls[$url]) );
@@ -661,10 +675,6 @@ function wp_is_post_revision() {
 }
 
 function remove_action() {}
-
-function wp_slash( $input ) {
-    return $input;
-}
 
 function wp_generate_password( $length ) {
     $string = '';
@@ -794,4 +804,61 @@ function checked( $helper, $current=true, $echo=true, $type='checked' ) {
         echo $result;
 
     return $result;
+}
+
+function apply_filters( $hook, $orig_text, $text )
+{
+    return $text;
+}
+
+/**
+ * Stripped down version of the original wp_allowed_protocols()
+ */
+function wp_allowed_protocols() {
+    static $protocols = array();
+
+    if ( empty( $protocols ) ) {
+        $protocols = array( 'http', 'https', 'ftp', 'ftps', 'mailto', 'news', 'irc', 'gopher', 'nntp', 'feed', 'telnet', 'mms', 'rtsp', 'svn', 'tel', 'fax', 'xmpp', 'webcal', 'urn' );
+    }
+
+    /* if ( ! did_action( 'wp_loaded' ) ) { */
+    /*     /\** */
+    /*      * Filters the list of protocols allowed in HTML attributes. */
+    /*      * */
+    /*      * @since 3.0.0 */
+    /*      * */
+    /*      * @param array $protocols Array of allowed protocols e.g. 'http', 'ftp', 'tel', and more. */
+    /*      *\/ */
+    /*     $protocols = array_unique( (array) apply_filters( 'kses_allowed_protocols', $protocols ) ); */
+    /* } */
+
+    return $protocols;
+}
+
+function wp_load_alloptions() {
+    return array();
+}
+
+function the_archive_title( $before = '', $after = '' ) {
+    $title = get_the_archive_title();
+
+    if ( ! empty( $title ) ) {
+        echo $before . $title . $after;
+    }
+}
+
+function get_the_archive_title() {
+    return "foo";
+}
+
+function the_archive_description( $before = '', $after = '' ) {
+    $title = get_the_archive_description();
+
+    if ( ! empty( $title ) ) {
+        echo $before . $title . $after;
+    }
+}
+
+function get_the_archive_description() {
+    return "bar";
 }
