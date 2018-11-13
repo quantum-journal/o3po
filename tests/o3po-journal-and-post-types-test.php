@@ -495,7 +495,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                     '#ERROR: Corresponding author email is malformed#',
                                  )],
             [5, array(
-                    '#INFO: URL of author 1 is empty\.#',
                                  )],
             [9, array(
                     '#ERROR: Affiliation 1 is not associated to any authors.#',
@@ -892,7 +891,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                    ),
              array(
                  '#ERROR: It seems like .* not published .* creative commons license#',
-                 '#INFO: ORCID of author 1 is empty\.#',
                  '#INFO: This paper was publicly published\.#',
                  '#INFO: Email to buffer.com sent correctly\.#',
                    ),
@@ -1022,11 +1020,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
     }
 
-
-
-
-
-
         /**
          * @doesNotPerformAssertions
          * @depends test_create_primary_publication_type
@@ -1074,6 +1067,59 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     public function test_cleanup_at_the_very_end() {
         exec('git checkout ' . dirname(__File__) . '/resources/arxiv/0809.2542v4.pdf');
         O3PO_Environment::save_recursive_remove_dir(dirname(__File__) . "/resources/tmp/", dirname(__File__));
+    }
+
+
+        /**
+         * @depends test_setup_primary_journal
+         * @depends test_setup_environment
+         */
+    public function test_volumes_endpoint_overview( $journal, $environment )
+    {
+
+        $query_vars = array($journal->get_journal_property('volumes_endpoint') => "/");
+        $wp_query = new WP_Query(null , $query_vars);
+
+        $journal->handle_volumes_endpoint_request($wp_query);
+
+        ob_start();
+        $journal->volume_navigation_at_loop_start( $wp_query );
+        $output = ob_get_contents();
+        ob_end_clean();
+        $output = preg_replace('#(main|header)#', 'div', $output); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
+
+        $dom = new DOMDocument;
+        $result = $dom->loadHTML($output);
+            //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
+        $this->assertNotFalse($result);
+
+    }
+
+
+        /**
+         * @depends test_setup_primary_journal
+         * @depends test_setup_environment
+         */
+    public function test_volumes_endpoint_volume_1( $journal, $environment )
+    {
+
+        $query_vars = array($journal->get_journal_property('volumes_endpoint') => "1/");
+        $wp_query = new WP_Query(null , $query_vars);
+
+        $journal->handle_volumes_endpoint_request($wp_query);
+
+        ob_start();
+        $journal->volume_navigation_at_loop_start( $wp_query );
+        $journal->compress_enteies_in_volume_view( $wp_query );
+        $output = ob_get_contents();
+        ob_end_clean();
+        $output = preg_replace('#(main|header)#', 'div', $output); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
+
+        $dom = new DOMDocument;
+        $result = $dom->loadHTML($output);
+            //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
+        $this->assertNotFalse($result);
+
     }
 
 
