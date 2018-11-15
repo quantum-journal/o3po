@@ -207,6 +207,8 @@ class O3PO_Public {
 	 * Replace search.php with a custom search template so that we can
      * customize the search page.
 	 *
+     * To be added to the 'template_include' action.
+     *
 	 * @since    0.1.0
 	 * @access   public
 	 * @param    string    $template    Path to template file.
@@ -251,15 +253,17 @@ class O3PO_Public {
     /**
 	 * Add a search interaface to the main page just before the loop starts.
 	 *
+	 * To be added to the 'loop_start' action.
+	 *
 	 * @since      0.1.0
 	 * @access     public
 	 * @param      string    $query      Query that lead to the current loop.
 	 */
     public function extended_search_and_navigation_at_loop_start( $query ){
 
-        if(is_front_page()) {
-            $settings = O3PO_Settings::instance();
+        $settings = O3PO_Settings::instance();
 
+        if(is_home() and $query->is_main_query() and !is_admin()) {
                 /* To get all post types from the primary and secondary journals we could do the following,
                  * but in the text we are outputting, we are only mentioning the primary and secondary post types
                  * and so it is more honest to take precisely these counts. As of version 0.1.0 these
@@ -286,7 +290,7 @@ var search_field = document.getElementsByClassName("search-field");
         search_field[i].placeholder=\'Doi, title, author, arXiv id, ...\';
     }
 </script>';
-            echo $settings->get_plugin_option('journal_title') . ' has published <a href="' . $settings->get_plugin_option('primary_publication_type_name_plural') . '/">' . $primary_journal_post_count . ' ' . ucfirst($primary_journal_post_count > 1 ? $settings->get_plugin_option('primary_publication_type_name_plural') : $settings->get_plugin_option('primary_publication_type_name')) . '</a> in <a href="volumes/">' . (getdate()["year"] - ($settings->get_plugin_option('first_volume_year')-1)) . ' Volumes</a>, as well as <a href="'. $settings->get_plugin_option('secondary_publication_type_name_plural') . '/">' . $secondary_journal_post_count . ' ' . ucfirst($secondary_journal_post_count > 1 ? $settings->get_plugin_option('secondary_publication_type_name_plural') : $settings->get_plugin_option('secondary_publication_type_name') ) . '</a> in ' . $settings->get_plugin_option('secondary_journal_title') . '.';
+            echo $settings->get_plugin_option('journal_title') . ' has published <a href="/' . $settings->get_plugin_option('primary_publication_type_name_plural') . '/">' . $primary_journal_post_count . ' ' . ucfirst($primary_journal_post_count > 1 ? $settings->get_plugin_option('primary_publication_type_name_plural') : $settings->get_plugin_option('primary_publication_type_name')) . '</a> in <a href="/' . $settings->get_plugin_option('volumes_endpoint') . '">' . (getdate()["year"] - ($settings->get_plugin_option('first_volume_year')-1)) . ' Volumes</a>, as well as <a href="/'. $settings->get_plugin_option('secondary_publication_type_name_plural') . '/">' . $secondary_journal_post_count . ' ' . ucfirst($secondary_journal_post_count > 1 ? $settings->get_plugin_option('secondary_publication_type_name_plural') : $settings->get_plugin_option('secondary_publication_type_name') ) . '</a> in ' . $settings->get_plugin_option('secondary_journal_title') . '.';
             echo '</div>';
             echo '</div>';
         }

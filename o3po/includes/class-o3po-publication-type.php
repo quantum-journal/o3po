@@ -444,7 +444,7 @@ abstract class O3PO_PublicationType {
          * @access   public
          * @param    string      $new      The new post status after this transition.
          * @param    string      $old      The old post status before this transition.
-         * @param    int         $post_id  The id of the post that transitions.
+         * @param    int         $post     The post that is undergoing the transitions.
          */
     public final function on_transition_post_status( $new, $old, $post ) {
 
@@ -634,15 +634,12 @@ abstract class O3PO_PublicationType {
                 $validation_result .= "ERROR: Author " . ($x+1) . " Surname is empty.\n" ;
             if ( empty( $author_name_styles[$x] ) )
                 $validation_result .= "WARNING: Author " . ($x+1) . " name style is empty.\n" ;
-            if ( empty( $author_orcids[$x] ) )
-                $validation_result .= "INFO: ORCID of author " . ($x+1) . " is empty.\n" ;
-            else {
+            if ( !empty( $author_orcids[$x] ) )
+            {
                 $check_orcid_result = O3PO_Utility::check_orcid( $author_orcids[$x]);
                 if( !($check_orcid_result === true) )
                     $validation_result .= "ERROR: ORCID of author " . ($x+1) . " " . $check_orcid_result . ".\n" ;
             }
-            if ( empty( $author_urls[$x] ) )
-                $validation_result .= "INFO: URL of author " . ($x+1) . " is empty.\n" ;
             if ( empty( $author_affiliations[$x] ) )
                 $validation_result .= "WARNING: Affiliations of author " . ($x+1) . " are empty.\n" ;
             else {
