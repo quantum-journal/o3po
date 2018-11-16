@@ -14,7 +14,7 @@
  * to be such a evil thing to do given that the options are anyway
  * global.
  *
- * @link       http://example.com
+ * @link       https://quantum-journal.org/o3po/
  * @since      0.1.0
  *
  * @package    O3PO
