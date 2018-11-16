@@ -1471,7 +1471,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             if ( has_post_thumbnail( ) ) {
                 $content .= '<div class="featured-image-box">';
                 $content .= '<div style="float:left; padding-right: 1rem; padding-bottom: 1rem">';
-                the_post_thumbnail( 'onepress-blog-small' );
+                $content .= get_the_post_thumbnail($post_id, 'onepress-blog-small');
                 $content .= '</div>';
                 $feature_image_caption = get_post_meta( $post_id, $post_type . '_feature_image_caption', true );
                 if (!empty($feature_image_caption))
