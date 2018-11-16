@@ -202,27 +202,6 @@ class O3PO_Public {
         return $html;
     }
 
-
-        /**
-         * Replace search.php with a custom search template so that we can
-         * customize the search page.
-         *
-         * To be added to the 'template_include' action.
-         *
-         * @since    0.1.0
-         * @access   public
-         * @param    string    $template    Path to template file.
-         */
-    public function install_custom_search_page_template( $template ){
-
-        global $wp_query;
-
-        if ($wp_query->is_search)
-            return dirname( __FILE__ ) . '/templates/search.php';
-        else
-            return $template;
-    }
-
         /**
          * Add a search interaface to the main page just before the loop starts.
          *
