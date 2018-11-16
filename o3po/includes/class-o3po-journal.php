@@ -287,26 +287,114 @@ class O3PO_Journal {
          * to inject content into the standard page template of the current
          * theme.
          *
+         * To be added to the 'the_posts' action.
+         *
          * @since  0.2.2+
          * @access public
          * @param  array   $posts   Array of posts that would be returned if we do not intervene.
          * @return array   Array of posts that are returned if we do intervene.
          */
-    public function add_fake_empty_post_to_volume_overview_page( $posts ) {
+    public function add_fake_post_to_volume_overview_page( $posts ) {
 
         global $wp_query;
 
         if ( count($posts) > 0 or !isset( $wp_query->query_vars[ $this->get_journal_property('volumes_endpoint') . '_add_fake_post' ] ) )
             return $posts;
 
-            //create a fake post
+        return $this->create_fake_post();
+    }
+
+        /**
+         * Add a notice to the search form if there are no results.
+         *
+         * To be added to the 'get_search_form' filter.
+         *
+         * @since  0.2.2+
+         * @access public
+         * @param  string  $form   The normal search form,
+         * @return string  Modified search form.
+         */
+    public function add_notice_to_search_form( $form ) {
+
+        if(!is_search() or have_posts())
+            return $form;
+
+        return $form . $this->get_search_notice();
+    }
+
+        /**
+         * Add a notice to the search results.
+         *
+         * To be added to the 'loop_start' filter.
+         *
+         * @since  0.2.2+
+         * @access public
+         * @param  WP_Query  $wp_query   The current Wordpress query.
+         */
+    public function add_notice_to_search_results_at_loop_start( $wp_query ) {
+
+        if(!$wp_query->is_main_query() or !$wp_query->is_search())
+            return $wp_query;
+
+        echo($this->get_search_notice());
+
+        return $wp_query;
+    }
+
+
+
+
+    public function get_search_notice() {
+
+        global $_GET;
+
+        $notice = '';
+        if ( !have_posts() || (!empty($_GET["reason"]) and $_GET["reason"]==="title-click") ) {
+            $notice .= '<div class="hentry">';
+            $notice .= '<div class="important-box">';
+
+            $settings = O3PO_Settings::instance();
+            $journal_title = $settings->get_plugin_option('journal_title');
+            if(!empty($_GET["reason"]) and $_GET["reason"]==="title-click") {
+                if(!have_posts()) {
+                    $notice .= "<h3>The manuscript whose title you clicked is not published in " . $journal_title . "</h3>";
+                    $notice .= "<p>This can mean two things:</p>";
+                } else {
+                    $notice .= "<h3>You came here to verify whether a manuscript is published in " . $journal_title . "</h3>";
+                    $notice .= "<p>If the manuscript you are looking for is not in the list, this can mean two things:</p>";
+                }
+            } else {
+                $notice .= "<h3>Important notice</h3>";
+                $notice .= "<p>If you came here by clicking the title of a manuscript using the " . $journal_title . " LaTeX template to check whether it is published in " . $journal_title . ", this can mean two things:</p>";
+            }
+            $notice .= '<ol>';
+            $notice .= '<li>If the manuscript states an acceptance date in the recent past, it will probably be published soon.</li>';
+            $notice .= '<li>If the manuscript states no acceptance date or its latest version has been on the arXiv for some time, then this manuscript has not been published and almost certainly has not been accepted; it however might currently be under review.</li>';
+            $notice .= '</ol>';
+            $notice .= "<p>Everyone is free to use the open source " . $journal_title . " LaTeX document class and its usage does not imply endorsement of the manuscript by " . $journal_title . " in any way.</p>";
+            $notice .= '</div></div>';
+        }
+
+        return $notice;
+    }
+
+        /**
+         * Create and return a fake empty post.
+         *
+         * @since  0.2.2+
+         * @access public
+         * @param  string $post_content  The content of the post to create.
+         * @return stdClass A WP_Post compatible object representing a fake post that is empty apart from the given cont.
+         */
+    public function create_fake_post( $post_content='' ) {
+
         $page_slug = $this->get_journal_property('volumes_endpoint');
         $post = new stdClass;
         $post->post_author = -1;
         $post->post_name = $page_slug;
         $post->guid = get_bloginfo( get_site_url() . $page_slug);
         $post->post_title = '';
-        $post->post_content = '';
+        $post->post_content = $post_content;
         $post->ID = -1;
         $post->post_status = 'static';
         $post->comment_status = 'closed';
@@ -326,6 +414,8 @@ class O3PO_Journal {
          *
          * Inject some java script to change how the entries of
          * individual publications are displayed in the list of a volume.
+         *
+         * To be added to the 'loop_end' filter.
          *
          * @since  0.2.2+
          * @access public

@@ -305,9 +305,6 @@ class O3PO {
 		$this->loader->add_action('wp_head', $plugin_public, 'add_open_graph_meta_tags_for_social_media');
         $this->loader->add_action('wp_head', $plugin_public, 'enable_mathjax');
         $this->loader->add_action('get_custom_logo', $plugin_public, 'fix_custom_logo_html');
-        if($settings->get_plugin_option('custom_search_page')==='checked')
-            $this->loader->add_action('template_include', $plugin_public, 'install_custom_search_page_template');
-        #$this->loader->add_action('single_template', $plugin_public, 'primary_publication_type_template' );
         $this->loader->add_action('loop_start', $plugin_public, 'extended_search_and_navigation_at_loop_start');
         $this->loader->add_action('loop_start', $plugin_public, 'secondary_journal_help_text');
 
@@ -318,7 +315,13 @@ class O3PO {
         $this->loader->add_filter('loop_start', $this->journal, 'volume_navigation_at_loop_start');
         $this->loader->add_filter('loop_end', $this->journal, 'compress_enteies_in_volume_view');
         $this->loader->add_action('template_include', $this->journal, 'volume_endpoint_template');
-        $this->loader->add_action('the_posts', $this->journal, 'add_fake_empty_post_to_volume_overview_page');
+        $this->loader->add_action('the_posts', $this->journal, 'add_fake_post_to_volume_overview_page');
+        if($settings->get_plugin_option('custom_search_page')==='checked')
+        {
+            $this->loader->add_filter('get_search_form', $this->journal, 'add_notice_to_search_form');
+            $this->loader->add_filter('loop_start', $this->journal, 'add_notice_to_search_results_at_loop_start');
+        }
+
 
         #$this->loader->add_action('get_template_part_template-parts/content', $this->journal, 'foo', 99, 2);
 
