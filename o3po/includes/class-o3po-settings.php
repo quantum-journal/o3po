@@ -105,6 +105,7 @@ class O3PO_Settings extends O3PO_Singleton {
         'doaj_api_url' => "https://doaj.org/api/v1/articles",
         'doaj_language_code' => "EN",
         'custom_search_page' => "checked",
+        'page_template_for_publication_posts' => "unchecked",
         'maintenance_mode' => 'unchecked',
 
         'self_notification_subject_template' =>
@@ -249,6 +250,7 @@ class O3PO_Settings extends O3PO_Singleton {
         add_settings_section('plugin_settings', 'Plugin settings', array( $this, 'render_plugin_settings' ), 'plugin_settings');
         add_settings_field('production_site_url', 'Production site url', array( $this, 'render_production_site_url_setting' ), 'plugin_settings', 'plugin_settings');
         add_settings_field('custom_search_page', 'Customize search page', array( $this, 'render_custom_search_page_setting' ), 'plugin_settings', 'plugin_settings');
+        add_settings_field('page_template_for_publication_posts', 'Template for publication posts', array( $this, 'render_page_template_for_publication_posts_setting' ), 'plugin_settings', 'plugin_settings');
         add_settings_field('maintenance_mode', 'Maintenance mode', array( $this, 'render_maintenance_mode_setting' ), 'plugin_settings', 'plugin_settings');
 
         add_settings_section('journal_settings', 'Journal settings', array( $this, 'render_journal_settings' ), 'journal_settings');
@@ -426,6 +428,18 @@ class O3PO_Settings extends O3PO_Singleton {
     public function render_custom_search_page_setting() {
 
         $this->render_checkbox_setting('custom_search_page', 'Uncheck to disable the display of a notice on the search page informing users what it can mean if they are unable to find a paper on this website, but whose version on the arXiv claims that it was published in this journal. You can preview the two versions of this message <a href="/?s=thissearchstringyieldsnoresults">here</a> and <a href="/?s=thissearchstringyieldsnoresults&amp;reason=title-click">here</a>. Notice how a search that includes the reason=title-click query variable can be used to implement a way for readers to check the validity of claims of publication in, e.g., the LaTeX template of your journal.');
+
+    }
+
+        /**
+         * Render the setting for whether to use the page template for publications.
+         *
+         * @since    0.2.2+
+         * @access   public
+         */
+    public function render_page_template_for_publication_posts_setting() {
+
+        $this->render_checkbox_setting('page_template_for_publication_posts', 'If checked publication posts are shown with the page template instead of the post template of your theme. Some themes include information such as "Posted on ... by ..." on the post template which may be inappropriate for publication posts.');
 
     }
 
@@ -1170,6 +1184,7 @@ class O3PO_Settings extends O3PO_Singleton {
                 'doaj_api_key' => 'trim',
                 'doaj_language_code' => 'trim',
                 'custom_search_page' => 'trim',
+                'page_template_for_publication_posts' => 'trim',
                 'maintenance_mode' => 'trim',
                 'volumes_endpoint' => 'trim',
                 'doi_prefix' => array($this, 'sanitize_doi_prefix'),

@@ -2944,4 +2944,28 @@ abstract class O3PO_PublicationType {
         }
     }
 
+        /**
+         * Force the usage of the page template for publication posts.
+         *
+         * To be added to the 'template_include' action.
+         *
+         * @since  0.2.2+
+         * @access public
+         * @param  string   $template   The template that would be used.
+         * @return string   Template that should be used.
+         */
+    public function use_page_template( $template ) {
+
+        global $post;
+
+        $post_id = $post->ID;
+        $post_type = get_post_type($post_id);
+
+        if ( !is_single() or $this->get_publication_type_name() !== $post_type )
+            return $template;
+
+        return locate_template( array( 'page.php' ) );
+    }
+
+
 }

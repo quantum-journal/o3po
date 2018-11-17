@@ -347,6 +347,8 @@ class O3PO {
         $this->loader->add_filter('the_content_feed', $this->primary_publication_type, 'get_feed_content');
         $this->loader->add_filter('the_excerpt_rss', $this->primary_publication_type, 'get_feed_content');
         $this->loader->add_filter('transition_post_status', $this->primary_publication_type, 'on_transition_post_status', 10, 3);
+        if($settings->get_plugin_option('page_template_for_publication_posts')==='checked')
+            $this->loader->add_filter('template_include', $this->primary_publication_type, 'use_page_template');
 
             //add hooks for the secondary publication type...
         $this->loader->add_filter('the_author', $this->secondary_publication_type, 'get_the_author', PHP_INT_MAX, 1);
@@ -362,6 +364,8 @@ class O3PO {
         $this->loader->add_filter('request', $this->secondary_publication_type, 'add_custom_post_types_to_rss_feed');
         $this->loader->add_filter('the_author', $this->secondary_publication_type, 'the_author_feed', PHP_INT_MAX, 1);
         $this->loader->add_filter('transition_post_status', $this->secondary_publication_type, 'on_transition_post_status', 10, 3);
+        if($settings->get_plugin_option('page_template_for_publication_posts')==='checked')
+            $this->loader->add_filter('template_include', $this->secondary_publication_type, 'use_page_template');
 
 	}
 

@@ -262,6 +262,8 @@ class O3PO_Journal {
          * Checks for the presence of a query var ending in '_add_fake_post'
          * to determine when to change the template.
          *
+         * To be added to the 'template_include' action.
+         *
          * @since  0.2.2+
          * @access public
          * @param  string   $template   The template that would be used.
