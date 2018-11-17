@@ -98,7 +98,29 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
     }
 
         /**
-         * Parser for bbl code
+         * Parse bbl code of potentially multiple bibliographies.
+         *
+         * Parses bbl code produced by either bibtex or biblatex as well as
+         * such written by authors by hand. $bbl may be a concatenation of
+         * multiple bibliographies.
+         *
+         * @since    0.1.0
+         * @access   public
+         * @param    string    $bbl    Bibliography or concatenation of bibliographies in .bbl format as it is produced by BibTeX, Biber, and BibLaTeX.
+         */
+    static public function parse_bbl( $bbl ) {
+
+        $citations = array();
+        $bbls = preg_split('/(% \$ biblatex auxiliary file \$|\\\\begin{thebibliography}|\\\\begin{references})/', $bbl, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        foreach($bbls as $individual_bbl)
+            $citations = array_merge($citations, static::parse_single_bbl($individual_bbl));
+
+        return $citations;
+    }
+
+
+        /**
+         * Parse bbl code of an individual bibliography.
          *
          * Parses bbl code produced by either bibtex or biblatex as well as
          * such written by authors by hand.
@@ -107,7 +129,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
          * @access   public
          * @param    string    $bbl    Bibliography in .bbl format as it is produced by BibTeX, Biber, and BibLaTeX.
          */
-    static public function parse_bbl( $bbl ) {
+    static public function parse_single_bbl( $bbl ) {
 
         preg_match('/% \$ (biblatex bbl format|biblatex) version ([0-9.]*) \$/' , $bbl, $version);
         if( !empty($version[1]))
@@ -122,7 +144,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 '\\bibinitdelim ' => ' ',
                                       );
             $preg_replacements = array(
-                '\\\\\s' => ' ',
+                '\\\\\s+' => ' ',
                 '(?<!\\\\)%.*' => '', //remove all comments
                                        );
 
@@ -163,6 +185,13 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 if(!empty($doi[1]))
                     $citations[$n]['doi'] = $doi[1];
 
+                if(empty($citations[$n]['doi']))
+                {
+                    preg_match('#\\\\verb{url}\s*?\\\\verb ([^\s]*)\s*\\\\endverb#', $entry, $url);
+                    if(!empty($url[1]))
+                        $citations[$n]['url'] = $url[1];
+                }
+
                 preg_match('#\\\\verb{eprint}\s*?\\\\verb ([^\s]*)\s*\\\\endverb#', $entry, $eprint);
                 if(!empty($eprint[1]))
                     $citations[$n]['eprint'] = $eprint[1];
@@ -172,12 +201,16 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                     'title',
                     'volume',
     				'journaltitle',
-    				'eprinttype',
-    				'eprintclass',
+                    'booktitle',
+                    'issuetitle',
     				'month',
                     'year',
                     'chapter',
                     'note',
+                    'institution',
+                    'organization',
+                    'howpublished',
+                    'editor',
                                 );
                 foreach( $fields as $field) {
                     preg_match('#\\\\field{' . $field .'}{*([^}]*)}*#', $entry, $arg);
@@ -199,12 +232,21 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                         if($num_authors > 2) $text .= ", ";
                         if($i === $num_authors-1 ) $text .= "and ";
                     }
+                    $text .= ' ';
                 }
                 switch ($citations[$n]['type']) {
                     case 'article':
                     case 'unpublished':
-				        if(!empty($citations[$n]['title'])) $text .= " ``" . $citations[$n]['title'] . "''";
+                    case 'periodical':
+                    case 'suppperiodical':
+                    case 'proceedings':
+                    case 'mvproceedings':
+                    case 'inproceedings':
+                    case 'conference':
+				        if(!empty($citations[$n]['title'])) $text .= "``" . $citations[$n]['title'] . "''";
 				        if(!empty($citations[$n]['journaltitle'])) $text .= " " . $citations[$n]['journaltitle'];
+                        if(!empty($citations[$n]['booktitle'])) $text .= " " . $citations[$n]['booktitle'];
+                        if(!empty($citations[$n]['issuetitle'])) $text .= " " . $citations[$n]['issuetitle'];
 				        if(!empty($citations[$n]['volume'])) $text .= " " . $citations[$n]['volume'];
                         if(!empty($citations[$n]['volume']) && !empty($citations[$n]['pages'])) $text .= ",";
 				        if(!empty($citations[$n]['pages'])) $text .= " " . $citations[$n]['pages'];
@@ -212,14 +254,54 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                         if(!empty($citations[$n]['note'])) $text .= " " . $citations[$n]['note'];
                         break;
                     case 'book':
+                    case 'mvbook':
                     case 'inbook':
-				        if(!empty($citations[$n]['title'])) $text .= " ``" . $citations[$n]['title'] . "''";
+                    case 'bookinbook':
+                    case 'suppbook':
+                    case 'booklet':
+                    case 'collection':
+                    case 'mvcollection':
+                    case 'incollection':
+                    case 'suppcollection':
+                    case 'reference':
+                    case 'mvreference':
+                    case 'inreference':
+                        if(!empty($text) && !empty($citations[$n]['editor'])) $text .= ' ';
+                        if(!empty($citations[$n]['editor'])) $text .= $citations[$n]['editor'] . " (eds.) ";
+				        if(!empty($citations[$n]['title'])) $text .= "``" . $citations[$n]['title'] . "''";
 				        if(!empty($citations[$n]['publisher'])) $text .= " " . $citations[$n]['publisher'];
-                            //if(!empty($citations[$n]['chapter'])) $text .= " " . $citations[$n]['chapter'];
+                        if(!empty($citations[$n]['howpublished'])) $text .= " " . $citations[$n]['howpublished'];
+                        if(!empty($citations[$n]['chapter'])) $text .= " chapter " . $citations[$n]['chapter'];
+				        if(!empty($citations[$n]['year'])) $text .= " (" . $citations[$n]['year'] . ")";
+                        break;
+                    case 'thesis':
+                    case 'mastersthesis':
+                    case 'phdthesis':
+                    case 'manual':
+                    case 'patent':
+                    case 'report':
+                    case 'techreport':
+                        if(!empty($citations[$n]['title'])) $text .= "``" . $citations[$n]['title'] . "''";
+				        if(!empty($citations[$n]['type'])) $text .= " " . $citations[$n]['type'];
+                        if(!empty($citations[$n]['number'])) $text .= " " . $citations[$n]['number'];
+                        if(!empty($citations[$n]['institution'])) $text .= " " . $citations[$n]['institution'];
+                        if(!empty($citations[$n]['organization'])) $text .= " " . $citations[$n]['organization'];
+                        if(!empty($citations[$n]['location'])) $text .= " " . $citations[$n]['location'];
+				        if(!empty($citations[$n]['year'])) $text .= " (" . $citations[$n]['year'] . ")";
+                        break;
+                    case 'misc':
+                    case 'online':
+                    case 'electronic':
+                    case 'www':
+                        if(!empty($text) && !empty($citations[$n]['editor'])) $text .= ' ';
+                        if(!empty($citations[$n]['editor'])) $text .= $citations[$n]['editor'] . " (eds.) ";
+				        if(!empty($citations[$n]['title'])) $text .= "``" . $citations[$n]['title'] . "''";
+                        if(!empty($citations[$n]['howpublished'])) $text .= " " . $citations[$n]['howpublished'];
 				        if(!empty($citations[$n]['year'])) $text .= " (" . $citations[$n]['year'] . ")";
                         break;
                     default:
-				        $text .= "Type " . $citations[$n]['type'] . " not implemented!\\";
+                        if(!empty($citations[$n]['title'])) $text .= "``" . $citations[$n]['title'] . "''";
+                        if(!empty($citations[$n]['year'])) $text .= " (" . $citations[$n]['year'] . ")";
                         break;
                 }
                 foreach ($str_replacements as $target => $substitute)
@@ -718,8 +800,10 @@ class O3PO_Latex_Dictionary_Provider
                 '\\\\spacefactor[0-9]*' => '',
                 '\\\\relax(?![a-zA-Z])' => '',
                 '\\\\space(?![a-zA-Z])' => ' ',
+                '\\\\bibnamedelim[abcdi](?![a-zA-Z])' => ' ',
                 '\\\\textemdash(?![a-zA-Z])' => '—',
                 '\\\\textendash(?![a-zA-Z])' => '–',
+                '\\\\&' => '&',
                 '\\\\ss(\s*\{\s*\}|\s+|(?![a-zA-Z]))' => 'ß',
                 '\\\\L(\s*\{\s*\}|\s+|(?![a-zA-Z]))' => 'Ł',
                 '\\\\l(\s*\{\s*\}|\s+|(?![a-zA-Z]))' => 'ł',
@@ -727,7 +811,6 @@ class O3PO_Latex_Dictionary_Provider
                 '\\\\O(\s*\{\s*\}|\s+|(?![a-zA-Z]))' => 'Ø',
                 '\\\\aa(\s*\{\s*\}|\s+|(?![a-zA-Z]))' => 'å',
                 '\\\\AA(\s*\{\s*\}|\s+|(?![a-zA-Z]))' => 'Å',
-
                 '\\\\"'.self::match_single_non_character_makro_regexp_fragment('A') => 'Ä',
                 '\\\\"'.self::match_single_non_character_makro_regexp_fragment('E') => 'Ë',
                 '\\\\"'.self::match_single_non_character_makro_regexp_fragment('I') => 'Ï',
@@ -1325,6 +1408,95 @@ class O3PO_Latex_Dictionary_Provider
         }
 
         return $text;
+    }
+
+        /**
+         * Normalized white space and line break characters.
+         *
+         * @since    0.2.2+
+         * @access   public
+         * @param    string   $text          LaTeX text to normalize.
+         * @param    boolean  $single_line   Whether to output a single-line text.
+         * @param    boolean  $remove_extra_newlines If true, single newlines are replaced by space and any number of more than two successive newlines are replaced by exactly two newlines.
+         */
+    static public function normalize_whitespace_and_linebreak_characters( $text, $single_line=true, $remove_extra_newlines=false) {
+        if($remove_extra_newlines)
+            $text = preg_replace('#(?<!\n)\n(?!\n)#', ' ', $text);
+
+        foreach(array(
+                    '\\\\\\\\(\s*|\s*\[.*?\])' => "\n",
+                    '\\\\linebreak(?![a-zA-Z])\h*' => "\n",
+                    '\\\\(newline|hfill|break)(?![a-zA-Z])\h*'  => "\n",
+                    '\\\\(hspace|vspace)\s*{[^}]*?}\h*' => " ",
+                    '\\\\(smallskip|medskip|bigskip)(?![a-zA-Z])\h*' => " ",
+                      ) as $target => $replacement )
+            $text = preg_replace('#' . $target . '#', $replacement, $text);
+
+        if($single_line)
+            $text = str_replace("\n", ' ', $text);
+
+        $text = str_replace("\t", ' ', $text);
+        $text = join("\n", array_map("trim", explode("\n", $text)));
+        $text = trim(preg_replace('#\h\h+#', ' ', $text));
+
+        if($remove_extra_newlines)
+            $text = preg_replace('#\n\n\n+#', "\n\n", $text);
+
+
+        return $text;
+    }
+
+
+        /**
+         * Extract all bibliographies from latex code.
+         *
+         * @since   0.2.2+
+         * @access  public
+         * @param   string    $latex   Latex code to search for bibliographies.
+         *
+         */
+    static public function extract_bibliographies( $latex ) {
+
+        $bbl = '';
+
+        preg_match_all('/(\\\\begin{thebibliography}.*?\\\\end{thebibliography}|\\\\begin{references}.*?\\\\end{references})/s', $latex, $matches, PREG_PATTERN_ORDER);
+        if(!empty($matches[0])) {
+            $i = 0;
+            while(isset($matches[0][$i]))
+            {
+                $bbl .= $matches[0][$i] . "\n";
+                $i++;
+            }
+            return $bbl;
+        }
+        else
+            return '';
+    }
+
+        /**
+         * Extract all abstracts from latex code.
+         *
+         * @since   0.2.2+
+         * @access  public
+         * @param   string    $latex   Latex code to search for abstracts.
+         *
+         */
+    static public function extract_abstracts( $latex ) {
+
+        $abstract = '';
+
+        preg_match_all('/\\\\begin{abstract}(.*?)\\\\end{abstract}/s', $latex, $matches, PREG_PATTERN_ORDER);
+        if(!empty($matches[1])) {
+            $i = 0;
+            while(isset($matches[1][$i]))
+            {
+                $abstract .= $matches[1][$i] . "\n";
+                $i++;
+            }
+            return $abstract;
+        }
+        else
+            return '';
     }
 
 }
