@@ -16,8 +16,6 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-setti
 /**
  * The public-facing functionality of the plugin.
  *
- * Defines the plugin name, version, and hooks.
- *
  * @package    O3PO
  * @subpackage O3PO/public
  * @author     Christian Gogolin <o3po@quantum-journal.org>

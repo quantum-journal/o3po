@@ -123,31 +123,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         ];
     }
 
-        /**
-         * Remeber: This test depends on the post types being active, not
-         * directly, because it doesn't need them as an imput, but
-         * indirecty, as the template only works if they are already active.
-         *
-         * @dataProvider single_paper_template_provider
-         * @depends test_create_primary_publication_type
-         */
-    public function test_single_paper_template( $post_id, $primary_publication_type ) {
-
-        $query = new WP_Query(array('ID' => $post_id));
-        set_global_query($query);
-
-        ob_start();
-        include( dirname(__File__) . '/../o3po/public/templates/single-paper.php');
-        $output = ob_get_contents();
-        ob_end_clean();
-        $output = preg_replace('#(main|header)#', 'div', $output); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
-
-        $dom = new DOMDocument;
-        $result = $dom->loadHTML($output);
-            //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
-        $this->assertNotFalse($result);
-    }
-
     public function primary_the_admin_components_provider() {
 
         return [

@@ -341,9 +341,12 @@ class O3PO_Journal {
         return $wp_query;
     }
 
-
-
-
+        /**
+         * Generate the notice for the search page.
+         *
+         * @since  0.2.2+
+         * @access public
+         */
     public function get_search_notice() {
 
         global $_GET;
