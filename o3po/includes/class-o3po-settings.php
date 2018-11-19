@@ -355,7 +355,9 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_plugin_settings() {
-        echo '<p>Settings of the plugin.</p>';
+
+        echo '<p>Configure the general behavior of ' . $this->plugin_name . '.</p>';
+
     }
 
         /**
@@ -365,7 +367,9 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_email_settings() {
-        echo '<p> Settings of email templates.</p>';
+
+        echo '<p>Configure the templates used for sending emails.</p>';
+
     }
 
         /**
@@ -375,7 +379,9 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_journal_settings() {
-        echo '<p>Settings defining the journal.</p>';
+
+        echo '<p>Configure your journal(s).</p>';
+
     }
 
         /**
@@ -385,7 +391,9 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_crossref_settings() {
-        echo '<p>Settings for interaction with Crossref.</p>';
+
+        echo '<p>Configure how ' . $this->plugin_name . ' interacts with Crossref.</p>';
+
     }
 
         /**
@@ -395,7 +403,9 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_clockss_settings() {
-        echo '<p>Settings for interaction with CLOCKSS.</p>';
+
+        echo '<p>Configure how ' . $this->plugin_name . ' interacts with CLOCKSS.</p>';
+
     }
 
         /**
@@ -405,7 +415,9 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_doaj_settings() {
-        echo '<p>Settings for interaction with the DOAJ.</p>';
+
+        echo '<p>Configure how ' . $this->plugin_name . ' interacts with DOAJ.</p>';
+
     }
 
         /**
@@ -415,7 +427,9 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_arxiv_settings() {
-        echo '<p>Settings for arXiv.org.</p>';
+
+        echo '<p>Configure how ' . $this->plugin_name . ' interacts with the arXiv.</p>';
+
     }
 
         /**
@@ -425,7 +439,9 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_other_service_settings() {
-        echo '<p>Settings for other services.</p>';
+
+        echo '<p>Configure how ' . $this->plugin_name . ' interacts with other external services.</p>';
+
     }
 
         /**
