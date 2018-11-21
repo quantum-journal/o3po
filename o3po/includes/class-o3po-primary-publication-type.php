@@ -317,14 +317,9 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         if(php_uname('s')!=='Linux')
             return "WARNING: Adding meta-data to pdfs is currently only supported on Linux";
         $exiftool_command_name = 'exiftool';
-        $exiftool_in_path = exec('command -v ' . $exiftool_command_name . ' 2>&1 > /dev/null; echo $?');
-
-        $exiftool_not_found_message = "ERROR: Adding meta-data to pdfs requires the external programm exiftool but the exiftool binary was not found.";
-        if($exiftool_in_path !== '0')
-            return $exiftool_not_found_message;
-        $exiftool_binary_path = exec('which ' . $exiftool_command_name);
-        if($exiftool_binary_path===null)
-            return $exiftool_not_found_message;
+        $exiftool_binary_path = exec('command -v ' . $exiftool_command_name);
+        if(empty($exiftool_binary_path))
+            return "WARNING: Adding meta-data to pdfs requires the external programm exiftool but the exiftool binary was not found via ´" . 'command -v ' . $exiftool_command_name . "´.";;
 
         $post_type = get_post_type($post_id);
         $arxiv_pdf_attach_ids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_arxiv_pdf_attach_ids');
@@ -1435,7 +1430,8 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             $content = '';
 
             $content .= '<header class="entry-header">';
-#            $content .= '<h1 class="entry-title title citation_title">' . esc_html ( get_the_title( $post_id ) ) . '</h1>';
+            if($settings->get_plugin_option('page_template_for_publication_posts')==='checked')
+                $content .= '<h1 class="entry-title title citation_title"><a href="#">' . esc_html ( get_the_title( $post_id ) ) . '</a></h1>';
             $content .= '<p class="authors citation_author">';
             $content .= $this->get_formated_authors_html( $post_id );
             $content .= '</p>';
@@ -1458,12 +1454,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             $content .= '<form action="' . esc_attr($this->get_pdf_pretty_permalink($post_id)) . '" method="get">';
             $content .= '<input id="fulltext" type="submit" value="full text pdf">';
             $content .= '</form>';
-
-
             $content .= '</header>';
-
-
-
             $content .= '<div class="entry-content">';
             $content .= '<p class="abstract">';
             $content .= nl2br(esc_html( get_post_meta( $post_id, $post_type . '_abstract', true )) );
@@ -1471,7 +1462,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             if ( has_post_thumbnail( ) ) {
                 $content .= '<div class="featured-image-box">';
                 $content .= '<div style="float:left; padding-right: 1rem; padding-bottom: 1rem">';
-                $content .= get_the_post_thumbnail($post_id, 'onepress-blog-small');
+                $content .= get_the_post_thumbnail($post_id);
                 $content .= '</div>';
                 $feature_image_caption = get_post_meta( $post_id, $post_type . '_feature_image_caption', true );
                 if (!empty($feature_image_caption))

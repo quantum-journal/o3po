@@ -726,6 +726,8 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 
         global $post;
 
+        $settings = O3PO_Settings::instance();
+
         $post_id = $post->ID;
         $post_type = get_post_type($post_id);
 
@@ -746,6 +748,9 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
             $journal = get_post_meta( $post_id, $post_type . '_journal', true );
 
             $content = '';
+            $content .= '<header class="entry-header">';
+            if($settings->get_plugin_option('page_template_for_publication_posts')==='checked')
+                $content .= '<h1 class="entry-title title citation_title"><a href="#">' . esc_html ( get_the_title( $post_id ) ) . '</a></h1>';
 
             if ( has_post_thumbnail( ) ) {
                 $content .= '<img src="' . get_the_post_thumbnail_url($post_id) . '" alt="" width="300" height="150" class="alignright size-medium wp-image-1433">';
@@ -812,6 +817,8 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
             $content .= '<input style="display:none;" id="print-btn" type="submit" value="print page">';
             $content .= '</form>';
             $content .= '<script type="text/javascript">document.getElementById("print-btn").style.display = "inline-block";</script>';//show button only if browser supports java script
+            $content .= '</header>';
+
             $bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
             $content .= O3PO_Latex::expand_cite_to_html($old_content, $bbl);
 
