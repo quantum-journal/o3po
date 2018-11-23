@@ -3,7 +3,7 @@
 /**
  * A collection of various functions to transform, parse, and convert latex code to and from utf8 and other encodings
  *
- * @link       http://example.com
+ * @link       https://quantum-journal.org/o3po/
  * @since      0.1.0
  *
  * @package    O3PO

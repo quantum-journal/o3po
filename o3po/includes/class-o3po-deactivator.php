@@ -3,7 +3,7 @@
 /**
  * Fired during plugin deactivation
  *
- * @link       http://example.com
+ * @link       https://quantum-journal.org/o3po/
  * @since      0.1.0
  *
  * @package    O3PO
@@ -30,7 +30,7 @@ class O3PO_Deactivator {
 	 * @since    0.1.0
 	 */
 	public static function deactivate() {
-        
+
             //Flush the rewrite rules to completely disable custom post types and endpoints
         flush_rewrite_rules(true);
 

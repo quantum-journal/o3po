@@ -9,7 +9,7 @@
  * Each publication type is connected to a WordPress custom post type and
  * individual publications are represented by posts of that type.
  *
- * @link       http://example.com
+ * @link       https://quantum-journal.org/o3po/
  * @since      0.1.0
  *
  * @package    O3PO
@@ -634,15 +634,12 @@ abstract class O3PO_PublicationType {
                 $validation_result .= "ERROR: Author " . ($x+1) . " Surname is empty.\n" ;
             if ( empty( $author_name_styles[$x] ) )
                 $validation_result .= "WARNING: Author " . ($x+1) . " name style is empty.\n" ;
-            if ( empty( $author_orcids[$x] ) )
-                $validation_result .= "INFO: ORCID of author " . ($x+1) . " is empty.\n" ;
-            else {
+            if ( !empty( $author_orcids[$x] ) )
+            {
                 $check_orcid_result = O3PO_Utility::check_orcid( $author_orcids[$x]);
                 if( !($check_orcid_result === true) )
                     $validation_result .= "ERROR: ORCID of author " . ($x+1) . " " . $check_orcid_result . ".\n" ;
             }
-            if ( empty( $author_urls[$x] ) )
-                $validation_result .= "INFO: URL of author " . ($x+1) . " is empty.\n" ;
             if ( empty( $author_affiliations[$x] ) )
                 $validation_result .= "WARNING: Affiliations of author " . ($x+1) . " are empty.\n" ;
             else {
