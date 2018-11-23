@@ -317,14 +317,9 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         if(php_uname('s')!=='Linux')
             return "WARNING: Adding meta-data to pdfs is currently only supported on Linux";
         $exiftool_command_name = 'exiftool';
-        $exiftool_in_path = exec('command -v ' . $exiftool_command_name . ' 2>&1 > /dev/null; echo $?');
-
-        $exiftool_not_found_message = "ERROR: Adding meta-data to pdfs requires the external programm exiftool but the exiftool binary was not found.";
-        if($exiftool_in_path !== '0')
-            return $exiftool_not_found_message;
-        $exiftool_binary_path = exec('which ' . $exiftool_command_name);
-        if($exiftool_binary_path===null)
-            return $exiftool_not_found_message;
+        $exiftool_binary_path = exec('command -v ' . $exiftool_command_name);
+        if(empty($exiftool_binary_path))
+            return "WARNING: Adding meta-data to pdfs requires the external programm exiftool but the exiftool binary was not found via ´" . 'command -v ' . $exiftool_command_name . "´.";;
 
         $post_type = get_post_type($post_id);
         $arxiv_pdf_attach_ids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_arxiv_pdf_attach_ids');
@@ -333,10 +328,10 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $path = get_attached_file(end($arxiv_pdf_attach_ids));
         if(empty($path))
             return "ERROR: Cannot add licensing information, no file found for pdf attachment of post " . $post_id;
-        $paper_doi = get_post_meta( $post_id, $post_type . '_doi_prefix', true ) . '/' .  get_post_meta( $post_id, $post_type . '_doi_suffix', true );
-        if(empty($paper_doi))
+        $doi = get_post_meta( $post_id, $post_type . '_doi_prefix', true ) . '/' .  get_post_meta( $post_id, $post_type . '_doi_suffix', true );
+        if(empty($doi))
             return "ERROR: Cannot add licensing information, DOI not set" ;
-        $url = $this->get_journal_property('doi_url_prefix') . $paper_doi;
+        $url = $this->get_journal_property('doi_url_prefix') . $doi;
         $web_statement_url = get_site_url() . '/' . $this->get_publication_type_name_plural() . '/' . get_post_meta( $post_id, $post_type . '_doi_suffix', true ) . '/web-statement/';
 
         $command  = $exiftool_binary_path;
@@ -435,7 +430,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         else
             $validation_result .= 'INFO: Email notification of publication sent to publisher.' . "\n";
 
-            /* We do not send trackbacks for Papers as it is against arXiv's policies.
+            /* We do not send trackbacks for papers as it is against arXiv's policies.
              * Instead we have a doi feed through wich arXiv can automatically
              * pull and set dois.*/
         /*     // Send a trackback to the arXiv */
@@ -583,8 +578,8 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             echo '<tr><td></td><td>Affiliations (number, association, spelling)</td></tr>' . "\n";
             echo '<tr><td></td><td>References (total number, DOIs)</td></tr>' . "\n";
             echo '<tr><td>Step 4</td><td>Only if requested by the authors: Tick the opt-in to fermats library box.'.(empty($fermats_library==="checked") ? "" : " DONE!").'</td></tr>';
-            echo '<tr><td>Step 5</td><td>If provided by the authors: Copy over the <a href="#paper_popular_summary">popular summary</a>.'.(empty($popular_summary) ? "" : " DONE!").'</td></tr>';
-            echo '<tr><td>Step 6</td><td>If provided by the authors: Copy over the <a href="#paper_feature_image_caption">feature image caption</a>.'.(empty($feature_image_caption) ? "" : " DONE!").'</td></tr>';
+            echo '<tr><td>Step 5</td><td>If provided by the authors: Copy over the <a href="#' . $post_type. '_popular_summary">popular summary</a>.'.(empty($popular_summary) ? "" : " DONE!").'</td></tr>';
+            echo '<tr><td>Step 6</td><td>If provided by the authors: Copy over the <a href="#' . $post_type . '_feature_image_caption">feature image caption</a>.'.(empty($feature_image_caption) ? "" : " DONE!").'</td></tr>';
             echo '<tr><td>Step 7</td><td>If provided by the authors: Edit the feature image to a suitable format (large enough, aspect ration 2:1) and set it as <a href="#postimagediv">feature image</a>.'.(empty($feature_image_path) ? "" : " DONE!").'</td></tr>';
             echo '<tr><td>Step 8</td><td>Click the Update button and address all remaining warnings and errors in the validation results below.</td></tr>';
             echo '<tr><td>Step 9</td><td>Once all is resolved, click edit next to <a href="#submitdiv">Visibility</a> in the Publish box and select Public. Then press the Publish button. '.(get_post_status( $post_id ) !== 'publish' ? "" : " DONE!").'</td></tr>';
@@ -912,23 +907,23 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
          *
          * Used to generate the excerpt for lists of posts.
          *
-         * To be added to the 'get_the_excerpt' filter. Use this filter instead of 'the_excerpt' to also affect get_the_excerpt()!
+         * To be added to the 'get_the_excerpt' filter.
          *
-         * @since 0.1.0
-         * @access    public
-         * @param     string     $content     Content to be ammended.
+         * @since  0.1.0
+         * @access public
+         * @param  string     $content     Content to be ammended.
          */
     public function get_the_excerpt( $content ) {
 
         global $post;
+
         $post_id = $post->ID;
         $post_type = get_post_type($post_id);
 
         if ( $post_type === $this->get_publication_type_name() ) {
-            $old_content = $content;
             $content = '';
             $content .= '<p class="authors-in-excerpt">' . static::get_formated_authors( $post_id ) . ',</p>' . "\n";
-            $content .= '<p class="citation-in-excerpt">' . static::get_formated_citation($post_id) . ' <a href="' . $this->get_journal_property('doi_url_prefix') . static::get_doi($post_id) . '">' . $this->get_journal_property('doi_url_prefix') . static::get_doi($post_id) . '</a>' . "\n";
+            $content .= '<p class="citation-in-excerpt"><a href="' . $this->get_journal_property('doi_url_prefix') . static::get_doi($post_id) . '">' . static::get_formated_citation($post_id) . '</a></p>' . "\n";
             $content .= '<p><a href="' . get_permalink($post_id) . '" class="abstract-in-excerpt">';
             $trimmer_abstract = wp_html_excerpt( get_post_meta( $post_id, $post_type . '_abstract', true ), 190, '&#8230;');
             while( preg_match_all('/(?<!\\\\)\$/', $trimmer_abstract) % 2 !== 0 )
@@ -938,7 +933,6 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             }
             $content .= esc_html ( $trimmer_abstract );
             $content .= '</a></p>';
-            $content .= $old_content;
         }
 
         return $content;
@@ -1410,5 +1404,84 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                      );
     }
 
+        /**
+         * Construct the content.
+         *
+         * Here we output dynamic information about the publication
+         * alongside the standard content.
+         *
+         * To be added to the 'the_content' filter.
+         *
+         * @since     0.1.0
+         * @access    public
+         * @param     string    $content     Content to be filtered.
+         */
+    public function get_the_content( $content ) {
+
+        global $post;
+
+        $settings = O3PO_Settings::instance();
+
+        $post_id = $post->ID;
+        $post_type = get_post_type($post_id);
+
+        if ( get_post_type($post_id) === $this->get_publication_type_name() ) {
+            $old_content = $content;
+            $content = '';
+
+            $content .= '<header class="entry-header">';
+            if($settings->get_plugin_option('page_template_for_publication_posts')==='checked')
+                $content .= '<h1 class="entry-title title citation_title"><a href="#">' . esc_html ( get_the_title( $post_id ) ) . '</a></h1>';
+            $content .= '<p class="authors citation_author">';
+            $content .= $this->get_formated_authors_html( $post_id );
+            $content .= '</p>';
+            $content .= '<p class="affiliations">';
+            $content .= $this->get_formated_affiliations_html( $post_id );
+            $content .= '</p>';
+            $content .= '<table class="meta-data-table">';
+            $content .= '<tr><td>Published:</td><td>' . esc_html($this->get_formated_date_published( $post_id )) .  ', ' . $this->get_formated_volume_html($post_id) . ', page ' . esc_html(get_post_meta( $post_id, $post_type . '_pages', true )) . '</td></tr>';
+            $content .= '<tr><td>Eprint:</td><td><a href="' . esc_attr($settings->get_plugin_option('arxiv_url_abs_prefix') . get_post_meta( $post_id, $post_type . '_eprint', true ) ) . '">arXiv:' . esc_html(get_post_meta( $post_id, $post_type . '_eprint', true )) . '</a></td></tr>';
+            $content .= '<tr><td>Scirate:</td><td><a href="' . esc_attr($settings->get_plugin_option('scirate_url_abs_prefix') . get_post_meta( $post_id, $post_type . '_eprint', true ) ) . '">' . esc_html($settings->get_plugin_option('scirate_url_abs_prefix') . get_post_meta( $post_id, $post_type . '_eprint', true )) . '</a></td></tr>';
+            $doi = get_post_meta( $post_id, $post_type . '_doi_prefix', true ) . '/' .  get_post_meta( $post_id, $post_type . '_doi_suffix', true );
+            $content .= '<tr><td>Doi:</td><td><a href="' . esc_attr($settings->get_plugin_option('doi_url_prefix') . $doi) . '">' . esc_html($settings->get_plugin_option('doi_url_prefix') . $doi ) . '</a></td></tr>';
+            if ( $this->show_fermats_library_permalink($post_id) ) {
+                $fermats_library_permalink = get_post_meta( $post_id, $post_type . '_fermats_library_permalink', true );
+                $content .= '<tr><td>Fermat&#39;s library:</td><td><a href="' . esc_attr($fermats_library_permalink) . '">' . esc_html($fermats_library_permalink) . '</a></td></tr>';
+            }
+            $content .= '<tr><td>Citation:</td><td>' . esc_html($this->get_formated_citation($post_id)) . '</td></tr>';
+            $content .= '</table>';
+//$content .= '<a id="fulltext" class="btn-theme-primary" href="' . esc_attr($this->get_pdf_pretty_permalink($post_id)) . '">full text pdf</a>';
+            $content .= '<form action="' . esc_attr($this->get_pdf_pretty_permalink($post_id)) . '" method="get">';
+            $content .= '<input id="fulltext" type="submit" value="full text pdf">';
+            $content .= '</form>';
+            $content .= '</header>';
+            $content .= '<div class="entry-content">';
+            $content .= '<p class="abstract">';
+            $content .= nl2br(esc_html( get_post_meta( $post_id, $post_type . '_abstract', true )) );
+            $content .= '</p>';
+            if ( has_post_thumbnail( ) ) {
+                $content .= '<div class="featured-image-box">';
+                $content .= '<div style="float:left; padding-right: 1rem; padding-bottom: 1rem">';
+                $content .= get_the_post_thumbnail($post_id);
+                $content .= '</div>';
+                $feature_image_caption = get_post_meta( $post_id, $post_type . '_feature_image_caption', true );
+                if (!empty($feature_image_caption))
+                    $content .= '<p class="feature-image-caption">' . "Featured image: " . nl2br(esc_html($feature_image_caption)) . '</p>';
+                $content .= '<div style="clear:both;"></div>';
+                $content .= '</div>';
+            }
+
+            $content .= $old_content;
+            $content .= $this->get_popular_summary($post_id);
+            $content .= $this->get_bibtex_html($post_id);
+            $content .= $this->get_bibliography_html($post_id);
+            $content .= $this->get_cited_by($post_id);
+            $content .= $this->get_license_information($post_id);
+            $content .= '</div>';
+            return $content;
+        }
+        else
+            return $content;
+    }
 
 }

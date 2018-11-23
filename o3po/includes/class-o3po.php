@@ -300,63 +300,72 @@ class O3PO {
         $settings = O3PO_Settings::instance();
 		$plugin_public = new O3PO_Public( $this->get_plugin_name(), $this->get_version() );
 
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
-		$this->loader->add_action( 'wp_head', $plugin_public, 'add_open_graph_meta_tags_for_social_media' );
-        $this->loader->add_action( 'wp_head', $plugin_public, 'enable_mathjax' );
-        $this->loader->add_action( 'get_custom_logo', $plugin_public, 'fix_custom_logo_html' );
-        if($settings->get_plugin_option('custom_search_page')==='checked')
-            $this->loader->add_action( 'template_include', $plugin_public, 'install_custom_search_page_template' );
-        $this->loader->add_action( 'single_template', $plugin_public, 'primary_publication_type_template' );
-        $this->loader->add_action( 'loop_start', $plugin_public, 'extended_search_and_navigation_at_loop_start' );
-        $this->loader->add_action( 'loop_start', $plugin_public, 'secondary_journal_help_text' );
+		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
+		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
+		$this->loader->add_action('wp_head', $plugin_public, 'add_open_graph_meta_tags_for_social_media');
+        $this->loader->add_action('wp_head', $plugin_public, 'enable_mathjax');
+        $this->loader->add_action('get_custom_logo', $plugin_public, 'fix_custom_logo_html');
+        $this->loader->add_action('loop_start', $plugin_public, 'extended_search_and_navigation_at_loop_start');
+        $this->loader->add_action('loop_start', $plugin_public, 'secondary_journal_help_text');
 
-        $this->loader->add_action( 'wp_head', $this->environment, 'modify_css_if_in_test_environment' );
+        $this->loader->add_action('wp_head', $this->environment, 'modify_css_if_in_test_environment');
 
-        $this->loader->add_action( 'init', $this->journal, 'add_volumes_endpoint' );
-        $this->loader->add_action( 'parse_request', $this->journal, 'handle_volumes_endpoint_request' );
-        $this->loader->add_filter( 'loop_start', $this->journal, 'volume_navigation_at_loop_start' );
-        $this->loader->add_filter( 'loop_end', $this->journal, 'compress_enteies_in_volume_view' );
+        $this->loader->add_action('init', $this->journal, 'add_volumes_endpoint');
+        $this->loader->add_action('parse_request', $this->journal, 'handle_volumes_endpoint_request');
+        $this->loader->add_filter('loop_start', $this->journal, 'volume_navigation_at_loop_start');
+        $this->loader->add_filter('loop_end', $this->journal, 'compress_enteies_in_volume_view');
         $this->loader->add_action('template_include', $this->journal, 'volume_endpoint_template');
-        $this->loader->add_action('the_posts', $this->journal, 'add_fake_empty_post_to_volume_overview_page');
+        $this->loader->add_action('the_posts', $this->journal, 'add_fake_post_to_volume_overview_page');
+        if($settings->get_plugin_option('custom_search_page')==='checked')
+        {
+            $this->loader->add_filter('get_search_form', $this->journal, 'add_notice_to_search_form');
+            $this->loader->add_filter('loop_start', $this->journal, 'add_notice_to_search_results_at_loop_start');
+        }
+
 
         #$this->loader->add_action('get_template_part_template-parts/content', $this->journal, 'foo', 99, 2);
 
             //add hooks for the primary publication type...
-        $this->loader->add_action('pre_get_posts', $this->primary_publication_type, 'add_custom_post_types_to_query' );
+        $this->loader->add_filter('the_author', $this->primary_publication_type, 'get_the_author', PHP_INT_MAX, 1);
+        $this->loader->add_filter('author_link', $this->primary_publication_type, 'get_the_author_posts_link', PHP_INT_MAX, 1);
+        $this->loader->add_action('pre_get_posts', $this->primary_publication_type, 'add_custom_post_types_to_query');
         $this->loader->add_action('wp_head', $this->primary_publication_type, 'add_dublin_core_and_highwire_press_meta_tags');
         $this->loader->add_action('wp_head', $this->primary_publication_type, 'the_java_script_single_page');
         $this->loader->add_action('admin_head', $this->primary_publication_type, 'admin_page_extra_css');
-        $this->loader->add_filter('request', $this->primary_publication_type, 'add_custom_post_types_to_rss_feed' );
-        $this->loader->add_filter('the_author', $this->primary_publication_type, 'the_author_feed', PHP_INT_MAX, 1 );
+        $this->loader->add_filter('request', $this->primary_publication_type, 'add_custom_post_types_to_rss_feed');
+        $this->loader->add_filter('the_author', $this->primary_publication_type, 'the_author_feed', PHP_INT_MAX, 1);
             //...and those inherited from publicationtype
         $this->loader->add_action('init', $this->primary_publication_type, 'register_as_custom_post_type' );
-        $this->loader->add_action( 'init', $this->primary_publication_type, 'add_pdf_endpoint' , 0 );
-        $this->loader->add_action( 'parse_request', $this->primary_publication_type, 'handle_pdf_endpoint_request' , 1 );
-        $this->loader->add_action( 'init', $this->primary_publication_type, 'add_web_statement_endpoint' , 0 );
-        $this->loader->add_action( 'parse_request', $this->primary_publication_type, 'handle_web_statement_endpoint_request' , 1 );
-        $this->loader->add_action( 'init', $this->primary_publication_type, 'add_axiv_paper_doi_feed_endpoint' , 0 );
-        $this->loader->add_action( 'parse_request', $this->primary_publication_type, 'handle_arxiv_paper_doi_feed_endpoint_request' , 1 );
-        $this->loader->add_filter( 'get_the_excerpt', $this->primary_publication_type, 'get_the_excerpt') ;//Use this filter instead of 'the_excerpt' to also affect get_the_excerpt()
-        $this->loader->add_filter( 'the_content_feed', $this->primary_publication_type, 'get_feed_content' );
-        $this->loader->add_filter( 'the_excerpt_rss', $this->primary_publication_type, 'get_feed_content' );
-//        $this->loader->add_filter( 'single_template', $this->primary_publication_type, 'get_custom_post_type_single_template' );
-        $this->loader->add_filter( 'transition_post_status', $this->primary_publication_type, 'on_transition_post_status', 10, 3 );
+        $this->loader->add_action('init', $this->primary_publication_type, 'add_pdf_endpoint' , 0 );
+        $this->loader->add_action('parse_request', $this->primary_publication_type, 'handle_pdf_endpoint_request' , 1 );
+        $this->loader->add_action('init', $this->primary_publication_type, 'add_web_statement_endpoint' , 0 );
+        $this->loader->add_action('parse_request', $this->primary_publication_type, 'handle_web_statement_endpoint_request' , 1 );
+        $this->loader->add_action('init', $this->primary_publication_type, 'add_axiv_paper_doi_feed_endpoint' , 0 );
+        $this->loader->add_action('parse_request', $this->primary_publication_type, 'handle_arxiv_paper_doi_feed_endpoint_request' , 1 );
+        $this->loader->add_filter('the_content', $this->primary_publication_type, 'get_the_content');
+        $this->loader->add_filter('get_the_excerpt', $this->primary_publication_type, 'get_the_excerpt') ;//Use this filter instead of 'the_excerpt' to also affect get_the_excerpt()
+        $this->loader->add_filter('the_content_feed', $this->primary_publication_type, 'get_feed_content');
+        $this->loader->add_filter('the_excerpt_rss', $this->primary_publication_type, 'get_feed_content');
+        $this->loader->add_filter('transition_post_status', $this->primary_publication_type, 'on_transition_post_status', 10, 3);
+        if($settings->get_plugin_option('page_template_for_publication_posts')==='checked')
+            $this->loader->add_filter('template_include', $this->primary_publication_type, 'use_page_template');
 
             //add hooks for the secondary publication type...
-        $this->loader->add_filter( 'the_author', $this->secondary_publication_type, 'get_the_author', PHP_INT_MAX, 1 );
-        $this->loader->add_filter( 'author_link', $this->secondary_publication_type, 'get_the_author_posts_link', PHP_INT_MAX, 1 );
-        $this->loader->add_filter( 'the_content', $this->secondary_publication_type, 'get_the_content' );
-        $this->loader->add_filter( 'get_the_excerpt', $this->secondary_publication_type, 'get_the_excerpt' );//Use this filter instead of 'the_excerpt' to also affect get_the_excerpt()
+        $this->loader->add_filter('the_author', $this->secondary_publication_type, 'get_the_author', PHP_INT_MAX, 1);
+        $this->loader->add_filter('author_link', $this->secondary_publication_type, 'get_the_author_posts_link', PHP_INT_MAX, 1);
+        $this->loader->add_filter('the_content', $this->secondary_publication_type, 'get_the_content');
+        $this->loader->add_filter('get_the_excerpt', $this->secondary_publication_type, 'get_the_excerpt');//Use this filter instead of 'the_excerpt' to also affect get_the_excerpt()
             //...and those inherited from publicationtype
-        $this->loader->add_action('init', $this->secondary_publication_type, 'register_as_custom_post_type' );
-        $this->loader->add_action('pre_get_posts', $this->secondary_publication_type, 'add_custom_post_types_to_query' );
+        $this->loader->add_action('init', $this->secondary_publication_type, 'register_as_custom_post_type');
+        $this->loader->add_action('pre_get_posts', $this->secondary_publication_type, 'add_custom_post_types_to_query');
         $this->loader->add_action('wp_head', $this->secondary_publication_type, 'add_dublin_core_and_highwire_press_meta_tags');
         $this->loader->add_action('wp_head', $this->secondary_publication_type, 'the_java_script_single_page');
         $this->loader->add_action('admin_head', $this->secondary_publication_type, 'admin_page_extra_css');
-        $this->loader->add_filter('request', $this->secondary_publication_type, 'add_custom_post_types_to_rss_feed' );
-        $this->loader->add_filter('the_author', $this->secondary_publication_type, 'the_author_feed', PHP_INT_MAX, 1 );
-        $this->loader->add_filter( 'transition_post_status', $this->secondary_publication_type, 'on_transition_post_status', 10, 3 );
+        $this->loader->add_filter('request', $this->secondary_publication_type, 'add_custom_post_types_to_rss_feed');
+        $this->loader->add_filter('the_author', $this->secondary_publication_type, 'the_author_feed', PHP_INT_MAX, 1);
+        $this->loader->add_filter('transition_post_status', $this->secondary_publication_type, 'on_transition_post_status', 10, 3);
+        if($settings->get_plugin_option('page_template_for_publication_posts')==='checked')
+            $this->loader->add_filter('template_include', $this->secondary_publication_type, 'use_page_template');
 
 	}
 

@@ -123,31 +123,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         ];
     }
 
-        /**
-         * Remeber: This test depends on the post types being active, not
-         * directly, because it doesn't need them as an imput, but
-         * indirecty, as the template only works if they are already active.
-         *
-         * @dataProvider single_paper_template_provider
-         * @depends test_create_primary_publication_type
-         */
-    public function test_single_paper_template( $post_id, $primary_publication_type ) {
-
-        $query = new WP_Query(array('ID' => $post_id));
-        set_global_query($query);
-
-        ob_start();
-        include( dirname(__File__) . '/../o3po/public/templates/single-paper.php');
-        $output = ob_get_contents();
-        ob_end_clean();
-        $output = preg_replace('#(main|header)#', 'div', $output); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
-
-        $dom = new DOMDocument;
-        $result = $dom->loadHTML($output);
-            //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
-        $this->assertNotFalse($result);
-    }
-
     public function primary_the_admin_components_provider() {
 
         return [
@@ -331,6 +306,51 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             else
                 $this->assertSame($orig_content, $content);
 
+            $content = preg_replace('#(main|header)#', 'div', $content); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
+
+            $dom = new DOMDocument;
+            $result = $dom->loadHTML('<div>' . $content . '</div>');
+//            $this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
+            $this->assertNotFalse($result);
+        }
+    }
+
+
+        /**
+         * @depends test_create_primary_publication_type
+         * @depends test_initialize_settings
+         */
+    public function test_primary_get_the_content( $primary_publication_type, $settings ) {
+        global $posts;
+        global $post;
+        global $global_query;
+
+        foreach($posts as $post_id => $post_data)
+        {
+            $post = new WP_Post($post_id);
+            $global_query = new WP_Query(array('ID' => $post_id));
+            the_post();
+
+            if(isset($posts[$post_id]['post_content']))
+                $orig_content = $posts[$post_id]['post_content'];
+            else
+                $orig_content = '';
+            $content = $primary_publication_type->get_the_content($orig_content);
+
+            $post_type = get_post_type($post_id);
+            if($post_type == 'paper')
+            {
+                foreach( array(
+                         '#' . $settings->get_plugin_option('license_url')  . '#',
+                         '#' . $settings->get_plugin_option('publisher')  . '#',
+                           )
+                         as $regexp)
+                    $this->assertRegexp($regexp, $content);
+            }
+            else
+                $this->assertSame($orig_content, $content);
+
+            $content = preg_replace('#(main|header)#', 'div', $content); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
 
             $dom = new DOMDocument;
             $result = $dom->loadHTML('<div>' . $content . '</div>');

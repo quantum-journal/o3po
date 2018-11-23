@@ -16,61 +16,59 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-setti
 /**
  * The public-facing functionality of the plugin.
  *
- * Defines the plugin name, version, and hooks.
- *
  * @package    O3PO
  * @subpackage O3PO/public
  * @author     Christian Gogolin <o3po@quantum-journal.org>
  */
 class O3PO_Public {
 
-	/**
-	 * The ID of this plugin.
-	 *
-	 * @since    0.1.0
-	 * @access   private
-	 * @var      string    $plugin_name    The ID of this plugin.
-	 */
+        /**
+         * The ID of this plugin.
+         *
+         * @since    0.1.0
+         * @access   private
+         * @var      string    $plugin_name    The ID of this plugin.
+         */
 	private $plugin_name;
 
-	/**
-	 * The version of this plugin.
-	 *
-	 * @since    0.1.0
-	 * @access   private
-	 * @var      string    $version    The current version of this plugin.
-	 */
+        /**
+         * The version of this plugin.
+         *
+         * @since    0.1.0
+         * @access   private
+         * @var      string    $version    The current version of this plugin.
+         */
 	private $version;
 
-	/**
-	 * Initialize the class and set its properties.
-	 *
-	 * @since    0.1.0
-	 * @param    string    $plugin_name    The name of the plugin.
-	 * @param    string    $version        The version of this plugin.
-	 */
+        /**
+         * Initialize the class and set its properties.
+         *
+         * @since    0.1.0
+         * @param    string    $plugin_name    The name of the plugin.
+         * @param    string    $version        The version of this plugin.
+         */
 	public function __construct( $plugin_name, $version ) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 	}
 
-	/**
-	 * Register the stylesheets for the public-facing side of the site.
-	 *
-	 * @since    0.1.0
-	 */
+        /**
+         * Register the stylesheets for the public-facing side of the site.
+         *
+         * @since    0.1.0
+         */
 	public function enqueue_styles() {
 
-		/**
-		 * An instance of this class should be passed to the run() function
-		 * defined in O3PO_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The O3PO_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
+            /**
+             * An instance of this class should be passed to the run() function
+             * defined in O3PO_Loader as all of the hooks are defined
+             * in that particular class.
+             *
+             * The O3PO_Loader will then create the relationship
+             * between the defined hooks and the functions defined in this
+             * class.
+             */
 
 		wp_enqueue_style( $this->plugin_name . '-public.css', plugin_dir_url( __FILE__ ) . 'css/' . $this->plugin_name . '-public.css', array(), $this->version, 'all' );
 
@@ -80,34 +78,34 @@ class O3PO_Public {
 
 	}
 
-	/**
-	 * Register the JavaScript for the public-facing side of the site.
-	 *
-	 * @since    0.1.0
-	 */
+        /**
+         * Register the JavaScript for the public-facing side of the site.
+         *
+         * @since    0.1.0
+         */
 	public function enqueue_scripts() {
 
-		/**
-		 * An instance of this class should be passed to the run() function
-		 * defined in O3PO_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The O3PO_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
+            /**
+             * An instance of this class should be passed to the run() function
+             * defined in O3PO_Loader as all of the hooks are defined
+             * in that particular class.
+             *
+             * The O3PO_Loader will then create the relationship
+             * between the defined hooks and the functions defined in this
+             * class.
+             */
 
 //		wp_enqueue_script( $this->plugin_name . '-public.js', plugin_dir_url( __FILE__ ) . 'js/' . $this->plugin_name . '-public.js', array( 'jquery' ), $this->version, false );
 
 	}
 
-	/**
-	 * Add opne graph (OG) meta tags describing the respective page. This
-	 * data is used by social networks to generate excerpts for sharing.
-	 *
-	 * @since    0.1.0
-	 * @access   public
-	 */
+        /**
+         * Add opne graph (OG) meta tags describing the respective page. This
+         * data is used by social networks to generate excerpts for sharing.
+         *
+         * @since    0.1.0
+         * @access   public
+         */
     public function add_open_graph_meta_tags_for_social_media() {
         $settings = O3PO_Settings::instance();
 
@@ -152,20 +150,20 @@ class O3PO_Public {
         echo '<meta property="og:site_name" content="' . esc_attr($journa_title) .'" />' . "\n";
         echo '<meta property="og:description" content="' . esc_attr($description) . '" />' . "\n";
 
-    if(!empty($image_url))
-        echo '<meta property="og:image" content="' .$image_url . '" />' . "\n";
+        if(!empty($image_url))
+            echo '<meta property="og:image" content="' .$image_url . '" />' . "\n";
 
-    if(!empty($facebook_app_id))
-        echo '<meta property="fb:app_id" content="' .$facebook_app_id . '" />' . "\n";
+        if(!empty($facebook_app_id))
+            echo '<meta property="fb:app_id" content="' .$facebook_app_id . '" />' . "\n";
 
     }
 
-    /**
-	 * Enable MathJax on all public pages.
-	 *
-	 * @since    0.1.0
-	 * @access   public
-	 */
+        /**
+         * Enable MathJax on all public pages.
+         *
+         * @since    0.1.0
+         * @access   public
+         */
     public function enable_mathjax() {
 
         $settings = O3PO_Settings::instance();
@@ -181,14 +179,14 @@ class O3PO_Public {
     }
 
 
-    /**
-	 * Fix some invalid html generated by WordPress as part of the logo.
-	 *
-	 * To be added to the 'get_custom_logo' filter.
-	 *
-	 * @since    0.1.0
-	 * @access   public
-	 */
+        /**
+         * Fix some invalid html generated by WordPress as part of the logo.
+         *
+         * To be added to the 'get_custom_logo' filter.
+         *
+         * @since    0.1.0
+         * @access   public
+         */
     public function fix_custom_logo_html() {
 
         $custom_logo_id = get_theme_mod( 'custom_logo' );
@@ -202,63 +200,15 @@ class O3PO_Public {
         return $html;
     }
 
-
-    /**
-	 * Replace search.php with a custom search template so that we can
-     * customize the search page.
-	 *
-     * To be added to the 'template_include' action.
-     *
-	 * @since    0.1.0
-	 * @access   public
-	 * @param    string    $template    Path to template file.
-	 */
-    public function install_custom_search_page_template( $template ){
-
-        global $wp_query;
-
-        if ($wp_query->is_search)
-            return dirname( __FILE__ ) . '/templates/search.php';
-        else
-            return $template;
-    }
-
         /**
-         * Get custom post type single template.
+         * Add a search interaface to the main page just before the loop starts.
          *
-         * For posts of the primary publication type we want full controle over how their page appears. We do this
-         * by installing a custom 'single_template' derived from that of the OnePress
-         * theme and install it here via the filter of the same name.
+         * To be added to the 'loop_start' action.
          *
-         * To be added to the 'single_template' filter.
-         *
-         * @since     0.1.0
-         * @access    public
-         * @param     string     $single_template     The name of the single template that we might want to replace.
+         * @since      0.1.0
+         * @access     public
+         * @param      string    $query      Query that lead to the current loop.
          */
-    public function primary_publication_type_template( $single_template ) {
-
-        global $post;
-
-        $settings = O3PO_Settings::instance();
-        $primary_publication_type_name = $settings->get_plugin_option('primary_publication_type_name');
-
-        if ($post->post_type === $primary_publication_type_name) {
-            $single_template = dirname( __FILE__ ) . '/templates/single-' . $primary_publication_type_name . '.php';
-        }
-
-        return $single_template;
-    }
-
-    /**
-	 * Add a search interaface to the main page just before the loop starts.
-	 *
-	 * To be added to the 'loop_start' action.
-	 *
-	 * @since      0.1.0
-	 * @access     public
-	 * @param      string    $query      Query that lead to the current loop.
-	 */
     public function extended_search_and_navigation_at_loop_start( $query ){
 
         $settings = O3PO_Settings::instance();
@@ -296,13 +246,13 @@ var search_field = document.getElementsByClassName("search-field");
         }
     }
 
-    /**
-	 * Add a help text for listing pages showing posts from the secondary journal just before the loop starts.
-	 *
-	 * @since    0.1.0
-	 * @access   public
-	 * @param    string    $query      Query that lead to the current loop.
-	 */
+        /**
+         * Add a help text for listing pages showing posts from the secondary journal just before the loop starts.
+         *
+         * @since    0.1.0
+         * @access   public
+         * @param    string    $query      Query that lead to the current loop.
+         */
     public function secondary_journal_help_text( $query )
     {
         $settings = O3PO_Settings::instance();
@@ -314,11 +264,11 @@ var search_field = document.getElementsByClassName("search-field");
         else
             foreach(O3PO_SecondaryPublicationType::get_associated_categories() as $category)
             {
-            if(is_category($category))
-            {
-                $show_help_on_this_page = true;
-                break;
-            }
+                if(is_category($category))
+                {
+                    $show_help_on_this_page = true;
+                    break;
+                }
             }
         if($show_help_on_this_page)
         {
