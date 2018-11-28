@@ -590,6 +590,9 @@ abstract class O3PO_PublicationType {
 
         $validation_result = '';
 
+        if( empty($journal) or empty($doi_prefix) or empty($publisher) )
+            $validation_result .= "WARNING: The journal title, doi prefix, or publisher seem to be empty. Probably some some essential settings were not set. Please go to the settings page and configure them.\n";
+
         if( O3PO_Latex::strpos_outside_math_mode($abstract, '\\') != false )
             $validation_result .= "WARNING: The abstract contains one or more backslashes. Please double check.\n" ;
         if( O3PO_Latex::strpos_outside_math_mode($abstract, '=') != false )
