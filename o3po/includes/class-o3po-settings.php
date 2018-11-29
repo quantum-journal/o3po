@@ -1383,10 +1383,9 @@ class O3PO_Settings extends O3PO_Singleton {
         if(!empty($options[$id]))
             return $options[$id];
 
-            /*todo: Comment out this fallback*/
-        $options = get_option($this->plugin_name . '-setttings');
-        if(!empty($options[$id]))
-            return $options[$id];
+        /* $options = get_option($this->plugin_name . '-setttings'); */
+        /* if(!empty($options[$id])) */
+        /*     return $options[$id]; */
 
         if(isset($this->option_defaults[$id]))
             return $this->option_defaults[$id];
