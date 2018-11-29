@@ -378,12 +378,12 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * Get the excerpt of a this publication type.
          *
          * As we modify the content in get_the_content() we
-         * construct the excerpt from stratch,
+         * construct the excerpt from scratch,
          *
          * To be added to the 'get_the_excerpt' filter.
          *
-         * @since     0.1.0
-         * @param     string    $content    Content to be filtered.
+         * @since 0.1.0
+         * @param string    $content    Content to be filtered.
          */
     public function get_the_excerpt( $content ) {
 
@@ -395,12 +395,10 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         if ( $post_type === $this->get_publication_type_name() ) {
             $content = '';
             $content .= '<p class="authors-in-excerpt">' . static::get_formated_authors( $post_id ) . ',</p>' . "\n";
-            $content .= '<p class="citation-in-excerpt">' . static::get_formated_citation($post_id) . ' <a href="' . $this->get_journal_property('doi_url_prefix') . static::get_doi($post_id) . '">' . $this->get_journal_property('doi_url_prefix') . static::get_doi($post_id) . '</a>' . "\n";
+            $content .= '<p class="citation-in-excerpt"><a href="' . $this->get_journal_property('doi_url_prefix') . static::get_doi($post_id) . '">' . static::get_formated_citation($post_id) . '</a></p>' . "\n";
             $content .= '<p><a href="' . get_permalink($post_id) . '" class="abstract-in-excerpt">';
             $bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
             $trimmer_abstract = wp_html_excerpt( do_shortcode(O3PO_Latex::expand_cite_to_html(get_post_field('post_content', $post_id), $bbl)), 190, '&#8230;');
-
-
             while( preg_match_all('/(?<!\\\\)\$/', $trimmer_abstract) % 2 !== 0 )
             {
                 empty($i) ? $i = 1 : $i += 1;
@@ -713,62 +711,9 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
     }
 
         /**
-         * Fake the author.
-         *
-         * To be added to the 'the_author' filter.
-         *
-         * @since    0.1.0
-         * @access   pulic
-         * @param    string    $display_name   Display name to be filtered.
-         */
-    public function get_the_author( $display_name ) {
-
-        global $post;
-
-        $post_id = $post->ID;
-        $post_type = get_post_type($post_id);
-
-        if ( $post_type === $this->get_publication_type_name() ) {
-            $journal = get_post_meta( $post_id, $post_type . '_journal', true );
-            return $journal;
-        }
-        else
-        {
-            return $display_name;
-        }
-    }
-
-        /**
-         * Fake the author post link.
-         *
-         * To be added to the 'the_author_posts_link' filter.
-         *
-         * @since    0.2.2+
-         * @access   pulic
-         * @param    string    $link   Link to be filtered.
-         */
-    public function get_the_author_posts_link( $link ) {
-
-        global $post;
-
-        $post_id = $post->ID;
-        $post_type = get_post_type($post_id);
-
-        if ( $post_type === $this->get_publication_type_name() ) {
-            $slug = $this->get_publication_type_name_plural();
-            return '/' . $slug;
-        }
-        else
-        {
-            return $link;
-        }
-    }
-
-        /**
          * Construct the content.
          *
-         * Contrary to posts of primary publication type, we are not using
-         * a single template here, but simply output some information
+         * Here we output dynamic information about the publication
          * alongside the standard content.
          *
          * To be added to the 'the_content' filter.
@@ -780,6 +725,8 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
     public function get_the_content( $content ) {
 
         global $post;
+
+        $settings = O3PO_Settings::instance();
 
         $post_id = $post->ID;
         $post_type = get_post_type($post_id);
@@ -801,6 +748,9 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
             $journal = get_post_meta( $post_id, $post_type . '_journal', true );
 
             $content = '';
+            $content .= '<header class="entry-header">';
+            if($settings->get_plugin_option('page_template_for_publication_posts')==='checked')
+                $content .= '<h1 class="entry-title title citation_title"><a href="#">' . esc_html ( get_the_title( $post_id ) ) . '</a></h1>';
 
             if ( has_post_thumbnail( ) ) {
                 $content .= '<img src="' . get_the_post_thumbnail_url($post_id) . '" alt="" width="300" height="150" class="alignright size-medium wp-image-1433">';
@@ -867,6 +817,8 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
             $content .= '<input style="display:none;" id="print-btn" type="submit" value="print page">';
             $content .= '</form>';
             $content .= '<script type="text/javascript">document.getElementById("print-btn").style.display = "inline-block";</script>';//show button only if browser supports java script
+            $content .= '</header>';
+
             $bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
             $content .= O3PO_Latex::expand_cite_to_html($old_content, $bbl);
 

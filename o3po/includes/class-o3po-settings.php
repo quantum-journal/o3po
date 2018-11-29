@@ -123,6 +123,7 @@ class O3PO_Settings extends O3PO_Singleton {
         'doaj_api_url' => "https://doaj.org/api/v1/articles",
         'doaj_language_code' => "EN",
         'custom_search_page' => "checked",
+        'page_template_for_publication_posts' => "unchecked",
         'maintenance_mode' => 'unchecked',
 
         'self_notification_subject_template' =>
@@ -260,6 +261,7 @@ class O3PO_Settings extends O3PO_Singleton {
 
         echo '<input name="Submit" type="submit" value="Save Settings" />';
         echo '</form></div>';
+
     }
 
         /**
@@ -469,7 +471,19 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_custom_search_page_setting() {
 
-        $this->render_checkbox_setting('custom_search_page', 'Uncheck to disable the display of extra information on the Wordpress search page for users trying to verify whether a given paper has been published by your journal.');
+        $this->render_checkbox_setting('custom_search_page', 'Uncheck to disable the display of a notice on the search page informing users what it can mean if they are unable to find a paper on this website, but whose version on the arXiv claims that it was published in this journal. You can preview the two versions of this message <a href="/?s=thissearchstringyieldsnoresults">here</a> and <a href="/?s=thissearchstringyieldsnoresults&amp;reason=title-click">here</a>. Notice how a search that includes the reason=title-click query variable can be used to implement a way for readers to check the validity of claims of publication in, e.g., the LaTeX template of your journal.');
+
+    }
+
+        /**
+         * Render the setting for whether to use the page template for publications.
+         *
+         * @since    0.2.2+
+         * @access   public
+         */
+    public function render_page_template_for_publication_posts_setting() {
+
+        $this->render_checkbox_setting('page_template_for_publication_posts', 'If checked publication posts are shown with the page template instead of the post template of your theme. Some themes include information such as "Posted on ... by ..." on the post template which may be inappropriate for publication posts.');
 
     }
 
@@ -495,7 +509,7 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_doi_prefix_setting() {
         $this->render_setting('doi_prefix');
-        echo('<p>(The DOI prefix assigned to your published by Crossref.)</p>');
+        echo('<p>(The DOI prefix assigned to your publisher by Crossref.)</p>');
     }
 
         /**

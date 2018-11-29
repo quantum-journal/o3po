@@ -2583,27 +2583,41 @@ abstract class O3PO_PublicationType {
 
 
         /**
+         * Echo the polupar summary.
+         *
+         * Echo the popilar summary if available. To be used in the single
+         * templates.
+         *
+         * @since  0.1.0
+         * @access public
+         * @param  int    $post_id     Id of the post.
+         */
+    public static function the_popular_summary( $post_id ) {
+        echo static::get_popular_summary( $post_id );
+    }
+
+        /**
          * Get the polupar summary.
          *
          * Get the popilar summary if available. To be used in the single
          * templates.
          *
-         * @since 0.1.0
-         * @access   public
-         * @param    int    $post_id     Id of the post.
+         * @since  0.2.2+
+         * @access public
+         * @param  int    $post_id     Id of the post.
          */
-    public static function the_popular_summary( $post_id )
-    {
+    public static function get_popular_summary( $post_id ) {
+        $output = '';
         $post_type = get_post_type($post_id);
         $popular_summary = get_post_meta( $post_id, $post_type . '_popular_summary', true );
         if( !empty($popular_summary) ) {
-            echo '<h3 class="popular-summary additional-info"><a href="">Popular summary</a></h3>';
-            echo '<div>';
-            echo nl2br(esc_html($popular_summary));
-            echo '</div>';
+            $output .= '<h3 class="popular-summary additional-info"><a href="">Popular summary</a></h3>';
+            $output .= '<div>';
+            $output .= nl2br(esc_html($popular_summary));
+            $output .= '</div>';
         }
+        return $output;
     }
-
 
         /**
          * Get the formatted authors.
@@ -2876,5 +2890,82 @@ abstract class O3PO_PublicationType {
          * @param     int     $post_id     Id of the post.
          */
     abstract public function get_pdf_pretty_permalink( $post_id );
+
+
+        /**
+         * Fake the author.
+         *
+         * To be added to the 'the_author' filter.
+         *
+         * @since    0.1.0
+         * @access   pulic
+         * @param    string    $display_name   Display name to be filtered.
+         */
+    public function get_the_author( $display_name ) {
+
+        global $post;
+
+        $post_id = $post->ID;
+        $post_type = get_post_type($post_id);
+
+        if ( $post_type === $this->get_publication_type_name() ) {
+            $journal = get_post_meta( $post_id, $post_type . '_journal', true );
+            return $journal;
+        }
+        else
+        {
+            return $display_name;
+        }
+    }
+
+        /**
+         * Fake the author post link.
+         *
+         * To be added to the 'the_author_posts_link' filter.
+         *
+         * @since    0.2.2+
+         * @access   pulic
+         * @param    string    $link   Link to be filtered.
+         */
+    public function get_the_author_posts_link( $link ) {
+
+        global $post;
+
+        $post_id = $post->ID;
+        $post_type = get_post_type($post_id);
+
+        if ( $post_type === $this->get_publication_type_name() ) {
+            $slug = $this->get_publication_type_name_plural();
+            return '/' . $slug;
+        }
+        else
+        {
+            return $link;
+        }
+    }
+
+        /**
+         * Force the usage of the page template for publication posts.
+         *
+         * To be added to the 'template_include' action.
+         *
+         * @since  0.2.2+
+         * @access public
+         * @param  string   $template   The template that would be used.
+         * @return string   Template that should be used.
+         */
+    public function use_page_template( $template ) {
+
+        global $post;
+
+        $post_id = $post->ID;
+        $post_type = get_post_type($post_id);
+
+        if ( !is_single() or $this->get_publication_type_name() !== $post_type )
+            return $template;
+
+        return locate_template( array( 'page.php' ) );
+    }
+
 
 }
