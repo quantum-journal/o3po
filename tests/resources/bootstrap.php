@@ -745,6 +745,9 @@ function the_posts_navigation() {
 }
 
 $global_settings = array();
+$wp_settings_fields = array();
+$wp_settings_sections = array();
+
 function register_setting( $option_group, $option_name, $args = array() ) {
     global $global_settings;
 
@@ -756,7 +759,7 @@ function register_setting( $option_group, $option_name, $args = array() ) {
 }
 
 function add_settings_section( $id, $title, $callback, $page ) {
-    global $global_settings;
+    global $global_settings, $wp_settings_sections;
 
     if(empty($global_settings['sections']))
         $global_settings['sections'] = array();
@@ -767,10 +770,15 @@ function add_settings_section( $id, $title, $callback, $page ) {
         'page' => $page,
         'fields' => array(),
                                                );
+
+    if(!isset($wp_settings_sections[$page]))
+        $wp_settings_sections[$page] = array();
+
+    $wp_settings_sections[$page][$id] = array('id' => $id, 'title' => $title, 'callback' => $callback);
 }
 
-function add_settings_field( $id, $title, $callback, $page ) {
-    global $global_settings;
+function add_settings_field( $id, $title, $callback, $page, $section = 'default', $args = array() ) {
+    global $global_settings, $wp_settings_fields;
 
     $keys = array_keys($global_settings['sections']);
     $last_settings_section_id = end($keys);
@@ -782,8 +790,36 @@ function add_settings_field( $id, $title, $callback, $page ) {
         'page' => $page,
                                                                                    );
 
-//    print("\nglobal_settings=" . json_encode($global_settings['sections']) . "\n" );
+    $wp_settings_fields[$page][$section][$id] = array('id' => $id, 'title' => $title, 'callback' => $callback, 'args' => $args);
 }
+
+$global_setting_errors = array();
+
+function settings_errors( $setting = '', $sanitize = false, $hide_on_update = false ) {
+    global $global_setting_errors;
+
+    $output = '';
+    foreach ( $global_setting_errors as $key => $details ) {
+        $css_id = 'setting-error-' . $details['code'];
+        $css_class = $details['type'] . ' settings-error notice is-dismissible';
+        $output .= "<div id='$css_id' class='$css_class'> \n";
+        $output .= "<p><strong>{$details['message']}</strong></p>";
+        $output .= "</div> \n";
+    }
+    echo $output;
+}
+
+function add_settings_errors( $setting, $code, $message, $type = 'error' ) {
+    global $global_setting_errors;
+
+    $global_setting_errors[] = array(
+        'setting' => $setting,
+        'code'    => $code,
+        'message' => $message,
+        'type'    => $type
+                                     );
+}
+
 
 function settings_fields( $option_group ) {
 
@@ -791,6 +827,8 @@ function settings_fields( $option_group ) {
 
 function do_settings_sections( $id ) {
     global $global_settings;
+
+    $id = substr($id, strpos($id, ":") + 1);
 
     call_user_func($global_settings['sections'][$id]['callback']);
     foreach($global_settings['sections'][$id]['fields'] as $id => $properties)
