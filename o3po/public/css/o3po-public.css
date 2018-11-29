@@ -89,9 +89,13 @@ form.search-form input.search-submit {
 }
 /* make header and sidebar invisible when printing */
 @media print
-{    
+{
     .addtoany_share_save_container, .addtoany_share_save_container *, input#print-btn, div.sidebar, div.sidebar *, div#header-section, div#header-section *
     {
         display: none !important;
     }
+}
+div.publication-action-buttons form {
+    display: inline-block;
+    margin-right: 1em;
 }
