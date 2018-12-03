@@ -1278,7 +1278,7 @@ class O3PO_Settings extends O3PO_Singleton {
         if(preg_match('/^[0-9.-]*$/', $doi_prefix))
             return $doi_prefix;
 
-        add_settings_error( $field, 'illegal-doi-prefix', "The DOI prefix in '" . $this->settings_fields[$field]['title'] . "' may consist only of numbers 0-9, dot . and the dash - character. Setting not updated.", 'error');
+        add_settings_error( $field, 'illegal-doi-prefix', "The DOI prefix in '" . $this->settings_fields[$field]['title'] . "' may consist only of numbers 0-9, dot . and the dash - character. Field cleared.", 'error');
         return "";
     }
 
@@ -1296,7 +1296,7 @@ class O3PO_Settings extends O3PO_Singleton {
         if(empty($eissn) or preg_match('/^[0-9]{4}-[0-9]{3}[0-9X]$/', $eissn))
             return $eissn;
 
-        add_settings_error( $field, 'illegal-eissn', "The eISSN in '" . $this->settings_fields[$field]['title'] . "' must consist of two groups of four characters separated by a dash -, each of which must be a number 0-9, except the last, which may also be an upper case X. Setting not updated.", 'error');
+        add_settings_error( $field, 'illegal-eissn', "The eISSN in '" . $this->settings_fields[$field]['title'] . "' must consist of two groups of four characters separated by a dash -, each of which must be a number 0-9, except the last, which may also be an upper case X. Field cleared.", 'error');
         return "";
     }
 
@@ -1314,7 +1314,7 @@ class O3PO_Settings extends O3PO_Singleton {
         if(preg_match('/^[0-9]{4}$/', $first_volume_year)) //this will cause a year 10000 bug
             return $first_volume_year;
 
-        add_settings_error( $field, 'illegal-first-volume-year', "The year in '" . $this->settings_fields[$field]['title'] . "' must consist of exactly four digits in the range 0-9. Setting not updated.", 'error');
+        add_settings_error( $field, 'illegal-first-volume-year', "The year in '" . $this->settings_fields[$field]['title'] . "' must consist of exactly four digits in the range 0-9. Field cleared.", 'error');
         return "";
     }
 
@@ -1350,7 +1350,7 @@ class O3PO_Settings extends O3PO_Singleton {
         if(preg_match('/^[A-Z]{2}$/', $input))
             return $input;
 
-        add_settings_error( $field, 'url-validated', "The two letter country code in '" . $this->settings_fields[$field]['title'] . "' was malformed. Setting not updated.", 'error');
+        add_settings_error( $field, 'url-validated', "The two letter country code in '" . $this->settings_fields[$field]['title'] . "' was malformed. Field cleared.", 'error');
         return "";
     }
 
@@ -1367,8 +1367,8 @@ class O3PO_Settings extends O3PO_Singleton {
         if($input === "checked" or $input === "unchecked")
             return $input;
 
-        add_settings_error( $field, 'not-checked-or-unchecked', "The field '" . $this->settings_fields[$field]['title'] . "' must be either checked or unchecked. Setting not updated.", 'error');
-        return trim($input);
+        add_settings_error( $field, 'not-checked-or-unchecked', "The field '" . $this->settings_fields[$field]['title'] . "' must be either checked or unchecked. Set to unchecked.", 'error');
+        return 'unchecked';
     }
 
         /**
