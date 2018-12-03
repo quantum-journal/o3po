@@ -37,6 +37,7 @@ O-3PO offers the following features:
 * Interfaces with [CLOCKSS](https://www.clockss.org/clockss/Home)
 * Interfaces with [Buffer.com](https://buffer.com/app)
 * Interfaces with [Fermat's library](https://fermatslibrary.com/)
+* Customizable email templates for author communication
 * Search centered navigation of articles
 * RSS integration feed
 * arXiv recent papers feed endpoint
@@ -59,7 +60,7 @@ In fact, certain features of O-3PO currently only work correctly in conjunction 
 
 ## Installation
 
-O-3PO uses the PHPUnit testing framework. You can run all tests locally by executing `make run-tests`.
+O-3PO uses the PHPUnit testing framework. You can run all tests locally by executing `make test`.
 
 ## Documentation
 
@@ -70,7 +71,7 @@ The documentation can be build locally by running `make docs`.
 ## Bugs, limitations, and to do
 
 * Move fix_custom_logo_html into separate plug-in
-* Disable the fall-back loading of options from the `quantum-journal-plugin` context.
+* Move remaining onepress related customizations into a separate plug-in
 
 ## Frequently Asked Questions
 
@@ -88,6 +89,12 @@ It is obviously a play on the name of humanoid robot character from a series of 
 
 ## Changelog
 
+### 0.3.0
+* O-3PO is now largely theme independent.
+* Settings page completely redesigned.
+* Email templates and various other aspects of the plugin are now customizable.
+* Tweaked appearance of publications.
+* Code quality and test coverage improved.
 ### 0.2.2
 * Settings page now uses password text fields for sensitive settings.
 * Fixed file name of full text pdf download.
