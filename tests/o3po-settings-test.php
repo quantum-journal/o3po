@@ -70,7 +70,7 @@ class O3PO_SettingsTest extends PHPUnit_Framework_TestCase
                 $this->assertNotContains($id, $combined_output, 'Option ' . $id . ' was found in the settings page html, but we thought it should not be configurable?.');
         }
 
-        preg_match_all('#id="' . $settings->get_plugin_name() . '-setttings-(.*?)"#', $combined_output, $matches);
+        preg_match_all('#id="' . $settings->get_plugin_name() . '-settings-(.*?)"#', $combined_output, $matches);
         foreach($matches[1] as $id)
         {
             $this->assertContains($id, array_keys($settings->get_all_settings_fields_map()), 'Option ' . $id . ' was found in the settings page html but not in the all_settings_fields_map. Only settings with an entry in that map are actually saved, when the settings are saved.');

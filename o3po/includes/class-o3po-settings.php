@@ -279,6 +279,7 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->add_settings_section('plugin_settings', 'Plugin', array( $this, 'render_plugin_settings' ), $this->plugin_name . '-settings:plugin_settings');
         $this->add_settings_field('production_site_url', 'Production site url', array( $this, 'render_production_site_url_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
         $this->add_settings_field('custom_search_page', 'Use custom search page', array( $this, 'render_custom_search_page_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
+        $this->add_settings_field('page_template_for_publication_posts', 'Force page template', array( $this, 'render_page_template_for_publication_posts_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
         $this->add_settings_field('maintenance_mode', 'Maintenance mode', array( $this, 'render_maintenance_mode_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
 
         $this->add_settings_section('journal_settings', 'Journal', array( $this, 'render_journal_settings' ), $this->plugin_name . '-settings:journal_settings');
@@ -1240,8 +1241,9 @@ class O3PO_Settings extends O3PO_Singleton {
                 'doaj_api_url' => 'trim_settings_field',
                 'doaj_api_key' => 'trim_settings_field',
                 'doaj_language_code' => 'validate_two_letter_country_code',
-                'custom_search_page' => 'trim_settings_field',
-                'maintenance_mode' => 'trim_settings_field',
+                'custom_search_page' => 'checked_or_unchecked',
+                'page_template_for_publication_posts' => 'checked_or_unchecked',
+                'maintenance_mode' => 'checked_or_unchecked',
                 'volumes_endpoint' => 'trim_settings_field',
                 'doi_prefix' => 'validate_doi_prefix',
                 'eissn' => 'validate_eissn',
@@ -1353,6 +1355,23 @@ class O3PO_Settings extends O3PO_Singleton {
     }
 
         /**
+         * Restrict input to checked or unchecked
+         *
+         * @since    0.3.0
+         * @access   private
+         * @param    string   $field    The field this was input to.
+         * @param    string   $input    User input.
+         */
+    public function checked_or_unchecked( $field, $input ) {
+
+        if($input === "checked" or $input === "unchecked")
+            return $input;
+
+        add_settings_error( $field, 'not-checked-or-unchecked', "The field '" . $this->settings_fields[$field]['title'] . "' must be either checked or unchecked. Setting not updated.", 'error');
+        return trim($input);
+    }
+
+        /**
          * Trim user input to settings
          *
          * @since    0.3.0
@@ -1360,7 +1379,7 @@ class O3PO_Settings extends O3PO_Singleton {
          * @param    string   $field    The field this was input to.
          * @param    string   $input    User input.
          */
-    public static function trim_settings_field( $field, $input ) {
+    public function trim_settings_field( $field, $input ) {
 
         return trim($input);
     }
@@ -1379,6 +1398,8 @@ class O3PO_Settings extends O3PO_Singleton {
         {
             if(isset($input[$field]))
                 $newinput[$field] = $this->$validation_method($field, $input[$field]);
+            else
+                $newinput[$field] = $this->get_plugin_option($field);
         }
 
         return $newinput;
@@ -1396,10 +1417,6 @@ class O3PO_Settings extends O3PO_Singleton {
         $options = get_option($this->plugin_name . '-settings');
         if(!empty($options[$id]))
             return $options[$id];
-
-        /* $options = get_option($this->plugin_name . '-setttings'); */
-        /* if(!empty($options[$id])) */
-        /*     return $options[$id]; */
 
         if(isset($this->option_defaults[$id]))
             return $this->option_defaults[$id];
