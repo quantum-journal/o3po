@@ -1413,7 +1413,7 @@ class O3PO_Latex_Dictionary_Provider
         /**
          * Normalized white space and line break characters.
          *
-         * @since    0.2.2+
+         * @since    0.3.0
          * @access   public
          * @param    string   $text          LaTeX text to normalize.
          * @param    boolean  $single_line   Whether to output a single-line text.
@@ -1450,7 +1450,7 @@ class O3PO_Latex_Dictionary_Provider
         /**
          * Extract all bibliographies from latex code.
          *
-         * @since   0.2.2+
+         * @since   0.3.0
          * @access  public
          * @param   string    $latex   Latex code to search for bibliographies.
          *
@@ -1476,7 +1476,7 @@ class O3PO_Latex_Dictionary_Provider
         /**
          * Extract all abstracts from latex code.
          *
-         * @since   0.2.2+
+         * @since   0.3.0
          * @access  public
          * @param   string    $latex   Latex code to search for abstracts.
          *

@@ -4,7 +4,7 @@
  * Encapsulates the interface with the external service arXiv.
  *
  * @link       http://example.com
- * @since      0.2.2+
+ * @since      0.3.0
  *
  * @package    O3PO
  * @subpackage O3PO/includes
@@ -29,7 +29,7 @@ class O3PO_Arxiv {
          * extracts the abstract, number_authors, author_given_names,
          * author_surnames and title
          *
-         * @since  0.2.2+
+         * @since  0.3.0
          * @access public
          * @param  string  The eprint for which to fetch the meta-data.
          * @param  int     An optional timeout.
@@ -120,7 +120,7 @@ class O3PO_Arxiv {
          * Uses the provided $evironment to download the
          * pdf of an eprint from the arXiv.
          *
-         * @since  0.2.2+
+         * @since  0.3.0
          * @access public
          * @param  O3PO_Environment  $environment                  The environment to use for downloading
          * @param  string            $eprint                       The eprint whose source is to be downloaded
@@ -145,7 +145,7 @@ class O3PO_Arxiv {
          * uncompressed tex file. The returned mime type is
          * accessible via the 'mime_type' key in the returned results.
          *
-         * @since  0.2.2+
+         * @since  0.3.0
          * @access public
          * @param  O3PO_Environment  $environment                  The environment to use for downloading
          * @param  string            $eprint                       The eprint whose source is to be downloaded

@@ -1183,7 +1183,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
          * Depending on the manuscript we either got a single uncompressed .tex file
          * or a tar.gz archive from the arXivm which we have to extract and then analyse.
          *
-         * @since   0.2.2+
+         * @since   0.3.0
          * @access  private
          * @param   string     $path_source    Path to the source file.
          * @param   string     $mime_type      Mime type of the source file.

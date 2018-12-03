@@ -78,7 +78,7 @@ class O3PO_Settings extends O3PO_Singleton {
         /**
          * Array of the IDs of all settings sections.
          *
-         * @since    0.2.2+
+         * @since    0.3.0
          * @access   protected
          * @var      array     $settings_sections   Dictionary of all setting sections and their properties.
          */
@@ -87,7 +87,7 @@ class O3PO_Settings extends O3PO_Singleton {
         /**
          * Array of the IDs of all settings field.
          *
-         * @since    0.2.2+
+         * @since    0.3.0
          * @access   protected
          * @var      array     $settings_fields    Dictionary of all setting fields and their properties.
          */
@@ -478,7 +478,7 @@ class O3PO_Settings extends O3PO_Singleton {
         /**
          * Render the setting for whether to use the page template for publications.
          *
-         * @since    0.2.2+
+         * @since    0.3.0
          * @access   public
          */
     public function render_page_template_for_publication_posts_setting() {
@@ -1319,7 +1319,7 @@ class O3PO_Settings extends O3PO_Singleton {
         /**
          * Clean user input to url type settings
          *
-         * @since    0.2.2+
+         * @since    0.3.0
          * @access   private
          * @param    string   $field    The field this was input to.
          * @param    string   $input    User input.
@@ -1337,7 +1337,7 @@ class O3PO_Settings extends O3PO_Singleton {
         /**
          * Validate two letter country code
          *
-         * @since    0.2.2+
+         * @since    0.3.0
          * @access   private
          * @param    string   $field    The field this was input to.
          * @param    string   $input    User input.
@@ -1355,7 +1355,7 @@ class O3PO_Settings extends O3PO_Singleton {
         /**
          * Trim user input to settings
          *
-         * @since    0.2.2+
+         * @since    0.3.0
          * @access   private
          * @param    string   $field    The field this was input to.
          * @param    string   $input    User input.
@@ -1417,7 +1417,7 @@ class O3PO_Settings extends O3PO_Singleton {
         /**
          * Get the plugin_name.
          *
-         * @since 2.2.2+
+         * @since 0.3.0
          * @access public
          */
     public function get_plugin_name() {
@@ -1428,7 +1428,7 @@ class O3PO_Settings extends O3PO_Singleton {
         /**
          * Get the plugin_pretty_name.
          *
-         * @since 2.2.2+
+         * @since 0.3.0
          * @access public
          */
     public function get_plugin_pretty_name() {
@@ -1442,7 +1442,7 @@ class O3PO_Settings extends O3PO_Singleton {
          *
          * Keeps a record of all settings sections in $this->settings_sections.
          *
-         * @since  0.2.2+
+         * @since  0.3.0
          * @access private
          * @param string   $id       Slug-name to identify the section. Used in the 'id' attribute of tags.
          * @param string   $title    Formatted title of the section. Shown as the heading for the section.
@@ -1463,7 +1463,7 @@ class O3PO_Settings extends O3PO_Singleton {
          *
          * Keeps a record of all settings sections in $this->settings_sections.
          *
-         * @since  0.2.2+
+         * @since  0.3.0
          * @access private
          * @param string   $id       Slug-name to identify the section. Used in the 'id' attribute of tags.
          * @param string   $title    Formatted title of the section. Shown as the heading for the section.

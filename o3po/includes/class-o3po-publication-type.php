@@ -345,7 +345,7 @@ abstract class O3PO_PublicationType {
         /**
          * Render the maintenance_mode warning if appropriate.
          *
-         * @since    0.2.2+
+         * @since    0.3.0
          * @access   public
          * @param    WP_Post     $post   The post for which to render the metabox.
          * */
@@ -440,7 +440,7 @@ abstract class O3PO_PublicationType {
          *
          * To be added to the 'transition_post_status' hook.
          *
-         * @since    0.2.2+
+         * @since    0.3.0
          * @access   public
          * @param    string      $new      The new post status after this transition.
          * @param    string      $old      The old post status before this transition.
@@ -2602,7 +2602,7 @@ abstract class O3PO_PublicationType {
          * Get the popilar summary if available. To be used in the single
          * templates.
          *
-         * @since  0.2.2+
+         * @since  0.3.0
          * @access public
          * @param  int    $post_id     Id of the post.
          */
@@ -2923,7 +2923,7 @@ abstract class O3PO_PublicationType {
          *
          * To be added to the 'the_author_posts_link' filter.
          *
-         * @since    0.2.2+
+         * @since    0.3.0
          * @access   pulic
          * @param    string    $link   Link to be filtered.
          */
@@ -2949,7 +2949,7 @@ abstract class O3PO_PublicationType {
          *
          * To be added to the 'template_include' action.
          *
-         * @since  0.2.2+
+         * @since  0.3.0
          * @access public
          * @param  string   $template   The template that would be used.
          * @return string   Template that should be used.
