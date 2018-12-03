@@ -1444,16 +1444,20 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             $content .= '<tr><td>Scirate:</td><td><a href="' . esc_attr($settings->get_plugin_option('scirate_url_abs_prefix') . get_post_meta( $post_id, $post_type . '_eprint', true ) ) . '">' . esc_html($settings->get_plugin_option('scirate_url_abs_prefix') . get_post_meta( $post_id, $post_type . '_eprint', true )) . '</a></td></tr>';
             $doi = get_post_meta( $post_id, $post_type . '_doi_prefix', true ) . '/' .  get_post_meta( $post_id, $post_type . '_doi_suffix', true );
             $content .= '<tr><td>Doi:</td><td><a href="' . esc_attr($settings->get_plugin_option('doi_url_prefix') . $doi) . '">' . esc_html($settings->get_plugin_option('doi_url_prefix') . $doi ) . '</a></td></tr>';
-            if ( $this->show_fermats_library_permalink($post_id) ) {
-                $fermats_library_permalink = get_post_meta( $post_id, $post_type . '_fermats_library_permalink', true );
-                $content .= '<tr><td>Fermat&#39;s library:</td><td><a href="' . esc_attr($fermats_library_permalink) . '">' . esc_html($fermats_library_permalink) . '</a></td></tr>';
-            }
+            /* if ( $this->show_fermats_library_permalink($post_id) ) { */
+            /*     $fermats_library_permalink = get_post_meta( $post_id, $post_type . '_fermats_library_permalink', true ); */
+            /*     $content .= '<tr><td>Fermat&#39;s library:</td><td><a href="' . esc_attr($fermats_library_permalink) . '">' . esc_html($fermats_library_permalink) . '</a></td></tr>'; */
+            /* } */
             $content .= '<tr><td>Citation:</td><td>' . esc_html($this->get_formated_citation($post_id)) . '</td></tr>';
             $content .= '</table>';
-//$content .= '<a id="fulltext" class="btn-theme-primary" href="' . esc_attr($this->get_pdf_pretty_permalink($post_id)) . '">full text pdf</a>';
-            $content .= '<form action="' . esc_attr($this->get_pdf_pretty_permalink($post_id)) . '" method="get">';
-            $content .= '<input id="fulltext" type="submit" value="full text pdf">';
-            $content .= '</form>';
+            $content .= '<div class="publication-action-buttons">';
+            $content .= '<form action="' . esc_attr($this->get_pdf_pretty_permalink($post_id)) . '" method="get"><input id="fulltext" type="submit" value="full text pdf"></form>';
+            if ( $this->show_fermats_library_permalink($post_id) )
+            {
+                $fermats_library_permalink = get_post_meta( $post_id, $post_type . '_fermats_library_permalink', true );
+                $content .= '<form action="' . esc_attr($fermats_library_permalink) . '" method="get"><input id="fermatslibrary" type="submit" value="comment on Fermat\'s library"></form>';
+            }
+            $content .= '</div>';
             $content .= '</header>';
             $content .= '<div class="entry-content">';
             $content .= '<p class="abstract">';
