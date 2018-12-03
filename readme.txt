@@ -90,6 +90,7 @@ It is obviously a play on the name of humanoid robot character from a series of 
 ## Changelog
 
 ### 0.3.0
+* Added maintenance mode.
 * O-3PO is now largely theme independent.
 * Settings page completely redesigned.
 * Email templates and various other aspects of the plugin are now customizable.
