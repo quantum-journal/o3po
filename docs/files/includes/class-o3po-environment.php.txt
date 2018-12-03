@@ -3,7 +3,7 @@
 /**
  * Provide information about and functions to interact with the environment in which this plugin is running.
  *
- * @link       http://example.com
+ * @link       https://quantum-journal.org/o3po/
  * @since      0.1.0
  *
  * @package    O3PO

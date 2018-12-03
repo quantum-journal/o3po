@@ -9,7 +9,7 @@
  * Each publication type is connected to a WordPress custom post type and
  * individual publications are represented by posts of that type.
  *
- * @link       http://example.com
+ * @link       https://quantum-journal.org/o3po/
  * @since      0.1.0
  *
  * @package    O3PO
@@ -345,7 +345,7 @@ abstract class O3PO_PublicationType {
         /**
          * Render the maintenance_mode warning if appropriate.
          *
-         * @since    0.2.2+
+         * @since    0.3.0
          * @access   public
          * @param    WP_Post     $post   The post for which to render the metabox.
          * */
@@ -440,7 +440,7 @@ abstract class O3PO_PublicationType {
          *
          * To be added to the 'transition_post_status' hook.
          *
-         * @since    0.2.2+
+         * @since    0.3.0
          * @access   public
          * @param    string      $new      The new post status after this transition.
          * @param    string      $old      The old post status before this transition.
@@ -590,6 +590,9 @@ abstract class O3PO_PublicationType {
 
         $validation_result = '';
 
+        if( empty($journal) or empty($doi_prefix) or empty($publisher) )
+            $validation_result .= "WARNING: The journal title, doi prefix, or publisher seem to be empty. Probably some some essential settings were not set. Please go to the settings page and configure them.\n";
+
         if( O3PO_Latex::strpos_outside_math_mode($abstract, '\\') != false )
             $validation_result .= "WARNING: The abstract contains one or more backslashes. Please double check.\n" ;
         if( O3PO_Latex::strpos_outside_math_mode($abstract, '=') != false )
@@ -634,15 +637,12 @@ abstract class O3PO_PublicationType {
                 $validation_result .= "ERROR: Author " . ($x+1) . " Surname is empty.\n" ;
             if ( empty( $author_name_styles[$x] ) )
                 $validation_result .= "WARNING: Author " . ($x+1) . " name style is empty.\n" ;
-            if ( empty( $author_orcids[$x] ) )
-                $validation_result .= "INFO: ORCID of author " . ($x+1) . " is empty.\n" ;
-            else {
+            if ( !empty( $author_orcids[$x] ) )
+            {
                 $check_orcid_result = O3PO_Utility::check_orcid( $author_orcids[$x]);
                 if( !($check_orcid_result === true) )
                     $validation_result .= "ERROR: ORCID of author " . ($x+1) . " " . $check_orcid_result . ".\n" ;
             }
-            if ( empty( $author_urls[$x] ) )
-                $validation_result .= "INFO: URL of author " . ($x+1) . " is empty.\n" ;
             if ( empty( $author_affiliations[$x] ) )
                 $validation_result .= "WARNING: Affiliations of author " . ($x+1) . " are empty.\n" ;
             else {
@@ -2602,7 +2602,7 @@ abstract class O3PO_PublicationType {
          * Get the popilar summary if available. To be used in the single
          * templates.
          *
-         * @since  0.2.2+
+         * @since  0.3.0
          * @access public
          * @param  int    $post_id     Id of the post.
          */
@@ -2923,7 +2923,7 @@ abstract class O3PO_PublicationType {
          *
          * To be added to the 'the_author_posts_link' filter.
          *
-         * @since    0.2.2+
+         * @since    0.3.0
          * @access   pulic
          * @param    string    $link   Link to be filtered.
          */
@@ -2949,7 +2949,7 @@ abstract class O3PO_PublicationType {
          *
          * To be added to the 'template_include' action.
          *
-         * @since  0.2.2+
+         * @since  0.3.0
          * @access public
          * @param  string   $template   The template that would be used.
          * @return string   Template that should be used.

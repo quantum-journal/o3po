@@ -4,7 +4,7 @@
  * Encapsulates the interface with the external service CLOCKSS.
  *
  * @link       http://example.com
- * @since      0.2.2+
+ * @since      0.3.0
  *
  * @package    O3PO
  * @subpackage O3PO/includes
@@ -26,7 +26,7 @@ class O3PO_Clockss {
          *
          * Uploads xml meta-data and pdf to CLOCKSS for permanent archiving.
          *
-         * @since    0.2.2+
+         * @since    0.3.0
          * @access   public
          * @param    string     $clockss_xml      The xml encoded meta-data to upload.
          * @param    string     $pdf_path         Path to the local fulltext pdf

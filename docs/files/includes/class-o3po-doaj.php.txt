@@ -4,7 +4,7 @@
  * Encapsulates the interface with the external service DOAJ.
  *
  * @link       http://example.com
- * @since      0.2.2+
+ * @since      0.3.0
  *
  * @package    O3PO
  * @subpackage O3PO/includes
@@ -26,7 +26,7 @@ class O3PO_Doaj {
          *
          * Posts meta-data in json format to the DOAJ.
          *
-         * @since:    0.2.2+
+         * @since:    0.3.0
          * @access    public
          * @param     string  $doaj_json     Json encoded meta-data in a format suitable for DOAJ
          * @param     string  $doaj_api_url  The DOAJ API submission URL

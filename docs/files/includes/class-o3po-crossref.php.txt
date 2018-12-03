@@ -4,7 +4,7 @@
  * Encapsulates the interface with the external service Crossref.
  *
  * @link       http://example.com
- * @since      0.2.2+
+ * @since      0.3.0
  *
  * @package    O3PO
  * @subpackage O3PO/includes
@@ -26,7 +26,7 @@ class O3PO_Crossref {
          *
          * Submits meta-data in Crossref's xml format via http post to their servers.
          *
-         * @since    0.2.2+
+         * @since    0.3.0
          * @access   private
          * @param    string   $doi_batch_id    Batch id of this upload.
          * @param    string   $crossref_xml    The xml to upload.
@@ -78,7 +78,7 @@ class O3PO_Crossref {
          *
          * Uses Crossref's cited-by service.
          *
-         * @since    0.2.2+
+         * @since    0.3.0
          * @access   private
          * @param    string   $crossref_url    The url of the crossref server to upload to.
          * @param    string   $crossref_id     The id for which to submit this upload.
@@ -98,7 +98,7 @@ class O3PO_Crossref {
          *
          * Uses Crossref's cited-by service to retrieve information about works citing the given DOI in xml format.
          *
-         * @since    0.2.2+
+         * @since    0.3.0
          * @access   public
          * @param    string   $crossref_url    The url of the crossref server to upload to.
          * @param    string   $crossref_id     The id for which to submit this upload.

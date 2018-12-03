@@ -222,7 +222,7 @@ class O3PO_Journal {
          *
          * To be added to 'loop_start'.
          *
-         * @since  0.2.2+
+         * @since  0.3.0
          * @access public
          * @param  WP_Query  $wp_query   The current Wordpress query.
          */
@@ -264,7 +264,7 @@ class O3PO_Journal {
          *
          * To be added to the 'template_include' action.
          *
-         * @since  0.2.2+
+         * @since  0.3.0
          * @access public
          * @param  string   $template   The template that would be used.
          * @return string   Template that should be used.
@@ -291,7 +291,7 @@ class O3PO_Journal {
          *
          * To be added to the 'the_posts' action.
          *
-         * @since  0.2.2+
+         * @since  0.3.0
          * @access public
          * @param  array   $posts   Array of posts that would be returned if we do not intervene.
          * @return array   Array of posts that are returned if we do intervene.
@@ -311,7 +311,7 @@ class O3PO_Journal {
          *
          * To be added to the 'get_search_form' filter.
          *
-         * @since  0.2.2+
+         * @since  0.3.0
          * @access public
          * @param  string  $form   The normal search form,
          * @return string  Modified search form.
@@ -329,7 +329,7 @@ class O3PO_Journal {
          *
          * To be added to the 'loop_start' filter.
          *
-         * @since  0.2.2+
+         * @since  0.3.0
          * @access public
          * @param  WP_Query  $wp_query   The current Wordpress query.
          */
@@ -346,7 +346,7 @@ class O3PO_Journal {
         /**
          * Generate the notice for the search page.
          *
-         * @since  0.2.2+
+         * @since  0.3.0
          * @access public
          */
     public function get_search_notice() {
@@ -386,7 +386,7 @@ class O3PO_Journal {
         /**
          * Create and return a fake empty post.
          *
-         * @since  0.2.2+
+         * @since  0.3.0
          * @access public
          * @param  string $post_content  The content of the post to create.
          * @return stdClass A WP_Post compatible object representing a fake post that is empty apart from the given cont.
@@ -422,7 +422,7 @@ class O3PO_Journal {
          *
          * To be added to the 'loop_end' filter.
          *
-         * @since  0.2.2+
+         * @since  0.3.0
          * @access public
          * @param  WP_Query  $wp_query   The current Wordpress query.
          */

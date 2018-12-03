@@ -136,10 +136,10 @@
                                 <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-1200637577"></a>
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-825033903"></a>
                                 <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
             </div>
-            <div id="namespace-1200637577" class="accordion-body collapse in">
+            <div id="namespace-825033903" class="accordion-body collapse in">
                 <div class="accordion-inner">
 
                     
@@ -283,10 +283,18 @@ the respetive admin page and menu entry. *</p>
                                                                     <a href="../classes/O3PO_Settings.html#method_render_password_setting" class="">render_password_setting()</a><br />
                                                                     <a href="../classes/O3PO_Settings.html#method_render_checkbox_setting" class="">render_checkbox_setting()</a><br />
                                                                     <a href="../classes/O3PO_Settings.html#method_get_all_settings_fields_map" class="">get_all_settings_fields_map()</a><br />
+                                                                    <a href="../classes/O3PO_Settings.html#method_validate_doi_prefix" class="">validate_doi_prefix()</a><br />
+                                                                    <a href="../classes/O3PO_Settings.html#method_validate_eissn" class="">validate_eissn()</a><br />
+                                                                    <a href="../classes/O3PO_Settings.html#method_validate_first_volume_year" class="">validate_first_volume_year()</a><br />
+                                                                    <a href="../classes/O3PO_Settings.html#method_validate_url" class="">validate_url()</a><br />
+                                                                    <a href="../classes/O3PO_Settings.html#method_validate_two_letter_country_code" class="">validate_two_letter_country_code()</a><br />
+                                                                    <a href="../classes/O3PO_Settings.html#method_trim_settings_field" class="">trim_settings_field()</a><br />
                                                                     <a href="../classes/O3PO_Settings.html#method_validate_settings" class="">validate_settings()</a><br />
                                                                     <a href="../classes/O3PO_Settings.html#method_get_plugin_option" class="">get_plugin_option()</a><br />
                                                                     <a href="../classes/O3PO_Settings.html#method_get_plugin_name" class="">get_plugin_name()</a><br />
                                                                     <a href="../classes/O3PO_Settings.html#method_get_plugin_pretty_name" class="">get_plugin_pretty_name()</a><br />
+                                                                    <a href="../classes/O3PO_Settings.html#method_add_settings_section" class="">add_settings_section()</a><br />
+                                                                    <a href="../classes/O3PO_Settings.html#method_add_settings_field" class="">add_settings_field()</a><br />
                                                             </section>
                             <section class="span4">
                                                                     <em>No public properties found</em>
@@ -304,6 +312,8 @@ the respetive admin page and menu entry. *</p>
                                                                     <a href="../classes/O3PO_Settings.html#property_plugin_pretty_name" class="">$plugin_pretty_name</a><br />
                                                                     <a href="../classes/O3PO_Settings.html#property_version" class="">$version</a><br />
                                                                     <a href="../classes/O3PO_Settings.html#property_active_post_type_names_callback" class="">$active_post_type_names_callback</a><br />
+                                                                    <a href="../classes/O3PO_Settings.html#property_settings_sections" class="">$settings_sections</a><br />
+                                                                    <a href="../classes/O3PO_Settings.html#property_settings_field" class="">$settings_field</a><br />
                                                             </section>
                             <section class="span4">
                                 <em>N/A</em>
@@ -315,10 +325,6 @@ the respetive admin page and menu entry. *</p>
                                                                     <a href="../classes/O3PO_Singleton.html#method___clone" class="">__clone()</a><br />
                                                                     <a href="../classes/O3PO_Singleton.html#method___sleep" class="">__sleep()</a><br />
                                                                     <a href="../classes/O3PO_Singleton.html#method___wakeup" class="">__wakeup()</a><br />
-                                                                    <a href="../classes/O3PO_Settings.html#method_sanitize_doi_prefix" class="">sanitize_doi_prefix()</a><br />
-                                                                    <a href="../classes/O3PO_Settings.html#method_sanitize_eissn" class="">sanitize_eissn()</a><br />
-                                                                    <a href="../classes/O3PO_Settings.html#method_sanitize_secondary_journal_eissn" class="">sanitize_secondary_journal_eissn()</a><br />
-                                                                    <a href="../classes/O3PO_Settings.html#method_sanitize_first_volume_year" class="">sanitize_first_volume_year()</a><br />
                                                             </section>
                             <section class="span4">
                                                                     <a href="../classes/O3PO_Settings.html#property_option_defaults" class="">$option_defaults</a><br />
@@ -486,6 +492,68 @@ the respetive admin page and menu entry. *</p>
                                 <h4>Type</h4>
                 mixed
                 &mdash; The callback from which to get the active post type names.                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_settings_sections" name="property_settings_sections" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$settings_sections</h3>
+                <pre class="signature">$settings_sections : array</pre>
+                <p><em>Array of the IDs of all settings sections.</em></p>
+                
+
+                                <h4>Type</h4>
+                array
+                &mdash; Dictionary of all setting sections and their properties.                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_settings_field" name="property_settings_field" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$settings_field</h3>
+                <pre class="signature">$settings_field : array</pre>
+                <p><em>Array of the IDs of all settings field.</em></p>
+                
+
+                                <h4>Type</h4>
+                array
+                &mdash; Dictionary of all setting fields and their properties.                            </article>
         </div>
         <aside class="span4 detailsbar">
             <h1><i class="icon-arrow-down"></i></h1>
@@ -739,7 +807,7 @@ the respetive admin page and menu entry. *</p>
                 <h3 class="public ">register_settings()</h3>
                 <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
                 <pre class="signature" style="margin-right: 54px;">register_settings() </pre>
-                <p><em>Register all the all the settings.</em></p>
+                <p><em>Register all the settings.</em></p>
                 <p>To be added to the 'admin_init' action.</p>
 
                 
@@ -1121,7 +1189,7 @@ the respetive admin page and menu entry. *</p>
                             since
                         </th>
                         <td>
-                                                            0.2.2+                                
+                                                            0.3.0                                
                                                     </td>
                     </tr>
                             </table>
@@ -3246,6 +3314,283 @@ the respetive admin page and menu entry. *</p>
 
                                     <div class="row-fluid">
         <div class="span8 content class">
+            <a id="method_validate_doi_prefix" name="method_validate_doi_prefix" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">validate_doi_prefix()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">validate_doi_prefix(string  <span class="argument">$field</span>, string  <span class="argument">$doi_prefix</span>) </pre>
+                <p><em>Clean user input to the doi_prefix setting</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$field </td>
+                                <td><p>The field this was input to.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$doi_prefix </td>
+                                <td><p>User input.</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            0.1.0                                
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_validate_eissn" name="method_validate_eissn" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">validate_eissn()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">validate_eissn(string  <span class="argument">$field</span>, string  <span class="argument">$eissn</span>) </pre>
+                <p><em>Clean user input to the eissn setting</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$field </td>
+                                <td><p>The field this was input to.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$eissn </td>
+                                <td><p>User input.</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            0.1.0                                
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_validate_first_volume_year" name="method_validate_first_volume_year" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">validate_first_volume_year()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">validate_first_volume_year(string  <span class="argument">$field</span>, string  <span class="argument">$first_volume_year</span>) </pre>
+                <p><em>Clean user input to the first_volume_year setting</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$field </td>
+                                <td><p>The field this was input to.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$first_volume_year </td>
+                                <td><p>User input.</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            0.1.0                                
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_validate_url" name="method_validate_url" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">validate_url()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">validate_url(string  <span class="argument">$field</span>, string  <span class="argument">$input</span>) </pre>
+                <p><em>Clean user input to url type settings</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$field </td>
+                                <td><p>The field this was input to.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$input </td>
+                                <td><p>User input.</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            0.3.0                                
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_validate_two_letter_country_code" name="method_validate_two_letter_country_code" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">validate_two_letter_country_code()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">validate_two_letter_country_code(string  <span class="argument">$field</span>, string  <span class="argument">$input</span>) </pre>
+                <p><em>Validate two letter country code</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$field </td>
+                                <td><p>The field this was input to.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$input </td>
+                                <td><p>User input.</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            0.3.0                                
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_trim_settings_field" name="method_trim_settings_field" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">trim_settings_field()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">trim_settings_field(string  <span class="argument">$field</span>, string  <span class="argument">$input</span>) </pre>
+                <p><em>Trim user input to settings</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$field </td>
+                                <td><p>The field this was input to.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$input </td>
+                                <td><p>User input.</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            0.3.0                                
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
             <a id="method_validate_settings" name="method_validate_settings" class="anchor"></a>
             <article class="method">
                 <h3 class="public ">validate_settings()</h3>
@@ -3360,7 +3705,7 @@ the respetive admin page and menu entry. *</p>
                             since
                         </th>
                         <td>
-                                                            2.2.2+                                
+                                                            0.3.0                                
                                                     </td>
                     </tr>
                             </table>
@@ -3393,7 +3738,141 @@ the respetive admin page and menu entry. *</p>
                             since
                         </th>
                         <td>
-                                                            2.2.2+                                
+                                                            0.3.0                                
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_add_settings_section" name="method_add_settings_section" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">add_settings_section()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">add_settings_section(string  <span class="argument">$id</span>, string  <span class="argument">$title</span>, callable  <span class="argument">$callback</span>, string  <span class="argument">$page</span>) </pre>
+                <p><em>Wrapper around Wordpress&#039; add_settings_section()</em></p>
+                <p>Keeps a record of all settings sections in $this-&gt;settings_sections.</p>
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$id </td>
+                                <td><p>Slug-name to identify the section. Used in the 'id' attribute of tags.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$title </td>
+                                <td><p>Formatted title of the section. Shown as the heading for the section.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>callable</td>
+                                <td>$callback </td>
+                                <td><p>Function that echos out any content at the top of the section (between heading and fields).</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$page </td>
+                                <td><p>The slug-name of the settings page on which to show the section. Built-in pages include
+'general', 'reading', 'writing', 'discussion', 'media', etc. Create your own using
+add_options_page();</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            0.3.0                                
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_add_settings_field" name="method_add_settings_field" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">add_settings_field()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">add_settings_field(string  <span class="argument">$id</span>, string  <span class="argument">$title</span>, callable  <span class="argument">$callback</span>, string  <span class="argument">$page</span>, string  <span class="argument">$section = &#039;default&#039;</span>, array  <span class="argument">$args = array()</span>) </pre>
+                <p><em>Wrapper around Wordpress&#039; add_settings_field()</em></p>
+                <p>Keeps a record of all settings sections in $this-&gt;settings_sections.</p>
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$id </td>
+                                <td><p>Slug-name to identify the section. Used in the 'id' attribute of tags.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$title </td>
+                                <td><p>Formatted title of the section. Shown as the heading for the section.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>callable</td>
+                                <td>$callback </td>
+                                <td><p>Function that echos out any content at the top of the section (between heading and fields).</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$page </td>
+                                <td><p>The slug-name of the settings page on which to show the section. Built-in pages include
+'general', 'reading', 'writing', 'discussion', 'media', etc. Create your own using
+add_options_page();</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$section </td>
+                                <td><p>Optional. The slug-name of the section of the settings page
+in which to show the box. Default 'default'.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$args </td>
+                                <td><p>{
+Optional. Extra arguments used when outputting the field.</p>
+<pre><code>@type string $label_for When supplied, the setting title will be wrapped
+                        in a `&lt;label&gt;` element, its `for` attribute populated
+                        with this value.
+@type string $class     CSS Class to be added to the `&lt;tr&gt;` element when the
+                        field is output.</code></pre>
+<p>}</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            0.3.0                                
                                                     </td>
                     </tr>
                             </table>
@@ -3512,170 +3991,6 @@ the respetive admin page and menu entry. *</p>
         </aside>
     </div>
 
-                                    <div class="row-fluid">
-        <div class="span8 content class">
-            <a id="method_sanitize_doi_prefix" name="method_sanitize_doi_prefix" class="anchor"></a>
-            <article class="method">
-                <h3 class="private ">sanitize_doi_prefix()</h3>
-                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
-                <pre class="signature" style="margin-right: 54px;">sanitize_doi_prefix(string  <span class="argument">$doi_prefix</span>) </pre>
-                <p><em>Clean user input to the doi_prefix setting</em></p>
-                
-
-                                    <h4>Parameters</h4>
-                    <table class="table table-condensed table-hover">
-                                                    <tr>
-                                <td>string</td>
-                                <td>$doi_prefix </td>
-                                <td><p>User input.</p></td>
-                            </tr>
-                                            </table>
-                
-                
-                				
-                            </article>
-        </div>
-        <aside class="span4 detailsbar">
-            <h1><i class="icon-arrow-down"></i></h1>
-                                                            <dl>
-                                                                            </dl>
-            <h2>Tags</h2>
-            <table class="table table-condensed">
-                                    <tr>
-                        <th>
-                            since
-                        </th>
-                        <td>
-                                                            0.1.0                                
-                                                    </td>
-                    </tr>
-                            </table>
-        </aside>
-    </div>
-
-                                    <div class="row-fluid">
-        <div class="span8 content class">
-            <a id="method_sanitize_eissn" name="method_sanitize_eissn" class="anchor"></a>
-            <article class="method">
-                <h3 class="private ">sanitize_eissn()</h3>
-                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
-                <pre class="signature" style="margin-right: 54px;">sanitize_eissn(string  <span class="argument">$eissn</span>) </pre>
-                <p><em>Cleam user input to the eissn setting</em></p>
-                
-
-                                    <h4>Parameters</h4>
-                    <table class="table table-condensed table-hover">
-                                                    <tr>
-                                <td>string</td>
-                                <td>$eissn </td>
-                                <td><p>User input.</p></td>
-                            </tr>
-                                            </table>
-                
-                
-                				
-                            </article>
-        </div>
-        <aside class="span4 detailsbar">
-            <h1><i class="icon-arrow-down"></i></h1>
-                                                            <dl>
-                                                                            </dl>
-            <h2>Tags</h2>
-            <table class="table table-condensed">
-                                    <tr>
-                        <th>
-                            since
-                        </th>
-                        <td>
-                                                            0.1.0                                
-                                                    </td>
-                    </tr>
-                            </table>
-        </aside>
-    </div>
-
-                                    <div class="row-fluid">
-        <div class="span8 content class">
-            <a id="method_sanitize_secondary_journal_eissn" name="method_sanitize_secondary_journal_eissn" class="anchor"></a>
-            <article class="method">
-                <h3 class="private ">sanitize_secondary_journal_eissn()</h3>
-                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
-                <pre class="signature" style="margin-right: 54px;">sanitize_secondary_journal_eissn(string  <span class="argument">$secondary_journal_eissn</span>) </pre>
-                <p><em>Cleam user input to the secondary_journal_eissn setting</em></p>
-                
-
-                                    <h4>Parameters</h4>
-                    <table class="table table-condensed table-hover">
-                                                    <tr>
-                                <td>string</td>
-                                <td>$secondary_journal_eissn </td>
-                                <td><p>User input.</p></td>
-                            </tr>
-                                            </table>
-                
-                
-                				
-                            </article>
-        </div>
-        <aside class="span4 detailsbar">
-            <h1><i class="icon-arrow-down"></i></h1>
-                                                            <dl>
-                                                                            </dl>
-            <h2>Tags</h2>
-            <table class="table table-condensed">
-                                    <tr>
-                        <th>
-                            since
-                        </th>
-                        <td>
-                                                            0.1.0                                
-                                                    </td>
-                    </tr>
-                            </table>
-        </aside>
-    </div>
-
-                                    <div class="row-fluid">
-        <div class="span8 content class">
-            <a id="method_sanitize_first_volume_year" name="method_sanitize_first_volume_year" class="anchor"></a>
-            <article class="method">
-                <h3 class="private ">sanitize_first_volume_year()</h3>
-                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
-                <pre class="signature" style="margin-right: 54px;">sanitize_first_volume_year(string  <span class="argument">$first_volume_year</span>) </pre>
-                <p><em>Cleam user input to the first_volume_year setting</em></p>
-                
-
-                                    <h4>Parameters</h4>
-                    <table class="table table-condensed table-hover">
-                                                    <tr>
-                                <td>string</td>
-                                <td>$first_volume_year </td>
-                                <td><p>User input.</p></td>
-                            </tr>
-                                            </table>
-                
-                
-                				
-                            </article>
-        </div>
-        <aside class="span4 detailsbar">
-            <h1><i class="icon-arrow-down"></i></h1>
-                                                            <dl>
-                                                                            </dl>
-            <h2>Tags</h2>
-            <table class="table table-condensed">
-                                    <tr>
-                        <th>
-                            since
-                        </th>
-                        <td>
-                                                            0.1.0                                
-                                                    </td>
-                    </tr>
-                            </table>
-        </aside>
-    </div>
-
                                     </div>
     </section>
 
@@ -3725,7 +4040,7 @@ the respetive admin page and menu entry. *</p>
                 <section class="span10 offset1">
                     <hr />
                     Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
-                    on November 17th, 2018 at 18:41.
+                    on December 3rd, 2018 at 17:42.
                 </section>
             </section>
         </section>
