@@ -110,7 +110,7 @@ class O3PO_Settings extends O3PO_Singleton {
         'crossref_get_forward_links_url' => 'https://doi.crossref.org/servlet/getForwardLinks',
         'crossref_deposite_url' => 'https://doi.crossref.org/servlet/deposit',
         'crossref_test_deposite_url' => 'https://test.crossref.org/servlet/deposit',
-        'clockss_ftp_url' => 'ftp://ftp.clockss.org',
+        'clockss_ftp_url' => 'ftp.clockss.org',
         'arxiv_doi_feed_identifier' => 'arxiv_paper_doi_feed',
         'arxiv_url_abs_prefix' => 'https://arxiv.org/abs/',
         'arxiv_url_pdf_prefix' => 'https://arxiv.org/pdf/',
@@ -898,7 +898,7 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_clockss_ftp_url_setting() {
         $this->render_setting('clockss_ftp_url');
-        echo '<p>(Must start with ftp://)</p>';
+        echo '<p>(Please enter the raw url without a leading ftp://)</p>';
     }
 
         /**
@@ -1220,7 +1220,7 @@ class O3PO_Settings extends O3PO_Singleton {
                 'crossref_test_deposite_url' => 'validate_url',
                 'crossref_email' => 'trim_settings_field',
                 'crossref_archive_locations' => 'trim_settings_field',
-                'clockss_ftp_url' => 'validate_url',
+                'clockss_ftp_url' => 'trim_settings_field', #cannot use validate_url here because it prepends https:// or ftp:// and we want to save the raw url
                 'clockss_username' => 'trim_settings_field',
                 'clockss_password' => 'trim_settings_field',
                 'arxiv_url_abs_prefix' => 'validate_url',
