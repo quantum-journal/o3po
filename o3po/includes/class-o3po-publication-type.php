@@ -484,7 +484,7 @@ abstract class O3PO_PublicationType {
 		for ($x = 0; $x < $new_number_authors; $x++) {
 			$new_author_given_names[] = isset( $_POST[ $post_type . '_author_given_names' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_given_names' ][$x] ) : '';
 			$new_author_surnames[] = isset( $_POST[ $post_type . '_author_surnames' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_surnames' ][$x] ) : '';
-			$new_author_name_styles[] = isset( $_POST[ $post_type . '_author_name_styles' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_name_styles' ][$x] ) : '';
+			$new_author_name_styles[] = isset( $_POST[ $post_type . '_author_name_styles' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_name_styles' ][$x] ) : 'western';
 			$affiliation_nums = isset( $_POST[ $post_type . '_author_affiliations' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_affiliations' ][$x] ) : '';
 			$affiliation_nums = trim( preg_replace("/[^,0-9]/", "", $affiliation_nums ), ',');
 			$new_author_affiliations[] = $affiliation_nums;
@@ -579,6 +579,7 @@ abstract class O3PO_PublicationType {
         $corresponding_author_has_been_notifed_date = get_post_meta( $post_id, $post_type . '_corresponding_author_has_been_notifed_date', true );
         $doi_suffix_was_changed_on_last_save = get_post_meta( $post_id, $post_type . '_doi_suffix_was_changed_on_last_save', true );
         $abstract = get_post_meta( $post_id, $post_type . '_abstract', true );
+        $publisher = $this->get_journal_property('publisher');
 
             // Set the permalink
         if( !empty( $doi_suffix ) ) {
@@ -591,15 +592,17 @@ abstract class O3PO_PublicationType {
         $validation_result = '';
 
         if( empty($journal) or empty($doi_prefix) or empty($publisher) )
-            $validation_result .= "WARNING: The journal title, doi prefix, or publisher seem to be empty. Probably some some essential settings were not set. Please go to the settings page and configure them.\n";
+            $validation_result .= "WARNING: The journal title (" . $journal . "), doi prefix (" . $doi_prefix . "), or publisher (" . $publisher . ") seem to be empty. Probably some some essential settings were not set. Please go to the settings page and configure them.\n";
 
-        if( O3PO_Latex::strpos_outside_math_mode($abstract, '\\') != false )
+        if( O3PO_Latex::strpos_outside_math_mode($abstract, '\\') !== false )
             $validation_result .= "WARNING: The abstract contains one or more backslashes. Please double check.\n" ;
-        if( O3PO_Latex::strpos_outside_math_mode($abstract, '=') != false )
+        if( O3PO_Latex::strpos_outside_math_mode($abstract, '\\') !== false )
+            $validation_result .= "WARNING: The abstract contains one or more curly bracket. Please double check.\n" ;
+        if( O3PO_Latex::strpos_outside_math_mode($abstract, '=') !== false )
             $validation_result .= "WARNING: The abstract contains an = sign that should probably be part of a mathematical formulat, please put dollar signs around the formula.\n" ;
-        if( O3PO_Latex::strpos_outside_math_mode($abstract, '<') != false )
+        if( O3PO_Latex::strpos_outside_math_mode($abstract, '<') !== false )
             $validation_result .= "WARNING: The abstract contains an < sign that should probably be part of a mathematical formulat, please put dollar signs around the formula.\n" ;
-        if( O3PO_Latex::strpos_outside_math_mode($abstract, '>') != false )
+        if( O3PO_Latex::strpos_outside_math_mode($abstract, '>') !== false )
             $validation_result .= "WARNING: The abstract contains an > sign that should probably be part of a mathematical formulat, please put dollar signs around the formula.\n" ;
 
         $highest_pages_info = $this->journal->get_post_type_highest_pages_info( $post_id, array($post_type) );
@@ -667,7 +670,7 @@ abstract class O3PO_PublicationType {
                 $validation_result .= "WARNING: Affiliation " . ($x+1) . " contains suspicious looking special characters.\n" ;
             if ( strpos($all_appearing_affiliations, (string)($x+1) ) === false)
                 $validation_result .= "ERROR: Affiliation " . ($x+1) . " is not associated to any authors.\n" ;
-            if ( strpos($all_appearing_affiliations, (string)($x) ) > strpos($all_appearing_affiliations, (string)($x+1) ) )
+            if ( strpos($all_appearing_affiliations, (string)($x) ) !== false and strpos($all_appearing_affiliations, (string)($x+1) ) !== false and strpos($all_appearing_affiliations, (string)($x) ) > strpos($all_appearing_affiliations, (string)($x+1) ) )
                 $validation_result .= "ERROR: Affiliation " . ($x) . " appears after first appearance of " . ($x+1) . "\n" ;
         }
 
@@ -1830,7 +1833,7 @@ abstract class O3PO_PublicationType {
         echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_title" class="' . $post_type . '_title_label">' . 'Title' . '</label></th>';
 		echo '		<td>';
-		echo '			<input style="width:100%;" type="text" id="' . $post_type . '_title" name="' . $post_type . '_title" class="' . $post_type . '_title_field preview_and_mathml required" placeholder="' . '' . '" value="' . esc_attr($title) . '"><p>(The title may contain special characters. Type Č instead of \\v{C} for example. In contrary, mathematical formulas must be entered in LaTeX notation surrounded by $ signs. Write \\$ for an actual dollar sign. If a mathematical formula is detected, a live preview of how it will appear on the website and the MathML we submit to Crossref appears above this help text.)</p>';
+		echo '			<input style="width:100%;" type="text" id="' . $post_type . '_title" name="' . $post_type . '_title" class="' . $post_type . '_title_field preview_and_mathml required" placeholder="' . '' . '" value="' . esc_attr($title) . '"><p>(The title may contain special characters. Type Č instead of \\v{C} for example. On the contrary, mathematical formulas must be entered in LaTeX notation surrounded by $ signs. Write \\$ for an actual dollar sign. If a mathematical formula is detected, a live preview of how it will display on the website and the MathML representation appears above this help text.)</p>';
 		echo '		</td>';
 		echo '	</tr>';
 

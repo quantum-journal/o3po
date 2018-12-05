@@ -138,7 +138,8 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             update_post_meta( $post_id, $post_type . '_number_authors', $fetch_meta_data_from_abstract_page_result['number_authors'] );
             update_post_meta( $post_id, $post_type . '_author_given_names', $fetch_meta_data_from_abstract_page_result['author_given_names'] );
             update_post_meta( $post_id, $post_type . '_author_surnames', $fetch_meta_data_from_abstract_page_result['author_surnames'] );
-
+            if(isset($fetch_meta_data_from_abstract_page_result['number_authors']) and $fetch_meta_data_from_abstract_page_result['number_authors'] >= 0)
+                update_post_meta( $post_id, $post_type . '_author_name_styles', array_fill(0, $fetch_meta_data_from_abstract_page_result['number_authors'], 'western') ); #we cannot guess the name style from the arXiv page but must set this to a legal value
 		}
         else if(strpos($old_arxiv_fetch_results, 'ERROR') !== false or strpos($old_arxiv_fetch_results, 'WARNING') !== false)
             $arxiv_fetch_results .= "WARNING: No meta-data was fetched from the arXiv this time, but there were errors or warnings during the last fetch. Please make sure to resolve all of them manually or trigger a new fetch attempt by ticking the corresponding box below.\n";
@@ -1371,7 +1372,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                         //Look for abstracts and extract them
                     $thisabstract = O3PO_Latex::extract_abstracts($filecontents_without_comments);//we search the file with comments removed to not accidentially pic up a commented out abstract
                     $thisabstract = O3PO_Latex::expand_latex_macros($new_author_latex_macro_definitions, $thisabstract);
-                    $thisabstract = O3PO_Latex::latex_to_utf8_outside_math_mode($thisabstract);
+                    $thisabstract = O3PO_Latex::latex_to_utf8_outside_math_mode($thisabstract, false);
                     $thisabstract = O3PO_Latex::normalize_whitespace_and_linebreak_characters($thisabstract, false, true);
                     if(!empty($thisabstract))
                     {
