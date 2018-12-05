@@ -178,7 +178,7 @@ class O3PO_LatexTest extends PHPUnit_Framework_TestCase
             ["\\'a    " , "á    "],
             ["\\'{a}" , "á"],
             ["\\'{\\a}" , "á"],
-            ["\\'xax " , "\\'xax "],
+            ["\\'bax " , "\\'bax "],
             ["\\'{a" , "\\'{a"],
             ["\\'{\\a" , "\\'{\\a"],
             ["\\`  \n a" , "à"],
@@ -192,7 +192,7 @@ class O3PO_LatexTest extends PHPUnit_Framework_TestCase
             ["\\`a    " , "à    "],
             ["\\`{a}" , "à"],
             ["\\`{\\a}" , "à"],
-            ["\\`xax " , "\\`xax "],
+            ["\\`bax " , "\\`bax "],
             ["\\`{a" , "\\`{a"],
             ["\\`{\\a" , "\\`{\\a"],
             ["\\`a}" , "à}"],
@@ -236,6 +236,53 @@ ab' , 'äb'],
          */
     public function test_latex_to_utf8_outside_math_mode( $input, $expected ) {
         $this->assertSame($expected, O3PO_Latex::latex_to_utf8_outside_math_mode($input, false));
+    }
+
+
+    public function preg_split_at_latex_math_mode_delimters_provider() {
+        return [
+            ['foo' , ['foo']],
+            ['foo \\$ bar' , ['foo \\$ bar']],
+            ['foo $a$ bar' , ['foo ', 'a', ' bar']],
+            ['foo $$a$$ bar' , ['foo ', 'a', ' bar']],
+            ['foo \\[a\\] bar' , ['foo ', 'a', ' bar']],
+            ['foo \\(a\\) bar' , ['foo ', 'a', ' bar']],
+            ['foo \\begin{equation}a\\end{equation} bar' , ['foo ', 'a', ' bar']],
+            ['foo \\begin{align*}a\\end{align*} bar' , ['foo ', 'a', ' bar']],
+            ['$a$ bar' , ['', 'a', ' bar']],
+            ['foo $a$' , ['foo ', 'a', '']],
+            ['$a$' , ['', 'a', '']],
+            ['\\begin{abstract} foo \\(a\\) bar' , ['\\begin{abstract} foo ', 'a', ' bar']],
+
+                ];
+    }
+
+        /**
+         * @dataProvider preg_split_at_latex_math_mode_delimters_provider
+         */
+    public function test_preg_split_at_latex_math_mode_delimters( $input, $expected ) {
+        $this->assertSame($expected, O3PO_Latex::preg_split_at_latex_math_mode_delimters($input));
+    }
+
+    public function strpos_outside_math_mode_provider() {
+        return [
+            [['foo', 'o'] , 1],
+            [['foo', 'x'] , false],
+            [['foo $x$', 'x'] , false],
+            [['foo $x$ bar', 'a'] , 6],
+            [['foo $x$ \\bar', '\\'] , 5],
+            [[' \\begin{abstract} foo $x$', '\\'] , 1],
+            [['\\begin{abstract} foo $x$', '\\'] , 0],
+            [['\\begin{equation} x + \alpha = 4 \\end{equation}', '\\'] , false],
+            [['\\begin{equation} x + \alpha = 4 \\end{equation} x', 'x'] , 1],
+                ];
+    }
+
+        /**
+         * @dataProvider strpos_outside_math_mode_provider
+         */
+    public function test_strpos_outside_math_mode( $input, $expected ) {
+        $this->assertSame($expected, O3PO_Latex::strpos_outside_math_mode($input[0], $input[1]));
     }
 
 

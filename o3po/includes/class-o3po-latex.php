@@ -73,7 +73,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
          */
     static public function preg_split_at_latex_math_mode_delimters( $text ) {
 
-        return preg_split('#(?<!\\\\)(?:\$\$|\$|\\\\\[|\\\\\]|\\\\\(|\\\\\))#', $text);
+        return preg_split('#(?<!\\\\)(?:\$\$|\$|\\\\\[|\\\\\]|\\\\\(|\\\\\)|\\\\(?:begin|end)\s*{(?:equation|align|eqarray|gather|displaymath)\**})#', $text);
     }
 
 
@@ -89,9 +89,16 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
     static public function strpos_outside_math_mode( $latex_text, $string ) {
 
         $latex_lines = self::preg_split_at_latex_math_mode_delimters($latex_text);
+        $result = false;
+        $strlen_so_far = 0;
         foreach ($latex_lines as $x => $line) {
             if ($x % 2 !== 1) //Outside math mode
-                return strpos($line, $string);
+            {
+                $result = strpos($line, $string);
+                if($result !== false)
+                    return $result+$strlen_so_far;
+                $strlen_so_far += strlen($line);
+            }
         }
 
         return false;
@@ -892,13 +899,34 @@ class O3PO_Latex_Dictionary_Provider
                 '\\\\`'.self::match_single_non_character_makro_regexp_fragment('A') => 'À',
                 '\\\\`'.self::match_single_non_character_makro_regexp_fragment('E') => 'È',
                 '\\\\`'.self::match_single_non_character_makro_regexp_fragment('I') => 'Ì',
+                '\\\\`'.self::match_single_non_character_makro_regexp_fragment('K') => 'K̀',
+                '\\\\`'.self::match_single_non_character_makro_regexp_fragment('M') => 'M̀',
+                '\\\\`'.self::match_single_non_character_makro_regexp_fragment('N') => 'Ѝ',
                 '\\\\`'.self::match_single_non_character_makro_regexp_fragment('O') => 'Ò',
+                '\\\\`'.self::match_single_non_character_makro_regexp_fragment('R') => 'R̀',
+                '\\\\`'.self::match_single_non_character_makro_regexp_fragment('S') => 'S̀',
+                '\\\\`'.self::match_single_non_character_makro_regexp_fragment('T') => 'T̀',
                 '\\\\`'.self::match_single_non_character_makro_regexp_fragment('U') => 'Ù',
+                '\\\\`'.self::match_single_non_character_makro_regexp_fragment('V') => 'V̀',
+                '\\\\`'.self::match_single_non_character_makro_regexp_fragment('W') => 'Ẁ',
+                '\\\\`'.self::match_single_non_character_makro_regexp_fragment('X') => 'X̀',
+                '\\\\`'.self::match_single_non_character_makro_regexp_fragment('Y') => 'Ỳ',
+                '\\\\`'.self::match_single_non_character_makro_regexp_fragment('Z') => 'Z̀',
                 '\\\\`'.self::match_single_non_character_makro_regexp_fragment('a') => 'à',
                 '\\\\`'.self::match_single_non_character_makro_regexp_fragment('e') => 'è',
                 '\\\\`'.self::match_single_non_character_makro_regexp_fragment('i') => 'ì',
+                '\\\\`'.self::match_single_non_character_makro_regexp_fragment('k') => 'k̀',
+                '\\\\`'.self::match_single_non_character_makro_regexp_fragment('m') => 'm̀',
+                '\\\\`'.self::match_single_non_character_makro_regexp_fragment('n') => 'ѝ',
                 '\\\\`'.self::match_single_non_character_makro_regexp_fragment('o') => 'ò',
+                '\\\\`'.self::match_single_non_character_makro_regexp_fragment('r') => 'r̀',
+                '\\\\`'.self::match_single_non_character_makro_regexp_fragment('s') => 's̀',
+                '\\\\`'.self::match_single_non_character_makro_regexp_fragment('t') => 't̀',
                 '\\\\`'.self::match_single_non_character_makro_regexp_fragment('u') => 'ù',
+                '\\\\`'.self::match_single_non_character_makro_regexp_fragment('v') => 'v̀',
+                '\\\\`'.self::match_single_non_character_makro_regexp_fragment('w') => 'ẁ',
+                '\\\\`'.self::match_single_non_character_makro_regexp_fragment('x') => 'x̀',
+                '\\\\`'.self::match_single_non_character_makro_regexp_fragment('y') => 'ỳ',
                 '\\\\~'.self::match_single_non_character_makro_regexp_fragment('A') => 'Ã',
                 '\\\\~'.self::match_single_non_character_makro_regexp_fragment('I') => 'Ĩ',
                 '\\\\~'.self::match_single_non_character_makro_regexp_fragment('N') => 'Ñ',
@@ -908,7 +936,7 @@ class O3PO_Latex_Dictionary_Provider
                 '\\\\~'.self::match_single_non_character_makro_regexp_fragment('n') => 'ñ',
                 '\\\\~'.self::match_single_non_character_makro_regexp_fragment('o') => 'õ',
                 '\\\\~'.self::match_single_non_character_makro_regexp_fragment('u') => 'ũ',
-
+                '\\\\`'.self::match_single_non_character_makro_regexp_fragment('z') => 'z̀',
                 '\\\\c'.self::match_single_character_makro_regexp_fragment('C') => 'Ç',
                 '\\\\c'.self::match_single_character_makro_regexp_fragment('G') => 'Ģ',
                 '\\\\c'.self::match_single_character_makro_regexp_fragment('K') => 'Ķ',
