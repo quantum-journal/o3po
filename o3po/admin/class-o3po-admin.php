@@ -195,7 +195,10 @@ class O3PO_Admin {
                         $post_id = get_the_ID();
                         $post_type = get_post_type($post_id);
 
-                        $out .= "[" . '"' . O3PO_PublicationType::get_formated_authors($post_id) . '", ' . O3PO_PublicationType::get_number_authors($post_id) . ', "' . O3PO_PublicationType::get_title($post_id) . ', "' . O3PO_PublicationType::get_corresponding_author_email($post_id) .  '"' . "],\n";
+                        if($post_type !== 'paper')
+                            continue;
+
+                        $out .= "[" . '"' . O3PO_PublicationType::get_formated_authors($post_id) . '", ' . O3PO_PublicationType::get_number_authors($post_id) . ', "' . O3PO_PublicationType::get_title($post_id) . '", "' . O3PO_PublicationType::get_corresponding_author_email($post_id) .  '"' . "],\n";
                     }
                 }
             }
