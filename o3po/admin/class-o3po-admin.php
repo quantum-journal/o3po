@@ -11,6 +11,7 @@
  */
 
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-plotter.php';
 
 /**
  * The admin-specific functionality of the plugin.
@@ -194,12 +195,13 @@ class O3PO_Admin {
                         $post_id = get_the_ID();
                         $post_type = get_post_type($post_id);
 
-                        $out .= "[" . '"' . O3PO_PublicationType::get_formated_authors( $post_id ) . '", ' . O3PO_PublicationType::get_number_authors( $post_id ) . ', "' . O3PO_PublicationType::get_title() . ', "' . O3PO_PublicationType::get_corresponding_author_email($post_id) .  '"' . "],\n";
+                        $out .= "[" . '"' . O3PO_PublicationType::get_formated_authors($post_id) . '", ' . O3PO_PublicationType::get_number_authors($post_id) . ', "' . O3PO_PublicationType::get_title($post_id) . ', "' . O3PO_PublicationType::get_corresponding_author_email($post_id) .  '"' . "],\n";
                     }
                 }
             }
             wp_reset_postdata();
 
+            $html .= '<p>This is only a very basic summary of some of the meta-data fields of the published publications. In the future this page will allow a more customizable display and export of that meta-data.</p>';
             $html .= '<textarea rows="16" style="width:80%;" readonly>' . esc_textarea($out) . '</textarea>';
         }
         elseif($active_tab === 'citation-metrics')
@@ -268,8 +270,8 @@ class O3PO_Admin {
                     $delta_x += 1;
 
                 $html .= '<h5>Citation statistics</h5>';
-                $html .= static::histogram($citations_this_type, $delta_x, "citations", "number of publications", "Citation histogram.", "#53257F");
-
+                $plotter = new O3PO_Plotter();
+                $html .= $plotter->histogram($citations_this_type, $delta_x, "citations", "number of publications", "#53257F", "Citation histogram.");
                 $html .= '<table>
 <tr><td style="text-align: right;">Total number of publications:</td><td style="text-align: left;">' . count($citations_this_type) . '</td></tr>
 <tr><td style="text-align: right;">Mean number of citations:</td><td style="text-align: left;">' . O3PO_Utility::array_mean($citations_this_type) . '</td></tr>
@@ -283,104 +285,17 @@ class O3PO_Admin {
     }
 
 
+        /**
+         * Array of tabs in the meta-data explorer.
+         *
+         * @since 0.3.0
+         * @access private
+         * @var array $meta_data_explorer_tabs    Array of slugs and labels of the tabs of the meta-data explorer.
+         */
     private $meta_data_explorer_tabs = [
         'meta-data' => 'Meta-data',
         'citation-metrics' => 'Citation metrics'
                                              ];
-
-
-    public static function caption($type,$text,$ref=null)
-    {
-        global $caption_refs, $last_num;
-
-        $output = "";
-        if(!isset($caption_refs[$type]))
-        {
-            $caption_refs[$type] = array();
-        }
-
-        if(!isset($last_num[$type]))
-            $last_num[$type] = 0;
-
-        $id = $last_num[$type]+1;
-
-        if(!empty($ref))
-            $caption_refs[$type][$ref] = $id;
-
-            /* if($type==="table") */
-            /*     $output .= "<caption style=\"caption-side: bottom;margin-bottom:1em;margin-top:0.5em;text-align:left\"><span id=\"" . $type . $id . "\" style=\"transform:translateY(-50vh);\"></span><strong>".ucfirst($type)." ".($last_num[$type]+1).":</strong> ".$text."</caption>"; */
-            /* else */
-        $output .= "<div style=\"display: flex;\"><span id=\"" . $type . $id . "\" style=\"transform:translateY(-50vh);\"></span><div style=\"flex-grow: 1;width: 0;margin-bottom:1em;margin-top:0.5em;text-align:left\"><strong>".ucfirst($type)." ".($last_num[$type]+1).":</strong> ".$text."</div></div>";
-
-        $output .= "\n";
-        $last_num[$type] +=1;
-        return $output;
-    }
-
-
-    public static function histogram($data, $x_delta, $x_label, $y_label, $caption, $color, $ref=null, $extra=null)
-{
-    $frame_color = "gray";
-
-    $max_val_in_data = 0;
-    foreach($data as $title => $t)
-    {
-        if($t > $max_val_in_data)
-            $max_val_in_data = $t;
-    }
-    $x_max = floor($max_val_in_data/$x_delta+1)*$x_delta;
-
-    $hist_data = array_fill(0,floor($x_max/$x_delta)+1,0);
-    foreach($data as $title => $t)
-    {
-        $hist_data[floor($t/$x_delta)] += 1;
-    }
-    $y_max = max($hist_data);
-
-    $y_delta = 1;
-    $y_delta_step = 0;
-    while($y_max/$y_delta > 10) {
-        $y_delta = (($y_delta_step % 3)**2 + 1) * 10**floor($y_delta_step/3); #taken from http://oeis.org/A051109
-        $y_delta_step += 1;
-    }
-
-    $output = "";
-    $output .= '<div style="position:relative;display:inline-block;vertical-align:top;width:100%;max-width:45em;margin-right:1em;"><div style="display:block;margin:1em;margin-bottom:3em;margin-left:1em;"><div style="position:relative;height:14em;outline:0.2ch solid '.$frame_color.';margin-left:6ch;margin-bottom:2em;margin-right:2ch;margin-top:0.5em">';
-    $output .=  '<span style="display:inline-block;width:0;height:100%;"></span>';//make following bars start at the bottom;
-    /* foreach($data as $title => $t) */
-    /* { */
-    /*     $output .=  '<span title="'.round($t/60/60/24,0).' days" style="display:inline-block;width:'.(100/$x_max).'%;height:'.($t/$y_max*100).'%;box-shadow:0px 0px 0px 1px '.$color.' inset;background-color:'.$color.';"   onMouseOver="this.style.opacity=\'0.7\'" onMouseOut="this.style.opacity=\'1\'"></span>'; */
-    /* } */
-
-    foreach($hist_data as $x => $y)
-    {
-        $output .= '<span title="'.$y.' times ' . $x . '" style="display:inline-block;width:'.(100*$x_delta/$x_max).'%;height:'.($y/$y_max*100).'%;box-shadow:0px 0px 0px 1px '.$color.' inset;background-color:'.$color.';"   onMouseOver="this.style.opacity=\'0.7\'" onMouseOut="this.style.opacity=\'1\'"></span>';
-    }
-
-//Axes
-    for($y=0; $y <= $y_max; $y+=$y_delta)
-    {
-        $output .=  '<div style="position:absolute;left:-1ch;width:1ch;height:0.2ch;top:'.(100-$y/$y_max*100).'%;background-color:'.$frame_color.';box-shadow:0px 0px 0px 1px '.$frame_color.' inset;"><div style="color:'.$frame_color.';position:absolute;left:-6ch;width:5ch;bottom:-0.5em;text-align:right">'.round($y,2).'</div></div>';
-    }
-    for($x=0; $x <= $x_max; $x+=$x_delta)
-    {
-        $output .=  '<div style="position:absolute;bottom:-1ch;width:0.2ch;height:1ch;right:'.(100-$x/$x_max*100).'%;background-color:'.$frame_color.';box-shadow:0px 0px 0px 1px '.$frame_color.' inset;"><div style="color:'.$frame_color.';position:absolute;bottom:-1.5em;width:6ch;left:-3ch;text-align:center">'.round($x,2).'</div></div>';
-    }
-        //Axes labels
-    $output .=  '<div style="position:absolute;right:50%;bottom:-2em;"><div style="position:absolute;left:-13em;width:26em;text-align:center;">'.$x_label.'</div></div>';
-    $output .=  '<div style="position:absolute;top:50%;left:-7ch;"><div style="position:absolute;left:-8em;text-align:center;width:16em;-moz-transform: rotate(-90deg);-o-transform: rotate(-90deg);-webkit-transform: rotate(-90deg);transform: rotate(-90deg);">'.$y_label.'</div></div>';
-    $output .=  '</div></div>' . "\n";
-    static::caption("figure", $caption, $ref);
-    $output .=  '<div class="bar-chart-data" style="display:none;">' . "\n";
-    $output .=  "time in seconds\n";
-    foreach($data as $data_point)
-        $output .=  $data_point . ", ";
-    $output .= '</div>'. "\n";
-    $output .= '</div>';
-
-    return $output;
-}
-
 
 
         /**

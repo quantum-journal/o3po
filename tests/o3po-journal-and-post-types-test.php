@@ -533,6 +533,9 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          */
     public function test_primary_validate_and_process_data( $post_id, $expections, $primary_publication_type ) {
 
+        #init settings here instead of depending on test_initialize_settings because O3PO_Settings is a singleton
+        $this->test_initialize_settings();
+
         if(!defined('ABSPATH'))
             define( 'ABSPATH', dirname( __FILE__ ) . '/resources/' );
 
@@ -565,6 +568,9 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          * @depends test_create_secondary_publication_type
          */
     public function test_secondary_validate_and_process_data( $post_id, $expections, $secondary_publication_type ) {
+
+        #init settings here instead of depending on test_initialize_settings because O3PO_Settings is a singleton
+        $this->test_initialize_settings();
 
         $secondary_publication_type_class = new ReflectionClass('O3PO_SecondaryPublicationType');
 
@@ -605,6 +611,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          * @depends test_create_primary_publication_type
          */
     public function test_primary_on_post_actually_published( $post_id, $primary_publication_type ) {
+
+        #init settings here instead of depending on test_initialize_settings because O3PO_Settings is a singleton
+        $this->test_initialize_settings();
+
         $class = new ReflectionClass('O3PO_PrimaryPublicationType');
 
         $post_type = get_post_type($post_id);
@@ -630,6 +640,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          * @depends test_create_secondary_publication_type
          */
     public function test_secondary_on_post_actually_published( $post_id, $secondary_publication_type ) {
+
+        #init settings here instead of depending on test_initialize_settings because O3PO_Settings is a singleton
+        $this->test_initialize_settings();
+
         $class = new ReflectionClass('O3PO_SecondaryPublicationType');
 
         $post_type = get_post_type($post_id);
@@ -724,6 +738,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          * @depends test_create_primary_publication_type
          */
     public function test_primary_save_meta_data( $post_id, $POST_args, $expections, $primary_publication_type ) {
+
+        #init settings here instead of depending on test_initialize_settings because O3PO_Settings is a singleton
+        $this->test_initialize_settings();
+
         $post_type = get_post_type($post_id);
 
         foreach($POST_args as $key => $value)
@@ -811,6 +829,8 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
 
     public function save_metabox_provider() {
+        #init settings here instead of depending on test_initialize_settings because O3PO_Settings is a singleton
+        $this->test_initialize_settings();
         $settings = O3PO_Settings::instance();
 
         return [
@@ -950,6 +970,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          * @depends test_create_secondary_publication_type
          */
     public function test_save_metabox( $post_id, $POST_args, $expections_first, $expections_second, $primary_publication_type, $secondary_publication_type ) {
+
+        #init settings here instead of depending on test_initialize_settings because O3PO_Settings is a singleton
+        $this->test_initialize_settings();
+
         if(!defined('ABSPATH'))
             define( 'ABSPATH', dirname( __FILE__ ) . '/resources/' );
 
@@ -997,6 +1021,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          * @depends test_create_secondary_publication_type
          */
     public function test_on_transition_post_status( $post_id, $POST_args, $expections_first, $expections_second, $primary_publication_type, $secondary_publication_type ) {
+
+        #init settings here instead of depending on test_initialize_settings because O3PO_Settings is a singleton
+        $this->test_initialize_settings();
+
         if(!defined('ABSPATH'))
             define( 'ABSPATH', dirname( __FILE__ ) . '/resources/' );
 
@@ -1044,8 +1072,9 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          * @doesNotPerformAssertions
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
+         * @depends test_initialize_settings
          */
-    public function test_register_as_custom_post_type( $primary_publication_type, $secondary_publication_type) {
+    public function test_register_as_custom_post_type( $primary_publication_type, $secondary_publication_type, $settings ) {
         $primary_publication_type->register_as_custom_post_type();
         $secondary_publication_type->register_as_custom_post_type();
     }
