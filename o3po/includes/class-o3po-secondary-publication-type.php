@@ -487,7 +487,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_reviewers_summary" class="' . $post_type . '_reviewers_summary_label">' . 'Reviewers summary' . '</label></th>';
 		echo '		<td>';
-		echo '			<textarea rows="6" style="width:100%;" name="' . $post_type . '_reviewers_summary" id="' . $post_type . '_reviewers_summary">' . esc_html($reviewers_summary) . '</textarea><p>(Summary of the reviewers.)</p>';
+		echo '			<textarea rows="6" style="width:100%;" name="' . $post_type . '_reviewers_summary" id="' . $post_type . '_reviewers_summary">' . esc_textarea($reviewers_summary) . '</textarea><p>(Summary of the reviewers.)</p>';
 		echo '		</td>';
 		echo '	</tr>';
     }
@@ -606,9 +606,9 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_author_commentary" class="' . $post_type . '_author_commentary_label">' . 'Author commentary' . '</label></th>';
 		echo '		<td>';
-		echo '			<textarea rows="6" style="width:100%;" name="' . $post_type . '_author_commentary" id="' . $post_type . '_author_commentary">' . esc_html( $author_commentary ) . '</textarea><p>(Commentary of the author(s).)</p>';
+		echo '			<textarea rows="6" style="width:100%;" name="' . $post_type . '_author_commentary" id="' . $post_type . '_author_commentary">' . esc_textarea( $author_commentary ) . '</textarea><p>(Commentary of the author(s).)</p>';
 
-        echo '			<textarea rows="6" style="width:100%;" name="' . $post_type . '_about_the_author" id="' . $post_type . '_about_the_author">' . esc_html( $about_the_author ) . '</textarea><p>(Some text about the author(s).)</p>';
+        echo '			<textarea rows="6" style="width:100%;" name="' . $post_type . '_about_the_author" id="' . $post_type . '_about_the_author">' . esc_textarea( $about_the_author ) . '</textarea><p>(Some text about the author(s).)</p>';
 
 		echo '		</td>';
 		echo '	</tr>';

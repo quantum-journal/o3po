@@ -11,6 +11,9 @@ include(dirname( __FILE__ ) . '/posts.php');
 include(dirname( __FILE__ ) . '/formatting.php');
 include(dirname( __FILE__ ) . '/kses.php');
 
+require_once dirname( __FILE__ ) . '/../../o3po/includes/class-o3po-settings.php';
+
+
 if(!class_exists('PHPUnit_Framework_TestCase')){
         /**
          * Make sure the class PHPUnit_Framework_TestCase is always defined
@@ -23,6 +26,8 @@ if(!class_exists('PHPUnit_Framework_TestCase')){
     }
 }
 
+#$settings = O3PO_Settings::instance();
+#
 
 function plugin_dir_path($path) {
 
@@ -78,7 +83,7 @@ function get_site_url() {
 
 function get_option( $option, $default = false ) {
 
-    if($option === 'o3po-setttings' or 'quantum-journal-plugin-setttings')
+    if($option === 'o3po-settings' or $option === 'o3po-setttings' or $option === 'quantum-journal-plugin-setttings')
         return array(
             'production_site_url' => 'fake_production_site_url',
             'journal_title' => 'fake_journal_title',
@@ -130,6 +135,10 @@ function get_option( $option, $default = false ) {
             'secondary_journal_eissn' => "fake_secondary_journal_eissn",
             'first_volume_year' => "2009",
                      );
+    elseif($option === 'blog_charset')
+        return 'UTF-8';
+    elseif($option === 'rewrite_rules')
+        return array();
     else
         throw(new Exception("We don't know how to fake the option " . $option . "."));
 
@@ -658,7 +667,7 @@ function wp_remote_get( $url, $args=array() ) {
                           );
     if(!empty($local_file_urls[$url]))
         return array('headers'=>'' ,'body'=> file_get_contents($local_file_urls[$url]) );
-    elseif(strpos($url, get_option('o3po-setttings')['crossref_get_forward_links_url']) === 0)
+    elseif(strpos($url, get_option('o3po-settings')['crossref_get_forward_links_url']) === 0)
         return array('body' => 'fake respose form crossref forward links url');
     else
         throw new Exception('Fake wp_remote_get() does not know how to handle ' . $url);

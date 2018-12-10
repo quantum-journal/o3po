@@ -74,13 +74,13 @@ class O3PO_Crossref {
     }
 
         /**
-         * Retrieve cited-by information from Crossref.
+         * Retrieve cited-by information for a given doi from Crossref.
          *
          * Uses Crossref's cited-by service.
          *
          * @since    0.3.0
          * @access   private
-         * @param    string   $crossref_url    The url of the crossref server to upload to.
+         * @param    string   $crossref_url    The url of the crossref server from which to fetch cited by information.
          * @param    string   $crossref_id     The id for which to submit this upload.
          * @param    string   $crossref_pw     The password corresponding to the crossref_id.
          * @param    string   $doi             The doi for which cited-by data is to be retrieved.
@@ -92,6 +92,26 @@ class O3PO_Crossref {
         return  wp_remote_get($request_url);
     }
 
+
+        /**
+         * Retrieve cited-by information for all citations under a given doi prefix.
+         *
+         * Uses Crossref's cited-by service.
+         *
+         * @since    0.3.0
+         * @access   private
+         * @param    string   $crossref_url    The url of the crossref server to upload to.
+         * @param    string   $crossref_id     The id for which to submit this upload.
+         * @param    string   $crossref_pw     The password corresponding to the crossref_id.
+         * @param    string   $doi_prefix      The doi prefix for which cited-by data is to be retrieved.
+         * @param    string   $startDate       The date from which on the cited by data is to be included in the format YYYY-mm-dd
+         */
+    private static function remote_get_all_cited_by( $crossref_url, $crossref_id, $crossref_pw, $doi_prefix, $startDate ) {
+
+        $request_url = $crossref_url . '?usr=' . urlencode($crossref_id).  '&pwd=' . urlencode($crossref_pw) . '&doi=' . urlencode($doi_prefix) . '&startDate=' . $startDate;
+
+        return wp_remote_get($request_url, array('timeout' => 20));
+    }
 
         /**
          * Retrieve cited-by information in xml format from Crossref.
@@ -135,4 +155,67 @@ class O3PO_Crossref {
             return new WP_Error($e->getMessage());
         }
     }
+
+
+        /**
+         * Retrieve cited-by information in xml format from Crossref.
+         *
+         * Uses Crossref's cited-by service to retrieve information about works citing the given DOI in xml format.
+         *
+         * @since    0.3.0
+         * @access   public
+         * @param    string   $crossref_url    The url of the crossref server to upload to.
+         * @param    string   $crossref_id     The id for which to submit this upload.
+         * @param    string   $crossref_pw     The password corresponding to the crossref_id.
+         * @param    string   $doi             The doi for which cited-by data is to be retrieved.
+         */
+    public static function get_all_citation_counts( $crossref_url, $crossref_id, $crossref_pw, $doi_prefix, $start_date ) {
+
+        try
+        {
+            $xml_string = get_transient('all_cited_by_xml_' . $crossref_id . "_" . $doi_prefix . "_" . $start_date);
+
+            if(false === $xml_string)
+            {
+                $response = static::remote_get_all_cited_by($crossref_url, $crossref_id, $crossref_pw, $doi_prefix, $start_date);
+
+                if(is_wp_error($response))
+                    return null;
+                else if(empty($response['body']) )
+                    return null;
+                else
+                {
+                    $xml_string = $response['body'];
+                }
+            }
+
+            $use_errors=libxml_use_internal_errors(true);
+            $xml = simplexml_load_string($xml_string);
+            libxml_use_internal_errors($use_errors);
+
+            if ($xml === false)
+                return null;
+
+            set_transient('all_cited_by_xml_' . $crossref_id . "_" . $doi_prefix . "_" . $start_date, $xml_string, 600); //keep for 10 minute
+
+            echo("now printing: ");
+
+            $citations = array();
+            foreach($xml->query_result->body->children() as $forward_link )
+            {
+                $doi = (string)$forward_link->attributes()->doi;
+                if(!isset($citations[$doi]))
+                    $citations[$doi] = 0;
+                $citations[$doi] += 1;
+            }
+
+            return $citations;
+
+        } catch (Exception $e) {
+            echo("Exception!");
+
+            return null;
+        }
+    }
+
 }

@@ -209,7 +209,7 @@ class O3PO {
         $this->loader = new O3PO_Loader();
 
         $settings = O3PO_Settings::instance();
-        $settings->configure($this->plugin_name, $this->plugin_pretty_name, $this->version, 'O3PO_PublicationType::get_active_publication_type_names');
+        $settings->configure($this->plugin_name, $this->get_plugin_pretty_name(), $this->version, 'O3PO_PublicationType::get_active_publication_type_names');
 
         $this->environment = new O3PO_Environment($settings->get_plugin_option("production_site_url"));
 
@@ -270,13 +270,14 @@ class O3PO {
          */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new O3PO_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_admin = new O3PO_Admin( $this->get_plugin_name(), $this->get_version(), $this->get_plugin_pretty_name() );
         $settings = O3PO_Settings::instance();
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'plugin_action_links_' . $this->get_plugin_name() . '/' . $this->get_plugin_name() . '.php', $plugin_admin, 'add_plugin_action_links' );
         $this->loader->add_action( 'admin_head', $plugin_admin, 'enable_mathjax' );
+        $this->loader->add_action( 'admin_menu', $plugin_admin, 'add_meta_data_explorer_page_to_menu' );
 
         $this->loader->add_action( 'admin_menu', $settings, 'add_settings_page_to_menu' );
         $this->loader->add_action( 'admin_init', $settings, 'register_settings' );
@@ -389,6 +390,17 @@ class O3PO {
 	public function get_plugin_name() {
 
 		return $this->plugin_name;
+	}
+
+        /**
+         * The pretty name of the plugin
+         *
+         * @since     0.3.0
+         * @return    string    The pretty name of the plugin.
+         */
+	public function get_plugin_pretty_name() {
+
+		return $this->plugin_pretty_name;
 	}
 
         /**

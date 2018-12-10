@@ -238,4 +238,38 @@ class O3PO_Utility
  (?&address)/x", $email));
     }
 
+
+    public static function array_mean($a) {
+        return array_sum($a)/count($a);
+    }
+
+    public static function array_stddev($a) {
+        if(count($a)<2)
+            return "undefined";
+
+        $mean = array_mean($a);
+        $sum_of_squares = array();
+        foreach($a as $elem)
+            $sum_of_squares[] = ($elem - $mean)*($elem - $mean);
+
+        return sqrt(array_sum($sum_of_squares)/(count($a)-1));//???
+    }
+
+    public static function array_median($array) {
+        if (!is_array($array))
+            throw new DomainException('Input is not an array');
+
+        $iCount = count($array);
+        if ($iCount == 0)
+            throw new DomainException('Input array is empty');
+
+        $middle_index = floor($iCount / 2);
+        sort($array, SORT_NUMERIC);
+        $median = $array[$middle_index];
+        if ($iCount % 2 == 0) {
+            $median = ($median + $array[$middle_index - 1]) / 2;
+        }
+        return $median;
+    }
+
 }

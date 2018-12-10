@@ -15,7 +15,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-setti
 /**
  * Encapsulates the interface with the external service arXiv.
  *
- * Provides methods to interface with DOAJ.
+ * Provides methods to interface with arXiv.
  *
  * @package    O3PO
  * @subpackage O3PO/includes

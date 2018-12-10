@@ -237,7 +237,7 @@ class O3PO_Settings extends O3PO_Singleton {
     public function render_settings_page() {
 
         echo '<div>';
-        echo '<h1>' . $this->plugin_pretty_name . ' settings (version ' . $this->version . ')</h1>';
+        echo '<h2>' . $this->plugin_pretty_name . ' settings (version ' . $this->version . ')</h2>';
 
         if(isset( $_GET['tab'] ))
             $active_setting_section = $_GET['tab'];
@@ -248,7 +248,6 @@ class O3PO_Settings extends O3PO_Singleton {
         }
 
         echo '<h2 class="nav-tab-wrapper">' . "\n";
-
         foreach($this->settings_sections as $section_id => $section_options)
             echo '<a href="' . esc_url('?page=' . $this->plugin_name . '-settings' . '&amp;tab=' . $section_id) . '" class="nav-tab' . ($active_setting_section == $section_id ? ' nav-tab-active' : '') . '">' . esc_html($section_options['title']) . '</a>' . "\n";
         echo '</h2>' . "\n";
