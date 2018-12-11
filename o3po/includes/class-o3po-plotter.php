@@ -31,17 +31,19 @@ class O3PO_Plotter {
          *
          * @since  0.3.0
          * @access public
-         * @param  array $data      Array of data to be displayed as a histogram. Can be a dictionary, in which case the values will be interpreted as the data.
-         * @param  float $x_delta   The width of the bins (in x direction) of the histogram.
-         * @param  float $y_delta   The distance (in y direction) between axis ticks.
-         * @param  string $x_label  The label of the x axis
-         * @param  string $y_label  The label of the y axis
-         * @param  string $color    The color of of the bars in HTML notation (defaults to '#000000').
-         * @param  string $caption  The caption of the plot (optional)
-         * @param  string $ref      The reference key of this plot
-         * @return string           The generated html code of the histogram
+         * @param  array $data       Array of data to be displayed as a histogram. Can be a dictionary, in which case the values will be interpreted as the data.
+         * @param  float $x_delta    The width of the bins (in x direction) of the histogram.
+         * @param  int   $max_y_labels    The maximum number of labels on the y axis.
+         * @param  string $max_width HTML length for the maximum width, below that takes 100% of the available space
+         * @param  string $height    HTML length for the height of the plot
+         * @param  string $x_label   The label of the x axis
+         * @param  string $y_label   The label of the y axis
+         * @param  string $color     The color of of the bars in HTML notation (defaults to '#000000').
+         * @param  string $caption   The caption of the plot (optional)
+         * @param  string $ref       The reference key of this plot
+         * @return string            The generated html code of the histogram
          */
-    public function histogram($data, $x_delta, $x_label, $y_label, $color="#000000", $caption=null, $ref=null)
+    public function histogram($data, $x_delta, $max_y_labels, $max_width, $height, $x_label=null, $y_label=null, $color="#000000", $caption=null, $ref=null)
     {
         $frame_color = "gray";
 
@@ -62,13 +64,13 @@ class O3PO_Plotter {
 
         $y_delta = 1;
         $y_delta_step = 0;
-        while($y_max/$y_delta > 10) {
+        while($y_max/$y_delta > $max_y_labels) {
             $y_delta = (($y_delta_step % 3)**2 + 1) * 10**floor($y_delta_step/3); #taken from http://oeis.org/A051109
             $y_delta_step += 1;
         }
 
         $output = "";
-        $output .= '<div style="position:relative;display:inline-block;vertical-align:top;width:100%;max-width:45em;margin-right:1em;"><div style="display:block;margin:1em;margin-bottom:3em;margin-left:1em;"><div style="position:relative;height:14em;outline:0.2ch solid '.$frame_color.';margin-left:6ch;margin-bottom:2em;margin-right:2ch;margin-top:0.5em">';
+        $output .= '<div style="position:relative;display:inline-block;vertical-align:top;width:100%;max-width:' . $max_width . ';margin-right:1em;"><div style="display:block;margin:1em;margin-bottom:3em;margin-left:1em;"><div style="position:relative;height:' . $height . ';outline:0.2ch solid '.$frame_color.';margin-left:6ch;margin-bottom:2em;margin-right:2ch;margin-top:0.5em">';
         $output .=  '<span style="display:inline-block;width:0;height:100%;"></span>';//make following bars start at the bottom;
 
         foreach($hist_data as $x => $y)
@@ -86,10 +88,13 @@ class O3PO_Plotter {
             $output .=  '<div style="position:absolute;bottom:-1ch;width:0.2ch;height:1ch;right:'.(100-$x/$x_max*100).'%;background-color:'.$frame_color.';box-shadow:0px 0px 0px 1px '.$frame_color.' inset;"><div style="color:'.$frame_color.';position:absolute;bottom:-1.5em;width:6ch;left:-3ch;text-align:center">'.round($x,2).'</div></div>';
         }
         #axes labels
-        $output .=  '<div style="position:absolute;right:50%;bottom:-2em;"><div style="position:absolute;left:-13em;width:26em;text-align:center;">'.$x_label.'</div></div>';
-        $output .=  '<div style="position:absolute;top:50%;left:-7ch;"><div style="position:absolute;left:-8em;text-align:center;width:16em;-moz-transform: rotate(-90deg);-o-transform: rotate(-90deg);-webkit-transform: rotate(-90deg);transform: rotate(-90deg);">'.$y_label.'</div></div>';
+         if(!empty($x_label))
+            $output .= '<div style="position:absolute;right:50%;bottom:-2em;"><div style="position:absolute;left:-13em;width:26em;text-align:center;">'.$x_label.'</div></div>';
+         if(!empty($y_label))
+             $output .= '<div style="position:absolute;top:50%;left:-7ch;"><div style="position:absolute;left:-8em;text-align:center;width:16em;-moz-transform: rotate(-90deg);-o-transform: rotate(-90deg);-webkit-transform: rotate(-90deg);transform: rotate(-90deg);">'.$y_label.'</div></div>';
         $output .=  '</div></div>' . "\n";
-        $output .= static::caption("figure", $caption, $ref);
+        if(!empty($caption))
+            $output .= static::caption("figure", $caption, $ref);
         $output .= '</div>';
 
         return $output;

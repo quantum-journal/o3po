@@ -176,7 +176,7 @@ abstract class O3PO_PublicationType {
          * @access   public
          * @param    string     $name    Name of a publication type. If provided returns only that publication type (if it is acitve).
          */
-    public static function get_active_publication_types($name=Null) {
+    public static function get_active_publication_types( $name=Null ) {
 
         if(!isset(self::$active_publication_types))
             return Null;
@@ -3042,6 +3042,61 @@ abstract class O3PO_PublicationType {
 
         $post_type = get_post_type($post_id);
         return get_post_meta( $post_id, $post_type . '_title', true );
+    }
+
+        /**
+         * Get date published.
+         *
+         * @since 0.3.0
+         * @access    public
+         * @param     int     $post_id     Id of the post.
+         * @retur     string               YYYY-mm-dd representation of the date of publication.
+         */
+    public static function get_date_published( $post_id ) {
+
+        $post_type = get_post_type($post_id);
+        return get_post_meta( $post_id, $post_type . '_date_published', true );
+    }
+
+
+        /**
+         * Get the citation counts for all publications of the given type.
+         *
+         * @since 0.3.0
+         */
+    public function get_all_citation_counts_for_publication_type( $post_type, $start_date ) {
+
+        $login_id = $this->get_journal_property('crossref_id');
+        $login_passwd = $this->get_journal_property('crossref_pw');
+        $crossref_url = $this->get_journal_property('crossref_get_forward_links_url');
+        $doi_url_prefix = $this->get_journal_property('doi_url_prefix');
+        $crossref_url = $this->get_journal_property('crossref_get_forward_links_url');
+        $doi_prefix = $this->get_journal_property('doi_prefix');
+
+        $citations = O3PO_Crossref::get_all_citation_counts($crossref_url, $login_id, $login_passwd, $doi_prefix, $start_date, 60*60*12);
+
+        $query = array(
+            'post_type' => $post_type,
+            'post_status' => array('publish'),
+            'posts_per_page' => -1,
+                       );
+
+        $my_query = new WP_Query( $query );
+        if ( $my_query->have_posts() ) {
+            $num = 0;
+            $citations_this_type = array();
+            while ( $my_query->have_posts() ) {
+                $num++;
+                $my_query->the_post();
+
+                $post_id = get_the_ID();
+                $post_type = get_post_type($post_id);
+                $doi = $this->get_doi($post_id);
+                $citations_this_type[$doi] = (!empty($citations[$doi]) ? $citations[$doi] : '0');
+            }
+        }
+
+        return $citations_this_type;
     }
 
 }

@@ -212,41 +212,15 @@ class O3PO_Admin {
             $html .= '<h3>Crossref cited-by citation statistics</h3>';
 
             $settings = O3PO_Settings::instance();
-
-            $login_id = $settings->get_plugin_option('crossref_id');
-            $login_passwd = $settings->get_plugin_option('crossref_pw');
-            $crossref_url = $settings->get_plugin_option('crossref_get_forward_links_url');
             $doi_prefix = $settings->get_plugin_option('doi_prefix');
             $doi_url_prefix = $settings->get_plugin_option('doi_url_prefix');
             $first_volume_year = $settings->get_plugin_option('first_volume_year');
             $start_date = $first_volume_year . '-01-01';
 
-            $citations = O3PO_Crossref::get_all_citation_counts($crossref_url, $login_id, $login_passwd, $doi_prefix, $start_date, 60*60*12);
-
-            $html .= '<p>The following data is based on cited-by data by Crossref for publications published under the DOI prefix ' . $doi_prefix . ' since ' . $start_date . '. Remember that not all publishers participate in this service, and therefore citations may be missing. Fresh data from Crossref is pulled at most every 12 hours.</p>';
-
+            $html .= '<p>The following data is based on cited-by data by Crossref for publications published under the DOI prefix ' . $doi_prefix . ' through this plugin and includes citations since ' . $start_date . '. Remember that not all publishers participate in Crossref cited.by, and therefore citations will likely be missing. Fresh data from Crossref is pulled when this page is refreshed but at most every 12 hours.</p>';
             foreach(O3PO_PublicationType::get_active_publication_type_names() as $post_type)
             {
-                $query = array(
-                    'post_type' => $post_type,
-                    'post_status' => array('publish'),
-                    'posts_per_page' => -1,
-                               );
-
-                $my_query = new WP_Query( $query );
-                if ( $my_query->have_posts() ) {
-                    $num = 0;
-                    $citations_this_type = array();
-                    while ( $my_query->have_posts() ) {
-                        $num++;
-                        $my_query->the_post();
-
-                        $post_id = get_the_ID();
-                        $post_type = get_post_type($post_id);
-                        $doi = O3PO_PublicationType::get_doi($post_id);
-                        $citations_this_type[$doi] = (!empty($citations[$doi]) ? $citations[$doi] : '0');
-                    }
-                }
+                $citations_this_type = O3PO_PublicationType::get_active_publication_types($post_type)->get_all_citation_counts_for_publication_type($post_type, $start_date);
 
                 $max_citations = max($citations_this_type);
                 $total_publications = count($citations_this_type);
@@ -259,9 +233,9 @@ class O3PO_Admin {
                 arsort($citations_this_type);
                 $num = 10;
                 $html .= '<table><tr><th style="text-align: center;" >Citations</th><th style="text-align: center;">DOI</th></tr>';
-                foreach($citations_this_type as $doi => $citations)
+                foreach($citations_this_type as $doi => $citation_count)
                 {
-                    $html .= '<tr><td style="text-align: right;">' . esc_html($citations) . '</td><td style="text-align: left;"><a href="' . esc_attr($doi_url_prefix . $doi) . '">' . esc_html($doi) . '</a></td></tr>' . "\n";
+                    $html .= '<tr><td style="text-align: right;">' . esc_html($citation_count) . '</td><td style="text-align: left;"><a href="' . esc_attr($doi_url_prefix . $doi) . '">' . esc_html($doi) . '</a></td></tr>' . "\n";
                     $num -= 1;
                     if($num <= 0)
                         break;
@@ -274,7 +248,8 @@ class O3PO_Admin {
 
                 $html .= '<h5>Citation statistics</h5>';
                 $plotter = new O3PO_Plotter();
-                $html .= $plotter->histogram($citations_this_type, $delta_x, "citations", "number of publications", "#53257F", "Histogram of citations. The distribution of citation counts is typically very broad, making average quantities, such as the journal impact factor, statistically almost meaningless.");
+                $html .= $plotter->histogram($citations_this_type, $delta_x, 10, '45em', '18em', "citations", "number of publications", "#53257F", "Histogram of citations. The distribution of citation counts is typically very broad, making average quantities, such as the journal impact factor, statistically almost meaningless.");
+
                 $html .= '<table>
 <tr><td style="text-align: right;">Total number of publications:</td><td style="text-align: left;">' . count($citations_this_type) . '</td></tr>
 <tr><td style="text-align: right;">Mean number of citations:</td><td style="text-align: left;">' . O3PO_Utility::array_mean($citations_this_type) . '</td></tr>
@@ -286,7 +261,6 @@ class O3PO_Admin {
 
         echo $html;
     }
-
 
         /**
          * Array of tabs in the meta-data explorer.
