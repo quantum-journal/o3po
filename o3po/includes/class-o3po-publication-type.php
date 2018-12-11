@@ -176,7 +176,7 @@ abstract class O3PO_PublicationType {
          * @access   public
          * @param    string     $name    Name of a publication type. If provided returns only that publication type (if it is acitve).
          */
-    public static function get_active_publication_types($name=Null) {
+    public static function get_active_publication_types( $name=Null ) {
 
         if(!isset(self::$active_publication_types))
             return Null;
@@ -2361,46 +2361,80 @@ abstract class O3PO_PublicationType {
         if ( is_wp_error($body) )
             return '<p>' . $body->get_error_code() . ' ' . $body->get_error_message() . '</p>';
 
-        if( empty($body) )
+        if( empty($body) or empty($body->forward_link))
             return '<p>Crossref\'s <a href="https://www.crossref.org/services/cited-by/">cited-by service</a> has no data on citing works. Unfortunately not all publishers provide suitable citation data.</p>';
 
         $cited_by_html = '';
         $citation_number = 0;
         foreach ($body->forward_link as $f_link) {
-            $citation_number += 1;
-            $citation_journal_title = $f_link->journal_cite->journal_title;
-            $citation_article_title = $f_link->journal_cite->article_title;
-            $citation_volume = $f_link->journal_cite->volume;
-            $citation_issue = $f_link->journal_cite->issue;
-            $citation_first_page = $f_link->journal_cite->first_page;
-            $citation_item_number = $f_link->journal_cite->item_number;
-            $citation_page = !empty($citation_first_page) ? $citation_first_page : $citation_item_number;
-            $citation_year = $f_link->journal_cite->year;
-            $citation_doi = $f_link->journal_cite->doi;
-            $citation_publication_type = $f_link->journal_cite->publication_type;
 
+            if(isset($f_link->journal_cite))
+                $cite = $f_link->journal_cite;
+            elseif(isset($f_link->book_cite))
+                $cite = $f_link->book_cite;
+            elseif(isset($f_link->conf_cite))
+                $cite = $f_link->conf_cite;
+            elseif(isset($f_link->dissertation_cite))
+                $cite = $f_link->dissertation_cite;
+            elseif(isset($f_link->report_cite))
+                $cite = $f_link->report_cite;
+            elseif(isset($f_link->standard_cite))
+                $cite = $f_link->standard_cite;
+            else
+                continue;
+
+            $citation_number += 1;
+            $citation_journal_title = $cite->journal_title;
+            $citation_article_title = $cite->article_title;
+            $citation_title = $cite->title;
+            $citation_series_title = $cite->series_title;
+            $citation_volume_title = $cite->volume_title;
+            $citation_volume = $cite->volume;
+            $citation_component_number = $cite->component_number;
+            $citation_issue = $cite->issue;
+            $citation_first_page = $cite->first_page;
+            $citation_item_number = $cite->item_number;
+            $citation_page = !empty($citation_first_page) ? $citation_first_page : $citation_item_number;
+            $citation_year = $cite->year;
+            $citation_doi = $cite->doi;
+            $citation_isbn = $cite->isbn;
+            $citation_issn = $cite->issn;
+            $citation_publication_type = $cite->publication_type;
 
             $cited_by_html .= '<p class="break-at-all-cost">' . '[' . $citation_number . '] ';
-            foreach ($f_link->journal_cite->contributors->contributor as $contributor) {
-                    /* $citation_contributor_given_name[] = $contributor->given_name; */
-                    /* $citation_contributor_surname[] = $contributor->surname; */
-                if(!empty($contributor->given_name))
-                    $cited_by_html .= $contributor->given_name . ' ';
-                if(!empty($contributor->surname))
-                    $cited_by_html .= $contributor->surname;
-                $cited_by_html .= ', ';
+            if(!empty($cite->contributors->contributor))
+            {
+                foreach ($cite->contributors->contributor as $contributor) {
+                    if(!empty($contributor->given_name))
+                        $cited_by_html .= $contributor->given_name . ' ';
+                    if(!empty($contributor->surname))
+                        $cited_by_html .= $contributor->surname;
+                    $cited_by_html .= ', ';
+                }
             }
             if(!empty($citation_article_title))
                 $cited_by_html .= '"' . $citation_article_title . '", ';
+            if(!empty($citation_title))
+                $cited_by_html .= '"' . $citation_title . '", ';
 
             $citation_cite_as = '';
             if(!empty($citation_journal_title))
                 $citation_cite_as .= $citation_journal_title . " ";
+            if(!empty($citation_series_title))
+                $citation_cite_as .= $citation_series_title . " ";
+            if(!empty($citation_volume_title))
+                $citation_cite_as .= $citation_volume_title . " ";
+            if(!empty($citation_component_number))
+                $citation_cite_as .= $citation_component_number . " ";
             if(!empty($citation_volume))
                 $citation_cite_as .= $citation_volume;
-            if(!empty($citation_volume) && !empty($citation_page))
+            if(!empty($citation_volume) && !empty($citation_issue))
+                $citation_cite_as .= " ";
+            if(!empty($citation_issue))
+                $citation_cite_as .= $citation_issue;
+            if((!empty($citation_volume) || !empty($citation_issue)) && !empty($citation_page))
                 $citation_cite_as .= ', ';
-            if(!empty($citation_volume) && empty($citation_page))
+            if((!empty($citation_volume) || !empty($citation_issue)) && empty($citation_page))
                 $citation_cite_as .= ' ';
             if(!empty($citation_page))
                 $citation_cite_as .= $citation_page . " ";
@@ -2409,8 +2443,15 @@ abstract class O3PO_PublicationType {
             if(!empty($citation_year))
                 $citation_cite_as .= '('. $citation_year . ')';
 
+            if(!empty($citation_isbn))
+                $citation_cite_as .= ' ISBN:'. $citation_isbn;
+
             if(!empty($citation_doi))
-                $cited_by_html .= '<a href="' . $doi_url_prefix . $citation_doi . '">' . $citation_cite_as . '</a>.' . '</p>' . "\n";
+                $cited_by_html .= '<a href="' . $doi_url_prefix . $citation_doi . '">' . $citation_cite_as . '</a>.';
+            else
+                $cited_by_html .= $citation_cite_as;
+
+            $cited_by_html .= '</p>' . "\n";
         }
         $cited_by_html .= '<p>(The above data is from Crossref\'s <a href="https://www.crossref.org/services/cited-by/">cited-by service</a>. Unfortunately not all publishers provide suitable and complete citation data so that some citing works or bibliographic details may be missing.)</p>';
 
@@ -3007,6 +3048,61 @@ abstract class O3PO_PublicationType {
 
         $post_type = get_post_type($post_id);
         return get_post_meta( $post_id, $post_type . '_title', true );
+    }
+
+        /**
+         * Get date published.
+         *
+         * @since 0.3.0
+         * @access    public
+         * @param     int     $post_id     Id of the post.
+         * @retur     string               YYYY-mm-dd representation of the date of publication.
+         */
+    public static function get_date_published( $post_id ) {
+
+        $post_type = get_post_type($post_id);
+        return get_post_meta( $post_id, $post_type . '_date_published', true );
+    }
+
+
+        /**
+         * Get the citation counts for all publications of the given type.
+         *
+         * @since 0.3.0
+         */
+    public function get_all_citation_counts_for_publication_type( $post_type, $start_date ) {
+
+        $login_id = $this->get_journal_property('crossref_id');
+        $login_passwd = $this->get_journal_property('crossref_pw');
+        $crossref_url = $this->get_journal_property('crossref_get_forward_links_url');
+        $doi_url_prefix = $this->get_journal_property('doi_url_prefix');
+        $crossref_url = $this->get_journal_property('crossref_get_forward_links_url');
+        $doi_prefix = $this->get_journal_property('doi_prefix');
+
+        $citations = O3PO_Crossref::get_all_citation_counts($crossref_url, $login_id, $login_passwd, $doi_prefix, $start_date, 60*60*12);
+
+        $query = array(
+            'post_type' => $post_type,
+            'post_status' => array('publish'),
+            'posts_per_page' => -1,
+                       );
+
+        $my_query = new WP_Query( $query );
+        if ( $my_query->have_posts() ) {
+            $num = 0;
+            $citations_this_type = array();
+            while ( $my_query->have_posts() ) {
+                $num++;
+                $my_query->the_post();
+
+                $post_id = get_the_ID();
+                $post_type = get_post_type($post_id);
+                $doi = $this->get_doi($post_id);
+                $citations_this_type[$doi] = (!empty($citations[$doi]) ? $citations[$doi] : '0');
+            }
+        }
+
+        return $citations_this_type;
     }
 
 }

@@ -108,7 +108,7 @@ class O3PO_Crossref {
          */
     private static function remote_get_all_cited_by( $crossref_url, $crossref_id, $crossref_pw, $doi_prefix, $startDate ) {
 
-        $request_url = $crossref_url . '?usr=' . urlencode($crossref_id).  '&pwd=' . urlencode($crossref_pw) . '&doi=' . urlencode($doi_prefix) . '&startDate=' . $startDate;
+        $request_url = $crossref_url . '?usr=' . urlencode($crossref_id).  '&pwd=' . urlencode($crossref_pw) . '&doi=' . urlencode($doi_prefix) . '&startDate=' . $startDate . '&include_postedcontent=true';
 
         return wp_remote_get($request_url, array('timeout' => 20));
     }
@@ -116,7 +116,11 @@ class O3PO_Crossref {
         /**
          * Retrieve cited-by information in xml format from Crossref.
          *
-         * Uses Crossref's cited-by service to retrieve information about works citing the given DOI in xml format.
+         * Uses Crossref's cited-by service to retrieve information about works
+         * citing the given DOI in xml format.
+         *
+         * See http://data.crossref.org/reports/help/schema_doc/crossref_query_output2.0/query_output2.0.html
+         * for more information.
          *
          * @since    0.3.0
          * @access   public
@@ -160,7 +164,12 @@ class O3PO_Crossref {
         /**
          * Retrieve cited-by information in xml format from Crossref.
          *
-         * Uses Crossref's cited-by service to retrieve information about works citing the given DOI in xml format.
+         * Uses Crossref's cited-by service to retrieve information about works
+         * citing the given DOI in xml format.
+         *
+         * The response from crossref is stored in a transient for 12 hours
+         * so that subsequent calls to this method are fast and do not create
+         * additional traffic.
          *
          * @since    0.3.0
          * @access   public
@@ -168,8 +177,9 @@ class O3PO_Crossref {
          * @param    string   $crossref_id     The id for which to submit this upload.
          * @param    string   $crossref_pw     The password corresponding to the crossref_id.
          * @param    string   $doi             The doi for which cited-by data is to be retrieved.
+         * @param    int      $storage_time    The number of seconds to cache the response by Crossref.
          */
-    public static function get_all_citation_counts( $crossref_url, $crossref_id, $crossref_pw, $doi_prefix, $start_date ) {
+    public static function get_all_citation_counts( $crossref_url, $crossref_id, $crossref_pw, $doi_prefix, $start_date, $storage_time=60*60*12 ) {
 
         try
         {
@@ -196,7 +206,7 @@ class O3PO_Crossref {
             if ($xml === false)
                 return null;
 
-            set_transient('all_cited_by_xml_' . $crossref_id . "_" . $doi_prefix . "_" . $start_date, $xml_string, 600); //keep for 10 minute
+            set_transient('all_cited_by_xml_' . $crossref_id . "_" . $doi_prefix . "_" . $start_date, $xml_string, $storage_time);
 
             echo("now printing: ");
 
