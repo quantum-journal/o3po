@@ -274,7 +274,7 @@ class O3PO_Admin {
 
                 $html .= '<h5>Citation statistics</h5>';
                 $plotter = new O3PO_Plotter();
-                $html .= $plotter->histogram($citations_this_type, $delta_x, "citations", "number of publications", "#53257F", "Citation histogram.");
+                $html .= $plotter->histogram($citations_this_type, $delta_x, "citations", "number of publications", "#53257F", "Histogram of citations. The distribution of citation counts is typically very broad, making average quantities, such as the journal impact factor, statistically almost meaningless.");
                 $html .= '<table>
 <tr><td style="text-align: right;">Total number of publications:</td><td style="text-align: left;">' . count($citations_this_type) . '</td></tr>
 <tr><td style="text-align: right;">Mean number of citations:</td><td style="text-align: left;">' . O3PO_Utility::array_mean($citations_this_type) . '</td></tr>
