@@ -1198,11 +1198,11 @@ class O3PO_Settings extends O3PO_Singleton {
                 'journal_title' => 'trim_settings_field',
                 'journal_subtitle' => 'trim_settings_field',
                 'journal_description' => 'trim_settings_field',
-                'journal_level_doi_suffix' => 'trim_settings_field',
+                'journal_level_doi_suffix' => 'validate_doi_suffix',
                 'eissn' => 'trim_settings_field',
                 'publisher' => 'trim_settings_field',
                 'secondary_journal_title' => 'trim_settings_field',
-                'secondary_journal_level_doi_suffix' => 'trim_settings_field',
+                'secondary_journal_level_doi_suffix' => 'validate_doi_suffix',
                 'secondary_journal_eissn' => 'trim_settings_field',
                 'developer_email' => 'trim_settings_field',
                 'publisher_email' => 'trim_settings_field',
@@ -1278,6 +1278,24 @@ class O3PO_Settings extends O3PO_Singleton {
             return $doi_prefix;
 
         add_settings_error( $field, 'illegal-doi-prefix', "The DOI prefix in '" . $this->settings_fields[$field]['title'] . "' may consist only of numbers 0-9, dot . and the dash - character. Field cleared.", 'error');
+        return "";
+    }
+
+        /**
+         * Clean user input to the doi_prefix setting
+         *
+         * @since    0.1.0
+         * @access   private
+         * @param    string   $field    The field this was input to.
+         * @param    string   $doi_prefix    User input.
+         */
+    public function validate_doi_suffix( $field, $doi_suffix ) {
+
+        $doi_suffix = trim($doi_suffix);
+        if(preg_match('/^[a-zA-Z0-9.-]*$/', $doi_suffix))
+            return $doi_suffix;
+
+        add_settings_error( $field, 'illegal-doi-suffix', "The DOI suffix in '" . $this->settings_fields[$field]['title'] . "' may consist only of lower and upper case English alphabet letters a-z and A-Z, numbers 0-9, dot . and the dash - character. Field cleared.", 'error');
         return "";
     }
 
