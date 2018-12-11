@@ -116,7 +116,11 @@ class O3PO_Crossref {
         /**
          * Retrieve cited-by information in xml format from Crossref.
          *
-         * Uses Crossref's cited-by service to retrieve information about works citing the given DOI in xml format.
+         * Uses Crossref's cited-by service to retrieve information about works
+         * citing the given DOI in xml format.
+         *
+         * See http://data.crossref.org/reports/help/schema_doc/crossref_query_output2.0/query_output2.0.html
+         * for more information.
          *
          * @since    0.3.0
          * @access   public

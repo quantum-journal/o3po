@@ -2386,9 +2386,11 @@ abstract class O3PO_PublicationType {
             $citation_number += 1;
             $citation_journal_title = $cite->journal_title;
             $citation_article_title = $cite->article_title;
+            $citation_title = $cite->title;
             $citation_series_title = $cite->series_title;
             $citation_volume_title = $cite->volume_title;
             $citation_volume = $cite->volume;
+            $citation_component_number = $cite->component_number;
             $citation_issue = $cite->issue;
             $citation_first_page = $cite->first_page;
             $citation_item_number = $cite->item_number;
@@ -2412,6 +2414,8 @@ abstract class O3PO_PublicationType {
             }
             if(!empty($citation_article_title))
                 $cited_by_html .= '"' . $citation_article_title . '", ';
+            if(!empty($citation_title))
+                $cited_by_html .= '"' . $citation_title . '", ';
 
             $citation_cite_as = '';
             if(!empty($citation_journal_title))
@@ -2420,6 +2424,8 @@ abstract class O3PO_PublicationType {
                 $citation_cite_as .= $citation_series_title . " ";
             if(!empty($citation_volume_title))
                 $citation_cite_as .= $citation_volume_title . " ";
+            if(!empty($citation_component_number))
+                $citation_cite_as .= $citation_component_number . " ";
             if(!empty($citation_volume))
                 $citation_cite_as .= $citation_volume;
             if(!empty($citation_volume) && !empty($citation_issue))
