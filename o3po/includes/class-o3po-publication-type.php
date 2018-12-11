@@ -2361,34 +2361,54 @@ abstract class O3PO_PublicationType {
         if ( is_wp_error($body) )
             return '<p>' . $body->get_error_code() . ' ' . $body->get_error_message() . '</p>';
 
-        if( empty($body) )
+        if( empty($body) or empty($body->forward_link))
             return '<p>Crossref\'s <a href="https://www.crossref.org/services/cited-by/">cited-by service</a> has no data on citing works. Unfortunately not all publishers provide suitable citation data.</p>';
 
         $cited_by_html = '';
         $citation_number = 0;
         foreach ($body->forward_link as $f_link) {
-            $citation_number += 1;
-            $citation_journal_title = $f_link->journal_cite->journal_title;
-            $citation_article_title = $f_link->journal_cite->article_title;
-            $citation_volume = $f_link->journal_cite->volume;
-            $citation_issue = $f_link->journal_cite->issue;
-            $citation_first_page = $f_link->journal_cite->first_page;
-            $citation_item_number = $f_link->journal_cite->item_number;
-            $citation_page = !empty($citation_first_page) ? $citation_first_page : $citation_item_number;
-            $citation_year = $f_link->journal_cite->year;
-            $citation_doi = $f_link->journal_cite->doi;
-            $citation_publication_type = $f_link->journal_cite->publication_type;
 
+            if(isset($f_link->journal_cite))
+                $cite = $f_link->journal_cite;
+            elseif(isset($f_link->book_cite))
+                $cite = $f_link->book_cite;
+            elseif(isset($f_link->conf_cite))
+                $cite = $f_link->conf_cite;
+            elseif(isset($f_link->dissertation_cite))
+                $cite = $f_link->dissertation_cite;
+            elseif(isset($f_link->report_cite))
+                $cite = $f_link->report_cite;
+            elseif(isset($f_link->standard_cite))
+                $cite = $f_link->standard_cite;
+            else
+                continue;
+
+            $citation_number += 1;
+            $citation_journal_title = $cite->journal_title;
+            $citation_article_title = $cite->article_title;
+            $citation_series_title = $cite->series_title;
+            $citation_volume_title = $cite->volume_title;
+            $citation_volume = $cite->volume;
+            $citation_issue = $cite->issue;
+            $citation_first_page = $cite->first_page;
+            $citation_item_number = $cite->item_number;
+            $citation_page = !empty($citation_first_page) ? $citation_first_page : $citation_item_number;
+            $citation_year = $cite->year;
+            $citation_doi = $cite->doi;
+            $citation_isbn = $cite->isbn;
+            $citation_issn = $cite->issn;
+            $citation_publication_type = $cite->publication_type;
 
             $cited_by_html .= '<p class="break-at-all-cost">' . '[' . $citation_number . '] ';
-            foreach ($f_link->journal_cite->contributors->contributor as $contributor) {
-                    /* $citation_contributor_given_name[] = $contributor->given_name; */
-                    /* $citation_contributor_surname[] = $contributor->surname; */
-                if(!empty($contributor->given_name))
-                    $cited_by_html .= $contributor->given_name . ' ';
-                if(!empty($contributor->surname))
-                    $cited_by_html .= $contributor->surname;
-                $cited_by_html .= ', ';
+            if(!empty($cite->contributors->contributor))
+            {
+                foreach ($cite->contributors->contributor as $contributor) {
+                    if(!empty($contributor->given_name))
+                        $cited_by_html .= $contributor->given_name . ' ';
+                    if(!empty($contributor->surname))
+                        $cited_by_html .= $contributor->surname;
+                    $cited_by_html .= ', ';
+                }
             }
             if(!empty($citation_article_title))
                 $cited_by_html .= '"' . $citation_article_title . '", ';
@@ -2396,11 +2416,19 @@ abstract class O3PO_PublicationType {
             $citation_cite_as = '';
             if(!empty($citation_journal_title))
                 $citation_cite_as .= $citation_journal_title . " ";
+            if(!empty($citation_series_title))
+                $citation_cite_as .= $citation_series_title . " ";
+            if(!empty($citation_volume_title))
+                $citation_cite_as .= $citation_volume_title . " ";
             if(!empty($citation_volume))
                 $citation_cite_as .= $citation_volume;
-            if(!empty($citation_volume) && !empty($citation_page))
+            if(!empty($citation_volume) && !empty($citation_issue))
+                $citation_cite_as .= " ";
+            if(!empty($citation_issue))
+                $citation_cite_as .= $citation_issue;
+            if((!empty($citation_volume) || !empty($citation_issue)) && !empty($citation_page))
                 $citation_cite_as .= ', ';
-            if(!empty($citation_volume) && empty($citation_page))
+            if((!empty($citation_volume) || !empty($citation_issue)) && empty($citation_page))
                 $citation_cite_as .= ' ';
             if(!empty($citation_page))
                 $citation_cite_as .= $citation_page . " ";
@@ -2409,8 +2437,15 @@ abstract class O3PO_PublicationType {
             if(!empty($citation_year))
                 $citation_cite_as .= '('. $citation_year . ')';
 
+            if(!empty($citation_isbn))
+                $citation_cite_as .= ' ISBN:'. $citation_isbn;
+
             if(!empty($citation_doi))
-                $cited_by_html .= '<a href="' . $doi_url_prefix . $citation_doi . '">' . $citation_cite_as . '</a>.' . '</p>' . "\n";
+                $cited_by_html .= '<a href="' . $doi_url_prefix . $citation_doi . '">' . $citation_cite_as . '</a>.';
+            else
+                $cited_by_html .= $citation_cite_as;
+
+            $cited_by_html .= '</p>' . "\n";
         }
         $cited_by_html .= '<p>(The above data is from Crossref\'s <a href="https://www.crossref.org/services/cited-by/">cited-by service</a>. Unfortunately not all publishers provide suitable and complete citation data so that some citing works or bibliographic details may be missing.)</p>';
 

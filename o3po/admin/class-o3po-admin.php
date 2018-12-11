@@ -221,9 +221,9 @@ class O3PO_Admin {
             $first_volume_year = $settings->get_plugin_option('first_volume_year');
             $start_date = $first_volume_year . '-01-01';
 
-            $citations = O3PO_Crossref::get_all_citation_counts($crossref_url, $login_id, $login_passwd, $doi_prefix, $start_date);
+            $citations = O3PO_Crossref::get_all_citation_counts($crossref_url, $login_id, $login_passwd, $doi_prefix, $start_date, 60*60*12);
 
-            $html .= '<p>The following data is based on cited-by data by Crossref for publications published under the DOI prefix ' . $doi_prefix . ' since ' . $start_date . '. Remember that not all publishers participate in this service, and therefore citations may be missing.</p>';
+            $html .= '<p>The following data is based on cited-by data by Crossref for publications published under the DOI prefix ' . $doi_prefix . ' since ' . $start_date . '. Remember that not all publishers participate in this service, and therefore citations may be missing. Fresh data from Crossref is pulled at most every 12 hours.</p>';
 
             foreach(O3PO_PublicationType::get_active_publication_type_names() as $post_type)
             {
