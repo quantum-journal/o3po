@@ -284,6 +284,7 @@ class O3PO {
 
         $this->loader->add_action( 'admin_head', $this->environment, 'modify_css_if_in_test_environment' );
         $this->loader->add_action( 'upload_mimes', $this->environment, 'custom_upload_mimes' );
+        $this->loader->add_filter( 'wp_check_filetype_and_ext', $this->environment, 'disable_real_mime_check_for_selected_extensions', 10, 4 );
 
         $this->loader->add_action( 'load-post.php', Null, 'O3PO_PublicationType::init_metabox' );
         $this->loader->add_action( 'load-post-new.php', Null, 'O3PO_PublicationType::init_metabox' );
