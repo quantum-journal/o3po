@@ -740,28 +740,29 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 			echo '	</tr>';
 		}
 
-		if ( !empty($arxiv_pdf_attach_ids) ) {
-			echo '	<tr>';
-			echo '		<th><label for="' . $post_type . '_arxiv_pdf_ids" class="' . $post_type . '_arxiv_pdf_ids_label">' . 'PDFs from arXiv' . '</label></th>';
-			echo '		<td>';
-			echo '                  <input type="checkbox" name="' . $post_type . '_download_arxiv_pdf">Download the pdf from the arXiv again upon next Save/Update.';
+        echo '	<tr>';
+        echo '		<th><label for="' . $post_type . '_arxiv_pdf_ids" class="' . $post_type . '_arxiv_pdf_ids_label">' . 'PDFs from arXiv' . '</label></th>';
+        echo '		<td>';
+        echo '                  <input type="checkbox" id="' . $post_type . '_download_arxiv_pdf" name="' . $post_type . '_download_arxiv_pdf"><label for="' . $post_type . '_download_arxiv_pdf">Download the pdf from the arXiv again upon next Save/Update.</label>';
+        if ( !empty($arxiv_pdf_attach_ids) ) {
 			foreach ($arxiv_pdf_attach_ids as $arxiv_pdf_attach_id) {
-				echo '<p>ID: <a href="post.php?post=' . $arxiv_pdf_attach_id . '%26action=edit" target="_blank">' . $arxiv_pdf_attach_id . '</a> Url: <a href="' . wp_get_attachment_url( $arxiv_pdf_attach_id ) . '" target="_blank">' . wp_get_attachment_url( $arxiv_pdf_attach_id ) . "</a></p>\n";
+				echo '<p>ID: <a href="post.php?post=' . $arxiv_pdf_attach_id . '&amp;action=edit" target="_blank">' . $arxiv_pdf_attach_id . '</a> Url: <a href="' . wp_get_attachment_url( $arxiv_pdf_attach_id ) . '" target="_blank">' . wp_get_attachment_url( $arxiv_pdf_attach_id ) . "</a></p>\n";
 			}
-			echo '		</td>';
-			echo '	</tr>';
-		}
-		if ( !empty($arxiv_source_attach_ids) ) {
-			echo '	<tr>';
-			echo '		<th><label for="' . $post_type . '_arxiv_source_ids" class="' . $post_type . '_arxiv_source_ids_label">' . 'Source files from arXiv' . '</label></th>';
-			echo '		<td>';
-			echo '                  <input type="checkbox" name="' . $post_type . '_download_arxiv_source">Download the source from the arXiv again upon next Save/Update.';
+        }
+        echo '		</td>';
+        echo '	</tr>';
+
+        echo '	<tr>';
+        echo '		<th><label for="' . $post_type . '_arxiv_source_ids" class="' . $post_type . '_arxiv_source_ids_label">' . 'Source files from arXiv' . '</label></th>';
+        echo '		<td>';
+        echo '                  <input type="checkbox" id="' . $post_type . '_download_arxiv_source" name="' . $post_type . '_download_arxiv_source"><label for="' . $post_type . '_download_arxiv_source">Download the source from the arXiv again upon next Save/Update.</label>';
+        if ( !empty($arxiv_source_attach_ids) ) {
 			foreach ($arxiv_source_attach_ids as $arxiv_source_attach_id) {
-				echo '<p>ID: <a href="post.php?post=' . $arxiv_source_attach_id . '%26action=edit" target="_blank">' . $arxiv_source_attach_id . '</a> Url: <a href="' . wp_get_attachment_url( $arxiv_source_attach_id ) . '" target="_blank">' . wp_get_attachment_url( $arxiv_source_attach_id ) . "</a></p>\n";
+				echo '<p>ID: <a href="post.php?post=' . $arxiv_source_attach_id . '&amp;action=edit" target="_blank">' . $arxiv_source_attach_id . '</a> Url: <a href="' . wp_get_attachment_url( $arxiv_source_attach_id ) . '" target="_blank">' . wp_get_attachment_url( $arxiv_source_attach_id ) . "</a></p>\n";
 			}
-			echo '		</td>';
-			echo '	</tr>';
-		}
+        }
+        echo '		</td>';
+        echo '	</tr>';
 
     }
 
