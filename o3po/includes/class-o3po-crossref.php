@@ -208,8 +208,6 @@ class O3PO_Crossref {
 
             set_transient('all_cited_by_xml_' . $crossref_id . "_" . $doi_prefix . "_" . $start_date, $xml_string, $storage_time);
 
-            echo("now printing: ");
-
             $citations = array();
             foreach($xml->query_result->body->children() as $forward_link )
             {

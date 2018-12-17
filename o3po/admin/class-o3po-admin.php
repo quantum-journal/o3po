@@ -217,7 +217,7 @@ class O3PO_Admin {
             $first_volume_year = $settings->get_plugin_option('first_volume_year');
             $start_date = $first_volume_year . '-01-01';
 
-            $html .= '<p>The following data is based on cited-by data by Crossref for publications published under the DOI prefix ' . $doi_prefix . ' through this plugin and includes citations since ' . $start_date . '. Remember that not all publishers participate in Crossref cited.by, and therefore citations will likely be missing. Fresh data from Crossref is pulled when this page is refreshed but at most every 12 hours.</p>';
+            $html .= '<p>The following data is based on cited-by data by Crossref for publications published under the DOI prefix ' . $doi_prefix . ' through this plugin on this website and includes citations since ' . $start_date . '. Remember that not all publishers participate in Crossref cited.by, and therefore citations will likely be missing. Fresh data from Crossref is pulled when this page is refreshed but at most every 12 hours.</p>';
             foreach(O3PO_PublicationType::get_active_publication_type_names() as $post_type)
             {
                 $citations_this_type = O3PO_PublicationType::get_active_publication_types($post_type)->get_all_citation_counts_for_publication_type($post_type, $start_date);
@@ -248,10 +248,11 @@ class O3PO_Admin {
 
                 $html .= '<h5>Citation statistics</h5>';
                 $plotter = new O3PO_Plotter();
-                $html .= $plotter->histogram($citations_this_type, $delta_x, 10, '45em', '18em', "citations", "number of publications", "#53257F", "Histogram of citations. The distribution of citation counts is typically very broad, making average quantities, such as the journal impact factor, statistically almost meaningless.");
+                $html .= $plotter->histogram($citations_this_type, $delta_x, 15, 10, '45em', '18em', "citations", "number of publications", "#53257F", "Histogram of citations. The distribution of citation counts is typically very broad, making average quantities, such as the journal impact factor, statistically almost meaningless.");
 
                 $html .= '<table>
 <tr><td style="text-align: right;">Total number of publications:</td><td style="text-align: left;">' . count($citations_this_type) . '</td></tr>
+<tr><td style="text-align: right;">Total number of citations:</td><td style="text-align: left;">' . array_sum($citations_this_type) . '</td></tr>
 <tr><td style="text-align: right;">Mean number of citations:</td><td style="text-align: left;">' . O3PO_Utility::array_mean($citations_this_type) . '</td></tr>
 <tr><td style="text-align: right;">Median number of citations:</td><td style="text-align: left;">' . O3PO_Utility::array_median($citations_this_type) . '</td></tr></table>';
             }

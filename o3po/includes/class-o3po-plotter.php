@@ -43,7 +43,7 @@ class O3PO_Plotter {
          * @param  string $ref       The reference key of this plot
          * @return string            The generated html code of the histogram
          */
-    public function histogram($data, $x_delta, $max_y_labels, $max_width, $height, $x_label=null, $y_label=null, $color="#000000", $caption=null, $ref=null)
+    public function histogram($data, $x_delta, $max_x_labels, $max_y_labels, $max_width, $height, $x_label=null, $y_label=null, $color="#000000", $caption=null, $ref=null)
     {
         $frame_color = "gray";
 
@@ -68,9 +68,14 @@ class O3PO_Plotter {
             $y_delta = (($y_delta_step % 3)**2 + 1) * 10**floor($y_delta_step/3); #taken from http://oeis.org/A051109
             $y_delta_step += 1;
         }
+        $x_label_step = 1;
+        while($x_max/($x_delta*$x_label_step) > $max_x_labels) {
+            $x_label_step += 1;
+        }
+
 
         $output = "";
-        $output .= '<div style="position:relative;display:inline-block;vertical-align:top;width:100%;max-width:' . $max_width . ';margin-right:1em;"><div style="display:block;margin:1em;margin-bottom:3em;margin-left:1em;"><div style="position:relative;height:' . $height . ';outline:0.2ch solid '.$frame_color.';margin-left:6ch;margin-bottom:2em;margin-right:2ch;margin-top:0.5em">';
+        $output .= '<div style="position:relative;display:inline-block;vertical-align:top;width:100%;max-width:' . $max_width . ';"><div style="display:block;margin-bottom:3em;margin-left:1em;"><div style="position:relative;height:' . $height . ';outline:0.2ch solid '.$frame_color.';margin-left:6ch;margin-bottom:2em;margin-right:2ch;margin-top:0.5em">';
         $output .=  '<span style="display:inline-block;width:0;height:100%;"></span>';//make following bars start at the bottom;
 
         foreach($hist_data as $x => $y)
@@ -83,9 +88,11 @@ class O3PO_Plotter {
         {
             $output .=  '<div style="position:absolute;left:-1ch;width:1ch;height:0.2ch;top:'.(100-$y/$y_max*100).'%;background-color:'.$frame_color.';box-shadow:0px 0px 0px 1px '.$frame_color.' inset;"><div style="color:'.$frame_color.';position:absolute;left:-6ch;width:5ch;bottom:-0.5em;text-align:right">'.round($y,2).'</div></div>';
         }
+        $num_x_label = 0;
         for($x=0; $x <= $x_max; $x+=$x_delta)
         {
-            $output .=  '<div style="position:absolute;bottom:-1ch;width:0.2ch;height:1ch;right:'.(100-$x/$x_max*100).'%;background-color:'.$frame_color.';box-shadow:0px 0px 0px 1px '.$frame_color.' inset;"><div style="color:'.$frame_color.';position:absolute;bottom:-1.5em;width:6ch;left:-3ch;text-align:center">'.round($x,2).'</div></div>';
+            $output .=  '<div style="position:absolute;bottom:-1ch;width:0.2ch;height:1ch;right:'.(100-$x/$x_max*100).'%;background-color:'.$frame_color.';box-shadow:0px 0px 0px 1px '.$frame_color.' inset;"><div style="color:'.$frame_color.';position:absolute;bottom:-1.5em;width:6ch;left:-3ch;text-align:center">' . ($num_x_label % $x_label_step == 0 ? round($x,2) : '') . '</div></div>';
+            $num_x_label += 1;
         }
         #axes labels
          if(!empty($x_label))
