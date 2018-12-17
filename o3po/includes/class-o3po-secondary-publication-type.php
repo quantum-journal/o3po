@@ -216,6 +216,18 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         $number_target_dois = get_post_meta( $post_id, $post_type . '_number_target_dois', true );
         $target_dois = static::get_post_meta_field_containing_array( $post_id, $post_type . '_target_dois');
 
+        $number_reviewers = get_post_meta( $post_id, $post_type . '_number_reviewers', true );
+		$reviewer_given_names = static::get_post_meta_field_containing_array( $post_id, $post_type . '_reviewer_given_names');
+		$reviewer_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_reviewer_surnames');
+		$reviewer_name_styles = static::get_post_meta_field_containing_array( $post_id, $post_type . '_reviewer_name_styles');
+		$reviewer_affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_reviewer_affiliations');
+		$reviewer_orcids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_reviewer_orcids');
+        $reviewer_urls = static::get_post_meta_field_containing_array( $post_id, $post_type . '_reviewer_urls');
+        $reviewer_ages = static::get_post_meta_field_containing_array( $post_id, $post_type . '_reviewer_ages');
+        $reviewer_grades = static::get_post_meta_field_containing_array( $post_id, $post_type . '_reviewer_grades');
+        $number_reviewer_institutions = get_post_meta( $post_id, $post_type . '_number_reviewer_institutions', true );
+		$reviewer_institutions = static::get_post_meta_field_containing_array( $post_id, $post_type . '_reviewer_institutions');
+
             // Set the category from $type
         $term_id = term_exists( $type, 'category' );
         if($term_id == 0)
@@ -236,6 +248,53 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                 $validation_result .= "WARNING: Target DOI " . ($x+1) . " is empty.\n" ;
             else if( substr($target_dois[$x], 0, 8) !== $settings->get_plugin_option('doi_prefix') )
                 $validation_result .= "WARNING: Target DOI " . ($x+1) . " does not point to a paper of this publisher or it contains a prefix such as https://dx.doi.org/, which it shouldn't. Pleae check the DOI.\n" ;
+        }
+
+        if(empty($number_reviewers))
+            $validation_result .= "ERROR: Number of reviewers is empty.\n" ;
+        for ($x = 0; $x < $number_reviewers; $x++) {
+            if ( empty( $reviewer_given_names[$x] ) )
+                $validation_result .= "WARNING: Reviewer " . ($x+1) . " Given name is empty.\n" ;
+            if ( empty( $reviewer_surnames[$x] ) )
+                $validation_result .= "ERROR: Reviewer " . ($x+1) . " Surname is empty.\n" ;
+            if ( empty( $reviewer_name_styles[$x] ) )
+                $validation_result .= "WARNING: Reviewer " . ($x+1) . " name style is empty.\n" ;
+            if ( !empty( $reviewer_orcids[$x] ) )
+            {
+                $check_orcid_result = O3PO_Utility::check_orcid( $reviewer_orcids[$x]);
+                if( !($check_orcid_result === true) )
+                    $validation_result .= "ERROR: ORCID of reviewer " . ($x+1) . " " . $check_orcid_result . ".\n" ;
+            }
+            if ( empty( $reviewer_affiliations[$x] ) )
+                $validation_result .= "WARNING: Affiliations of reviewer " . ($x+1) . " are empty.\n" ;
+            else {
+                $last_affiliation_num = 0;
+                foreach(preg_split('/,/', $reviewer_affiliations[$x]) as $affiliation_num) {
+                    if ($affiliation_num < 1 or $affiliation_num > $number_reviewer_institutions )
+                        $validation_result .= "ERROR: At least one affiliation number of reviewer " . ($x+1) . " does not correspond to an actual affiliation.\n" ;
+                    if( $last_affiliation_num >= $number_reviewer_institutions )
+                        $validation_result .= "WARNING: Affiliations of reviewer " . ($x+1) . " are not in increasing order.\n" ;
+                    $last_affiliation_num = $affiliation_num;
+                }
+            }
+            if ( empty( $reviewer_ages[$x] ) )
+                $validation_result .= "WARNING: Age of reviewer " . ($x+1) . " is empty.\n" ;
+            if ( empty( $reviewer_grades[$x] ) )
+                $validation_result .= "WARNING: Grade of reviewer " . ($x+1) . " is empty.\n" ;
+        }
+        if ( !empty($reviewer_affiliations))
+            $all_appearing_reviewer_affiliations = join(',', $reviewer_affiliations);
+        else
+            $all_appearing_reviewer_affiliations = '';
+        for ($x = 0; $x < $number_reviewer_institutions; $x++) {
+            if ( empty( $reviewer_institutions[$x] ) )
+                $validation_result .= "ERROR: Reviewer institution " . ($x+1) . " is empty.\n" ;
+            if ( preg_match('#[\\\\]#', $reviewer_institutions[$x] ) )
+                $validation_result .= "WARNING: Reviewer institution " . ($x+1) . " contains suspicious looking special characters.\n" ;
+            if ( strpos($all_appearing_reviewer_affiliations, (string)($x+1) ) === false)
+                $validation_result .= "ERROR: Reviewer institution " . ($x+1) . " is not associated to any reviewers.\n" ;
+            if ( strpos($all_appearing_reviewer_affiliations, (string)($x) ) !== false and strpos($all_appearing_reviewer_affiliations, (string)($x+1) ) !== false and strpos($all_appearing_reviewer_affiliations, (string)($x) ) > strpos($all_appearing_reviewer_affiliations, (string)($x+1) ) )
+                $validation_result .= "ERROR: Reviewer institution " . ($x) . " appears after first appearance of " . ($x+1) . "\n" ;
         }
 
         return $validation_result;
