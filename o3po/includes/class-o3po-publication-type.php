@@ -652,7 +652,7 @@ abstract class O3PO_PublicationType {
                 $last_affiliation_num = 0;
                 foreach(preg_split('/,/', $author_affiliations[$x]) as $affiliation_num) {
                     if ($affiliation_num < 1 or $affiliation_num > $number_affiliations )
-                        $validation_result .= "ERROR: At least on affiliation number of author " . ($x+1) . " does not correspond to an actual affiliation.\n" ;
+                        $validation_result .= "ERROR: At least one affiliation number of author " . ($x+1) . " does not correspond to an actual affiliation.\n" ;
                     if( $last_affiliation_num >= $affiliation_num )
                         $validation_result .= "WARNING: Affiliations of author " . ($x+1) . " are not in increasing order.\n" ;
                     $last_affiliation_num = $affiliation_num;
