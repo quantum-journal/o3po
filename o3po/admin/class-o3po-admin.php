@@ -177,35 +177,98 @@ class O3PO_Admin {
 
         if($active_tab === 'meta-data')
         {
+
+            $html .= '<p>This is only a very basic summary of some of the meta-data fields of the published publications. In the future this page will allow a more customizable display and export of that meta-data.</p>';
+
+            $post_type_names = O3PO_PublicationType::get_active_publication_type_names();
+            if(isset( $_GET['post_type'] ))
+                $post_type = $_GET['post_type'];
+            else
+                $post_type = $post_type_names[0];
+
+            $output_formats = [
+                'python'
+            ];
+            if(isset( $_GET['output_format'] ))
+                $output_format = $_GET['output_format'];
+            else
+                $output_format = $output_formats[0];
+
+            $meta_data_field_map = [
+                'doi' => array('callable' => array('O3PO_PublicationType', 'get_doi'), 'field_type' => 'string'),
+                'volume' => array('callable' => array('O3PO_PublicationType', 'get_volume'), 'field_type' => 'int'),
+                'page' => array('callable' => array('O3PO_PublicationType', 'get_page'), 'field_type' => 'int'),
+                'date_published' => array('callable' => array('O3PO_PublicationType', 'get_date_published'), 'field_type' => 'string'),
+                'formated_authors' => array('callable' => array('O3PO_PublicationType', 'get_formated_authors'), 'field_type' => 'string'),
+                'number_authors' => array('callable' => array('O3PO_PublicationType', 'get_number_authors'), 'field_type' => 'int'),
+                'title' => array('callable' => array('O3PO_PublicationType', 'get_title'), 'field_type' => 'string'),
+                'corresponding_author_email' => array('callable' => array('O3PO_PublicationType', 'get_corresponding_author_email'), 'field_type' => 'string'),
+            ];
+            if(isset( $_GET['meta_data_field_list'] ))
+                $meta_data_field_list = preg_split('/\s*,\s*/', $_GET['meta_data_field_list']);
+            else
+                $meta_data_field_list = ['formated_authors', 'number_authors', 'title', 'corresponding_author_email'];
+
+            $html .= '<form style="padding-right:1em; margin-bottom:1em;" method="get">';
+            $html .= '<input type="hidden" name="page" value="' . $this->get_plugin_name() . '-meta-data-explorer' . '">';
+            $html .= '<input type="hidden" name="tab" value="' . $active_tab . '">';
+
+            $html .= '<select name="post_type" id="post_type">';
+			foreach($post_type_names as $post_type_name)
+                $html .= '<option value="' . $post_type_name . '"' . ( ($post_type_name === $post_type) ? " selected" : "" ) . '>' . $post_type_name . '</option>';
+			$html .= '</select><label for="post_type">Chose the type of publication</label><br />';
+
+            $html .= '<select name="output_format" id="output_format">';
+			foreach($output_formats as $format)
+                $html .= '<option value="' . $format . '"' . ( ($output_format === $format) ? " selected" : "" ) . '>' . $format . '</option>';
+			$html .= '</select><label for="output_format">Chose the output format</label><br />';
+
+            $html .= '<label for="' . 'meta_data_field_list' . '">Comma separated list of meta-data elements to export:</label><br /><input style="width:100%;" type="text" name="' . 'meta_data_field_list" id="' . 'meta_data_field_list" placeholder="' . '' . '" value="' . implode($meta_data_field_list, ', ') . '" />';
+            $html .= '<p>The available elements are:</p>';
+            $html .= '<ul>';
+            foreach(array_keys($meta_data_field_map) as $field)
+                $html .= '<li>' . esc_html($field) . '</li>';
+            $html .= '</ul>';
+            $html .= '<input id="submit" type="submit" value="Generate table"></form>';
+
+
             $out = "";
-            foreach(O3PO_PublicationType::get_active_publication_type_names() as $post_type)
-            {
-                $query = array(
-                    'post_type' => $post_type,
-                    'post_status' => array('publish'),
-                    'posts_per_page' => -1,
-                               );
-                $my_query = new WP_Query( $query );
-                if ( $my_query->have_posts() ) {
-                    $num = 0;
-                    while ( $my_query->have_posts() ) {
-                        $num++;
-                        $my_query->the_post();
+            $query = array(
+                'post_type' => $post_type,
+                'post_status' => array('publish'),
+                'posts_per_page' => -1,
+                           );
+            $my_query = new WP_Query( $query );
+            if ( $my_query->have_posts() ) {
+                $num = 0;
+                while ( $my_query->have_posts() ) {
+                    $num++;
+                    $my_query->the_post();
 
-                        $post_id = get_the_ID();
-                        $post_type = get_post_type($post_id);
+                    $post_id = get_the_ID();
 
-                        if($post_type !== 'paper')
-                            continue;
-
-                        $out .= "[" . '"' . O3PO_PublicationType::get_formated_authors($post_id) . '", ' . O3PO_PublicationType::get_number_authors($post_id) . ', "' . O3PO_PublicationType::get_title($post_id) . '", "' . O3PO_PublicationType::get_corresponding_author_email($post_id) .  '"' . "],\n";
+                    if($output_format === 'python')
+                    {
+                        $out .= "[";
+                        foreach($meta_data_field_list as $field)
+                        {
+                            $value = call_user_func($meta_data_field_map[$field]['callable'], $post_id);
+                            if($meta_data_field_map[$field]['field_type'] === 'string')
+                                $value = '"' . $value . '"';
+                            $out .= $value . ', ';
+                        }
+                        $out = substr($out, 0, -2);
+                        $out .= "],\n";
+                    }
+                    else
+                    {
+                        $out .= 'unsupported output format';
+                        break;
                     }
                 }
             }
             wp_reset_postdata();
-
-            $html .= '<p>This is only a very basic summary of some of the meta-data fields of the published publications. In the future this page will allow a more customizable display and export of that meta-data.</p>';
-            $html .= '<textarea rows="16" style="width:80%;" readonly>' . esc_textarea($out) . '</textarea>';
+            $html .= '<textarea rows="16" style="width:100%; margin-right:1em" readonly>' . esc_textarea($out) . '</textarea>';
         }
         elseif($active_tab === 'citation-metrics')
         {

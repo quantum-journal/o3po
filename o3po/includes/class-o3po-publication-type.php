@@ -1094,6 +1094,32 @@ abstract class O3PO_PublicationType {
     }
 
         /**
+         * Get the volume of the post with id $post_id.
+         *
+         * @since    0.1.0
+         * @access   public
+         * @param    int    $post_id    The id of the post for which to get the volume.
+         */
+    public static function get_volume( $post_id ) {
+
+        $post_type = get_post_type($post_id);
+        return get_post_meta( $post_id, $post_type . '_volume', true );
+    }
+
+        /**
+         * Get the page of the post with id $post_id.
+         *
+         * @since    0.1.0
+         * @access   public
+         * @param    int    $post_id    The id of the post for which to get the page.
+         */
+    public static function get_page( $post_id ) {
+
+        $post_type = get_post_type($post_id);
+        return get_post_meta( $post_id, $post_type . '_page', true );
+    }
+
+        /**
          * Get how this $post_id should be cited.
          *
          * @since    0.1.0
@@ -3037,7 +3063,7 @@ abstract class O3PO_PublicationType {
         return get_post_meta( $post_id, $post_type . '_number_authors', true );
     }
 
-   /**
+        /**
          * Get the title.
          *
          * @since 0.3.0
@@ -3049,6 +3075,21 @@ abstract class O3PO_PublicationType {
         $post_type = get_post_type($post_id);
         return get_post_meta( $post_id, $post_type . '_title', true );
     }
+
+
+        /**
+         * Get a meta data field.
+         *
+         * @since 0.3.0
+         * @access    public
+         * @param     int     $post_id     Id of the post.
+         */
+    public static function get_post_meta( $post_id, $field ) {
+
+        $post_type = get_post_type($post_id);
+        return get_post_meta( $post_id, $post_type . '_' . $field, true );
+    }
+
 
         /**
          * Get date published.
