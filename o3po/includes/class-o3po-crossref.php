@@ -26,6 +26,10 @@ class O3PO_Crossref {
          *
          * Submits meta-data in Crossref's xml format via http post to their servers.
          *
+         * From the command line one could do roughly the same with curl as follows:
+         *
+         * curl -F 'operation=doMDUpload' -F 'login_id=XXXX' -F 'login_passwd=XXXX' -F 'fname=@/home/cgogolin/tmp/crossref-test.xml' https://test.crossref.org/servlet/deposit -v
+
          * @since    0.3.0
          * @access   private
          * @param    string   $doi_batch_id    Batch id of this upload.

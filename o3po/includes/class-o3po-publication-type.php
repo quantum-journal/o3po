@@ -18,6 +18,7 @@
 
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-clockss.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-crossref.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-ads.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-doaj.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-latex.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
@@ -1375,10 +1376,6 @@ abstract class O3PO_PublicationType {
 
         /**
          * Submit meta-data to Crossref.
-         *
-         * From the command line one could do roughly the same with curl as follows:
-         *
-         * curl -F 'operation=doMDUpload' -F 'login_id=XXXX' -F 'login_passwd=XXXX' -F 'fname=@/home/cgogolin/tmp/crossref-test.xml' https://test.crossref.org/servlet/deposit -v
          *
          * This function must be private since we do no longer check internally whether we are running on the test system.
          *
@@ -3075,7 +3072,6 @@ abstract class O3PO_PublicationType {
         $post_type = get_post_type($post_id);
         return get_post_meta( $post_id, $post_type . '_title', true );
     }
-
 
         /**
          * Get a meta data field.
