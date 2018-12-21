@@ -10,6 +10,8 @@
  * @subpackage O3PO/includes
  */
 
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-bibentry.php';
+
 /**
  * Encapsulates the interface with the external service ads.
  *
@@ -34,11 +36,16 @@ class O3PO_Ads {
                 return '';
         }
         set_transient('get_cited_by_json_' . $url, $response, 10*60);
-        $json = json_decode($response['body']);
+
+        return = json_decode($response['body']);
+    }
+
+    public static function get_cited_by_bibentries( $ads_api_search_url, $api_token, $eprint ) {
+
+        $json = static::get_cited_by_json($ads_api_search_url, $api_token, $eprint);
 
         $bibcodes = $json->response->docs[0]->citation;
         $citing_bibcodes_querey = 'bibcode:' . implode($bibcodes, '+OR+bibcode:');
-        echo($citing_bibcodes_querey);
 
         $url = $ads_api_search_url . '?q=' . $citing_bibcodes_querey . '&fl=' . 'doi,title,author,page,issue,volume,year,pub,pubdate';
         $response = get_transient('get_cited_by_json_' . $url);
@@ -50,23 +57,23 @@ class O3PO_Ads {
         set_transient('get_cited_by_json_' . $url, $response, 10*60);
         $json = json_decode($response['body']);
 
-        $citation_list = array();
+        $bibentries = array();
         foreach($json->response->docs as $doc)
         {
-            $citation_list[] = array( #todo introduce a class to handle this!
-                'doi' => $doc->doi,
-                'title' => $doc->title,
-                'authors' => $doc->author, #todo: split this up ["Wu, Anqi","Aoi, Mikio C.","Pillow, Jonathan W."]
-                'page' => $doc->page,
-                'issue' => $doc->issue,
-                'volume' => $doc->volume,
-                'year' => $doc->year,
-                'venue' => $doc->pub,
-                                     );
+            $bibentries[] = new O3PO_Bibentry(array(
+                                                     'doi' => $doc->doi,
+                                                     'title' => $doc->title,
+                                                     'authors' => $doc->author, #todo: split this up ["Wu, Anqi","Aoi, Mikio C.","Pillow, Jonathan W."]
+                                                     'page' => $doc->page,
+                                                     'issue' => $doc->issue,
+                                                     'volume' => $doc->volume,
+                                                     'year' => $doc->year,
+                                                     'venue' => $doc->pub,
+                                                       ));
         }
 
-        XXXX
+        return $bibentries;
 
-        return $citation_list; #treat the return value reasonbly in publication-type.php and unify how crossref and ads citations are returned, i.e., implement a function in crossref.php to return the same format as here and split this function up!
+        TODO #treat the return value reasonbly in publication-type.php and unify how crossref and ads citations are returned, i.e., implement a function in crossref.php to return the same format as here and split this function up!
     }
 }

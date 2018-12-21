@@ -285,6 +285,9 @@ class O3PO_Admin {
             {
                 $citations_this_type = O3PO_PublicationType::get_active_publication_types($post_type)->get_all_citation_counts_for_publication_type($post_type, $start_date);
 
+                if(is_wp_error($citations_this_type))
+                    $html .= '<p>Citation data for type ' . $post_type . ' could not be retrieved: ' . $citations_this_type->get_error_message() . '</p>';
+
                 $max_citations = max($citations_this_type);
                 $total_publications = count($citations_this_type);
 

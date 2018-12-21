@@ -183,6 +183,8 @@ class O3PO_Settings extends O3PO_Singleton {
 
         'executive_board' => "",
         'editor_in_chief' => "",
+        'ads_api_search_url' => 'https://api.adsabs.harvard.edu/v1/search/query',
+        'ads_api_token' => '',
 
             /* The options below are currently not customizable.
              *
