@@ -10,6 +10,8 @@
  * @subpackage O3PO/includes
  */
 
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-author.php';
+
 /**
  * A class to represent bibliography entries.
  *
@@ -52,7 +54,7 @@ class O3PO_Bibentry {
             if(isset($meta_data[$field]))
                 $this->meta_data[$field] = $meta_data[$field];
             else
-                $this->meta_data[$field] = ''
+                $this->meta_data[$field] = '';
     }
 
     public function get( $field ) {
@@ -60,100 +62,87 @@ class O3PO_Bibentry {
         return $this->meta_data[$field];
     }
 
-    public function get_formated_html() {
+    public function get_formated_html( $doi_url_prefix ) {
 
+        $bibitem_html = '';
 
-        XXX
+        Dont forget the contributors!
+        $bibitem_html .= ...
+        /*     if(!empty($cite->contributors->contributor)) */
+        /*     { */
+        /*         foreach ($cite->contributors->contributor as $contributor) { */
+        /*             if(!empty($contributor->given_name)) */
+        /*                 $bibitem_html .= $contributor->given_name . ' '; */
+        /*             if(!empty($contributor->surname)) */
+        /*                 $bibitem_html .= $contributor->surname; */
+        /*             $bibitem_html .= ', '; */
+        /*         } */
+        /*     } */
 
-        $cited_by_html = '';
-        $citation_number = 0;
-        foreach ($body->forward_link as $f_link) {
+        if(!empty($this->get('title')))
+            $bibitem_html .= '"' . esc_html($this->get('title')) . '", ';
 
-            if(isset($f_link->journal_cite))
-                $cite = $f_link->journal_cite;
-            elseif(isset($f_link->book_cite))
-                $cite = $f_link->book_cite;
-            elseif(isset($f_link->conf_cite))
-                $cite = $f_link->conf_cite;
-            elseif(isset($f_link->dissertation_cite))
-                $cite = $f_link->dissertation_cite;
-            elseif(isset($f_link->report_cite))
-                $cite = $f_link->report_cite;
-            elseif(isset($f_link->standard_cite))
-                $cite = $f_link->standard_cite;
-            else
-                continue;
+        $citation_cite_as = $this->get_cite_as_text();
+        if(!empty($this->get('doi')))
+            $bibitem_html .= '<a href="' . $doi_url_prefix . $this->get('doi') . '">' . esc_html($citation_cite_as) . '</a>.'; escape the doi!!!
+        else
+            $bibitem_html .= esc_html($citation_cite_as);
 
-            $citation_number += 1;
-            $citation_journal_title = $cite->journal_title;
-            $citation_article_title = $cite->article_title;
-            $citation_title = $cite->title;
-            $citation_series_title = $cite->series_title;
-            $citation_volume_title = $cite->volume_title;
-            $citation_volume = $cite->volume;
-            $citation_component_number = $cite->component_number;
-            $citation_issue = $cite->issue;
-            $citation_first_page = $cite->first_page;
-            $citation_item_number = $cite->item_number;
-            $citation_page = !empty($citation_first_page) ? $citation_first_page : $citation_item_number;
-            $citation_year = $cite->year;
-            $citation_doi = $cite->doi;
-            $citation_isbn = $cite->isbn;
-            $citation_issn = $cite->issn;
-            $citation_publication_type = $cite->publication_type;
-
-            $cited_by_html .= '<p class="break-at-all-cost">' . '[' . $citation_number . '] ';
-            if(!empty($cite->contributors->contributor))
-            {
-                foreach ($cite->contributors->contributor as $contributor) {
-                    if(!empty($contributor->given_name))
-                        $cited_by_html .= $contributor->given_name . ' ';
-                    if(!empty($contributor->surname))
-                        $cited_by_html .= $contributor->surname;
-                    $cited_by_html .= ', ';
-                }
-            }
-            if(!empty($citation_article_title))
-                $cited_by_html .= '"' . $citation_article_title . '", ';
-            if(!empty($citation_title))
-                $cited_by_html .= '"' . $citation_title . '", ';
-
-            $citation_cite_as = '';
-            if(!empty($citation_journal_title))
-                $citation_cite_as .= $citation_journal_title . " ";
-            if(!empty($citation_series_title))
-                $citation_cite_as .= $citation_series_title . " ";
-            if(!empty($citation_volume_title))
-                $citation_cite_as .= $citation_volume_title . " ";
-            if(!empty($citation_component_number))
-                $citation_cite_as .= $citation_component_number . " ";
-            if(!empty($citation_volume))
-                $citation_cite_as .= $citation_volume;
-            if(!empty($citation_volume) && !empty($citation_issue))
-                $citation_cite_as .= " ";
-            if(!empty($citation_issue))
-                $citation_cite_as .= $citation_issue;
-            if((!empty($citation_volume) || !empty($citation_issue)) && !empty($citation_page))
-                $citation_cite_as .= ', ';
-            if((!empty($citation_volume) || !empty($citation_issue)) && empty($citation_page))
-                $citation_cite_as .= ' ';
-            if(!empty($citation_page))
-                $citation_cite_as .= $citation_page . " ";
-            if(empty($citation_cite_as))
-                $citation_cite_as = $citation_doi . ' ';
-            if(!empty($citation_year))
-                $citation_cite_as .= '('. $citation_year . ')';
-
-            if(!empty($citation_isbn))
-                $citation_cite_as .= ' ISBN:'. $citation_isbn;
-
-            if(!empty($citation_doi))
-                $cited_by_html .= '<a href="' . $doi_url_prefix . $citation_doi . '">' . $citation_cite_as . '</a>.';
-            else
-                $cited_by_html .= $citation_cite_as;
-
-            $cited_by_html .= '</p>' . "\n";
-        }
-        return $cited_by_html;
+        return $bibitem_html;
     }
+
+
+    public function get_cite_as_text() {
+
+        $citation_cite_as = '';
+
+        Implement!;
+        $citation_journal_title = $cite->journal_title;
+        $citation_article_title = $cite->article_title;
+        $citation_title = $cite->title;
+        $citation_series_title = $cite->series_title;
+        $citation_volume_title = $cite->volume_title;
+        $citation_volume = $cite->volume;
+        $citation_component_number = $cite->component_number;
+        $citation_issue = $cite->issue;
+        $citation_first_page = $cite->first_page;
+        $citation_item_number = $cite->item_number;
+        $citation_page = !empty($citation_first_page) ? $citation_first_page : $citation_item_number;
+        $citation_year = $cite->year;
+        $citation_doi = $cite->doi;
+        $citation_isbn = $cite->isbn;
+        $citation_issn = $cite->issn;
+        $citation_publication_type = $cite->publication_type;
+
+        if(!empty($citation_journal_title))
+            $citation_cite_as .= $citation_journal_title . " ";
+        if(!empty($citation_series_title))
+            $citation_cite_as .= $citation_series_title . " ";
+        if(!empty($citation_volume_title))
+            $citation_cite_as .= $citation_volume_title . " ";
+        if(!empty($citation_component_number))
+            $citation_cite_as .= $citation_component_number . " ";
+        if(!empty($citation_volume))
+            $citation_cite_as .= $citation_volume;
+        if(!empty($citation_volume) && !empty($citation_issue))
+            $citation_cite_as .= " ";
+        if(!empty($citation_issue))
+            $citation_cite_as .= $citation_issue;
+        if((!empty($citation_volume) || !empty($citation_issue)) && !empty($citation_page))
+            $citation_cite_as .= ', ';
+        if((!empty($citation_volume) || !empty($citation_issue)) && empty($citation_page))
+            $citation_cite_as .= ' ';
+        if(!empty($citation_page))
+            $citation_cite_as .= $citation_page . " ";
+        if(empty($citation_cite_as))
+            $citation_cite_as = $citation_doi . ' ';
+        if(!empty($citation_year))
+            $citation_cite_as .= '('. $citation_year . ')';
+
+        if(!empty($citation_isbn))
+            $citation_cite_as .= ' ISBN:'. $citation_isbn;
+
+        return $citation_cite_as;
+    }
+
 }

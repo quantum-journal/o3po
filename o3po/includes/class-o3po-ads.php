@@ -63,7 +63,7 @@ class O3PO_Ads {
             $bibentries[] = new O3PO_Bibentry(array(
                                                      'doi' => $doc->doi,
                                                      'title' => $doc->title,
-                                                     'authors' => $doc->author, #todo: split this up ["Wu, Anqi","Aoi, Mikio C.","Pillow, Jonathan W."]
+                                                     'authors' => $doc->author, Split this up as the format is ["Wu, Anqi","Aoi, Mikio C.","Pillow, Jonathan W."]
                                                      'page' => $doc->page,
                                                      'issue' => $doc->issue,
                                                      'volume' => $doc->volume,

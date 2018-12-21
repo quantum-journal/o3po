@@ -196,11 +196,26 @@ class O3PO_Crossref {
             else
                 continue;
 
+
+            Dont forget the contributors/authors!
+
+            /* if(!empty($cite->contributors->contributor)) */
+            /* { */
+            /*     foreach ($cite->contributors->contributor as $contributor) { */
+            /*         if(!empty($contributor->given_name)) */
+            /*             $bibitem_html .= $contributor->given_name . ' '; */
+            /*         if(!empty($contributor->surname)) */
+            /*             $bibitem_html .= $contributor->surname; */
+            /*         $bibitem_html .= ', '; */
+            /*     } */
+            /* } */
+
+
             $bibentries[] = new O3PO_Bibentry(
                 array(
                     'venue' => $cite->journal_title,
                     'title' => !empty($cite->title) ? $cite->title : $cite->article_title,
-                    'collectiontitle' => !empty($cite->series_title) $cite->series_title : $cite->volume_title,
+                    'collectiontitle' => !empty($cite->series_title) ? $cite->series_title : $cite->volume_title,
                     'volume' => $cite->volume,
                     'issue' => $cite->issue,
                     'page' => !empty($cite->first_page) ? $cite->first_page : $cite->item_number,
