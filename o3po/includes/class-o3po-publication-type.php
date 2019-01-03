@@ -2381,60 +2381,47 @@ abstract class O3PO_PublicationType {
         $ads_api_search_url = $this->get_journal_property('ads_api_search_url');
         $ads_api_token = $this->get_journal_property('ads_api_token');
         $arxiv_url_abs_prefix = $this->get_journal_property('arxiv_url_abs_prefix');
-
-        $cited_by_html = '';
-        $citation_number = 0;
+        $eprint = get_post_meta( $post_id, $post_type . '_eprint', true );
 
         $crossref_bibentries = O3PO_Crossref::get_cited_by_bibentries($crossref_url, $login_id, $login_passwd, $doi);
+        $ads_bibentries = O3PO_Ads::get_cited_by_bibentries($ads_api_search_url, $ads_api_token, $eprint);
+
+        $cited_by_html = '';
+
         if (is_wp_error($crossref_bibentries))
-            $cited_by_html .= '<p>' . $crossref_bibentries->get_error_code() . ' ' . $crossref_bibentries->get_error_message() . '</p>';
+        {
+            $cited_by_html .= '<p>Error fetching Crossref cited-by data: ' . $crossref_bibentries->get_error_code() . ' ' . $crossref_bibentries->get_error_message() . '</p>';
+            $crossref_bibentries = array();
+        }
         elseif(empty($crossref_bibentries))
-            $cited_by_html .= '<p>Crossref\'s <a href="https://www.crossref.org/services/cited-by/">cited-by service</a> has no data on citing works. Unfortunately not all publishers provide suitable citation data.</p>';
-        else
+            $cited_by_html .= '<p>At the moment Crossref\'s <a href="https://www.crossref.org/services/cited-by/">cited-by service</a> has no data on citing works.</p>';
+
+        if (is_wp_error($ads_bibentries))
         {
-            foreach($crossref_bibentries as $bibentry)
-            {
-                $citation_number += 1;
-                $cited_by_html .= '<p class="break-at-all-cost">' . '[' . $citation_number . '] ';
-                $cited_by_html .= $bibentry->get_formated_html($doi_url_prefix, $arxiv_url_abs_prefix);
-                $cited_by_html .= '</p>' . "\n";
-            }
-            $cited_by_html .= '<p>(The above data is from Crossref\'s <a href="https://www.crossref.org/services/cited-by/">cited-by service</a>. Unfortunately not all publishers provide suitable and complete citation data so that some citing works or bibliographic details may be missing.)</p>';
+            $cited_by_html .= '<p>Error fetching ADS cited-by data: ' . $ads_bibentries->get_error_code() . ' ' . $ads_bibentries->get_error_message() . '</p>';
+            $ads_bibentries = array();
         }
+        elseif(empty($ads_bibentries))
+            $cited_by_html .= '<p>At the moment <a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a> has no data on citing works.</p>';
 
-        $eprint = get_post_meta( $post_id, $post_type . '_eprint', true );
-        if(empty($eprint))
-            $cited_by_html .= '<p><a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a> data can only be displayed for publications that are on the arXiv.</p>';
-        else
+        $sources = array();
+        if(!empty($crossref_bibentries) and !empty($ads_bibentries))
+            $all_bibentries = O3PO_Bibentry::merge_bibitem_arrays($crossref_bibentries, $ads_bibentries);
+        elseif(!empty($crossref_bibentries))
         {
-            $ads_bibentries = O3PO_Ads::get_cited_by_bibentries($ads_api_search_url, $ads_api_token, $eprint);
-            if (is_wp_error($ads_bibentries))
-                $cited_by_html .= '<p>(' . $ads_bibentries->get_error_code() . ' ' . $ads_bibentries->get_error_message() . ')</p>';
-            elseif(empty($ads_bibentries))
-                $cited_by_html .= '<p><a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a> has no data on citing works. Unfortunately not all publishers provide suitable citation data.</p>';
-            else
-            {
-                $citation_number = 0;
-                foreach($ads_bibentries as $bibentry)
-                {
-                    $citation_number += 1;
-                    $cited_by_html .= '<p class="break-at-all-cost">' . '[' . $citation_number . '] ';
-                    $cited_by_html .= $bibentry->get_formated_html($doi_url_prefix, $arxiv_url_abs_prefix);
-                    $cited_by_html .= '</p>' . "\n";
-                }
-                $cited_by_html .= '<p>(The above data is from <a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a>. Unfortunately not all publishers provide suitable citation data.)</p>';
-            }
-        }
-
-
-        if(!is_wp_error($ads_bibentries) and !is_wp_error($crossref_bibentries))
-            $all_bibentries = O3PO_Bibentry::merge_bibitem_arrays($ads_bibentries, $crossref_bibentries);
-        elseif(!is_wp_error($crossref_bibentries))
             $all_bibentries = $crossref_bibentries;
-        elseif(!is_wp_error($ads_bibentries))
+            $sources[] = 'Crossref\'s <a href="https://www.crossref.org/services/cited-by/">cited-by service</a>';
+        }
+        elseif(!empty($ads_bibentries))
+        {
             $all_bibentries = $ads_bibentries;
+            $sources[] = '<a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a>';
+        }
         else
             $all_bibentries = array();
+
+        if(!empty($sources))
+            $cited_by_html .= '<p>The following cited-by data is from ' . implode($sources, ' and ') . '. It may be incomplete as not all publishers provide suitable and complete citation data.</p>';
 
         $citation_number = 0;
         foreach($all_bibentries as $bibentry)

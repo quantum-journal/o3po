@@ -29,6 +29,9 @@ class O3PO_Ads {
          */
     public static function get_cited_by_json( $ads_api_search_url, $api_token, $eprint, $storage_time=10*60, $timeout=20 ) {
 
+        if(empty($eprint))
+            return array();
+
         $eprint_without_version = preg_replace('#v[0-9]+$#', '', $eprint);
         $headers = array( 'Authorization' => 'Bearer:' . $api_token );
 
