@@ -43,7 +43,6 @@ class O3PO_Bibentry {
         'ref',
         'title',
         'type',
-        'type',
         'url',
         'venue',
         'volume',
@@ -51,7 +50,7 @@ class O3PO_Bibentry {
     );
 
     public function __construct( $meta_data ) {
-        foreach($meta_data_fields as $field)
+        foreach($this->meta_data_fields as $field)
             if(isset($meta_data[$field]))
                 $this->meta_data[$field] = $meta_data[$field];
             else
@@ -95,51 +94,34 @@ class O3PO_Bibentry {
 
         $citation_cite_as = '';
 
-        $citation_journal_title = $cite->journal_title;
-        $citation_article_title = $cite->article_title;
-        $citation_title = $cite->title;
-        $citation_series_title = $cite->series_title;
-        $citation_volume_title = $cite->volume_title;
-        $citation_volume = $cite->volume;
-        $citation_component_number = $cite->component_number;
-        $citation_issue = $cite->issue;
-        $citation_first_page = $cite->first_page;
-        $citation_item_number = $cite->item_number;
-        $citation_page = !empty($citation_first_page) ? $citation_first_page : $citation_item_number;
-        $citation_year = $cite->year;
-        $citation_doi = $cite->doi;
-        $citation_isbn = $cite->isbn;
-        $citation_issn = $cite->issn;
-        $citation_publication_type = $cite->publication_type;
-
-        if(!empty($citation_journal_title))
-            $citation_cite_as .= $citation_journal_title . " ";
-        if(!empty($citation_series_title))
-            $citation_cite_as .= $citation_series_title . " ";
-        if(!empty($citation_volume_title))
-            $citation_cite_as .= $citation_volume_title . " ";
-        if(!empty($citation_component_number))
-            $citation_cite_as .= $citation_component_number . " ";
-        if(!empty($citation_volume))
-            $citation_cite_as .= $citation_volume;
-        if(!empty($citation_volume) && !empty($citation_issue))
+        if(!empty($this->get('howpublished')))
+            $citation_cite_as .= $this->get('howpublished') . " ";
+        if(!empty($this->get('venue')))
+            $citation_cite_as .= $this->get('venue') . " ";
+        if(!empty($this->get('collectiontitle')))
+            $citation_cite_as .= $this->get('collectiontitle') . " ";
+        if(!empty($this->get('institution')))
+            $citation_cite_as .= $this->get('institution') . " ";
+        if(!empty($this->get('volume')))
+            $citation_cite_as .= $this->get('volume');
+        if(!empty($this->get('volume')) and !empty($this->get('issue')))
             $citation_cite_as .= " ";
-        if(!empty($citation_issue))
-            $citation_cite_as .= $citation_issue;
-        if((!empty($citation_volume) || !empty($citation_issue)) && !empty($citation_page))
-            $citation_cite_as .= ', ';
-        if((!empty($citation_volume) || !empty($citation_issue)) && empty($citation_page))
-            $citation_cite_as .= ' ';
-        if(!empty($citation_page))
-            $citation_cite_as .= $citation_page . " ";
-        if(empty($citation_cite_as))
-            $citation_cite_as = $citation_doi . ' ';
-        if(!empty($citation_year))
-            $citation_cite_as .= '('. $citation_year . ')';
-        if(!empty($citation_isbn))
-            $citation_cite_as .= ' ISBN:'. $citation_isbn;
+        if(!empty($this->get('issue')))
+            $citation_cite_as .= $this->get('issue');
+        if((!empty($this->get('volume')) or !empty($this->get('issue'))) and !empty($this->get('page')))
+            $citation_cite_as .= ", ";
+        if(!empty($this->get('page')))
+            $citation_cite_as .= $this->get('page') . " ";
+        if(!empty($this->get('eprint')))
+            $citation_cite_as .= 'arXiv:'. $this->get('eprint') . " ";
+        if(!empty($this->get('year')))
+            $citation_cite_as .= '(' . $this->get('year') . ")";
+        /* if(!empty($this->get('doi'))) */
+        /*     $citation_cite_as .= ' doi:'. $this->get('doi'); */
+        if(!empty($this->get('isbn')))
+            $citation_cite_as .= ' ISBN:'. $this->get('isbn');
 
-        return $citation_cite_as;
+        return trim($citation_cite_as, ' ');
     }
 
 }

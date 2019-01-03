@@ -2380,6 +2380,7 @@ abstract class O3PO_PublicationType {
         $doi_url_prefix = $this->get_journal_property('doi_url_prefix');
         $ads_api_search_url = $this->get_journal_property('ads_api_search_url');
         $ads_api_token = $this->get_journal_property('ads_api_token');
+        $arxiv_url_abs_prefix = $this->get_journal_property('arxiv_url_abs_prefix');
 
         $cited_by_html = '';
         $citation_number = 0;
@@ -2395,7 +2396,7 @@ abstract class O3PO_PublicationType {
             {
                 $citation_number += 1;
                 $cited_by_html .= '<p class="break-at-all-cost">' . '[' . $citation_number . '] ';
-                $cited_by_html .= $bibentry->get_formated_html();
+                $cited_by_html .= $bibentry->get_formated_html($doi_url_prefix, $arxiv_url_abs_prefix);
                 $cited_by_html .= '</p>' . "\n";
             }
             $cited_by_html .= '<p>(The above data is from Crossref\'s <a href="https://www.crossref.org/services/cited-by/">cited-by service</a>. Unfortunately not all publishers provide suitable and complete citation data so that some citing works or bibliographic details may be missing.)</p>';
@@ -2403,24 +2404,25 @@ abstract class O3PO_PublicationType {
 
         $eprint = get_post_meta( $post_id, $post_type . '_eprint', true );
         if(empty($eprint))
-            $cited_by_html .= '<p><a href="https://ui.adsabs.harvard.edu/">NASA ads</a> data can only be displayed for publications that are on the arXiv.</p>';
+            $cited_by_html .= '<p><a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a> data can only be displayed for publications that are on the arXiv.</p>';
         else
         {
             $ads_bibentries = O3PO_Ads::get_cited_by_bibentries($ads_api_search_url, $ads_api_token, $eprint);
             if (is_wp_error($ads_bibentries))
                 $cited_by_html .= '<p>(' . $ads_bibentries->get_error_code() . ' ' . $ads_bibentries->get_error_message() . ')</p>';
             elseif(empty($ads_bibentries))
-                $cited_by_html .= '<p><a href="https://ui.adsabs.harvard.edu/">NASA ads</a> has no data on citing works. Unfortunately not all publishers provide suitable citation data.</p>';
+                $cited_by_html .= '<p><a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a> has no data on citing works. Unfortunately not all publishers provide suitable citation data.</p>';
             else
             {
-                foreach($crossref_bibentries as $bibentry)
+                $citation_number = 0;
+                foreach($ads_bibentries as $bibentry)
                 {
                     $citation_number += 1;
                     $cited_by_html .= '<p class="break-at-all-cost">' . '[' . $citation_number . '] ';
-                    $cited_by_html .= $bibentry->get_formated_html();
+                    $cited_by_html .= $bibentry->get_formated_html($doi_url_prefix, $arxiv_url_abs_prefix);
                     $cited_by_html .= '</p>' . "\n";
                 }
-                $cited_by_html .= '<p>(The above data is from <a href="https://ui.adsabs.harvard.edu/">NASA ads</a>. Unfortunately not all publishers provide suitable citation data.)</p>';
+                $cited_by_html .= '<p>(The above data is from <a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a>. Unfortunately not all publishers provide suitable citation data.)</p>';
             }
         }
 
@@ -2970,6 +2972,8 @@ abstract class O3PO_PublicationType {
     public function use_page_template( $template ) {
 
         global $post;
+        if(!is_object($post))
+            return $template;
 
         $post_id = $post->ID;
         $post_type = get_post_type($post_id);

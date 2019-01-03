@@ -326,8 +326,8 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->add_settings_field('crossref_archive_locations', 'Archive locations', array( $this, 'render_crossref_archive_locations_setting' ), $this->plugin_name . '-settings:crossref_settings', 'crossref_settings');
 
         $this->add_settings_section('ads_settings', 'ADS', array( $this, 'render_ads_settings' ), $this->plugin_name . '-settings:ads_settings');
-        $this->add_settings_field('ads_api_search_url', 'ADS API URL', array( $this, 'render_ads_api_search_url_setting' ), $this->plugin_name . '-settings:ads_api_search_url_settings', 'ads_settings');
-        $this->add_settings_field('ads_api_token', 'ADS API token', array( $this, 'render_ads_api_token_setting' ), $this->plugin_name . '-settings:ads_api_token_settings', 'ads_settings');
+        $this->add_settings_field('ads_api_search_url', 'ADS API URL', array( $this, 'render_ads_api_search_url_setting' ), $this->plugin_name . '-settings:ads_settings', 'ads_settings');
+        $this->add_settings_field('ads_api_token', 'ADS API token', array( $this, 'render_ads_api_token_setting' ), $this->plugin_name . '-settings:ads_settings', 'ads_settings');
 
         $this->add_settings_section('clockss_settings', 'Clockss', array( $this, 'render_clockss_settings' ), $this->plugin_name . '-settings:clockss_settings');
         $this->add_settings_field('clockss_ftp_url', 'Clockss FTP URL', array( $this, 'render_clockss_ftp_url_setting' ), $this->plugin_name . '-settings:clockss_settings', 'clockss_settings');
@@ -428,7 +428,7 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_clockss_settings() {
 
-        echo '<p>Configure how ' . $this->plugin_name . ' interacts with CLOCKSS.</p>';
+        echo '<p>Configure how ' . $this->plugin_name . ' interacts with <a href="https://clockss.org/">CLOCKSS</a>.</p>';
 
     }
 
@@ -440,7 +440,7 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_doaj_settings() {
 
-        echo '<p>Configure how ' . $this->plugin_name . ' interacts with DOAJ.</p>';
+        echo '<p>Configure how ' . $this->plugin_name . ' interacts with the <a href="https://doaj.org/">DOAJ</a>.</p>';
 
     }
 
@@ -452,7 +452,7 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_arxiv_settings() {
 
-        echo '<p>Configure how ' . $this->plugin_name . ' interacts with the arXiv.</p>';
+        echo '<p>Configure how ' . $this->plugin_name . ' interacts with the <a href="https://arxiv.org/">arXiv</a>.</p>';
 
     }
 

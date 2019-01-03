@@ -23,7 +23,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-biben
  */
 class O3PO_Ads {
 
-    public static function get_cited_by_json( $ads_api_search_url, $api_token, $eprint ) {
+    public static function get_cited_by_json( $ads_api_search_url, $api_token, $eprint, $storage_time=10*60 ) {
 
         $eprint_without_version = preg_replace('#v[0-9]+$#', '', $eprint);
         $headers = array( 'Authorization' => 'Bearer:' . $api_token );
@@ -33,16 +33,19 @@ class O3PO_Ads {
         if(empty($response)) {
             $response = wp_remote_get($url, array('headers' => $headers));
             if(is_wp_error($response))
-                return '';
+                return $response;
+            set_transient('get_cited_by_json_' . $url, $response, $storage_time);
         }
-        set_transient('get_cited_by_json_' . $url, $response, 10*60);
 
         return json_decode($response['body']);
     }
 
-    public static function get_cited_by_bibentries( $ads_api_search_url, $api_token, $eprint ) {
+    public static function get_cited_by_bibentries( $ads_api_search_url, $api_token, $eprint, $storage_time=10*60, $max_number_of_citations=1000 ) {
 
         $json = static::get_cited_by_json($ads_api_search_url, $api_token, $eprint);
+
+        if(is_wp_error($json))
+            return $json;
 
         if(isset($json->response->docs[0]->citation))
             $bibcodes = $json->response->docs[0]->citation;
@@ -50,14 +53,15 @@ class O3PO_Ads {
             return array();
         $citing_bibcodes_querey = 'bibcode:' . implode($bibcodes, '+OR+bibcode:');
 
-        $url = $ads_api_search_url . '?q=' . $citing_bibcodes_querey . '&fl=' . 'doi,title,author,page,issue,volume,year,pub,pubdate';
+        $url = $ads_api_search_url . '?q=' . $citing_bibcodes_querey . '&fl=' . 'doi,title,author,page,issue,volume,year,pub,pubdate' . '&rows=' . $max_number_of_citations;
         $response = get_transient('get_cited_by_json_' . $url);
         if(empty($response)) {
+            $headers = array( 'Authorization' => 'Bearer:' . $api_token );
             $response = wp_remote_get($url, array('headers' => $headers));
             if(is_wp_error($response))
                 return $response;
+            set_transient('get_cited_by_json_' . $url, $response, $storage_time);
         }
-        set_transient('get_cited_by_json_' . $url, $response, 10*60);
         $json = json_decode($response['body']);
 
         $bibentries = array();
@@ -70,16 +74,27 @@ class O3PO_Ads {
                 $authors[] = new O3PO_Author(!empty($names[1]) ? $names[1] : '', !empty($names[0]) ? $names[0] : '');
             }
 
-            $bibentries[] = new O3PO_Bibentry(array(
-                                                     'doi' => $doc->doi,
-                                                     'title' => $doc->title,
-                                                     'authors' => $authors,
-                                                     'page' => $doc->page,
-                                                     'issue' => $doc->issue,
-                                                     'volume' => $doc->volume,
-                                                     'year' => $doc->year,
-                                                     'venue' => $doc->pub,
-                                                       ));
+            $bibentry_data = array(
+                'doi' => !empty($doc->doi) ? $doc->doi[0] : '',
+                'title' => !empty($doc->title) ? implode($doc->title, ' - ') : '',
+                'authors' => !empty($authors) ? $authors : '',
+                'page' => !empty($doc->page) ? $doc->page[0] : '',
+                'issue' => !empty($doc->issue) ? $doc->issue : '',
+                'volume' => !empty($doc->volume) ? $doc->volume : '',
+                'year' => !empty($doc->year) ? $doc->year : '',
+                'venue' => !empty($doc->pub) ? $doc->pub : '',
+                                   );
+
+            #post process the page and venue in case of arXiv citations
+            if(substr($bibentry_data['page'], 0, 6 ) === 'arXiv:')
+            {
+                $bibentry_data['eprint'] = substr($bibentry_data['page'], 6);
+                $bibentry_data['page'] = '';
+                if(substr($bibentry_data['venue'], 0, 5 ) === 'arXiv')
+                    $bibentry_data['venue'] = '';
+            }
+
+            $bibentries[] = new O3PO_Bibentry($bibentry_data);
         }
 
         return $bibentries;
