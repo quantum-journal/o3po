@@ -110,6 +110,8 @@ function get_option( $option, $default = false ) {
             'crossref_test_deposite_url' => 'fake_crossref_test_deposite_url',
             'crossref_email' => 'fake_crossref_email',
             'crossref_archive_locations' => 'fake_crossref_archive_locations',
+            'ads_api_search_url' => 'https://api.adsabs.harvard.edu/v1/search/query',
+            'ads_api_token' => '',
             'arxiv_url_abs_prefix' => 'https://arxiv.org/abs/',
             'arxiv_url_pdf_prefix' => 'https://arxiv.org/pdf/',
             'arxiv_url_source_prefix' => 'https://arxiv.org/e-print/',
@@ -241,6 +243,7 @@ class WP_Query
     private $query;
     public $query_vars;
     public $post_count;
+    public $found_posts;
 
     function __construct( $input=null, $query_vars=null ) {
         global $posts;
@@ -283,6 +286,7 @@ class WP_Query
         }
 
         $this->post_count = count($this->posts);
+        $this->found_posts = $this->post_count;
     }
 
     function get($key) {
@@ -664,6 +668,7 @@ function wp_remote_get( $url, $args=array() ) {
         'https://arxiv.org/abs/1609.09584v4' => dirname(__FILE__) . '/arxiv/1609.09584v4.html',
         'https://arxiv.org/abs/0908.2921v2' => dirname(__FILE__) . '/arxiv/0908.2921v2.html',
         'https://arxiv.org/abs/1806.02820v3' => dirname(__FILE__) . '/arxiv/1806.02820v3.html',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0908.2921&fl=citation' => dirname(__FILE__) . '/ads/0908.2921.json'
                           );
     if(!empty($local_file_urls[$url]))
         return array('headers'=>'' ,'body'=> file_get_contents($local_file_urls[$url]) );

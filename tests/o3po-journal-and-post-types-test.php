@@ -1,5 +1,6 @@
 <?php
 
+require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po.php');
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-settings.php');
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-environment.php');
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-journal.php');
@@ -30,17 +31,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          */
     public function test_setup_primary_journal( $settings )
     {
-        $journal_config_properties = O3PO_Journal::get_journal_config_properties();
-        $journal_config = array();
-        foreach(array_intersect(array_keys($settings->get_all_settings_fields_map()), $journal_config_properties) as $journal_config_property){
-            $journal_config[$journal_config_property] = $settings->get_plugin_option($journal_config_property);
-        }
-            //add some properties that are named differently (for a reason) in settings
-        $journal_config['publication_type_name'] = $settings->get_plugin_option('primary_publication_type_name');
-        $journal_config['publication_type_name_plural'] = $settings->get_plugin_option('primary_publication_type_name_plural');
-
-            //create the journal
-        $journal = new O3PO_Journal($journal_config);
+        $journal = O3PO::setup_primary_journal($settings);
         $this->assertInstanceOf(O3PO_Journal::class, $journal);
 
         return $journal;
@@ -52,26 +43,8 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          */
     public function test_setup_secondary_journal( $settings )
     {
-        $journal_config_properties = O3PO_Journal::get_journal_config_properties();
-        $journal_config = array();
-        foreach(array_intersect(array_keys($settings->get_all_settings_fields_map()), $journal_config_properties) as $journal_config_property){
-            $journal_config[$journal_config_property] = $settings->get_plugin_option($journal_config_property);
-        }
-            //add some properties that are named differently (for a reason) in settings
-        $journal_config['publication_type_name'] = $settings->get_plugin_option('primary_publication_type_name');
-        $journal_config['publication_type_name_plural'] = $settings->get_plugin_option('primary_publication_type_name_plural');
 
-            //reconfigure for the secondary journal
-        $journal_config['journal_title'] = $settings->get_plugin_option('secondary_journal_title');
-        $journal_config['journal_level_doi_suffix'] = $settings->get_plugin_option('secondary_journal_level_doi_suffix');
-        $journal_config['eissn'] = $settings->get_plugin_option('secondary_journal_eissn');
-        $journal_config['volumes_endpoint'] = 'secondary_volumes';
-        $journal_config['publication_type_name'] = $settings->get_plugin_option('secondary_publication_type_name');
-        $journal_config['publication_type_name_plural'] = $settings->get_plugin_option('secondary_publication_type_name_plural');
-
-
-            //create the journal
-        $journal = new O3PO_Journal($journal_config);
+        $journal = O3PO::setup_secondary_journal($settings);
         $this->assertInstanceOf(O3PO_Journal::class, $journal);
 
         return $journal;

@@ -197,22 +197,17 @@ class O3PO_Crossref {
                 continue;
 
 
-            Dont forget the contributors/authors!
-
-            /* if(!empty($cite->contributors->contributor)) */
-            /* { */
-            /*     foreach ($cite->contributors->contributor as $contributor) { */
-            /*         if(!empty($contributor->given_name)) */
-            /*             $bibitem_html .= $contributor->given_name . ' '; */
-            /*         if(!empty($contributor->surname)) */
-            /*             $bibitem_html .= $contributor->surname; */
-            /*         $bibitem_html .= ', '; */
-            /*     } */
-            /* } */
-
+            $authors = array();
+            if(!empty($cite->contributors->contributor))
+            {
+                foreach ($cite->contributors->contributor as $contributor) {
+                    $authors[] = new O3PO_Author($contributor->given_name, $contributor->surname);
+                }
+            }
 
             $bibentries[] = new O3PO_Bibentry(
                 array(
+                    'authors' => $authors,
                     'venue' => $cite->journal_title,
                     'title' => !empty($cite->title) ? $cite->title : $cite->article_title,
                     'collectiontitle' => !empty($cite->series_title) ? $cite->series_title : $cite->volume_title,
@@ -225,7 +220,6 @@ class O3PO_Crossref {
                     'issn' => $cite->issn,
                     'type' => $cite->publication_type,
                       ));
-
         }
 
         return $bibentries;

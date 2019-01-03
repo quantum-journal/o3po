@@ -37,14 +37,17 @@ class O3PO_Ads {
         }
         set_transient('get_cited_by_json_' . $url, $response, 10*60);
 
-        return = json_decode($response['body']);
+        return json_decode($response['body']);
     }
 
     public static function get_cited_by_bibentries( $ads_api_search_url, $api_token, $eprint ) {
 
         $json = static::get_cited_by_json($ads_api_search_url, $api_token, $eprint);
 
-        $bibcodes = $json->response->docs[0]->citation;
+        if(isset($json->response->docs[0]->citation))
+            $bibcodes = $json->response->docs[0]->citation;
+        else
+            return array();
         $citing_bibcodes_querey = 'bibcode:' . implode($bibcodes, '+OR+bibcode:');
 
         $url = $ads_api_search_url . '?q=' . $citing_bibcodes_querey . '&fl=' . 'doi,title,author,page,issue,volume,year,pub,pubdate';
@@ -52,7 +55,7 @@ class O3PO_Ads {
         if(empty($response)) {
             $response = wp_remote_get($url, array('headers' => $headers));
             if(is_wp_error($response))
-                return '';
+                return $response;
         }
         set_transient('get_cited_by_json_' . $url, $response, 10*60);
         $json = json_decode($response['body']);
@@ -60,10 +63,17 @@ class O3PO_Ads {
         $bibentries = array();
         foreach($json->response->docs as $doc)
         {
+            $authors = array();
+            foreach($doc->author as $author)
+            {
+                $names = preg_split('#\s*,\s*#', $author);
+                $authors[] = new O3PO_Author(!empty($names[1]) ? $names[1] : '', !empty($names[0]) ? $names[0] : '');
+            }
+
             $bibentries[] = new O3PO_Bibentry(array(
                                                      'doi' => $doc->doi,
                                                      'title' => $doc->title,
-                                                     'authors' => $doc->author, Split this up as the format is ["Wu, Anqi","Aoi, Mikio C.","Pillow, Jonathan W."]
+                                                     'authors' => $authors,
                                                      'page' => $doc->page,
                                                      'issue' => $doc->issue,
                                                      'volume' => $doc->volume,
@@ -73,7 +83,5 @@ class O3PO_Ads {
         }
 
         return $bibentries;
-
-        TODO #treat the return value reasonbly in publication-type.php and unify how crossref and ads citations are returned, i.e., implement a function in crossref.php to return the same format as here and split this function up!
     }
 }

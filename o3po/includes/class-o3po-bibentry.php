@@ -11,6 +11,7 @@
  */
 
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-author.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-utility.php';
 
 /**
  * A class to represent bibliography entries.
@@ -62,29 +63,27 @@ class O3PO_Bibentry {
         return $this->meta_data[$field];
     }
 
-    public function get_formated_html( $doi_url_prefix ) {
+    public function get_formated_html( $doi_url_prefix, $arxiv_url_abs_prefix ) {
 
         $bibitem_html = '';
 
-        Dont forget the contributors!
-        $bibitem_html .= ...
-        /*     if(!empty($cite->contributors->contributor)) */
-        /*     { */
-        /*         foreach ($cite->contributors->contributor as $contributor) { */
-        /*             if(!empty($contributor->given_name)) */
-        /*                 $bibitem_html .= $contributor->given_name . ' '; */
-        /*             if(!empty($contributor->surname)) */
-        /*                 $bibitem_html .= $contributor->surname; */
-        /*             $bibitem_html .= ', '; */
-        /*         } */
-        /*     } */
+        if(!empty($this->get('authors')))
+        {
+            $author_names = array();
+            foreach ($this->get('authors') as $author) {
+                $author_names[] = $author->get_name();
+            }
+            $bibitem_html .= O3PO_Utility::oxford_comma_implode($author_names) . ', ';
+        }
 
         if(!empty($this->get('title')))
             $bibitem_html .= '"' . esc_html($this->get('title')) . '", ';
 
         $citation_cite_as = $this->get_cite_as_text();
         if(!empty($this->get('doi')))
-            $bibitem_html .= '<a href="' . $doi_url_prefix . $this->get('doi') . '">' . esc_html($citation_cite_as) . '</a>.'; escape the doi!!!
+            $bibitem_html .= '<a href="' . esc_attr($doi_url_prefix . $this->get('doi')) . '">' . esc_html($citation_cite_as) . '</a>.';
+        elseif(!empty($this->get('eprint')))
+            $bibitem_html .= '<a href="' . esc_attr($arxiv_url_abs_prefix . $this->get('eprint')) . '">' . esc_html($citation_cite_as) . '</a>.';
         else
             $bibitem_html .= esc_html($citation_cite_as);
 
@@ -96,7 +95,6 @@ class O3PO_Bibentry {
 
         $citation_cite_as = '';
 
-        Implement!;
         $citation_journal_title = $cite->journal_title;
         $citation_article_title = $cite->article_title;
         $citation_title = $cite->title;
@@ -138,7 +136,6 @@ class O3PO_Bibentry {
             $citation_cite_as = $citation_doi . ' ';
         if(!empty($citation_year))
             $citation_cite_as .= '('. $citation_year . ')';
-
         if(!empty($citation_isbn))
             $citation_cite_as .= ' ISBN:'. $citation_isbn;
 

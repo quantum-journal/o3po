@@ -213,30 +213,9 @@ class O3PO {
 
         $this->environment = new O3PO_Environment($settings->get_plugin_option("production_site_url"));
 
-            //construct the journal config from settings
-        $journal_config_properties = O3PO_Journal::get_journal_config_properties();
-        $journal_config = array();
-        foreach(array_intersect(array_keys($settings->get_all_settings_fields_map()), $journal_config_properties) as $journal_config_property){
-            $journal_config[$journal_config_property] = $settings->get_plugin_option($journal_config_property);
-        }
-            //add some properties that are named differently (for a reason) in settings
-            /* $journal_config['volumes_endpoint'] = 'volumes'; */
-        $journal_config['publication_type_name'] = $settings->get_plugin_option('primary_publication_type_name');
-        $journal_config['publication_type_name_plural'] = $settings->get_plugin_option('primary_publication_type_name_plural');
-
-            //create the primary journal
-        $this->journal = new O3PO_Journal($journal_config);
-
-            //reconfigure for the secondary journal
-        $journal_config['journal_title'] = $settings->get_plugin_option('secondary_journal_title');
-        $journal_config['journal_level_doi_suffix'] = $settings->get_plugin_option('secondary_journal_level_doi_suffix');
-        $journal_config['eissn'] = $settings->get_plugin_option('secondary_journal_eissn');
-        $journal_config['volumes_endpoint'] = 'secondary_volumes';
-        $journal_config['publication_type_name'] = $settings->get_plugin_option('secondary_publication_type_name');
-        $journal_config['publication_type_name_plural'] = $settings->get_plugin_option('secondary_publication_type_name_plural');
-
-            //create the secondary journal
-        $this->journal_secondary = new O3PO_Journal($journal_config);
+            //create the journals
+        $this->journal = static::setup_primary_journal($settings);
+        $this->journal_secondary = static::setup_secondary_journal($settings);
 
             //create the publication types for each journal
         $this->primary_publication_type = new O3PO_PrimaryPublicationType($this->journal, $this->environment);
@@ -425,5 +404,45 @@ class O3PO {
 
 		return $this->version;
 	}
+
+
+
+    public static function journal_config_from_settings( $settings ) {
+
+        $journal_config_properties = O3PO_Journal::get_journal_config_properties();
+        $journal_config = array();
+        foreach(array_intersect(array_keys($settings->get_all_settings_fields_map()), $journal_config_properties) as $journal_config_property){
+            $journal_config[$journal_config_property] = $settings->get_plugin_option($journal_config_property);
+        }
+        return $journal_config;
+    }
+
+    public static function setup_primary_journal( $settings ) {
+        $journal_config = static::journal_config_from_settings($settings);
+
+            //add some properties that are named differently (for a reason) in settings
+            /* $journal_config['volumes_endpoint'] = 'volumes'; */
+        $journal_config['publication_type_name'] = $settings->get_plugin_option('primary_publication_type_name');
+        $journal_config['publication_type_name_plural'] = $settings->get_plugin_option('primary_publication_type_name_plural');
+
+            //create the primary journal
+        return new O3PO_Journal($journal_config);
+    }
+
+    public static function setup_secondary_journal( $settings ) {
+
+        $journal_config = static::journal_config_from_settings($settings);
+                    //reconfigure for the secondary journal
+        $journal_config['journal_title'] = $settings->get_plugin_option('secondary_journal_title');
+        $journal_config['journal_level_doi_suffix'] = $settings->get_plugin_option('secondary_journal_level_doi_suffix');
+        $journal_config['eissn'] = $settings->get_plugin_option('secondary_journal_eissn');
+        $journal_config['volumes_endpoint'] = 'secondary_volumes';
+        $journal_config['publication_type_name'] = $settings->get_plugin_option('secondary_publication_type_name');
+        $journal_config['publication_type_name_plural'] = $settings->get_plugin_option('secondary_publication_type_name_plural');
+
+            //create the secondary journal
+        return new O3PO_Journal($journal_config);
+    }
+
 
 }

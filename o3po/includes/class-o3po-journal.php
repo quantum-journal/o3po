@@ -71,6 +71,8 @@ class O3PO_Journal {
             'crossref_id',
             'crossref_pw',
             'crossref_test_deposite_url',
+            'ads_api_search_url',
+            'ads_api_token',
             'developer_email',
             'doaj_api_key',
             'doaj_api_url',
@@ -611,7 +613,7 @@ for (i = 0; i < elemets_to_condense.length; i++) {
         }
         $my_query = new WP_Query($query);
 
-        return $my_query->post_count;
+        return $my_query->found_posts;
     }
 
 }
