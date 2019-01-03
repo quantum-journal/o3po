@@ -166,7 +166,7 @@ class O3PO_Crossref {
                 $xml = simplexml_load_string($response['body']);
                 libxml_use_internal_errors($use_errors);
                 if ($xml === false) {
-                    $error = "Could not load cited-by data from Crossref (maybe the DOI is not yet active?)";
+                    $error = "Could not load cited-by data from Crossref (this is normal if the DOI was registered only recently).";
                     foreach(libxml_get_errors() as $e) {
                         $error .= " " . $e->message;
                     }

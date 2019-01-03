@@ -2404,22 +2404,26 @@ abstract class O3PO_PublicationType {
         elseif(empty($ads_bibentries))
             $cited_by_html .= '<p>At the moment <a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a> has no data on citing works.</p>';
 
-        $sources = array();
         if(!empty($crossref_bibentries) and !empty($ads_bibentries))
+        {
             $all_bibentries = O3PO_Bibentry::merge_bibitem_arrays($crossref_bibentries, $ads_bibentries);
+        }
         elseif(!empty($crossref_bibentries))
         {
             $all_bibentries = $crossref_bibentries;
-            $sources[] = 'Crossref\'s <a href="https://www.crossref.org/services/cited-by/">cited-by service</a>';
         }
         elseif(!empty($ads_bibentries))
         {
             $all_bibentries = $ads_bibentries;
-            $sources[] = '<a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a>';
         }
         else
             $all_bibentries = array();
 
+        $sources = array();
+        if(!empty($crossref_bibentries))
+            $sources[] = 'Crossref\'s <a href="https://www.crossref.org/services/cited-by/">cited-by service</a>';
+        if(!empty($ads_bibentries))
+            $sources[] = '<a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a>';
         if(!empty($sources))
             $cited_by_html .= '<p>The following cited-by data is from ' . implode($sources, ' and ') . '. It may be incomplete as not all publishers provide suitable and complete citation data.</p>';
 
@@ -2468,8 +2472,8 @@ abstract class O3PO_PublicationType {
             $cited_by = '';
             $post_type = get_post_type($post_id);
             if( !empty(get_post_meta( $post_id, $post_type . '_bbl', true )) ) {
-                $cited_by .= '<h3 class="references toggle-following additional-info"><a href="javascript:void(0);" onclick="toggleFollowing(this);">&#9658; Cited by (beta)</a></h3>';
-                $cited_by .= '<div class="initially-display-none-if-js">';
+                $cited_by .= '<h3 class="references toggle-following additional-info"><a href="javascript:void(0);" onclick="toggleFollowing(this);">&#9658; Cited by</a></h3>';
+                $cited_by .= '<div class="">';
                 $cited_by .= $this->get_formated_cited_by_html($post_id);
                 $cited_by .= '</div>';
             }
