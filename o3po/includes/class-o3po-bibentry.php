@@ -149,8 +149,6 @@ class O3PO_Bibentry {
                 $merged_meta_data[$field] = $bibitem2->get($field);
         }
 
-        $merged_meta_data['title'] = $merged_meta_data['title'] . " - THIS ENTRY WAS MERGED WITH: " . $bibitem2->get('title');
-
         return new O3PO_Bibentry($merged_meta_data);
     }
 
