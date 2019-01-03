@@ -23,24 +23,43 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-biben
  */
 class O3PO_Ads {
 
-    public static function get_cited_by_json( $ads_api_search_url, $api_token, $eprint, $storage_time=10*60 ) {
+        /**
+         *
+         * If running out of queries storage time is automatically increased.
+         */
+    public static function get_cited_by_json( $ads_api_search_url, $api_token, $eprint, $storage_time=10*60, $timeout=20 ) {
 
         $eprint_without_version = preg_replace('#v[0-9]+$#', '', $eprint);
         $headers = array( 'Authorization' => 'Bearer:' . $api_token );
 
         $url = $ads_api_search_url . '?q=' . 'arxiv:' . $eprint_without_version . '&fl=' . 'citation';
-        $response = get_transient('get_cited_by_json_' . $url);
+        $response = get_transient('get_ads_cited_by_json_' . $url);
         if(empty($response)) {
-            $response = wp_remote_get($url, array('headers' => $headers));
+            $response = wp_remote_get($url, array('headers' => $headers, 'timeout' => $timeout));
             if(is_wp_error($response))
                 return $response;
-            set_transient('get_cited_by_json_' . $url, $response, $storage_time);
+
+            if(!empty($response['headers']['x-ratelimit-remaining']))
+            {
+                $remaining_queries = $response['headers']['x-ratelimit-remaining'];
+                if($remaining_queries <= 100)
+                    $storage_time = $storage_time*10;
+                if($remaining_queries == 0)
+                    return new WP_Error("Cannot retrieve data from ADS due to rate limitations.");
+            }
+            set_transient('get_ads_cited_by_json_' . $url, $response, $storage_time);
         }
 
         return json_decode($response['body']);
     }
 
-    public static function get_cited_by_bibentries( $ads_api_search_url, $api_token, $eprint, $storage_time=10*60, $max_number_of_citations=1000 ) {
+
+
+        /**
+         *
+         * If running out of queries storage time is automatically increased.
+         */
+    public static function get_cited_by_bibentries( $ads_api_search_url, $api_token, $eprint, $storage_time=10*60, $max_number_of_citations=1000, $timeout=20 ) {
 
         $json = static::get_cited_by_json($ads_api_search_url, $api_token, $eprint);
 
@@ -54,13 +73,21 @@ class O3PO_Ads {
         $citing_bibcodes_querey = 'bibcode:' . implode($bibcodes, '+OR+bibcode:');
 
         $url = $ads_api_search_url . '?q=' . $citing_bibcodes_querey . '&fl=' . 'doi,title,author,page,issue,volume,year,pub,pubdate' . '&rows=' . $max_number_of_citations;
-        $response = get_transient('get_cited_by_json_' . $url);
+        $response = get_transient('get_ads_cited_by_json_' . $url);
         if(empty($response)) {
             $headers = array( 'Authorization' => 'Bearer:' . $api_token );
-            $response = wp_remote_get($url, array('headers' => $headers));
+            $response = wp_remote_get($url, array('headers' => $headers, 'timeout' => $timeout));
             if(is_wp_error($response))
                 return $response;
-            set_transient('get_cited_by_json_' . $url, $response, $storage_time);
+            if(!empty($response['headers']['x-ratelimit-remaining']))
+            {
+                $remaining_queries = $response['headers']['x-ratelimit-remaining'];
+                if($remaining_queries <= 100)
+                    $storage_time = $storage_time*10;
+                if($remaining_queries == 0)
+                    return new WP_Error("Cannot retrieve data from ADS due to rate limitations.");
+            }
+            set_transient('get_ads_cited_by_json_' . $url, $response, $storage_time);
         }
         $json = json_decode($response['body']);
 

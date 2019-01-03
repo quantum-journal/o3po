@@ -2426,6 +2426,26 @@ abstract class O3PO_PublicationType {
             }
         }
 
+
+        if(!is_wp_error($ads_bibentries) and !is_wp_error($crossref_bibentries))
+            $all_bibentries = O3PO_Bibentry::merge_bibitem_arrays($ads_bibentries, $crossref_bibentries);
+        elseif(!is_wp_error($crossref_bibentries))
+            $all_bibentries = $crossref_bibentries;
+        elseif(!is_wp_error($ads_bibentries))
+            $all_bibentries = $ads_bibentries;
+        else
+            $all_bibentries = array();
+
+        $citation_number = 0;
+        foreach($all_bibentries as $bibentry)
+        {
+            $citation_number += 1;
+            $cited_by_html .= '<p class="break-at-all-cost">' . '[' . $citation_number . '] ';
+            $cited_by_html .= $bibentry->get_formated_html($doi_url_prefix, $arxiv_url_abs_prefix);
+            $cited_by_html .= '</p>' . "\n";
+        }
+
+
         return $cited_by_html;
     }
 

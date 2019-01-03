@@ -24,7 +24,7 @@ class O3PO_Bibentry {
 
     private $meta_data;
 
-    private $meta_data_fields = array(
+    private static $meta_data_fields = array(
         'authors',
         'chapter',
         'collectiontitle',
@@ -50,7 +50,7 @@ class O3PO_Bibentry {
     );
 
     public function __construct( $meta_data ) {
-        foreach($this->meta_data_fields as $field)
+        foreach(static::$meta_data_fields as $field)
             if(isset($meta_data[$field]))
                 $this->meta_data[$field] = $meta_data[$field];
             else
@@ -62,9 +62,7 @@ class O3PO_Bibentry {
         return $this->meta_data[$field];
     }
 
-    public function get_formated_html( $doi_url_prefix, $arxiv_url_abs_prefix ) {
-
-        $bibitem_html = '';
+    public function get_formated_authors() {
 
         if(!empty($this->get('authors')))
         {
@@ -72,19 +70,30 @@ class O3PO_Bibentry {
             foreach ($this->get('authors') as $author) {
                 $author_names[] = $author->get_name();
             }
-            $bibitem_html .= O3PO_Utility::oxford_comma_implode($author_names) . ', ';
+            return O3PO_Utility::oxford_comma_implode($author_names);
         }
+        return '';
+    }
+
+
+    public function get_formated_html( $doi_url_prefix, $arxiv_url_abs_prefix ) {
+
+        $bibitem_html = '';
+
+        $bibitem_html .= esc_html($this->get_formated_authors());
+        if(!empty($bibitem_html))
+            $bibitem_html .= ', ';
 
         if(!empty($this->get('title')))
             $bibitem_html .= '"' . esc_html($this->get('title')) . '", ';
 
-        $citation_cite_as = $this->get_cite_as_text();
+        $citation_cite_as_html = esc_html($this->get_cite_as_text());
         if(!empty($this->get('doi')))
-            $bibitem_html .= '<a href="' . esc_attr($doi_url_prefix . $this->get('doi')) . '">' . esc_html($citation_cite_as) . '</a>.';
+            $bibitem_html .= '<a href="' . esc_attr($doi_url_prefix . $this->get('doi')) . '">' . $citation_cite_as_html . '</a>.';
         elseif(!empty($this->get('eprint')))
-            $bibitem_html .= '<a href="' . esc_attr($arxiv_url_abs_prefix . $this->get('eprint')) . '">' . esc_html($citation_cite_as) . '</a>.';
+            $bibitem_html .= '<a href="' . esc_attr($arxiv_url_abs_prefix . $this->get('eprint')) . '">' . $citation_cite_as_html . '</a>.';
         else
-            $bibitem_html .= esc_html($citation_cite_as);
+            $bibitem_html .= $citation_cite_as_html;
 
         return $bibitem_html;
     }
@@ -123,5 +132,101 @@ class O3PO_Bibentry {
 
         return trim($citation_cite_as, ' ');
     }
+
+
+        /**
+         *
+         *  $bibitem1 takes preference over $bibitem2
+         *
+         */
+    public static function merge($bibitem1, $bibitem2) {
+
+        $merged_meta_data = array();
+        foreach(static::$meta_data_fields as $field)
+        {
+            $merged_meta_data[$field] = $bibitem1->get($field);
+            if(empty($merged_meta_data[$field]))
+                $merged_meta_data[$field] = $bibitem2->get($field);
+        }
+
+        $merged_meta_data['title'] = $merged_meta_data['title'] . " - THIS ENTRY WAS MERGED WITH: " . $bibitem2->get('title');
+
+        return new O3PO_Bibentry($merged_meta_data);
+    }
+
+    public static function match($bibitem1, $bibitem2) {
+
+        if($bibitem1 == $bibitem2)
+            return true;
+        elseif(!empty($bibitem1->get('eprint')) and $bibitem1->get('eprint') === $bibitem2->get('eprint'))
+            return true;
+        elseif(!empty($bibitem1->get('doi')) and $bibitem1->get('doi') === $bibitem2->get('doi'))
+            return true;
+        else #now we do some heuristics to catch the remaining duplicates:
+        {
+            $years_identical = false;
+            if(!empty($bibitem1->get('year')) and !empty($bibitem2->get('year')) and $bibitem1->get('year') == $bibitem2->get('year') )
+                $years_identical = true;
+
+            if($years_identical)
+            {
+                $titles_similar = false;
+                $authors_similar = false;
+                if(!empty($bibitem1->get('title')) and !empty($bibitem2->get('title')))
+                {
+                    $t1 = substr(strtolower($bibitem1->get('title')), 0, 255);
+                    $t2 = substr(strtolower($bibitem2->get('title')), 0, 255);
+                    $l1 = strlen($t1); #length in bytes
+                    $l2 = strlen($t2);
+                    $lmin = min($l1, $l2);
+                    $lev = levenshtein($t1, $t2);
+                    if($lev <= 0.2*$lmin)
+                        $titles_similar = true;
+                }
+                if(!empty($bibitem1->get('title')) and !empty($bibitem2->get('title')))
+                {
+                    $a1 = substr(strtolower($bibitem1->get_formated_authors()), 0, 255);
+                    $a2 = substr(strtolower($bibitem2->get_formated_authors()), 0, 255);
+                    $l1 = strlen($t1); #length in bytes
+                    $l2 = strlen($t2);
+                    $lmin = min($l1, $l2);
+                    $lev = levenshtein($a1, $a2);
+                    if($lev <= 0.2*$lmin)
+                        $authors_similar = true;
+                }
+                if(($titles_similar and $authors_similar)
+                       /* or ($authors_similar and empty($bibitem1->get('title')) and empty($bibitem2->get('title'))) */
+                       /* or ($title_similar and empty($bibitem1->get('authors')) and empty($bibitem2->get('authors'))) */
+                   )
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+
+        /**
+         *
+         * Merges $array1 into $array2,
+         */
+    public static function merge_bibitem_arrays($array1, $array2 ) {
+
+        $merged = $array2;
+        foreach($array1 as $key1 => $bibitem1){
+            $merged_at_least_once = false;
+            foreach($array2 as $key2 => $bibitem2){
+                if(static::match($bibitem2, $bibitem1))
+                {
+                    $merged[$key2] = static::merge($bibitem2, $bibitem1);
+                    $merged_at_least_once = true;
+                }
+            }
+            if(!$merged_at_least_once)
+                $merged[] = $bibitem1;
+        }
+        return $merged;
+    }
+
 
 }
