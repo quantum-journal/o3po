@@ -752,20 +752,25 @@ abstract class O3PO_PublicationType {
         if( strpos($validation_result, 'ERROR') === false or strpos($validation_result, 'REVIEW') === false)
         {
                 //Upload meta-data to DOAJ
-            if (get_post_status($post_id) === 'publish' && !$this->environment->is_test_environment())
-            {
-                $doaj_response = $this->upload_meta_data_to_doaj($doaj_json,
-                                                                 $this->get_journal_property('doaj_api_url'),
-                                                                 $this->get_journal_property('doaj_api_key')
-                                                                 );
-                if(!empty($doaj_response) && (strpos($doaj_response, 'ERROR') !== false || strpos($doaj_response, 'WARNING') !== false))
-                    $validation_result .= $doaj_response;
-                else
-                    $validation_result .= "INFO: Meta-data successfully uploaded to DOAJ.\n";
-            }
+            if(empty($this->get_journal_property('eissn')))
+                $validation_result .= "INFO: Skipping upload to DOAJ as no eISSN was configured for this journal.\n";
             else
-                $doaj_response = NULL;
-            update_post_meta( $post_id, $post_type . '_doaj_response', $doaj_response );
+            {
+                if (get_post_status($post_id) === 'publish' && !$this->environment->is_test_environment())
+                {
+                    $doaj_response = $this->upload_meta_data_to_doaj($doaj_json,
+                                                                     $this->get_journal_property('doaj_api_url'),
+                                                                     $this->get_journal_property('doaj_api_key')
+                                                                     );
+                    if(!empty($doaj_response) && (strpos($doaj_response, 'ERROR') !== false || strpos($doaj_response, 'WARNING') !== false))
+                        $validation_result .= $doaj_response;
+                    else
+                        $validation_result .= "INFO: Meta-data successfully uploaded to DOAJ.\n";
+                }
+                else
+                    $doaj_response = NULL;
+                update_post_meta( $post_id, $post_type . '_doaj_response', $doaj_response );
+            }
 
 
                 //Upload meta-data and fulltext to CLOCKSS (only if a fulltext exists)
