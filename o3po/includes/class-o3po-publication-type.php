@@ -2520,17 +2520,13 @@ abstract class O3PO_PublicationType {
     public function get_cited_by( $post_id ) {
 
         $cited_by = get_transient($post_id . '_cited_by_html');
-
         if( false === $cited_by ) {
-                // Transient expired, regenerate
             $cited_by = '';
             $post_type = get_post_type($post_id);
-            if( !empty(get_post_meta( $post_id, $post_type . '_bbl', true )) ) {
-                $cited_by .= '<h3 class="references additional-info">Cited by</h3>';
-                $cited_by .= '<div class="">';
-                $cited_by .= $this->get_formated_cited_by_html($post_id);
-                $cited_by .= '</div>';
-            }
+            $cited_by .= '<h3 class="references additional-info">Cited by</h3>';
+            $cited_by .= '<div class="">';
+            $cited_by .= $this->get_formated_cited_by_html($post_id);
+            $cited_by .= '</div>';
             set_transient($post_id . '_cited_by_html', $cited_by, 60); //keep for 1 minute
         }
 
