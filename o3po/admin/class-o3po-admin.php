@@ -283,7 +283,7 @@ class O3PO_Admin {
             $html .= '<p>The following data is based on cited-by data by Crossref for publications published under the DOI prefix ' . $doi_prefix . ' through this plugin on this website and includes citations since ' . $start_date . '. Remember that not all publishers participate in Crossref cited.by, and therefore citations will likely be missing. Fresh data from Crossref is pulled when this page is refreshed but at most every 12 hours.</p>';
             foreach(O3PO_PublicationType::get_active_publication_type_names() as $post_type)
             {
-                $citations_this_type = O3PO_PublicationType::get_active_publication_types($post_type)->get_all_citation_counts_for_publication_type($post_type, $start_date);
+                $citations_this_type = O3PO_PublicationType::get_active_publication_types($post_type)->get_all_citation_counts($start_date);
 
                 if(is_wp_error($citations_this_type))
                     $html .= '<p>Citation data for type ' . $post_type . ' could not be retrieved: ' . $citations_this_type->get_error_message() . '</p>';

@@ -2370,6 +2370,13 @@ abstract class O3PO_PublicationType {
          * @param    int    $post_id     Id of the post.
          */
     public function get_formated_cited_by_html( $post_id ) {
+        return $this->get_cited_by_data($post_id)['html'];
+    }
+
+        /**
+         *
+         */
+    public function get_cited_by_data( $post_id ) {
 
         $post_type = get_post_type($post_id);
         $doi = $this->get_doi($post_id);
@@ -2388,8 +2395,10 @@ abstract class O3PO_PublicationType {
 
         $cited_by_html = '';
 
+        $errors = array();
         if (is_wp_error($crossref_bibentries))
         {
+            $errors[] = $crossref_bibentries;
             $cited_by_html .= '<p>Error fetching Crossref cited-by data: ' . $crossref_bibentries->get_error_code() . ' ' . $crossref_bibentries->get_error_message() . '</p>';
             $crossref_bibentries = array();
         }
@@ -2398,6 +2407,7 @@ abstract class O3PO_PublicationType {
 
         if (is_wp_error($ads_bibentries))
         {
+            $errors[] = $ads_bibentries;
             $cited_by_html .= '<p>Error fetching ADS cited-by data: ' . $ads_bibentries->get_error_code() . ' ' . $ads_bibentries->get_error_message() . '</p>';
             $ads_bibentries = array();
         }
@@ -2436,8 +2446,14 @@ abstract class O3PO_PublicationType {
             $cited_by_html .= '</p>' . "\n";
         }
 
-
-        return $cited_by_html;
+        return array(
+            'html' => $cited_by_html,
+            'citation_count' => $citation_number,
+            'all_bibentries' => $all_bibentries,
+            'crossref_bibentries' => $crossref_bibentries,
+            'ads_bibentries' => $ads_bibentries,
+            'errors' => $errors,
+                     );
     }
 
         /**
@@ -3068,7 +3084,9 @@ abstract class O3PO_PublicationType {
          *
          * @since 0.3.0
          */
-    public function get_all_citation_counts_for_publication_type( $post_type, $start_date ) {
+    public function get_all_citation_counts( $start_date ) {
+
+        $post_type = $this->get_publication_type_name();
 
         $login_id = $this->get_journal_property('crossref_id');
         $login_passwd = $this->get_journal_property('crossref_pw');
