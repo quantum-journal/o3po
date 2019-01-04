@@ -27,7 +27,7 @@ class O3PO_Ads {
          *
          * If running out of queries storage time is automatically increased.
          */
-    public static function get_cited_by_json( $ads_api_search_url, $api_token, $eprint, $storage_time=60*60*12, $storage_time_on_error=60*60, $timeout=20 ) {
+    public static function get_cited_by_json( $ads_api_search_url, $api_token, $eprint, $storage_time=60*60*12, $timeout=20 ) {
 
         if(empty($eprint))
             return array();
@@ -39,7 +39,6 @@ class O3PO_Ads {
         $response = get_transient('get_ads_cited_by_json_' . $url);
         if(empty($response)) {
             $response = wp_remote_get($url, array('headers' => $headers, 'timeout' => $timeout));
-            set_transient('get_ads_cited_by_json_' . $url, $response, $storage_time_on_error);
             if(is_wp_error($response))
                 return $response;
 
@@ -69,9 +68,9 @@ class O3PO_Ads {
          *
          *
          */
-    public static function get_cited_by_bibentries( $ads_api_search_url, $api_token, $eprint, $storage_time=60*60*12, $storage_time_on_error=60*60, $max_number_of_citations=1000, $timeout=20 ) {
+    public static function get_cited_by_bibentries( $ads_api_search_url, $api_token, $eprint, $storage_time=60*60*12, $max_number_of_citations=1000, $timeout=20 ) {
 
-        $json = static::get_cited_by_json($ads_api_search_url, $api_token, $eprint, $storage_time, $storage_time_on_error, $timeout);
+        $json = static::get_cited_by_json($ads_api_search_url, $api_token, $eprint, $storage_time, $timeout);
 
         if(is_wp_error($json))
             return $json;
@@ -87,7 +86,6 @@ class O3PO_Ads {
         if(empty($response)) {
             $headers = array( 'Authorization' => 'Bearer:' . $api_token );
             $response = wp_remote_get($url, array('headers' => $headers, 'timeout' => $timeout));
-            set_transient('get_ads_cited_by_json_' . $url, $response, $storage_time_on_error);
             if(is_wp_error($response))
                 return $response;
             set_transient('get_ads_cited_by_json_' . $url, $response, $storage_time);

@@ -91,13 +91,12 @@ class O3PO_Crossref {
          * @param    string   $crossref_pw     The password corresponding to the crossref_id.
          * @param    string   $doi             The doi for which cited-by data is to be retrieved.
          */
-    private static function remote_get_cited_by( $crossref_url, $crossref_id, $crossref_pw, $doi, $storage_time=60*60*12, $storage_time_on_error=60*60, $timeout=20 ) {
+    private static function remote_get_cited_by( $crossref_url, $crossref_id, $crossref_pw, $doi, $storage_time=60*60*12, $timeout=20 ) {
 
         $request_url = $crossref_url . '?usr=' . urlencode($crossref_id).  '&pwd=' . urlencode($crossref_pw) . '&doi=' . urlencode($doi) . '&include_postedcontent=true';
         $response = get_transient('get_crossref_cited_by_' . $request_url);
         if(empty($response)) {
             $response = wp_remote_get($request_url, array('timeout' => $timeout));
-            set_transient('get_crossref_cited_by_' . $request_url, $response, $storage_time_on_error);
             if(is_wp_error($response))
                 return $response;
             set_transient('get_crossref_cited_by_' . $request_url, $response, $storage_time);
@@ -120,14 +119,13 @@ class O3PO_Crossref {
          * @param    string   $doi_prefix      The doi prefix for which cited-by data is to be retrieved.
          * @param    string   $startDate       The date from which on the cited by data is to be included in the format YYYY-mm-dd
          */
-    private static function remote_get_all_cited_by( $crossref_url, $crossref_id, $crossref_pw, $doi_prefix, $startDate, $storage_time=60*60*12, $storage_time_on_error=60*60, $timeout=20 ) {
+    private static function remote_get_all_cited_by( $crossref_url, $crossref_id, $crossref_pw, $doi_prefix, $startDate, $storage_time=60*60*12, $timeout=20 ) {
 
         $request_url = $crossref_url . '?usr=' . urlencode($crossref_id).  '&pwd=' . urlencode($crossref_pw) . '&doi=' . urlencode($doi_prefix) . '&startDate=' . $startDate . '&include_postedcontent=true';
 
         $response = get_transient('get_crossref_cited_by_' . $request_url);
         if(empty($response)) {
             $response = wp_remote_get($request_url, array('timeout' => $timeout));
-            set_transient('get_crossref_cited_by_' . $request_url, $response, $storage_time_on_error);
             if(is_wp_error($response))
                 return $response;
             set_transient('get_crossref_cited_by_' . $request_url, $response, $storage_time);
@@ -268,7 +266,7 @@ class O3PO_Crossref {
          * @param    int      $storage_time    The number of seconds to cache the response by Crossref.
          * @retutn array   Array of citation counts by DOI or an empty array in case no citations could be found or an exception occurred.
          */
-    public static function get_all_citation_counts( $crossref_url, $crossref_id, $crossref_pw, $doi_prefix, $start_date, $storage_time=60*60*12, $storage_time_on_error=60*60 ) {
+    public static function get_all_citation_counts( $crossref_url, $crossref_id, $crossref_pw, $doi_prefix, $start_date, $storage_time=60*60*12) {
 
         try
         {
@@ -276,7 +274,6 @@ class O3PO_Crossref {
             if(false === $xml_string)
             {
                 $response = static::remote_get_all_cited_by($crossref_url, $crossref_id, $crossref_pw, $doi_prefix, $start_date);
-                set_transient('all_cited_by_xml_' . $crossref_id . "_" . $doi_prefix . "_" . $start_date, $xml_string, $storage_time_on_error);
                 if(is_wp_error($response))
                     return null;
                 else if(empty($response['body']) )
