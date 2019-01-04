@@ -792,18 +792,18 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 
         if ( get_post_type($post_id) === $this->get_publication_type_name() ) {
             $old_content = $content;
-            $doi = static::get_doi($post_id);
-            $authors = static::get_formated_authors($post_id);
+            $doi = $this->get_doi($post_id);
+            $authors = $this->get_formated_authors($post_id);
             $type = get_post_meta( $post_id, $post_type . '_type', true );
             $number_target_dois = get_post_meta( $post_id, $post_type . '_number_target_dois', true );
-            $target_dois = static::get_post_meta_field_containing_array( $post_id, $post_type . '_target_dois');
+            $target_dois = $this->get_post_meta_field_containing_array( $post_id, $post_type . '_target_dois');
             $number_authors = get_post_meta( $post_id, $post_type . '_number_authors', true );
-            $author_given_names = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_given_names');
-            $author_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
-            $author_urls = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_urls');
-            $author_affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_affiliations');
-            $affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_affiliations');
-            $citation = rtrim(static::get_formated_citation($post_id), '.');
+            $author_given_names = $this->get_post_meta_field_containing_array( $post_id, $post_type . '_author_given_names');
+            $author_surnames = $this->get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
+            $author_urls = $this->get_post_meta_field_containing_array( $post_id, $post_type . '_author_urls');
+            $author_affiliations = $this->get_post_meta_field_containing_array( $post_id, $post_type . '_author_affiliations');
+            $affiliations = $this->get_post_meta_field_containing_array( $post_id, $post_type . '_affiliations');
+            $citation = rtrim($this->get_formated_citation($post_id), '.');
             $journal = get_post_meta( $post_id, $post_type . '_journal', true );
 
             $content = '';
@@ -815,7 +815,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                 $content .= '<img src="' . get_the_post_thumbnail_url($post_id) . '" alt="" width="300" height="150" class="alignright size-medium wp-image-1433">';
             }
 
-            $content .= static::lead_in_paragraph($post_id);
+            $content .= $this->lead_in_paragraph($post_id);
 
             $all_authors_have_same_affiliation = true;
             if ( !empty($author_affiliations) ) {
@@ -867,7 +867,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
             $content .= ".</strong></p>\n";
 
             $content .= '<table class="meta-data-table">';
-            $content .= '<tr><td>Published:</td><td>' . esc_html(static::get_formated_date_published( $post_id )) .  ', ' . static::get_formated_volume_html($post_id) . ', page ' . get_post_meta( $post_id, $post_type . '_pages', true ) . '</td></tr>';
+            $content .= '<tr><td>Published:</td><td>' . esc_html($this->get_formated_date_published( $post_id )) .  ', ' . $this->get_formated_volume_html($post_id) . ', page ' . get_post_meta( $post_id, $post_type . '_pages', true ) . '</td></tr>';
             $content .= '<tr><td>Doi:</td><td><a href="' . esc_attr($this->get_journal_property('doi_url_prefix') . $doi) . '">' . esc_html($this->get_journal_property('doi_url_prefix') . $doi ) . '</a></td></tr>';
             $content .= '<tr><td>Citation:</td><td>' . esc_html($citation) . '</td></tr>';
             $content .= '</table>';
@@ -882,14 +882,15 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 
             if($type==="Leap")
             {
-                $content .= static::get_reviewers_summary_html($post_id);
-                $content .= static::get_reviewers_html($post_id);
-                $content .= static::get_author_commentary_html($post_id);
+                $content .= $this->get_reviewers_summary_html($post_id);
+                $content .= $this->get_reviewers_html($post_id);
+                $content .= $this->get_author_commentary_html($post_id);
             }
 
-            $content .= static::get_bibtex_html($post_id);
-            $content .= static::get_bibliography_html($post_id);
-            $content .= static::get_license_information($post_id);
+            $content .= $this->get_bibtex_html($post_id);
+            $content .= $this->get_bibliography_html($post_id);
+            $content .= $this->get_cited_by($post_id);
+            $content .= $this->get_license_information($post_id);
             return $content;
         }
         else
