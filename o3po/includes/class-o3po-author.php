@@ -27,15 +27,15 @@ class O3PO_Author {
     private $affiliations;
 
     public function __construct( $given_name, $surname, $name_style='western', $orcid='', $url='', $affiliations=array() ) {
-        $this->given_name = $given_name;
-        $this->surname = $surname;
-        $this->name_style = $name_style;
-        $this->orcid = $orcid;
-        $this->url = $url;
+        $this->given_name = (string)$given_name;
+        $this->surname = (string)$surname;
+        $this->name_style = (string)$name_style;
+        $this->orcid = (string)$orcid;
+        $this->url = (string)$url;
         if(is_array($affiliations))
             $this->affiliations = $affiliations;
         else
-            $this->affiliations = preg_split('/\s*,\s*/', $affiliations);
+            $this->affiliations = preg_split('/\s*,\s*/', (string)$affiliations);
     }
 
     public function get( $field ) {

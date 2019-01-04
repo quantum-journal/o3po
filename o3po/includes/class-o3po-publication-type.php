@@ -2390,8 +2390,36 @@ abstract class O3PO_PublicationType {
         $arxiv_url_abs_prefix = $this->get_journal_property('arxiv_url_abs_prefix');
         $eprint = get_post_meta( $post_id, $post_type . '_eprint', true );
 
-        $crossref_bibentries = O3PO_Crossref::get_cited_by_bibentries($crossref_url, $login_id, $login_passwd, $doi);
-        $ads_bibentries = O3PO_Ads::get_cited_by_bibentries($ads_api_search_url, $ads_api_token, $eprint);
+        $crossref_bibentries = get_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries', true );
+        $crossref_bibentries_timestamp = get_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries_timestamp', true );
+        if(empty($crossref_bibentries_timestamp) or time() - $crossref_bibentries_timestamp > 60*5)
+        {
+            $crossref_bibentries_timestamp = time();
+            update_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries_timestamp', $crossref_bibentries_timestamp);
+
+            $new_crossref_bibentries = O3PO_Crossref::get_cited_by_bibentries($crossref_url, $login_id, $login_passwd, $doi);
+            if(!empty($new_crossref_bibentries) or !is_wp_error($new_crossref_bibentries) or empty($crossref_bibentries) or is_wp_error($crossref_bibentries))
+            {
+                $crossref_bibentries = $new_crossref_bibentries;
+                update_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries', $crossref_bibentries );
+            }
+        }
+
+        $ads_bibentries = get_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries', true );
+        $ads_bibentries_timestamp = get_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries_timestamp', true );
+        if(empty($ads_bibentries_timestamp) or time() - $ads_bibentries_timestamp > 60*5)
+        {
+            $ads_bibentries_timestamp = time();
+            update_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries_timestamp', $ads_bibentries_timestamp);
+
+            $new_ads_bibentries = O3PO_Ads::get_cited_by_bibentries($ads_api_search_url, $ads_api_token, $eprint);
+
+            if(!empty($new_ads_bibentries) or !is_wp_error($new_ads_bibentries) or empty($ads_bibentries) or is_wp_error($ads_bibentries))
+            {
+                $ads_bibentries = $new_ads_bibentries;
+                update_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries', $ads_bibentries );
+            }
+        }
 
         $cited_by_html = '';
 
@@ -2431,11 +2459,11 @@ abstract class O3PO_PublicationType {
 
         $sources = array();
         if(!empty($crossref_bibentries))
-            $sources[] = 'Crossref\'s <a href="https://www.crossref.org/services/cited-by/">cited-by service</a>';
-        if(!empty($ads_bibentries))
-            $sources[] = '<a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a>';
+            $sources[] = 'Crossref\'s <a href="https://www.crossref.org/services/cited-by/">cited-by service</a> (last updated ' . date("Y-m-d H:i:s", $ads_bibentries_timestamp) . ')';
+        if(!empty($crossref_bibentries))
+            $sources[] = '<a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a>  (last updated ' . date("Y-m-d H:i:s", $ads_bibentries_timestamp) . ')';
         if(!empty($sources))
-            $cited_by_html .= '<p>The following cited-by data is from ' . implode($sources, ' and ') . '. It may be incomplete as not all publishers provide suitable and complete citation data.</p>';
+            $cited_by_html .= '<p>The following citations are from ' . implode($sources, ' and ') . '. The list may be incomplete as not all publishers provide suitable and complete citation data.</p>';
 
         $citation_number = 0;
         foreach($all_bibentries as $bibentry)
@@ -3095,8 +3123,6 @@ abstract class O3PO_PublicationType {
         $crossref_url = $this->get_journal_property('crossref_get_forward_links_url');
         $doi_prefix = $this->get_journal_property('doi_prefix');
 
-        #$citations = O3PO_Crossref::get_all_citation_counts($crossref_url, $login_id, $login_passwd, $doi_prefix, $start_date, 60*60*12);
-
         $query = array(
             'post_type' => $post_type,
             'post_status' => array('publish'),
@@ -3106,6 +3132,7 @@ abstract class O3PO_PublicationType {
         $errors = array();
         $citations_this_type = array();
         $my_query = new WP_Query( $query );
+
         if ( $my_query->have_posts() ) {
             $num = 0;
             while ( $my_query->have_posts() ) {
@@ -3119,10 +3146,6 @@ abstract class O3PO_PublicationType {
 
                 $doi = $this->get_doi($post_id);
                 $citations_this_type[$doi] = $cited_by_data['citation_count'];
-
-                /* $post_type = get_post_type($post_id); */
-                /* $doi = $this->get_doi($post_id); */
-                /* $citations_this_type[$doi] = (!empty($citations[$doi]) ? $citations[$doi] : '0'); */
             }
         }
 

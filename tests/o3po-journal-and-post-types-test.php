@@ -1145,8 +1145,8 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     function test_get_all_citation_counts( $primary_publication_type, $secondary_publication_type ) {
 
         # this is just an execution test
-        $primary_publication_type->get_all_citation_counts();
-        $secondary_publication_type->get_all_citation_counts();
+        echo(json_encode($primary_publication_type->get_all_citation_counts()));
+        echo(json_encode($secondary_publication_type->get_all_citation_counts()));
 
     }
 

@@ -182,9 +182,11 @@ function get_post_meta( $post_id, $key, $single = false ) {
         throw new Exception("Post with id=" . $post_id . " has no meta-data.");
     if(!isset($posts[$post_id]['meta'][$key]))
     {
-        throw new Exception("Post with id=" . $post_id . " has no meta-data for key=" . $key . ".");
-       /* echo("\nPost with id=" . $post_id . " has no meta-data for key=" . $key . "\n"); */
-       /* return "fake!"; */
+        #throw new Exception("Post with id=" . $post_id . " has no meta-data for key=" . $key . ".");
+        if($single)
+            return '';
+        else
+            return array();
     }
 
 
@@ -256,6 +258,12 @@ class WP_Query
         else
             $array = array($input);
 
+        if(isset($array['posts_per_page']))
+        {
+            $max_posts_to_return = $array['posts_per_page'];
+            unset($array['posts_per_page']);
+        }
+
         $this->posts = array();
         if(!empty($posts) and $input !== null)
         {
@@ -272,7 +280,6 @@ class WP_Query
                         $include_post = in_array($id, $value);
                         break;
                     }
-
 
                     if(!isset($posts[$id][$key]) or !in_array ($posts[$id][$key], $value))
                     {
@@ -588,6 +595,8 @@ function wp_update_post( $array ) {
 
 function update_post_meta( $post_id, $key, $value ) {
     global $posts;
+
+    serialize($value); #test that value is serializable. We save the plain value for simplicity.
 
     $posts[$post_id]['meta'][$key] = $value;
 }

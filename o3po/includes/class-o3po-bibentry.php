@@ -52,7 +52,12 @@ class O3PO_Bibentry {
     public function __construct( $meta_data ) {
         foreach(static::$meta_data_fields as $field)
             if(isset($meta_data[$field]))
-                $this->meta_data[$field] = $meta_data[$field];
+            {
+                if(is_array($meta_data[$field]))
+                    $this->meta_data[$field] = $meta_data[$field];
+                else
+                    $this->meta_data[$field] = (string)$meta_data[$field];
+            }
             else
                 $this->meta_data[$field] = '';
     }
@@ -64,15 +69,15 @@ class O3PO_Bibentry {
 
     public function get_formated_authors() {
 
-        if(!empty($this->get('authors')))
-        {
-            $author_names = array();
-            foreach ($this->get('authors') as $author) {
-                $author_names[] = $author->get_name();
-            }
-            return O3PO_Utility::oxford_comma_implode($author_names);
+        if(empty($this->get('authors')) or !is_array($this->get('authors')))
+            return '';
+
+        $author_names = array();
+        foreach ($this->get('authors') as $author) {
+            $author_names[] = $author->get_name();
         }
-        return '';
+
+        return O3PO_Utility::oxford_comma_implode($author_names);
     }
 
 
