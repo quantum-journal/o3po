@@ -324,9 +324,9 @@ class O3PO {
         $this->loader->add_action('init', $this->primary_publication_type, 'add_axiv_paper_doi_feed_endpoint' , 0 );
         $this->loader->add_action('parse_request', $this->primary_publication_type, 'handle_arxiv_paper_doi_feed_endpoint_request' , 1 );
         $this->loader->add_filter('the_content', $this->primary_publication_type, 'get_the_content');
-        $this->loader->add_filter('get_the_excerpt', $this->primary_publication_type, 'get_the_excerpt') ;//Use this filter instead of 'the_excerpt' to also affect get_the_excerpt()
-        $this->loader->add_filter('the_content_feed', $this->primary_publication_type, 'get_feed_content');
-        $this->loader->add_filter('the_excerpt_rss', $this->primary_publication_type, 'get_feed_content');
+        $this->loader->add_filter('get_the_excerpt', $this->primary_publication_type, 'get_the_excerpt', 1) ;//Use get_the_excerpt instead of 'the_excerpt' to also affect get_the_excerpt(). The low priority number is crucial to ensure early execution and prevent (expensive) auto generation of excerpt from content via wp_trim_excerpt() (see default-filters.php in WP)
+        $this->loader->add_filter('the_content_feed', $this->primary_publication_type, 'get_feed_content', 1); //The low priority number is crucial to ensure early execution and prevent (expensive) auto generation of excerpt from content via wp_trim_excerpt() (see default-filters.php in WP)
+        $this->loader->add_filter('the_excerpt_rss', $this->primary_publication_type, 'get_feed_content', 1); //The low priority number is crucial to ensure early execution and prevent (expensive) auto generation of excerpt from content via wp_trim_excerpt() (see default-filters.php in WP)
         $this->loader->add_filter('transition_post_status', $this->primary_publication_type, 'on_transition_post_status', 10, 3);
         if($settings->get_plugin_option('page_template_for_publication_posts')==='checked')
             $this->loader->add_filter('template_include', $this->primary_publication_type, 'use_page_template');
@@ -335,8 +335,7 @@ class O3PO {
         $this->loader->add_filter('the_author', $this->secondary_publication_type, 'get_the_author', PHP_INT_MAX, 1);
         $this->loader->add_filter('author_link', $this->secondary_publication_type, 'get_the_author_posts_link', PHP_INT_MAX, 1);
         $this->loader->add_filter('the_content', $this->secondary_publication_type, 'get_the_content');
-        $this->loader->add_filter('get_the_excerpt', $this->secondary_publication_type, 'get_the_excerpt');//Use this filter instead of 'the_excerpt' to also affect get_the_excerpt()
-            //...and those inherited from publicationtype
+        $this->loader->add_filter('get_the_excerpt', $this->secondary_publication_type, 'get_the_excerpt', 1);//Use get_the_excerpt instead of 'the_excerpt' to also affect get_the_excerpt(). The low priority number is crucial to ensure early execution and prevent (expensive) auto generation of excerpt from content via wp_trim_excerpt() (see default-filters.php in WP)
         $this->loader->add_action('init', $this->secondary_publication_type, 'register_as_custom_post_type');
         $this->loader->add_action('pre_get_posts', $this->secondary_publication_type, 'add_custom_post_types_to_query');
         $this->loader->add_action('wp_head', $this->secondary_publication_type, 'add_dublin_core_and_highwire_press_meta_tags');
