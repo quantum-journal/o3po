@@ -1151,6 +1151,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         $dom = new DOMDocument;
         $result = $dom->loadHTML('<div>' . $cited_by_data['html'] . '<div>');
+            //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
         $this->assertNotFalse($result);
 
     }

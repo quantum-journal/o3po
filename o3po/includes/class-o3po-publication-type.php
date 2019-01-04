@@ -2463,8 +2463,9 @@ abstract class O3PO_PublicationType {
         $sources = array();
         if(!empty($crossref_bibentries))
             $sources[] = 'Crossref\'s <a href="https://www.crossref.org/services/cited-by/">cited-by service</a> (last updated ' . date("Y-m-d H:i:s", $ads_bibentries_timestamp) . ')';
-        if(!empty($crossref_bibentries))
+        if(!empty($ads_bibentries))
             $sources[] = '<a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a>  (last updated ' . date("Y-m-d H:i:s", $ads_bibentries_timestamp) . ')';
+
         if(!empty($sources))
             $cited_by_html .= '<p>The following citations are from ' . implode($sources, ' and ') . '. The list may be incomplete as not all publishers provide suitable and complete citation data.</p>';
 
