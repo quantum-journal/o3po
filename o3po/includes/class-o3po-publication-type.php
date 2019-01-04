@@ -2520,7 +2520,7 @@ abstract class O3PO_PublicationType {
             $cited_by = '';
             $post_type = get_post_type($post_id);
             if( !empty(get_post_meta( $post_id, $post_type . '_bbl', true )) ) {
-                $cited_by .= '<h3 class="references toggle-following additional-info"><a href="javascript:void(0);" onclick="toggleFollowing(this);">&#9658; Cited by</a></h3>';
+                $cited_by .= '<h3 class="references additional-info">Cited by</h3>';
                 $cited_by .= '<div class="">';
                 $cited_by .= $this->get_formated_cited_by_html($post_id);
                 $cited_by .= '</div>';
