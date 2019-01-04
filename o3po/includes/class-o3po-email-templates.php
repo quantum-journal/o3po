@@ -59,9 +59,15 @@ class O3PO_EmailTemplates {
          *                result: The template in which the short codes were replaced.
          *                short_codes: A map where the keys are the short codes and the values are the descriptions of the short codes.
          */
-   public static function self_notification_body($email_template,
-                                                 $journal,
-                                                 $publication_type_name, $title, $authors, $url, $doi_url_prefix, $doi){
+   public static function self_notification_body( $email_template,
+                                                  $journal,
+                                                  $publication_type_name,
+                                                  $title,
+                                                  $authors,
+                                                  $url,
+                                                  $doi_url_prefix,
+                                                  $doi ){
+
        $doi_hex_encoded = static::hex_encode($doi);
        $short_codes = array("[journal]" => "The journal name",
                          "[publication_type_name]" => "The type of the publication",

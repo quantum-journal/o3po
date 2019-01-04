@@ -416,11 +416,12 @@ abstract class O3PO_PublicationType {
         $this->save_meta_data($post_id);
 
             // Unhook this function to prevent infinite looping because in the remainder of this function (especially in validate_and_process_data()) we will be calling update_post() which triggers 'save_post'
+        $validation_result = '';
         try
         {
             remove_action( 'save_post', array( $this, 'save_metabox' ), 10, 2 );
 
-            $validation_result = $this->validate_and_process_data($post_id);
+            $validation_result .= $this->validate_and_process_data($post_id);
         }
         catch(Exception $e) {
             $validation_result .= "ERROR: There was an exception while saving and processing the entered meta-data: " . $e->getMessage() . "\n";
