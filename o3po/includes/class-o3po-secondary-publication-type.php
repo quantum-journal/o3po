@@ -338,14 +338,14 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                     $journal, strtolower($type))['result'];
         $message  = $this->environment->is_test_environment() ? 'TEST ' : '' .
                     O3PO_EmailTemplates::self_notification_body(
-                      $settings->get_plugin_option('self_notification_body_template').
-                      $journal,
-                      $this->get_publication_type_name(),
-                      $title,
-                      static::get_formated_authors($post_id),
-                      $post_url,
-                      $this->get_journal_property('doi_url_prefix'),
-                      $doi)['result'];
+                        $settings->get_plugin_option('self_notification_body_template'),
+                        $journal,
+                        $this->get_publication_type_name(),
+                        $title,
+                        static::get_formated_authors($post_id),
+                        $post_url,
+                        $this->get_journal_property('doi_url_prefix'),
+                        $doi)['result'];
 
         $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
@@ -388,12 +388,18 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                      $journal, $type)['result'];
             $message  = $this->environment->is_test_environment() ? 'TEST ' : '' .
                         O3PO_EmailTemplates::author_notification_body(
-                           $settings->get_plugin_option('author_notification_secondary_body_template'),
-                         $journal, $executive_board, $editor_in_chief, $this->get_journal_property('publisher_email'),
-                         $type, $title, "", $post_url,
-                         $this->get_journal_property('doi_url_prefix'), $doi,
-                         static::get_formated_citation($post_id)
-                         )['result'];
+                            $settings->get_plugin_option('author_notification_secondary_body_template'),
+                            $journal,
+                            $executive_board,
+                            $editor_in_chief,
+                            $this->get_journal_property('publisher_email'),
+                            $type,
+                            $title,
+                            "",
+                            $post_url,
+                            $this->get_journal_property('doi_url_prefix'), $doi,
+                            static::get_formated_citation($post_id)
+                                                                      )['result'];
 
             $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
