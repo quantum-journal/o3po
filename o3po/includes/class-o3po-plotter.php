@@ -80,7 +80,7 @@ class O3PO_Plotter {
 
         foreach($hist_data as $x => $y)
         {
-            $output .= '<span title="'.$y.' times ' . $x . '" style="display:inline-block;width:'.(100*$x_delta/$x_max).'%;height:'.($y/$y_max*100).'%;box-shadow:0px 0px 0px 1px '.$color.' inset;background-color:'.$color.';"   onMouseOver="this.style.opacity=\'0.7\'" onMouseOut="this.style.opacity=\'1\'"></span>';
+            $output .= '<span title="'.$y.' times ' . ( $x_delta == 1 ? $x : ($x*$x_delta) .' to ' . (($x+1)*$x_delta-1)) . '" style="display:inline-block;width:'.(100*$x_delta/$x_max).'%;height:'.($y/$y_max*100).'%;box-shadow:0px 0px 0px 1px '.$color.' inset;background-color:'.$color.';"   onMouseOver="this.style.opacity=\'0.7\'" onMouseOut="this.style.opacity=\'1\'"></span>';
         }
 
         #axes

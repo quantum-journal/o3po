@@ -1084,15 +1084,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     }
 
         /**
-         * @doesNotPerformAssertions
-         */
-    public function test_cleanup_at_the_very_end() {
-        exec('git checkout ' . dirname(__File__) . '/resources/arxiv/0809.2542v4.pdf');
-        O3PO_Environment::save_recursive_remove_dir(dirname(__File__) . "/resources/tmp/", dirname(__File__));
-    }
-
-
-        /**
          * @depends test_setup_primary_journal
          * @depends test_setup_environment
          */
@@ -1145,4 +1136,26 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     }
 
 
+
+        /**
+         * @doesNotPerformAssertions
+         * @depends test_create_primary_publication_type
+         * @depends test_create_secondary_publication_type
+         */
+    function test_get_all_citation_counts( $primary_publication_type, $secondary_publication_type ) {
+
+        # this is just an execution test
+        $primary_publication_type->get_all_citation_counts();
+        $secondary_publication_type->get_all_citation_counts();
+
+    }
+
+        /**
+         * @doesNotPerformAssertions
+         */
+    public function test_cleanup_at_the_very_end() {
+        exec('git checkout ' . dirname(__File__) . '/resources/arxiv/0809.2542v4.pdf');
+        O3PO_Environment::save_recursive_remove_dir(dirname(__File__) . "/resources/tmp/", dirname(__File__));
+    }
+    #do not add tests after this one!
 }

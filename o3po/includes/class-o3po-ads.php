@@ -27,7 +27,7 @@ class O3PO_Ads {
          *
          * If running out of queries storage time is automatically increased.
          */
-    public static function get_cited_by_json( $ads_api_search_url, $api_token, $eprint, $storage_time=10*60, $timeout=20 ) {
+    public static function get_cited_by_json( $ads_api_search_url, $api_token, $eprint, $storage_time=60*60*12, $timeout=20 ) {
 
         if(empty($eprint))
             return array();
@@ -45,8 +45,6 @@ class O3PO_Ads {
             if(!empty($response['headers']['x-ratelimit-remaining']))
             {
                 $remaining_queries = $response['headers']['x-ratelimit-remaining'];
-                if($remaining_queries <= 100)
-                    $storage_time = $storage_time*10;
                 if($remaining_queries == 0)
                     return new WP_Error("Cannot retrieve data from ADS due to rate limitations.");
             }
@@ -60,9 +58,9 @@ class O3PO_Ads {
 
         /**
          *
-         * If running out of queries storage time is automatically increased.
+         *
          */
-    public static function get_cited_by_bibentries( $ads_api_search_url, $api_token, $eprint, $storage_time=10*60, $max_number_of_citations=1000, $timeout=20 ) {
+    public static function get_cited_by_bibentries( $ads_api_search_url, $api_token, $eprint, $storage_time=60*60*12, $max_number_of_citations=1000, $timeout=20 ) {
 
         $json = static::get_cited_by_json($ads_api_search_url, $api_token, $eprint);
 
@@ -85,8 +83,6 @@ class O3PO_Ads {
             if(!empty($response['headers']['x-ratelimit-remaining']))
             {
                 $remaining_queries = $response['headers']['x-ratelimit-remaining'];
-                if($remaining_queries <= 100)
-                    $storage_time = $storage_time*10;
                 if($remaining_queries == 0)
                     return new WP_Error("Cannot retrieve data from ADS due to rate limitations.");
             }

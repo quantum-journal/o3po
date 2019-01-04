@@ -3084,7 +3084,7 @@ abstract class O3PO_PublicationType {
          *
          * @since 0.3.0
          */
-    public function get_all_citation_counts( $start_date ) {
+    public function get_all_citation_counts() {
 
         $post_type = $this->get_publication_type_name();
 
@@ -3095,7 +3095,7 @@ abstract class O3PO_PublicationType {
         $crossref_url = $this->get_journal_property('crossref_get_forward_links_url');
         $doi_prefix = $this->get_journal_property('doi_prefix');
 
-        $citations = O3PO_Crossref::get_all_citation_counts($crossref_url, $login_id, $login_passwd, $doi_prefix, $start_date, 60*60*12);
+        #$citations = O3PO_Crossref::get_all_citation_counts($crossref_url, $login_id, $login_passwd, $doi_prefix, $start_date, 60*60*12);
 
         $query = array(
             'post_type' => $post_type,
@@ -3103,22 +3103,33 @@ abstract class O3PO_PublicationType {
             'posts_per_page' => -1,
                        );
 
+        $errors = array();
+        $citations_this_type = array();
         $my_query = new WP_Query( $query );
         if ( $my_query->have_posts() ) {
             $num = 0;
-            $citations_this_type = array();
             while ( $my_query->have_posts() ) {
                 $num++;
                 $my_query->the_post();
 
                 $post_id = get_the_ID();
-                $post_type = get_post_type($post_id);
+                $cited_by_data = $this->get_cited_by_data($post_id);
+                if(!empty($cited_by_data['errors']))
+                    $errors = array_merge($errors, $cited_by_data['errors']);
+
                 $doi = $this->get_doi($post_id);
-                $citations_this_type[$doi] = (!empty($citations[$doi]) ? $citations[$doi] : '0');
+                $citations_this_type[$doi] = $cited_by_data['citation_count'];
+
+                /* $post_type = get_post_type($post_id); */
+                /* $doi = $this->get_doi($post_id); */
+                /* $citations_this_type[$doi] = (!empty($citations[$doi]) ? $citations[$doi] : '0'); */
             }
         }
 
-        return $citations_this_type;
+        return array(
+            'citation_count' => $citations_this_type,
+            'errors' => $errors,
+                     );
     }
 
 }
