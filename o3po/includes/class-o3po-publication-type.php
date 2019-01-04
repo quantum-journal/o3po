@@ -2586,7 +2586,7 @@ abstract class O3PO_PublicationType {
         $doi = $this->get_doi($post_id);
         $doi_url_prefix = $this->get_journal_property('doi_url_prefix');
 
-        $key = O3PO_Latex::utf8_to_closest_latin_letter_string($author_surnames[0]) . $year . O3PO_Latex::title_to_key_suffix(get_post_meta( $post_id, $post_type . '_title', true ));
+        $key = (isset($author_surnames[0]) ? O3PO_Latex::utf8_to_closest_latin_letter_string($author_surnames[0]) : 'surname') . $year . O3PO_Latex::title_to_key_suffix(get_post_meta( $post_id, $post_type . '_title', true ));
 
         $bibtex = '';
         $bibtex .= '@article{' . $key . ',' . "\n";

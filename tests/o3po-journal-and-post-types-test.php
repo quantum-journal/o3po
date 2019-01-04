@@ -1144,10 +1144,9 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          */
     function test_get_all_citation_counts( $primary_publication_type, $secondary_publication_type ) {
 
-        # this is just an execution test
-        echo(json_encode($primary_publication_type->get_all_citation_counts()));
-        echo(json_encode($secondary_publication_type->get_all_citation_counts()));
+        $this->assertSame($primary_publication_type->get_all_citation_counts()['10.22331/q-2017-04-25-8'], 19);
 
+        echo(json_encode($primary_publication_type->get_cited_by_data(12)));
     }
 
         /**

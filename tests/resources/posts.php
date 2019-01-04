@@ -386,4 +386,21 @@ $posts = array(
             'paper_clockss_response' => '',
                         )
                ),
+
+
+        12 => array(
+        'post_type' => 'paper',
+        'post_content' => 'fake_post_content5',
+        'paper_nonce' => 'fake_nonce',
+        'thumbnail_id' => 2,
+        'post_status' => 'publish',
+        'post_title' => 'Fake title 2',
+        'permalink' => 'Fake permalink',
+        'meta' => array(
+            'paper_eprint' => '1610.01808v4',
+            'paper_doi_prefix' => '10.22331',
+            'paper_doi_suffix' => 'q-2017-04-25-8',
+                        )
+                    ),
+
                );
