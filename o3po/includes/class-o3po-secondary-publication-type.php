@@ -339,8 +339,13 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         $message  = $this->environment->is_test_environment() ? 'TEST ' : '' .
                     O3PO_EmailTemplates::self_notification_body(
                       $settings->get_plugin_option('self_notification_body_template').
-                      $journal, strtolower($type), $title.
-                      static::get_formated_authors($post_id), $post_url, $this->get_journal_property('doi_url_prefix'), $doi)['result'];
+                      $journal,
+                      $this->get_publication_type_name(),
+                      $title,
+                      static::get_formated_authors($post_id),
+                      $post_url,
+                      $this->get_journal_property('doi_url_prefix'),
+                      $doi)['result'];
 
         $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
