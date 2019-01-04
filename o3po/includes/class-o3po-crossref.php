@@ -91,12 +91,13 @@ class O3PO_Crossref {
          * @param    string   $crossref_pw     The password corresponding to the crossref_id.
          * @param    string   $doi             The doi for which cited-by data is to be retrieved.
          */
-    private static function remote_get_cited_by( $crossref_url, $crossref_id, $crossref_pw, $doi, $storage_time=60*60*12, $timeout=20 ) {
+    private static function remote_get_cited_by( $crossref_url, $crossref_id, $crossref_pw, $doi, $storage_time=60*60*12, $storage_time_on_error=60*60, $timeout=20 ) {
 
         $request_url = $crossref_url . '?usr=' . urlencode($crossref_id).  '&pwd=' . urlencode($crossref_pw) . '&doi=' . urlencode($doi) . '&include_postedcontent=true';
         $response = get_transient('get_crossref_cited_by_' . $request_url);
         if(empty($response)) {
             $response = wp_remote_get($request_url, array('timeout' => $timeout));
+            set_transient('get_crossref_cited_by_' . $request_url, $response, $storage_time_on_error);
             if(is_wp_error($response))
                 return $response;
             set_transient('get_crossref_cited_by_' . $request_url, $response, $storage_time);
@@ -119,13 +120,14 @@ class O3PO_Crossref {
          * @param    string   $doi_prefix      The doi prefix for which cited-by data is to be retrieved.
          * @param    string   $startDate       The date from which on the cited by data is to be included in the format YYYY-mm-dd
          */
-    private static function remote_get_all_cited_by( $crossref_url, $crossref_id, $crossref_pw, $doi_prefix, $startDate, $timeout=20 ) {
+    private static function remote_get_all_cited_by( $crossref_url, $crossref_id, $crossref_pw, $doi_prefix, $startDate, $storage_time=60*60*12, $storage_time_on_error=60*60, $timeout=20 ) {
 
         $request_url = $crossref_url . '?usr=' . urlencode($crossref_id).  '&pwd=' . urlencode($crossref_pw) . '&doi=' . urlencode($doi_prefix) . '&startDate=' . $startDate . '&include_postedcontent=true';
 
         $response = get_transient('get_crossref_cited_by_' . $request_url);
         if(empty($response)) {
             $response = wp_remote_get($request_url, array('timeout' => $timeout));
+            set_transient('get_crossref_cited_by_' . $request_url, $response, $storage_time_on_error);
             if(is_wp_error($response))
                 return $response;
             set_transient('get_crossref_cited_by_' . $request_url, $response, $storage_time);
@@ -159,7 +161,7 @@ class O3PO_Crossref {
             if(is_wp_error($response))
                 return $response;
             else if(empty($response['body']) )
-                return '';
+                throw new Exception("Could not load cited-by data for " . $doi . " from Crossref. No response.");
             else
             {
                 $use_errors=libxml_use_internal_errors(true);
@@ -186,55 +188,60 @@ class O3PO_Crossref {
 
         $body = O3PO_Crossref::get_cited_by_xml_body($crossref_url, $login_id, $login_passwd, $doi);
 
-        if ( is_wp_error($body) )
+        if(is_wp_error($body))
             return $body;
 
-        if( empty($body) or empty($body->forward_link))
+        if(empty($body) or empty($body->forward_link))
             return array();
 
         $citation_number = 0;
         $bibentries = array();
-        foreach ($body->forward_link as $f_link) {
+        try
+        {
+            foreach ($body->forward_link as $f_link) {
 
-            if(isset($f_link->journal_cite))
-                $cite = $f_link->journal_cite;
-            elseif(isset($f_link->book_cite))
-                $cite = $f_link->book_cite;
-            elseif(isset($f_link->conf_cite))
-                $cite = $f_link->conf_cite;
-            elseif(isset($f_link->dissertation_cite))
-                $cite = $f_link->dissertation_cite;
-            elseif(isset($f_link->report_cite))
-                $cite = $f_link->report_cite;
-            elseif(isset($f_link->standard_cite))
-                $cite = $f_link->standard_cite;
-            else
-                continue;
+                if(isset($f_link->journal_cite))
+                    $cite = $f_link->journal_cite;
+                elseif(isset($f_link->book_cite))
+                    $cite = $f_link->book_cite;
+                elseif(isset($f_link->conf_cite))
+                    $cite = $f_link->conf_cite;
+                elseif(isset($f_link->dissertation_cite))
+                    $cite = $f_link->dissertation_cite;
+                elseif(isset($f_link->report_cite))
+                    $cite = $f_link->report_cite;
+                elseif(isset($f_link->standard_cite))
+                    $cite = $f_link->standard_cite;
+                else
+                    continue;
 
-
-            $authors = array();
-            if(!empty($cite->contributors->contributor))
-            {
-                foreach ($cite->contributors->contributor as $contributor) {
-                    $authors[] = new O3PO_Author($contributor->given_name, $contributor->surname);
+                $authors = array();
+                if(!empty($cite->contributors->contributor))
+                {
+                    foreach ($cite->contributors->contributor as $contributor) {
+                        $authors[] = new O3PO_Author($contributor->given_name, $contributor->surname);
+                    }
                 }
-            }
 
-            $bibentries[] = new O3PO_Bibentry(
-                array(
-                    'authors' => $authors,
-                    'venue' => $cite->journal_title,
-                    'title' => !empty($cite->title) ? $cite->title : $cite->article_title,
-                    'collectiontitle' => !empty($cite->series_title) ? $cite->series_title : $cite->volume_title,
-                    'volume' => $cite->volume,
-                    'issue' => $cite->issue,
-                    'page' => !empty($cite->first_page) ? $cite->first_page : $cite->item_number,
-                    'year' => $cite->year,
-                    'doi' => $cite->doi,
-                    'isbn' => $cite->isbn,
-                    'issn' => $cite->issn,
-                    'type' => $cite->publication_type,
-                      ));
+                $bibentries[] = new O3PO_Bibentry(
+                    array(
+                        'authors' => $authors,
+                        'venue' => $cite->journal_title,
+                        'title' => !empty($cite->title) ? $cite->title : $cite->article_title,
+                        'collectiontitle' => !empty($cite->series_title) ? $cite->series_title : $cite->volume_title,
+                        'volume' => $cite->volume,
+                        'issue' => $cite->issue,
+                        'page' => !empty($cite->first_page) ? $cite->first_page : $cite->item_number,
+                        'year' => $cite->year,
+                        'doi' => $cite->doi,
+                        'isbn' => $cite->isbn,
+                        'issn' => $cite->issn,
+                        'type' => $cite->publication_type,
+                          ));
+            }
+        }
+        catch (Exception $e) {
+            return new WP_Error($e->getMessage());
         }
 
         return $bibentries;
@@ -242,7 +249,7 @@ class O3PO_Crossref {
 
 
         /**
-         * Retrieve cited-by information on all works citing a given DOI prefix from Crossref.
+         * DEPRECATED: Retrieve cited-by information on all works citing a given DOI prefix from Crossref.
          *
          * Uses Crossref's cited-by service to retrieve information about works
          * citing works with the given DOI prefix in xml format.
@@ -261,16 +268,15 @@ class O3PO_Crossref {
          * @param    int      $storage_time    The number of seconds to cache the response by Crossref.
          * @retutn array   Array of citation counts by DOI or an empty array in case no citations could be found or an exception occurred.
          */
-    public static function get_all_citation_counts( $crossref_url, $crossref_id, $crossref_pw, $doi_prefix, $start_date, $storage_time=60*60*12 ) {
+    public static function get_all_citation_counts( $crossref_url, $crossref_id, $crossref_pw, $doi_prefix, $start_date, $storage_time=60*60*12, $storage_time_on_error=60*60 ) {
 
         try
         {
             $xml_string = get_transient('all_cited_by_xml_' . $crossref_id . "_" . $doi_prefix . "_" . $start_date);
-
             if(false === $xml_string)
             {
                 $response = static::remote_get_all_cited_by($crossref_url, $crossref_id, $crossref_pw, $doi_prefix, $start_date);
-
+                set_transient('all_cited_by_xml_' . $crossref_id . "_" . $doi_prefix . "_" . $start_date, $xml_string, $storage_time_on_error);
                 if(is_wp_error($response))
                     return null;
                 else if(empty($response['body']) )
@@ -279,6 +285,7 @@ class O3PO_Crossref {
                 {
                     $xml_string = $response['body'];
                 }
+                set_transient('all_cited_by_xml_' . $crossref_id . "_" . $doi_prefix . "_" . $start_date, $xml_string, $storage_time);
             }
 
             $use_errors=libxml_use_internal_errors(true);
@@ -287,8 +294,6 @@ class O3PO_Crossref {
 
             if ($xml === false)
                 return null;
-
-            set_transient('all_cited_by_xml_' . $crossref_id . "_" . $doi_prefix . "_" . $start_date, $xml_string, $storage_time);
 
             $citation_counts = array();
             foreach($xml->query_result->body->children() as $forward_link )
