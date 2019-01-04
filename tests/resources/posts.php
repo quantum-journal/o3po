@@ -400,6 +400,7 @@ $posts = array(
             'paper_eprint' => '1610.01808v4',
             'paper_doi_prefix' => '10.22331',
             'paper_doi_suffix' => 'q-2017-04-25-8',
+            'paper_pages' => '5',
                         )
                     ),
 
