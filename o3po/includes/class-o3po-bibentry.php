@@ -215,6 +215,11 @@ class O3PO_Bibentry {
          */
     public static function merge_bibitem_arrays($array1, $array2 ) {
 
+        if(empty($array1))
+            return $array2;
+        if(empty($array2))
+            return $array1;
+
         $merged = $array2;
         foreach($array1 as $key1 => $bibitem1){
             $merged_at_least_once = false;

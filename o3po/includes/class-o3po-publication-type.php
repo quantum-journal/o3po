@@ -2390,9 +2390,12 @@ abstract class O3PO_PublicationType {
         $arxiv_url_abs_prefix = $this->get_journal_property('arxiv_url_abs_prefix');
         $eprint = get_post_meta( $post_id, $post_type . '_eprint', true );
 
+        $settings = O3PO_Settings::instance();
+        $cited_by_refresh_seconds = $settings->get_plugin_option('cited_by_refresh_seconds');
+
         $crossref_bibentries = get_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries', true );
         $crossref_bibentries_timestamp = get_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries_timestamp', true );
-        if(empty($crossref_bibentries_timestamp) or time() - $crossref_bibentries_timestamp > 60*5)
+        if(empty($crossref_bibentries_timestamp) or time() - $crossref_bibentries_timestamp > $cited_by_refresh_seconds)
         {
             $crossref_bibentries_timestamp = time();
             update_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries_timestamp', $crossref_bibentries_timestamp);
@@ -2407,7 +2410,7 @@ abstract class O3PO_PublicationType {
 
         $ads_bibentries = get_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries', true );
         $ads_bibentries_timestamp = get_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries_timestamp', true );
-        if(empty($ads_bibentries_timestamp) or time() - $ads_bibentries_timestamp > 60*5)
+        if(empty($ads_bibentries_timestamp) or time() - $ads_bibentries_timestamp > $cited_by_refresh_seconds)
         {
             $ads_bibentries_timestamp = time();
             update_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries_timestamp', $ads_bibentries_timestamp);

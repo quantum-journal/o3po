@@ -191,11 +191,13 @@ class O3PO_Settings extends O3PO_Singleton {
              * Warning: The name of the paper-single.php templare must match
              * the primary_publication_type_name!
              */
+        'cited_by_refresh_seconds' => 60*60*12,
         'primary_publication_type_name' => 'paper',
         'primary_publication_type_name_plural' => 'papers',
         'secondary_publication_type_name' => 'view',
         'secondary_publication_type_name_plural' => 'views',
         'volumes_endpoint' => 'volumes',
+
                                      );
 
         /**
