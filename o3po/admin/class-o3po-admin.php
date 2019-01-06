@@ -277,21 +277,34 @@ class O3PO_Admin {
             $settings = O3PO_Settings::instance();
             $doi_prefix = $settings->get_plugin_option('doi_prefix');
             $doi_url_prefix = $settings->get_plugin_option('doi_url_prefix');
-            $first_volume_year = $settings->get_plugin_option('first_volume_year');
-            $start_date = $first_volume_year . '-01-01';
+            #$first_volume_year = $settings->get_plugin_option('first_volume_year');
+            #$start_date = $first_volume_year . '-01-01';
 
-            $html .= '<p>The following data is based on cited-by data by Crossref for publications published under the DOI prefix ' . $doi_prefix . ' through this plugin on this website and includes citations since ' . $start_date . '. Remember that not all publishers participate in Crossref cited.by, and therefore citations will likely be missing. Fresh data from Crossref is pulled when this page is refreshed but at most every 12 hours.</p>';
+            $html .= '<p>The following analysis is based on cited-by data from Corssref (if a user name and password are configured in the settings and you are participating in Crossref cited-by) and ADS (if an API token was configures in the settings) for publications published through this plugin. Not all publishers provide complete and suitable citation date, so that the data may be incomplete. Best efforts are made to identify and merge duplicates in case more than one data source is configured.</p>';
             foreach(O3PO_PublicationType::get_active_publication_type_names() as $post_type)
             {
-                $citations_this_type = O3PO_PublicationType::get_active_publication_types($post_type)->get_all_citation_counts_for_publication_type($post_type, $start_date);
-
-                $max_citations = max($citations_this_type);
-                $total_publications = count($citations_this_type);
-
-                if($max_citations == 0)
-                    continue;
+                $citations_data = O3PO_PublicationType::get_active_publication_types($post_type)->get_all_citation_counts();
 
                 $html .= '<h4>Publications of type ' . $post_type . '</h4>';
+                if(!empty($citations_data['errors']))
+                {
+                    $html .= '<p>The following errors occurred while calculating citation counts for this type: <ul>';
+                    foreach($citations_data['errors'] as $error)
+                        $html .= '<li>' . esc_html($error->get_error_code() . ' ' . $error->get_error_message() . " ") . '</li>';
+                    $html .= '</ul></p>';
+                }
+
+                $citations_this_type = $citations_data['citation_count'];
+
+                $total_publications = count($citations_this_type);
+                if($total_publications != 0)
+                    $max_citations = max($citations_this_type);
+                if($total_publications == 0 or $max_citations == 0)
+                {
+                    $html .= '<p>No citations have been found for this type.</p>';
+                    continue;
+                }
+
                 $html .= '<h5>Ten most cited</h5>';
                 arsort($citations_this_type);
                 $num = 10;

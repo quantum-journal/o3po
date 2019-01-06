@@ -213,30 +213,9 @@ class O3PO {
 
         $this->environment = new O3PO_Environment($settings->get_plugin_option("production_site_url"));
 
-            //construct the journal config from settings
-        $journal_config_properties = O3PO_Journal::get_journal_config_properties();
-        $journal_config = array();
-        foreach(array_intersect(array_keys($settings->get_all_settings_fields_map()), $journal_config_properties) as $journal_config_property){
-            $journal_config[$journal_config_property] = $settings->get_plugin_option($journal_config_property);
-        }
-            //add some properties that are named differently (for a reason) in settings
-            /* $journal_config['volumes_endpoint'] = 'volumes'; */
-        $journal_config['publication_type_name'] = $settings->get_plugin_option('primary_publication_type_name');
-        $journal_config['publication_type_name_plural'] = $settings->get_plugin_option('primary_publication_type_name_plural');
-
-            //create the primary journal
-        $this->journal = new O3PO_Journal($journal_config);
-
-            //reconfigure for the secondary journal
-        $journal_config['journal_title'] = $settings->get_plugin_option('secondary_journal_title');
-        $journal_config['journal_level_doi_suffix'] = $settings->get_plugin_option('secondary_journal_level_doi_suffix');
-        $journal_config['eissn'] = $settings->get_plugin_option('secondary_journal_eissn');
-        $journal_config['volumes_endpoint'] = 'secondary_volumes';
-        $journal_config['publication_type_name'] = $settings->get_plugin_option('secondary_publication_type_name');
-        $journal_config['publication_type_name_plural'] = $settings->get_plugin_option('secondary_publication_type_name_plural');
-
-            //create the secondary journal
-        $this->journal_secondary = new O3PO_Journal($journal_config);
+            //create the journals
+        $this->journal = static::setup_primary_journal($settings);
+        $this->journal_secondary = static::setup_secondary_journal($settings);
 
             //create the publication types for each journal
         $this->primary_publication_type = new O3PO_PrimaryPublicationType($this->journal, $this->environment);
@@ -345,9 +324,9 @@ class O3PO {
         $this->loader->add_action('init', $this->primary_publication_type, 'add_axiv_paper_doi_feed_endpoint' , 0 );
         $this->loader->add_action('parse_request', $this->primary_publication_type, 'handle_arxiv_paper_doi_feed_endpoint_request' , 1 );
         $this->loader->add_filter('the_content', $this->primary_publication_type, 'get_the_content');
-        $this->loader->add_filter('get_the_excerpt', $this->primary_publication_type, 'get_the_excerpt') ;//Use this filter instead of 'the_excerpt' to also affect get_the_excerpt()
-        $this->loader->add_filter('the_content_feed', $this->primary_publication_type, 'get_feed_content');
-        $this->loader->add_filter('the_excerpt_rss', $this->primary_publication_type, 'get_feed_content');
+        $this->loader->add_filter('get_the_excerpt', $this->primary_publication_type, 'get_the_excerpt', 1) ;//Use get_the_excerpt instead of 'the_excerpt' to also affect get_the_excerpt(). The low priority number is crucial to ensure early execution and prevent (expensive) auto generation of excerpt from content via wp_trim_excerpt() (see default-filters.php in WP)
+        $this->loader->add_filter('the_content_feed', $this->primary_publication_type, 'get_feed_content', 1); //The low priority number is crucial to ensure early execution and prevent (expensive) auto generation of excerpt from content via wp_trim_excerpt() (see default-filters.php in WP)
+        $this->loader->add_filter('the_excerpt_rss', $this->primary_publication_type, 'get_feed_content', 1); //The low priority number is crucial to ensure early execution and prevent (expensive) auto generation of excerpt from content via wp_trim_excerpt() (see default-filters.php in WP)
         $this->loader->add_filter('transition_post_status', $this->primary_publication_type, 'on_transition_post_status', 10, 3);
         if($settings->get_plugin_option('page_template_for_publication_posts')==='checked')
             $this->loader->add_filter('template_include', $this->primary_publication_type, 'use_page_template');
@@ -356,8 +335,7 @@ class O3PO {
         $this->loader->add_filter('the_author', $this->secondary_publication_type, 'get_the_author', PHP_INT_MAX, 1);
         $this->loader->add_filter('author_link', $this->secondary_publication_type, 'get_the_author_posts_link', PHP_INT_MAX, 1);
         $this->loader->add_filter('the_content', $this->secondary_publication_type, 'get_the_content');
-        $this->loader->add_filter('get_the_excerpt', $this->secondary_publication_type, 'get_the_excerpt');//Use this filter instead of 'the_excerpt' to also affect get_the_excerpt()
-            //...and those inherited from publicationtype
+        $this->loader->add_filter('get_the_excerpt', $this->secondary_publication_type, 'get_the_excerpt', 1);//Use get_the_excerpt instead of 'the_excerpt' to also affect get_the_excerpt(). The low priority number is crucial to ensure early execution and prevent (expensive) auto generation of excerpt from content via wp_trim_excerpt() (see default-filters.php in WP)
         $this->loader->add_action('init', $this->secondary_publication_type, 'register_as_custom_post_type');
         $this->loader->add_action('pre_get_posts', $this->secondary_publication_type, 'add_custom_post_types_to_query');
         $this->loader->add_action('wp_head', $this->secondary_publication_type, 'add_dublin_core_and_highwire_press_meta_tags');
@@ -425,5 +403,45 @@ class O3PO {
 
 		return $this->version;
 	}
+
+
+
+    public static function journal_config_from_settings( $settings ) {
+
+        $journal_config_properties = O3PO_Journal::get_journal_config_properties();
+        $journal_config = array();
+        foreach(array_intersect(array_keys($settings->get_all_settings_fields_map()), $journal_config_properties) as $journal_config_property){
+            $journal_config[$journal_config_property] = $settings->get_plugin_option($journal_config_property);
+        }
+        return $journal_config;
+    }
+
+    public static function setup_primary_journal( $settings ) {
+        $journal_config = static::journal_config_from_settings($settings);
+
+            //add some properties that are named differently (for a reason) in settings
+            /* $journal_config['volumes_endpoint'] = 'volumes'; */
+        $journal_config['publication_type_name'] = $settings->get_plugin_option('primary_publication_type_name');
+        $journal_config['publication_type_name_plural'] = $settings->get_plugin_option('primary_publication_type_name_plural');
+
+            //create the primary journal
+        return new O3PO_Journal($journal_config);
+    }
+
+    public static function setup_secondary_journal( $settings ) {
+
+        $journal_config = static::journal_config_from_settings($settings);
+                    //reconfigure for the secondary journal
+        $journal_config['journal_title'] = $settings->get_plugin_option('secondary_journal_title');
+        $journal_config['journal_level_doi_suffix'] = $settings->get_plugin_option('secondary_journal_level_doi_suffix');
+        $journal_config['eissn'] = $settings->get_plugin_option('secondary_journal_eissn');
+        $journal_config['volumes_endpoint'] = 'secondary_volumes';
+        $journal_config['publication_type_name'] = $settings->get_plugin_option('secondary_publication_type_name');
+        $journal_config['publication_type_name_plural'] = $settings->get_plugin_option('secondary_publication_type_name_plural');
+
+            //create the secondary journal
+        return new O3PO_Journal($journal_config);
+    }
+
 
 }

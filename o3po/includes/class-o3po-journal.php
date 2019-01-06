@@ -71,6 +71,8 @@ class O3PO_Journal {
             'crossref_id',
             'crossref_pw',
             'crossref_test_deposite_url',
+            'ads_api_search_url',
+            'ads_api_token',
             'developer_email',
             'doaj_api_key',
             'doaj_api_url',
@@ -243,7 +245,8 @@ class O3PO_Journal {
             $content .= '<p>&larr; <a href="' . get_site_url() . '">back to main page</a><p>';
             $content .= '<ul>';
             for ($volume = 1; $volume <= $last_volume; $volume++) {
-                $content .= '  <li><a href="' . get_site_url() . '/volumes/' . $volume . '/">Volume ' . $volume . ' (' . ($volume+($settings->get_plugin_option('first_volume_year')-1)) . ') ' . $this->get_count_of_volume($volume, $this->get_journal_property('publication_type_name')) . ' ' . $this->get_journal_property('publication_type_name_plural') . '</a></li>';
+                $count_in_this_volume = $this->get_count_of_volume($volume, $this->get_journal_property('publication_type_name'));
+                $content .= '  <li><a href="' . get_site_url() . '/volumes/' . $volume . '/">Volume ' . $volume . ' (' . ($volume+($settings->get_plugin_option('first_volume_year')-1)) . ') ' . $count_in_this_volume . ' ' . ($count_in_this_volume==1 ? $this->get_journal_property('publication_type_name') : $this->get_journal_property('publication_type_name_plural')) . '</a></li>';
             }
             $content .= '</ul>';
         }
@@ -608,9 +611,9 @@ for (i = 0; i < elemets_to_condense.length; i++) {
             $query['meta_key'] = $publication_type . '_volume';
             $query['meta_value'] = $vol_num;
         }
-        $my_query = new WP_Query( $query );
+        $my_query = new WP_Query($query);
 
-        return $my_query->post_count;
+        return $my_query->found_posts;
     }
 
 }

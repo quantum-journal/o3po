@@ -183,17 +183,21 @@ class O3PO_Settings extends O3PO_Singleton {
 
         'executive_board' => "",
         'editor_in_chief' => "",
+        'ads_api_search_url' => 'https://api.adsabs.harvard.edu/v1/search/query',
+        'ads_api_token' => '',
 
             /* The options below are currently not customizable.
              *
              * Warning: The name of the paper-single.php templare must match
              * the primary_publication_type_name!
              */
+        'cited_by_refresh_seconds' => 60*60*12,
         'primary_publication_type_name' => 'paper',
         'primary_publication_type_name_plural' => 'papers',
         'secondary_publication_type_name' => 'view',
         'secondary_publication_type_name_plural' => 'views',
         'volumes_endpoint' => 'volumes',
+
                                      );
 
         /**
@@ -323,6 +327,10 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->add_settings_field('crossref_email', 'Email for communication with Crossref', array( $this, 'render_crossref_email_setting' ), $this->plugin_name . '-settings:crossref_settings', 'crossref_settings');
         $this->add_settings_field('crossref_archive_locations', 'Archive locations', array( $this, 'render_crossref_archive_locations_setting' ), $this->plugin_name . '-settings:crossref_settings', 'crossref_settings');
 
+        $this->add_settings_section('ads_settings', 'ADS', array( $this, 'render_ads_settings' ), $this->plugin_name . '-settings:ads_settings');
+        $this->add_settings_field('ads_api_search_url', 'ADS API URL', array( $this, 'render_ads_api_search_url_setting' ), $this->plugin_name . '-settings:ads_settings', 'ads_settings');
+        $this->add_settings_field('ads_api_token', 'ADS API token', array( $this, 'render_ads_api_token_setting' ), $this->plugin_name . '-settings:ads_settings', 'ads_settings');
+
         $this->add_settings_section('clockss_settings', 'Clockss', array( $this, 'render_clockss_settings' ), $this->plugin_name . '-settings:clockss_settings');
         $this->add_settings_field('clockss_ftp_url', 'Clockss FTP URL', array( $this, 'render_clockss_ftp_url_setting' ), $this->plugin_name . '-settings:clockss_settings', 'clockss_settings');
         $this->add_settings_field('clockss_username', 'Clockss Username', array( $this, 'render_clockss_username_setting' ), $this->plugin_name . '-settings:clockss_settings', 'clockss_settings');
@@ -398,7 +406,19 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_crossref_settings() {
 
-        echo '<p>Configure how ' . $this->plugin_name . ' interacts with Crossref.</p>';
+        echo '<p>Configure how ' . $this->plugin_name . ' interacts with <a href="https://www.crossref.org/">Crossref</a>.</p>';
+
+    }
+
+        /**
+         * Render the head of the ads settings part.
+         *
+         * @since    0.3.0
+         * @access   public
+         */
+    public function render_ads_settings() {
+
+        echo '<p>Configure how ' . $this->plugin_name . ' interacts with <a href="https://github.com/adsabs/adsabs-dev-api">ADS</a>.</p>';
 
     }
 
@@ -410,7 +430,7 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_clockss_settings() {
 
-        echo '<p>Configure how ' . $this->plugin_name . ' interacts with CLOCKSS.</p>';
+        echo '<p>Configure how ' . $this->plugin_name . ' interacts with <a href="https://clockss.org/">CLOCKSS</a>.</p>';
 
     }
 
@@ -422,7 +442,7 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_doaj_settings() {
 
-        echo '<p>Configure how ' . $this->plugin_name . ' interacts with DOAJ.</p>';
+        echo '<p>Configure how ' . $this->plugin_name . ' interacts with the <a href="https://doaj.org/">DOAJ</a>.</p>';
 
     }
 
@@ -434,7 +454,7 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_arxiv_settings() {
 
-        echo '<p>Configure how ' . $this->plugin_name . ' interacts with the arXiv.</p>';
+        echo '<p>Configure how ' . $this->plugin_name . ' interacts with the <a href="https://arxiv.org/">arXiv</a>.</p>';
 
     }
 
@@ -890,6 +910,26 @@ class O3PO_Settings extends O3PO_Singleton {
     }
 
         /**
+         * Render the setting for the ads api search URL.
+         *
+         * @since    0.3.0
+         * @access   public
+         */
+    public function render_ads_api_search_url_setting() {
+        $this->render_setting('ads_api_search_url');
+    }
+
+        /**
+         * Render the setting for the ads api token.
+         *
+         * @since    0.3.0
+         * @access   public
+         */
+    public function render_ads_api_token_setting() {
+        $this->render_password_setting('ads_api_token');
+    }
+
+        /**
          * Render the setting for the CLOCKSS ftp url.
          *
          * @since    0.1.0
@@ -1219,6 +1259,8 @@ class O3PO_Settings extends O3PO_Singleton {
                 'crossref_test_deposite_url' => 'validate_url',
                 'crossref_email' => 'trim_settings_field',
                 'crossref_archive_locations' => 'trim_settings_field',
+                'ads_api_search_url' => 'validate_url',
+                'ads_api_token' => 'trim_settings_field',
                 'clockss_ftp_url' => 'trim_settings_field', #cannot use validate_url here because it prepends https:// or ftp:// and we want to save the raw url
                 'clockss_username' => 'trim_settings_field',
                 'clockss_password' => 'trim_settings_field',

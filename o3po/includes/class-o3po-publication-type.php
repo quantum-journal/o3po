@@ -18,6 +18,7 @@
 
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-clockss.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-crossref.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-ads.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-doaj.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-latex.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
@@ -415,11 +416,12 @@ abstract class O3PO_PublicationType {
         $this->save_meta_data($post_id);
 
             // Unhook this function to prevent infinite looping because in the remainder of this function (especially in validate_and_process_data()) we will be calling update_post() which triggers 'save_post'
+        $validation_result = '';
         try
         {
             remove_action( 'save_post', array( $this, 'save_metabox' ), 10, 2 );
 
-            $validation_result = $this->validate_and_process_data($post_id);
+            $validation_result .= $this->validate_and_process_data($post_id);
         }
         catch(Exception $e) {
             $validation_result .= "ERROR: There was an exception while saving and processing the entered meta-data: " . $e->getMessage() . "\n";
@@ -750,20 +752,25 @@ abstract class O3PO_PublicationType {
         if( strpos($validation_result, 'ERROR') === false or strpos($validation_result, 'REVIEW') === false)
         {
                 //Upload meta-data to DOAJ
-            if (get_post_status($post_id) === 'publish' && !$this->environment->is_test_environment())
-            {
-                $doaj_response = $this->upload_meta_data_to_doaj($doaj_json,
-                                                                 $this->get_journal_property('doaj_api_url'),
-                                                                 $this->get_journal_property('doaj_api_key')
-                                                                 );
-                if(!empty($doaj_response) && (strpos($doaj_response, 'ERROR') !== false || strpos($doaj_response, 'WARNING') !== false))
-                    $validation_result .= $doaj_response;
-                else
-                    $validation_result .= "INFO: Meta-data successfully uploaded to DOAJ.\n";
-            }
+            if(empty($this->get_journal_property('eissn')))
+                $validation_result .= "INFO: Skipping upload to DOAJ as no eISSN was configured for this journal.\n";
             else
-                $doaj_response = NULL;
-            update_post_meta( $post_id, $post_type . '_doaj_response', $doaj_response );
+            {
+                if (get_post_status($post_id) === 'publish' && !$this->environment->is_test_environment())
+                {
+                    $doaj_response = $this->upload_meta_data_to_doaj($doaj_json,
+                                                                     $this->get_journal_property('doaj_api_url'),
+                                                                     $this->get_journal_property('doaj_api_key')
+                                                                     );
+                    if(!empty($doaj_response) && (strpos($doaj_response, 'ERROR') !== false || strpos($doaj_response, 'WARNING') !== false))
+                        $validation_result .= $doaj_response;
+                    else
+                        $validation_result .= "INFO: Meta-data successfully uploaded to DOAJ.\n";
+                }
+                else
+                    $doaj_response = NULL;
+                update_post_meta( $post_id, $post_type . '_doaj_response', $doaj_response );
+            }
 
 
                 //Upload meta-data and fulltext to CLOCKSS (only if a fulltext exists)
@@ -1375,10 +1382,6 @@ abstract class O3PO_PublicationType {
 
         /**
          * Submit meta-data to Crossref.
-         *
-         * From the command line one could do roughly the same with curl as follows:
-         *
-         * curl -F 'operation=doMDUpload' -F 'login_id=XXXX' -F 'login_passwd=XXXX' -F 'fname=@/home/cgogolin/tmp/crossref-test.xml' https://test.crossref.org/servlet/deposit -v
          *
          * This function must be private since we do no longer check internally whether we are running on the test system.
          *
@@ -2373,6 +2376,13 @@ abstract class O3PO_PublicationType {
          * @param    int    $post_id     Id of the post.
          */
     public function get_formated_cited_by_html( $post_id ) {
+        return $this->get_cited_by_data($post_id)['html'];
+    }
+
+        /**
+         *
+         */
+    public function get_cited_by_data( $post_id ) {
 
         $post_type = get_post_type($post_id);
         $doi = $this->get_doi($post_id);
@@ -2381,107 +2391,107 @@ abstract class O3PO_PublicationType {
         $login_passwd = $this->get_journal_property('crossref_pw');
         $crossref_url = $this->get_journal_property('crossref_get_forward_links_url');
         $doi_url_prefix = $this->get_journal_property('doi_url_prefix');
+        $ads_api_search_url = $this->get_journal_property('ads_api_search_url');
+        $ads_api_token = $this->get_journal_property('ads_api_token');
+        $arxiv_url_abs_prefix = $this->get_journal_property('arxiv_url_abs_prefix');
+        $eprint = get_post_meta( $post_id, $post_type . '_eprint', true );
 
-        $body = O3PO_Crossref::get_cited_by_xml_body($crossref_url, $login_id, $login_passwd, $doi);
+        $settings = O3PO_Settings::instance();
+        $cited_by_refresh_seconds = $settings->get_plugin_option('cited_by_refresh_seconds');
 
-        if ( is_wp_error($body) )
-            return '<p>' . $body->get_error_code() . ' ' . $body->get_error_message() . '</p>';
+        $crossref_bibentries = get_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries', true );
+        $crossref_bibentries_timestamp = get_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries_timestamp', true );
+        if(empty($crossref_bibentries_timestamp) or time() - $crossref_bibentries_timestamp > $cited_by_refresh_seconds)
+        {
+            $crossref_bibentries_timestamp = time();
+            update_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries_timestamp', $crossref_bibentries_timestamp);
 
-        if( empty($body) or empty($body->forward_link))
-            return '<p>Crossref\'s <a href="https://www.crossref.org/services/cited-by/">cited-by service</a> has no data on citing works. Unfortunately not all publishers provide suitable citation data.</p>';
+            $new_crossref_bibentries = O3PO_Crossref::get_cited_by_bibentries($crossref_url, $login_id, $login_passwd, $doi);
+            if(!empty($new_crossref_bibentries) or !is_wp_error($new_crossref_bibentries) or empty($crossref_bibentries) or is_wp_error($crossref_bibentries))
+            {
+                $crossref_bibentries = $new_crossref_bibentries;
+                update_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries', $crossref_bibentries );
+            }
+        }
+
+        $ads_bibentries = get_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries', true );
+        $ads_bibentries_timestamp = get_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries_timestamp', true );
+        if(empty($ads_bibentries_timestamp) or time() - $ads_bibentries_timestamp > $cited_by_refresh_seconds)
+        {
+            $ads_bibentries_timestamp = time();
+            update_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries_timestamp', $ads_bibentries_timestamp);
+
+            $new_ads_bibentries = O3PO_Ads::get_cited_by_bibentries($ads_api_search_url, $ads_api_token, $eprint);
+
+            if(!empty($new_ads_bibentries) or !is_wp_error($new_ads_bibentries) or empty($ads_bibentries) or is_wp_error($ads_bibentries))
+            {
+                $ads_bibentries = $new_ads_bibentries;
+                update_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries', $ads_bibentries );
+            }
+        }
 
         $cited_by_html = '';
+
+        $errors = array();
+        if (is_wp_error($crossref_bibentries))
+        {
+            $errors[] = $crossref_bibentries;
+            $cited_by_html .= '<p>Error fetching Crossref cited-by data: ' . $crossref_bibentries->get_error_code() . ' ' . $crossref_bibentries->get_error_message() . '</p>';
+            $crossref_bibentries = array();
+        }
+        elseif(empty($crossref_bibentries))
+            $cited_by_html .= '<p>At the moment Crossref\'s <a href="https://www.crossref.org/services/cited-by/">cited-by service</a> has no data on citing works.</p>';
+
+        if (is_wp_error($ads_bibentries))
+        {
+            $errors[] = $ads_bibentries;
+            $cited_by_html .= '<p>Error fetching ADS cited-by data: ' . $ads_bibentries->get_error_code() . ' ' . $ads_bibentries->get_error_message() . '</p>';
+            $ads_bibentries = array();
+        }
+        elseif(empty($ads_bibentries))
+            $cited_by_html .= '<p>At the moment <a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a> has no data on citing works.</p>';
+
+        if(!empty($crossref_bibentries) and !empty($ads_bibentries))
+        {
+            $all_bibentries = O3PO_Bibentry::merge_bibitem_arrays($crossref_bibentries, $ads_bibentries);
+        }
+        elseif(!empty($crossref_bibentries))
+        {
+            $all_bibentries = $crossref_bibentries;
+        }
+        elseif(!empty($ads_bibentries))
+        {
+            $all_bibentries = $ads_bibentries;
+        }
+        else
+            $all_bibentries = array();
+
+        $sources = array();
+        if(!empty($crossref_bibentries))
+            $sources[] = 'Crossref\'s <a href="https://www.crossref.org/services/cited-by/">cited-by service</a> (last updated ' . date("Y-m-d H:i:s", $ads_bibentries_timestamp) . ')';
+        if(!empty($ads_bibentries))
+            $sources[] = '<a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a>  (last updated ' . date("Y-m-d H:i:s", $ads_bibentries_timestamp) . ')';
+
+        if(!empty($sources))
+            $cited_by_html .= '<p>The following citations are from ' . implode($sources, ' and ') . '. The list may be incomplete as not all publishers provide suitable and complete citation data.</p>';
+
         $citation_number = 0;
-        foreach ($body->forward_link as $f_link) {
-
-            if(isset($f_link->journal_cite))
-                $cite = $f_link->journal_cite;
-            elseif(isset($f_link->book_cite))
-                $cite = $f_link->book_cite;
-            elseif(isset($f_link->conf_cite))
-                $cite = $f_link->conf_cite;
-            elseif(isset($f_link->dissertation_cite))
-                $cite = $f_link->dissertation_cite;
-            elseif(isset($f_link->report_cite))
-                $cite = $f_link->report_cite;
-            elseif(isset($f_link->standard_cite))
-                $cite = $f_link->standard_cite;
-            else
-                continue;
-
+        foreach($all_bibentries as $bibentry)
+        {
             $citation_number += 1;
-            $citation_journal_title = $cite->journal_title;
-            $citation_article_title = $cite->article_title;
-            $citation_title = $cite->title;
-            $citation_series_title = $cite->series_title;
-            $citation_volume_title = $cite->volume_title;
-            $citation_volume = $cite->volume;
-            $citation_component_number = $cite->component_number;
-            $citation_issue = $cite->issue;
-            $citation_first_page = $cite->first_page;
-            $citation_item_number = $cite->item_number;
-            $citation_page = !empty($citation_first_page) ? $citation_first_page : $citation_item_number;
-            $citation_year = $cite->year;
-            $citation_doi = $cite->doi;
-            $citation_isbn = $cite->isbn;
-            $citation_issn = $cite->issn;
-            $citation_publication_type = $cite->publication_type;
-
             $cited_by_html .= '<p class="break-at-all-cost">' . '[' . $citation_number . '] ';
-            if(!empty($cite->contributors->contributor))
-            {
-                foreach ($cite->contributors->contributor as $contributor) {
-                    if(!empty($contributor->given_name))
-                        $cited_by_html .= $contributor->given_name . ' ';
-                    if(!empty($contributor->surname))
-                        $cited_by_html .= $contributor->surname;
-                    $cited_by_html .= ', ';
-                }
-            }
-            if(!empty($citation_article_title))
-                $cited_by_html .= '"' . $citation_article_title . '", ';
-            if(!empty($citation_title))
-                $cited_by_html .= '"' . $citation_title . '", ';
-
-            $citation_cite_as = '';
-            if(!empty($citation_journal_title))
-                $citation_cite_as .= $citation_journal_title . " ";
-            if(!empty($citation_series_title))
-                $citation_cite_as .= $citation_series_title . " ";
-            if(!empty($citation_volume_title))
-                $citation_cite_as .= $citation_volume_title . " ";
-            if(!empty($citation_component_number))
-                $citation_cite_as .= $citation_component_number . " ";
-            if(!empty($citation_volume))
-                $citation_cite_as .= $citation_volume;
-            if(!empty($citation_volume) && !empty($citation_issue))
-                $citation_cite_as .= " ";
-            if(!empty($citation_issue))
-                $citation_cite_as .= $citation_issue;
-            if((!empty($citation_volume) || !empty($citation_issue)) && !empty($citation_page))
-                $citation_cite_as .= ', ';
-            if((!empty($citation_volume) || !empty($citation_issue)) && empty($citation_page))
-                $citation_cite_as .= ' ';
-            if(!empty($citation_page))
-                $citation_cite_as .= $citation_page . " ";
-            if(empty($citation_cite_as))
-                $citation_cite_as = $citation_doi . ' ';
-            if(!empty($citation_year))
-                $citation_cite_as .= '('. $citation_year . ')';
-
-            if(!empty($citation_isbn))
-                $citation_cite_as .= ' ISBN:'. $citation_isbn;
-
-            if(!empty($citation_doi))
-                $cited_by_html .= '<a href="' . $doi_url_prefix . $citation_doi . '">' . $citation_cite_as . '</a>.';
-            else
-                $cited_by_html .= $citation_cite_as;
-
+            $cited_by_html .= $bibentry->get_formated_html($doi_url_prefix, $arxiv_url_abs_prefix);
             $cited_by_html .= '</p>' . "\n";
         }
-        $cited_by_html .= '<p>(The above data is from Crossref\'s <a href="https://www.crossref.org/services/cited-by/">cited-by service</a>. Unfortunately not all publishers provide suitable and complete citation data so that some citing works or bibliographic details may be missing.)</p>';
 
-        return $cited_by_html;
+        return array(
+            'html' => $cited_by_html,
+            'citation_count' => $citation_number,
+            'all_bibentries' => $all_bibentries,
+            'crossref_bibentries' => $crossref_bibentries,
+            'ads_bibentries' => $ads_bibentries,
+            'errors' => $errors,
+                     );
     }
 
         /**
@@ -2510,17 +2520,13 @@ abstract class O3PO_PublicationType {
     public function get_cited_by( $post_id ) {
 
         $cited_by = get_transient($post_id . '_cited_by_html');
-
         if( false === $cited_by ) {
-                // Transient expired, regenerate
             $cited_by = '';
             $post_type = get_post_type($post_id);
-            if( !empty(get_post_meta( $post_id, $post_type . '_bbl', true )) ) {
-                $cited_by .= '<h3 class="references toggle-following additional-info"><a href="javascript:void(0);" onclick="toggleFollowing(this);">&#9658; Cited by (beta)</a></h3>';
-                $cited_by .= '<div class="initially-display-none-if-js">';
-                $cited_by .= $this->get_formated_cited_by_html($post_id);
-                $cited_by .= '</div>';
-            }
+            $cited_by .= '<h3 class="references additional-info">Cited by</h3>';
+            $cited_by .= '<div class="">';
+            $cited_by .= $this->get_formated_cited_by_html($post_id);
+            $cited_by .= '</div>';
             set_transient($post_id . '_cited_by_html', $cited_by, 60); //keep for 1 minute
         }
 
@@ -2586,7 +2592,7 @@ abstract class O3PO_PublicationType {
         $doi = $this->get_doi($post_id);
         $doi_url_prefix = $this->get_journal_property('doi_url_prefix');
 
-        $key = O3PO_Latex::utf8_to_closest_latin_letter_string($author_surnames[0]) . $year . O3PO_Latex::title_to_key_suffix(get_post_meta( $post_id, $post_type . '_title', true ));
+        $key = (isset($author_surnames[0]) ? O3PO_Latex::utf8_to_closest_latin_letter_string($author_surnames[0]) : 'surname') . $year . O3PO_Latex::title_to_key_suffix(get_post_meta( $post_id, $post_type . '_title', true ));
 
         $bibtex = '';
         $bibtex .= '@article{' . $key . ',' . "\n";
@@ -3027,6 +3033,8 @@ abstract class O3PO_PublicationType {
     public function use_page_template( $template ) {
 
         global $post;
+        if(!is_object($post))
+            return $template;
 
         $post_id = $post->ID;
         $post_type = get_post_type($post_id);
@@ -3076,7 +3084,6 @@ abstract class O3PO_PublicationType {
         return get_post_meta( $post_id, $post_type . '_title', true );
     }
 
-
         /**
          * Get a meta data field.
          *
@@ -3111,7 +3118,9 @@ abstract class O3PO_PublicationType {
          *
          * @since 0.3.0
          */
-    public function get_all_citation_counts_for_publication_type( $post_type, $start_date ) {
+    public function get_all_citation_counts() {
+
+        $post_type = $this->get_publication_type_name();
 
         $login_id = $this->get_journal_property('crossref_id');
         $login_passwd = $this->get_journal_property('crossref_pw');
@@ -3120,30 +3129,36 @@ abstract class O3PO_PublicationType {
         $crossref_url = $this->get_journal_property('crossref_get_forward_links_url');
         $doi_prefix = $this->get_journal_property('doi_prefix');
 
-        $citations = O3PO_Crossref::get_all_citation_counts($crossref_url, $login_id, $login_passwd, $doi_prefix, $start_date, 60*60*12);
-
         $query = array(
             'post_type' => $post_type,
             'post_status' => array('publish'),
             'posts_per_page' => -1,
                        );
 
+        $errors = array();
+        $citations_this_type = array();
         $my_query = new WP_Query( $query );
+
         if ( $my_query->have_posts() ) {
             $num = 0;
-            $citations_this_type = array();
             while ( $my_query->have_posts() ) {
                 $num++;
                 $my_query->the_post();
 
                 $post_id = get_the_ID();
-                $post_type = get_post_type($post_id);
+                $cited_by_data = $this->get_cited_by_data($post_id);
+                if(!empty($cited_by_data['errors']))
+                    $errors = array_merge($errors, $cited_by_data['errors']);
+
                 $doi = $this->get_doi($post_id);
-                $citations_this_type[$doi] = (!empty($citations[$doi]) ? $citations[$doi] : '0');
+                $citations_this_type[$doi] = $cited_by_data['citation_count'];
             }
         }
 
-        return $citations_this_type;
+        return array(
+            'citation_count' => $citations_this_type,
+            'errors' => $errors,
+                     );
     }
 
 }

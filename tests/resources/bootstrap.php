@@ -110,6 +110,8 @@ function get_option( $option, $default = false ) {
             'crossref_test_deposite_url' => 'fake_crossref_test_deposite_url',
             'crossref_email' => 'fake_crossref_email',
             'crossref_archive_locations' => 'fake_crossref_archive_locations',
+            'ads_api_search_url' => 'https://api.adsabs.harvard.edu/v1/search/query',
+            'ads_api_token' => '',
             'arxiv_url_abs_prefix' => 'https://arxiv.org/abs/',
             'arxiv_url_pdf_prefix' => 'https://arxiv.org/pdf/',
             'arxiv_url_source_prefix' => 'https://arxiv.org/e-print/',
@@ -180,9 +182,11 @@ function get_post_meta( $post_id, $key, $single = false ) {
         throw new Exception("Post with id=" . $post_id . " has no meta-data.");
     if(!isset($posts[$post_id]['meta'][$key]))
     {
-        throw new Exception("Post with id=" . $post_id . " has no meta-data for key=" . $key . ".");
-       /* echo("\nPost with id=" . $post_id . " has no meta-data for key=" . $key . "\n"); */
-       /* return "fake!"; */
+        #throw new Exception("Post with id=" . $post_id . " has no meta-data for key=" . $key . ".");
+        if($single)
+            return '';
+        else
+            return array();
     }
 
 
@@ -241,6 +245,7 @@ class WP_Query
     private $query;
     public $query_vars;
     public $post_count;
+    public $found_posts;
 
     function __construct( $input=null, $query_vars=null ) {
         global $posts;
@@ -252,6 +257,12 @@ class WP_Query
             $array = $input;
         else
             $array = array($input);
+
+        if(isset($array['posts_per_page']))
+        {
+            $max_posts_to_return = $array['posts_per_page'];
+            unset($array['posts_per_page']);
+        }
 
         $this->posts = array();
         if(!empty($posts) and $input !== null)
@@ -270,7 +281,6 @@ class WP_Query
                         break;
                     }
 
-
                     if(!isset($posts[$id][$key]) or !in_array ($posts[$id][$key], $value))
                     {
                         $include_post = false;
@@ -283,6 +293,7 @@ class WP_Query
         }
 
         $this->post_count = count($this->posts);
+        $this->found_posts = $this->post_count;
     }
 
     function get($key) {
@@ -585,6 +596,8 @@ function wp_update_post( $array ) {
 function update_post_meta( $post_id, $key, $value ) {
     global $posts;
 
+    serialize($value); #test that value is serializable. We save the plain value for simplicity.
+
     $posts[$post_id]['meta'][$key] = $value;
 }
 
@@ -664,6 +677,13 @@ function wp_remote_get( $url, $args=array() ) {
         'https://arxiv.org/abs/1609.09584v4' => dirname(__FILE__) . '/arxiv/1609.09584v4.html',
         'https://arxiv.org/abs/0908.2921v2' => dirname(__FILE__) . '/arxiv/0908.2921v2.html',
         'https://arxiv.org/abs/1806.02820v3' => dirname(__FILE__) . '/arxiv/1806.02820v3.html',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0908.2921&fl=citation' => dirname(__FILE__) . '/ads/0908.2921.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0809.2542&fl=citation' => dirname(__FILE__) . '/ads/0809.2542.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2010CoTPh..54.1023Z+OR+bibcode:2011EPJB...81..155H+OR+bibcode:2011JSMTE..05..023Z+OR+bibcode:2014PhyA..414..240P&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => dirname(__FILE__) . '/ads/0809.2542_citations.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:1806.02820&fl=citation' => dirname(__FILE__) . '/ads/1806.02820.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2018arXiv180601279B+OR+bibcode:2018arXiv181009469B+OR+bibcode:2018arXiv181205117B&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => dirname(__FILE__) . '/ads/1806.02820_citation.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:1610.01808&fl=citation' => dirname(__FILE__) . '/ads/1610.01808.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2015arXiv151207892E+OR+bibcode:2016arXiv160800263B+OR+bibcode:2016arXiv161003632F+OR+bibcode:2016arXiv161201652L+OR+bibcode:2016arXiv161205903A+OR+bibcode:2017arXiv170309568K+OR+bibcode:2017arXiv170401998M+OR+bibcode:2017arXiv170500686N+OR+bibcode:2017arXiv170608913Y+OR+bibcode:2017arXiv170801875B+OR+bibcode:2017arXiv170903489H+OR+bibcode:2017arXiv171205384B+OR+bibcode:2017NatCo...8.1572A+OR+bibcode:2017npjQI...3...15L+OR+bibcode:2017PhRvA..95d2336M+OR+bibcode:2017PhRvL.118d0502G+OR+bibcode:2018arXiv180306775B+OR+bibcode:2018arXiv180603200Y+OR+bibcode:2018arXiv180906957H+OR+bibcode:2018QS&T....3b5004V+OR+bibcode:2018Sci...360..195N+OR+bibcode:2018Sci...362..308B&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => dirname(__FILE__) . '/ads/1610.01808_citations.json',
                           );
     if(!empty($local_file_urls[$url]))
         return array('headers'=>'' ,'body'=> file_get_contents($local_file_urls[$url]) );
