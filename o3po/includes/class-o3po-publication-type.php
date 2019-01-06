@@ -2060,7 +2060,7 @@ abstract class O3PO_PublicationType {
 			if( !empty($parsed_bbl) ) {
 				foreach($parsed_bbl as $n => $entry) {
 					static::the_formated_bibliography_entry_html($entry);
-					if( O3PO_Latex::strpos_outside_math_mode($entry['text'], '\\') != false ) echo '<p style="color:red;">WARNING: This entry still contains one or more backslashes. Probably this means we have not recognized some LaTeX commmand, but it can also be ok if the entry contains a mathematical formula.</p>';
+					if( O3PO_Latex::strpos_outside_math_mode($entry['text'], '\\') !== false ) echo '<p style="color:red;">WARNING: This entry still contains one or more backslashes. Probably this means we have not recognized some LaTeX commmand, but it can also be ok if the entry contains a mathematical formula.</p>';
                     if( empty($entry['doi']) ) echo '<p style="color:orange;">WARNING: No DOI found for this entry. Does it really not have one?</p>';
 				}
 			} else {
@@ -2321,7 +2321,7 @@ abstract class O3PO_PublicationType {
 
         $doi_url_prefix = $this->get_journal_property('doi_url_prefix');
 
-        return '			 <p class="break-at-all-cost"><a name="' . esc_attr($entry['key']) . '" id="' . esc_attr($entry['key']) . '">[' . $entry['ref'] . ']</a> ' . O3PO_Utility::make_slash_breakable_html(esc_html($entry['text'])) . (!empty($entry['doi']) ? ' <br /><a href="' . esc_url(htmlspecialchars($doi_url_prefix . $entry['doi'])) . '">' . esc_html(htmlspecialchars($doi_url_prefix . $entry['doi'])) . '</a>' : '' ) . ( !empty($entry['eprint']) ? ' <br /><a href="' . esc_url($this->get_journal_property('arxiv_url_abs_prefix') . $entry['eprint']) . '">arXiv:' . $entry['eprint'] . '</a>' : '' ) . ( !empty($entry['url']) ? ' <br /><a style="width: 300px; word-wrap: break-all;" href="' . esc_url(htmlspecialchars($entry['url'])) . '">' . O3PO_Utility::make_slash_breakable_html(esc_url(htmlspecialchars($entry['url']))) . '</a>' : '' ) . '</p>';
+        return '			 <p class="break-at-all-cost"><a id="' . esc_attr($entry['key']) . '">[' . esc_html($entry['ref']) . ']</a> ' . O3PO_Utility::make_slash_breakable_html(esc_html(htmlspecialchars($entry['text']))) . (!empty($entry['doi']) ? ' <br /><a href="' . esc_url(htmlspecialchars($doi_url_prefix . $entry['doi'])) . '">' . esc_html(htmlspecialchars($doi_url_prefix . $entry['doi'])) . '</a>' : '' ) . ( !empty($entry['eprint']) ? ' <br /><a href="' . esc_url($this->get_journal_property('arxiv_url_abs_prefix') . $entry['eprint']) . '">arXiv:' . $entry['eprint'] . '</a>' : '' ) . ( !empty($entry['url']) ? ' <br /><a style="width: 300px; word-wrap: break-all;" href="' . esc_url(htmlspecialchars($entry['url'])) . '">' . O3PO_Utility::make_slash_breakable_html(esc_url(htmlspecialchars($entry['url']))) . '</a>' : '' ) . '</p>';
     }
 
 
