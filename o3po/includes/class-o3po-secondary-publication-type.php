@@ -394,11 +394,12 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                             $executive_board,
                             $editor_in_chief,
                             $this->get_journal_property('publisher_email'),
-                            $type,
+                            $this->get_publication_type_name(),
                             $title,
-                            "",
+                            static::get_formated_authors($post_id),
                             $post_url,
-                            $this->get_journal_property('doi_url_prefix'), $doi,
+                            $this->get_journal_property('doi_url_prefix'),
+                            $doi,
                             static::get_formated_citation($post_id)
                                                                       )['result'];
 
