@@ -378,6 +378,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 '\\\\bib(info|field)\s*{(year|pages|journal|title|author|volume|editor|publisher|booktitle|address|series|series and number|howpublished|note|school|edition|eid|number)}\s*' => '',
                 '\\\\BibitemShut\s*{(No|)Stop}' => '',
                 '\\\\enquote\s*' => '', //this should be improved to actually add quotes
+                '\\\\selectlanguage\s*{[a-zA-Z]+}' => '',
                 '\\\\(href|Eprint|eprint)(@noop|)\s*{[^}]*}' => '',
                 '\\\\(bf|tt|sf|sl)(series|family)[\s{]' => '',
                 '\\\\text(em|it|bf|tt|rm|sl|sc)[\s{]' => '',
@@ -390,6 +391,10 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 '\\\\font' => '',
                 '\\\\hskip[^\\\\]*\\\\relax' => '',
                 '\\\\relax' => '',
+                '\\\\textendash' => '–',
+                '\\\\textemdash' => '—',
+                '\\\\textquoteright' => '’',
+                '\\\\textquoteleft' => '‘',
                                        );
 
             foreach($entries as $n => $entry) {
@@ -414,48 +419,52 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 if(isset($args[0]))
                     $entry = substr($entry, strlen($args[0]));
 
-			preg_match('#\\\\doi\s*{([^}]*)}#' , $entry, $doi);
-			if( empty($doi[1]) )
-				preg_match('#\\\\doibase\s*([^} ]*)}#' , $entry, $doi);
-			if( empty($doi[1]) )
-				preg_match('#\\\\(?:href|url)\s*{.*doi\.org/([^} ]*)}#' , $entry, $doi);
-			if( empty($doi[1]) )
-				preg_match('#\\\\path\s*{doi:([^} ]*)}#' , $entry, $doi);
-            if( !empty($doi[1]) )
-                $citations[$n]['doi'] = str_replace('\\%', '_', str_replace('\\#', '_', str_replace('\\_', '_', $doi[1]))); //Undo escaping of special characters in LaTeX. TODO: make a method that does that propperly.
-			preg_match('#\\\\(href\s*|Eprint)(@noop|)\s*{.*arxiv\.org/abs/([^}]*)}#' , $entry, $eprint);
-			if( empty($eprint[3]) )
-				preg_match('#(arxiv|arXiv)(:)(/*[a-z*-]*/*[0-9]+\.?[0-9]+v*[0-9]*)#' , $entry, $eprint);
-			if( empty($eprint[3]) )
-				preg_match('#()()(quant-ph/[0-9]+\.?[0-9]+v*[0-9]*)#' , $entry, $eprint);
-            if( !empty($eprint[3]) )
+			preg_match('#\\\\doi\s*{([^}]*)}#', $entry, $doi);
+			if(empty($doi[1]))
+				preg_match('#\\\\(?:href|url)\s*{.*(?:doi\.org/|dx\.doi\.org/|\\\\doibase\s*)([^}]*)}#', $entry, $doi);
+			if(empty($doi[1]))
+				preg_match('#\\\\path\s*{doi:([^}]*)}#', $entry, $doi);
+            if(empty($doi[1]))
+				preg_match('#(?:http|https)://(?:doi\.org|dx\.doi\.org)/([^}\s]*)#', $entry, $doi);
+            if(!empty($doi[1]))
+                $citations[$n]['doi'] = static::un_escape_url($doi[1]);
+
+			preg_match('#\\\\(href\s*|Eprint)(@noop|)\s*{.*arxiv\.org/abs/([^}]*)}#', $entry, $eprint);
+			if(empty($eprint[3]))
+				preg_match('#(arxiv|arXiv)(:)(/*[a-z*-]*/*[0-9]+\.?[0-9]+v*[0-9]*)#', $entry, $eprint);
+			if(empty($eprint[3]))
+				preg_match('#()()(quant-ph/[0-9]+\.?[0-9]+v*[0-9]*)#', $entry, $eprint);
+			if(empty($eprint[3]))
+				preg_match('#(http|https)://(arxiv.org/abs)/(quant-ph/[0-9]+\.?[0-9]+v*[0-9]*|[0-9]+\.?[0-9]+v*[0-9]*)#', $entry, $eprint);
+            if(!empty($eprint[3]))
                 $citations[$n]['eprint'] = $eprint[3];
 
-			preg_match('#\\\\(url)(@noop|)\s*{([^}]*)}#' , $entry, $url);
-			if( empty($url[3]) && empty($citations[$n]['eprint']) && empty($citations[$n]['doi']) )
-				preg_match('#\\\\(href)(@noop|)\s*{([^}]*)}#' , $entry, $url);
-            if( !empty($url[3]) )
-                $citations[$n]['url'] = $url[3];
+			preg_match('#\\\\(url)(@noop|)\s*{([^}]*)}#', $entry, $url);
+			if(empty($url[3]) && empty($citations[$n]['eprint']) && empty($citations[$n]['doi']))
+				preg_match('#\\\\(href)(@noop|)\s*{([^}]*)}#', $entry, $url);
+			if(empty($url[3]))
+				preg_match('#()()((?:http|https)://[-a-zA-Z0-9@:%._\+~\#=\\\\]{2,256}\.[a-z]{2,6}\b[-a-zA-Z0-9@:%_\+.~\#?&////=\\\\]*)#', $entry, $url);
+            if(!empty($url[3]))
+                $citations[$n]['url'] = static::un_escape_url($url[3]);
 
-            if( !empty($citations[$n]['url']) && ( !empty($citations[$n]['doi']) &&  strpos($citations[$n]['url'], $citations[$n]['doi']) !== false || !empty($citations[$n]['eprint']) &&  strpos($citations[$n]['url'], $citations[$n]['eprint']) !== false ) )
+            if(!empty($citations[$n]['url']) && ( (!empty($citations[$n]['doi']) &&  strpos($citations[$n]['url'], $citations[$n]['doi']) !== false || strpos($citations[$n]['url'], 'doi.org/') !== false) || (!empty($citations[$n]['eprint']) && strpos($citations[$n]['url'], $citations[$n]['eprint']) !== false )))
                 unset($citations[$n]['url']);
 
-                $text = $entry;
+            $text = $entry;
 
+            foreach ($str_replacements as $target => $substitute)
+                $text = str_replace($target, $substitute, $text);
 
-                foreach ($str_replacements as $target => $substitute)
-                    $text = str_replace($target, $substitute, $text);
+            foreach ($preg_replacements as $target => $substitute) {
+                $text = preg_replace('#'.$target.'#', $substitute, $text);
+                if( strpos($text, '\\') === false ) break;
+            }
+            $text = self::latex_to_utf8_outside_math_mode($text);
 
-                foreach ($preg_replacements as $target => $substitute) {
-                    $text = preg_replace('#'.$target.'#', $substitute, $text);
-                    if( strpos($text, '\\') === false ) break;
-                }
-                $text = self::latex_to_utf8_outside_math_mode($text);
+            $text = preg_replace('!\s+!', ' ', $text);
+            $text = trim($text, ". \t\n\r\0\x0B\s");
 
-                $text = preg_replace('!\s+!', ' ', $text);
-                $text = trim($text, ". \t\n\r\0\x0B\s");
-
-                $citations[$n]['text'] = $text . '.';
+            $citations[$n]['text'] = $text . '.';
             }
         }
 
@@ -765,7 +774,7 @@ class O3PO_Latex_Dictionary_Provider
          */
     static private function match_single_character_makro_regexp_fragment( $char ) {
 
-        return '\s*(?(?=\{)\{\s*\\\\?'.$char.'\s*\}|[\s\\\\]'.$char.'(?![a-zA-Z]))';
+        return '\s*(?(?=\{)\{\s*\\\\?'.$char.'\s*\}|(?:\s+'.$char.'|\s*\\\\'.$char.'(?![a-zA-Z])))';
     }
 
 
@@ -1526,5 +1535,19 @@ class O3PO_Latex_Dictionary_Provider
         else
             return '';
     }
+
+
+        /**
+         *
+         *
+         */
+    static public function un_escape_url( $latex_url ) {
+        foreach (array('\\%' => '%', '\\#' => '#', '\\_' => '_') as $target => $substitute)
+        {
+            $latex_url = str_replace($target, $substitute, $latex_url);
+        }
+        return $latex_url;
+    }
+
 
 }
