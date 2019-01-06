@@ -2382,7 +2382,7 @@ abstract class O3PO_PublicationType {
         /**
          *
          */
-    public function get_cited_by_data( $post_id ) {
+    public function get_cited_by_data( $post_id, $fetch_if_outdated=true ) {
 
         $post_type = get_post_type($post_id);
         $doi = $this->get_doi($post_id);
@@ -2401,25 +2401,29 @@ abstract class O3PO_PublicationType {
 
         $crossref_bibentries = get_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries', true );
         $crossref_bibentries_timestamp = get_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries_timestamp', true );
-        if(empty($crossref_bibentries_timestamp) or time() - $crossref_bibentries_timestamp > $cited_by_refresh_seconds)
+        $crossref_bibentries_last_fetch_attempt_timestamp = get_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries_last_fetch_attempt_timestamp', true );
+        if(empty($crossref_bibentries_last_fetch_attempt_timestamp) or ($fetch_if_outdated and time() - $crossref_bibentries_last_fetch_attempt_timestamp > $cited_by_refresh_seconds))
         {
-            $crossref_bibentries_timestamp = time();
-            update_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries_timestamp', $crossref_bibentries_timestamp);
+            $crossref_bibentries_last_fetch_attempt_timestamp = time();
+            update_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries_last_fetch_attempt_timestamp', $crossref_bibentries_last_fetch_attempt_timestamp);
 
             $new_crossref_bibentries = O3PO_Crossref::get_cited_by_bibentries($crossref_url, $login_id, $login_passwd, $doi);
             if(!empty($new_crossref_bibentries) or !is_wp_error($new_crossref_bibentries) or empty($crossref_bibentries) or is_wp_error($crossref_bibentries))
             {
                 $crossref_bibentries = $new_crossref_bibentries;
                 update_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries', $crossref_bibentries );
+                $crossref_bibentries_timestamp = time();
+                update_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries_timestamp', $crossref_bibentries_timestamp);
             }
         }
 
         $ads_bibentries = get_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries', true );
         $ads_bibentries_timestamp = get_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries_timestamp', true );
-        if(empty($ads_bibentries_timestamp) or time() - $ads_bibentries_timestamp > $cited_by_refresh_seconds)
+        $ads_bibentries_last_fetch_attempt_timestamp = get_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries_last_fetch_attempt_timestamp', true );
+        if(empty($ads_bibentries_last_fetch_attempt_timestamp) or ($fetch_if_outdated and time() - $ads_bibentries_last_fetch_attempt_timestamp > $cited_by_refresh_seconds))
         {
-            $ads_bibentries_timestamp = time();
-            update_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries_timestamp', $ads_bibentries_timestamp);
+            $ads_bibentries_last_fetch_attempt_timestamp = time();
+            update_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries_last_fetch_attempt_timestamp', $ads_bibentries_last_fetch_attempt_timestamp);
 
             $new_ads_bibentries = O3PO_Ads::get_cited_by_bibentries($ads_api_search_url, $ads_api_token, $eprint);
 
@@ -2427,29 +2431,33 @@ abstract class O3PO_PublicationType {
             {
                 $ads_bibentries = $new_ads_bibentries;
                 update_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries', $ads_bibentries );
+                $ads_bibentries_timestamp = time();
+                update_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries_timestamp', $ads_bibentries_timestamp);
             }
         }
 
         $cited_by_html = '';
 
         $errors = array();
+
         if (is_wp_error($crossref_bibentries))
         {
             $errors[] = $crossref_bibentries;
-            $cited_by_html .= '<p>Error fetching Crossref cited-by data: ' . $crossref_bibentries->get_error_code() . ' ' . $crossref_bibentries->get_error_message() . '</p>';
+            $cited_by_html .= '<p>Error fetching Crossref cited-by data: ' . $crossref_bibentries->get_error_code() . ' ' . $crossref_bibentries->get_error_message() . ' (last attempt ' . date("Y-m-d H:i:s", $crossref_bibentries_last_fetch_attempt_timestamp) . ')</p>';
             $crossref_bibentries = array();
         }
         elseif(empty($crossref_bibentries))
-            $cited_by_html .= '<p>At the moment Crossref\'s <a href="https://www.crossref.org/services/cited-by/">cited-by service</a> has no data on citing works.</p>';
+            $cited_by_html .= '<p>On <a href="https://www.crossref.org/services/cited-by/">Crossref\'s cited-by service</a> no data on citing works was found (last attempt ' . date("Y-m-d H:i:s", $crossref_bibentries_last_fetch_attempt_timestamp) . ').</p>';
+
 
         if (is_wp_error($ads_bibentries))
         {
             $errors[] = $ads_bibentries;
-            $cited_by_html .= '<p>Error fetching ADS cited-by data: ' . $ads_bibentries->get_error_code() . ' ' . $ads_bibentries->get_error_message() . '</p>';
+            $cited_by_html .= '<p>Error fetching ADS cited-by data: ' . $ads_bibentries->get_error_code() . ' ' . $ads_bibentries->get_error_message() . ' (last attempt ' . date("Y-m-d H:i:s", $ads_bibentries_last_fetch_attempt_timestamp) . ')</p>';
             $ads_bibentries = array();
         }
         elseif(empty($ads_bibentries))
-            $cited_by_html .= '<p>At the moment <a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a> has no data on citing works.</p>';
+            $cited_by_html .= '<p>On <a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a> no data on citing works was found (last attempt ' . date("Y-m-d H:i:s", $ads_bibentries_last_fetch_attempt_timestamp) . ').</p>';
 
         if(!empty($crossref_bibentries) and !empty($ads_bibentries))
         {
@@ -2467,10 +2475,17 @@ abstract class O3PO_PublicationType {
             $all_bibentries = array();
 
         $sources = array();
+        $timestamps = array();
         if(!empty($crossref_bibentries))
-            $sources[] = 'Crossref\'s <a href="https://www.crossref.org/services/cited-by/">cited-by service</a> (last updated ' . date("Y-m-d H:i:s", $ads_bibentries_timestamp) . ')';
+        {
+            $sources[] = '<a href="https://www.crossref.org/services/cited-by/">Crossref\'s cited-by service</a> (last updated ' . date("Y-m-d H:i:s", $crossref_bibentries_timestamp) . ')';
+            $timestamps[] = $crossref_bibentries_timestamp;
+        }
         if(!empty($ads_bibentries))
+        {
             $sources[] = '<a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a>  (last updated ' . date("Y-m-d H:i:s", $ads_bibentries_timestamp) . ')';
+            $timestamps[] = $ads_bibentries_timestamp;
+        }
 
         if(!empty($sources))
             $cited_by_html .= '<p>The following citations are from ' . implode($sources, ' and ') . '. The list may be incomplete as not all publishers provide suitable and complete citation data.</p>';
@@ -2491,6 +2506,8 @@ abstract class O3PO_PublicationType {
             'crossref_bibentries' => $crossref_bibentries,
             'ads_bibentries' => $ads_bibentries,
             'errors' => $errors,
+            'sources' => $sources,
+            'timestamps' => $timestamps,
                      );
     }
 
@@ -3118,7 +3135,7 @@ abstract class O3PO_PublicationType {
          *
          * @since 0.3.0
          */
-    public function get_all_citation_counts() {
+    public function get_all_citation_counts($fetch_if_outdated = false) {
 
         $post_type = $this->get_publication_type_name();
 
@@ -3136,6 +3153,7 @@ abstract class O3PO_PublicationType {
                        );
 
         $errors = array();
+        $timestamps = array();
         $citations_this_type = array();
         $my_query = new WP_Query( $query );
 
@@ -3146,19 +3164,30 @@ abstract class O3PO_PublicationType {
                 $my_query->the_post();
 
                 $post_id = get_the_ID();
-                $cited_by_data = $this->get_cited_by_data($post_id);
+                $cited_by_data = $this->get_cited_by_data($post_id, $fetch_if_outdated);
                 if(!empty($cited_by_data['errors']))
                     $errors = array_merge($errors, $cited_by_data['errors']);
+
+                if(!empty($cited_by_data['timestamps']))
+                    foreach($cited_by_data['timestamps'] as $timestamp)
+                        $timestamps[] = $timestamp;
 
                 $doi = $this->get_doi($post_id);
                 $citations_this_type[$doi] = $cited_by_data['citation_count'];
             }
         }
 
-        return array(
+        $out = array(
             'citation_count' => $citations_this_type,
             'errors' => $errors,
                      );
+        if(!empty($timestamps))
+        {
+            $out['min_timestamp'] = min($timestamps);
+            $out['max_timestamp'] = max($timestamps);
+        }
+
+        return $out;
     }
 
 }

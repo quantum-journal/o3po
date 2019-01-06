@@ -286,9 +286,12 @@ class O3PO_Admin {
                 $citations_data = O3PO_PublicationType::get_active_publication_types($post_type)->get_all_citation_counts();
 
                 $html .= '<h4>Publications of type ' . $post_type . '</h4>';
+                if(!empty($citations_data['min_timestamp']) and !empty($citations_data['max_timestamp']))
+                    $html .= '<p>Based on data fetched between ' . date("Y-m-d H:i:s", $citations_data['min_timestamp']) . ' and  ' .  date("Y-m-d H:i:s", $citations_data['max_timestamp']) . '.</p>';
+
                 if(!empty($citations_data['errors']))
                 {
-                    $html .= '<p>The following errors occurred while calculating citation counts for this type: <ul>';
+                    $html .= '<p>The following errors occurred while fetching and calculating citation counts for this type: <ul>';
                     foreach($citations_data['errors'] as $error)
                         $html .= '<li>' . esc_html($error->get_error_code() . ' ' . $error->get_error_message() . " ") . '</li>';
                     $html .= '</ul></p>';
@@ -301,7 +304,7 @@ class O3PO_Admin {
                     $max_citations = max($citations_this_type);
                 if($total_publications == 0 or $max_citations == 0)
                 {
-                    $html .= '<p>No citations have been found for this type.</p>';
+                    $html .= '<p>No citations were found for this type.</p>';
                     continue;
                 }
 
