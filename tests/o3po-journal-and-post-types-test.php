@@ -6,6 +6,8 @@ require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-environment.php
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-journal.php');
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-primary-publication-type.php');
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-secondary-publication-type.php');
+require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-latex.php');
+
 
 class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 {
@@ -407,18 +409,22 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                     "affiliations" => array('#Aix-Marseille Univ, Université de Toulon, CNRS, LIS, Marseille, and IXXI, Lyon, France#', '#Aix-Marseille Univ, Université de Toulon, CNRS, LIS, Marseille, France and Departamento de Física Teórica and IFIC, Universidad de Valencia-CSIC, Dr. Moliner 50, 46100-Burjassot, Spain#', '#Aix-Marseille Univ, Université de Toulon, CNRS, LIS, Marseille, France#'),
                     "validation_result" => array("#REVIEW: Found BibTeX or manually formated bibliographic information#", "#REVIEW: Author homepage data updated from arxiv source#"),
                     "bbl" => array('#\\\\begin{thebibliography}#', '#ahlbrecht2012molecular#', '#venegas2012quantum#'),
-            )],
+                    'num_dois' => 28,
+                                                                                                   )],
             [dirname(__FILE__) . '/resources/arxiv/0809.2542v4.tar.gz', "application/x-tar", array(
                     "validation_result" => "#REVIEW: Found BibTeX or manually formated bibliographic information#",
                     "author_affiliations" => '#1#',
                     "affiliations" => '#Fakultät für Physik und Astronomie, Universität Würzburg, Am Hubland, 97074 Würzburg, Germany#',
                     "bbl" => array('#\\\\begin{thebibliography}#', '#DeGennes#', '#Ising#'),
-            )],
+                    'num_dois' => 0,
+                                                                                                   )],
             [dirname(__FILE__) . '/resources/arxiv/1708.05489v2.tar.gz', "application/gz", array(
                     "validation_result" => array("#REVIEW: Found BibTeX or manually formated bibliographic information#", '#REVIEW: Author and affiliations data updated from arxiv source.#'),
                     "author_affiliations" => array('#1#', '#2#'),
                     "affiliations" => array('#Institute of Theoretical Physics, Faculty of Physics, University of Warsaw, Pasteura 5, 02-093 Warsaw, Poland#', '#Department of Physics, Saint Anselm College, Manchester, NH 03102, USA#'),
-                    "bbl" => array('#\\\\begin{thebibliography}#', '#\\[Abdolrahimi\\(2014\\)\\]{Abdolrahimi:2014aa}#', '#\\\\end{thebibliography}#'),                                                                             )],
+                    "bbl" => array('#\\\\begin{thebibliography}#', '#\\[Abdolrahimi\\(2014\\)\\]{Abdolrahimi:2014aa}#', '#\\\\end{thebibliography}#'),
+                    'num_dois' => 21,
+                                                                                                 )],
             [dirname(__FILE__) . '/resources/arxiv/0908.2921v2.tex', "text/tex", array(
                     "validation_result" => array('#Found BibTeX or manually formated bibliograph#', '#Author and affiliations data updated from arxiv source#'),
                     #"author_latex_macro_definitions" => '#\\\\newcommand{\\\\bra}#',
@@ -426,17 +432,38 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                     "author_affiliations" => '#1#',
                     "affiliations" => '#Fakultät für Physik und Astronomie, Universität Würzburg, Am Hubland, 97074 Würzburg, Germany#',
                     "bbl" => '#\\\\begin{thebibliography}#',
+                    'num_dois' => 0,
                                                                                        )],
 
 
-        [dirname(__FILE__) . '/resources/arxiv/1704.02130v3.tar.gz', "application/x-tar", array(
+            [dirname(__FILE__) . '/resources/arxiv/1704.02130v3.tar.gz', "application/x-tar", array(
                     "validation_result" => array('#REVIEW: Found BibLaTeX formated bibliographic information#', '#Author and affiliations data updated from arxiv source#'),
                     #"author_latex_macro_definitions" => '#\\\\newcommand{\\\\bra}#',
                         /*"author_orcids" => , */
                     "author_affiliations" => '#1#',
                     "affiliations" => '#Laboratoire d\'Information Quantique, CP 224, Université libre de Bruxelles \(ULB\), 1050 Brussels, Belgium#',
                     "bbl" => array( '#biblatex auxiliary file#', '#entry{AM16}{article}{}#', '#verb 10\.1109/ISIT\.2002\.1023345#' ),
-                                                                                       )],
+                    'num_dois' => 17,
+                                                                                                    )],
+
+            [dirname(__FILE__) . '/resources/arxiv/1603.04424v3.tar.gz', "application/x-tar", array(
+                    'num_dois' => 21,
+                                                                                                    )],
+
+            [dirname(__FILE__) . '/resources/arxiv/1610.00336v2.tar.gz', "application/x-tar", array(
+                    'num_dois' => 54,
+                                                                                                    )],
+
+            [dirname(__FILE__) . '/resources/arxiv/1610.06169.tar.gz', "application/x-tar", array(
+                    'num_dois' => 48,
+                                                                                                    )],
+
+            [dirname(__FILE__) . '/resources/arxiv/1801.03508.tar.gz', "application/x-tar", array(
+                    'num_dois' => 26,
+                                                                                                    )],
+
+
+
             ];
 
 
@@ -467,10 +494,36 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                 if(!is_array($expectation[$key]))
                     $expectations = array($expectation[$key]);
                 else
-                    $expectations = $expectation[$key] ;
+                    $expectations = $expectation[$key];
                 foreach($expectations as $expect)
                     $this->assertRegexp($expect, $result);
             }
+        }
+
+        # We do some more in-depth parsing of the extracted bbl:
+        if($parse_publication_source_result['bbl'])
+        {
+            $parsed_bbl = O3PO_Latex::parse_bbl($parse_publication_source_result['bbl']);
+            $num_dois = 0;
+            foreach($parsed_bbl as $n => $entry) {
+
+                $this->assertFalse( O3PO_Latex::strpos_outside_math_mode($entry['text'], '\\'), "The text " . $entry['text'] . " extracted from the bbl in " . $path_source . " still contains one ore more backslashes that were not caught by parse_bbl");
+
+                $dom = new DOMDocument;
+                #print("\n\n" . $primary_publication_type->get_formated_bibliography_entry_html($entry) . "\n\n");
+
+                $result = $dom->loadHTML('<div>' . $primary_publication_type->get_formated_bibliography_entry_html($entry) . '</div>');
+                    // $this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
+                $this->assertNotFalse($result);
+
+
+                if( !empty($entry['doi']) )
+                    $num_dois += 1;
+            }
+            #print("  ".$path_source.":".$num_dois."  ");
+
+            if(!empty($expectation['num_dois']))
+                $this->assertSame($num_dois, $expectation['num_dois']);
         }
     }
 
