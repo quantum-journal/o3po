@@ -46,7 +46,7 @@ class O3PO_Ads {
             {
                 $remaining_queries = $response['headers']['x-ratelimit-remaining'];
                 if($remaining_queries == 0)
-                    return new WP_Error("Cannot retrieve data from ADS due to rate limitations.");
+                    return new WP_Error("rate_limitation", "Cannot retrieve data from ADS due to rate limitations.");
             }
             set_transient('get_ads_cited_by_json_' . $url, $response, $storage_time);
         }
@@ -56,7 +56,7 @@ class O3PO_Ads {
             $json = json_decode($response['body']);
         }
         catch (Exception $e) {
-            return new WP_Error($e->getMessage());
+            return new WP_Error("exception", $e->getMessage());
         }
 
         return $json;
@@ -94,7 +94,7 @@ class O3PO_Ads {
         {
             $remaining_queries = $response['headers']['x-ratelimit-remaining'];
             if($remaining_queries == 0)
-                return new WP_Error("Cannot retrieve fresh data from ADS due to rate limitations.");
+                return new WP_Error("rate_limitation", "Cannot retrieve fresh data from ADS due to rate limitations.");
         }
 
         try
@@ -135,7 +135,7 @@ class O3PO_Ads {
             }
         }
         catch (Exception $e) {
-            return new WP_Error($e->getMessage());
+            return new WP_Error("exception", $e->getMessage());
         }
 
         return $bibentries;

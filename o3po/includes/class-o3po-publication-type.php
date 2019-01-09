@@ -2436,7 +2436,7 @@ abstract class O3PO_PublicationType {
         if (is_wp_error($crossref_bibentries))
         {
             $errors[] = $crossref_bibentries;
-            $cited_by_html .= '<p>Error fetching Crossref cited-by data: ' . $crossref_bibentries->get_error_code() . ' ' . $crossref_bibentries->get_error_message() . '</p>';
+            $cited_by_html .= '<p>Could not fetch Crossref cited-by data: ' . $crossref_bibentries->get_error_message() . '</p>';
             $crossref_bibentries = array();
         }
         elseif(empty($crossref_bibentries))
@@ -2445,7 +2445,7 @@ abstract class O3PO_PublicationType {
         if (is_wp_error($ads_bibentries))
         {
             $errors[] = $ads_bibentries;
-            $cited_by_html .= '<p>Error fetching ADS cited-by data: ' . $ads_bibentries->get_error_code() . ' ' . $ads_bibentries->get_error_message() . '</p>';
+            $cited_by_html .= '<p>Could not fetching ADS cited-by data: ' . $ads_bibentries->get_error_message() . '</p>';
             $ads_bibentries = array();
         }
         elseif(empty($ads_bibentries))

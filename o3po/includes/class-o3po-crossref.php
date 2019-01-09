@@ -177,7 +177,7 @@ class O3PO_Crossref {
                 return $body;
             }
         } catch (Exception $e) {
-            return new WP_Error($e->getMessage());
+            return new WP_Error("exception", $e->getMessage());
         }
     }
 
@@ -239,7 +239,7 @@ class O3PO_Crossref {
             }
         }
         catch (Exception $e) {
-            return new WP_Error($e->getMessage());
+            return new WP_Error("exception", $e->getMessage());
         }
 
         return $bibentries;
@@ -304,7 +304,7 @@ class O3PO_Crossref {
             return $citation_counts;
 
         } catch (Exception $e) {
-            return new WP_Error($e->getMessage());
+            return new WP_Error("exception", $e->getMessage());
         }
     }
 
