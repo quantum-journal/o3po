@@ -91,7 +91,7 @@ class O3PO_Crossref {
          * @param    string   $crossref_pw     The password corresponding to the crossref_id.
          * @param    string   $doi             The doi for which cited-by data is to be retrieved.
          */
-    private static function remote_get_cited_by( $crossref_url, $crossref_id, $crossref_pw, $doi, $storage_time=60*60*12, $timeout=20 ) {
+    private static function remote_get_cited_by( $crossref_url, $crossref_id, $crossref_pw, $doi, $storage_time=60*10, $timeout=6 ) {
 
         $request_url = $crossref_url . '?usr=' . urlencode($crossref_id).  '&pwd=' . urlencode($crossref_pw) . '&doi=' . urlencode($doi) . '&include_postedcontent=true';
         $response = get_transient('get_crossref_cited_by_' . $request_url);
@@ -119,7 +119,7 @@ class O3PO_Crossref {
          * @param    string   $doi_prefix      The doi prefix for which cited-by data is to be retrieved.
          * @param    string   $startDate       The date from which on the cited by data is to be included in the format YYYY-mm-dd
          */
-    private static function remote_get_all_cited_by( $crossref_url, $crossref_id, $crossref_pw, $doi_prefix, $startDate, $storage_time=60*60*12, $timeout=20 ) {
+    private static function remote_get_all_cited_by( $crossref_url, $crossref_id, $crossref_pw, $doi_prefix, $startDate, $storage_time=60*10, $timeout=6 ) {
 
         $request_url = $crossref_url . '?usr=' . urlencode($crossref_id).  '&pwd=' . urlencode($crossref_pw) . '&doi=' . urlencode($doi_prefix) . '&startDate=' . $startDate . '&include_postedcontent=true';
 
@@ -252,10 +252,6 @@ class O3PO_Crossref {
          * Uses Crossref's cited-by service to retrieve information about works
          * citing works with the given DOI prefix in xml format.
          *
-         * The response from crossref is stored in a transient for 12 hours (by default)
-         * so that subsequent calls to this method are fast and do not create
-         * additional traffic.
-         *
          * @since    0.3.0
          * @access   public
          * @param    string   $crossref_url    The url of the crossref server to upload to.
@@ -266,7 +262,7 @@ class O3PO_Crossref {
          * @param    int      $storage_time    The number of seconds to cache the response by Crossref.
          * @retutn array   Array of citation counts by DOI or an empty array in case no citations could be found or an exception occurred.
          */
-    public static function get_all_citation_counts( $crossref_url, $crossref_id, $crossref_pw, $doi_prefix, $start_date, $storage_time=60*60*12) {
+    public static function get_all_citation_counts( $crossref_url, $crossref_id, $crossref_pw, $doi_prefix, $start_date, $storage_time=60*10) {
 
         try
         {

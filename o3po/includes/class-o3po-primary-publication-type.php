@@ -1498,4 +1498,37 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             return $content;
     }
 
+
+
+
+        /**
+         * Get the eprint of the post with id $post_id.
+         *
+         * @since    0.3.0
+         * @access   public
+         * @param    int    $post_id    The id of the post for which to get the eprint.
+         */
+    public static function get_eprint( $post_id ) {
+
+        $post_type = get_post_type($post_id);
+        return get_post_meta( $post_id, $post_type . '_eprint', true );
+    }
+
+
+        /**
+         * Get the arXiv upload date
+         *
+         * @since    0.3.0
+         * @access   public
+         * @param    int    $post_id    The id of the post for which to get the arXiv upload date.
+         */
+    public function get_arxiv_upload_date( $post_id ) {
+
+        $eprint = static::get_eprint($post_id);
+        $arxiv_url_abs_prefix = $this->get_journal_property('arxiv_url_abs_prefix');
+
+        return O3PO_Arxiv::get_arxiv_upload_date($arxiv_url_abs_prefix, $eprint);
+    }
+
+
 }

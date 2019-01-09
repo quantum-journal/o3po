@@ -186,6 +186,8 @@ class O3PO_Admin {
             else
                 $post_type = $post_type_names[0];
 
+            $publication_type_with_eprint = O3PO_PublicationType::get_active_publication_types($post_type_names[0]);
+
             $output_formats = [
                 'python'
             ];
@@ -196,6 +198,8 @@ class O3PO_Admin {
 
             $meta_data_field_map = [
                 'doi' => array('callable' => array('O3PO_PublicationType', 'get_doi'), 'field_type' => 'string'),
+                'eprint' => array('callable' => array($publication_type_with_eprint, 'get_eprint'), 'field_type' => 'string'),
+                'get_arxiv_upload_date' => array('callable' => array($publication_type_with_eprint, 'get_arxiv_upload_date'), 'field_type' => 'string'),
                 'volume' => array('callable' => array('O3PO_PublicationType', 'get_volume'), 'field_type' => 'int'),
                 'page' => array('callable' => array('O3PO_PublicationType', 'get_page'), 'field_type' => 'int'),
                 'date_published' => array('callable' => array('O3PO_PublicationType', 'get_date_published'), 'field_type' => 'string'),
@@ -224,7 +228,7 @@ class O3PO_Admin {
 			$html .= '</select><label for="output_format">Chose the output format</label><br />';
 
             $html .= '<label for="' . 'meta_data_field_list' . '">Comma separated list of meta-data elements to export:</label><br /><input style="width:100%;" type="text" name="' . 'meta_data_field_list" id="' . 'meta_data_field_list" placeholder="' . '' . '" value="' . implode($meta_data_field_list, ', ') . '" />';
-            $html .= '<p>The available elements are:</p>';
+            $html .= '<p>The available elements are (beware that nor all of them will work for all publication types!):</p>';
             $html .= '<ul>';
             foreach(array_keys($meta_data_field_map) as $field)
                 $html .= '<li>' . esc_html($field) . '</li>';
@@ -277,17 +281,22 @@ class O3PO_Admin {
             $settings = O3PO_Settings::instance();
             $doi_prefix = $settings->get_plugin_option('doi_prefix');
             $doi_url_prefix = $settings->get_plugin_option('doi_url_prefix');
+            $cited_by_refresh_seconds = $settings->get_plugin_option('cited_by_refresh_seconds');
             #$first_volume_year = $settings->get_plugin_option('first_volume_year');
             #$start_date = $first_volume_year . '-01-01';
 
-            $html .= '<p>The following analysis is based on cited-by data from Corssref (if a user name and password are configured in the settings and you are participating in Crossref cited-by) and ADS (if an API token was configures in the settings) for publications published through this plugin. Not all publishers provide complete and suitable citation date, so that the data may be incomplete. Best efforts are made to identify and merge duplicates in case more than one data source is configured.</p>';
+            $fetch_if_outdated = false;
+            if(isset($_POST['refresh']) and $_POST['refresh'] === 'checked')
+                $fetch_if_outdated = true;
+
+            $html .= '<p>The following analysis is based on cited-by data from Crossref (if a user name and password are configured in the settings and you are participating in Crossref cited-by) and ADS (if an API token was configures in the settings) for publications published through this plugin. Not all publishers provide complete and suitable citation date, so that the data may be incomplete. Best efforts are made to identify and merge duplicates in case more than one data source is configured.</p>';
             foreach(O3PO_PublicationType::get_active_publication_type_names() as $post_type)
             {
-                $citations_data = O3PO_PublicationType::get_active_publication_types($post_type)->get_all_citation_counts();
+                $citations_data = O3PO_PublicationType::get_active_publication_types($post_type)->get_all_citation_counts($fetch_if_outdated);
 
                 $html .= '<h4>Publications of type ' . $post_type . '</h4>';
                 if(!empty($citations_data['min_timestamp']) and !empty($citations_data['max_timestamp']))
-                    $html .= '<p>Based on data fetched between ' . date("Y-m-d H:i:s", $citations_data['min_timestamp']) . ' and  ' .  date("Y-m-d H:i:s", $citations_data['max_timestamp']) . '.</p>';
+                    $html .= '<p>Based on data fetched between ' . date("Y-m-d H:i:s", $citations_data['min_timestamp']) . ' and  ' .  date("Y-m-d H:i:s", $citations_data['max_timestamp']) . ' (see below for more details).</p>';
 
                 if(!empty($citations_data['errors']))
                 {
@@ -337,6 +346,9 @@ class O3PO_Admin {
             }
             wp_reset_postdata();
 
+            $html .= '<h4>Why is the data not always up to date?</h4>';
+            $html .= '<p>Fetching cited-by data is a time consuming operation for which external services need to be queried. Fresh cited-by data is thus fetched when the page of a publication is visited and the last time cited-by data for that publication was fetched lies more than ' . $cited_by_refresh_seconds . ' seconds in the past. This balances the load and makes sure that cited by data is always reasonably up to date. If, for some reason, you want to fetch fresh cited-by data for all publications with cited-by data older ' . $cited_by_refresh_seconds . ' seconds you can press the fetch fresh data button below. Beware that this might be a very long operation that can easily time out depending on your server setup and the number of publications.</p>';
+            $html .= '<form method="post" action="' . esc_url('?page=' . $this->get_plugin_name() . '-meta-data-explorer' . '&amp;tab=' . $tab_slug) . '"><input type="checkbox" id="refresh" name="refresh" value="checked" /><label for="refresh">I have read the above text on refreshing cited-by data.</label><input id="submit" type="submit" value="Refresh cited-by data"></form>';
         }
 
         echo $html;

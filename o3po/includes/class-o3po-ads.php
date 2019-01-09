@@ -27,7 +27,7 @@ class O3PO_Ads {
          *
          * If running out of queries storage time is automatically increased.
          */
-    public static function get_cited_by_json( $ads_api_search_url, $api_token, $eprint, $storage_time=60*60*12, $timeout=20 ) {
+    public static function get_cited_by_json( $ads_api_search_url, $api_token, $eprint, $storage_time=60*60*12, $timeout=6 ) {
 
         if(empty($eprint))
             return array();
@@ -68,7 +68,7 @@ class O3PO_Ads {
          *
          *
          */
-    public static function get_cited_by_bibentries( $ads_api_search_url, $api_token, $eprint, $storage_time=60*60*12, $max_number_of_citations=1000, $timeout=20 ) {
+    public static function get_cited_by_bibentries( $ads_api_search_url, $api_token, $eprint, $storage_time=60*60*12, $max_number_of_citations=1000, $timeout=6 ) {
 
         $json = static::get_cited_by_json($ads_api_search_url, $api_token, $eprint, $storage_time, $timeout);
 

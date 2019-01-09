@@ -162,4 +162,27 @@ class O3PO_Arxiv {
         return $environment->download_to_media_library($source_download_url, $file_name_without_extension, '', '', $post_id );
     }
 
+
+        /**
+         *
+         * Warning! This function is neither robust nor well tested!
+         *
+         */
+    public static function get_arxiv_upload_date( $arxiv_url_abs_prefix, $eprint, $timeout=10 ) {
+
+        $response = wp_remote_get( $arxiv_url_abs_prefix . $eprint, array('timeout'=> $timeout) );
+        $html = $response['body'];
+        $dom = new DOMDocument;
+        @$dom->loadHTML($html);
+        $x_path = new DOMXPath($dom);
+
+        $arxiv_submission_history = $x_path->query("/html/body//div[@class='submission-history']/b[last()]/following-sibling::text()");
+        foreach($arxiv_submission_history as $entry){
+            $date_info = $entry->nodeValue;
+            preg_match('#[0-9]+ [A-Z][a-z]{2} [0-9]{4} [:0-9]+ [A-Z]+ #', $date_info, $date);
+            $date = strtotime(trim($date[0]));
+        }
+
+        return $date;
+    }
 }
