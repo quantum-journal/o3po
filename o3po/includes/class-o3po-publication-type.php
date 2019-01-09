@@ -2439,25 +2439,25 @@ abstract class O3PO_PublicationType {
         $cited_by_html = '';
 
         $errors = array();
-
+        $error_explanations = array();
         if (is_wp_error($crossref_bibentries))
         {
             $errors[] = $crossref_bibentries;
-            $cited_by_html .= '<p>Could not fetch Crossref cited-by data: ' . $crossref_bibentries->get_error_message() . ' (last attempt ' . date("Y-m-d H:i:s", $crossref_bibentries_last_fetch_attempt_timestamp) . ')</p>';
+            $error_explanations[] = 'Could not fetch Crossref cited-by data (last attempt ' . date("Y-m-d H:i:s", $crossref_bibentries_last_fetch_attempt_timestamp) . '): ' . $crossref_bibentries->get_error_message();
             $crossref_bibentries = array();
         }
         elseif(empty($crossref_bibentries))
-            $cited_by_html .= '<p>On <a href="https://www.crossref.org/services/cited-by/">Crossref\'s cited-by service</a> no data on citing works was found (last attempt ' . date("Y-m-d H:i:s", $crossref_bibentries_last_fetch_attempt_timestamp) . ').</p>';
+            $error_explanations[] = 'On <a href="https://www.crossref.org/services/cited-by/">Crossref\'s cited-by service</a> no data on citing works was found (last attempt ' . date("Y-m-d H:i:s", $crossref_bibentries_last_fetch_attempt_timestamp) . ').';
 
 
         if (is_wp_error($ads_bibentries))
         {
             $errors[] = $ads_bibentries;
-            $cited_by_html .= '<p>Could not fetch ADS cited-by data: ' . $ads_bibentries->get_error_message() . ' (last attempt ' . date("Y-m-d H:i:s", $ads_bibentries_last_fetch_attempt_timestamp) . ')</p>';
+            $error_explanations[] = 'Could not fetch ADS cited-by data (last attempt ' . date("Y-m-d H:i:s", $ads_bibentries_last_fetch_attempt_timestamp) . '): ' . $ads_bibentries->get_error_message();
             $ads_bibentries = array();
         }
         elseif(empty($ads_bibentries))
-            $cited_by_html .= '<p>On <a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a> no data on citing works was found (last attempt ' . date("Y-m-d H:i:s", $ads_bibentries_last_fetch_attempt_timestamp) . ').</p>';
+            $error_explanations[] = 'On <a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a> no data on citing works was found (last attempt ' . date("Y-m-d H:i:s", $ads_bibentries_last_fetch_attempt_timestamp) . ').';
 
         if(!empty($crossref_bibentries) and !empty($ads_bibentries))
         {
@@ -2487,9 +2487,6 @@ abstract class O3PO_PublicationType {
             $timestamps[] = $ads_bibentries_timestamp;
         }
 
-        if(!empty($sources))
-            $cited_by_html .= '<p>The following citations are from ' . implode($sources, ' and ') . '. The list may be incomplete as not all publishers provide suitable and complete citation data.</p>';
-
         $citation_number = 0;
         foreach($all_bibentries as $bibentry)
         {
@@ -2498,6 +2495,12 @@ abstract class O3PO_PublicationType {
             $cited_by_html .= $bibentry->get_formated_html($doi_url_prefix, $arxiv_url_abs_prefix);
             $cited_by_html .= '</p>' . "\n";
         }
+
+        if(!empty($sources))
+            $cited_by_html .= '<p>The above citations are from ' . implode($sources, ' and ') . '. The list may be incomplete as not all publishers provide suitable and complete citation data.</p>';
+
+        if(!empty($error_explanations))
+            $cited_by_html .= '<p>' . implode($error_explanations, ' ') . '</p>';
 
         return array(
             'html' => $cited_by_html,

@@ -159,14 +159,14 @@ class O3PO_Crossref {
             if(is_wp_error($response))
                 return $response;
             else if(empty($response['body']) )
-                throw new Exception("Could not load cited-by data for " . $doi . " from Crossref. No response.");
+                throw new Exception("Could not fetch cited-by data for " . $doi . " from Crossref. No response.");
             else
             {
                 $use_errors=libxml_use_internal_errors(true);
                 $xml = simplexml_load_string($response['body']);
                 libxml_use_internal_errors($use_errors);
                 if ($xml === false) {
-                    $error = "Could not load cited-by data for " . $doi . " from Crossref (this is normal if the DOI was registered only recently)";
+                    $error = "Could not fetch cited-by data for " . $doi . " from Crossref. This is normal if the DOI was registered recently.";
                     foreach(libxml_get_errors() as $e) {
                         $error .= " " . $e->message;
                     }
