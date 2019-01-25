@@ -168,9 +168,8 @@ class O3PO_Crossref {
                 if ($xml === false) {
                     $error = "Could not fetch cited-by data for " . $doi . " from Crossref. This is normal if the DOI was registered recently.";
                     foreach(libxml_get_errors() as $e) {
-                        $error .= " " . $e->message;
+                        $error .= " " . $e->message . ".";
                     }
-                    $error .= '.';
                     throw new Exception($error);
                 }
                 $body = $xml->query_result->body[0];

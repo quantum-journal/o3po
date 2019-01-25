@@ -597,9 +597,7 @@ abstract class O3PO_PublicationType {
             $validation_result .= "WARNING: The journal title (" . $journal . "), doi prefix (" . $doi_prefix . "), or publisher (" . $publisher . ") seem to be empty. Probably some some essential settings were not set. Please go to the settings page and configure them.\n";
 
         if( O3PO_Latex::strpos_outside_math_mode($abstract, '\\') !== false )
-            $validation_result .= "WARNING: The abstract contains one or more backslashes. Please double check.\n" ;
-        if( O3PO_Latex::strpos_outside_math_mode($abstract, '\\') !== false )
-            $validation_result .= "WARNING: The abstract contains one or more curly bracket. Please double check.\n" ;
+            $validation_result .= "WARNING: The abstract contains one or more backslashes. Please double check. If it/they are part of a \\\\cite command, this is fine, but please verify that the citation is displayed correctly on the page of the publication.\n" ;
         if( O3PO_Latex::strpos_outside_math_mode($abstract, '=') !== false )
             $validation_result .= "WARNING: The abstract contains an = sign that should probably be part of a mathematical formulat, please put dollar signs around the formula.\n" ;
         if( O3PO_Latex::strpos_outside_math_mode($abstract, '<') !== false )

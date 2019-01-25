@@ -899,12 +899,14 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         if ( $post_type === $this->get_publication_type_name() ) {
             $old_content = $content;
             $abstract = get_post_meta( $post_id, $post_type . '_abstract', true );
+            $bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
             $doi = static::get_doi( $post_id );
             $content = '';
             $content .= '<p>' . static::get_formated_citation($post_id) . '</p>';
             $content .= '<a href="' . $this->get_journal_property('doi_url_prefix') . $doi . '">' . $this->get_journal_property('doi_url_prefix') . $doi . '</a>';
             $content .= '<p>' . esc_html($abstract) . '</p>';
             $content .= $old_content;
+            $content = O3PO_Latex::expand_cite_to_html($content, $bbl);
             return $content;
         }
         else
@@ -943,6 +945,8 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             }
             $content .= esc_html ( $trimmer_abstract );
             $content .= '</a></p>';
+            $bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
+            $content = O3PO_Latex::expand_cite_to_html($content, $bbl);
         }
 
         return $content;
@@ -1473,6 +1477,8 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             $content .= '<p class="abstract">';
             $content .= nl2br(esc_html( get_post_meta( $post_id, $post_type . '_abstract', true )) );
             $content .= '</p>';
+            $bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
+            $content = O3PO_Latex::expand_cite_to_html($content, $bbl);
             if ( has_post_thumbnail( ) ) {
                 $content .= '<div class="featured-image-box">';
                 $content .= '<div style="float:left; padding-right: 1rem; padding-bottom: 1rem">';
