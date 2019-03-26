@@ -117,14 +117,13 @@ class O3PO_Settings extends O3PO_Singleton {
         'arxiv_url_source_prefix' => 'https://arxiv.org/e-print/',
         'arxiv_url_trackback_prefix' => 'http://arxiv.org/trackback/',
         'doi_url_prefix' => 'https://doi.org/',
-        'scirate_url_abs_prefix' => 'https://scirate.com/arxiv/',
+        'scirate_url_abs_prefix' => '',
         'orcid_url_prefix' => 'https://orcid.org/',
         'fermats_library_url_prefix' => 'https://fermatslibrary.com/s/',
         'doaj_api_url' => "https://doaj.org/api/v1/articles",
         'doaj_language_code' => "EN",
         'custom_search_page' => "checked",
         'page_template_for_publication_posts' => "unchecked",
-        'page_template_include_scirate' => "unchecked",
         'page_template_abstract_header' => '',
         'maintenance_mode' => 'unchecked',
 
@@ -285,7 +284,6 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->add_settings_field('production_site_url', 'Production site url', array( $this, 'render_production_site_url_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
         $this->add_settings_field('custom_search_page', 'Use custom search page', array( $this, 'render_custom_search_page_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
         $this->add_settings_field('page_template_for_publication_posts', 'Force page template', array( $this, 'render_page_template_for_publication_posts_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
-        $this->add_settings_field('page_template_include_scirate', 'Show link to scirate', array( $this, 'render_page_template_include_scirate_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
         $this->add_settings_field('page_template_abstract_heading', 'Show a heading for the abstract', array( $this, 'render_page_template_abstract_header_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
         $this->add_settings_field('maintenance_mode', 'Maintenance mode', array( $this, 'render_maintenance_mode_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
 
@@ -508,17 +506,6 @@ class O3PO_Settings extends O3PO_Singleton {
     public function render_page_template_abstract_header_setting() {
 
         $this->render_setting('page_template_abstract_header', 'An additional header for the abstract.');
-    }
-
-        /**
-         * Render the setting for whether to show the scirate link
-         *
-         * @since    0.3.1
-         * @access   public
-         */
-    public function render_page_template_include_scirate_setting() {
-
-        $this->render_checkbox_setting('page_template_include_scirate', 'If checked publication the scirate link is shown.');
     }
 
         /**
@@ -1310,7 +1297,6 @@ class O3PO_Settings extends O3PO_Singleton {
                 'doaj_language_code' => 'validate_two_letter_country_code',
                 'custom_search_page' => 'checked_or_unchecked',
                 'page_template_for_publication_posts' => 'checked_or_unchecked',
-                'page_template_include_scirate' => 'checked_or_unchecked',
                 'page_template_abstract_header' => 'trim_settings_field',
                 'maintenance_mode' => 'checked_or_unchecked',
                 'volumes_endpoint' => 'trim_settings_field',

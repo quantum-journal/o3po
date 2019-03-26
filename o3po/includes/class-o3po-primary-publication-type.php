@@ -1458,14 +1458,11 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             $content .= '<tr><td>Published:</td><td>' . esc_html($this->get_formated_date_published( $post_id )) .  ', ' . $this->get_formated_volume_html($post_id) . ', page ' . esc_html(get_post_meta( $post_id, $post_type . '_pages', true )) . '</td></tr>';
             $content .= '<tr><td>Eprint:</td><td><a href="' . esc_attr($settings->get_plugin_option('arxiv_url_abs_prefix') . get_post_meta( $post_id, $post_type . '_eprint', true ) ) . '">arXiv:' . esc_html(get_post_meta( $post_id, $post_type . '_eprint', true )) . '</a></td></tr>';
 
-            if($settings->get_plugin_option('page_template_include_scirate')==='checked') {
-                $content .= '<tr><td>Scirate:</td><td><a href="' 
-                         . esc_attr($settings->get_plugin_option('scirate_url_abs_prefix') 
-                         . get_post_meta( $post_id, $post_type . '_eprint', true ) ) . '">' 
-                         . esc_html($settings->get_plugin_option('scirate_url_abs_prefix') 
-                         . get_post_meta( $post_id, $post_type . '_eprint', true )) . '</a></td></tr>';
-            }
- 
+            $content .= $this->scirate_content(
+                           $settings->get_plugin_option('scirate_url_abs_prefix'), 
+                           $post_id,
+                           $post_type);
+
             $doi = get_post_meta( $post_id, $post_type . '_doi_prefix', true ) . '/' .  get_post_meta( $post_id, $post_type . '_doi_suffix', true );
             $content .= '<tr><td>Doi:</td><td><a href="' . esc_attr($settings->get_plugin_option('doi_url_prefix') . $doi) . '">' . esc_html($settings->get_plugin_option('doi_url_prefix') . $doi ) . '</a></td></tr>';
             /* if ( $this->show_fermats_library_permalink($post_id) ) { */
@@ -1516,6 +1513,17 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
     }
 
 
+    public function scirate_content($scirate_url_abs_prefix, $post_id, $post_type) {
+            if(!empty($scirate_url_abs_prefix)) {
+                return '<tr><td>Scirate:</td><td><a href="' 
+                         . esc_attr($scirate_url_abs_prefix
+                         . get_post_meta( $post_id, $post_type . '_eprint', true ) ) . '">' 
+                         . esc_html($scirate_url_abs_prefix
+                         . get_post_meta( $post_id, $post_type . '_eprint', true )) . '</a></td></tr>';
+            }
+            return '';
+    }
+ 
 
 
         /**
