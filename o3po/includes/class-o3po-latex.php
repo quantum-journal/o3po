@@ -25,15 +25,17 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
         /**
          * Convert LaTeX code to utf8, leaving along everything within math mode.
          *
-         * This is the function that actually does all the replacements. It
-         * leaves mathematicla formulas enclosed in $...$ intact so that they can be
+         * Does not attempt to deal with commands that cannot be reasonably represented in utf8, such as \small, \newblock, \emph, ...
+         *
+         * Leaves mathematical formulas enclosed in $...$ intact so that they can be
          * displayed nicely using MathJax. This function turns various math modes
-         * into standard linline mode $a+b$. At the moment this is a feature.
+         * into standard linline mode $a+b$.
          *
          * @since    0.1.0
          * @access   public
          * @param    string     $latex_text    Latex code whose non-math part is to be converted to utf8
          * @param    boolean    $clean         Whether to perform some cleanup at the end.
+         * @return string       A utf8 approximation to $latex_text
          * */
     static public function latex_to_utf8_outside_math_mode( $latex_text, $clean=true  ) {
 
@@ -42,7 +44,6 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
         foreach ($latex_lines as $x => $line) {
             if ($x % 2 === 1) //In math mode
                 $latex_text_converted .= '$' . $line . '$';
-                //$latex_text_converted .= '$'.preg_replace('/([a-zA-Z]{2,})/', '\\\\'."$1", $line).'$';
             else { //Outside math mode
                 foreach (self::get_latex_special_chars_dictionary() as $target => $substitute) {
                     $line = preg_replace('#'.'(?<!\\\\)'.$target.'#', $substitute, $line);
@@ -317,6 +318,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                     $text = preg_replace('#'.$target.'#', $substitute, $text);
                     if( strpos($text, '\\') === false ) break;
                 }
+                $text = self::normalize_whitespace_and_linebreak_characters($text, true, true);
                 $text = self::latex_to_utf8_outside_math_mode($text);
 
                 $text = preg_replace('!\s+!', ' ', $text);
@@ -343,13 +345,6 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
 
             $citations = array();
 
-                /* $str_replacements_key = array( */
-                /* '\\etalchar{+}' => '⁺', */
-                /* '{' => '', */
-                /* '}' => '', */
-                /* '\\citenamefont' => '', */
-                /* '\\natexlab' => '', */
-                /* ); */
             $str_replacements = array(
                 '\\ensuremath' => '',
                 '\\eprintprefix' => '',
@@ -367,7 +362,16 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 '\\protect' => '',
                 '\\path' => '',
                 '\\penalty0' => '',
-                '\\&' => '&',
+                '\\tiny' => '',
+                '\\scriptsize' => '',
+                '\\footnotesize' => '',
+                '\\small' => '',
+                '\\normalsize' => '',
+                '\\large' => '',
+                '\\Large' => '',
+                '\\LARGE' => '',
+                '\\huge' => '',
+                '\\Huge' => '',
                                       );
             $preg_replacements = array(
                 '\\\\\s' => ' ',
@@ -388,10 +392,6 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 '\\\\font' => '',
                 '\\\\hskip[^\\\\]*\\\\relax' => '',
                 '\\\\relax' => '',
-                '\\\\textendash' => '–',
-                '\\\\textemdash' => '—',
-                '\\\\textquoteright' => '’',
-                '\\\\textquoteleft' => '‘',
                                        );
 
             foreach($entries as $n => $entry) {
@@ -402,8 +402,6 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 preg_match('/^\s*(|\[[^\]]*\]){([^}]*)}/' , $entry, $args);
                 if( $style !== 'numeric' && !empty($args[1]) && strlen($args[1]) >= 3) {
                     $key = substr($args[1], 1, -1);
-                        /* foreach ($str_replacements_key as $target => $substitute) */
-                        /* 	$key = str_replace($target, $substitute, $key); */
                     $key = trim(self::latex_to_utf8_outside_math_mode($key));
                     $citations[$n]['ref'] = $key;
                 }
@@ -448,7 +446,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 unset($citations[$n]['url']);
 
             $text = $entry;
-
+            $text = self::normalize_whitespace_and_linebreak_characters($text, true, true);
             foreach ($str_replacements as $target => $substitute)
                 $text = str_replace($target, $substitute, $text);
 
@@ -1001,6 +999,8 @@ class O3PO_Latex_Dictionary_Provider
                 '\\\\v'.self::match_single_character_makro_regexp_fragment('t') => 'ť',
                 '\\\\v'.self::match_single_character_makro_regexp_fragment('z') => 'ž',
                 '\\\\etalchar{?\+}?' => '⁺',
+                '\\\\textquoteright' => '’',
+                '\\\\textquoteleft' => '‘',
                                                     );
         return self::$latex_special_chars_dictionary;
     }
