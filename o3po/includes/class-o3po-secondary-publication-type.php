@@ -277,7 +277,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                         $validation_result .= "WARNING: Affiliations of reviewer " . ($x+1) . " are empty.\n" ;
                     else {
                         $last_affiliation_num = 0;
-                        foreach(preg_split('/,/', $reviewer_affiliations[$x]) as $affiliation_num) {
+                        foreach(preg_split('/\s*,\s*/', $reviewer_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY) as $affiliation_num) {
                             if ($affiliation_num < 1 or $affiliation_num > $number_reviewer_institutions )
                                 $validation_result .= "ERROR: At least one affiliation number of reviewer " . ($x+1) . " does not correspond to an actual affiliation.\n" ;
                             if( $last_affiliation_num >= $number_reviewer_institutions )
@@ -859,7 +859,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                 if( !$all_authors_have_same_affiliation && !empty($author_affiliations) && !empty($author_affiliations[$x]) )
                 {
                     $content .= ' (';
-                    $this_authors_affiliations = preg_split('/,/', $author_affiliations[$x]);
+                    $this_authors_affiliations = preg_split('/\s*,\s*/', $author_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY);
                     $this_authors_affiliations_count = count($this_authors_affiliations);
                     foreach($this_authors_affiliations as $y => $affiliation_num)
                     {
@@ -875,7 +875,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                 if( $x === $number_authors-2 ) $content .= "and ";
             }
             if(!empty($affiliations) && !empty(end($affiliations)) && $all_authors_have_same_affiliation && !empty($author_affiliations) ) {
-                $this_authors_affiliations = preg_split('/,/', $author_affiliations[0], 0, PREG_SPLIT_NO_EMPTY);
+                $this_authors_affiliations = preg_split('/\s*,\s*/', $author_affiliations[0], -1, PREG_SPLIT_NO_EMPTY);
                 $this_authors_affiliations_count = count($this_authors_affiliations);
                 if($this_authors_affiliations_count > 0)
                 {

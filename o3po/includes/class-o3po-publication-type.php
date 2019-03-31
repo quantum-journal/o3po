@@ -650,7 +650,7 @@ abstract class O3PO_PublicationType {
                 $validation_result .= "WARNING: Affiliations of author " . ($x+1) . " are empty.\n" ;
             else {
                 $last_affiliation_num = 0;
-                foreach(preg_split('/,/', $author_affiliations[$x]) as $affiliation_num) {
+                foreach(preg_split('/\s*,\s*/', $author_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY) as $affiliation_num) {
                     if ($affiliation_num < 1 or $affiliation_num > $number_affiliations )
                         $validation_result .= "ERROR: At least one affiliation number of author " . ($x+1) . " does not correspond to an actual affiliation.\n" ;
                     if( $last_affiliation_num >= $affiliation_num )
@@ -1027,7 +1027,7 @@ abstract class O3PO_PublicationType {
             for ($x = 0; $x < $number_authors; $x++) {
                 if(!empty($author_surnames[$x])) echo '<meta name="citation_author" content="' . esc_attr($author_given_names[$x] . " " . $author_surnames[$x]) . '">'."\n";
                 if ( !empty($author_affiliations) && !empty($author_affiliations[$x]) ) {
-                    foreach(preg_split('/,/', $author_affiliations[$x]) as $affiliation_num) {
+                    foreach(preg_split('/\s*,\s*/', $author_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY) as $affiliation_num) {
                         if ( !empty($affiliations[$affiliation_num-1]) )
                             echo '<meta name="citation_author_institution" content="' . esc_attr($affiliations[$affiliation_num-1]) . '">' . "\n";
                     }
@@ -1240,7 +1240,7 @@ abstract class O3PO_PublicationType {
         if(!empty($this->get_journal_property('crossref_archive_locations')) && $journal === $this->get_journal_property('journal_title'))
         {
             $xml .= '	<archive_locations>' . "\n";
-            foreach(preg_split('#,#', $this->get_journal_property('crossref_archive_locations'))  as $archive_name)
+            foreach(preg_split('/\s*,\s*/', $this->get_journal_property('crossref_archive_locations'))  as $archive_name)
                 $xml .= '	  <archive name="' . esc_attr(trim($archive_name)) . '"></archive>' . "\n";
             $xml .= '	</archive_locations>' . "\n";
         }
@@ -1288,7 +1288,7 @@ abstract class O3PO_PublicationType {
             $xml .= '	    <surname>' . esc_html($author_surnames[$x]) . '</surname>' . "\n";
                 // $xml .= '	    <suffix>{0,1}</suffix>' . "\n";
             if ( !empty($author_affiliations) && !empty($author_affiliations[$x]) ) {
-                foreach(preg_split('/,/', $author_affiliations[$x]) as $affiliation_num) {
+                foreach(preg_split('/\s*,\s*/', $author_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY) as $affiliation_num) {
                     if ( !empty($affiliations[$affiliation_num-1]) )
 				     	$xml .= '	    <affiliation>' . esc_html($affiliations[$affiliation_num-1]) . '</affiliation>' . "\n";
                 }
@@ -1554,7 +1554,7 @@ abstract class O3PO_PublicationType {
             $xml .= '            <given-names>' . esc_html($author_given_names[$x]) . '</given-names>' . "\n";
             $xml .= '          </name>' . "\n";
             if ( !empty($author_affiliations) && !empty($author_affiliations[$x]) ) {
-                foreach(preg_split('/,/', $author_affiliations[$x]) as $affiliation_num) {
+                foreach(preg_split('/\s*,\s*/', $author_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY) as $affiliation_num) {
                     $xml .= '          <xref ref-type="aff" rid="aff-' . $affiliation_num . '"/>' . "\n";
                 }
             }
@@ -1752,7 +1752,7 @@ abstract class O3PO_PublicationType {
 
             echo '<h4>Validation results</h4>';
             echo '<div style="width:100%; background-color: #fff; border: 1px solid #eee"><div style="margin:6pt 6pt 6pt 6pt">';
-            foreach(preg_split("/\n/", $validation_result) as $line){
+            foreach(preg_split("/\n/", $validation_result, -1, PREG_SPLIT_NO_EMPTY) as $line){
                 $color = "green";
                 if(strpos($line, 'WARNING') !== false)
                     $color = "orange";

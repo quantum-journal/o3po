@@ -55,7 +55,7 @@ class O3PO_Arxiv {
             if(!empty($arxiv_author_links))
             {
                 foreach ($arxiv_author_links as $x => $arxiv_author_link) {
-                    $arxiv_author_names = preg_split('/\s+(?=\S+$)/', $arxiv_author_link->nodeValue);
+                    $arxiv_author_names = preg_split('/\s+(?=\S+$)/', $arxiv_author_link->nodeValue, -1, PREG_SPLIT_NO_EMPTY);
                     if ( !empty($arxiv_author_names[0]) )
                         $author_given_names[$x] = $arxiv_author_names[0];
                     if ( !empty($arxiv_author_names[1]) )

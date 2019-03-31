@@ -107,7 +107,7 @@ class O3PO_Ads {
                 $authors = array();
                 foreach($doc->author as $author)
                 {
-                    $names = preg_split('#\s*,\s*#', $author);
+                    $names = preg_split('#\s*,\s*#', $author, -1, PREG_SPLIT_NO_EMPTY);
                     $authors[] = new O3PO_Author(!empty($names[1]) ? $names[1] : '', !empty($names[0]) ? $names[0] : '');
                 }
 

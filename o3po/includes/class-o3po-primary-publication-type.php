@@ -437,7 +437,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         /*     // Send a trackback to the arXiv */
         /* if(!empty($eprint) && !$this->environment->is_test_environment()) { */
         /*     $eprint_without_version = preg_replace('#v[0-9]+$#', '', $eprint); */
-        /*     $trackback_result = trackback( $this->get_journal_property('arxiv_url_trackback_prefix') . $eprint_without_version , $title, static::get_trackback_excerpt($post_id), $post_id ); */
+        /*     $trackback_result = trackback( $this->get_journal_property('arxiv_url_trackback_prefix') . $eprint_without_version , $title, $this->get_trackback_excerpt($post_id), $post_id ); */
         /*     $validation_result .= "INFO: A trackback was sent to " . $this->get_journal_property('arxiv_url_trackback_prefix') . $eprint_without_version . " and the response was: " . $trackback_result . ".\n" ; */
         /* } */
 
@@ -520,7 +520,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         /**
          * Get an excerpt for trackbaks.
          */
-    /* private static function get_trackback_excerpt($post_id) { */
+    /* private function get_trackback_excerpt($post_id) { */
     /*     $post_type = get_post_type($post_id); */
 
     /*     if ( $post_type === $this->get_publication_type_name() ) { */
