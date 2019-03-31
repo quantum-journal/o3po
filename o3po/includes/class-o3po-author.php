@@ -35,7 +35,7 @@ class O3PO_Author {
         if(is_array($affiliations))
             $this->affiliations = $affiliations;
         else
-            $this->affiliations = preg_split('/\s*,\s*/', (string)$affiliations);
+            $this->affiliations = preg_split('/\s*,\s*/', (string)$affiliations, -1, PREG_SPLIT_NO_EMPTY);
     }
 
     public function get( $field ) {

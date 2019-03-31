@@ -209,7 +209,7 @@ class O3PO_Admin {
                 'corresponding_author_email' => array('callable' => array('O3PO_PublicationType', 'get_corresponding_author_email'), 'field_type' => 'string'),
             ];
             if(isset( $_GET['meta_data_field_list'] ))
-                $meta_data_field_list = preg_split('/\s*,\s*/', $_GET['meta_data_field_list']);
+                $meta_data_field_list = preg_split('/\s*,\s*/', $_GET['meta_data_field_list'], -1, PREG_SPLIT_NO_EMPTY);
             else
                 $meta_data_field_list = ['formated_authors', 'number_authors', 'title', 'corresponding_author_email'];
 

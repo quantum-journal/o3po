@@ -118,7 +118,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
     static public function parse_bbl( $bbl ) {
 
         $citations = array();
-        $bbls = preg_split('/(% \$ biblatex auxiliary file \$|\\\\begin{thebibliography}|\\\\begin{references})/', $bbl, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        $bbls = preg_split('/(% \$ biblatex auxiliary file \$|\\\\begin{thebibliography}|\\\\begin{references})/', $bbl, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
         foreach($bbls as $individual_bbl)
             $citations = array_merge($citations, static::parse_single_bbl($individual_bbl));
 
@@ -155,7 +155,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 '(?<!\\\\)%.*' => '', //remove all comments
                                        );
 
-            $entries = preg_split('/\\\\entry/', $bbl);
+            $entries = preg_split('/\\\\entry/', $bbl, -1, PREG_SPLIT_NO_EMPTY);
             foreach($entries as $n => $entry) {
                 if(strpos($entry, '\\endentry' ) === false ) continue;
 
@@ -167,7 +167,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 $citations[$n]['ref'] = $n;
 
                 preg_match('#\\\\name\{[^}]*\}\{[^}]*\}\{\}(?=\{((?:[^{}]++|\{(?1)\})*)\})#', $entry, $name);//matches balanced parenthesis (Note the use of (?1) here!) to test changes go here https://regex101.com/r/bVHadc/1
-                foreach(preg_split('/{{hash=/', $name[1]) as $i => $author_bbl) {
+                foreach(preg_split('/{{hash=/', $name[1], -1, PREG_SPLIT_NO_EMPTY) as $i => $author_bbl) {
                     if($i === 0) continue;
                     preg_match('#family={(.*?)},#', $author_bbl, $family );
                     preg_match('#familyi={(.*?)},#', $author_bbl, $familyi );
@@ -339,10 +339,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 $style = 'author-year';
 
             $bbl = preg_replace('#\\\\(newcommand|providecommand|def)(?:\{| +|)(\\\\[@a-zA-Z]+)(?:\}| +|)(\[[0-9]\]|)(\[[^]]*\]|)(?=\{((?:[^{}]++|\{(?5)\})*)\})#', '', $bbl); //remove all \newcommand and similar (Note the use of (?5) here!) to test changes go here https://regex101.com/r/g7LCUO/1
-
-//		$entries = preg_split('/\\\\bibitem(?=[^a-zA-Z])/', $bbl);
-            $entries = preg_split('/\\\\bibitem\s*(?=[[{])/', $bbl);
-//      $entries = preg_split('#\\\\bibitem\s*(?:(?=\[((?:[^\[\]]++|\[(?1)\])*)\])\s*\[(?1)\]|)\s*(?=\{((?:[^{}]++|\{(?2)\})*)\})\s*{(?2)}#', $bbl);
+            $entries = preg_split('/\\\\bibitem\s*(?=[[{])/', $bbl, -1, PREG_SPLIT_NO_EMPTY);
 
             $citations = array();
 
@@ -723,7 +720,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
     static public function title_to_key_suffix( $text ) {
 
         $text = trim(O3PO_Utility::remove_stopwords($text));
-        $words = preg_split('/( |-|\\$)/', $text);
+        $words = preg_split('/( |-|\\$)/', $text, -1, PREG_SPLIT_NO_EMPTY);
         $key = '';
         if(!empty($words[0]))
             $key .= $words[0];
@@ -1435,7 +1432,7 @@ class O3PO_Latex_Dictionary_Provider
         foreach($refs[1] as $x => $ref)
         {
             $replacement = '[';
-            foreach(preg_split('#\s*,\s*#', $ref) as $bibtex_key) {
+            foreach(preg_split('#\s*,\s*#', $ref, -1, PREG_SPLIT_NO_EMPTY) as $bibtex_key) {
                 $replacement .= '<a onclick="document.getElementById(\'references\').style.display=\'block\';" href="#' . $bibtex_key . '">' . ( isset($bibtex_key_dict[$bibtex_key]) ? $bibtex_key_dict[$bibtex_key] : '?' )  . '</a>,';
             }
             $replacement = rtrim($replacement,',');
