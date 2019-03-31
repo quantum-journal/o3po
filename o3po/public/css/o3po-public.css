@@ -29,7 +29,6 @@ p.authors, p.authors a {
 }
 p.abstract {
     text-align: justify;
-    padding-top: 1rem;
 }
 h3.additional-info {
     padding-top: 1rem;
@@ -98,4 +97,5 @@ form.search-form input.search-submit {
 div.publication-action-buttons form {
     display: inline-block;
     margin-right: 1em;
+    margin-bottom: 1rem;
 }
