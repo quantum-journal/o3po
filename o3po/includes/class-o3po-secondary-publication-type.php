@@ -865,17 +865,20 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                 if( $x === $number_authors-2 ) $content .= "and ";
             }
             if(!empty($affiliations) && !empty(end($affiliations)) && $all_authors_have_same_affiliation && !empty($author_affiliations) ) {
-                $content .= ' (';
                 $this_authors_affiliations = preg_split('/,/', $author_affiliations[0]);
                 $this_authors_affiliations_count = count($this_authors_affiliations);
-                foreach($this_authors_affiliations as $y => $affiliation_num)
+                if($this_authors_affiliations_count > 0)
                 {
-                    $content .= $affiliations[$affiliation_num-1];
-                    if( $y < $this_authors_affiliations_count-1 and $this_authors_affiliations_count > 2) $content .= ",";
-                    if( $y < $this_authors_affiliations_count-1 ) $content .= " ";
-                    if( $y === $this_authors_affiliations_count-2 ) $content .= "and ";
+                    $content .= ' (';
+                    foreach($this_authors_affiliations as $y => $affiliation_num)
+                    {
+                        $content .= $affiliations[$affiliation_num-1];
+                        if( $y < $this_authors_affiliations_count-1 and $this_authors_affiliations_count > 2) $content .= ",";
+                        if( $y < $this_authors_affiliations_count-1 ) $content .= " ";
+                        if( $y === $this_authors_affiliations_count-2 ) $content .= "and ";
+                    }
+                    $content .= ')';
                 }
-                $content .= ')';
             }
             $content .= ".</strong></p>\n";
 
