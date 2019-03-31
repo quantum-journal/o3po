@@ -865,7 +865,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                 if( $x === $number_authors-2 ) $content .= "and ";
             }
             if(!empty($affiliations) && !empty(end($affiliations)) && $all_authors_have_same_affiliation && !empty($author_affiliations) ) {
-                $this_authors_affiliations = preg_split('/,/', $author_affiliations[0]);
+                $this_authors_affiliations = preg_split('/,/', $author_affiliations[0], 0, PREG_SPLIT_NO_EMPTY);
                 $this_authors_affiliations_count = count($this_authors_affiliations);
                 if($this_authors_affiliations_count > 0)
                 {
