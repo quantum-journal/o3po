@@ -1429,7 +1429,7 @@ class O3PO_Latex_Dictionary_Provider
         $parsed_bbl = static::parse_bbl($bbl);
         $bibtex_key_dict = array();
         foreach($parsed_bbl as $n => $entry) {
-            $bibtex_key_dict[$entry['key']] = $n;
+            $bibtex_key_dict[$entry['key']] = $n+1;
         }
 
         foreach($refs[1] as $x => $ref)
