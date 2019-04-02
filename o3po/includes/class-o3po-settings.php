@@ -284,7 +284,7 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->add_settings_field('production_site_url', 'Production site url', array( $this, 'render_production_site_url_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
         $this->add_settings_field('custom_search_page', 'Use custom search page', array( $this, 'render_custom_search_page_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
         $this->add_settings_field('page_template_for_publication_posts', 'Force page template', array( $this, 'render_page_template_for_publication_posts_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
-        $this->add_settings_field('page_template_abstract_heading', 'Show a heading for the abstract', array( $this, 'render_page_template_abstract_header_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
+        $this->add_settings_field('page_template_abstract_header', 'Show a heading for the abstract', array( $this, 'render_page_template_abstract_header_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
         $this->add_settings_field('maintenance_mode', 'Maintenance mode', array( $this, 'render_maintenance_mode_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
 
         $this->add_settings_section('journal_settings', 'Journal', array( $this, 'render_journal_settings' ), $this->plugin_name . '-settings:journal_settings');
@@ -505,7 +505,8 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_page_template_abstract_header_setting() {
 
-        $this->render_setting('page_template_abstract_header', 'An additional header for the abstract.');
+        $this->render_setting('page_template_abstract_header');
+        echo '<p>An optional header that is displayed before the abstract on the pages of individual publications.</p>';
     }
 
         /**
