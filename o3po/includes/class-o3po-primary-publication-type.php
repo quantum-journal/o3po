@@ -1444,9 +1444,8 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             $content = '';
 
             $content .= '<header class="entry-header">';
-            if($settings->get_plugin_option('page_template_for_publication_posts')==='checked') {
+            if($settings->get_plugin_option('page_template_for_publication_posts')==='checked')
                 $content .= '<h1 class="entry-title title citation_title"><a href="#">' . esc_html ( get_the_title( $post_id ) ) . '</a></h1>'; 
-            }
 
             $content .= '<p class="authors citation_author">';
             $content .= $this->get_formated_authors_html( $post_id );
