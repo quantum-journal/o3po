@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Encapsulates the interface with the external service ads.
+ * Encapsulates the interface with the external service astrophysics data system ads.
  *
  * @link       http://example.com
  * @since      0.3.0
@@ -13,9 +13,9 @@
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-bibentry.php';
 
 /**
- * Encapsulates the interface with the external service ads.
+ * Encapsulates the interface with the external service astrophysics data system ads.
  *
- * Provides methods to interface with ads.
+ * Provides methods to interface with the ads search api.
  *
  * @package    O3PO
  * @subpackage O3PO/includes
@@ -24,6 +24,18 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-biben
 class O3PO_Ads {
 
         /**
+         * Get ads cited-by data as JSON
+         *
+         * Obtains JSON encoded cited-by information from ads by querying the ads api.
+         * The returned data contains the ads bibcodes of the citing works, but no
+         * further bibliographic information.
+         *
+         * @param string $ads_api_search_url Url of the ads api
+         * @param string $api_token          Api toke for authentication
+         * @param string $eprint             Eprint number for which to retrieve cited-by data
+         * @param int    $storage_time       Maximum storage time of the api response in a transient in seconds, defaults to 60*60*12
+         * @param int    $timeout            Timeout when waiting for the ads api response
+         * @return JSON encoded cite-by information or a WP_Error on error
          *
          * If running out of queries storage time is automatically increased.
          */
@@ -65,8 +77,20 @@ class O3PO_Ads {
 
 
         /**
+         * Get ads cited-by data as a O3PO_Bibentry array
          *
+         * Obtains cited-by information from ads and returns it as an O3PO_Bibentry
+         * array. The data is compiled in a two step process, first the bibcodes of
+         * citing works are obtainde via get_cited_by_json(), and then the
+         * bibliographic information of each bibcode is downloaded.
          *
+         * @param string $ads_api_search_url      Url of the ads api
+         * @param string $api_token               Api toke for authentication
+         * @param string $eprint                  Eprint number for which to retrieve cited-by data
+         * @param int    $storage_time            Maximum storage time of the api response in a transient in seconds, defaults to 60*60*12
+         * @param int    $max_number_of_citations Maximum number of bibitems to return, defaults to 1000
+         * @param int    $timeout                 Timeout when waiting for the ads api response
+         * @return JSON encoded cite-by information or a WP_Error on error
          */
     public static function get_cited_by_bibentries( $ads_api_search_url, $api_token, $eprint, $storage_time=60*60*12, $max_number_of_citations=1000, $timeout=6 ) {
 
