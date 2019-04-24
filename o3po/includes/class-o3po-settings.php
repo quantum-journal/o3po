@@ -185,6 +185,7 @@ class O3PO_Settings extends O3PO_Singleton {
         'editor_in_chief' => "",
         'ads_api_search_url' => 'https://api.adsabs.harvard.edu/v1/search/query',
         'ads_api_token' => '',
+        'relevanssi_mime_types_to_exclude' => '#(application/.*(tar|gz|gzip)|text/.*tex)#',
 
             /* The options below are currently not customizable.
              *
@@ -355,11 +356,13 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->add_settings_field('orcid_url_prefix', 'Orcid url prefix', array( $this, 'render_orcid_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('fermats_library_url_prefix', 'Url prefix for Fermats Library', array( $this, 'render_fermats_library_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('fermats_library_email', 'Email for Fermats Library', array( $this, 'render_fermats_library_email_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
-
         $this->add_settings_field('mathjax_url', 'MathJax url', array( $this, 'render_mathjax_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('social_media_thumbnail_url', 'Url of default thumbnail for social media', array( $this, 'render_social_media_thumbnail_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('facebook_app_id', 'Facebook app_id', array( $this, 'render_facebook_app_id_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('buffer_secret_email', 'Secret email for adding posts to buffer.com', array( $this, 'render_buffer_secret_email_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
+
+        $this->add_settings_section('other_plugins_settings', 'Other plugins', array( $this, 'render_other_plugins_settings' ), $this->plugin_name . '-settings:other_plugins_settings');
+        $this->add_settings_field('relevanssi_mime_types_to_exclude', 'Relevanssi mime types to exclude', array( $this, 'render_relevanssi_mime_types_to_exclude_setting' ), $this->plugin_name . '-settings:other_plugins_settings', 'other_plugins_settings');
     }
 
         /**
@@ -467,6 +470,18 @@ class O3PO_Settings extends O3PO_Singleton {
     public function render_other_service_settings() {
 
         echo '<p>Configure how ' . $this->plugin_name . ' interacts with other external services.</p>';
+
+    }
+
+        /**
+         * Render the head of the other plugins settings part.
+         *
+         * @since    0.3.0
+         * @access   public
+         */
+    public function render_other_plugins_settings() {
+
+        echo '<p>Configure how ' . $this->plugin_name . ' interacts with other plugins.</p>';
 
     }
 
@@ -1146,6 +1161,19 @@ class O3PO_Settings extends O3PO_Singleton {
     }
 
         /**
+         * Render the setting for the Relevanssi mime types to exclude.
+         *
+         * @since    0.3.0
+         * @access   public
+         */
+    public function render_relevanssi_mime_types_to_exclude_setting() {
+
+        $this->render_setting('relevanssi_mime_types_to_exclude');
+        echo '<p>(Relevanssi Premium has the ability to index the content of attachments and thereby, e.g., enabled full text search in PDFs attached to publications. It however, by default, will index all attachment types and this is usually not desirable for the arXiv source files in .tex or .tar.gz format. Through this setting, mime types can be excluded from indexing by providing a php regular expression. All attachment posts whose mime type matches that regular expression are excluded from indexing via the <a href="https://www.relevanssi.com/knowledge-base/controlling-attachment-types-index/">relevanssi_do_not_index</a> filter. If left empty all post attachments are indexed if that feature is enable in Relevanssi Premium.)</p>';
+
+    }
+
+        /**
          * Render a standard text box type setting.
          *
          * @since    0.1.0
@@ -1300,6 +1328,7 @@ class O3PO_Settings extends O3PO_Singleton {
                 'author_notification_secondary_body_template' => 'trim_settings_field',
                 'fermats_library_notification_subject_template' => 'trim_settings_field',
                 'fermats_library_notification_body_template' => 'trim_settings_field',
+                'relevanssi_mime_types_to_exclude' => 'trim_settings_field',
                                                    );
 
         return self::$all_settings_fields_map;

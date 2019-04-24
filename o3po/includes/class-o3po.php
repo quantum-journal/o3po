@@ -206,6 +206,11 @@ class O3PO {
              */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-secondary-publication-type.php';
 
+            /**
+             * The class providing the interface to relevanssi.
+             */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-relevanssi.php';
+
         $this->loader = new O3PO_Loader();
 
         $settings = O3PO_Settings::instance();
@@ -267,6 +272,10 @@ class O3PO {
 
         $this->loader->add_action( 'load-post.php', Null, 'O3PO_PublicationType::init_metabox' );
         $this->loader->add_action( 'load-post-new.php', Null, 'O3PO_PublicationType::init_metabox' );
+
+        if(!empty($settings->get_plugin_option('relevanssi_mime_types_to_exclude')))
+            $this->loader->add_filter( 'relevanssi_do_not_index', null, 'O3PO_Relevanssi::exclude_mime_types_by_regexp', 10, 2 );
+
 	}
 
         /**
