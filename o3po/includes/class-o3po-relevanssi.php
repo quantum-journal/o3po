@@ -3,7 +3,7 @@
 /**
  * Encapsulates the interface with the Relevanssi plugin.
  *
- * @link       https://github.com/quantum-journal/o3po/
+ * @link       https://quantum-journal.org/o3po/
  * @since      0.3.0
  *
  * @package    O3PO
