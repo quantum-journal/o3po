@@ -240,6 +240,17 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_settings_page() {
 
+            /*
+             * Flush the rewrite rules here because only during the rendering
+             * of the settings page can we be sure that all post types and
+             * endpoints have been registered.
+             */
+        if(get_transient($this->plugin_name . '-settings-rewrite-rules-affected'))
+        {
+            flush_rewrite_rules(true);
+            delete_transient($this->plugin_name . '-settings-rewrite-rules-affected');
+        }
+
         echo '<div>';
         echo '<h2>' . $this->plugin_pretty_name . ' settings (version ' . $this->version . ')</h2>';
 
@@ -1053,7 +1064,7 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->render_setting('arxiv_paper_doi_feed_endpoint');
         $settings = O3PO_Settings::instance();
         $endpoint_suffix = $settings->get_plugin_option('arxiv_paper_doi_feed_endpoint');
-        $arxiv_paper_doi_feed_endpoint_url = get_site_url() . $endpoint_suffix;
+        $arxiv_paper_doi_feed_endpoint_url = get_site_url() . '/'. $endpoint_suffix;
 
         echo '<p>(With the current setting the feed is available under <a href="' . esc_attr($arxiv_paper_doi_feed_endpoint_url) . '">' . esc_html($arxiv_paper_doi_feed_endpoint_url) . '</a>.)</p>';
     }
@@ -1317,7 +1328,7 @@ class O3PO_Settings extends O3PO_Singleton {
                 'author_notification_secondary_body_template' => 'trim_settings_field',
                 'fermats_library_notification_subject_template' => 'trim_settings_field',
                 'fermats_library_notification_body_template' => 'trim_settings_field',
-                'arxiv_paper_doi_feed_endpoint' => 'trim_settings_field_ensure_not_empty_and_flush_rewrite_rules_if_changed',
+                'arxiv_paper_doi_feed_endpoint' => 'trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed',
                                                    );
 
         return self::$all_settings_fields_map;
@@ -1456,7 +1467,7 @@ class O3PO_Settings extends O3PO_Singleton {
          * @param    string   $field    The field this was input to.
          * @param    string   $input    User input.
          */
-    public function trim_settings_field_ensure_not_empty_and_flush_rewrite_rules_if_changed( $field, $input ) {
+    public function trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed( $field, $input ) {
         $input = trim($input);
         if(empty($input))
         {
@@ -1468,8 +1479,12 @@ class O3PO_Settings extends O3PO_Singleton {
 
         if($input !== $this->get_plugin_option($field))
         {
-            flush_rewrite_rules(true);
-            add_settings_error( $field, 'rewrite-rules-updated', "The rewrite rules have been updated because the field '" . $this->settings_fields[$field]['title'] . "' was changed.", 'updated');
+                /*
+                 * In render_settings_page() we check for transient and
+                 * flush rewrite rules there if it is set and True.
+                 */
+            set_transient($this->plugin_name . '-settings-rewrite-rules-affected', True);
+            add_settings_error( $field, 'rewrite-rules-affected', "The rewrite rules have been updated because the field '" . $this->settings_fields[$field]['title'] . "' was changed.", 'updated');
         }
 
         return $input;
