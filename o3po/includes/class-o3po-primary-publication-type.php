@@ -1138,6 +1138,8 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 
         $settings = O3PO_Settings::instance();
         $endpoint_suffix = $settings->get_plugin_option('arxiv_paper_doi_feed_endpoint');
+        $endpoint_days = $settings->get_plugin_option('arxiv_paper_doi_feed_days');
+
 
         if ( !isset( $wp_query->query_vars[ $endpoint_suffix ] ) )
             return;
@@ -1153,7 +1155,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 
         query_posts(array('post_status' => 'publish', 'post_type' => $this->get_publication_type_name(), 'date_query'    => array(
                               'column'  => 'post_date',
-                              'after'   => '- 365 days'                                                                         ) ));
+                              'after'   => '- ' . $endpoint_days . ' days'                                                                         ) ));
         while(have_posts()) {
             the_post();
             $post_id = get_the_ID();

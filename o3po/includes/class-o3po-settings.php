@@ -112,6 +112,8 @@ class O3PO_Settings extends O3PO_Singleton {
         'crossref_test_deposite_url' => 'https://test.crossref.org/servlet/deposit',
         'clockss_ftp_url' => 'ftp.clockss.org',
         'arxiv_doi_feed_identifier' => '',
+        'arxiv_paper_doi_feed_endpoint' => 'arxiv_paper_doi_feed',
+        'arxiv_paper_doi_feed_days' => 365,
         'arxiv_url_abs_prefix' => 'https://arxiv.org/abs/',
         'arxiv_url_pdf_prefix' => 'https://arxiv.org/pdf/',
         'arxiv_url_source_prefix' => 'https://arxiv.org/e-print/',
@@ -197,7 +199,6 @@ class O3PO_Settings extends O3PO_Singleton {
         'secondary_publication_type_name' => 'view',
         'secondary_publication_type_name_plural' => 'views',
         'volumes_endpoint' => 'volumes',
-        'arxiv_paper_doi_feed_endpoint' => 'arxiv_paper_doi_feed'
                                      );
 
         /**
@@ -359,6 +360,7 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->add_settings_field('arxiv_url_trackback_prefix', 'Url prefix for trackbacks', array( $this, 'render_arxiv_url_trackback_prefix_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings');
         $this->add_settings_field('arxiv_doi_feed_identifier', 'Indentifier for the DOI feed', array( $this, 'render_arxiv_doi_feed_identifier_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings');
         $this->add_settings_field('arxiv_paper_doi_feed_endpoint', 'Endpoint for the arXiv DOI feed', array( $this, 'render_arxiv_paper_doi_feed_endpoint_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings');
+        $this->add_settings_field('arxiv_paper_doi_feed_days', 'Number of days in arXiv DOI feed', array( $this, 'render_arxiv_paper_doi_feed_days_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings');
 
         $this->add_settings_section('other_service_settings', 'Other services', array( $this, 'render_other_service_settings' ), $this->plugin_name . '-settings:other_service_settings');
         $this->add_settings_field('doi_url_prefix', 'Url prefix for DOI resolution', array( $this, 'render_doi_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
@@ -1055,9 +1057,9 @@ class O3PO_Settings extends O3PO_Singleton {
     }
 
         /**
-         * Render the setting for the DOI feed identifier for the arXiv.
+         * Render the setting for the DOI feed endpoint for the arXiv.
          *
-         * @since    0.1.0
+         * @since    0.3.0
          * @access   public
          */
     public function render_arxiv_paper_doi_feed_endpoint_setting() {
@@ -1067,6 +1069,17 @@ class O3PO_Settings extends O3PO_Singleton {
         $arxiv_paper_doi_feed_endpoint_url = get_site_url() . '/'. $endpoint_suffix;
 
         echo '<p>(With the current setting the feed is available under <a href="' . esc_attr($arxiv_paper_doi_feed_endpoint_url) . '">' . esc_html($arxiv_paper_doi_feed_endpoint_url) . '</a>.)</p>';
+    }
+
+        /**
+         * Render the setting for the arXiv DOI feed number of days.
+         *
+         * @since    0.3.0
+         * @access   public
+         */
+    public function render_arxiv_paper_doi_feed_days_setting() {
+        $this->render_setting('arxiv_paper_doi_feed_days');
+        echo '<p>(Show publications up to this many days in the past in the doi feed.)</p>';
     }
 
         /**
@@ -1297,6 +1310,8 @@ class O3PO_Settings extends O3PO_Singleton {
                 'arxiv_url_source_prefix' => 'validate_url',
                 'arxiv_url_trackback_prefix' => 'validate_url',
                 'arxiv_doi_feed_identifier' => 'trim_settings_field',
+                'arxiv_paper_doi_feed_endpoint' => 'trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed',
+                'arxiv_paper_doi_feed_days' => 'validate_positive_integer',
                 'doi_url_prefix' => 'validate_url',
                 'scholastica_manuscripts_url' => 'validate_url',
                 'scirate_url_abs_prefix' => 'validate_url',
@@ -1328,7 +1343,6 @@ class O3PO_Settings extends O3PO_Singleton {
                 'author_notification_secondary_body_template' => 'trim_settings_field',
                 'fermats_library_notification_subject_template' => 'trim_settings_field',
                 'fermats_library_notification_body_template' => 'trim_settings_field',
-                'arxiv_paper_doi_feed_endpoint' => 'trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed',
                                                    );
 
         return self::$all_settings_fields_map;
@@ -1440,6 +1454,24 @@ class O3PO_Settings extends O3PO_Singleton {
 
         add_settings_error( $field, 'url-validated', "The two letter country code in '" . $this->settings_fields[$field]['title'] . "' was malformed. Field cleared.", 'error');
         return "";
+    }
+
+        /**
+         * Validate positive integer
+         *
+         * @since    0.3.0
+         * @access   private
+         * @param    string   $field    The field this was input to.
+         * @param    string   $input    User input.
+         */
+    public function validate_positive_integer( $field, $input ) {
+
+        $input = trim($input);
+        if(preg_match('/^[1-9][0-9]*$/', $input))
+            return $input;
+
+        add_settings_error( $field, 'not-a-positive-integer', "The input to the field '" . $this->settings_fields[$field]['title'] . "' was not a positive integer without leading zeros.", 'error');
+        return "1";
     }
 
         /**
