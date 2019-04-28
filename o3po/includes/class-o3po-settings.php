@@ -117,7 +117,7 @@ class O3PO_Settings extends O3PO_Singleton {
         'arxiv_url_source_prefix' => 'https://arxiv.org/e-print/',
         'arxiv_url_trackback_prefix' => 'http://arxiv.org/trackback/',
         'doi_url_prefix' => 'https://doi.org/',
-        'scirate_url_abs_prefix' => '',
+        'scirate_url_abs_prefix' => 'https://scirate.com/arxiv/',
         'orcid_url_prefix' => 'https://orcid.org/',
         'fermats_library_url_prefix' => 'https://fermatslibrary.com/s/',
         'doaj_api_url' => "https://doaj.org/api/v1/articles",
@@ -507,6 +507,7 @@ class O3PO_Settings extends O3PO_Singleton {
 
         $this->render_setting('page_template_abstract_header');
         echo '<p>An optional header that is displayed before the abstract on the pages of individual publications.</p>';
+
     }
 
         /**
