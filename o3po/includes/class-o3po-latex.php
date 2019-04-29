@@ -106,6 +106,45 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
     }
 
         /**
+         * Preg match in latex code, but only taking into account the part of
+         * code that is not in math mode.
+         *
+         * @since    0.3.0
+         * @access   public
+         * @param    string   $pattern         Reular expression to match against.
+         * @param    string   $subject         Latex text in whose non-math parts the expression is to be found.
+         * @param    array    $matches         If matches is provided, then it is filled with the results of search. $matches[0] will contain an array of texts that matched the full pattern, $matches[1] will have an array of the texts that matched the first captured parenthesized subpattern, and so on.
+         * @param    int      $flags           Flags as in preg_match().
+         * @param    int      $offset          Place from which to start the search (in bytes) within each segment of subjbect that is outisde math mode.
+         * @return   int      False in case an error occurred during any of the matches. Alternatively returns the total number of segments in which a match was found.
+         */
+    static public function preg_match_outside_math_mode( $pattern, $subject, &$matches=array(), $flags=0, $offset=0 ) {
+
+        $latex_lines = self::preg_split_at_latex_math_mode_delimters($subject);
+        $result = 0;
+        $strlen_so_far = 0;
+        foreach ($latex_lines as $x => $line) {
+            if ($x % 2 !== 1) //Outside math mode
+            {
+                $line_matches = array();
+                $line_result = preg_match($pattern, $line, $line_matches, $flags, $offset);
+
+                echo("\nresult=" . $line_result . " while checking: '" . $line . "' against " . $pattern . "'");
+
+                if($line_result === false)
+                    return false;
+                elseif($line_result === 1)
+                    $result += 1;
+                if(!empty($line_matches))
+                    foreach($line_matches as $key => $match)
+                        $matches[$key][] = $match;
+            }
+        }
+
+        return $result;
+    }
+
+        /**
          * Parse bbl code of potentially multiple bibliographies.
          *
          * Parses bbl code produced by either bibtex or biblatex as well as
