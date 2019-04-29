@@ -295,7 +295,11 @@ class O3PO {
 		$this->loader->add_action('wp_head', $plugin_public, 'add_open_graph_meta_tags_for_social_media');
         $this->loader->add_action('wp_head', $plugin_public, 'enable_mathjax');
         $this->loader->add_action('get_custom_logo', $plugin_public, 'fix_custom_logo_html');
-        $this->loader->add_action('loop_start', $plugin_public, 'extended_search_and_navigation_at_loop_start');
+        if($settings->get_plugin_option('extended_search_and_navigation')==='checked')
+            $this->loader->add_action('loop_start', $plugin_public, 'extended_search_and_navigation_at_loop_start');
+        if($settings->get_plugin_option('search_form_on_search_page')==='checked')
+            $this->loader->add_action('loop_start', $plugin_public, 'search_form_at_loop_start_on_search_page');
+
         $this->loader->add_action('loop_start', $plugin_public, 'secondary_journal_help_text');
 
         $this->loader->add_action('wp_head', $this->environment, 'modify_css_if_in_test_environment');
