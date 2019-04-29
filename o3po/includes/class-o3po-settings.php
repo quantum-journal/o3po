@@ -122,6 +122,8 @@ class O3PO_Settings extends O3PO_Singleton {
         'fermats_library_url_prefix' => 'https://fermatslibrary.com/s/',
         'doaj_api_url' => "https://doaj.org/api/v1/articles",
         'doaj_language_code' => "EN",
+        'extended_search_and_navigation' => "checked",
+        'search_form_on_search_page' => "checked",
         'custom_search_page' => "checked",
         'page_template_for_publication_posts' => "unchecked",
         'maintenance_mode' => 'unchecked',
@@ -281,7 +283,9 @@ class O3PO_Settings extends O3PO_Singleton {
 
         $this->add_settings_section('plugin_settings', 'Plugin', array( $this, 'render_plugin_settings' ), $this->plugin_name . '-settings:plugin_settings');
         $this->add_settings_field('production_site_url', 'Production site url', array( $this, 'render_production_site_url_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
-        $this->add_settings_field('custom_search_page', 'Use custom search page', array( $this, 'render_custom_search_page_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
+        $this->add_settings_field('extended_search_and_navigation', 'Add search and navigation to home page', array( $this, 'render_extended_search_and_navigation_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
+        $this->add_settings_field('search_form_on_search_page', 'Add a search form to the search page', array( $this, 'render_search_form_on_search_page_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
+        $this->add_settings_field('custom_search_page', 'Display search page notice', array( $this, 'render_custom_search_page_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
         $this->add_settings_field('page_template_for_publication_posts', 'Force page template', array( $this, 'render_page_template_for_publication_posts_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
         $this->add_settings_field('maintenance_mode', 'Maintenance mode', array( $this, 'render_maintenance_mode_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
 
@@ -479,7 +483,31 @@ class O3PO_Settings extends O3PO_Singleton {
     public function render_production_site_url_setting() {
 
         $this->render_setting('production_site_url');
-        echo '<p>(Unless this field is filled and matches the string ' . esc_html(get_site_url())  . ' this instance will be considered a test system and the interfaces with various critical services will remain disabled. This ensures that even a full backup of your journal website, when hosted under a different domain and used as, e.g., a staging system, will not accidentally register DOIs or interact with external services in an unintended way.)</p>';
+        echo '<p>(Unless this field is filled and matches the string ' . esc_html(get_site_url())  . ', this instance will be considered a test system and the interfaces with various critical services will remain disabled. This ensures that even a full backup of your journal website, when hosted under a different domain and used as, e.g., a staging system, will not accidentally register DOIs or interact with external services in an unintended way.)</p>';
+
+    }
+
+        /**
+         * Render the setting for whether to show the extended search-based navigation on the home page.
+         *
+         * @since    0.3.0
+         * @access   public
+         */
+    public function render_extended_search_and_navigation_setting() {
+
+        $this->render_checkbox_setting('extended_search_and_navigation', 'Add  a search-base navigation with statistics about the number of publications and volumes above the posts on the home page. Has no effect if the home page is set to a static page without a post list.');
+
+    }
+
+        /**
+         * Render the setting for whether to show a search form above the results on the search page.
+         *
+         * @since    0.3.0
+         * @access   public
+         */
+    public function render_search_form_on_search_page_setting() {
+
+        $this->render_checkbox_setting('search_form_on_search_page', 'Add a search form above the results on the search page.');
 
     }
 
@@ -503,7 +531,7 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_page_template_for_publication_posts_setting() {
 
-        $this->render_checkbox_setting('page_template_for_publication_posts', 'If checked publication posts are shown with the page template instead of the post template of your theme. Some themes include information such as "Posted on ... by ..." on the post template which may be inappropriate for publication posts.');
+        $this->render_checkbox_setting('page_template_for_publication_posts', 'Show publication posts with the page template instead of the default post template of your theme. Some themes include information such as "Posted on ... by ..." on the post template, which may be inappropriate for publication posts.');
 
     }
 
@@ -1283,6 +1311,8 @@ class O3PO_Settings extends O3PO_Singleton {
                 'doaj_api_key' => 'trim_settings_field',
                 'doaj_language_code' => 'validate_two_letter_country_code',
                 'custom_search_page' => 'checked_or_unchecked',
+                'extended_search_and_navigation' => 'checked_or_unchecked',
+                'search_form_on_search_page' => 'checked_or_unchecked',
                 'page_template_for_publication_posts' => 'checked_or_unchecked',
                 'maintenance_mode' => 'checked_or_unchecked',
                 'volumes_endpoint' => 'trim_settings_field',

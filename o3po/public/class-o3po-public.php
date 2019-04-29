@@ -201,7 +201,9 @@ class O3PO_Public {
     }
 
         /**
-         * Add a search interaface to the main page just before the loop starts.
+         * Add search based extended navigation to the main page.
+         *
+         * Add a search interface, some statistics about the number of publications and volumes, and links to the respective volume pand publication type pages to the main page just before the loop starts.
          *
          * To be added to the 'loop_start' action.
          *
@@ -245,6 +247,30 @@ var search_field = document.getElementsByClassName("search-field");
             echo '</div>';
         }
     }
+
+
+        /**
+         * Add a search form above the search results just before the loop starts.
+         *
+         * To be added to the 'loop_start' action.
+         *
+         * @since      0.1.0
+         * @access     public
+         * @param      string    $query      Query that lead to the current loop.
+         */
+    public function search_form_at_loop_start_on_search_page( $query ){
+
+        if(is_search() and !is_admin()) {
+            echo '<div class="search-results">';
+            echo '<div class="hentry">';
+            get_search_form();
+            echo '</div>';
+            echo '</div>';
+        }
+
+    }
+
+
 
         /**
          * Add a help text for listing pages showing posts from the secondary journal just before the loop starts.
