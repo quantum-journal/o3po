@@ -1594,8 +1594,8 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function get_plugin_option( $id ) {
 
-        $options = get_option($this->plugin_name . '-settings');
-        if(!empty($options[$id]))
+        $options = get_option($this->plugin_name . '-settings', array());
+        if(array_key_exists($id, $options))
             return $options[$id];
 
         if(isset($this->option_defaults[$id]))
