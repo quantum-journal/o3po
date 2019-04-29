@@ -118,7 +118,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
          * @param    int      $offset          Place from which to start the search (in bytes) within each segment of subjbect that is outisde math mode.
          * @return   int      False in case an error occurred during any of the matches. Alternatively returns the total number of segments in which a match was found.
          */
-    static public function preg_match_outside_math_mode( string $pattern, string $subject, &$matches=array(), $flags=0, $offset=0 ) {
+    static public function preg_match_outside_math_mode( $pattern, $subject, &$matches=array(), $flags=0, $offset=0 ) {
 
         $latex_lines = self::preg_split_at_latex_math_mode_delimters($subject);
         $result = 0;
