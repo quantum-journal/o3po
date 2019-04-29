@@ -144,11 +144,13 @@ $posts = array(
         'post_type' => 'attachment',
         'attachment_url' => 'fake_attachment_url',
         'attachment_path' => dirname(__FILE__) . '/arxiv/0809.2542v4.pdf',
+        'mime_type' => 'application/pdf',
                ),
     7 => array(
         'post_type' => 'attachment',
         'attachment_url' => 'fake_attachment_url',
         'attachment_path' => dirname(__FILE__) . '/arxiv/0809.2542v4.tar.gz',
+        'mime_type' => 'application/gz',
                ),
     8 => array(
         'post_type' => 'paper',
@@ -330,7 +332,7 @@ $posts = array(
             'view_clockss_response' => '',
                         )
                 ),
-        11 => array(
+    11 => array(
         'post_type' => 'paper',
         'post_content' => 'fake_post_content5',
         'paper_nonce' => 'fake_nonce',
@@ -388,7 +390,7 @@ $posts = array(
                ),
 
 
-        12 => array(
+    12 => array(
         'post_type' => 'paper',
         'post_content' => 'fake_post_content5',
         'paper_nonce' => 'fake_nonce',
@@ -403,5 +405,11 @@ $posts = array(
             'paper_pages' => '5',
                         )
                     ),
+    13 => array(
+        'post_type' => 'attachment',
+        'attachment_url' => 'fake_attachment_url',
+        'attachment_path' => dirname(__FILE__) . '/arxiv/0908.2921v2.tex',
+        'mime_type' => 'text/tex',
+               ),
 
                );

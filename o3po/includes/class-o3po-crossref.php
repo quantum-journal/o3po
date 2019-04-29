@@ -3,7 +3,7 @@
 /**
  * Encapsulates the interface with the external service Crossref.
  *
- * @link       http://example.com
+ * @link       https://quantum-journal.org/o3po/
  * @since      0.3.0
  *
  * @package    O3PO

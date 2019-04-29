@@ -148,7 +148,7 @@ class O3PO_Journal {
         /**
          * Handle the requests to the /volume/ endpoint.
          *
-         * We want to display an overview of the available volumes and then sub-pages
+         * We want to display an overview of the available volumes as well as sub-pages
          * with lists for each volume. Here we set up appropriate queries to do that.
          *
          * We then want that Wordpress and the theme take care of turning these queries
@@ -169,13 +169,13 @@ class O3PO_Journal {
          * the function volume_endpoint_template() below). Without any posts to show,
          * however, even the 'page' template does not execute 'loop_start' and (depending
          * on the theme) can fall back to the 'content-none' template. To prevent this we
-         * have to add a fake "empty" post. We do this in during the 'the_posts' action in
+         * have to add a fake "empty" post. We do this during the 'the_posts' action in
          * add_fake_empty_post_to_volume_overview_page() (see below).
          *
          * - Finally, we want the entries in the list to appear more "compressed" than in
          * other archive pages. This again could be solved with a custom theme or template,
-         * but we want to stay largely theme independent. We this insert some java script
-         * into the page to hide pars of the generated html and reduce the spacing between
+         * but we want to stay largely theme independent. We thus instead insert some java script
+         * into the page to hide parts of the generated html and reduce the spacing between
          * elements. This will not work with every theme, but at least is unlikely to cause
          * serious unintended side-effects.
          *
@@ -206,7 +206,7 @@ class O3PO_Journal {
             $page = 1;
 
         if(isset($vol_num) and $vol_num>=1)
-            query_posts(array('post_status' => 'publish', 'post_type' => $this->get_journal_property('publication_type_name'), 'meta_key' => $this->get_journal_property('publication_type_name') . '_volume', 'meta_value' => $vol_num, 'paged' => $page, 'posts_per_page' => 9999 ));
+            query_posts(array('post_status' => 'publish', 'post_type' => $this->get_journal_property('publication_type_name'), 'meta_key' => $this->get_journal_property('publication_type_name') . '_volume', 'meta_value' => $vol_num, 'paged' => $page, 'posts_per_page' => -1 ));
         else
         {
             query_posts(array('post_type' => 'page', 'post__in' => array(0), $this->get_journal_property('volumes_endpoint') . '_add_fake_post' => true)); //empty query but with $this->get_journal_property('volumes_endpoint') => true so that we know that we should inject a fake post

@@ -449,6 +449,13 @@ function get_post_status( $ID = '' ) {
     return $posts[$post_id]['post_status'];
 }
 
+function get_post_mime_type( $post_id ) {
+    global $posts;
+
+    return $posts[$post_id]['mime_type'];
+}
+
+
 function wp_get_attachment_url($id) {
     global $posts;
 

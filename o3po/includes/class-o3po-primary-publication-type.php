@@ -1117,13 +1117,16 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         */
     public static function add_axiv_paper_doi_feed_endpoint() {
 
-        add_rewrite_endpoint( 'arxiv_paper_doi_feed', EP_ROOT );
+        $settings = O3PO_Settings::instance();
+        $endpoint_suffix = $settings->get_plugin_option('arxiv_paper_doi_feed_endpoint');
+
+        add_rewrite_endpoint( $endpoint_suffix, EP_ROOT );
             // flush_rewrite_rules( true );  //// <---------- ONLY COMMENT IN WHILE TESTING
 
     }
 
         /**
-        * Handle requests to the /arxiv_paper_doi_feed end point for serving a feed of recent papers for the arXiv.
+        * Handle requests to the arxiv_paper_doi_feed endpoint for serving a feed of recent papers for the arXiv.
         *
         * To be added to the 'parse_request' action.
         *
@@ -1133,7 +1136,12 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         */
     public function handle_arxiv_paper_doi_feed_endpoint_request( $wp_query ) {
 
-        if ( !isset( $wp_query->query_vars[ 'arxiv_paper_doi_feed' ] ) )
+        $settings = O3PO_Settings::instance();
+        $endpoint_suffix = $settings->get_plugin_option('arxiv_paper_doi_feed_endpoint');
+        $endpoint_days = $settings->get_plugin_option('arxiv_paper_doi_feed_days');
+
+
+        if ( !isset( $wp_query->query_vars[ $endpoint_suffix ] ) )
             return;
 
         $date=getdate();
@@ -1147,7 +1155,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 
         query_posts(array('post_status' => 'publish', 'post_type' => $this->get_publication_type_name(), 'date_query'    => array(
                               'column'  => 'post_date',
-                              'after'   => '- 90 days'                                                                         ) ));
+                              'after'   => '- ' . $endpoint_days . ' days'                                                                         ) ));
         while(have_posts()) {
             the_post();
             $post_id = get_the_ID();

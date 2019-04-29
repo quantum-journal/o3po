@@ -206,6 +206,11 @@ class O3PO {
              */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-secondary-publication-type.php';
 
+            /**
+             * The class providing the interface to relevanssi.
+             */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-relevanssi.php';
+
         $this->loader = new O3PO_Loader();
 
         $settings = O3PO_Settings::instance();
@@ -267,6 +272,10 @@ class O3PO {
 
         $this->loader->add_action( 'load-post.php', Null, 'O3PO_PublicationType::init_metabox' );
         $this->loader->add_action( 'load-post-new.php', Null, 'O3PO_PublicationType::init_metabox' );
+
+        if(!empty($settings->get_plugin_option('relevanssi_mime_types_to_exclude')))
+            $this->loader->add_filter( 'relevanssi_do_not_index', null, 'O3PO_Relevanssi::exclude_mime_types_by_regexp', 10, 2 );
+
 	}
 
         /**
@@ -286,7 +295,11 @@ class O3PO {
 		$this->loader->add_action('wp_head', $plugin_public, 'add_open_graph_meta_tags_for_social_media');
         $this->loader->add_action('wp_head', $plugin_public, 'enable_mathjax');
         $this->loader->add_action('get_custom_logo', $plugin_public, 'fix_custom_logo_html');
-        $this->loader->add_action('loop_start', $plugin_public, 'extended_search_and_navigation_at_loop_start');
+        if($settings->get_plugin_option('extended_search_and_navigation')==='checked')
+            $this->loader->add_action('loop_start', $plugin_public, 'extended_search_and_navigation_at_loop_start');
+        if($settings->get_plugin_option('search_form_on_search_page')==='checked')
+            $this->loader->add_action('loop_start', $plugin_public, 'search_form_at_loop_start_on_search_page');
+
         $this->loader->add_action('loop_start', $plugin_public, 'secondary_journal_help_text');
 
         $this->loader->add_action('wp_head', $this->environment, 'modify_css_if_in_test_environment');
