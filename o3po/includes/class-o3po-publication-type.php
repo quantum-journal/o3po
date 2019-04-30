@@ -585,11 +585,11 @@ abstract class O3PO_PublicationType {
 
             // Set the permalink
         if( !empty( $doi_suffix ) ) {
-            wp_update_post( array('ID' => $post_id, 'post_name' => $doi_suffix ));
+            wp_update_post( array('ID' => $post_id, 'post_name' => addslashes($doi_suffix) ));
         }
             // Set the post title
         if( !empty( $title ) )
-            wp_update_post( array('ID' => $post_id, 'post_title' => $title ));
+            wp_update_post( array('ID' => $post_id, 'post_title' => addslashes($title) ));
 
         $validation_result = '';
 
