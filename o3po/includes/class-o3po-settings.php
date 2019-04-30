@@ -128,6 +128,7 @@ class O3PO_Settings extends O3PO_Singleton {
         'search_form_on_search_page' => "checked",
         'custom_search_page' => "checked",
         'page_template_for_publication_posts' => "unchecked",
+        'page_template_abstract_header' => '',
         'maintenance_mode' => 'unchecked',
 
         'self_notification_subject_template' =>
@@ -300,6 +301,7 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->add_settings_field('search_form_on_search_page', 'Add a search form to the search page', array( $this, 'render_search_form_on_search_page_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
         $this->add_settings_field('custom_search_page', 'Display search page notice', array( $this, 'render_custom_search_page_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
         $this->add_settings_field('page_template_for_publication_posts', 'Force page template', array( $this, 'render_page_template_for_publication_posts_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
+        $this->add_settings_field('page_template_abstract_header', 'Show a heading for the abstract', array( $this, 'render_page_template_abstract_header_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
         $this->add_settings_field('maintenance_mode', 'Maintenance mode', array( $this, 'render_maintenance_mode_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
 
         $this->add_settings_section('journal_settings', 'Journal', array( $this, 'render_journal_settings' ), $this->plugin_name . '-settings:journal_settings');
@@ -549,6 +551,19 @@ class O3PO_Settings extends O3PO_Singleton {
     public function render_custom_search_page_setting() {
 
         $this->render_checkbox_setting('custom_search_page', 'Uncheck to disable the display of a notice on the search page informing users what it can mean if they are unable to find a paper on this website, but whose version on the arXiv claims that it was published in this journal. You can preview the two versions of this message <a href="/?s=thissearchstringyieldsnoresults">here</a> and <a href="/?s=thissearchstringyieldsnoresults&amp;reason=title-click">here</a>. Notice how a search that includes the reason=title-click query variable can be used to implement a way for readers to check the validity of claims of publication in, e.g., the LaTeX template of your journal.');
+
+    }
+
+        /**
+         * Render the setting for the abstract heading
+         *
+         * @since    0.3.1
+         * @access   public
+         */
+    public function render_page_template_abstract_header_setting() {
+
+        $this->render_setting('page_template_abstract_header');
+        echo '<p>An optional header that is displayed before the abstract on the pages of individual publications.</p>';
 
     }
 
@@ -1533,6 +1548,7 @@ class O3PO_Settings extends O3PO_Singleton {
                 'extended_search_and_navigation' => 'checked_or_unchecked',
                 'search_form_on_search_page' => 'checked_or_unchecked',
                 'page_template_for_publication_posts' => 'checked_or_unchecked',
+                'page_template_abstract_header' => 'trim_settings_field',
                 'maintenance_mode' => 'checked_or_unchecked',
                 'volumes_endpoint' => 'trim_settings_field',
                 'doi_prefix' => 'validate_doi_prefix',
