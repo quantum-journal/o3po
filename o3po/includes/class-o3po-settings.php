@@ -1256,6 +1256,7 @@ class O3PO_Settings extends O3PO_Singleton {
     public function render_doi_url_prefix_setting() {
 
         $this->render_setting('doi_url_prefix');
+        echo '<p>(The url prefix under which publications can be linked via their DOI.)</p>';
 
     }
 
