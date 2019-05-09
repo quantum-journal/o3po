@@ -23,10 +23,17 @@ $(PHPDOCUMENTORPHAR):
 lint:
 	@find . -type f -name '*.php' -exec php -l {} \;
 
-test: run-tests
+run-tests: test
 
-run-tests: $(shell find . -type f -name '*.php') $(PHPUNITPHAR) setsttysizenonzero
-	$(PHPUNITCOMMAND) --verbose --coverage-clover=coverage.xml --coverage-html=coverage-html --whitelist $(SRC) --bootstrap tests/resources/bootstrap.php --test-suffix 'test.php' tests/
+# test: $(shell find . -type f -name '*.php') $(PHPUNITPHAR) setsttysizenonzero
+# 	$(PHPUNITCOMMAND) --verbose --coverage-clover=coverage.xml --coverage-html=coverage-html --whitelist $(SRC) --bootstrap tests/resources/bootstrap.php --test-suffix 'test.php' tests/
+
+test: test-.
+
+test-%: $(shell find . -type f -name '*.php') $(PHPUNITPHAR) setsttysizenonzero
+	$(PHPUNITCOMMAND) --verbose --coverage-clover=coverage.xml --coverage-html=coverage-html --whitelist $(SRC) --bootstrap tests/resources/bootstrap.php --test-suffix 'test.php' tests/$(subst test-,,$@)
+
+
 
 $(PHPUNITPHAR):
 	wget -O $(PHPUNITPHAR) https://phar.phpunit.de/$(PHPUNITPHAR)

@@ -54,6 +54,11 @@ class O3PO_Author {
         return $out;
     }
 
+    public function get_surname() {
+        return $this->surname;
+    }
+
+
     public function get_affiliations_csv() {
         $out = '';
         foreach($this->affiliations as $affiliation)

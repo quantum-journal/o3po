@@ -2459,15 +2459,15 @@ abstract class O3PO_PublicationType {
 
         if(!empty($crossref_bibentries) and !empty($ads_bibentries))
         {
-            $all_bibentries = O3PO_Bibentry::merge_bibitem_arrays($crossref_bibentries, $ads_bibentries);
+            $all_bibentries = O3PO_Bibentry::merge_bibitem_arrays($crossref_bibentries, $ads_bibentries, true);
         }
         elseif(!empty($crossref_bibentries))
         {
-            $all_bibentries = $crossref_bibentries;
+            $all_bibentries = O3PO_Bibentry::remove_duplicates($crossref_bibentries);
         }
         elseif(!empty($ads_bibentries))
         {
-            $all_bibentries = $ads_bibentries;
+            $all_bibentries = O3PO_Bibentry::remove_duplicates($ads_bibentries);
         }
         else
             $all_bibentries = array();
