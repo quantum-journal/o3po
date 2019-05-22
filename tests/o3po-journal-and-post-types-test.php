@@ -254,12 +254,11 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     public function test_secondary_get_the_content( $secondary_publication_type, $settings ) {
         global $posts;
         global $post;
-        global $global_query;
 
         foreach($posts as $post_id => $post_data)
         {
             $post = new WP_Post($post_id);
-            $global_query = new WP_Query(array('ID' => $post_id));
+            set_global_query(new WP_Query(array('ID' => $post_id)));
             the_post();
 
             if(isset($posts[$post_id]['post_content']))
@@ -298,12 +297,11 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     public function test_primary_get_the_content( $primary_publication_type, $settings ) {
         global $posts;
         global $post;
-        global $global_query;
 
         foreach($posts as $post_id => $post_data)
         {
             $post = new WP_Post($post_id);
-            $global_query = new WP_Query(array('ID' => $post_id));
+            set_global_query(new WP_Query(array('ID' => $post_id)));
             the_post();
 
             if(isset($posts[$post_id]['post_content']))
@@ -384,6 +382,32 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $this->assertSame($primary_publication_type->get_active_publication_types(), array($primary_publication_type, $secondary_publication_type));
         $this->assertSame($primary_publication_type->get_active_publication_types($primary_publication_type->get_publication_type_name()), $primary_publication_type);
     }
+
+
+
+    function doi_suffix_still_free_provider() {
+
+        return [
+            ['unused_prefix', true],
+            ['fake_paper_doi_suffix', false],
+            ['fake_journal_level_doi_suffix-' . current_time("Y-m-d") . '-3', false],
+            ['q-2004-04-25-8', true],
+        ];
+    }
+
+        /**
+         * @dataProvider doi_suffix_still_free_provider
+         * @depends test_setup_primary_journal
+         * @depends test_setup_secondary_journal
+         * @depends test_create_primary_publication_type
+         * @depends test_create_secondary_publication_type
+         */
+    function test_doi_suffix_still_free( $prefix, $expected, $primary_journal, $setup_secondary_journal, $primary_publication_type, $secondary_publication_type ) {
+
+        $this->assertSame($expected, $primary_journal->doi_suffix_still_free($prefix, $primary_publication_type->get_active_publication_type_names()));
+
+    }
+
 
     function pages_still_free_info_provider() {
         return [
@@ -854,6 +878,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     }
 
 
+        /**
+         * @runInSeparateProcess
+         * @preserveGlobalState disabled
+         */
     public function save_metabox_provider() {
         #init settings here instead of depending on test_initialize_settings because O3PO_Settings is a singleton
         $this->test_initialize_settings();
@@ -937,7 +965,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
              array(
                  '_eprint' => '0908.2921v2',
                  '_pages' => '3',
-                 '_date_published' => current_time("Y-m-d"),
+                 '_date_published' => get_the_date('Y-m-d', 8),
                  '_volume' => '2',
                  '_corresponding_author_email' => 'baz@bar.com',
                  '_number_authors' => 2,
@@ -1148,8 +1176,11 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         $journal->handle_volumes_endpoint_request($wp_query);
 
+        $journal->add_fake_post_to_volume_overview_page(array());
+        $this->assertSame('page.php', $journal->volume_endpoint_template('original-template.php'));
+
         ob_start();
-        $journal->volume_navigation_at_loop_start( $wp_query );
+        $journal->volume_navigation_at_loop_start(get_global_query());
         $output = ob_get_contents();
         ob_end_clean();
         $output = preg_replace('#(main|header)#', 'div', $output); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
@@ -1159,35 +1190,116 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
         $this->assertNotFalse($result);
 
+    }
+
+    function volumes_endpoint_volume_1_provider() {
+
+        return [
+            ["1/" ],
+            ["1/page/1"],
+            ["1/page/2"],
+        ];
+    }
+
+        /**
+         * @dataProvider volumes_endpoint_volume_1_provider
+         * @depends test_setup_primary_journal
+         * @depends test_setup_environment
+         */
+    public function test_volumes_endpoint_volume_1( $query_var_extra, $journal, $environment )
+    {
+        $wp_query = new WP_Query(null , null);
+        #first check that nothing is output/changed if query doesn't match
+        $this->assertSame('original-template.php', $journal->volume_endpoint_template('original-template.php'));
+        $this->assertSame(array(), $journal->add_fake_post_to_volume_overview_page(array()));
+
+        ob_start();
+        $journal->handle_volumes_endpoint_request($wp_query);
+        $journal->volume_navigation_at_loop_start(get_global_query());
+        $journal->compress_entries_in_volume_view(get_global_query());
+        $output = ob_get_contents();
+        ob_end_clean();
+        $this->assertEmpty($output);
+
+        $query_vars = array($journal->get_journal_property('volumes_endpoint') => $query_var_extra);
+        $wp_query = new WP_Query(null , $query_vars);
+
+        $journal->handle_volumes_endpoint_request($wp_query);
+        ob_start();
+        $journal->volume_navigation_at_loop_start(get_global_query());
+        $journal->compress_entries_in_volume_view(get_global_query());
+        $output = ob_get_contents();
+        ob_end_clean();
+        $output = preg_replace('#(main|header)#', 'div', $output); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
+
+        $dom = new DOMDocument;
+        $result = $dom->loadHTML($output);
+            //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
+        $this->assertNotFalse($result);
     }
 
 
         /**
          * @depends test_setup_primary_journal
-         * @depends test_setup_environment
          */
-    public function test_volumes_endpoint_volume_1( $journal, $environment )
-    {
+    public function test_execution_of_various_journal_functions( $journal ) {
 
-        $query_vars = array($journal->get_journal_property('volumes_endpoint') => "1/");
-        $wp_query = new WP_Query(null , $query_vars);
+        define( 'EP_ROOT', 'EP_ROOT' );
+        $journal->add_volumes_endpoint();
 
-        $journal->handle_volumes_endpoint_request($wp_query);
-
-        ob_start();
-        $journal->volume_navigation_at_loop_start( $wp_query );
-        $journal->compress_enteies_in_volume_view( $wp_query );
-        $output = ob_get_contents();
-        ob_end_clean();
-        $output = preg_replace('#(main|header)#', 'div', $output); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
-
-        $dom = new DOMDocument;
-        $result = $dom->loadHTML($output);
-            //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
-        $this->assertNotFalse($result);
+        $this->expectException(Exception::class);
+        $journal->get_journal_property('non-existing-id');
 
     }
 
+        /**
+         * @depends test_setup_primary_journal
+         */
+    public function test_search_form_additions( $journal ) {
+
+        $neither_main_nor_search_query = new WP_Query('some query');
+        ob_start();
+        $this->assertSame($neither_main_nor_search_query, $journal->add_notice_to_search_results_at_loop_start($neither_main_nor_search_query));
+        $output = ob_get_contents();
+        ob_end_clean();
+        $this->assertEmpty($output);
+
+        $form = '<div>fake search form</div>';
+        $this->assertSame($form, $journal->add_notice_to_search_form($form));
+
+        set_global_query(new WP_Query("ID=1341351341341349889" , array('s' => 'search term'))); #global search query that will not yields results, so we expect the search form to be modified
+        $this->assertNotSame($form, $journal->add_notice_to_search_form($form));
+        $dom = new DOMDocument;
+        $result = $dom->loadHTML('<div>' . $journal->add_notice_to_search_form($form) . '</div>');
+        $this->assertNotFalse($result);
+
+        global $_GET;
+        $_GET["reason"]="title-click";
+
+        #first a query with no posts
+        $main_search_query = new WP_Query(null, array('s' => 'search term', 'is_main' => true));
+        set_global_query($main_search_query);
+        ob_start();
+        $this->assertSame($main_search_query, $journal->add_notice_to_search_results_at_loop_start($main_search_query));
+        $output = ob_get_contents();
+        ob_end_clean();
+
+        $dom = new DOMDocument;
+        $result = $dom->loadHTML('<div>' . $output . '</div>');
+        $this->assertNotFalse($result);
+
+        #and then one that has posts
+        $main_search_query = new WP_Query("post_type=paper", array('s' => 'search term', 'is_main' => true));
+        set_global_query($main_search_query);
+        ob_start();
+        $this->assertSame($main_search_query, $journal->add_notice_to_search_results_at_loop_start($main_search_query));
+        $output = ob_get_contents();
+        ob_end_clean();
+
+        $dom = new DOMDocument;
+        $result = $dom->loadHTML('<div>' . $output . '</div>');
+        $this->assertNotFalse($result);
+    }
 
 
         /**
@@ -1196,7 +1308,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          */
     function test_get_all_citation_counts( $primary_publication_type, $secondary_publication_type ) {
 
-        $this->assertSame($primary_publication_type->get_all_citation_counts()['citation_count']['10.22331/q-2017-04-25-8'], 19);
+        $this->assertSame($primary_publication_type->get_all_citation_counts()['citation_count']['10.22331/q-2017-04-25-8'], 43);
 
         $cited_by_data = $primary_publication_type->get_cited_by_data(12);
         $this->assertSame($cited_by_data['citation_count'], count($cited_by_data['all_bibentries']));
