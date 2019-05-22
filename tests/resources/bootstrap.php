@@ -767,7 +767,6 @@ function wp_remote_get( $url, $args=array() ) {
         get_option('o3po-settings')['crossref_get_forward_links_url'] . '?usr=' . get_option('o3po-settings')['crossref_id'] . '&pwd=' . get_option('o3po-settings')['crossref_pw'] .'&doi=10.22331%2Fq-2018-08-06-79&include_postedcontent=true' => dirname(__FILE__) . '/crossref/q-2018-08-06-79.xml',
         get_option('o3po-settings')['crossref_get_forward_links_url'] . '?usr=' . get_option('o3po-settings')['crossref_id'] . '&pwd=' . get_option('o3po-settings')['crossref_pw'] .'&doi=empty_response&include_postedcontent=true' => dirname(__FILE__) . '/crossref/empty_response.xml',
         get_option('o3po-settings')['crossref_get_forward_links_url'] . '?usr=' . get_option('o3po-settings')['crossref_id'] . '&pwd=' . get_option('o3po-settings')['crossref_pw'] .'&doi=invalid_xml&include_postedcontent=true' => dirname(__FILE__) . '/crossref/invalid_xml.xml',
-
         get_option('o3po-settings')['crossref_get_forward_links_url'] . '?usr=' . get_option('o3po-settings')['crossref_id'] . '&pwd=' . get_option('o3po-settings')['crossref_pw'] .'&doi=varied_cites&include_postedcontent=true' => dirname(__FILE__) . '/crossref/varied_cites.xml',
 
 
@@ -812,13 +811,24 @@ function wp_generate_password( $length ) {
 
 function wp_remote_post( $url, $args = array() ) {
     $local_file_urls = array(
-        'https://fake.api.buffer.com/1/updates/create.json?access_token=fakeaccesstoken&profile_ids[]=4eb854340acb04e870000010&text=my+text&media[link]=https%3A%2F%2Fdomain.org%2Fpaper%2Fq-2017-13-22-2&media[photo]=http%3A%2F%2Fdomain.org%2Fimg%2Ffoo.jpg&attachment=true&shorten=false&now=false&top=false' => 'meaningless response',
+        'https://fake_crossref_test_deposite_url' => null,
+        'https://url.com?api_key=key' => null,
+        'https://api.bufferapp.com/1/updates/create.json?access_token=1/345792aa62c2435f2345ff1845365234&profile_ids[]=573423fb35252a874d311e98&profile_ids[]=57828568375464d044868456&text=test+text&media[link]=https%3A%2F%2Fquantum-journal.org%2Ftwo-years-of-publications%2F&media[photo]=https%3A%2F%2Fquantum-journal.org%2Fwp-content%2Fuploads%2F2019%2F04%2F2years_publications_carnations.jpg&attachment=true&shorten=false&now=false&top=false' => dirname(__FILE__) . '/buffer/successful.json',
+        'https://api.bufferapp.com/1/updates/create.json?access_token=invalid_token&profile_ids[]=573423fb35252a874d311e98&profile_ids[]=57828568375464d044868456&text=test+text&media[link]=https%3A%2F%2Fquantum-journal.org%2Ftwo-years-of-publications%2F&media[photo]=https%3A%2F%2Fquantum-journal.org%2Fwp-content%2Fuploads%2F2019%2F04%2F2years_publications_carnations.jpg&attachment=true&shorten=false&now=false&top=false' => dirname(__FILE__) . '/buffer/token_invalid.json',
+        'https://api.bufferapp.com/1/updates/create.json?access_token=1/345792aa62c2435f2345ff1845365234&text=test+text&media[link]=https%3A%2F%2Fquantum-journal.org%2Ftwo-years-of-publications%2F&media[photo]=https%3A%2F%2Fquantum-journal.org%2Fwp-content%2Fuploads%2F2019%2F04%2F2years_publications_carnations.jpg&attachment=true&shorten=false&now=false&top=false' => dirname(__FILE__) . '/buffer/select_account.json',
+        'https://api.bufferapp.com/1/updates/create.json?access_token=1/345792aa62c2435f2345ff1845365234&profile_ids[]=profile_to_which_we_have_no_permission&text=test+text&media[link]=https%3A%2F%2Fquantum-journal.org%2Ftwo-years-of-publications%2F&media[photo]=https%3A%2F%2Fquantum-journal.org%2Fwp-content%2Fuploads%2F2019%2F04%2F2years_publications_carnations.jpg&attachment=true&shorten=false&now=false&top=false' => dirname(__FILE__) . '/buffer/no_permission.json',
+        'https://invalid.api.bufferapp.com/1/updates/create.json?access_token=1/345792aa62c2435f2345ff1845365234&profile_ids[]=573423fb35252a874d311e98&profile_ids[]=57828568375464d044868456&text=test+text&media[link]=https%3A%2F%2Fquantum-journal.org%2Ftwo-years-of-publications%2F&media[photo]=https%3A%2F%2Fquantum-journal.org%2Fwp-content%2Fuploads%2F2019%2F04%2F2years_publications_carnations.jpg&attachment=true&shorten=false&now=false&top=false' => dirname(__FILE__) . '/buffer/invalid.json',
                              );
 
     if(isset($local_file_urls[$url]))
-        return $local_file_urls[$url];
-    /* else */
-    /*     echo("\nunhandled upload url:" . $url . " with args=" . json_encode($args)); */
+    {
+        if(!empty($local_file_urls[$url]))
+            return array('body' => file_get_contents($local_file_urls[$url]));
+        else
+            return null;
+    }
+
+    echo("\nunhandled url in wp_remote_post():" . $url . "\n");
 }
 
 function register_post_type( $post_type, $args ) {}
