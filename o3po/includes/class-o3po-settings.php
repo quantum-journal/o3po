@@ -124,6 +124,7 @@ class O3PO_Settings extends O3PO_Singleton {
         'fermats_library_url_prefix' => 'https://fermatslibrary.com/s/',
         'doaj_api_url' => "https://doaj.org/api/v1/articles",
         'doaj_language_code' => "EN",
+        'buffer_api_url' => 'https://api.bufferapp.com/1',
         'extended_search_and_navigation' => "checked",
         'search_form_on_search_page' => "checked",
         'custom_search_page' => "checked",
@@ -380,6 +381,9 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->add_settings_field('social_media_thumbnail_url', 'Url of default thumbnail for social media', array( $this, 'render_social_media_thumbnail_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('facebook_app_id', 'Facebook app_id', array( $this, 'render_facebook_app_id_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('buffer_secret_email', 'Secret email for adding posts to buffer.com', array( $this, 'render_buffer_secret_email_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
+        $this->add_settings_field('buffer_api_url', 'Url of the buffer.com api', array( $this, 'render_buffer_api_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
+        $this->add_settings_field('buffer_profile_ids', 'Profile IDs on buffer.com', array( $this, 'render_buffer_profile_ids_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
+        $this->add_settings_field('buffer_access_token', 'Access token from buffer.com', array( $this, 'render_buffer_access_token_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
 
         $this->add_settings_section('other_plugins_settings', 'Other plugins', array( $this, 'render_other_plugins_settings' ), $this->plugin_name . '-settings:other_plugins_settings');
         $this->add_settings_field('relevanssi_mime_types_to_exclude', 'Relevanssi mime types to exclude', array( $this, 'render_relevanssi_mime_types_to_exclude_setting' ), $this->plugin_name . '-settings:other_plugins_settings', 'other_plugins_settings');
@@ -1389,7 +1393,48 @@ class O3PO_Settings extends O3PO_Singleton {
 
         $this->render_password_setting('buffer_secret_email');
         $post_types = O3PO_Utility::oxford_comma_implode(call_user_func($this->active_post_type_names_callback));
-        echo '<p>(If this is set, new ' . $post_types . ' posts are <a target="_blank" href="https://faq.buffer.com/article/272-is-it-possible-to-add-a-post-to-buffer-through-email">automatically submitted</a> to the buffer.com queue associated with the secret email)</p>';
+        echo '<p>(If this is set, new ' . $post_types . ' posts are <a target="_blank" href="https://faq.buffer.com/article/272-is-it-possible-to-add-a-post-to-buffer-through-email">automatically submitted</a> to the buffer.com queue associated with the secret email. WARNING: This way of sharing posts has recently been disabled by buffer.com, use the following settings instead.)</p>';
+
+    }
+
+        /**
+         * Render the setting for the Buffer.com api url.
+         *
+         * @since    0.3.0
+         * @access   public
+         */
+    public function render_buffer_api_url_setting() {
+
+        $this->render_setting('buffer_api_url');
+        echo '<p>(Url of the buffer.com api.)</p>';
+
+    }
+
+        /**
+         * Render the setting for the Buffer.com prfile ids.
+         *
+         * @since    0.3.0
+         * @access   public
+         */
+    public function render_buffer_profile_ids_setting() {
+
+        $this->render_setting('buffer_profile_ids');
+        $post_types = O3PO_Utility::oxford_comma_implode(call_user_func($this->active_post_type_names_callback));
+        echo '<p>(Comma separated list of buffer.com profile IDs under which to share updates of new ' . $post_types . ' posts.)</p>';
+
+    }
+
+        /**
+         * Render the setting for the Buffer.com access token.
+         *
+         * @since    0.3.0
+         * @access   public
+         */
+    public function render_buffer_access_token_setting() {
+
+        $this->render_password_setting('buffer_access_token');
+        $post_types = O3PO_Utility::oxford_comma_implode(call_user_func($this->active_post_type_names_callback));
+        echo '<p>(Create an access token <a href="https://buffer.com/developers/apps/create">here</a>.)</p>';
 
     }
 
@@ -1541,6 +1586,9 @@ class O3PO_Settings extends O3PO_Singleton {
                 'mathjax_url' => 'validate_url',
                 'social_media_thumbnail_url' => 'trim_settings_field',
                 'buffer_secret_email' => 'trim_settings_field',
+                'buffer_api_url' => 'validate_url',
+                'buffer_profile_ids' => 'trim_settings_field',
+                'buffer_access_token' => 'trim_settings_field',
                 'facebook_app_id' => 'trim_settings_field',
                 'doaj_api_url' => 'trim_settings_field',
                 'doaj_api_key' => 'trim_settings_field',
