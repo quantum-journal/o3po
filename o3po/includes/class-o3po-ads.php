@@ -29,7 +29,7 @@ class O3PO_Ads {
          * Retrieves cited-by information in json format from ads.
          *
          * @since 0.3.0
-         * @access public
+         * @access private
          * @param string $ads_api_search_url      Ads api url.
          * @param string $api_token               Ads API token.
          * @param string $eprint                  Eprint for which cited-by information is to be retrieved.
@@ -37,7 +37,7 @@ class O3PO_Ads {
          * @param string (optional) $timeout      Maximal time to wait for a response from ads.
          * @return mixed Json encoded cited-by information or a WP_Error in case of an error.
          */
-    public static function get_cited_by_json( $ads_api_search_url, $api_token, $eprint, $storage_time=60*60*12, $timeout=6 ) {
+    private static function get_cited_by_json( $ads_api_search_url, $api_token, $eprint, $storage_time=60*60*12, $timeout=6 ) {
 
         if(empty($eprint))
             return array();
@@ -62,7 +62,7 @@ class O3PO_Ads {
 
         $json = json_decode($response['body']);
         if($json === Null)
-            return array();
+            return new WP_Error("json_decode_failed", "No response from ADS or unable to decode the received json data.");
 
         return $json;
     }
@@ -80,40 +80,43 @@ class O3PO_Ads {
          * @param string (optional) $storage_time Time for which to store the response from ads in a transient.
          * @param int $max_number_of_citations    Maximal number of citations to return.
          * @param string (optional) $timeout      Maximal time to wait for a response from ads.
-         * @return mixed Cited-by information as an array of O3PO_Bibentries.
+         * @return mixed Cited-by information as an array of O3PO_Bibentries or WP_Error
          */
     public static function get_cited_by_bibentries( $ads_api_search_url, $api_token, $eprint, $storage_time=60*60*12, $max_number_of_citations=1000, $timeout=6 ) {
 
-        $json = static::get_cited_by_json($ads_api_search_url, $api_token, $eprint, $storage_time, $timeout);
-
-        if(is_wp_error($json))
-            return $json;
-
-        if(isset($json->response->docs[0]->citation))
-            $bibcodes = $json->response->docs[0]->citation;
-        else
-            return array();
-        $citing_bibcodes_querey = 'bibcode:' . implode($bibcodes, '+OR+bibcode:');
-
-        $url = $ads_api_search_url . '?q=' . $citing_bibcodes_querey . '&fl=' . 'doi,title,author,page,issue,volume,year,pub,pubdate' . '&rows=' . $max_number_of_citations;
-        $response = get_transient('get_ads_cited_by_json_' . $url);
-        if(empty($response)) {
-            $headers = array( 'Authorization' => 'Bearer:' . $api_token );
-            $response = wp_remote_get($url, array('headers' => $headers, 'timeout' => $timeout));
-            if(is_wp_error($response))
-                return $response;
-            set_transient('get_ads_cited_by_json_' . $url, $response, $storage_time);
-        }
-        if(!empty($response['headers']['x-ratelimit-remaining']) and empty($response['body']))
-        {
-            $remaining_queries = $response['headers']['x-ratelimit-remaining'];
-            if($remaining_queries == 0)
-                return new WP_Error("rate_limitation", "Cannot retrieve fresh data from ADS due to rate limitations.");
-        }
-
         try
         {
+            $json = static::get_cited_by_json($ads_api_search_url, $api_token, $eprint, $storage_time, $timeout);
+
+            if(is_wp_error($json))
+                return $json;
+
+            if(isset($json->response->docs[0]->citation))
+                $bibcodes = $json->response->docs[0]->citation;
+            else
+                return array();
+            $citing_bibcodes_querey = 'bibcode:' . implode($bibcodes, '+OR+bibcode:');
+
+            $url = $ads_api_search_url . '?q=' . $citing_bibcodes_querey . '&fl=' . 'doi,title,author,page,issue,volume,year,pub,pubdate' . '&rows=' . $max_number_of_citations;
+            $response = get_transient('get_ads_cited_by_json_' . $url);
+            if(empty($response)) {
+                $headers = array( 'Authorization' => 'Bearer:' . $api_token );
+                $response = wp_remote_get($url, array('headers' => $headers, 'timeout' => $timeout));
+                if(is_wp_error($response))
+                    return $response;
+                set_transient('get_ads_cited_by_json_' . $url, $response, $storage_time);
+            }
+
+            if(isset($response['headers']['x-ratelimit-remaining']))
+            {
+                $remaining_queries = $response['headers']['x-ratelimit-remaining'];
+                if($remaining_queries == 0)
+                    return new WP_Error("rate_limitation", "Cannot retrieve fresh data from ADS due to rate limitations.");
+            }
+
             $json = json_decode($response['body']);
+            if($json === Null)
+                return new WP_Error("json_decode_failed", "No response from ADS or unable to decode the received json data.");
 
             $bibentries = array();
             foreach($json->response->docs as $doc)
@@ -148,8 +151,8 @@ class O3PO_Ads {
                 $bibentries[] = new O3PO_Bibentry($bibentry_data);
             }
         }
-        catch (Exception $e) {
-            return new WP_Error("exception", $e->getMessage());
+        catch(Exception $e) {
+            return new WP_Error('exception', 'There was an error parsing the data received from ADS: ' . $e->getMessage());
         }
 
         return $bibentries;

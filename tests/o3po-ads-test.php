@@ -79,7 +79,7 @@ class O3PO_AdsTest extends PHPUnit_Framework_TestCase
                 'ads_api_search_url' => 'https://api.adsabs.harvard.edu/v1/search/query',
                 'api_token' => '',
                 'eprint' => '0000.0001',
-                'expected' => new WP_Error("json_decode_failed", "Cannot decode the received json data."),
+                'expected' => new WP_Error("json_decode_failed", "No response from ADS or unable to decode the received json data."),
                   ),
             array(
                 'ads_api_search_url' => 'https://api.adsabs.harvard.edu/v1/search/query',
@@ -97,7 +97,7 @@ class O3PO_AdsTest extends PHPUnit_Framework_TestCase
                 'ads_api_search_url' => 'https://api.adsabs.harvard.edu/v1/search/query',
                 'api_token' => '',
                 'eprint' => '0000.0004',
-                'expected' => new WP_Error("json_decode_failed", "Cannot decode the received json data."),
+                'expected' => new WP_Error("json_decode_failed", "No response from ADS or unable to decode the received json data."),
                   ),
             array(
                 'ads_api_search_url' => 'https://api.adsabs.harvard.edu/v1/search/query',
