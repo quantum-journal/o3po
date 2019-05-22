@@ -214,9 +214,9 @@ class O3PO_Journal {
 
         set_query_var($this->get_journal_property('volumes_endpoint'), true);
         set_query_var('page', $page);
-        if(isset($vol_num)) set_query_var('vol_num', $vol_num);
+        if(isset($vol_num))
+            set_query_var('vol_num', $vol_num);
 
-        return $wp_query;
     }
 
         /**
@@ -429,7 +429,7 @@ class O3PO_Journal {
          * @access public
          * @param  WP_Query  $wp_query   The current Wordpress query.
          */
-    public function compress_enteies_in_volume_view( $wp_query ) {
+    public function compress_entries_in_volume_view( $wp_query ) {
 
         if ( !isset( $wp_query->query_vars[ $this->get_journal_property('volumes_endpoint') ] ) )
             return;
@@ -515,7 +515,7 @@ for (i = 0; i < elemets_to_condense.length; i++) {
          * @access   public
          * @param    int      $post_id_to_exclude    Id of a post to exclude.
          * @param    int      $pages                 Page number to be checked for whether it is still free or not.
-         * @param    array    $post_types            Post types to take into accoun.
+         * @param    array    $post_types            Post types to take into account.
          * */
     public static function pages_still_free_info( $post_id_to_exclude, $pages, $post_types ) {
 
@@ -564,7 +564,7 @@ for (i = 0; i < elemets_to_condense.length; i++) {
          * @param    string   $doi_suffix   Doi suffix to be checked.
          * @param    array    $post_types   Post types to take into accoun.
          * */
-    public static function doi_suffix_stil_free( $doi_suffix, $post_types ) {
+    public static function doi_suffix_still_free( $doi_suffix, $post_types ) {
 
         $still_free = true;
         foreach($post_types as $post_type)
