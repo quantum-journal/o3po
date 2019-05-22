@@ -197,10 +197,11 @@ abstract class O3PO_PublicationType {
          *
          * @since    0.1.0
          * @access   public
+         * @return   array   Array of names of all active publication types.
          */
     public static function get_active_publication_type_names() {
 
-        if(!isset(self::$active_publication_types))
+        if(empty(self::$active_publication_types))
             return array();
 
         $active_publication_type_names = array();
@@ -208,7 +209,6 @@ abstract class O3PO_PublicationType {
             $active_publication_type_names[] = $active_publication_type->get_publication_type_name();
 
         return $active_publication_type_names;
-
     }
 
         /**
@@ -513,7 +513,7 @@ abstract class O3PO_PublicationType {
 		if ($old_doi_suffix === $new_doi_suffix)
 			update_post_meta( $post_id, $post_type . '_doi_suffix_was_changed_on_last_save', "false" );
 		else {
-			if ( !$this->journal->doi_suffix_stil_free($new_doi_suffix, $this->get_active_publication_type_names()) )
+			if ( !$this->journal->doi_suffix_still_free($new_doi_suffix, $this->get_active_publication_type_names()) )
 				$new_doi_suffix = '';
 			update_post_meta( $post_id, $post_type . '_doi_suffix_was_changed_on_last_save', "true" );
 		}
@@ -2489,16 +2489,16 @@ abstract class O3PO_PublicationType {
         foreach($all_bibentries as $bibentry)
         {
             $citation_number += 1;
-            $cited_by_html .= '<p class="break-at-all-cost">' . '[' . $citation_number . '] ';
+            $cited_by_html .= '<p class="break-at-all-cost">' . '[' . esc_html($citation_number) . '] ';
             $cited_by_html .= $bibentry->get_formated_html($doi_url_prefix, $arxiv_url_abs_prefix);
             $cited_by_html .= '</p>' . "\n";
         }
 
         if(!empty($sources))
-            $cited_by_html .= '<p>The above citations are from ' . implode($sources, ' and ') . '. The list may be incomplete as not all publishers provide suitable and complete citation data.</p>';
+            $cited_by_html .= '<p>The above citations are from ' . esc_html(implode($sources, ' and ')) . '. The list may be incomplete as not all publishers provide suitable and complete citation data.</p>';
 
         if(!empty($error_explanations))
-            $cited_by_html .= '<p>' . implode($error_explanations, ' ') . '</p>';
+            $cited_by_html .= '<p>' . esc_html(implode($error_explanations, ' ')) . '</p>';
 
         return array(
             'html' => $cited_by_html,
