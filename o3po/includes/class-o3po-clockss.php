@@ -34,6 +34,7 @@ class O3PO_Clockss {
          * @param    string     $clockss_ftp_url  The url of the CLOCKSS ftp server.
          * @param    string     $clockss_username The CLOCKSS username
          * @param    string     $clockss_password The CLOCKSS password
+         * @return   string     Description of what happened during the upload.
          */
     public static function ftp_upload_meta_data_and_pdf_to_clockss( $clockss_xml, $pdf_path, $remote_filename_without_extension, $clockss_ftp_url, $clockss_username, $clockss_password ) {
 
