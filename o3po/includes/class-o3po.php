@@ -307,7 +307,7 @@ class O3PO {
         $this->loader->add_action('init', $this->journal, 'add_volumes_endpoint');
         $this->loader->add_action('parse_request', $this->journal, 'handle_volumes_endpoint_request');
         $this->loader->add_filter('loop_start', $this->journal, 'volume_navigation_at_loop_start');
-        $this->loader->add_filter('loop_end', $this->journal, 'compress_enteies_in_volume_view');
+        $this->loader->add_filter('loop_end', $this->journal, 'compress_entries_in_volume_view');
         $this->loader->add_action('template_include', $this->journal, 'volume_endpoint_template');
         $this->loader->add_action('the_posts', $this->journal, 'add_fake_post_to_volume_overview_page');
         if($settings->get_plugin_option('custom_search_page')==='checked')
@@ -393,17 +393,6 @@ class O3PO {
 	public function get_plugin_pretty_name() {
 
 		return $this->plugin_pretty_name;
-	}
-
-        /**
-         * The reference to the class that orchestrates the hooks with the plugin.
-         *
-         * @since     0.1.0
-         * @return    O3PO_Loader    Orchestrates the hooks of the plugin.
-         */
-	public function get_loader() {
-
-		return $this->loader;
 	}
 
         /**
