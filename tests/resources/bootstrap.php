@@ -13,7 +13,6 @@ include(dirname( __FILE__ ) . '/kses.php');
 
 require_once dirname( __FILE__ ) . '/../../o3po/includes/class-o3po-settings.php';
 
-
 if(!class_exists('PHPUnit_Framework_TestCase')){
         /**
          * Make sure the class PHPUnit_Framework_TestCase is always defined
@@ -74,6 +73,23 @@ function add_filter( $hook, $callable ) {
     $filters[$hook][] = $callable;
 }
 
+function esc_html_filter( $text ) {
+
+    $replacements = array(
+        '#&(?!amp;)#' => '&amp;',
+        '#"#' => '&quot;',
+        "#'#" => '&#039;',
+        '#<#' => '&lt;',
+        '#>#' => '&gt;',
+    );
+    foreach($replacements as $expression => $replacement)
+        $text = preg_replace($expression, $replacement, $text);
+
+    return $text;
+}
+add_filter( 'esc_html', 'esc_html_filter' );
+
+
 function is_admin() {}
 
 function get_site_url() {
@@ -107,7 +123,7 @@ function get_option( $option, $default = false ) {
             'crossref_pw' => 'fake_crossref_pw',
             'crossref_get_forward_links_url' => 'fake_crossref_get_forward_links_url',
             'crossref_deposite_url' => 'fake_crossref_deposite_url',
-            'crossref_test_deposite_url' => 'fake_crossref_test_deposite_url',
+            'crossref_test_deposite_url' => 'https://fake_crossref_test_deposite_url',
             'crossref_email' => 'fake_crossref_email',
             'crossref_archive_locations' => 'fake_crossref_archive_locations',
             'ads_api_search_url' => 'https://api.adsabs.harvard.edu/v1/search/query',
@@ -136,6 +152,8 @@ function get_option( $option, $default = false ) {
             'eissn' => 'fake_eissn',
             'secondary_journal_eissn' => "fake_secondary_journal_eissn",
             'first_volume_year' => "2009",
+            'custom_search_page' => 'checked',
+            'page_template_for_publication_posts' => 'checked',
                      );
     elseif($option === 'blog_charset')
         return 'UTF-8';
@@ -161,6 +179,8 @@ function get_file_data( $file, $options ) {
 }
 
 function flush_rewrite_rules( $hard=false ) {}
+
+function add_rewrite_endpoint( $a, $b=Null ) {}
 
 $post_data = array();
 
@@ -247,7 +267,7 @@ class WP_Query
     public $post_count;
     public $found_posts;
 
-    function __construct( $input=null, $query_vars=null ) {
+    function __construct( $input=null, $query_vars=array() ) {
         global $posts;
 
         $this->query = $input;
@@ -257,6 +277,19 @@ class WP_Query
             $array = $input;
         else
             $array = array($input);
+
+        # turn 'key=value' type queries into $key => $value type ones
+        foreach($array as $key => $value){
+            if(is_numeric($key) and is_string($value) and strpos($value, '=') !== false)
+            {
+                $split = preg_split('/\s*=\s*/', $value);
+                if(!empty($split[0]) and isset($split[1]))
+                {
+                    $array[$split[0]] = $split[1];
+                    unset($array[$key]);
+                }
+            }
+        }
 
         if(isset($array['posts_per_page']))
         {
@@ -281,7 +314,7 @@ class WP_Query
                         break;
                     }
 
-                    if(!isset($posts[$id][$key]) or !in_array ($posts[$id][$key], $value))
+                    if(!isset($posts[$id][$key]) or !in_array($posts[$id][$key], $value))
                     {
                         $include_post = false;
                         break;
@@ -321,17 +354,38 @@ class WP_Query
 
         $post_data = array('current' => $current, 'ID' => $min_key);
     }
+
+    function is_search() {
+        return isset($this->query_vars['s']) ? true : false;
+    }
+
+    function is_main_query() {
+        return isset($this->query_vars['is_main']) ? $this->query_vars['is_main'] : false;
+    }
 }
 
-$global_query = new WP_Query();
-function set_global_query( $wp_query ) {
-    global $global_query;
+$wp_query = new WP_Query();
+function set_global_query( $query ) {
+    global $wp_query;
 
-    $global_query = $wp_query;
+    $wp_query = $query;
 }
+
+function get_global_query() {
+    global $wp_query;
+
+    return $wp_query;
+}
+
 
 function query_posts( $args ) {
-    set_global_query(new WP_Query($args));
+    set_global_query(new WP_Query($args, $args)); #this is a hack! I don't actually understand how the real query_posts() sets query vars.
+}
+
+function is_search() {
+    global $wp_query;
+
+    return $wp_query->is_search();
 }
 
 
@@ -349,40 +403,40 @@ function get_search_query() {
 }
 
 function have_posts() {
-    global $global_query;
+    global $wp_query;
 
-    if(!($global_query instanceof WP_Query))
-        throw(new Exception('You must first set the $global_query before you can use have_posts()'));
+    if(!($wp_query instanceof WP_Query))
+        throw(new Exception('You must first set the $wp_query before you can use have_posts()'));
 
-    return $global_query->have_posts();
+    return $wp_query->have_posts();
 }
 
 function the_post() {
-    global $global_query;
+    global $wp_query;
 
-    if(!($global_query instanceof WP_Query))
-        throw(new Exception('You must fist set the $global_query before you can use have_posts()'));
+    if(!($wp_query instanceof WP_Query))
+        throw(new Exception('You must fist set the $wp_query before you can use have_posts()'));
 
-    return $global_query->the_post();
+    return $wp_query->the_post();
 }
 
 
 function set_query_var( $var, $val ) {
-    global $global_query;
+    global $wp_query;
 
-    if(!($global_query instanceof WP_Query))
-        throw(new Exception('You must first set the $global_query before you can use get_query_var()'));
+    if(!($wp_query instanceof WP_Query))
+        throw(new Exception('You must first set the $wp_query before you can use get_query_var()'));
 
-    $global_query->query_vars[$var] = $val;
+    $wp_query->query_vars[$var] = $val;
 }
 
 function get_query_var( $var ) {
-    global $global_query;
+    global $wp_query;
 
-    if(!($global_query instanceof WP_Query))
-        throw(new Exception('You must first set the $global_query before you can use get_query_var()'));
+    if(!($wp_query instanceof WP_Query))
+        throw(new Exception('You must first set the $wp_query before you can use get_query_var()'));
 
-    return $global_query->query_vars[$var];
+    return $wp_query->query_vars[$var];
 }
 
 
@@ -481,7 +535,12 @@ function current_time( $format ) {
 }
 
 function get_the_date( $format, $post_id ) {
-    return current_time( $format );
+    global $posts;
+
+    if($format !== 'Y-m-d')
+        throw Exception("Date format not implemented");
+
+    return $posts[$post_id]['date'];
 }
 
 function download_url( $url, $timeout_seconds ) {
@@ -681,10 +740,11 @@ function wp_remote_get( $url, $args=array() ) {
 
     $local_file_urls = array(
         'https://arxiv.org/abs/0809.2542v4' => dirname(__FILE__) . '/arxiv/0809.2542v4.html',
+        'https://arxiv.org/abs/0809.2542v5' => dirname(__FILE__) . '/arxiv/0809.2542v5.html',
         'https://arxiv.org/abs/1609.09584v4' => dirname(__FILE__) . '/arxiv/1609.09584v4.html',
         'https://arxiv.org/abs/0908.2921v2' => dirname(__FILE__) . '/arxiv/0908.2921v2.html',
         'https://arxiv.org/abs/1806.02820v3' => dirname(__FILE__) . '/arxiv/1806.02820v3.html',
-        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0908.2921&fl=citation' => dirname(__FILE__) . '/ads/0908.2921.json',
+         'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0908.2921&fl=citation' => dirname(__FILE__) . '/ads/0908.2921.json',
         'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0809.2542&fl=citation' => dirname(__FILE__) . '/ads/0809.2542.json',
         'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2010CoTPh..54.1023Z+OR+bibcode:2011EPJB...81..155H+OR+bibcode:2011JSMTE..05..023Z+OR+bibcode:2014PhyA..414..240P&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => dirname(__FILE__) . '/ads/0809.2542_citations.json',
         'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:1806.02820&fl=citation' => dirname(__FILE__) . '/ads/1806.02820.json',
@@ -694,16 +754,35 @@ function wp_remote_get( $url, $args=array() ) {
         'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0000.0001&fl=citation' => dirname(__FILE__) . '/ads/0000.0001.json',
         'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0000.0002&fl=citation' => dirname(__FILE__) . '/ads/0000.0002.json',
         'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0000.0003&fl=citation' => array('headers' => array('x-ratelimit-remaining' => 0), 'body' => dirname(__FILE__) . '/ads/0000.0003.json'),
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0000.0004&fl=citation' => dirname(__FILE__) . '/ads/0000.0004.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2010Abcde..12.3456A&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => dirname(__FILE__) . '/ads/0000.0004_citations.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0000.0005&fl=citation' => dirname(__FILE__) . '/ads/0000.0005.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0000.0006&fl=citation' => dirname(__FILE__) . '/ads/0000.0006.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2015Phys...93.1143F&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => array('headers' => array('x-ratelimit-remaining' => 0), 'body' => dirname(__FILE__) . '/ads/0000.0006_citations.json'),
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0000.0007&fl=citation' => dirname(__FILE__) . '/ads/0000.0007.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2016Phys...12.4444F&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => array('headers' => array(), 'body' => dirname(__FILE__) . '/ads/0000.0007_citations.json'),
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0000.0008&fl=citation' => dirname(__FILE__) . '/ads/0000.0008.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2017XYZ....00001111&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => dirname(__FILE__) . '/ads/0000.0008_citations.json',
+        get_option('o3po-settings')['crossref_get_forward_links_url'] . '?usr=' . get_option('o3po-settings')['crossref_id'] . '&pwd=' . get_option('o3po-settings')['crossref_pw'] .'&doi=10.22331%2Fq-2017-04-25-8&include_postedcontent=true' => dirname(__FILE__) . '/crossref/q-2017-04-25-8.xml',
+        get_option('o3po-settings')['crossref_get_forward_links_url'] . '?usr=' . get_option('o3po-settings')['crossref_id'] . '&pwd=' . get_option('o3po-settings')['crossref_pw'] .'&doi=10.22331%2Fq-2018-08-06-79&include_postedcontent=true' => dirname(__FILE__) . '/crossref/q-2018-08-06-79.xml',
+        get_option('o3po-settings')['crossref_get_forward_links_url'] . '?usr=' . get_option('o3po-settings')['crossref_id'] . '&pwd=' . get_option('o3po-settings')['crossref_pw'] .'&doi=empty_response&include_postedcontent=true' => dirname(__FILE__) . '/crossref/empty_response.xml',
+        get_option('o3po-settings')['crossref_get_forward_links_url'] . '?usr=' . get_option('o3po-settings')['crossref_id'] . '&pwd=' . get_option('o3po-settings')['crossref_pw'] .'&doi=invalid_xml&include_postedcontent=true' => dirname(__FILE__) . '/crossref/invalid_xml.xml',
+
+        get_option('o3po-settings')['crossref_get_forward_links_url'] . '?usr=' . get_option('o3po-settings')['crossref_id'] . '&pwd=' . get_option('o3po-settings')['crossref_pw'] .'&doi=varied_cites&include_postedcontent=true' => dirname(__FILE__) . '/crossref/varied_cites.xml',
+
+
                           );
+
     if(!empty($local_file_urls[$url]))
         if(is_array($local_file_urls[$url]))
             return array('headers'=>$local_file_urls[$url]['headers'] ,'body'=> file_get_contents($local_file_urls[$url]['body']) );
         else
             return array('headers'=>array() ,'body'=> file_get_contents($local_file_urls[$url]) );
-    elseif(strpos($url, get_option('o3po-settings')['crossref_get_forward_links_url']) === 0)
-        return array('body' => 'fake respose form crossref forward links url');
+    /* elseif(strpos($url, get_option('o3po-settings')['crossref_get_forward_links_url']) === 0) */
+    /*     return array('body' => 'fake respose form crossref forward links url'); */
     else
-        return new WP_Error('Fake wp_remote_get() does not know how to handle ' . $url);
+        return new WP_Error('unhandled_url', 'Fake wp_remote_get() does not know how to handle ' . $url);
+
 }
 
 function wp_verify_nonce() {
@@ -727,11 +806,20 @@ function remove_action() {}
 function wp_generate_password( $length ) {
     $string = '';
     for($i=0; $i<$length; $i++)
-        $string .= rand(0, 9); //This is just a face environemnt, so no security concerns
+        $string .= rand(0, 9); //This is just a fake environemnt, so no security concerns
     return $string;
 }
 
-function wp_remote_post( $url, $args = array() ) {}
+function wp_remote_post( $url, $args = array() ) {
+    $local_file_urls = array(
+        'https://fake.api.buffer.com/1/updates/create.json?access_token=fakeaccesstoken&profile_ids[]=4eb854340acb04e870000010&text=my+text&media[link]=https%3A%2F%2Fdomain.org%2Fpaper%2Fq-2017-13-22-2&media[photo]=http%3A%2F%2Fdomain.org%2Fimg%2Ffoo.jpg&attachment=true&shorten=false&now=false&top=false' => 'meaningless response',
+                             );
+
+    if(isset($local_file_urls[$url]))
+        return $local_file_urls[$url];
+    /* else */
+    /*     echo("\nunhandled upload url:" . $url . " with args=" . json_encode($args)); */
+}
 
 function register_post_type( $post_type, $args ) {}
 
@@ -779,6 +867,11 @@ echo '<form role="search" method="get" class="search-form" action="' . 'http://s
 function get_template_part() {
 
     echo '';
+}
+
+function locate_template( $array ) {
+
+    return $array[0];
 }
 
 function the_posts_navigation() {
@@ -894,6 +987,14 @@ function checked( $helper, $current=true, $echo=true, $type='checked' ) {
 
 function apply_filters( $hook, $orig_text, $text )
 {
+    global $filters;
+
+    if(!empty($filters[$hook]))
+    {
+        foreach($filters[$hook] as $callable)
+            $text = call_user_func($callable, $text);
+    }
+
     return $text;
 }
 
@@ -947,4 +1048,18 @@ function the_archive_description( $before = '', $after = '' ) {
 
 function get_the_archive_description() {
     return "bar";
+}
+
+function load_plugin_textdomain( $slug, $b, $dir ) {
+
+}
+
+function plugin_basename( $file  ) {
+
+    return 'fake_basename';
+}
+
+function get_bloginfo( $url ) {
+
+    return 134134;
 }
