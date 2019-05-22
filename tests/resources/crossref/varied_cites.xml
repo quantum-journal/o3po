@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<crossref_result version="3.0" xmlns="http://www.crossref.org/qrschema/3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.crossref.org/qrschema/3.0 http://www.crossref.org/qrschema/crossref_query_output3.0.xsd">
+ <query_result>
+  <head>
+   <email_address>none</email_address>
+   <doi_batch_id>none</doi_batch_id>
+  </head>
+  <body>
+   <forward_link doi="10.22331/q-2018-08-06-79">
+    <journal_cite fl_count="0">
+     <issn type="print">2469-9926</issn>
+     <issn type="electronic">2469-9934</issn>
+     <journal_title>Physical Review A</journal_title>
+     <journal_abbreviation>Phys. Rev. A</journal_abbreviation>
+     <article_title>Experimental linear optical computing of the matrix permanent</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Yosep</given_name>
+       <surname>Kim</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Kang-Hee</given_name>
+       <surname>Hong</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Joonsuk</given_name>
+       <surname>Huh</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Yoon-Ho</given_name>
+       <surname>Kim</surname>
+      </contributor>
+     </contributors>
+     <volume>99</volume>
+     <issue>5</issue>
+     <item_number item_number_type="article-number">052308</item_number>
+     <year>2019</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1103/PhysRevA.99.052308</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.22331/q-2018-08-06-79">
+    <book_cite fl_count="0">
+     <issn type="print">0302-9743</issn>
+     <issn type="electronic">1611-3349</issn>
+     <isbn type="print">978-3-030-14081-6</isbn>
+     <isbn type="electronic">978-3-030-14082-3</isbn>
+     <series_title>Lecture Notes in Computer Science</series_title>
+     <volume_title>Quantum Technology and Optimization Problems</volume_title>
+     <volume>11413</volume>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Frank</given_name>
+       <surname>Leymann</surname>
+      </contributor>
+     </contributors>
+     <first_page>218</first_page>
+     <year>2019</year>
+     <publication_type>full_text</publication_type>
+     <component_number>Chapter 19</component_number>
+     <doi type="book_content">10.1007/978-3-030-14082-3_19</doi>
+    </book_cite>
+   </forward_link>
+   <forward_link doi="10.22331/q-2018-08-06-79">
+    <conf_cite fl_count="0">
+     <isbn type="print">9781450359337</isbn>
+     <volume_title>Proceedings of the 34th ACM/SIGAPP Symposium on Applied Computing  - SAC '19</volume_title>
+     <paper_title>On the analogy between quantum circuit design automation and virtual network embedding</paper_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Andreas</given_name>
+       <surname>Fischer</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Alexandra</given_name>
+       <surname>Paler</surname>
+      </contributor>
+     </contributors>
+     <first_page>1378</first_page>
+     <publication_type>full_text</publication_type>
+     <doi type="conference_paper">10.1145/3297280.3297419</doi>
+     <year>2019</year>
+    </conf_cite>
+   </forward_link>
+   <forward_link>
+     <dissertation_cite>
+     </dissertation_cite>
+   </forward_link>
+   <forward_link>
+     <report_cite>
+     </report_cite>
+   </forward_link>
+   <forward_link>
+     <standard_cite>
+     </standard_cite>
+   </forward_link>
+   <forward_link>
+   </forward_link>
+  </body>
+ </query_result>
+</crossref_result>
