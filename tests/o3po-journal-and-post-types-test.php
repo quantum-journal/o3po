@@ -1208,13 +1208,14 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          */
     public function test_volumes_endpoint_volume_1( $query_var_extra, $journal, $environment )
     {
-        $wp_query = new WP_Query(null , null);
+        set_global_query(new WP_Query(null , null));
+
         #first check that nothing is output/changed if query doesn't match
         $this->assertSame('original-template.php', $journal->volume_endpoint_template('original-template.php'));
         $this->assertSame(array(), $journal->add_fake_post_to_volume_overview_page(array()));
 
         ob_start();
-        $journal->handle_volumes_endpoint_request($wp_query);
+        $journal->handle_volumes_endpoint_request(get_global_query());
         $journal->volume_navigation_at_loop_start(get_global_query());
         $journal->compress_entries_in_volume_view(get_global_query());
         $output = ob_get_contents();
@@ -1222,9 +1223,9 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $this->assertEmpty($output);
 
         $query_vars = array($journal->get_journal_property('volumes_endpoint') => $query_var_extra);
-        $wp_query = new WP_Query(null , $query_vars);
+        set_global_query(new WP_Query(null , $query_vars));
 
-        $journal->handle_volumes_endpoint_request($wp_query);
+        $journal->handle_volumes_endpoint_request(get_global_query());
         ob_start();
         $journal->volume_navigation_at_loop_start(get_global_query());
         $journal->compress_entries_in_volume_view(get_global_query());
@@ -1324,7 +1325,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          * @doesNotPerformAssertions
          */
     public function test_cleanup_at_the_very_end() {
-        exec('git checkout ' . dirname(__File__) . '/resources/arxiv/0809.2542v4.pdf');
+        exec('git checkout ' . dirname(__File__) . '/resources/arxiv/0809.2542v4.pdf > /dev/null');
         O3PO_Environment::save_recursive_remove_dir(dirname(__File__) . "/resources/tmp/", dirname(__File__));
     }
     #do not add tests after this one!
