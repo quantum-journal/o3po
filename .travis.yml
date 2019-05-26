@@ -16,5 +16,6 @@ before_install:
  - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.1" ]]; then composer require --dev --no-update phpunit/phpunit ~7; fi
 install:
  - if [ $(echo "${TRAVIS_PHP_VERSION:0:3} <= 7.1" | bc -l) -eq 1 ]; then travis_retry composer install --no-interaction --ignore-platform-reqs; fi
+ - ls -l vendor
  - whereis phpunit
  - phpunit --version
