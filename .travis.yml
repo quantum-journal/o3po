@@ -19,3 +19,5 @@ install:
  - ls -l vendor/bin/
  - ls -l vendor/phpunit/
  - phpunit --version
+ - vendor/phpunit/phpunit --version
+ - PHPUNITCOMMAND=vendor/phpunit/phpunit
