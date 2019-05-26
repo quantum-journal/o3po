@@ -1,7 +1,6 @@
 <?php
 
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-settings.php');
-require_once 'PHPUnit/Runner/Version.php';
 
 class O3PO_SettingsTest extends PHPUnit_Framework_TestCase
 {
