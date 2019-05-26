@@ -65,9 +65,19 @@ class O3PO_SettingsTest extends PHPUnit_Framework_TestCase
                                'secondary_publication_type_name',
                                'secondary_publication_type_name_plural',
                                'volumes_endpoint',)))
-                $this->assertContains($id, $combined_output, 'There was a default set for the option ' . $id . ' but it was not found in the settings page html.');
+            {
+                if(version_compare(PHPUnit_Runner_Version::id(), '7.5', '>='))
+                    $this->assertStringContainsString($id, $combined_output, 'There was a default set for the option ' . $id . ' but it was not found in the settings page html.');
+                else
+                    $this->assertContains($id, $combined_output, 'There was a default set for the option ' . $id . ' but it was not found in the settings page html.');
+            }
             else
-                $this->assertNotContains($id, $combined_output, 'Option ' . $id . ' was found in the settings page html, but we thought it should not be configurable?.');
+            {
+                if(version_compare(PHPUnit_Runner_Version::id(), '7.5', '>='))
+                    $this->assertStringNotContainsString($id, $combined_output, 'Option ' . $id . ' was found in the settings page html, but we thought it should not be configurable?.');
+                else
+                    $this->assertNotContains($id, $combined_output, 'Option ' . $id . ' was found in the settings page html, but we thought it should not be configurable?.');
+            }
         }
 
         preg_match_all('#id="' . $settings->get_plugin_name() . '-settings-(.*?)"#', $combined_output, $matches);

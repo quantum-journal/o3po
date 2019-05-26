@@ -15,9 +15,12 @@ class O3PO_Test extends PHPUnit_Framework_TestCase
         global $filters;
 
             //Check that at least some standard hooks have been added
-        $this->assertArraySubset(array_intersect(array_keys($hooks), ["activation_hook","deactivation_hook","admin_menu","admin_init","init"]) , array_keys($hooks));
+        foreach(["activation_hook","deactivation_hook","admin_menu","admin_init","init"] as $hook)
+            $this->assertArrayHasKey($hook, $hooks);
+
             //and that some filters, which we want now and almost certainly also in the future, have been added
-        $this->assertArraySubset(array_intersect(array_keys($filters), ["the_author","get_the_excerpt","the_content_feed","the_excerpt_rss"]) , array_keys($filters));
+        foreach(["the_author","get_the_excerpt","the_content_feed","the_excerpt_rss"] as $filter)
+            $this->assertArrayHasKey($filter, $filters);
 
             /* print(json_encode(array_keys($hooks))."\n"); */
             /* foreach($hooks as $key => $hook) */
