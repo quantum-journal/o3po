@@ -1325,7 +1325,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          * @doesNotPerformAssertions
          */
     public function test_cleanup_at_the_very_end() {
-        exec('git checkout ' . dirname(__File__) . '/resources/arxiv/0809.2542v4.pdf > /dev/null');
+        exec('git checkout ' . dirname(__File__) . '/resources/arxiv/0809.2542v4.pdf > /dev/null 2>&1');
         O3PO_Environment::save_recursive_remove_dir(dirname(__File__) . "/resources/tmp/", dirname(__File__));
     }
     #do not add tests after this one!
