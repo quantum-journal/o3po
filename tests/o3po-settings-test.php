@@ -66,14 +66,14 @@ class O3PO_SettingsTest extends PHPUnit_Framework_TestCase
                                'secondary_publication_type_name_plural',
                                'volumes_endpoint',)))
             {
-                if(metho_exists($this, 'assertStringContainsString'))
+                if(method_exists($this, 'assertStringContainsString'))
                     $this->assertStringContainsString($id, $combined_output, 'There was a default set for the option ' . $id . ' but it was not found in the settings page html.');
                 else
                     $this->assertContains($id, $combined_output, 'There was a default set for the option ' . $id . ' but it was not found in the settings page html.');
             }
             else
             {
-                if(metho_exists($this, 'assertStringNotContainsString'))
+                if(method_exists($this, 'assertStringNotContainsString'))
                     $this->assertStringNotContainsString($id, $combined_output, 'Option ' . $id . ' was found in the settings page html, but we thought it should not be configurable?.');
                 else
                     $this->assertNotContains($id, $combined_output, 'Option ' . $id . ' was found in the settings page html, but we thought it should not be configurable?.');
