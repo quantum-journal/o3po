@@ -2,7 +2,9 @@ PHP := php
 SRC := o3po/
 DOCS := docs/
 PHPUNIT := phpunit
+ifndef PHPUNITCOMMAND
 PHPUNITCOMMAND := $(shell command -v $(PHPUNIT) 2> /dev/null)
+endif
 ifndef PHPUNITCOMMAND
 PHPUNITPHAR := $(PHPUNIT)-5.0.0.phar # we download this if no locally installed version could be found, as it is the latest version of phpunit that still works with old php versions
 PHPUNITCOMMAND := $(PHP) $(PHPUNITPHAR)
