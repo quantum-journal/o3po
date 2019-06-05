@@ -24,6 +24,7 @@
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-singleton.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-utility.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-email-templates.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-buffer.php';
 
 
 /**
@@ -1418,10 +1419,24 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_buffer_profile_ids_setting() {
 
-        $this->render_array_as_comma_separated_list_setting('buffer_profile_ids');
         $post_types = O3PO_Utility::oxford_comma_implode(call_user_func($this->active_post_type_names_callback));
-        echo '<p>(Comma separated list of buffer.com profile IDs under which to share updates of new ' . $post_types . ' posts. If empty, no attempt to share posts is made.)</p>';
 
+        if(empty($this->get_plugin_option('buffer_access_token')))
+            $profile_id_help = 'Save the settings after entering a valid access token above, to get a list of available profile ids under your account.';
+        else{
+            $buffer_profile_information = O3PO_Buffer::get_profile_information($this->get_plugin_option('buffer_api_url'), $this->get_plugin_option('buffer_access_token'));
+
+            if(is_wp_error($buffer_profile_information))
+                $profile_id_help = 'There was an error when trying to obtain the available profile ids for the provided access token: ' . $buffer_profile_information->get_error_message();
+            else{
+                $profile_id_help = 'The available services and profile ids are:';
+                foreach($buffer_profile_information as $info)
+                    $profile_id_help .= ' ' . $info['service'] . ":" . $info['id'];
+            }
+        }
+
+        $this->render_array_as_comma_separated_list_setting('buffer_profile_ids');
+        echo '<p>(Comma separated list of buffer.com profile IDs under which to share updates of new ' . $post_types . ' posts. If empty, no attempt to share posts is made. ' . esc_html($profile_id_help) . ')</p>';
     }
 
         /**

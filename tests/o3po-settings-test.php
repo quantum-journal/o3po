@@ -85,7 +85,7 @@ class O3PO_SettingsTest extends PHPUnit_Framework_TestCase
                     $this->assertNotContains($id, $combined_output, 'Option ' . $id . ' was found in the settings page html, but we thought it should not be configurable?.');
             }
 
-            #test the special cases of 'tab' not being set and a transient being present that will trigger a lush rewrite rules
+            #test the special cases of 'tab' not being set and a transient being present that will trigger a flush rewrite rules
             global $get_transient_returns;
             $get_transient_returns = true;
             ob_start();
