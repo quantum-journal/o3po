@@ -63,7 +63,9 @@ class O3PO_Journal {
             'arxiv_url_pdf_prefix', //from primary
             'arxiv_url_source_prefix', //from primary
             'arxiv_url_trackback_prefix', //from secondary
-            'buffer_secret_email',
+            'buffer_api_url',
+            'buffer_access_token',
+            'buffer_profile_ids',
             'crossref_archive_locations',
             'crossref_deposite_url',
             'crossref_email',

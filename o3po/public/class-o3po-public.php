@@ -12,6 +12,7 @@
 
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-utility.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-publication-type.php';
 
 /**
  * The public-facing functionality of the plugin.
@@ -114,18 +115,10 @@ class O3PO_Public {
         $url = get_site_url();
         $description = $settings->get_plugin_option('journal_description');
         $facebook_app_id = $settings->get_plugin_option('facebook_app_id');
-        if (is_single())
+        if(is_single())
         {
-            if(has_post_thumbnail())
-            {
-                $specific_image_url = wp_get_attachment_image_src(get_post_thumbnail_id(), "Full")[0];
-                if(!empty($specific_image_url))
-                {
-                        /* $size = getimagesize($specific_image_url); */
-                        /* if(!empty($size) && $size[0] >= 200 && $size[1] >= 200) */
-                    $image_url = $specific_image_url;
-                }
-            }
+
+            $image_url = O3PO_PublicationType::get_social_media_thumbnail_src(get_the_ID());
 
             $specific_title = get_the_title();
             if(!empty($specific_title))

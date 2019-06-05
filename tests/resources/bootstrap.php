@@ -25,8 +25,6 @@ if(!class_exists('PHPUnit_Framework_TestCase')){
     }
 }
 
-#$settings = O3PO_Settings::instance();
-#
 
 function plugin_dir_path($path) {
 
@@ -99,9 +97,9 @@ function get_site_url() {
 
 function get_option( $option, $default = false ) {
 
-    if($option === 'o3po-settings' or $option === 'o3po-setttings' or $option === 'quantum-journal-plugin-setttings')
+    if($option === 'o3po-settings')
         return array(
-            'production_site_url' => 'fake_production_site_url',
+            'production_site_url' => get_site_url(),#we test as if this were the production system
             'journal_title' => 'fake_journal_title',
             'journal_subtitle' => 'fake_journal_subtitle',
             'journal_description' => 'fake_journal_description',
@@ -117,12 +115,12 @@ function get_option( $option, $default = false ) {
             'license_name' => 'fake_license_name',
             'license_type' => 'fake_license_type',
             'license_version' => 'fake_license_version',
-            'license_url' => 'fake_license_url',
+            'license_url' => 'https://fake_license_url',
             'license_explanation' => 'fake_license_explanation',
             'crossref_id' => 'fake_crossref_id',
             'crossref_pw' => 'fake_crossref_pw',
-            'crossref_get_forward_links_url' => 'fake_crossref_get_forward_links_url',
-            'crossref_deposite_url' => 'fake_crossref_deposite_url',
+            'crossref_get_forward_links_url' => 'https://fake_crossref_get_forward_links_url',
+            'crossref_deposite_url' => 'https://fake_crossref_deposite_url',
             'crossref_test_deposite_url' => 'https://fake_crossref_test_deposite_url',
             'crossref_email' => 'fake_crossref_email',
             'crossref_archive_locations' => 'fake_crossref_archive_locations',
@@ -134,16 +132,18 @@ function get_option( $option, $default = false ) {
             'arxiv_url_trackback_prefix' => 'fake_arxiv_url_trackback_prefix',
             'arxiv_doi_feed_identifier' => 'fake_arxiv_doi_feed_identifier',
             'doi_url_prefix' => 'fake_doi_url_prefix',
-            'scholastica_manuscripts_url' => 'fake_scholastica_manuscripts_url',
-            'scirate_url_abs_prefix' => 'fake_scirate_url_abs_prefix',
-            'orcid_url_prefix' => 'fake_orcid_url_prefix',
-            'fermats_library_url_prefix' => 'fake_fermats_library_url_prefix',
+            'scholastica_manuscripts_url' => 'https://fake_scholastica_manuscripts_url',
+            'scirate_url_abs_prefix' => 'https://fake_scirate_url_abs_prefix',
+            'orcid_url_prefix' => 'https://fake_orcid_url_prefix',
+            'fermats_library_url_prefix' => 'https://fake_fermats_library_url_prefix',
             'fermats_library_email' => 'fake_fermats_library_email',
-            'mathjax_url' => 'fake_mathjax_url',
-            'social_media_thumbnail_url' => 'fake_social_media_thumbnail_url',
-            'buffer_secret_email' => 'fake_buffer_secret_email',
-            'facebook_app_id' => 'fake_facebook_app_id',
-            'doaj_api_url' => 'fake_doaj_api_url',
+            'mathjax_url' => 'https://fake_mathjax_url',
+            'social_media_thumbnail_url' => 'https://fake_social_media_thumbnail_url',
+            'buffer_api_url' => 'https://fake_buffer_api_url',
+            'buffer_access_token' => '081fa8123a892134ba93241',
+            'buffer_profile_ids' => array('1513412357695652', '785663451345245'),
+            'facebook_app_id' => 'https://fake_facebook_app_id',
+            'doaj_api_url' => 'https://fake_doaj_api_url',
             'doaj_api_key' => 'fake_doaj_api_key',
             'doaj_language_code' => 'fake_doaj_language_code',
             'custom_search_page' => 'fake_custom_search_page',
@@ -440,10 +440,11 @@ function get_query_var( $var ) {
 }
 
 
-function has_post_thumbnail() {
+function has_post_thumbnail( $post_id=Null ) {
     global $posts;
 
-    $post_id = get_the_ID();
+    if($post_id === NUll)
+        $post_id = get_the_ID();
 
     return !empty($posts[$post_id]['thumbnail_id']);
 }
@@ -727,13 +728,17 @@ function wp_mail( $to, $subject, $body, $headers, $attach=null) {
     return true;
 }
 
+
 function delete_transient() {}
 
-function get_transient() {
-    return false;
+$get_transient_returns = false;
+function get_transient( $transient ) {
+    global $get_transient_returns;
+
+    return $get_transient_returns;
 }
 
-function set_transient( $transient, $value, $expiration ) {}
+function set_transient( $transient, $value, $expiration=0 ) {}
 
 function wp_remote_get( $url, $args=array() ) {
         //return http_get( $url, $args );
@@ -768,6 +773,8 @@ function wp_remote_get( $url, $args=array() ) {
         get_option('o3po-settings')['crossref_get_forward_links_url'] . '?usr=' . get_option('o3po-settings')['crossref_id'] . '&pwd=' . get_option('o3po-settings')['crossref_pw'] .'&doi=empty_response&include_postedcontent=true' => dirname(__FILE__) . '/crossref/empty_response.xml',
         get_option('o3po-settings')['crossref_get_forward_links_url'] . '?usr=' . get_option('o3po-settings')['crossref_id'] . '&pwd=' . get_option('o3po-settings')['crossref_pw'] .'&doi=invalid_xml&include_postedcontent=true' => dirname(__FILE__) . '/crossref/invalid_xml.xml',
         get_option('o3po-settings')['crossref_get_forward_links_url'] . '?usr=' . get_option('o3po-settings')['crossref_id'] . '&pwd=' . get_option('o3po-settings')['crossref_pw'] .'&doi=varied_cites&include_postedcontent=true' => dirname(__FILE__) . '/crossref/varied_cites.xml',
+        get_option('o3po-settings')['crossref_get_forward_links_url'] . '?usr=' . get_option('o3po-settings')['crossref_id'] . '&pwd=' . get_option('o3po-settings')['crossref_pw'] .'&doi=unhandled_forward_link_type&include_postedcontent=true' => dirname(__FILE__) . '/crossref/unhandled_forward_link_type.xml',
+
 
 
                           );
@@ -810,25 +817,47 @@ function wp_generate_password( $length ) {
 }
 
 function wp_remote_post( $url, $args = array() ) {
-    $local_file_urls = array(
-        'https://fake_crossref_test_deposite_url' => null,
-        'https://url.com?api_key=key' => null,
-        'https://api.bufferapp.com/1/updates/create.json?access_token=1/345792aa62c2435f2345ff1845365234&profile_ids[]=573423fb35252a874d311e98&profile_ids[]=57828568375464d044868456&text=test+text&media[link]=https%3A%2F%2Fquantum-journal.org%2Ftwo-years-of-publications%2F&media[photo]=https%3A%2F%2Fquantum-journal.org%2Fwp-content%2Fuploads%2F2019%2F04%2F2years_publications_carnations.jpg&attachment=true&shorten=false&now=false&top=false' => dirname(__FILE__) . '/buffer/successful.json',
-        'https://api.bufferapp.com/1/updates/create.json?access_token=invalid_token&profile_ids[]=573423fb35252a874d311e98&profile_ids[]=57828568375464d044868456&text=test+text&media[link]=https%3A%2F%2Fquantum-journal.org%2Ftwo-years-of-publications%2F&media[photo]=https%3A%2F%2Fquantum-journal.org%2Fwp-content%2Fuploads%2F2019%2F04%2F2years_publications_carnations.jpg&attachment=true&shorten=false&now=false&top=false' => dirname(__FILE__) . '/buffer/token_invalid.json',
-        'https://api.bufferapp.com/1/updates/create.json?access_token=1/345792aa62c2435f2345ff1845365234&text=test+text&media[link]=https%3A%2F%2Fquantum-journal.org%2Ftwo-years-of-publications%2F&media[photo]=https%3A%2F%2Fquantum-journal.org%2Fwp-content%2Fuploads%2F2019%2F04%2F2years_publications_carnations.jpg&attachment=true&shorten=false&now=false&top=false' => dirname(__FILE__) . '/buffer/select_account.json',
-        'https://api.bufferapp.com/1/updates/create.json?access_token=1/345792aa62c2435f2345ff1845365234&profile_ids[]=profile_to_which_we_have_no_permission&text=test+text&media[link]=https%3A%2F%2Fquantum-journal.org%2Ftwo-years-of-publications%2F&media[photo]=https%3A%2F%2Fquantum-journal.org%2Fwp-content%2Fuploads%2F2019%2F04%2F2years_publications_carnations.jpg&attachment=true&shorten=false&now=false&top=false' => dirname(__FILE__) . '/buffer/no_permission.json',
-        'https://invalid.api.bufferapp.com/1/updates/create.json?access_token=1/345792aa62c2435f2345ff1845365234&profile_ids[]=573423fb35252a874d311e98&profile_ids[]=57828568375464d044868456&text=test+text&media[link]=https%3A%2F%2Fquantum-journal.org%2Ftwo-years-of-publications%2F&media[photo]=https%3A%2F%2Fquantum-journal.org%2Fwp-content%2Fuploads%2F2019%2F04%2F2years_publications_carnations.jpg&attachment=true&shorten=false&now=false&top=false' => dirname(__FILE__) . '/buffer/invalid.json',
+    $response_array = array(
+        'https://api.bufferapp.com/1/updates/create.json?access_token=1%252F345792aa62c_1' => dirname(__FILE__) . '/buffer/successful.json',
+        'https://api.bufferapp.com/1/updates/create.json?access_token=invalid_token' => dirname(__FILE__) . '/buffer/token_invalid.json',
+        'https://api.bufferapp.com/1/updates/create.json?access_token=1%252F345792aa62c_2' => dirname(__FILE__) . '/buffer/select_account.json',
+        'https://api.bufferapp.com/1/updates/create.json?access_token=1%252F345792aa62c_3' => dirname(__FILE__) . '/buffer/no_permission.json',
+        'https://invalid.api.bufferapp.com/1/updates/create.json?access_token=1%252F345792aa62c_5' => dirname(__FILE__) . '/buffer/invalid.json',
+        'https://fake_buffer_api_url/updates/create.json?access_token=081fa8123a892134ba93241' => dirname(__FILE__) . '/buffer/successful.json',
+        'Einselection+without+pointer+states+by+Christian+Gogolin&media[photo]=f&attachment=true&shorten=false&now=false&top=false' => dirname(__FILE__) . '/buffer/successful.json',
+        'Dynamic+wetting+with+two+competing+adsorbates+by+Christian+Gogolin%2C+Christian+Meltzer%2C+Marvin+Willers%2C+and+Haye+Hinrichsen&media[photo]=f&attachment=true&shorten=false&now=false&top=false' => dirname(__FILE__) . '/buffer/invalid.json',
+        'The+boundaries+and+twist+defects+of+the+color+code+and+their+applications+to+topological+quantum+computation+by+Markus+S.+Kesselring%2C+Fernando+Pastawski%2C+Jens+Eisert%2C+and+Benjamin+J.+Brown&media[photo]=f&attachment=true&shorten=false&now=false&top=false' => dirname(__FILE__) . '/buffer/successful.json',
+        'https://fake_doaj_api_url.com?api_key=key' => dirname(__FILE__) . '/doaj/success.json',
+        'https://fake_doaj_api_url?api_key=fake_doaj_api_key' => dirname(__FILE__) . '/doaj/success.json',
+        'https://fake_crossref_test_deposite_url' => dirname(__FILE__) . '/crossref/deposit_success.xml',
+        'https://fake_crossref_deposite_url' => dirname(__FILE__) . '/crossref/deposit_success.xml',
                              );
 
-    if(isset($local_file_urls[$url]))
+    foreach(array_keys($response_array) as $key)
     {
-        if(!empty($local_file_urls[$url]))
-            return array('body' => file_get_contents($local_file_urls[$url]));
-        else
-            return null;
+        if(strpos($url, $key) !== false)
+        {
+            if(!empty($response_array[$key]) and is_string($response_array[$key]))
+                return array('body' => file_get_contents($response_array[$key]));
+            elseif(!empty($response_array[$key]) and is_array($response_array[$key]))
+                return $response_array[$key];
+            else
+                return array();
+        }
     }
 
-    echo("\nunhandled url in wp_remote_post():" . $url . "\n");
+
+    /* if(in_array($url, array_keys($response_array))) */
+    /* { */
+    /*     if(!empty($response_array[$url]) and is_string($response_array[$url])) */
+    /*         return array('body' => file_get_contents($response_array[$url])); */
+    /*     elseif(!empty($response_array[$url]) and is_array($response_array[$url])) */
+    /*         return $response_array[$url]; */
+    /*     else */
+    /*         return array(); */
+    /* } */
+
+    echo("\nunhandled url in wp_remote_post() in bootstrap.php:" . $url . "\n");
 }
 
 function register_post_type( $post_type, $args ) {}
@@ -954,7 +983,7 @@ function settings_errors( $setting = '', $sanitize = false, $hide_on_update = fa
     echo $output;
 }
 
-function add_settings_errors( $setting, $code, $message, $type = 'error' ) {
+function add_settings_error( $setting, $code, $message, $type = 'error' ) {
     global $global_setting_errors;
 
     $global_setting_errors[] = array(
@@ -1072,4 +1101,8 @@ function plugin_basename( $file  ) {
 function get_bloginfo( $url ) {
 
     return 134134;
+}
+
+function add_options_page($a, $b, $c, $d) {
+
 }

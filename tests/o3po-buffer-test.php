@@ -10,7 +10,7 @@ class O3PO_BufferTest extends PHPUnit_Framework_TestCase
         return [
             array(
                 'buffer_url' => 'https://api.bufferapp.com/1',
-                'access_token' => '1/345792aa62c2435f2345ff1845365234',
+                'access_token' => '1%2F345792aa62c_1',
                 'profile_ids' => array('573423fb35252a874d311e98', '57828568375464d044868456'),
                 'text' => 'test text',
                 'media' => array(
@@ -40,7 +40,7 @@ class O3PO_BufferTest extends PHPUnit_Framework_TestCase
                   ),
             array(
                 'buffer_url' => 'https://api.bufferapp.com/1',
-                'access_token' => '1/345792aa62c2435f2345ff1845365234',
+                'access_token' => '1%2F345792aa62c_2',
                 'profile_ids' => array(), #this will cause a select_account error from buffer.com
                 'text' => 'test text',
                 'media' => array(
@@ -55,7 +55,7 @@ class O3PO_BufferTest extends PHPUnit_Framework_TestCase
                   ),
             array(
                 'buffer_url' => 'https://api.bufferapp.com/1',
-                'access_token' => '1/345792aa62c2435f2345ff1845365234',
+                'access_token' => '1%2F345792aa62c_3',
                 'profile_ids' => 'profile_to_which_we_have_no_permission', #this will cause a no_permission error from buffer.com
                 'text' => 'test text',
                 'media' => array(
@@ -70,7 +70,7 @@ class O3PO_BufferTest extends PHPUnit_Framework_TestCase
                   ),
             array(
                 'buffer_url' => new WP_Error('exception', 'When provided as URL I will raise an exception in create_update'),
-                'access_token' => '1/f798bb6527f3de77832ab3a562ab59a9',
+                'access_token' => '1%2F345792aa62c_4',
                 'profile_ids' => array('578c44fb3d66da874d311e98', '578c441e0c5464d043cccfb6'),
                 'text' => 'test text',
                 'media' => array(
@@ -85,7 +85,7 @@ class O3PO_BufferTest extends PHPUnit_Framework_TestCase
                   ),
             array(
                 'buffer_url' => 'https://invalid.api.bufferapp.com/1',
-                'access_token' => '1/345792aa62c2435f2345ff1845365234',
+                'access_token' => '1%2F345792aa62c_5',
                 'profile_ids' => array('573423fb35252a874d311e98', '57828568375464d044868456'),
                 'text' => 'test text',
                 'media' => array(

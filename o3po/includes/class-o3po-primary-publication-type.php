@@ -72,7 +72,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $this->the_admin_panel_eprint($post_id);
         $this->the_admin_panel_title($post_id);
         $this->the_admin_panel_corresponding_author_email($post_id);
-        $this->the_admin_panel_buffer_email($post_id);
+        $this->the_admin_panel_buffer($post_id);
         $this->the_admin_panel_fermats_library($post_id);
         $this->the_admin_panel_authors($post_id);
         $this->the_admin_panel_affiliations($post_id);

@@ -111,7 +111,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         $this->the_admin_panel_target_dois($post_id);
         $this->the_admin_panel_title($post_id);
         $this->the_admin_panel_corresponding_author_email($post_id);
-        $this->the_admin_panel_buffer_email($post_id);
+        $this->the_admin_panel_buffer($post_id);
         $this->the_admin_panel_authors($post_id);
         $this->the_admin_panel_affiliations($post_id);
         $this->the_admin_panel_date_volume_pages($post_id);

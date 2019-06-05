@@ -113,7 +113,7 @@ class O3PO_Settings extends O3PO_Singleton {
         'clockss_ftp_url' => 'ftp.clockss.org',
         'arxiv_doi_feed_identifier' => '',
         'arxiv_paper_doi_feed_endpoint' => 'arxiv_paper_doi_feed',
-        'arxiv_paper_doi_feed_days' => 365,
+        'arxiv_paper_doi_feed_days' => '365',
         'arxiv_url_abs_prefix' => 'https://arxiv.org/abs/',
         'arxiv_url_pdf_prefix' => 'https://arxiv.org/pdf/',
         'arxiv_url_source_prefix' => 'https://arxiv.org/e-print/',
@@ -380,10 +380,10 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->add_settings_field('mathjax_url', 'MathJax url', array( $this, 'render_mathjax_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('social_media_thumbnail_url', 'Url of default thumbnail for social media', array( $this, 'render_social_media_thumbnail_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('facebook_app_id', 'Facebook app_id', array( $this, 'render_facebook_app_id_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
-        $this->add_settings_field('buffer_secret_email', 'Secret email for adding posts to buffer.com', array( $this, 'render_buffer_secret_email_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('buffer_api_url', 'Url of the buffer.com api', array( $this, 'render_buffer_api_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
-        $this->add_settings_field('buffer_profile_ids', 'Profile IDs on buffer.com', array( $this, 'render_buffer_profile_ids_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('buffer_access_token', 'Access token from buffer.com', array( $this, 'render_buffer_access_token_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
+        $this->add_settings_field('buffer_profile_ids', 'Profile IDs on buffer.com', array( $this, 'render_buffer_profile_ids_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
+
 
         $this->add_settings_section('other_plugins_settings', 'Other plugins', array( $this, 'render_other_plugins_settings' ), $this->plugin_name . '-settings:other_plugins_settings');
         $this->add_settings_field('relevanssi_mime_types_to_exclude', 'Relevanssi mime types to exclude', array( $this, 'render_relevanssi_mime_types_to_exclude_setting' ), $this->plugin_name . '-settings:other_plugins_settings', 'other_plugins_settings');
@@ -1384,20 +1384,6 @@ class O3PO_Settings extends O3PO_Singleton {
     }
 
         /**
-         * Render the setting for the Buffer.com secret email.
-         *
-         * @since    0.1.0
-         * @access   public
-         */
-    public function render_buffer_secret_email_setting() {
-
-        $this->render_password_setting('buffer_secret_email');
-        $post_types = O3PO_Utility::oxford_comma_implode(call_user_func($this->active_post_type_names_callback));
-        echo '<p>(If this is set, new ' . $post_types . ' posts are <a target="_blank" href="https://faq.buffer.com/article/272-is-it-possible-to-add-a-post-to-buffer-through-email">automatically submitted</a> to the buffer.com queue associated with the secret email. WARNING: This way of sharing posts has recently been disabled by buffer.com, use the following settings instead.)</p>';
-
-    }
-
-        /**
          * Render the setting for the Buffer.com api url.
          *
          * @since    0.3.0
@@ -1407,20 +1393,6 @@ class O3PO_Settings extends O3PO_Singleton {
 
         $this->render_setting('buffer_api_url');
         echo '<p>(Url of the buffer.com api.)</p>';
-
-    }
-
-        /**
-         * Render the setting for the Buffer.com prfile ids.
-         *
-         * @since    0.3.0
-         * @access   public
-         */
-    public function render_buffer_profile_ids_setting() {
-
-        $this->render_setting('buffer_profile_ids');
-        $post_types = O3PO_Utility::oxford_comma_implode(call_user_func($this->active_post_type_names_callback));
-        echo '<p>(Comma separated list of buffer.com profile IDs under which to share updates of new ' . $post_types . ' posts.)</p>';
 
     }
 
@@ -1435,6 +1407,20 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->render_password_setting('buffer_access_token');
         $post_types = O3PO_Utility::oxford_comma_implode(call_user_func($this->active_post_type_names_callback));
         echo '<p>(Create an access token <a href="https://buffer.com/developers/apps/create">here</a>.)</p>';
+
+    }
+
+        /**
+         * Render the setting for the Buffer.com prfile ids.
+         *
+         * @since    0.3.0
+         * @access   public
+         */
+    public function render_buffer_profile_ids_setting() {
+
+        $this->render_array_as_comma_separated_list_setting('buffer_profile_ids');
+        $post_types = O3PO_Utility::oxford_comma_implode(call_user_func($this->active_post_type_names_callback));
+        echo '<p>(Comma separated list of buffer.com profile IDs under which to share updates of new ' . $post_types . ' posts. If empty, no attempt to share posts is made.)</p>';
 
     }
 
@@ -1522,6 +1508,26 @@ class O3PO_Settings extends O3PO_Singleton {
     }
 
         /**
+         * Render an array as comma separated list type setting.
+         *
+         * Does not escape or otherwise handle individual fields that contain commas.
+         *
+         * @since    0.3.0
+         * @access   public
+         * @param    string    $id   Id of the setting.
+         */
+    public function render_array_as_comma_separated_list_setting( $id ) {
+
+        $option = $this->get_plugin_option($id);
+        if(!is_array($option))
+            $option = array();
+
+        echo '<input class="regular-text ltr o3po-setting o3po-setting-text" type="text" id="' . $this->plugin_name . '-settings-' . $id . '" name="' . $this->plugin_name . '-settings[' . $id . ']" value="' . esc_attr(implode($option, ',')) . '" />';
+
+    }
+
+
+        /**
          * An array of all option names to the respective functions used when cleaning user input for these options.
          *
          * @since    0.1.0
@@ -1585,10 +1591,9 @@ class O3PO_Settings extends O3PO_Singleton {
                 'fermats_library_email' => 'trim_settings_field',
                 'mathjax_url' => 'validate_url',
                 'social_media_thumbnail_url' => 'trim_settings_field',
-                'buffer_secret_email' => 'trim_settings_field',
                 'buffer_api_url' => 'validate_url',
-                'buffer_profile_ids' => 'trim_settings_field',
                 'buffer_access_token' => 'trim_settings_field',
+                'buffer_profile_ids' => 'validate_array_as_comma_separated_list',
                 'facebook_app_id' => 'trim_settings_field',
                 'doaj_api_url' => 'trim_settings_field',
                 'doaj_api_key' => 'trim_settings_field',
@@ -1607,14 +1612,20 @@ class O3PO_Settings extends O3PO_Singleton {
                 'executive_board' => 'trim_settings_field',
                 'editor_in_chief' => 'trim_settings_field',
                 'self_notification_subject_template' => 'trim_settings_field',
-                'self_notification_body_template' => 'trim_settings_field',
+                'self_notification_body_template' => 'leave_unchaged',
                 'author_notification_subject_template' => 'trim_settings_field',
-                'author_notification_body_template' => 'trim_settings_field',
+                'author_notification_body_template' => 'leave_unchaged',
                 'author_notification_secondary_subject_template' => 'trim_settings_field',
-                'author_notification_secondary_body_template' => 'trim_settings_field',
+                'author_notification_secondary_body_template' => 'leave_unchaged',
                 'fermats_library_notification_subject_template' => 'trim_settings_field',
-                'fermats_library_notification_body_template' => 'trim_settings_field',
+                'fermats_library_notification_body_template' => 'leave_unchaged',
                 'relevanssi_mime_types_to_exclude' => 'trim_settings_field',
+
+                'cited_by_refresh_seconds' => null,
+                'primary_publication_type_name' => null,
+                'primary_publication_type_name_plural' => null,
+                'secondary_publication_type_name' => null,
+                'secondary_publication_type_name_plural' => null,
                                                    );
 
         return self::$all_settings_fields_map;
@@ -1702,13 +1713,40 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function validate_url( $field, $input ) {
 
-        $input = trim($input);
-        $url = esc_url_raw(strip_tags(stripslashes($input)));
+        $input_trimmed = trim($input);
+        $url = esc_url_raw(strip_tags(stripslashes($input_trimmed)));
 
         if($url !== $input)
             add_settings_error( $field, 'url-validated', "The URL in '" . $this->settings_fields[$field]['title'] . "' was malformed or contained special or illegal characters, which were removed or escaped. Please check.", 'updated');
         return $url;
     }
+
+        /**
+         * Break a comma separated list into an array of fields
+         *
+         * @since    0.3.0
+         * @access   private
+         * @param    string   $field    The field this was input to.
+         * @param    string   $input    User input.
+         */
+    public function validate_array_as_comma_separated_list( $field, $input ) {
+
+        try
+        {
+            $input = trim($input);
+            $array = preg_split('#,#', $input, Null, PREG_SPLIT_NO_EMPTY);
+            foreach($array as $key => $field)
+                $array[$key] = trim($field);
+
+            return $array;
+        }
+        catch (Exception $e) {
+            add_settings_error( $field, 'not-comma-separated-list', "The input to '" . $this->settings_fields[$field]['title'] . "' could not be interpreted as a comma separated list.", 'error');
+            return array();
+        }
+    }
+
+
 
         /**
          * Validate two letter country code
@@ -1810,6 +1848,19 @@ class O3PO_Settings extends O3PO_Singleton {
     }
 
         /**
+         * Leave user input to settings unchanged.
+         *
+         * @since    0.3.0
+         * @access   private
+         * @param    string   $field    The field this was input to.
+         * @param    string   $input    User input.
+         */
+    public function leave_unchaged( $field, $input ) {
+
+        return $input;
+    }
+
+        /**
          * Validate settings.
          *
          * @since    0.1.0
@@ -1821,7 +1872,7 @@ class O3PO_Settings extends O3PO_Singleton {
         $newinput = array();
         foreach($this->get_all_settings_fields_map() as $field => $validation_method)
         {
-            if(isset($input[$field]))
+            if(isset($input[$field]) and $validation_method !== null)
                 $newinput[$field] = $this->$validation_method($field, $input[$field]);
             else
                 $newinput[$field] = $this->get_plugin_option($field);
@@ -1930,5 +1981,17 @@ class O3PO_Settings extends O3PO_Singleton {
         add_settings_field($id, $title, $callback, $page, $section, $args);
         $this->settings_fields[$id] = array('title' => $title, 'callback' => $callback, 'page' => $page, 'section' => $section, 'args' => $args);
 
+    }
+
+
+        /**
+         * Return the defaults of all options.
+         *
+         * @sinde 0.3.0
+         * @access public
+         * @return array  Array of all default options.
+         */
+    public function get_option_defaults() {
+        return $this->option_defaults;
     }
 }
