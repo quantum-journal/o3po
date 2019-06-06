@@ -799,14 +799,12 @@ abstract class O3PO_PublicationType {
 
 
         /**
-         * Do things when the post is finally published.
+         * Put an update about the given publication post in the queue of buffer.com.
          *
-         * Is called from validate_and_process_data().
-         *
-         * @since     0.1.0
+         * @since     0.3.0
          * @access    private
-         * @param     int    $post_id   Id of the post that is actually beeing finally published publicly.
-         * @return    string   The validation_result of the upload.
+         * @param     int    $post_id   Id of the post.
+         * @return    string            The validation_result of the upload.
          */
     private function post_update_on_buffer_com_if_not_already_done( $post_id ) {
 
@@ -3217,12 +3215,12 @@ abstract class O3PO_PublicationType {
 
 
         /**
-         * Get the src of the feature image
+         * Get the src of the feature image.
          *
-         * @since 0.3.0
+         * @since  0.3.0
          * @access public
-         * @param int|WP_Post $post_id  Id of the post for which to get the social media thumbnail src.
-         * @return string Src of the social media thumbnail.
+         * @param  int|WP_Post $post_id  Id of the post for which to get the social media thumbnail src.
+         * @return string                Src of the social media thumbnail.
          */
     public static function get_social_media_thumbnail_src( $post_id ) {
 

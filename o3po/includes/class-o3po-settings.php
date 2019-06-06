@@ -1633,7 +1633,9 @@ class O3PO_Settings extends O3PO_Singleton {
                 'fermats_library_notification_subject_template' => 'trim_settings_field',
                 'fermats_library_notification_body_template' => 'leave_unchaged',
                 'relevanssi_mime_types_to_exclude' => 'trim_settings_field',
-
+                    /* The following settings cannot be customized by the user.
+                     * validation method null ensures that these settings are never
+                     * updated when user settings are saved and validated. */
                 'cited_by_refresh_seconds' => null,
                 'primary_publication_type_name' => null,
                 'primary_publication_type_name_plural' => null,
