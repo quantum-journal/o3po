@@ -40,7 +40,7 @@ class O3PO_CrossrefTest extends PHPUnit_Framework_TestCase
                 'crossref_id' => get_option('o3po-settings')['crossref_id'],
                 'crossref_pw' => get_option('o3po-settings')['crossref_pw'],
                 'doi' => 'unhandled_doi',
-                'expected' => new WP_Error('unhandled_url', 'Fake wp_remote_get() does not know how to handle fake_crossref_get_forward_links_url?usr=fake_crossref_id&pwd=fake_crossref_pw&doi=unhandled_doi&include_postedcontent=true'),
+                'expected' => new WP_Error('unhandled_url', 'Fake wp_remote_get() does not know how to handle https://fake_crossref_get_forward_links_url?usr=fake_crossref_id&pwd=fake_crossref_pw&doi=unhandled_doi&include_postedcontent=true'),
                   ),
                 ];
     }
@@ -522,6 +522,13 @@ class O3PO_CrossrefTest extends PHPUnit_Framework_TestCase
                                           'year' => '2019',
                                             )),
                                     ),
+                  ),
+            array(
+                'crossref_url' => get_option('o3po-settings')['crossref_get_forward_links_url'],
+                'crossref_id' => get_option('o3po-settings')['crossref_id'],
+                'crossref_pw' => get_option('o3po-settings')['crossref_pw'],
+                'doi' => 'unhandled_forward_link_type',
+                'expected' => new WP_Error('exception', 'Encountered an unhandled forward link type.'),
                   ),
                 ];
     }

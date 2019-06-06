@@ -9,9 +9,14 @@ class O3PO_DoajTest extends PHPUnit_Framework_TestCase
         return [
             array(
                 'doaj_json' => json_encode('foo'),
-                'doaj_api_url' => 'https://url.com',
+                'doaj_api_url' => 'https://fake_doaj_api_url.com',
                 'doaj_api_key' => 'key',
-                'expected' => Null
+                'expected' => array('body' => '{
+  "status": "created",
+  "id": "3695470555334b05890b24d7b0c9b5f4",
+  "location": "/api/v1/articles/3695470555334b05890b24d7b0c9b5f4"
+}
+'),
                   ),
                 ];
     }

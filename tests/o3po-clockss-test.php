@@ -11,7 +11,7 @@ class O3PO_ClockssTest extends PHPUnit_Framework_TestCase
                 'clockss_xml' => 'doesn\'t matter',
                 'pdf_path'  => 'no pdf',
                 'remote_filename_without_extension'  => 'doesn\'t matter',
-                'clockss_ftp_url'  => 'invalid_url',
+                'clockss_ftp_url'  => 'invalid_url_used_in_unit_tests', #this url is treated in a special way and prevents an actual connection attempt
                 'clockss_username'  => 'none',
                 'clockss_password'  => 'none',
                 'expected' => '#ERROR: There was an exception during the ftp transfer to CLOCKSS.*#',

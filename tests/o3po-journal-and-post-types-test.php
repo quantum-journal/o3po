@@ -107,7 +107,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             ['the_admin_panel_eprint'],
             ['the_admin_panel_title'],
             ['the_admin_panel_corresponding_author_email'],
-            ['the_admin_panel_buffer_email'],
+            ['the_admin_panel_buffer'],
             ['the_admin_panel_fermats_library'],
             ['the_admin_panel_authors'],
             ['the_admin_panel_affiliations'],
@@ -163,7 +163,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             ['the_admin_panel_target_dois'],
             ['the_admin_panel_title'],
             ['the_admin_panel_corresponding_author_email'],
-            ['the_admin_panel_buffer_email'],
+            ['the_admin_panel_buffer'],
             ['the_admin_panel_authors'],
             ['the_admin_panel_affiliations'],
             ['the_admin_panel_date_volume_pages'],
@@ -946,6 +946,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                  '_volume' => '2',
                  '_corresponding_author_email' => 'foo@bar.com',
                  '_journal' => $settings->get_plugin_option('journal_title'),
+                 '_buffer_email' => 'checked',
                    ),
              array(
                  '#ERROR: It seems like .* is not published under .* creative commons#',
@@ -958,6 +959,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                  '#WARNING: Not yet published.#',
                    ),
              array(
+                 '#INFO: Update about this publication posted to buffer\.com queue\.#',#this is expected to fail because the corresponding buffer url returns invalid json
                  '#INFO: This paper was publicly published\.#',
                    ),
              ],
@@ -984,9 +986,9 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                  '_buffer_email' => 'checked',
                    ),
              array(
-                 '#ERROR: It seems like .* not published .* creative commons license#',
+                 '#ERROR: It seems like .* not published .* creative commons license#', #upon the second publish attempt this ERROR is downgraded to a WARNING and then publishing is possible
                  '#INFO: This paper was publicly published\.#',
-                 '#INFO: Email to buffer.com sent correctly\.#',
+                 '#INFO: Update about this publication posted to buffer\.com queue\.#',
                    ),
              array(
                  '#INFO: This paper was publicly published\.#',
@@ -1004,12 +1006,14 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                  '_volume' => '2',
                  '_corresponding_author_email' => 'foo@bar.com',
                  '_journal' => $settings->get_plugin_option('journal_title'),
+                 '_buffer_email' => 'checked',
                    ),
              array(
                  '#REVIEW: Author and affiliations data updated from arxiv source. Please check\.#',
                  '#SUCCESS: Fetched meta-data from.*#',
                    ),
              array(
+                 '#INFO: Update about this publication posted to buffer\.com queue\.#',
                  '#INFO: This paper was publicly published\.#',
                    ),
              ],
@@ -1022,6 +1026,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          * @dataProvider save_metabox_provider
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
+         * @depends test_setup_environment
          */
     public function test_save_metabox( $post_id, $POST_args, $expections_first, $expections_second, $primary_publication_type, $secondary_publication_type ) {
 
@@ -1050,7 +1055,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             $this->assertRegexp($expection, $validation_result);
         }
 
-            //call it again to potentially trigger a post actually published event
+            //call it again to potentially trigger a post actually published event on the second try in case there was something to REVIEW in the first run
         set_post_status($post_id, 'publish');
         foreach(get_all_post_metas($post_id) as $key => $value)
             $_POST[ $key ] = $value;

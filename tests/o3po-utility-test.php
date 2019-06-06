@@ -105,6 +105,25 @@ class O3PO_UtilityTest extends PHPUnit_Framework_TestCase
 
 
 
+    public function valid_issn_provider() {
+        return [
+            ['0378-5955', true],
+            ['0378-5954', false],
+            ['0378-595X', false],
+            ['2521-327X', true],
+            ['2521-326X', false],
+        ];
+    }
+
+        /**
+         * @dataProvider valid_issn_provider
+         */
+    public function test_valid_issn( $array, $expected ) {
+
+        $this->assertSame($expected, O3PO_Utility::valid_issn($array));
+    }
+
+
     public function valid_email_provider() {
         return [
             ['info@quantum-journal.org', true],
