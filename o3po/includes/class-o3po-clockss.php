@@ -50,15 +50,18 @@ class O3PO_Clockss {
             $tmpfile_clockss_xml = tempnam(sys_get_temp_dir(), $remote_filename_without_extension );
             file_put_contents($tmpfile_clockss_xml, $clockss_xml);
 
-            $ftp_connection = ftp_connect($clockss_ftp_url);
+            if($clockss_ftp_url === 'invalid_url_used_in_unit_tests')
+                throw new Exception('Got invalid_url_used_in_unit_tests as url, aborting because we take this as an indication that we were called in a unit test.');
+
+            $ftp_connection = ftp_connect($clockss_ftp_url, 21, 10);
             $login_result = ftp_login($ftp_connection, $clockss_username, $clockss_password);
 
-            if (ftp_put($ftp_connection, $remote_filename_without_extension . '.xml', $tmpfile_clockss_xml, FTP_BINARY))
+            if(ftp_put($ftp_connection, $remote_filename_without_extension . '.xml', $tmpfile_clockss_xml, FTP_BINARY))
                 $clockss_response .= "INFO: successfully uploaded the meta-data xml to CLOCKSS.\n";
             else
                 $clockss_response .= "ERROR: There was an error uploading the meta-data xml to CLOCKSS: " . $php_errormsg . "\n";
 
-            if (ftp_put($ftp_connection, $remote_filename_without_extension . '.pdf', $pdf_path, FTP_BINARY))
+            if(ftp_put($ftp_connection, $remote_filename_without_extension . '.pdf', $pdf_path, FTP_BINARY))
                 $clockss_response .= "INFO: successfully uploaded the fulltext pdf to CLOCKSS.\n";
             else
                 $clockss_response .= "ERROR: There was an error uploading the fulltext pdf to CLOCKSS: " . $php_errormsg . "\n";
