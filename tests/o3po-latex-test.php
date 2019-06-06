@@ -239,6 +239,25 @@ ab' , 'äb'],
     }
 
 
+    public function utf8_to_closest_latin_letter_string_provider() {
+        return [
+            ['foo' , 'foo'],
+            ['ä' , 'a'],
+            ['á' , 'a'],
+            ['ç' , 'c'],
+            ['ü562457189(&(L' , 'uL'],
+                ];
+    }
+
+        /**
+         * @dataProvider utf8_to_closest_latin_letter_string_provider
+         */
+    public function test_utf8_to_closest_latin_letter_string( $input, $expected ) {
+        $this->assertSame($expected, O3PO_Latex::utf8_to_closest_latin_letter_string($input));
+    }
+
+
+
     public function preg_split_at_latex_math_mode_delimters_provider() {
         return [
             ['foo' , ['foo']],
@@ -283,6 +302,31 @@ ab' , 'äb'],
          */
     public function test_strpos_outside_math_mode( $input, $expected ) {
         $this->assertSame($expected, O3PO_Latex::strpos_outside_math_mode($input[0], $input[1]));
+    }
+
+
+    public function preg_match_outside_math_mode_provider() {
+        return [
+            [['#o#', 'foo'] , 1],
+            [['#x#', 'foo'] , 0],
+            [['#x#', 'foo $x$'] , 0],
+            [['#a#', 'foo $x$ bar'] , 1],
+            [['#\\\\#', 'foo $x$ \\bar'] , 1],
+            [['#\\\\#', '\\begin{abstract} foo $x$'] , 1],
+            [['#\\\\#', '\\begin{abstract} foo $x$ \\bar'] , 2],
+            [['#\\\\#', 'abc \\begin{equation} x + \alpha = 4 \\end{equation}'] , 0],
+            [['#x#', '\\begin{equation} x + \alpha = 4 \\end{equation} x'] , 1],
+            [['#\\\\#', 'foo \\cite{a} $x$ bar \\cite{b}'] , 2],
+            [['#\\\\(?!cite)#', 'foo \\cite{a} $x$ bar \\cite{b}'] , 0],
+            [['##', 'foo $x$'] , 2],
+                ];
+    }
+
+        /**
+         * @dataProvider preg_match_outside_math_mode_provider
+         */
+    public function test_preg_match_outside_math_mode( $input, $expected ) {
+        $this->assertSame($expected, O3PO_Latex::preg_match_outside_math_mode($input[0], $input[1]));
     }
 
 

@@ -24,6 +24,7 @@
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-singleton.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-utility.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-email-templates.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-buffer.php';
 
 
 /**
@@ -111,7 +112,9 @@ class O3PO_Settings extends O3PO_Singleton {
         'crossref_deposite_url' => 'https://doi.crossref.org/servlet/deposit',
         'crossref_test_deposite_url' => 'https://test.crossref.org/servlet/deposit',
         'clockss_ftp_url' => 'ftp.clockss.org',
-        'arxiv_doi_feed_identifier' => 'arxiv_paper_doi_feed',
+        'arxiv_doi_feed_identifier' => '',
+        'arxiv_paper_doi_feed_endpoint' => 'arxiv_paper_doi_feed',
+        'arxiv_paper_doi_feed_days' => '365',
         'arxiv_url_abs_prefix' => 'https://arxiv.org/abs/',
         'arxiv_url_pdf_prefix' => 'https://arxiv.org/pdf/',
         'arxiv_url_source_prefix' => 'https://arxiv.org/e-print/',
@@ -122,8 +125,12 @@ class O3PO_Settings extends O3PO_Singleton {
         'fermats_library_url_prefix' => 'https://fermatslibrary.com/s/',
         'doaj_api_url' => "https://doaj.org/api/v1/articles",
         'doaj_language_code' => "EN",
+        'buffer_api_url' => 'https://api.bufferapp.com/1',
+        'extended_search_and_navigation' => "checked",
+        'search_form_on_search_page' => "checked",
         'custom_search_page' => "checked",
         'page_template_for_publication_posts' => "unchecked",
+        'page_template_abstract_header' => '',
         'maintenance_mode' => 'unchecked',
 
         'self_notification_subject_template' =>
@@ -185,6 +192,7 @@ class O3PO_Settings extends O3PO_Singleton {
         'editor_in_chief' => "",
         'ads_api_search_url' => 'https://api.adsabs.harvard.edu/v1/search/query',
         'ads_api_token' => '',
+        'relevanssi_mime_types_to_exclude' => '#(application/.*(tar|gz|gzip)|text/.*tex)#',
 
             /* The options below are currently not customizable.
              *
@@ -197,7 +205,6 @@ class O3PO_Settings extends O3PO_Singleton {
         'secondary_publication_type_name' => 'view',
         'secondary_publication_type_name_plural' => 'views',
         'volumes_endpoint' => 'volumes',
-
                                      );
 
         /**
@@ -240,6 +247,17 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_settings_page() {
 
+            /*
+             * Flush the rewrite rules here because only during the rendering
+             * of the settings page can we be sure that all post types and
+             * endpoints have been registered.
+             */
+        if(get_transient($this->plugin_name . '-settings-rewrite-rules-affected'))
+        {
+            flush_rewrite_rules(true);
+            delete_transient($this->plugin_name . '-settings-rewrite-rules-affected');
+        }
+
         echo '<div>';
         echo '<h2>' . $this->plugin_pretty_name . ' settings (version ' . $this->version . ')</h2>';
 
@@ -281,8 +299,11 @@ class O3PO_Settings extends O3PO_Singleton {
 
         $this->add_settings_section('plugin_settings', 'Plugin', array( $this, 'render_plugin_settings' ), $this->plugin_name . '-settings:plugin_settings');
         $this->add_settings_field('production_site_url', 'Production site url', array( $this, 'render_production_site_url_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
-        $this->add_settings_field('custom_search_page', 'Use custom search page', array( $this, 'render_custom_search_page_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
+        $this->add_settings_field('extended_search_and_navigation', 'Add search and navigation to home page', array( $this, 'render_extended_search_and_navigation_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
+        $this->add_settings_field('search_form_on_search_page', 'Add a search form to the search page', array( $this, 'render_search_form_on_search_page_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
+        $this->add_settings_field('custom_search_page', 'Display search page notice', array( $this, 'render_custom_search_page_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
         $this->add_settings_field('page_template_for_publication_posts', 'Force page template', array( $this, 'render_page_template_for_publication_posts_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
+        $this->add_settings_field('page_template_abstract_header', 'Show a heading for the abstract', array( $this, 'render_page_template_abstract_header_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
         $this->add_settings_field('maintenance_mode', 'Maintenance mode', array( $this, 'render_maintenance_mode_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
 
         $this->add_settings_section('journal_settings', 'Journal', array( $this, 'render_journal_settings' ), $this->plugin_name . '-settings:journal_settings');
@@ -347,6 +368,8 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->add_settings_field('arxiv_url_source_prefix', 'Url prefix for eprint source', array( $this, 'render_arxiv_url_source_prefix_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings');
         $this->add_settings_field('arxiv_url_trackback_prefix', 'Url prefix for trackbacks', array( $this, 'render_arxiv_url_trackback_prefix_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings');
         $this->add_settings_field('arxiv_doi_feed_identifier', 'Indentifier for the DOI feed', array( $this, 'render_arxiv_doi_feed_identifier_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings');
+        $this->add_settings_field('arxiv_paper_doi_feed_endpoint', 'Endpoint for the arXiv DOI feed', array( $this, 'render_arxiv_paper_doi_feed_endpoint_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings');
+        $this->add_settings_field('arxiv_paper_doi_feed_days', 'Number of days in arXiv DOI feed', array( $this, 'render_arxiv_paper_doi_feed_days_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings');
 
         $this->add_settings_section('other_service_settings', 'Other services', array( $this, 'render_other_service_settings' ), $this->plugin_name . '-settings:other_service_settings');
         $this->add_settings_field('doi_url_prefix', 'Url prefix for DOI resolution', array( $this, 'render_doi_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
@@ -355,11 +378,16 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->add_settings_field('orcid_url_prefix', 'Orcid url prefix', array( $this, 'render_orcid_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('fermats_library_url_prefix', 'Url prefix for Fermats Library', array( $this, 'render_fermats_library_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('fermats_library_email', 'Email for Fermats Library', array( $this, 'render_fermats_library_email_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
-
         $this->add_settings_field('mathjax_url', 'MathJax url', array( $this, 'render_mathjax_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('social_media_thumbnail_url', 'Url of default thumbnail for social media', array( $this, 'render_social_media_thumbnail_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('facebook_app_id', 'Facebook app_id', array( $this, 'render_facebook_app_id_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
-        $this->add_settings_field('buffer_secret_email', 'Secret email for adding posts to buffer.com', array( $this, 'render_buffer_secret_email_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
+        $this->add_settings_field('buffer_api_url', 'Url of the buffer.com api', array( $this, 'render_buffer_api_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
+        $this->add_settings_field('buffer_access_token', 'Access token from buffer.com', array( $this, 'render_buffer_access_token_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
+        $this->add_settings_field('buffer_profile_ids', 'Profile IDs on buffer.com', array( $this, 'render_buffer_profile_ids_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
+
+
+        $this->add_settings_section('other_plugins_settings', 'Other plugins', array( $this, 'render_other_plugins_settings' ), $this->plugin_name . '-settings:other_plugins_settings');
+        $this->add_settings_field('relevanssi_mime_types_to_exclude', 'Relevanssi mime types to exclude', array( $this, 'render_relevanssi_mime_types_to_exclude_setting' ), $this->plugin_name . '-settings:other_plugins_settings', 'other_plugins_settings');
     }
 
         /**
@@ -471,6 +499,18 @@ class O3PO_Settings extends O3PO_Singleton {
     }
 
         /**
+         * Render the head of the other plugins settings part.
+         *
+         * @since    0.3.0
+         * @access   public
+         */
+    public function render_other_plugins_settings() {
+
+        echo '<p>Configure how ' . $this->plugin_name . ' interacts with other plugins.</p>';
+
+    }
+
+        /**
          * Render the setting for the production site url.
          *
          * @since    0.1.0
@@ -479,7 +519,31 @@ class O3PO_Settings extends O3PO_Singleton {
     public function render_production_site_url_setting() {
 
         $this->render_setting('production_site_url');
-        echo '<p>(Unless this field is filled and matches the string ' . esc_html(get_site_url())  . ' this instance will be considered a test system and the interfaces with various critical services will remain disabled. This ensures that even a full backup of your journal website, when hosted under a different domain and used as, e.g., a staging system, will not accidentally register DOIs or interact with external services in an unintended way.)</p>';
+        echo '<p>(Unless this field is filled and matches the string ' . esc_html(get_site_url())  . ', this instance will be considered a test system and the interfaces with various critical services will remain disabled. This ensures that even a full backup of your journal website, when hosted under a different domain and used as, e.g., a staging system, will not accidentally register DOIs or interact with external services in an unintended way.)</p>';
+
+    }
+
+        /**
+         * Render the setting for whether to show the extended search-based navigation on the home page.
+         *
+         * @since    0.3.0
+         * @access   public
+         */
+    public function render_extended_search_and_navigation_setting() {
+
+        $this->render_checkbox_setting('extended_search_and_navigation', 'Add  a search-base navigation with statistics about the number of publications and volumes above the posts on the home page. Has no effect if the home page is set to a static page without a post list.');
+
+    }
+
+        /**
+         * Render the setting for whether to show a search form above the results on the search page.
+         *
+         * @since    0.3.0
+         * @access   public
+         */
+    public function render_search_form_on_search_page_setting() {
+
+        $this->render_checkbox_setting('search_form_on_search_page', 'Add a search form above the results on the search page.');
 
     }
 
@@ -496,6 +560,19 @@ class O3PO_Settings extends O3PO_Singleton {
     }
 
         /**
+         * Render the setting for the abstract heading
+         *
+         * @since    0.3.1
+         * @access   public
+         */
+    public function render_page_template_abstract_header_setting() {
+
+        $this->render_setting('page_template_abstract_header');
+        echo '<p>An optional header that is displayed before the abstract on the pages of individual publications.</p>';
+
+    }
+
+        /**
          * Render the setting for whether to use the page template for publications.
          *
          * @since    0.3.0
@@ -503,7 +580,7 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_page_template_for_publication_posts_setting() {
 
-        $this->render_checkbox_setting('page_template_for_publication_posts', 'If checked publication posts are shown with the page template instead of the post template of your theme. Some themes include information such as "Posted on ... by ..." on the post template which may be inappropriate for publication posts.');
+        $this->render_checkbox_setting('page_template_for_publication_posts', 'Show publication posts with the page template instead of the default post template of your theme. Some themes include information such as "Posted on ... by ..." on the post template, which may be inappropriate for publication posts.');
 
     }
 
@@ -528,8 +605,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_doi_prefix_setting() {
+
         $this->render_setting('doi_prefix');
-        echo('<p>(The DOI prefix assigned to your publisher by Crossref.)</p>');
+        echo('<p>(The DOI prefix assigned to your publisher by your DOI registry.)</p>');
+
     }
 
         /**
@@ -539,7 +618,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_journal_title_setting() {
+
         $this->render_setting('journal_title');
+        echo('<p>(The title of your journal.)</p>');
+
     }
 
         /**
@@ -549,8 +631,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_journal_subtitle_setting() {
+
         $this->render_setting('journal_subtitle');
         echo('<p>(The subtitle of your journal. Currently not used.)</p>');
+
     }
 
         /**
@@ -560,8 +644,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_journal_description_setting() {
+
         $this->render_setting('journal_description');
         echo('<p>(A short description of your journal for use in open graph meta-tags.)</p>');
+
     }
 
         /**
@@ -571,8 +657,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_journal_level_doi_suffix_setting() {
+
         $this->render_setting('journal_level_doi_suffix');
         echo('<p>(This is used as both the journal level DOI suffix and to generate the DOIs of your publications via the scheme [doi_prefix]/[journal_level_doi_suffix]-[date]-[page], where [date] is the <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO_8601</a> formated publication date and [page] is an article number that counts up starting at 1.  See the <a href="https://support.crossref.org/hc/en-us/articles/214569903-Journal-level-DOIs">Crossref website</a> for more background.)</p>');
+
     }
 
         /**
@@ -582,7 +670,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_eissn_setting() {
+
         $this->render_setting('eissn');
+        echo('<p>(The eISSN of your journal.)</p>');
+
     }
 
         /**
@@ -592,7 +683,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_publisher_setting() {
+
         $this->render_setting('publisher');
+        echo('<p>(The name of your publisher.)</p>');
+
     }
 
         /**
@@ -602,8 +696,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_secondary_journal_title_setting() {
+
         $this->render_setting('secondary_journal_title');
-        echo('<p>(' . $this->get_plugin_pretty_name() . ' allows you to run a secondary journal for editorials and other secondary literature.)</p>');
+        echo('<p>(' . $this->get_plugin_pretty_name() . ' allows you to run a secondary journal for editorials and other secondary literature. Set its title here.)</p>');
+
     }
 
         /**
@@ -613,8 +709,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_secondary_journal_level_doi_suffix_setting() {
+
         $this->render_setting('secondary_journal_level_doi_suffix');
         echo('<p>(This is used as both the journal level DOI suffix of the secondary journal and to generate the DOIs of the publications in the secondary journal via the scheme [doi_prefix]/[secondary_journal_level_doi_suffix]-[date]-[page], where [date] is the <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO_8601</a> formated publication date and [page] is an article number that counts up starting at 1.  See the <a href="https://support.crossref.org/hc/en-us/articles/214569903-Journal-level-DOIs">Crossref website</a> for more background.)</p>');
+
     }
 
         /**
@@ -624,8 +722,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_secondary_journal_eissn_setting() {
+
         $this->render_setting('secondary_journal_eissn');
-        echo '<p>(It is OK to leave this blank, but DOAJ, for example will not accept meta-date on articles in the secondary journal if this is not set. Do not set it equal to the primary eISSN, as works in both journals will be treated on an equal footing when it comes to citation counting.)</p>';
+        echo '<p>(The eISSN of your secondary journal. Do not set this equal to the eISSN of your primary journal. If you do, they may be treated as a single journal for the purpose of biometrics. It is OK to leave this blank, but DOAJ, for example will not accept meta-date on articles in the secondary journal if this is not set.)</p>';
+
     }
 
         /**
@@ -635,8 +735,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_developer_email_setting() {
+
         $this->render_setting('developer_email');
         echo('<p>(Debug and other notification emails are sent to this address. Is used as the primary email address on test systems.)</p>');
+
     }
 
         /**
@@ -646,8 +748,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_publisher_email_setting() {
+
         $this->render_setting('publisher_email');
         echo('<p>(Email address of the publisher. This is used as the from address for emails sent by ' . $this->get_plugin_pretty_name() . '. Must be an address that is valid on the SMTP server used by this Wordpress instance.)</p>');
+
     }
 
         /**
@@ -657,8 +761,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_first_volume_year_setting() {
+
         $this->render_setting('first_volume_year');
-        echo('<p>(Four digit year in which the first volume was published. Is used to automatically set the volume number of newly published publications and when generating the <a href="/volume/">volume overview page</a>.)</p>');
+        echo('<p>(Four digit year in which the first volume was published. Is used to automatically set the volume number of newly published publications and, e.g., when generating the <a href="/volume/">volume overview page</a>.)</p>');
+
     }
 
         /**
@@ -668,8 +774,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_executive_board() {
+
         $this->render_setting('executive_board');
-        echo('<p>(Names of the Executive Board of your journal. Set this if you want to use the [executive_board] shortcode in the email templates below.)</p>');
+        echo('<p>(Names of the executive board of your journal. Set this if you want to use the [executive_board] shortcode in the email templates below.)</p>');
+
     }
 
         /**
@@ -679,8 +787,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_editor_in_chief() {
+
         $this->render_setting('editor_in_chief');
         echo('<p>(Name of the editor in chief. Set this if you want to use the [editor_in_chief] shortcode in the email templates below.)</p>');
+
     }
 
 
@@ -691,8 +801,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_self_notification_subject_template_settings() {
+
         $this->render_setting('self_notification_subject_template');
         echo O3PO_EmailTemplates::render_short_codes('self_notification_subject');
+
     }
 
         /**
@@ -702,8 +814,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_self_notification_body_template_settings() {
+
         $this->render_multi_line_setting('self_notification_body_template');
         echo O3PO_EmailTemplates::render_short_codes('self_notification_body');
+
     }
 
         /**
@@ -713,8 +827,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_author_notification_subject_template_settings() {
+
         $this->render_setting('author_notification_subject_template');
         echo O3PO_EmailTemplates::render_short_codes('author_notification_subject');
+
     }
 
         /**
@@ -724,8 +840,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_author_notification_body_template_settings() {
+
         $this->render_multi_line_setting('author_notification_body_template');
         echo O3PO_EmailTemplates::render_short_codes('author_notification_body');
+
     }
 
         /**
@@ -735,8 +853,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_author_notification_secondary_subject_template_settings() {
+
         $this->render_multi_line_setting('author_notification_secondary_subject_template');
         echo O3PO_EmailTemplates::render_short_codes('author_notification_subject');
+
     }
 
         /**
@@ -746,8 +866,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_author_notification_secondary_body_template_settings() {
+
         $this->render_multi_line_setting('author_notification_secondary_body_template');
         echo O3PO_EmailTemplates::render_short_codes('author_notification_body');
+
     }
 
         /**
@@ -757,8 +879,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_fermats_library_subject_template_settings() {
+
         $this->render_setting('fermats_library_notification_subject_template');
         echo O3PO_EmailTemplates::render_short_codes('fermats_library_notification_subject');
+
     }
 
         /**
@@ -768,8 +892,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_fermats_library_body_template_settings() {
+
         $this->render_multi_line_setting('fermats_library_notification_body_template');
         echo O3PO_EmailTemplates::render_short_codes('fermats_library_notification_body');
+
     }
 
         /**
@@ -779,8 +905,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_license_name_setting() {
+
         $this->render_setting('license_name');
-        echo '<p>(For example: Creative Commons Attribution 4.0 International (CC BY 4.0))</p>';
+        echo '<p>(The human readable name of the license under which you publish. For example: Creative Commons Attribution 4.0 International (CC BY 4.0))</p>';
+
     }
 
         /**
@@ -790,8 +918,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_license_type_setting() {
+
         $this->render_setting('license_type');
-        echo '<p>(For example: CC BY)</p>';
+        echo '<p>(The type of license under which you publish. For example: CC BY)</p>';
+
     }
 
         /**
@@ -801,8 +931,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_license_version_setting() {
+
         $this->render_setting('license_version');
-        echo '<p>(For example: 4.0)</p>';
+        echo '<p>(The version of the license under which you publish. For example: 4.0)</p>';
+
     }
 
         /**
@@ -812,8 +944,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_license_url_setting() {
+
         $this->render_setting('license_url');
-        echo '<p>(The url under which the license can be found, e.g., https://creativecommons.org/licenses/by/4.0/)</p>';
+        echo '<p>(The url under which the license can be found. For example : https://creativecommons.org/licenses/by/4.0/)</p>';
+
     }
 
         /**
@@ -823,8 +957,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_license_explanation_setting() {
+
         $this->render_setting('license_explanation');
-        echo '<p>(This will be displayed at the end of the license statement.)</p>';
+        echo '<p>(This will be displayed at the end of the license statement on the individual pages of your publications.)</p>';
+
     }
 
         /**
@@ -834,7 +970,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_publisher_country_setting() {
+
         $this->render_setting('publisher_country');
+        echo '<p>(The country in which your publisher is registered.)</p>';
+
     }
 
         /**
@@ -844,7 +983,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_crossref_id_setting() {
+
         $this->render_setting('crossref_id');
+        echo '<p>(Your Crossref ID.)</p>';
+
     }
 
         /**
@@ -854,7 +996,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_crossref_pw_setting() {
+
         $this->render_password_setting('crossref_pw');
+        echo '<p>(Your Crossref password.)</p>';
+
     }
 
         /**
@@ -864,7 +1009,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_crossref_get_forward_links_url_setting() {
+
         $this->render_setting('crossref_get_forward_links_url');
+        echo '<p>(The url from which <a href="https://www.crossref.org/services/cited-by/">Crossref cited-by data</a> can be obtained.)</p>';
+
     }
 
         /**
@@ -874,7 +1022,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_crossref_deposite_url_setting() {
+
         $this->render_setting('crossref_deposite_url');
+        echo '<p>(The url to use when depositing meta-data with Crossref.)</p>';
+
     }
 
         /**
@@ -884,8 +1035,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_crossref_test_deposite_url_setting() {
+
         $this->render_setting('crossref_test_deposite_url');
         echo '<p>(This url is used in place of the real Crossref deposit url when registering dois if ' . $this->get_plugin_pretty_name() . ' is in test system mode. It should be the deposit url of Crossref\'s test system.)</p>';
+
     }
 
         /**
@@ -895,7 +1048,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_crossref_email_setting() {
+
         $this->render_setting('crossref_email');
+        echo '<p>(The email address to use as the depositor\'s email when registering DOIs.)</p>';
+
     }
 
         /**
@@ -905,8 +1061,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_crossref_archive_locations_setting() {
+
         $this->render_setting('crossref_archive_locations');
-        echo '<p>(Please put a comma seperated list containing a subset of CLOCKSS, LOCKSS Portico, KB, DWT, Internet Archive, depending on the kind of archive the primary journal\'s content is archived in.)</p>';
+        echo '<p>(Comma separated list containing a subset of CLOCKSS, LOCKSS Portico, KB, DWT, Internet Archive, depending on which archives the primary journal\'s content is archived in.)</p>';
+
     }
 
         /**
@@ -916,7 +1074,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_ads_api_search_url_setting() {
+
         $this->render_setting('ads_api_search_url');
+        echo '<p>(The url of the ADS API from which cited-by information can be retrieved.)</p>';
+
     }
 
         /**
@@ -926,7 +1087,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_ads_api_token_setting() {
+
         $this->render_password_setting('ads_api_token');
+        echo '<p>(Your ADS API token.)</p>';
+
     }
 
         /**
@@ -936,8 +1100,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_clockss_ftp_url_setting() {
+
         $this->render_setting('clockss_ftp_url');
-        echo '<p>(Please enter the raw url without a leading ftp://)</p>';
+        echo '<p>(The CLOCKSS FTP server to use. Please enter the raw url without the leading ftp:// protocol specification.)</p>';
+
     }
 
         /**
@@ -947,7 +1113,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_clockss_username_setting() {
+
         $this->render_setting('clockss_username');
+        echo '<p>(Your CLOCKSS user name.)</p>';
+
     }
 
         /**
@@ -957,7 +1126,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_clockss_password_setting() {
+
         $this->render_password_setting('clockss_password');
+        echo '<p>(Your CLOCKSS password.)</p>';
+
     }
 
 
@@ -968,7 +1140,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_doaj_api_url_setting() {
+
         $this->render_setting('doaj_api_url');
+        echo '<p>(The url of the DOAJ API.)</p>';
+
     }
 
         /**
@@ -978,7 +1153,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_doaj_api_key_setting() {
+
         $this->render_password_setting('doaj_api_key');
+        echo '<p>(Your DOAJ API password.)</p>';
+
     }
 
         /**
@@ -988,7 +1166,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_doaj_language_code_setting() {
+
         $this->render_setting('doaj_language_code');
+        echo '<p>(The language code corresponding to the language in which you publish.)</p>';
+
     }
 
         /**
@@ -998,7 +1179,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_arxiv_url_abs_prefix_setting() {
+
         $this->render_setting('arxiv_url_abs_prefix');
+        echo '<p>(The url prefix of arXiv abstract pages.)</p>';
+
     }
 
         /**
@@ -1008,7 +1192,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_arxiv_url_pdf_prefix_setting() {
+
         $this->render_setting('arxiv_url_pdf_prefix');
+        echo '<p>(The url prefix for arXiv pdf downloads.)</p>';
+
     }
 
         /**
@@ -1018,7 +1205,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_arxiv_url_source_prefix_setting() {
+
         $this->render_setting('arxiv_url_source_prefix');
+        echo '<p>(The url prefix for arXiv source downloads.)</p>';
+
     }
 
         /**
@@ -1028,7 +1218,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_arxiv_url_trackback_prefix_setting() {
+
         $this->render_setting('arxiv_url_trackback_prefix');
+        echo '<p>(The url prefix for sending trackbacks to the arXiv.)</p>';
+
     }
 
         /**
@@ -1038,7 +1231,40 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_arxiv_doi_feed_identifier_setting() {
+
         $this->render_setting('arxiv_doi_feed_identifier');
+        echo '<p>(The arXiv can automatically update the journal reference of preprints based on information provided by publishers in the form of an xml feed as described <a href="https://arxiv.org/help/bib_feed">here</a>. For this to work, you must pick an identifier (specified via this setting) and inform the arXiv about the url under which the feed is available (can be configured in the following setting).)</p>';
+
+    }
+
+        /**
+         * Render the setting for the DOI feed endpoint for the arXiv.
+         *
+         * @since    0.3.0
+         * @access   public
+         */
+    public function render_arxiv_paper_doi_feed_endpoint_setting() {
+
+        $this->render_setting('arxiv_paper_doi_feed_endpoint');
+        $settings = O3PO_Settings::instance();
+        $endpoint_suffix = $settings->get_plugin_option('arxiv_paper_doi_feed_endpoint');
+        $arxiv_paper_doi_feed_endpoint_url = get_site_url() . '/'. $endpoint_suffix;
+
+        echo '<p>(With the current setting the feed is available under <a href="' . esc_attr($arxiv_paper_doi_feed_endpoint_url) . '">' . esc_html($arxiv_paper_doi_feed_endpoint_url) . '</a>.)</p>';
+
+    }
+
+        /**
+         * Render the setting for the arXiv DOI feed number of days.
+         *
+         * @since    0.3.0
+         * @access   public
+         */
+    public function render_arxiv_paper_doi_feed_days_setting() {
+
+        $this->render_setting('arxiv_paper_doi_feed_days');
+        echo '<p>(Show publications up to this many days in the past in the doi feed.)</p>';
+
     }
 
         /**
@@ -1048,7 +1274,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_doi_url_prefix_setting() {
+
         $this->render_setting('doi_url_prefix');
+        echo '<p>(The url prefix under which publications can be linked via their DOI.)</p>';
+
     }
 
         /**
@@ -1058,7 +1287,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_scholastica_manuscripts_url_setting() {
+
         $this->render_setting('scholastica_manuscripts_url');
+        echo '<p>(If you are using Scholastica as a peer-review platform, you may put here the url of the page on which Scholastica shows all your accepted manuscripts. This link will be displayed in the step-by-step publication guide on the admin panel for easy verification of the acceptance status of manuscripts before publication.)</p>';
+
     }
 
         /**
@@ -1068,7 +1300,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_scirate_url_abs_prefix_setting() {
+
         $this->render_setting('scirate_url_abs_prefix');
+        echo '<p>(The url prefix of scirate abstract pages. If left blank no link to scirate is put on the publication pages.)</p>';
+
     }
 
         /**
@@ -1078,7 +1313,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_orcid_url_prefix_setting() {
+
         $this->render_setting('orcid_url_prefix');
+        echo '<p>(The url prefix of the pages of individual ORCIDs.)</p>';
+
     }
 
         /**
@@ -1088,7 +1326,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_fermats_library_url_prefix_setting() {
+
         $this->render_setting('fermats_library_url_prefix');
+        echo '<p>(The url prefix under which papers are published on Fermat\'s library.)</p>';
+
     }
 
         /**
@@ -1098,7 +1339,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_fermats_library_email_setting() {
+
         $this->render_setting('fermats_library_email');
+        echo '<p>(The address to which emails to fermat\'s library should be sent when notifying them of a newly published paper.)</p>';
+
     }
 
         /**
@@ -1108,7 +1352,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_mathjax_url_setting() {
+
         $this->render_setting('mathjax_url');
+        echo '<p>(The url of the version of MathJax.js to use.)</p>';
+
     }
 
         /**
@@ -1118,7 +1365,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_social_media_thumbnail_url_setting() {
+
         $this->render_setting('social_media_thumbnail_url');
+        echo '<p>(Full url of a suitable image file. For posts and pages that do not have a dedicated feature image, this image is offered via meta-tags to social media platforms when a link to that post/page is shared.)</p>';
+
     }
 
         /**
@@ -1128,20 +1378,77 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_facebook_app_id_setting() {
+
         $this->render_setting('facebook_app_id');
+        echo '<p>(Your facebook_app_id, in case you have and want to use one.)</p>';
+
     }
 
         /**
-         * Render the setting for the Buffer.com secret email.
+         * Render the setting for the Buffer.com api url.
          *
-         * @since    0.1.0
+         * @since    0.3.0
          * @access   public
          */
-    public function render_buffer_secret_email_setting() {
+    public function render_buffer_api_url_setting() {
 
-        $this->render_password_setting('buffer_secret_email');
+        $this->render_setting('buffer_api_url');
+        echo '<p>(Url of the buffer.com api.)</p>';
+
+    }
+
+        /**
+         * Render the setting for the Buffer.com access token.
+         *
+         * @since    0.3.0
+         * @access   public
+         */
+    public function render_buffer_access_token_setting() {
+
+        $this->render_password_setting('buffer_access_token');
         $post_types = O3PO_Utility::oxford_comma_implode(call_user_func($this->active_post_type_names_callback));
-        echo '<p>(If this is set, new ' . $post_types . ' posts are <a target="_blank" href="https://faq.buffer.com/article/272-is-it-possible-to-add-a-post-to-buffer-through-email">automatically submitted</a> to the buffer.com queue associated with the secret email)</p>';
+        echo '<p>(Create an access token <a href="https://buffer.com/developers/apps/create">here</a>.)</p>';
+
+    }
+
+        /**
+         * Render the setting for the Buffer.com prfile ids.
+         *
+         * @since    0.3.0
+         * @access   public
+         */
+    public function render_buffer_profile_ids_setting() {
+
+        $post_types = O3PO_Utility::oxford_comma_implode(call_user_func($this->active_post_type_names_callback));
+
+        if(empty($this->get_plugin_option('buffer_access_token')))
+            $profile_id_help = 'Save the settings after entering a valid access token above, to get a list of available profile ids under your account.';
+        else{
+            $buffer_profile_information = O3PO_Buffer::get_profile_information($this->get_plugin_option('buffer_api_url'), $this->get_plugin_option('buffer_access_token'));
+
+            if(is_wp_error($buffer_profile_information))
+                $profile_id_help = 'There was an error when trying to obtain the available profile ids for the provided access token: ' . $buffer_profile_information->get_error_message();
+            else{
+                $profile_id_help = 'The available services and profile ids are:';
+                foreach($buffer_profile_information as $info)
+                    $profile_id_help .= ' ' . $info['service'] . ":" . $info['id'];
+            }
+        }
+
+        $this->render_array_as_comma_separated_list_setting('buffer_profile_ids');
+        echo '<p>(Comma separated list of buffer.com profile IDs under which to share updates of new ' . $post_types . ' posts. If empty, no attempt to share posts is made. ' . esc_html($profile_id_help) . ')</p>';
+    }
+
+        /**
+         * Render the setting for the Relevanssi mime types to exclude.
+         *
+         * @since    0.3.0
+         * @access   public
+         */
+    public function render_relevanssi_mime_types_to_exclude_setting() {
+
+        $this->render_setting('relevanssi_mime_types_to_exclude');
+        echo '<p>(Relevanssi Premium has the ability to index the content of attachments and thereby, e.g., enabled full text search in PDFs attached to publications. It however, by default, will index all attachment types and this is usually not desirable for the arXiv source files in .tex or .tar.gz format. Through this setting, mime types can be excluded from indexing by providing a php regular expression. All attachment posts whose mime type matches that regular expression are excluded from indexing via the <a href="https://www.relevanssi.com/knowledge-base/controlling-attachment-types-index/">relevanssi_do_not_index</a> filter. If left empty all post attachments are indexed if that feature is enable in Relevanssi Premium.)</p>';
 
     }
 
@@ -1216,6 +1523,26 @@ class O3PO_Settings extends O3PO_Singleton {
     }
 
         /**
+         * Render an array as comma separated list type setting.
+         *
+         * Does not escape or otherwise handle individual fields that contain commas.
+         *
+         * @since    0.3.0
+         * @access   public
+         * @param    string    $id   Id of the setting.
+         */
+    public function render_array_as_comma_separated_list_setting( $id ) {
+
+        $option = $this->get_plugin_option($id);
+        if(!is_array($option))
+            $option = array();
+
+        echo '<input class="regular-text ltr o3po-setting o3po-setting-text" type="text" id="' . $this->plugin_name . '-settings-' . $id . '" name="' . $this->plugin_name . '-settings[' . $id . ']" value="' . esc_attr(implode($option, ',')) . '" />';
+
+    }
+
+
+        /**
          * An array of all option names to the respective functions used when cleaning user input for these options.
          *
          * @since    0.1.0
@@ -1239,11 +1566,11 @@ class O3PO_Settings extends O3PO_Singleton {
                 'journal_subtitle' => 'trim_settings_field',
                 'journal_description' => 'trim_settings_field',
                 'journal_level_doi_suffix' => 'validate_doi_suffix',
-                'eissn' => 'trim_settings_field',
+                'eissn' => 'validate_issn',
                 'publisher' => 'trim_settings_field',
                 'secondary_journal_title' => 'trim_settings_field',
                 'secondary_journal_level_doi_suffix' => 'validate_doi_suffix',
-                'secondary_journal_eissn' => 'trim_settings_field',
+                'secondary_journal_eissn' => 'validate_issn',
                 'developer_email' => 'trim_settings_field',
                 'publisher_email' => 'trim_settings_field',
                 'publisher_country' => 'trim_settings_field',
@@ -1269,6 +1596,8 @@ class O3PO_Settings extends O3PO_Singleton {
                 'arxiv_url_source_prefix' => 'validate_url',
                 'arxiv_url_trackback_prefix' => 'validate_url',
                 'arxiv_doi_feed_identifier' => 'trim_settings_field',
+                'arxiv_paper_doi_feed_endpoint' => 'trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed',
+                'arxiv_paper_doi_feed_days' => 'validate_positive_integer',
                 'doi_url_prefix' => 'validate_url',
                 'scholastica_manuscripts_url' => 'validate_url',
                 'scirate_url_abs_prefix' => 'validate_url',
@@ -1277,29 +1606,39 @@ class O3PO_Settings extends O3PO_Singleton {
                 'fermats_library_email' => 'trim_settings_field',
                 'mathjax_url' => 'validate_url',
                 'social_media_thumbnail_url' => 'trim_settings_field',
-                'buffer_secret_email' => 'trim_settings_field',
+                'buffer_api_url' => 'validate_url',
+                'buffer_access_token' => 'trim_settings_field',
+                'buffer_profile_ids' => 'validate_array_as_comma_separated_list',
                 'facebook_app_id' => 'trim_settings_field',
                 'doaj_api_url' => 'trim_settings_field',
                 'doaj_api_key' => 'trim_settings_field',
                 'doaj_language_code' => 'validate_two_letter_country_code',
                 'custom_search_page' => 'checked_or_unchecked',
+                'extended_search_and_navigation' => 'checked_or_unchecked',
+                'search_form_on_search_page' => 'checked_or_unchecked',
                 'page_template_for_publication_posts' => 'checked_or_unchecked',
+                'page_template_abstract_header' => 'trim_settings_field',
                 'maintenance_mode' => 'checked_or_unchecked',
                 'volumes_endpoint' => 'trim_settings_field',
                 'doi_prefix' => 'validate_doi_prefix',
-                'eissn' => 'validate_eissn',
-                'secondary_journal_eissn' => 'validate_eissn',
                 'first_volume_year' => 'validate_first_volume_year',
                 'executive_board' => 'trim_settings_field',
                 'editor_in_chief' => 'trim_settings_field',
                 'self_notification_subject_template' => 'trim_settings_field',
-                'self_notification_body_template' => 'trim_settings_field',
+                'self_notification_body_template' => 'leave_unchaged',
                 'author_notification_subject_template' => 'trim_settings_field',
-                'author_notification_body_template' => 'trim_settings_field',
+                'author_notification_body_template' => 'leave_unchaged',
                 'author_notification_secondary_subject_template' => 'trim_settings_field',
-                'author_notification_secondary_body_template' => 'trim_settings_field',
+                'author_notification_secondary_body_template' => 'leave_unchaged',
                 'fermats_library_notification_subject_template' => 'trim_settings_field',
-                'fermats_library_notification_body_template' => 'trim_settings_field',
+                'fermats_library_notification_body_template' => 'leave_unchaged',
+                'relevanssi_mime_types_to_exclude' => 'trim_settings_field',
+
+                'cited_by_refresh_seconds' => null,
+                'primary_publication_type_name' => null,
+                'primary_publication_type_name_plural' => null,
+                'secondary_publication_type_name' => null,
+                'secondary_publication_type_name_plural' => null,
                                                    );
 
         return self::$all_settings_fields_map;
@@ -1342,24 +1681,6 @@ class O3PO_Settings extends O3PO_Singleton {
     }
 
         /**
-         * Clean user input to the eissn setting
-         *
-         * @since    0.1.0
-         * @access   private
-         * @param    string   $field    The field this was input to.
-         * @param    string   $eissn    User input.
-         */
-    public function validate_eissn( $field, $eissn ) {
-
-        $eissn = trim($eissn);
-        if(empty($eissn) or preg_match('/^[0-9]{4}-[0-9]{3}[0-9X]$/', $eissn))
-            return $eissn;
-
-        add_settings_error( $field, 'illegal-eissn', "The eISSN in '" . $this->settings_fields[$field]['title'] . "' must consist of two groups of four characters separated by a dash -, each of which must be a number 0-9, except the last, which may also be an upper case X. Field cleared.", 'error');
-        return "";
-    }
-
-        /**
          * Clean user input to the first_volume_year setting
          *
          * @since    0.1.0
@@ -1378,6 +1699,27 @@ class O3PO_Settings extends O3PO_Singleton {
     }
 
         /**
+         * Clean user input to issn type settings
+         *
+         * @since    0.3.0
+         * @access   private
+         * @param    string   $field    The field this was input to.
+         * @param    string   $input    User input.
+         */
+    public function validate_issn( $field, $input ) {
+
+        $input = trim($input);
+        if(empty($input))
+            return '';
+
+        if(!O3PO_Utility::valid_issn($input))
+            add_settings_error( $field, 'invalid-issn', "The ISSN in '" . $this->settings_fields[$field]['title'] . "' is invalid", 'error');
+
+        return $input;
+    }
+
+
+        /**
          * Clean user input to url type settings
          *
          * @since    0.3.0
@@ -1387,13 +1729,43 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function validate_url( $field, $input ) {
 
-        $input = trim($input);
-        $url = esc_url_raw(strip_tags(stripslashes($input)));
+        $input_trimmed = trim($input);
+        $url = esc_url_raw(strip_tags(stripslashes($input_trimmed)));
 
-        if($url !== $input)
+        $parsed = parse_url($url);
+        if(empty($parsed['scheme']) or empty($parsed['host']))
+            add_settings_error( $field, 'url-validated', "The URL in '" . $this->settings_fields[$field]['title'] . "' was malformed. Please check.", 'error');
+        elseif($url !== $input)
             add_settings_error( $field, 'url-validated', "The URL in '" . $this->settings_fields[$field]['title'] . "' was malformed or contained special or illegal characters, which were removed or escaped. Please check.", 'updated');
         return $url;
     }
+
+        /**
+         * Break a comma separated list into an array of fields
+         *
+         * @since    0.3.0
+         * @access   private
+         * @param    string   $field    The field this was input to.
+         * @param    string   $input    User input.
+         */
+    public function validate_array_as_comma_separated_list( $field, $input ) {
+
+        try
+        {
+            $input = trim($input);
+            $array = preg_split('#,#', $input, Null, PREG_SPLIT_NO_EMPTY);
+            foreach($array as $key => $field)
+                $array[$key] = trim($field);
+
+            return $array;
+        }
+        catch (Exception $e) {
+            add_settings_error( $field, 'not-comma-separated-list', "The input to '" . $this->settings_fields[$field]['title'] . "' could not be interpreted as a comma separated list.", 'error');
+            return array();
+        }
+    }
+
+
 
         /**
          * Validate two letter country code
@@ -1411,6 +1783,25 @@ class O3PO_Settings extends O3PO_Singleton {
 
         add_settings_error( $field, 'url-validated', "The two letter country code in '" . $this->settings_fields[$field]['title'] . "' was malformed. Field cleared.", 'error');
         return "";
+    }
+
+        /**
+         * Validate positive integer
+         *
+         * @since    0.3.0
+         * @access   private
+         * @param    string   $field    The field this was input to.
+         * @param    string   $input    User input.
+         */
+    public function validate_positive_integer( $field, $input ) {
+
+        $input = trim($input);
+        if(preg_match('/^[1-9][0-9]*$/', $input))
+            return $input;
+
+        add_settings_error( $field, 'not-a-positive-integer', "The input to the field '" . $this->settings_fields[$field]['title'] . "' was not a positive integer without leading zeros.", 'error');
+
+        return "1";
     }
 
         /**
@@ -1438,9 +1829,54 @@ class O3PO_Settings extends O3PO_Singleton {
          * @param    string   $field    The field this was input to.
          * @param    string   $input    User input.
          */
+    public function trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed( $field, $input ) {
+
+        $input = trim($input);
+        if(empty($input))
+        {
+            add_settings_error( $field, 'must-not-be-empty', "The field '" . $this->settings_fields[$field]['title'] . "' must not be empty. Reset to default value.", 'error');
+            $input = $this->option_defaults[$field];
+        }
+        if(empty($input))
+            $input = 'this-field-must-not-be-empty';
+
+        if($input !== $this->get_plugin_option($field))
+        {
+                /*
+                 * In render_settings_page() we check for transient and
+                 * flush rewrite rules there if it is set and True.
+                 */
+            set_transient($this->plugin_name . '-settings-rewrite-rules-affected', True);
+            add_settings_error( $field, 'rewrite-rules-affected', "The rewrite rules have been updated because the field '" . $this->settings_fields[$field]['title'] . "' was changed.", 'updated');
+        }
+
+        return $input;
+    }
+
+        /**
+         * Trim user input to settings
+         *
+         * @since    0.3.0
+         * @access   private
+         * @param    string   $field    The field this was input to.
+         * @param    string   $input    User input.
+         */
     public function trim_settings_field( $field, $input ) {
 
         return trim($input);
+    }
+
+        /**
+         * Leave user input to settings unchanged.
+         *
+         * @since    0.3.0
+         * @access   private
+         * @param    string   $field    The field this was input to.
+         * @param    string   $input    User input.
+         */
+    public function leave_unchaged( $field, $input ) {
+
+        return $input;
     }
 
         /**
@@ -1455,7 +1891,7 @@ class O3PO_Settings extends O3PO_Singleton {
         $newinput = array();
         foreach($this->get_all_settings_fields_map() as $field => $validation_method)
         {
-            if(isset($input[$field]))
+            if(isset($input[$field]) and $validation_method !== null)
                 $newinput[$field] = $this->$validation_method($field, $input[$field]);
             else
                 $newinput[$field] = $this->get_plugin_option($field);
@@ -1473,8 +1909,8 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function get_plugin_option( $id ) {
 
-        $options = get_option($this->plugin_name . '-settings');
-        if(!empty($options[$id]))
+        $options = get_option($this->plugin_name . '-settings', array());
+        if(array_key_exists($id, $options))
             return $options[$id];
 
         if(isset($this->option_defaults[$id]))
@@ -1564,5 +2000,17 @@ class O3PO_Settings extends O3PO_Singleton {
         add_settings_field($id, $title, $callback, $page, $section, $args);
         $this->settings_fields[$id] = array('title' => $title, 'callback' => $callback, 'page' => $page, 'section' => $section, 'args' => $args);
 
+    }
+
+
+        /**
+         * Return the defaults of all options.
+         *
+         * @sinde 0.3.0
+         * @access public
+         * @return array  Array of all default options.
+         */
+    public function get_option_defaults() {
+        return $this->option_defaults;
     }
 }

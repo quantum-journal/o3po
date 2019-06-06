@@ -3,7 +3,7 @@
 /**
  * Encapsulates the interface with the external service CLOCKSS.
  *
- * @link       http://example.com
+ * @link       https://quantum-journal.org/o3po/
  * @since      0.3.0
  *
  * @package    O3PO
@@ -34,6 +34,7 @@ class O3PO_Clockss {
          * @param    string     $clockss_ftp_url  The url of the CLOCKSS ftp server.
          * @param    string     $clockss_username The CLOCKSS username
          * @param    string     $clockss_password The CLOCKSS password
+         * @return   string     Description of what happened during the upload.
          */
     public static function ftp_upload_meta_data_and_pdf_to_clockss( $clockss_xml, $pdf_path, $remote_filename_without_extension, $clockss_ftp_url, $clockss_username, $clockss_password ) {
 
@@ -49,15 +50,18 @@ class O3PO_Clockss {
             $tmpfile_clockss_xml = tempnam(sys_get_temp_dir(), $remote_filename_without_extension );
             file_put_contents($tmpfile_clockss_xml, $clockss_xml);
 
-            $ftp_connection = ftp_connect($clockss_ftp_url);
+            if($clockss_ftp_url === 'invalid_url_used_in_unit_tests')
+                throw new Exception('Got invalid_url_used_in_unit_tests as url, aborting because we take this as an indication that we were called in a unit test.');
+
+            $ftp_connection = ftp_connect($clockss_ftp_url, 21, 10);
             $login_result = ftp_login($ftp_connection, $clockss_username, $clockss_password);
 
-            if (ftp_put($ftp_connection, $remote_filename_without_extension . '.xml', $tmpfile_clockss_xml, FTP_BINARY))
+            if(ftp_put($ftp_connection, $remote_filename_without_extension . '.xml', $tmpfile_clockss_xml, FTP_BINARY))
                 $clockss_response .= "INFO: successfully uploaded the meta-data xml to CLOCKSS.\n";
             else
                 $clockss_response .= "ERROR: There was an error uploading the meta-data xml to CLOCKSS: " . $php_errormsg . "\n";
 
-            if (ftp_put($ftp_connection, $remote_filename_without_extension . '.pdf', $pdf_path, FTP_BINARY))
+            if(ftp_put($ftp_connection, $remote_filename_without_extension . '.pdf', $pdf_path, FTP_BINARY))
                 $clockss_response .= "INFO: successfully uploaded the fulltext pdf to CLOCKSS.\n";
             else
                 $clockss_response .= "ERROR: There was an error uploading the fulltext pdf to CLOCKSS: " . $php_errormsg . "\n";

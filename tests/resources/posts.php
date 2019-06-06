@@ -17,6 +17,7 @@ $posts = array(
         'post_status' => 'private',
         'post_title' => 'Fake title',
         'permalink' => 'Fake permalink',
+        'date' => current_time("Y-m-d"),
         'meta' => array(
             'paper_abstract' => 'This is a test abstract that contains not math so far and no special characters.',
             'paper_abstract_mathml' => 'This is a test abstract that contains not math so far and no special characters.',
@@ -71,6 +72,7 @@ $posts = array(
         'attachment_image_src' => 'fake_attachment_image_src',
         'thumbnail_id' => 3,
         'attachment_url' => "Fake attachment_url",
+        'date' => current_time("Y-m-d"),
         'meta' => array(),
                ),
     3 => array(
@@ -78,6 +80,7 @@ $posts = array(
         'attachment_image_src' => 'fake_attachment_image_src',
         'attachment_url' => "Fake attachment_url",
         'attachment_path' => dirname(__FILE__) . '/arxiv/0809.2542v4.pdf',
+        'date' => current_time("Y-m-d"),
                ),
     4 => array(
         'post_type' => 'attachment',
@@ -92,6 +95,7 @@ $posts = array(
         'post_status' => 'private',
         'post_title' => 'Fake title 2',
         'permalink' => 'Fake permalink',
+        'date' => current_time("Y-m-d"),
         'meta' => array(
             'paper_abstract' => 'This is a test abstract 2 that contains not math so far and no special characters.',
             'paper_abstract_mathml' => 'This is a test abstract 2 that contains not math so far and no special characters.',
@@ -144,11 +148,15 @@ $posts = array(
         'post_type' => 'attachment',
         'attachment_url' => 'fake_attachment_url',
         'attachment_path' => dirname(__FILE__) . '/arxiv/0809.2542v4.pdf',
+        'mime_type' => 'application/pdf',
+        'date' => current_time("Y-m-d"),
                ),
     7 => array(
         'post_type' => 'attachment',
         'attachment_url' => 'fake_attachment_url',
         'attachment_path' => dirname(__FILE__) . '/arxiv/0809.2542v4.tar.gz',
+        'mime_type' => 'application/gz',
+        'date' => current_time("Y-m-d"),
                ),
     8 => array(
         'post_type' => 'paper',
@@ -158,6 +166,7 @@ $posts = array(
         'post_status' => 'publish',
         'post_title' => 'Fake title',
         'permalink' => 'Fake permalink',
+        'date' => current_time("Y-m-d"),
         'meta' => array(
             'paper_abstract' => 'This is a test abstract that contains not math so far and no special characters.',
             'paper_abstract_mathml' => 'This is a test abstract that contains not math so far and no special characters.',
@@ -214,6 +223,7 @@ $posts = array(
         'post_status' => 'publish',
         'post_title' => 'Fake title',
         'permalink' => 'Fake permalink',
+        'date' => current_time("Y-m-d"),
         'meta' => array(
             'view_type' => 'Leap',
             'view_number_target_dois' => '0',
@@ -276,6 +286,7 @@ $posts = array(
         'post_status' => 'publish',
         'post_title' => 'Fake title',
         'permalink' => 'Fake permalink',
+        'date' => current_time("Y-m-d"),
         'meta' => array(
             'view_type' => 'Leap',
             'view_number_target_dois' => '1',
@@ -330,7 +341,7 @@ $posts = array(
             'view_clockss_response' => '',
                         )
                 ),
-        11 => array(
+    11 => array(
         'post_type' => 'paper',
         'post_content' => 'fake_post_content5',
         'paper_nonce' => 'fake_nonce',
@@ -338,6 +349,7 @@ $posts = array(
         'post_status' => 'private',
         'post_title' => 'Fake title 2',
         'permalink' => 'Fake permalink',
+        'date' => current_time("Y-m-d"),
         'meta' => array(
             'paper_abstract' => 'This is a test abstract 2 that contains not math so far and no special characters.',
             'paper_abstract_mathml' => 'This is a test abstract 2 that contains not math so far and no special characters.',
@@ -388,7 +400,7 @@ $posts = array(
                ),
 
 
-        12 => array(
+    12 => array(
         'post_type' => 'paper',
         'post_content' => 'fake_post_content5',
         'paper_nonce' => 'fake_nonce',
@@ -396,6 +408,7 @@ $posts = array(
         'post_status' => 'publish',
         'post_title' => 'Fake title 2',
         'permalink' => 'Fake permalink',
+        'date' => current_time("Y-m-d"),
         'meta' => array(
             'paper_eprint' => '1610.01808v4',
             'paper_doi_prefix' => '10.22331',
@@ -403,5 +416,12 @@ $posts = array(
             'paper_pages' => '5',
                         )
                     ),
+    13 => array(
+        'post_type' => 'attachment',
+        'attachment_url' => 'fake_attachment_url',
+        'attachment_path' => dirname(__FILE__) . '/arxiv/0908.2921v2.tex',
+        'mime_type' => 'text/tex',
+        'date' => current_time("Y-m-d"),
+               ),
 
                );

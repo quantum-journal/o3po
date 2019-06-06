@@ -4,11 +4,11 @@
 
 
 
-* Contributors: cgogolin
+* Contributors: cgogolin, johannesjmeyer, drever
 * Donate link: https://quantum-journal.org/donate/
 * Tags: publishing, open-access
 * Requires at least: 4.0.1
-* Tested up to: 4.9.8
+* Tested up to: 5.2.0
 * Requires PHP: 5.6
 * Stable tag: 1.0.0
 * License: GPLv3 or later
@@ -37,13 +37,13 @@ O-3PO offers the following features:
 * Interfaces with [CLOCKSS](https://www.clockss.org/clockss/Home)
 * Interfaces with [Buffer.com](https://buffer.com/app)
 * Interfaces with [Fermat's library](https://fermatslibrary.com/)
+* Interfaces with [NASA ads](https://ui.adsabs.harvard.edu/)
 * Customizable email templates for author communication
 * Search centered navigation of articles
-* RSS integration feed
-* arXiv recent papers feed endpoint
-* PDF endpoint
-* Volume endpoint
+* Integration of publications in to RSS feed
+* Brows journal content by volume
 * Web-statement endpoint
+* Collection and display of cited-by data as well as computation of citation statistics
 
 ## Works best with
 
@@ -96,6 +96,10 @@ It is obviously a play on the name of humanoid robot character from a series of 
 * Email templates and various other aspects of the plugin are now customizable.
 * Tweaked appearance of publications.
 * Code quality and test coverage improved.
+* Improved cited-by data parsing.
+* Support for buffer.com https api
+* Greatly improved documentation of settings
+* Better test coverage
 ### 0.2.2
 * Settings page now uses password text fields for sensitive settings.
 * Fixed file name of full text pdf download.

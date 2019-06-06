@@ -63,7 +63,9 @@ class O3PO_Journal {
             'arxiv_url_pdf_prefix', //from primary
             'arxiv_url_source_prefix', //from primary
             'arxiv_url_trackback_prefix', //from secondary
-            'buffer_secret_email',
+            'buffer_api_url',
+            'buffer_access_token',
+            'buffer_profile_ids',
             'crossref_archive_locations',
             'crossref_deposite_url',
             'crossref_email',
@@ -148,7 +150,7 @@ class O3PO_Journal {
         /**
          * Handle the requests to the /volume/ endpoint.
          *
-         * We want to display an overview of the available volumes and then sub-pages
+         * We want to display an overview of the available volumes as well as sub-pages
          * with lists for each volume. Here we set up appropriate queries to do that.
          *
          * We then want that Wordpress and the theme take care of turning these queries
@@ -169,13 +171,13 @@ class O3PO_Journal {
          * the function volume_endpoint_template() below). Without any posts to show,
          * however, even the 'page' template does not execute 'loop_start' and (depending
          * on the theme) can fall back to the 'content-none' template. To prevent this we
-         * have to add a fake "empty" post. We do this in during the 'the_posts' action in
+         * have to add a fake "empty" post. We do this during the 'the_posts' action in
          * add_fake_empty_post_to_volume_overview_page() (see below).
          *
          * - Finally, we want the entries in the list to appear more "compressed" than in
          * other archive pages. This again could be solved with a custom theme or template,
-         * but we want to stay largely theme independent. We this insert some java script
-         * into the page to hide pars of the generated html and reduce the spacing between
+         * but we want to stay largely theme independent. We thus instead insert some java script
+         * into the page to hide parts of the generated html and reduce the spacing between
          * elements. This will not work with every theme, but at least is unlikely to cause
          * serious unintended side-effects.
          *
@@ -206,7 +208,7 @@ class O3PO_Journal {
             $page = 1;
 
         if(isset($vol_num) and $vol_num>=1)
-            query_posts(array('post_status' => 'publish', 'post_type' => $this->get_journal_property('publication_type_name'), 'meta_key' => $this->get_journal_property('publication_type_name') . '_volume', 'meta_value' => $vol_num, 'paged' => $page, 'posts_per_page' => 9999 ));
+            query_posts(array('post_status' => 'publish', 'post_type' => $this->get_journal_property('publication_type_name'), 'meta_key' => $this->get_journal_property('publication_type_name') . '_volume', 'meta_value' => $vol_num, 'paged' => $page, 'posts_per_page' => -1 ));
         else
         {
             query_posts(array('post_type' => 'page', 'post__in' => array(0), $this->get_journal_property('volumes_endpoint') . '_add_fake_post' => true)); //empty query but with $this->get_journal_property('volumes_endpoint') => true so that we know that we should inject a fake post
@@ -214,9 +216,9 @@ class O3PO_Journal {
 
         set_query_var($this->get_journal_property('volumes_endpoint'), true);
         set_query_var('page', $page);
-        if(isset($vol_num)) set_query_var('vol_num', $vol_num);
+        if(isset($vol_num))
+            set_query_var('vol_num', $vol_num);
 
-        return $wp_query;
     }
 
         /**
@@ -429,7 +431,7 @@ class O3PO_Journal {
          * @access public
          * @param  WP_Query  $wp_query   The current Wordpress query.
          */
-    public function compress_enteies_in_volume_view( $wp_query ) {
+    public function compress_entries_in_volume_view( $wp_query ) {
 
         if ( !isset( $wp_query->query_vars[ $this->get_journal_property('volumes_endpoint') ] ) )
             return;
@@ -515,7 +517,7 @@ for (i = 0; i < elemets_to_condense.length; i++) {
          * @access   public
          * @param    int      $post_id_to_exclude    Id of a post to exclude.
          * @param    int      $pages                 Page number to be checked for whether it is still free or not.
-         * @param    array    $post_types            Post types to take into accoun.
+         * @param    array    $post_types            Post types to take into account.
          * */
     public static function pages_still_free_info( $post_id_to_exclude, $pages, $post_types ) {
 
@@ -564,7 +566,7 @@ for (i = 0; i < elemets_to_condense.length; i++) {
          * @param    string   $doi_suffix   Doi suffix to be checked.
          * @param    array    $post_types   Post types to take into accoun.
          * */
-    public static function doi_suffix_stil_free( $doi_suffix, $post_types ) {
+    public static function doi_suffix_still_free( $doi_suffix, $post_types ) {
 
         $still_free = true;
         foreach($post_types as $post_type)

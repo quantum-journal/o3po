@@ -3,7 +3,7 @@
 /**
  * Encapsulates the interface with the external service DOAJ.
  *
- * @link       http://example.com
+ * @link       https://quantum-journal.org/o3po/
  * @since      0.3.0
  *
  * @package    O3PO
@@ -31,6 +31,7 @@ class O3PO_Doaj {
          * @param     string  $doaj_json     Json encoded meta-data in a format suitable for DOAJ
          * @param     string  $doaj_api_url  The DOAJ API submission URL
          * @param     string  $doaj_api_key  The DOAJ API key
+         * @return    array|WP_Error         The result of a wp_remote_post() call or a WP_Error in case of errors
          */
     public static function remote_post_meta_data_to_doaj( $doaj_json, $doaj_api_url, $doaj_api_key ) {
 

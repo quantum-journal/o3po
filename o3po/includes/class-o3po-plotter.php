@@ -3,7 +3,7 @@
 /**
  * Collection of functions for visualization of data by means of relatively simple html.
  *
- * @link       http://example.com
+ * @link       https://quantum-journal.org/o3po/
  * @since      0.3.0
  *
  * @package    O3PO

@@ -1,10 +1,10 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-%                                                     % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                     %
 % Einselection                                        %
-%                                                     % 
+%                                                     %
 % Christian Gogolin 2009                              %
-%                                                     % 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%                                                     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \documentclass[aps,prl,twocolumn,showpacs,showkeys,a4paper]{revtex4}
 \usepackage{graphicx}
@@ -15,7 +15,7 @@
 \usepackage[english]{babel}
 \usepackage{dsfont}
 \usepackage{bbm}
-\usepackage{hyperref} 
+\usepackage{hyperref}
 \usepackage{amsmath, amsthm, amssymb, mathrsfs}
 
 %PDFTeX
@@ -82,7 +82,7 @@ These approaches, which are subsumed under the term \emph{decoherence theory}, a
 But, in face of the enormous success of standard Quantum Mechanics in explaining microscopic phenomena and the existence of macroscopic quantum systems on the one hand and the broad applicability of Statistical Mechanics and Thermodynamics on the other, we feel that neither a modification of Quantum Theory, nor considerations restricted to special Hamiltonians can provide a satisfactory explanation for the classical, statistical and thermodynamic behavior of the macroscopic world.
 
 Recently there has been remarkable success in explaining macroscopic, seemingly irreversible behavior from standard Quantum Mechanics.
-It has been shown that it is possible to explain the phenomenon of equilibration \cite{gemmermichelmahler04,Reimann08,Linden09,0907.1267v1} and to justify the applicability of the canonical ensemble \cite{Popescu06} without added randomness and ensemble averages, from nothing but pure Quantum Mechanics and the randomness due to entanglement with the environment. 
+It has been shown that it is possible to explain the phenomenon of equilibration \cite{gemmermichelmahler04,Reimann08,Linden09,0907.1267v1} and to justify the applicability of the canonical ensemble \cite{Popescu06} without added randomness and ensemble averages, from nothing but pure Quantum Mechanics and the randomness due to entanglement with the environment.
 
 We make use of the results obtained in these papers and connect this approach with the research on decoherence.
 We consider the case of decoherence due to weak interaction with an environment, which is of particular interest for quantum information processing and quantum computing.
@@ -91,9 +91,9 @@ Our main result is that decoherence with respect to a fixed basis is a natural p
 
 \section{Setup and notation}
 \label{sec:setupanddefinitions}
-% 
+%
 We consider arbitrary quantum systems which can be described using a Hilbert space $\hiH$ of finite dimension $d$ and which can be divided into two parts which we will call the bath $B$ and the subsystem $S$.
-If the Hilbert space of a real system is infinite dimensional it should always be possible to find an effective description in a finite dimensional Hilbert space by introducing a high energy cut-off. 
+If the Hilbert space of a real system is infinite dimensional it should always be possible to find an effective description in a finite dimensional Hilbert space by introducing a high energy cut-off.
 It should be emphasized that we will note make any special a priori assumptions about the size and structure of the bath and subsystem.
 We use the terms bath and subsystem only because in the end we will be interested in situations where the dimension $d_B$ of the Hilbert space of the bath $\hiH_B$ is much larger than the dimension $d_S$ of the Hilbert space $\hiH_S$ of the subsystem.
 
@@ -126,7 +126,7 @@ We use the letter $\omega$ to denote the time average of time dependent states $
 
 \section{Equilibration}
 \label{sec:equilibration}
-% 
+%
 In a time reversal invariant theory equilibration in the usual sense is impossible.
 We therefore use an extended notion of equilibration and say that a system is in equilibrium when its density matrix stays close to some state for almost all times, and say that it evolves towards equilibrium if it approaches such a state and then stays close to it if started in a state far from equilibrium.
 
@@ -169,7 +169,7 @@ These two theorems prove that for almost all initial states of a sufficiently la
 \section{Speed of fluctuations around equilibrium}
 \label{sec:speedoffluctuationsaroudequilibrium}
 %
-Knowing that, under suitable conditions, subsystems of large quantum mechanical system will equilibrate, it is natural to ask: How fast will the fluctuations around the equilibrium state typically be? 
+Knowing that, under suitable conditions, subsystems of large quantum mechanical system will equilibrate, it is natural to ask: How fast will the fluctuations around the equilibrium state typically be?
 This question was investigated very recently in \cite{0907.1267v1}.
 
 The first step is to introduce a meaningful notion of \emph{speed}.
@@ -177,7 +177,7 @@ This is achieved by defining the time derivative \cite{0907.1267v1}
 \begin{equation}
   v_S(t) = \lim_{\delta t \to 0} \frac{\tracedistance(\rho^S_t,\rho^S_{t+\delta t})}{\delta t} = \frac{1}{2} \left\| \frac{d\rho^S_t}{dt} \right\|_1 ,
 \end{equation}
-with 
+with
 \begin{equation}
   \frac{d\rho^S_t}{dt} = \iu\,\Tr_B[\rho_t,\haH] .
 \end{equation}
@@ -278,7 +278,7 @@ We can now prove the main result of this paper:
 \begin{theorem}
   \label{theorem:slowstatesmustdecohere}
   Consider a physical system evolving under a Hamiltonian of the form given in \eqref{eq:generalhamiltonianwithconstanttermabsorbed1} and with non-degenerate energy gaps.
-  All reduced states $\rho^S$ that are slow in the sense that 
+  All reduced states $\rho^S$ that are slow in the sense that
   \begin{equation}
     \left\|\frac{d\rho^S}{dt}\right\|_1 \leq \epsilon
   \end{equation}
@@ -326,9 +326,9 @@ Our result establishes a link between decoherence theory and the research on equ
 Besides intentionally isolated systems for quantum information processing there exist numerous situations where our result can be applied two of which are:
 i) Electronic excitations of gases at moderate temperature.
 The energy gaps between the ground state and the first few excited states are typically much larger than the thermal energy.
-ii) Radioactive decay. 
+ii) Radioactive decay.
 The binding energy before and after the decay typically differ by much more than the interaction energy with the environment.
-It is therefore very unlikely to observe coherent superpositions between the ground state and the first excited states in such a gas or between a decayed and an undecayed atom. 
+It is therefore very unlikely to observe coherent superpositions between the ground state and the first excited states in such a gas or between a decayed and an undecayed atom.
 
 The author acknowledges the fruitful discussions with Andreas Winter, Peter Janotta, Haye Hinrichsen and Alexander Streltsov.
 
@@ -455,7 +455,7 @@ The author acknowledges the fruitful discussions with Andreas Winter, Peter Jano
 
 \end{document}
 
-%%% Local Variables: 
+%%% Local Variables:
 %%% mode: latex
 %%% TeX-master: t
-%%% End: 
+%%% End:

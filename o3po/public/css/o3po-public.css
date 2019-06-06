@@ -27,6 +27,10 @@ table.meta-data-table td {
 p.authors, p.authors a {
     font-size: 1.5rem;
 }
+h3.abstract-header {
+    padding-top: 1rem;
+    margin-bottom: 0rem;
+}
 p.abstract {
     text-align: justify;
 }
