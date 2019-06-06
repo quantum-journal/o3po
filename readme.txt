@@ -40,10 +40,8 @@ O-3PO offers the following features:
 * Interfaces with [NASA ads](https://ui.adsabs.harvard.edu/)
 * Customizable email templates for author communication
 * Search centered navigation of articles
-* RSS integration feed
-* arXiv recent papers feed endpoint
-* PDF endpoint
-* Volume endpoint
+* Integration of publications in to RSS feed
+* Brows journal content by volume
 * Web-statement endpoint
 * Collection and display of cited-by data as well as computation of citation statistics
 
@@ -98,8 +96,10 @@ It is obviously a play on the name of humanoid robot character from a series of 
 * Email templates and various other aspects of the plugin are now customizable.
 * Tweaked appearance of publications.
 * Code quality and test coverage improved.
-* Improved cited-by data parsing
-* Added various options to customize the behavior of the plugin
+* Improved cited-by data parsing.
+* Support for buffer.com https api
+* Greatly improved documentation of settings
+* Better test coverage
 ### 0.2.2
 * Settings page now uses password text fields for sensitive settings.
 * Fixed file name of full text pdf download.
