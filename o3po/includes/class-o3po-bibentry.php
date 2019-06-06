@@ -215,7 +215,7 @@ class O3PO_Bibentry {
 
         $citation_cite_as = '';
 
-        if(!empty($this->meta_data['type']) and strtolower($this->meta_data['type']) !== 'book')
+        if(!empty($this->meta_data['type']) and !in_array(strtolower($this->meta_data['type']), array('book', 'full_text')))
             $citation_cite_as .= ucfirst($this->meta_data['type']) . " ";
         if(!empty($this->meta_data['venue']))
             $citation_cite_as .= $this->meta_data['venue'] . " ";
