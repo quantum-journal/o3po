@@ -72,7 +72,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $this->the_admin_panel_eprint($post_id);
         $this->the_admin_panel_title($post_id);
         $this->the_admin_panel_corresponding_author_email($post_id);
-        $this->the_admin_panel_buffer_email($post_id);
+        $this->the_admin_panel_buffer($post_id);
         $this->the_admin_panel_fermats_library($post_id);
         $this->the_admin_panel_authors($post_id);
         $this->the_admin_panel_affiliations($post_id);
@@ -130,14 +130,21 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $arxiv_fetch_results = '';
 		if ( ( isset($_POST[$post_type . '_fetch_metadata_from_arxiv'] ) or $old_eprint !== $new_eprint ) and !empty($new_eprint) and preg_match("/^(quant-ph\/[0-9]{6,}|[0-9]{4}\.[0-9]{4,})v[0-9]*$/", $new_eprint) === 1 ) {
 
-            $fetch_meta_data_from_abstract_page_result = O3PO_Arxiv::fetch_meta_data_from_abstract_page($new_eprint);
-            $arxiv_fetch_results .= $fetch_meta_data_from_abstract_page_result['arxiv_fetch_results'];
-
-            $new_abstract = $fetch_meta_data_from_abstract_page_result['abstract'];
-            update_post_meta( $post_id, $post_type . '_title', $fetch_meta_data_from_abstract_page_result['title'] );
-            update_post_meta( $post_id, $post_type . '_number_authors', $fetch_meta_data_from_abstract_page_result['number_authors'] );
-            update_post_meta( $post_id, $post_type . '_author_given_names', $fetch_meta_data_from_abstract_page_result['author_given_names'] );
-            update_post_meta( $post_id, $post_type . '_author_surnames', $fetch_meta_data_from_abstract_page_result['author_surnames'] );
+            $settings = O3PO_Settings::instance();
+            $arxiv_abs_page_url = $settings->get_plugin_option('arxiv_url_abs_prefix');
+            $fetch_meta_data_from_abstract_page_result = O3PO_Arxiv::fetch_meta_data_from_abstract_page($arxiv_abs_page_url, $new_eprint);
+            if(!empty($fetch_meta_data_from_abstract_page_result['arxiv_fetch_results']))
+                $arxiv_fetch_results .= $fetch_meta_data_from_abstract_page_result['arxiv_fetch_results'];
+            if(!empty($fetch_meta_data_from_abstract_page_result['abstract']))
+                $new_abstract = $fetch_meta_data_from_abstract_page_result['abstract'];
+            if(!empty($fetch_meta_data_from_abstract_page_result['title']))
+                update_post_meta( $post_id, $post_type . '_title', $fetch_meta_data_from_abstract_page_result['title'] );
+            if(!empty($fetch_meta_data_from_abstract_page_result['number_authors']))
+                update_post_meta( $post_id, $post_type . '_number_authors', $fetch_meta_data_from_abstract_page_result['number_authors'] );
+            if(!empty($fetch_meta_data_from_abstract_page_result['author_given_names']))
+                update_post_meta( $post_id, $post_type . '_author_given_names', $fetch_meta_data_from_abstract_page_result['author_given_names'] );
+            if(!empty($fetch_meta_data_from_abstract_page_result['author_surnames']))
+                update_post_meta( $post_id, $post_type . '_author_surnames', $fetch_meta_data_from_abstract_page_result['author_surnames'] );
             if(isset($fetch_meta_data_from_abstract_page_result['number_authors']) and $fetch_meta_data_from_abstract_page_result['number_authors'] >= 0)
                 update_post_meta( $post_id, $post_type . '_author_name_styles', array_fill(0, $fetch_meta_data_from_abstract_page_result['number_authors'], 'western') ); #we cannot guess the name style from the arXiv page but must set this to a legal value
 		}
@@ -165,6 +172,8 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
     protected function validate_and_process_data( $post_id ) {
 
         $post_type = get_post_type($post_id);
+
+        $settings = O3PO_Settings::instance();
 
         $abstract = get_post_meta( $post_id, $post_type . '_abstract', true );
         $abstract_mathml = get_post_meta( $post_id, $post_type . '_abstract_mathml', true );
@@ -195,9 +204,10 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 
         $post_date = get_the_date( 'Y-m-d', $post_id );
         $today_date = current_time( 'Y-m-d' );
-        if ($date_published !== $post_date)
+
+        if ($post_date !== $date_published)
             $validation_result .= "ERROR: The publication date of this post (" . $post_date . ") set in the Publish box on the right does not match the publication date (" . $date_published . ") of this " . $post_type . " given in the input field below.\n";
-        if ($date_published !== $today_date and empty($corresponding_author_has_been_notifed_date) )
+        if ($post_date !== $today_date and empty($corresponding_author_has_been_notifed_date) )
             $validation_result .= "WARNING: The publication date of this post (" . $post_date . ") is not set to today's date (" . $today_date . ") but the post of this " . $post_type . " also does not appear to have already been published in the past.\n";
         if ($eprint_was_changed_on_last_save === "true")
             $validation_result .= "REVIEW: The eprint was set to ". $eprint . ".\n";
@@ -209,7 +219,8 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             // Download PDF form the arXiv
         if( !empty( $doi_suffix ) and !empty( $eprint ) and (isset($_POST[$post_type . '_download_arxiv_pdf']) or empty($arxiv_pdf_attach_ids) or $eprint_was_changed_on_last_save === "true" or $doi_suffix_was_changed_on_last_save === "true" ) )
         {
-            $pdf_download_result= O3PO_Arxiv::download_pdf($this->environment, $eprint, $doi_suffix, $post_id);
+            $arxiv_url_pdf_prefix = $settings->get_plugin_option('arxiv_url_pdf_prefix');
+            $pdf_download_result= O3PO_Arxiv::download_pdf($this->environment, $arxiv_url_pdf_prefix, $eprint, $doi_suffix, $post_id);
         }
         if ( !empty( $pdf_download_result['error'] ) ) {
             $validation_result .= "ERROR: Exception while downloading the pdf of " . $eprint . " from the arXiv: " . $pdf_download_result['error'] . "\n";
@@ -222,7 +233,8 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             // Download SOURCE form the arXiv (This can yield either a .tex or a .tar.gz file!)
         if( !empty( $doi_suffix ) and !empty( $eprint ) and (isset($_POST[$post_type . '_download_arxiv_source']) or empty($arxiv_source_attach_ids) or $eprint_was_changed_on_last_save === "true" or $doi_suffix_was_changed_on_last_save === 'true') )
         {
-            $source_download_result = O3PO_Arxiv::download_source($this->environment, $eprint, $doi_suffix, $post_id );
+            $arxiv_url_source_prefix = $settings->get_plugin_option('arxiv_url_source_prefix');
+            $source_download_result = O3PO_Arxiv::download_source($this->environment, $arxiv_url_source_prefix, $eprint, $doi_suffix, $post_id );
         }
         if ( !empty( $source_download_result['error'] ) ) {
             $validation_result .= "ERROR: Exception while downloading the source of " . $eprint ." from the arXiv: " . $source_download_result['error'] . "\n";
@@ -616,7 +628,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 		echo '		<td>';
 		echo '			<input type="text" id="' . $post_type . '_eprint" name="' . $post_type . '_eprint" class="' . $post_type . '_eprint_field required" placeholder="" value="' . esc_attr($eprint) . '">';
 		echo '                  <input type="checkbox" name="' . $post_type . '_fetch_metadata_from_arxiv"' . (empty($eprint) ? 'checked' : '' ) . '>Fetch title, authors, and abstract from the arXiv upon next Save/Update';
-		echo '			<p>(The arXiv identifier including the version and, for old eprints, the the prefix, so this should look like 1701.1234v5 or quant-ph/123456v3.)</p>';
+		echo '			<p>(The arXiv identifier including the version and, for old eprints, the prefix, e.g., 1701.1234v5 or quant-ph/123456v3.)</p>';
 		echo '		</td>';
 		echo '	</tr>';
 
@@ -1313,13 +1325,13 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                     $filecontents_without_comments = preg_replace('#(?<!\\\\)%.*#', '', $filecontents);//remove all comments
 
                         // Extract author, affiliation and similar information from the source
-                    preg_match_all('#\\\\(author|affiliation|affil|orcid|homepage)\s*([^{]*)\s*(?=\{((?:[^{}]++|\{(?3)\})*)\})#', $filecontents_without_comments, $author_info);//matches balanced parenthesis (Note the use of (?3) here!) to test changes go here https://regex101.com/r/bVHadc/1
+                    preg_match_all('#\\\\(author|affiliation|affil|address|orcid|homepage)\s*([^{]*)\s*(?=\{((?:[^{}]++|\{(?3)\})*)\})#', $filecontents_without_comments, $author_info);//matches balanced parenthesis (Note the use of (?3) here!) to test changes go here https://regex101.com/r/bVHadc/1
                     if(!empty($author_info[0]) && !empty($author_info[1]))
                     {
                         if($author_number !== -1)
                             $validation_result .= "WARNING: Found affiliations, ORCIDs, or author URLs in more than one file. Please check.\n";
 
-                        if(in_array('author', $author_info[1]) or in_array('affiliation', $author_info[1]) or in_array('affil', $author_info[1]))
+                        if(in_array('author', $author_info[1]) or in_array('affiliation', $author_info[1]) or in_array('affil', $author_info[1]) or in_array('address', $author_info[1]))
                             $validation_result .= "REVIEW: Author and affiliations data updated from arxiv source. Please check.\n";
                         if(in_array('orcid', $author_info[1]))
                             $validation_result .= "REVIEW: ORCID data updated from arxiv source. Please check.\n";
@@ -1354,14 +1366,14 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                                 $new_author_orcids[$author_number] = $author_info[3][$x];
                             else if( $author_info[1][$x] === 'homepage' and !empty($author_info[3][$x]))
                                 $new_author_urls[$author_number] = $author_info[3][$x];
-                            else if( $author_info[1][$x] === 'affiliation' or $author_info[1][$x] === 'affil')
+                            else if( $author_info[1][$x] === 'affiliation' or $author_info[1][$x] === 'affil' or $author_info[1][$x] === 'address')
                             {
                                 $current_affiliation = trim($author_info[3][$x], ' {}');
                                 $current_affiliation = O3PO_Latex::expand_latex_macros($new_author_latex_macro_definitions, $current_affiliation);
                                 $current_affiliation = O3PO_Latex::latex_to_utf8_outside_math_mode($current_affiliation);
                                 $current_affiliation = O3PO_Latex::normalize_whitespace_and_linebreak_characters($current_affiliation);
 
-                                if( $author_info[1][$x] === 'affiliation')
+                                if( $author_info[1][$x] === 'affiliation' or $author_info[1][$x] === 'address' )
                                 {
                                     if(!in_array($current_affiliation, $new_affiliations))
                                         $new_affiliations[] = $current_affiliation;

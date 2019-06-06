@@ -239,6 +239,25 @@ ab' , 'äb'],
     }
 
 
+    public function utf8_to_closest_latin_letter_string_provider() {
+        return [
+            ['foo' , 'foo'],
+            ['ä' , 'a'],
+            ['á' , 'a'],
+            ['ç' , 'c'],
+            ['ü562457189(&(L' , 'uL'],
+                ];
+    }
+
+        /**
+         * @dataProvider utf8_to_closest_latin_letter_string_provider
+         */
+    public function test_utf8_to_closest_latin_letter_string( $input, $expected ) {
+        $this->assertSame($expected, O3PO_Latex::utf8_to_closest_latin_letter_string($input));
+    }
+
+
+
     public function preg_split_at_latex_math_mode_delimters_provider() {
         return [
             ['foo' , ['foo']],
@@ -299,6 +318,7 @@ ab' , 'äb'],
             [['#x#', '\\begin{equation} x + \alpha = 4 \\end{equation} x'] , 1],
             [['#\\\\#', 'foo \\cite{a} $x$ bar \\cite{b}'] , 2],
             [['#\\\\(?!cite)#', 'foo \\cite{a} $x$ bar \\cite{b}'] , 0],
+            [['##', 'foo $x$'] , 2],
                 ];
     }
 

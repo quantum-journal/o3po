@@ -77,6 +77,7 @@ class O3PO_Bibentry {
          */
     public function __construct( $meta_data=array() ) {
 
+        $this->meta_data = array();
         foreach(static::$meta_data_fields as $field)
             if(isset($meta_data[$field]))
             {
@@ -95,11 +96,13 @@ class O3PO_Bibentry {
          * @since 0.3.0
          * @access public
          * @param string $field The key of the field to get.
-         * @return mixed string or array stored in the field.
+         * @return mixed The string or array stored in the field.
          */
     public function get( $field ) {
-
-        return $this->meta_data[$field];
+        if(isset($this->meta_data[$field]))
+            return $this->meta_data[$field];
+        else
+            return '';
     }
 
         /**
@@ -112,13 +115,13 @@ class O3PO_Bibentry {
     public function get_surnames() {
 
         $surnames = array();
-        if(!empty($this->get('authors')) and is_array($this->get('authors')))
-            foreach ($this->get('authors') as $author) {
+        if(!empty($this->meta_data['authors']) and is_array($this->meta_data['authors']))
+            foreach($this->meta_data['authors'] as $author) {
                 $surnames[] = $author->get_surname();
             }
-        if(!empty($this->get('editors')) and is_array($this->get('editors')))
-            foreach ($this->get('editors') as $editor) {
-                $surnames[] = $editor->get_surname();
+        if(!empty($this->meta_data['editors']) and is_array($this->meta_data['editors']))
+            foreach($this->meta_data['editors'] as $author) {
+                $surnames[] = $author->get_surname();
             }
 
         return O3PO_Utility::oxford_comma_implode($surnames);
@@ -138,18 +141,18 @@ class O3PO_Bibentry {
 
         $result = '';
         $author_names = array();
-        if(!empty($this->get('authors')) and is_array($this->get('authors')))
+        if(!empty($this->meta_data['authors']) and is_array($this->meta_data['authors']))
         {
             $author_names = array();
-            foreach ($this->get('authors') as $author) {
+            foreach ($this->meta_data['authors'] as $author) {
                 $author_names[] = $author->get_name();
             }
             $result .= O3PO_Utility::oxford_comma_implode($author_names);
         }
         $editor_names = array();
-        if(!empty($this->get('editors')) and is_array($this->get('editors')))
+        if(!empty($this->meta_data['editors']) and is_array($this->meta_data['editors']))
         {
-            foreach ($this->get('editors') as $editor) {
+            foreach ($this->meta_data['editors'] as $editor) {
                 $editor_names[] = $editor->get_name();
             }
             if(count($author_names) > 0)
@@ -182,17 +185,17 @@ class O3PO_Bibentry {
         if(!empty($bibitem_html))
             $bibitem_html .= ', ';
 
-        if(!empty($this->get('title')))
-            $bibitem_html .= '"' . esc_html($this->get('title')) . '", ';
+        if(!empty($this->meta_data['title']))
+            $bibitem_html .= '"' . esc_html($this->meta_data['title']) . '", ';
 
-        if(!empty($this->get('eprint')))
-            $bibitem_html .= '<a href="' . esc_attr($arxiv_url_abs_prefix . $this->get('eprint')) . '">' . esc_html("arXiv:" . $this->get('eprint')) . '</a>';
-        if(!empty($this->get('doi')) and !empty($this->get('eprint')))
+        if(!empty($this->meta_data['eprint']))
+            $bibitem_html .= '<a href="' . esc_attr($arxiv_url_abs_prefix . $this->meta_data['eprint']) . '">' . esc_html("arXiv:" . $this->meta_data['eprint']) . '</a>';
+        if(!empty($this->meta_data['doi']) and !empty($this->meta_data['eprint']))
             $bibitem_html .= ", ";
-        if(!empty($this->get('doi')))
-            $bibitem_html .= '<a href="' . esc_attr($doi_url_prefix . $this->get('doi')) . '">' . esc_html($this->get_cite_as_text()) . '</a>';
+        if(!empty($this->meta_data['doi']))
+            $bibitem_html .= '<a href="' . esc_attr($doi_url_prefix . $this->meta_data['doi']) . '">' . esc_html($this->get_cite_as_text()) . '</a>';
 
-        if(empty($this->get('doi')) and empty($this->get('eprint')))
+        if(empty($this->meta_data['doi']) and empty($this->meta_data['eprint']))
             $bibitem_html .= esc_html($this->get_cite_as_text());
 
         $bibitem_html = trim($bibitem_html, ' ,') . '.';
@@ -212,38 +215,38 @@ class O3PO_Bibentry {
 
         $citation_cite_as = '';
 
-        if(!empty($this->get('type')) and strtolower($this->get('type')) !== 'book')
-            $citation_cite_as .= ucfirst($this->get('type')) . " ";
-        if(!empty($this->get('venue')))
-            $citation_cite_as .= $this->get('venue') . " ";
-        if(!empty($this->get('collectiontitle')))
-            $citation_cite_as .= $this->get('collectiontitle') . " ";
-        if(!empty($this->get('publisher')) and $this->get('type') == "book")
-            $citation_cite_as .= $this->get('publisher') . " ";
-        if(!empty($this->get('institution')))
-            $citation_cite_as .= $this->get('institution') . " ";
-        if(!empty($this->get('howpublished')))
-            $citation_cite_as .= "(" . $this->get('howpublished') . ") ";
-        if(!empty($this->get('volume')))
-            $citation_cite_as .= $this->get('volume');
-        if(!empty($this->get('volume')) and !empty($this->get('issue')))
+        if(!empty($this->meta_data['type']) and !in_array(strtolower($this->meta_data['type']), array('book', 'full_text')))
+            $citation_cite_as .= ucfirst($this->meta_data['type']) . " ";
+        if(!empty($this->meta_data['venue']))
+            $citation_cite_as .= $this->meta_data['venue'] . " ";
+        if(!empty($this->meta_data['collectiontitle']))
+            $citation_cite_as .= $this->meta_data['collectiontitle'] . " ";
+        if(!empty($this->meta_data['publisher']) and $this->meta_data['type'] == "book")
+            $citation_cite_as .= $this->meta_data['publisher'] . " ";
+        if(!empty($this->meta_data['institution']))
+            $citation_cite_as .= $this->meta_data['institution'] . " ";
+        if(!empty($this->meta_data['howpublished']))
+            $citation_cite_as .= "(" . $this->meta_data['howpublished'] . ") ";
+        if(!empty($this->meta_data['volume']))
+            $citation_cite_as .= $this->meta_data['volume'];
+        if(!empty($this->meta_data['volume']) and !empty($this->meta_data['issue']))
             $citation_cite_as .= " ";
-        if(!empty($this->get('issue')))
-            $citation_cite_as .= $this->get('issue');
-        if((!empty($this->get('volume')) or !empty($this->get('issue'))) and !empty($this->get('page')))
+        if(!empty($this->meta_data['issue']))
+            $citation_cite_as .= $this->meta_data['issue'];
+        if((!empty($this->meta_data['volume']) or !empty($this->meta_data['issue'])) and !empty($this->meta_data['page']))
             $citation_cite_as .= ", ";
-        if(!empty($this->get('page')))
-            $citation_cite_as .= $this->get('page') . " ";
-        /* if(!empty($this->get('eprint'))) */
-        /*     $citation_cite_as .= 'arXiv:'. $this->get('eprint') . " "; */
-        if(!empty($this->get('year')))
-            $citation_cite_as .= '(' . $this->get('year') . ")";
-        /* if(!empty($this->get('doi'))) */
-        /*     $citation_cite_as .= ' doi:'. $this->get('doi'); */
-        if(!empty($this->get('isbn')))
-            $citation_cite_as .= ' ISBN:'. $this->get('isbn');
-        /* if(!empty($this->get('url'))) */
-        /*     $citation_cite_as .= $this->get('url') . ' '; */
+        if(!empty($this->meta_data['page']))
+            $citation_cite_as .= $this->meta_data['page'] . " ";
+        /* if(!empty($this->meta_data['eprint'])) */
+        /*     $citation_cite_as .= 'arXiv:'. $this->meta_data['eprint'] . " "; */
+        if(!empty($this->meta_data['year']))
+            $citation_cite_as .= '(' . $this->meta_data['year'] . ")";
+        /* if(!empty($this->meta_data['doi'])) */
+        /*     $citation_cite_as .= ' doi:'. $this->meta_data['doi']; */
+        if(!empty($this->meta_data['isbn']))
+            $citation_cite_as .= ' ISBN:'. $this->meta_data['isbn'];
+        /* if(!empty($this->meta_data['url'])) */
+        /*     $citation_cite_as .= $this->meta_data['url'] . ' '; */
 
         return trim($citation_cite_as, ' ');
     }

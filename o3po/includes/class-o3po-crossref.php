@@ -90,38 +90,11 @@ class O3PO_Crossref {
          * @param    string   $crossref_id     The id for which to submit this upload.
          * @param    string   $crossref_pw     The password corresponding to the crossref_id.
          * @param    string   $doi             The doi for which cited-by data is to be retrieved.
+         * @return   mixed    Response of wp_remote_get() from Crossref or WP_Error.
          */
     private static function remote_get_cited_by( $crossref_url, $crossref_id, $crossref_pw, $doi, $storage_time=60*10, $timeout=6 ) {
 
         $request_url = $crossref_url . '?usr=' . urlencode($crossref_id).  '&pwd=' . urlencode($crossref_pw) . '&doi=' . urlencode($doi) . '&include_postedcontent=true';
-        $response = get_transient('get_crossref_cited_by_' . $request_url);
-        if(empty($response)) {
-            $response = wp_remote_get($request_url, array('timeout' => $timeout));
-            if(is_wp_error($response))
-                return $response;
-            set_transient('get_crossref_cited_by_' . $request_url, $response, $storage_time);
-        }
-
-        return $response;
-    }
-
-
-        /**
-         * Retrieve cited-by information for all citations under a given doi prefix.
-         *
-         * Uses Crossref's cited-by service.
-         *
-         * @since    0.3.0
-         * @access   private
-         * @param    string   $crossref_url    The url of the crossref server to upload to.
-         * @param    string   $crossref_id     The id for which to submit this upload.
-         * @param    string   $crossref_pw     The password corresponding to the crossref_id.
-         * @param    string   $doi_prefix      The doi prefix for which cited-by data is to be retrieved.
-         * @param    string   $startDate       The date from which on the cited by data is to be included in the format YYYY-mm-dd
-         */
-    private static function remote_get_all_cited_by( $crossref_url, $crossref_id, $crossref_pw, $doi_prefix, $startDate, $storage_time=60*10, $timeout=6 ) {
-
-        $request_url = $crossref_url . '?usr=' . urlencode($crossref_id).  '&pwd=' . urlencode($crossref_pw) . '&doi=' . urlencode($doi_prefix) . '&startDate=' . $startDate . '&include_postedcontent=true';
 
         $response = get_transient('get_crossref_cited_by_' . $request_url);
         if(empty($response)) {
@@ -154,6 +127,8 @@ class O3PO_Crossref {
 
         try
         {
+            $use_errors=libxml_use_internal_errors(true);
+
             $response = static::remote_get_cited_by($crossref_url, $crossref_id, $crossref_pw, $doi);
 
             if(is_wp_error($response))
@@ -162,13 +137,15 @@ class O3PO_Crossref {
                 throw new Exception("Could not fetch cited-by data for " . $doi . " from Crossref. No response.");
             else
             {
-                $use_errors=libxml_use_internal_errors(true);
                 $xml = simplexml_load_string($response['body']);
-                libxml_use_internal_errors($use_errors);
                 if ($xml === false) {
                     $error = "Could not fetch cited-by data for " . $doi . " from Crossref. This is normal if the DOI was registered recently.";
-                    foreach(libxml_get_errors() as $e) {
-                        $error .= " " . $e->message . ".";
+                    if(!empty(libxml_get_errors()))
+                    {
+                        /* foreach(libxml_get_errors() as $e) { */
+                        /*     $error .= " " . trim($e->message) . "."; */
+                        /* } */
+                        libxml_clear_errors();
                     }
                     throw new Exception($error);
                 }
@@ -177,40 +154,51 @@ class O3PO_Crossref {
             }
         } catch (Exception $e) {
             return new WP_Error("exception", $e->getMessage());
+        } finally {
+            libxml_use_internal_errors($use_errors);
         }
     }
 
 
+        /**
+         * Get cited by information for a given DOI as an array of bibtenries.
+         *
+         * @since    0.3.0
+         * @access   public
+         * @param    string   $crossref_url    The url of the crossref server to upload to.
+         * @param    string   $crossref_id     The id for which to submit this upload.
+         * @param    string   $crossref_pw     The password corresponding to the crossref_id.
+         * @param    string   $doi             The doi for which cited-by data is to be retrieved.
+         * @return   array Array of bibentries citing the given DOI
+         *
+         */
     public static function get_cited_by_bibentries( $crossref_url, $login_id, $login_passwd, $doi ) {
 
-        $body = O3PO_Crossref::get_cited_by_xml_body($crossref_url, $login_id, $login_passwd, $doi);
-
-        if(is_wp_error($body))
-            return $body;
-
-        if(empty($body) or empty($body->forward_link))
-            return array();
-
-        $citation_number = 0;
-        $bibentries = array();
         try
         {
-            foreach ($body->forward_link as $f_link) {
+            $body = O3PO_Crossref::get_cited_by_xml_body($crossref_url, $login_id, $login_passwd, $doi);
 
-                if(isset($f_link->journal_cite))
+            if(is_wp_error($body))
+                return $body;
+
+            $citation_number = 0;
+            $bibentries = array();
+
+            foreach ($body->forward_link as $f_link) {
+                if(!empty($f_link->journal_cite))
                     $cite = $f_link->journal_cite;
-                elseif(isset($f_link->book_cite))
+                elseif(!empty($f_link->book_cite))
                     $cite = $f_link->book_cite;
-                elseif(isset($f_link->conf_cite))
+                elseif(!empty($f_link->conf_cite))
                     $cite = $f_link->conf_cite;
-                elseif(isset($f_link->dissertation_cite))
+                elseif(!empty($f_link->dissertation_cite))
                     $cite = $f_link->dissertation_cite;
-                elseif(isset($f_link->report_cite))
+                elseif(!empty($f_link->report_cite))
                     $cite = $f_link->report_cite;
-                elseif(isset($f_link->standard_cite))
+                elseif(!empty($f_link->standard_cite))
                     $cite = $f_link->standard_cite;
                 else
-                    continue;
+                    throw new Exception("Encountered an unhandled forward link type.");
 
                 $authors = array();
                 if(!empty($cite->contributors->contributor))
@@ -242,65 +230,6 @@ class O3PO_Crossref {
         }
 
         return $bibentries;
-    }
-
-
-        /**
-         * DEPRECATED: Retrieve cited-by information on all works citing a given DOI prefix from Crossref.
-         *
-         * Uses Crossref's cited-by service to retrieve information about works
-         * citing works with the given DOI prefix in xml format.
-         *
-         * @since    0.3.0
-         * @access   public
-         * @param    string   $crossref_url    The url of the crossref server to upload to.
-         * @param    string   $crossref_id     The id for which to submit this upload.
-         * @param    string   $crossref_pw     The password corresponding to the crossref_id.
-         * @param    string   $doi_prefix      The doi prefix for which cited-by data is to be retrieved.
-         * @param    string   $start_date      Date from which on citations are to be returned
-         * @param    int      $storage_time    The number of seconds to cache the response by Crossref.
-         * @retutn array   Array of citation counts by DOI or an empty array in case no citations could be found or an exception occurred.
-         */
-    public static function get_all_citation_counts( $crossref_url, $crossref_id, $crossref_pw, $doi_prefix, $start_date, $storage_time=60*10) {
-
-        try
-        {
-            $xml_string = get_transient('all_cited_by_xml_' . $crossref_id . "_" . $doi_prefix . "_" . $start_date);
-            if(false === $xml_string)
-            {
-                $response = static::remote_get_all_cited_by($crossref_url, $crossref_id, $crossref_pw, $doi_prefix, $start_date);
-                if(is_wp_error($response))
-                    return null;
-                else if(empty($response['body']) )
-                    return null;
-                else
-                {
-                    $xml_string = $response['body'];
-                }
-                set_transient('all_cited_by_xml_' . $crossref_id . "_" . $doi_prefix . "_" . $start_date, $xml_string, $storage_time);
-            }
-
-            $use_errors=libxml_use_internal_errors(true);
-            $xml = simplexml_load_string($xml_string);
-            libxml_use_internal_errors($use_errors);
-
-            if ($xml === false)
-                return null;
-
-            $citation_counts = array();
-            foreach($xml->query_result->body->children() as $forward_link )
-            {
-                $doi = (string)$forward_link->attributes()->doi;
-                if(!isset($citation_counts[$doi]))
-                    $citation_counts[$doi] = 0;
-                $citation_counts[$doi] += 1;
-            }
-
-            return $citation_counts;
-
-        } catch (Exception $e) {
-            return new WP_Error("exception", $e->getMessage());
-        }
     }
 
 }

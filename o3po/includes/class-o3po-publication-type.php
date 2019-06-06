@@ -19,6 +19,7 @@
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-clockss.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-crossref.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-ads.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-buffer.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-doaj.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-latex.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
@@ -197,10 +198,11 @@ abstract class O3PO_PublicationType {
          *
          * @since    0.1.0
          * @access   public
+         * @return   array   Array of names of all active publication types.
          */
     public static function get_active_publication_type_names() {
 
-        if(!isset(self::$active_publication_types))
+        if(empty(self::$active_publication_types))
             return array();
 
         $active_publication_type_names = array();
@@ -208,7 +210,6 @@ abstract class O3PO_PublicationType {
             $active_publication_type_names[] = $active_publication_type->get_publication_type_name();
 
         return $active_publication_type_names;
-
     }
 
         /**
@@ -513,12 +514,12 @@ abstract class O3PO_PublicationType {
 		if ($old_doi_suffix === $new_doi_suffix)
 			update_post_meta( $post_id, $post_type . '_doi_suffix_was_changed_on_last_save', "false" );
 		else {
-			if ( !$this->journal->doi_suffix_stil_free($new_doi_suffix, $this->get_active_publication_type_names()) )
+			if ( !$this->journal->doi_suffix_still_free($new_doi_suffix, $this->get_active_publication_type_names()) )
 				$new_doi_suffix = '';
 			update_post_meta( $post_id, $post_type . '_doi_suffix_was_changed_on_last_save', "true" );
 		}
         $new_corresponding_author_email = isset( $_POST[ $post_type . '_corresponding_author_email' ] ) ? sanitize_text_field( $_POST[ $post_type . '_corresponding_author_email' ] ) : '';
-        $new_buffer_email = isset($_POST[ $post_type . '_buffer_email' ]) ? sanitize_text_field( $_POST[ $post_type . '_buffer_email' ]) : '';
+        $new_buffer_email = isset($_POST[ $post_type . '_buffer_email' ]) ? sanitize_text_field( $_POST[ $post_type . '_buffer_email' ]) : ''; #we keep using the buffer_email and buffer_email_xxx fields for compatibility, even though the new buffer.com interface does no longer send emails but uses the buffer.com api
         $new_buffer_special_text = isset($_POST[ $post_type . '_buffer_special_text' ]) ? sanitize_text_field( $_POST[ $post_type . '_buffer_special_text' ]) : '';
 
         $new_bbl = isset( $_POST[ $post_type . '_bbl' ] ) ? $_POST[ $post_type . '_bbl' ] : '';
@@ -543,7 +544,7 @@ abstract class O3PO_PublicationType {
 		update_post_meta( $post_id, $post_type . '_doi_suffix', $new_doi_suffix );
 		update_post_meta( $post_id, $post_type . '_corresponding_author_email', $new_corresponding_author_email );
         update_post_meta( $post_id, $post_type . '_bbl', $new_bbl );
-        update_post_meta( $post_id, $post_type . '_buffer_email', $new_buffer_email );
+        update_post_meta( $post_id, $post_type . '_buffer_email', $new_buffer_email ); #we keep using the buffer_email and buffer_email_xxx fields for compatibility, even though the new buffer.com interface does no longer send emails but uses the buffer.com api
         update_post_meta( $post_id, $post_type . '_buffer_special_text', $new_buffer_special_text );
 
     }
@@ -750,40 +751,34 @@ abstract class O3PO_PublicationType {
         if( strpos($validation_result, 'ERROR') === false or strpos($validation_result, 'REVIEW') === false)
         {
                 //Upload meta-data to DOAJ
-            if(empty($this->get_journal_property('eissn')))
-                $validation_result .= "INFO: Skipping upload to DOAJ as no eISSN was configured for this journal.\n";
-            else
+            $eissn = $this->get_journal_property('eissn');
+            if(!empty($eissn) && get_post_status($post_id) === 'publish' && !$this->environment->is_test_environment())
             {
-                if (get_post_status($post_id) === 'publish' && !$this->environment->is_test_environment())
-                {
-                    $doaj_response = $this->upload_meta_data_to_doaj($doaj_json,
-                                                                     $this->get_journal_property('doaj_api_url'),
-                                                                     $this->get_journal_property('doaj_api_key')
-                                                                     );
-                    if(!empty($doaj_response) && (strpos($doaj_response, 'ERROR') !== false || strpos($doaj_response, 'WARNING') !== false))
-                        $validation_result .= $doaj_response;
-                    else
-                        $validation_result .= "INFO: Meta-data successfully uploaded to DOAJ.\n";
-                }
-                else
-                    $doaj_response = NULL;
-                update_post_meta( $post_id, $post_type . '_doaj_response', $doaj_response );
-            }
+                $doaj_api_url = $this->get_journal_property('doaj_api_url');
+                $doaj_api_key = $this->get_journal_property('doaj_api_key');
+                $doaj_response = $this->upload_meta_data_to_doaj($doaj_json, $doaj_api_url, $doaj_api_key);
 
+                if(strpos($doaj_response, 'ERROR') !== false || strpos($doaj_response, 'WARNING') !== false)
+                    $validation_result .= $doaj_response;
+                else
+                    $validation_result .= "INFO: Meta-data successfully uploaded to DOAJ.\n";
+            }
+            else
+                $doaj_response = NULL;
+            update_post_meta( $post_id, $post_type . '_doaj_response', $doaj_response);
 
                 //Upload meta-data and fulltext to CLOCKSS (only if a fulltext exists)
             $fulltext_pdf_path = $this->get_fulltext_pdf_path($post_id);
-            $doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
-            $remote_filename_without_extension = $doi_suffix;
-
-            if (get_post_status($post_id) === 'publish' && !empty($fulltext_pdf_path) && !$this->environment->is_test_environment())
+            if(!empty($fulltext_pdf_path) && get_post_status($post_id) === 'publish' && !$this->environment->is_test_environment())
             {
-
+                $doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
+                $remote_filename_without_extension = $doi_suffix;
+                $clockss_ftp_url = $this->get_journal_property('clockss_ftp_url');
+                $clockss_username = $this->get_journal_property('clockss_username');
+                $clockss_password = $this->get_journal_property('clockss_password');
                 $clockss_response = $this->upload_meta_data_and_pdf_to_clockss($clockss_xml, $fulltext_pdf_path, $remote_filename_without_extension,
-                                                                               $this->get_journal_property('clockss_ftp_url'),
-                                                                               $this->get_journal_property('clockss_username'),
-                                                                               $this->get_journal_property('clockss_password')
-                                                                               );
+                                                                               $clockss_ftp_url, $clockss_username, $clockss_password);
+
                 if(!empty($clockss_response) && ( strpos($clockss_response, 'ERROR') !== false || strpos($clockss_response, 'WARNING') !== false))
                     $validation_result .= $clockss_response;
                 else
@@ -793,14 +788,15 @@ abstract class O3PO_PublicationType {
                 $clockss_response = NULL;
             update_post_meta( $post_id, $post_type . '_clockss_response', $clockss_response );
 
-            if( get_post_status( $post_id ) === 'publish' )
+            if(get_post_status($post_id) === 'publish')
                 $validation_result .= $this->on_post_actually_published($post_id);
-            else if( get_post_status( $post_id ) === 'future' )
+            elseif(get_post_status( $post_id ) === 'future')
                 $validation_result .= "WARNING: This " . $post_type . " was scheduled for publication.\n";
         }
 
         return $validation_result;
     }
+
 
         /**
          * Do things when the post is finally published.
@@ -808,19 +804,22 @@ abstract class O3PO_PublicationType {
          * Is called from validate_and_process_data().
          *
          * @since     0.1.0
-         * @access    protected
+         * @access    private
          * @param     int    $post_id   Id of the post that is actually beeing finally published publicly.
+         * @return    string   The validation_result of the upload.
          */
-    protected function on_post_actually_published( $post_id ) {
+    private function post_update_on_buffer_com_if_not_already_done( $post_id ) {
 
+        $validation_result = '';
         $post_type = get_post_type($post_id);
-        $buffer_secret_email = $this->get_journal_property('buffer_secret_email');
 
-        $validation_result = 'INFO: This ' . $post_type . " was publicly published.\n";
+        $buffer_api_url = $this->get_journal_property('buffer_api_url');
+        $buffer_access_token = $this->get_journal_property('buffer_access_token');
+        $buffer_profile_ids = $this->get_journal_property('buffer_profile_ids');
 
-        if(!empty($buffer_secret_email))
+        if(!empty($buffer_api_url) and !empty($buffer_access_token) and !empty($buffer_profile_ids) and is_array($buffer_profile_ids))
         {
-            $buffer_email = get_post_meta( $post_id, $post_type . '_buffer_email', true );
+            $buffer_email = get_post_meta( $post_id, $post_type . '_buffer_email', true ); #we keep using the buffer_email and buffer_email_xxx fields for compatibility, even though the new buffer.com interface does no longer send emails but uses the buffer.com api
             $buffer_email_was_sent_date = get_post_meta( $post_id, $post_type . '_buffer_email_was_sent_date', true );
             $buffer_special_text = get_post_meta( $post_id, $post_type . '_buffer_special_text', true );
 
@@ -835,16 +834,14 @@ abstract class O3PO_PublicationType {
                     "Recently published in " . $journal,
                     "Fresh in " . $journal,
                     "New in " . $journal,
+                    "Newly published in " . $journal,
                     "Now in " . $journal,
                     "Freshly published in " . $journal,
                     "A new publication in " . $journal,
                     "Accepted and published in " . $journal,
-                    $journal . " has published",
+                    $journal . " has recently published",
                                   );
-                $image_path = $this->environment->get_feature_image_path($post_id);
-
-                $to = ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $buffer_secret_email );
-                $headers = array( 'From: ' . $this->get_journal_property('publisher_email') );
+                $image_url = static::get_social_media_thumbnail_src($post_id);
                 $subject = '';
                 if(!empty($buffer_special_text))
                 {
@@ -855,28 +852,46 @@ abstract class O3PO_PublicationType {
                     $subject .= $lead_ins[array_rand($lead_ins)];
                     $subject .= ': ' . $title . " by " . $authors;
                 }
-                $subject_facebook = $subject;
-                $body_facebook = "@service facebook\n@link " . $post_url . "\n";
-                $image_facebook = ''; //On facebook we rather want to see the link preview
+                if(strlen($subject)+1+strlen($post_url) > 280)
+                    $subject = substr($subject, 0, 280-(1+strlen($post_url)-3)) . '...';
+                $subject .= ' ' . $post_url;
+                $media = array(
+                    'photo' => $image_url,
+                    'link' => $post_url,
+                               );
 
-                $subject_twitter = $subject . " " . $post_url; //For twitter the link tag in the body is ignored by buffer.com
-                $body_twitter = "@service twitter\n";
-                $image_twitter = $image_path;
+                $response = O3PO_Buffer::create_update( $buffer_api_url, $buffer_access_token, $buffer_profile_ids, $subject, $media, false);
 
-                $successfully_sent = wp_mail( $to, $subject_facebook, $body_facebook, $headers, $image_facebook);
-                if($successfully_sent)
-                    $successfully_sent = wp_mail( $to, $subject_twitter, $body_twitter, $headers, $image_twitter);
-
-                if($successfully_sent) {
-                    update_post_meta( $post_id, $post_type . '_buffer_email_was_sent_date', date("Y-m-d"));
-                    $validation_result .= 'INFO: Email to buffer.com sent correctly.' . "\n";
-                }
+                if(is_wp_error($response))
+                    $validation_result .= 'ERROR: Posting update on buffer.com about this publication failed: ' . $response->get_error_message() . "\n";
                 else
                 {
-                    $validation_result .= 'WARNING: Sending email to buffer.com failed.' . "\n";
+                    update_post_meta( $post_id, $post_type . '_buffer_email_was_sent_date', date("Y-m-d"));
+                    $validation_result .= 'INFO: Update about this publication posted to buffer.com queue.' . "\n";
                 }
             }
         }
+
+        return $validation_result;
+    }
+
+
+        /**
+         * Do things when the post is finally published.
+         *
+         * Is called from validate_and_process_data().
+         *
+         * @since     0.1.0
+         * @access    protected
+         * @param     int    $post_id   Id of the post that is actually beeing finally published publicly.
+         */
+    protected function on_post_actually_published( $post_id ) {
+
+        $post_type = get_post_type($post_id);
+        $validation_result = 'INFO: This ' . $post_type . " was publicly published.\n";
+
+        if(!$this->environment->is_test_environment())
+            $validation_result .= $this->post_update_on_buffer_com_if_not_already_done($post_id);
 
         return $validation_result;
     }
@@ -1429,19 +1444,20 @@ abstract class O3PO_PublicationType {
     private static function upload_meta_data_to_doaj( $doaj_json, $doaj_api_url, $doaj_api_key ) {
 
         if(empty($doaj_api_url) || empty($doaj_api_key))
-            return "WARNING: DOAJ credential incomplete. Meta-data was not uploaded to DOAJ.\n";
+            return "WARNING: DOAJ credentials incomplete. No attempt was made to uploaded meta-data to the DOAJ.\n";
 
         $response = O3PO_Doaj::remote_post_meta_data_to_doaj( $doaj_json, $doaj_api_url, $doaj_api_key );
 
         $doaj_response = $doaj_api_url . " responded at " . date('Y-m-d H:i:s') . " with:\n";
-        if ( is_wp_error( $response ) ) {
-            $doaj_response .= 'ERROR: While submitting meta-data to DOAJ the following error occured: ' . $response->get_error_message() . "\n";
-        } else {
-            $doaj_response .= trim($response['body']);
-            if(strpos($doaj_response, 'created') === false)
-                $doaj_response = 'ERROR: Did not get the expected response from DOAJ. This may indicate a problem with the meta-data upload, please check manually:' . "\n" . $doaj_response . "\n";
+        if(is_wp_error($response))
+            $doaj_response .= 'ERROR: While submitting meta-data to DOAJ the following error occurred: ' . $response->get_error_message() . "\n";
+        elseif(!isset($response['body']) or strpos($doaj_response, 'created') !== false)
+        {
+            $doaj_response = 'ERROR: Did not get the expected response from DOAJ. This may indicate a problem with the meta-data upload, please check manually:' . "\n" . trim($response['body']) . "\n";
 
         }
+        else
+            $doaj_response .= trim($response['body']);
 
         return $doaj_response;
     }
@@ -1468,7 +1484,7 @@ abstract class O3PO_PublicationType {
     private static function upload_meta_data_and_pdf_to_clockss( $clockss_xml, $pdf_path, $remote_filename_without_extension, $clockss_ftp_url, $clockss_username, $clockss_password ) {
 
         if(empty($clockss_username) || empty($clockss_password))
-            return "WARNING: CLOCKKS credential incomplete. Meta-data and full text was not uploaded to CLOCKSS.\n";
+            return "WARNING: CLOCKKS credentials incomplete. No attempt was made to upload meta-data and full text to CLOCKSS.\n";
 
         $clockss_response = O3PO_Clockss::ftp_upload_meta_data_and_pdf_to_clockss($clockss_xml, $pdf_path, $remote_filename_without_extension, $clockss_ftp_url, $clockss_username, $clockss_password);
 
@@ -1796,22 +1812,29 @@ abstract class O3PO_PublicationType {
     }
 
         /**
-         * Echo an intro text for the admin panel.
+         * Echo an intro text for buffer functionality on the admin panel.
          *
-         * @since    0.1.0
+         * @since    0.3.0
          * @access   proteted
          * @param    int         $post_id    Id of the post.
          */
-    protected function the_admin_panel_buffer_email( $post_id ) {
+    protected function the_admin_panel_buffer( $post_id ) {
 
-        if(empty($this->get_journal_property('buffer_secret_email')))
-            return;
+        $buffer_api_url = $this->get_journal_property('buffer_api_url');
+        $buffer_access_token = $this->get_journal_property('buffer_access_token');
+        $buffer_profile_ids = $this->get_journal_property('buffer_profile_ids');
+        if(!empty($buffer_api_url) and !empty($buffer_access_token) and !empty($buffer_profile_ids) and is_array($buffer_profile_ids))
+            $buffer_configured = true;
+        else
+            $buffer_configured = false;
 
         $post_type = get_post_type($post_id);
-        $buffer_email = get_post_meta( $post_id, $post_type . '_buffer_email', true );
+        $buffer_email = get_post_meta( $post_id, $post_type . '_buffer_email', true ); #we keep using the buffer_email and buffer_email_xxx fields for compatibility, even though the new buffer.com interface does no longer send emails but uses the buffer.com api
 		$buffer_email_was_sent_date = get_post_meta( $post_id, $post_type . '_buffer_email_was_sent_date', true );
         $buffer_special_text = get_post_meta( $post_id, $post_type . '_buffer_special_text', true );
-        if(empty($buffer_email_was_sent_date)) $buffer_email_was_sent_date = '';
+        if(empty($buffer_email_was_sent_date))
+            $buffer_email_was_sent_date = '';
+
         if(empty($buffer_email))
             if(get_post_status( $post_id ) === 'auto-draft')
                 $buffer_email = 'checked'; //Check this by default for new posts
@@ -1830,13 +1853,13 @@ abstract class O3PO_PublicationType {
                 echo '		  This post is already published. Only new posts can be put into the buffer.com queue.';
             else
             {
-                echo '		  <input type="checkbox"' . ($buffer_email_was_sent_date === '' ? " " : " disabled ") . ' name="' . $post_type . '_buffer_email" value="checked"' . $buffer_email . '>Put a post with a link to this ' . $post_type . ' into the queue on buffer.com during publication';
+                echo '		  <input type="checkbox"' . (($buffer_email_was_sent_date === '' and $buffer_configured) ? " " : " disabled ") . ' name="' . $post_type . '_buffer_email" value="checked"' . ($buffer_configured ? $buffer_email: '') . '>Put a post with a link to this ' . $post_type . ' into the queue on buffer.com during publication';
 
-                echo '		  <input style="width:100%;" type="text" id="' . $post_type . '_buffer_special_text" name="' . $post_type . '_buffer_special_text" class="' . $post_type . '_buffer_special_text_field" placeholder="' . '' . '" value="' . esc_attr($buffer_special_text) . '"><p>(You can specify a custom message for buffer.com in this text field. The url to this post, separated by a space, is automatically added. If left blank, the message is generated from a set of pre-defined texts)</p>';
+                echo '		  <input style="width:100%;" type="text"' . (($buffer_email_was_sent_date === '' and $buffer_configured) ? " " : " disabled ") . ' id="' . $post_type . '_buffer_special_text" name="' . $post_type . '_buffer_special_text" class="' . $post_type . '_buffer_special_text_field" placeholder="' . '' . '" value="' . esc_attr($buffer_special_text) . '"><p>(You can specify a custom message for buffer.com in this text field. The url to this post, separated by a space, is automatically appended. If left blank, the message is generated from a set of pre-defined texts, the title, and the author names.' . (!$buffer_configured ? ' To enabled this features configure the buffer.com functionality via the settings.' : '') . ')</p>';
             }
         }
         else
-            echo '		  An email advising buffer.com to put a post with a link to this ' . $post_type . ' into the queue was sent on ' . $buffer_email_was_sent_date . '.';
+            echo '		  An update with a link to this ' . $post_type . ' was put into the buffer.com queue on ' . $buffer_email_was_sent_date . '.';
         echo '		</td>';
 		echo '	</tr>';
 
@@ -2438,10 +2461,10 @@ abstract class O3PO_PublicationType {
 
         $errors = array();
         $error_explanations = array();
-        if (is_wp_error($crossref_bibentries))
+        if(is_wp_error($crossref_bibentries))
         {
             $errors[] = $crossref_bibentries;
-            $error_explanations[] = 'Could not fetch Crossref cited-by data (last attempt ' . date("Y-m-d H:i:s", $crossref_bibentries_last_fetch_attempt_timestamp) . '): ' . $crossref_bibentries->get_error_message();
+            $error_explanations[] = 'Could not fetch <a href="https://www.crossref.org/services/cited-by/">Crossref cited-by data</a> (last attempt ' . date("Y-m-d H:i:s", $crossref_bibentries_last_fetch_attempt_timestamp) . '): ' . esc_html($crossref_bibentries->get_error_message());
             $crossref_bibentries = array();
         }
         elseif(empty($crossref_bibentries))
@@ -2451,7 +2474,7 @@ abstract class O3PO_PublicationType {
         if (is_wp_error($ads_bibentries))
         {
             $errors[] = $ads_bibentries;
-            $error_explanations[] = 'Could not fetch ADS cited-by data (last attempt ' . date("Y-m-d H:i:s", $ads_bibentries_last_fetch_attempt_timestamp) . '): ' . $ads_bibentries->get_error_message();
+            $error_explanations[] = 'Could not fetch <a href="https://ui.adsabs.harvard.edu/">ADS cited-by data</a> (last attempt ' . date("Y-m-d H:i:s", $ads_bibentries_last_fetch_attempt_timestamp) . '): ' . esc_html($ads_bibentries->get_error_message());
             $ads_bibentries = array();
         }
         elseif(empty($ads_bibentries))
@@ -2489,7 +2512,7 @@ abstract class O3PO_PublicationType {
         foreach($all_bibentries as $bibentry)
         {
             $citation_number += 1;
-            $cited_by_html .= '<p class="break-at-all-cost">' . '[' . $citation_number . '] ';
+            $cited_by_html .= '<p class="break-at-all-cost">' . '[' . esc_html($citation_number) . '] ';
             $cited_by_html .= $bibentry->get_formated_html($doi_url_prefix, $arxiv_url_abs_prefix);
             $cited_by_html .= '</p>' . "\n";
         }
@@ -3190,5 +3213,30 @@ abstract class O3PO_PublicationType {
 
         return $out;
     }
+
+
+
+        /**
+         * Get the src of the feature image
+         *
+         * @since 0.3.0
+         * @access public
+         * @param int|WP_Post $post_id  Id of the post for which to get the social media thumbnail src.
+         * @return string Src of the social media thumbnail.
+         */
+    public static function get_social_media_thumbnail_src( $post_id ) {
+
+        if(has_post_thumbnail($post_id))
+        {
+            $specific_image_url = wp_get_attachment_image_src(get_post_thumbnail_id($post_id), "Full")[0];
+            if(!empty($specific_image_url))
+                return $specific_image_url;
+        }
+
+        $settings = O3PO_Settings::instance();
+        $default_image_url = $settings->get_plugin_option('social_media_thumbnail_url');
+        return $default_image_url;
+    }
+
 
 }

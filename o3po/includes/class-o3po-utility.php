@@ -173,16 +173,45 @@ class O3PO_Utility
     }
 
         /**
+         * Verify that an issn is well formed.
+         *
+         * @since 0.3.0
+         * @param string    $issn    ISSN to be checked
+         * @return bool     Whether $issn is well formed.
+         */
+    static function valid_issn( $issn ) {
+
+        if(preg_match('#^[0-9]{4}-[0-9]{3}[0-9X]$#', $issn) !== 1)
+            return false;
+        $issn_without_dash = substr($issn, 0, 4) . substr($issn, 5, 4);
+        $check = 0;
+        for($i=8; $i>=2 ; $i--)
+        {
+            $check += $issn_without_dash[8-$i]*$i;
+        }
+        $check = $check % 11;
+        if($check !== 0)
+            $check = 11-$check;
+        if($check === 10)
+            $check = 'X';
+        else
+            $check = (string)$check;
+
+        return $check === $issn[8];
+    }
+
+        /**
          * Verify that an email is well formed.
          *
          * Based on https://stackoverflow.com/questions/201323/how-to-validate-an-email-address-using-a-regular-expression/1917982#1917982
          *
          * @since 0.2.0
          * @param string    $email    Email to be checked
+         * @return bool     Whether $email is well formed.
          */
     static function valid_email( $email )
     {
-        return( preg_match(
+        return(preg_match(
             "/(?(DEFINE)
    (?<address>         (?&mailbox) | (?&group))
    (?<mailbox>         (?&name_addr) | (?&addr_spec))
@@ -235,38 +264,62 @@ class O3PO_Utility
    (?<WSP>             [\x20\x09])
  )
 
- (?&address)/x", $email));
+ (?&address)/x", $email) ? true : false);
     }
 
+        /**
+         * Compute the mean
+         *
+         * @since 0.3.0
+         * @access public
+         * @param array $array Array for which to compute the mean.
+         * @return int|float Mean of the array.
+         */
+    public static function array_mean( $array ) {
 
-    public static function array_mean($a) {
-        return array_sum($a)/count($a);
-    }
-
-    public static function array_stddev($a) {
-        if(count($a)<2)
-            return "undefined";
-
-        $mean = array_mean($a);
-        $sum_of_squares = array();
-        foreach($a as $elem)
-            $sum_of_squares[] = ($elem - $mean)*($elem - $mean);
-
-        return sqrt(array_sum($sum_of_squares)/(count($a)-1));//???
-    }
-
-    public static function array_median($array) {
         if (!is_array($array))
             throw new DomainException('Input is not an array');
 
-        $iCount = count($array);
-        if ($iCount == 0)
+        return array_sum($array) / count($array);
+    }
+
+        /**
+         * Compute the standard deviation
+         *
+         * @since 0.3.0
+         * @access public
+         * @param array $array Array for which to compute the standard deviation.
+         * @return float Standard deviation of the array.
+         */
+    public static function array_stddev( $array ) {
+
+        if (!is_array($array))
+            throw new DomainException('Input is not an array');
+
+        if(count($array)<2)
+            return 0.0;
+
+        $mean = static::array_mean($array);
+        $sum_of_squares = array();
+        foreach($array as $elem)
+            $sum_of_squares[] = ($elem - $mean)*($elem - $mean);
+
+        return sqrt(array_sum($sum_of_squares)/(count($array)-1));
+    }
+
+    public static function array_median( $array ) {
+
+        if(!is_array($array))
+            throw new DomainException('Input is not an array');
+
+        if(empty($array))
             throw new DomainException('Input array is empty');
 
-        $middle_index = floor($iCount / 2);
+        $count = count($array);
+        $middle_index = floor($count / 2);
         sort($array, SORT_NUMERIC);
         $median = $array[$middle_index];
-        if ($iCount % 2 == 0) {
+        if ($count % 2 == 0) {
             $median = ($median + $array[$middle_index - 1]) / 2;
         }
         return $median;

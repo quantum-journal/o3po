@@ -847,6 +847,7 @@ class O3PO_Latex_Dictionary_Provider
                 '\\\\ifmmode.*?\\\\else[ {}\n\r]*(.*?)\\\\fi[ {}]*' => '$1',
                 '\\\\spacefactor[0-9]*' => '',
                 '\\\\relax(?![a-zA-Z])' => '',
+                '\\\\/' => '',
                 '\\\\space(?![a-zA-Z])' => ' ',
                 '\\\\bibnamedelim[abcdi](?![a-zA-Z])' => ' ',
                 '\\\\textemdash(?![a-zA-Z])' => '—',

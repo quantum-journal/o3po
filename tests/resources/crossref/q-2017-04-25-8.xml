@@ -1,0 +1,1026 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<crossref_result version="3.0" xmlns="http://www.crossref.org/qrschema/3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.crossref.org/qrschema/3.0 http://www.crossref.org/qrschema/crossref_query_output3.0.xsd">
+ <query_result>
+  <head>
+   <email_address>none</email_address>
+   <doi_batch_id>none</doi_batch_id>
+  </head>
+  <body>
+   <forward_link doi="10.22331/q-2017-04-25-8">
+    <journal_cite fl_count="0">
+     <issn type="print">2040-8978</issn>
+     <issn type="electronic">2040-8986</issn>
+     <journal_title>Journal of Optics</journal_title>
+     <journal_abbreviation>J. Opt.</journal_abbreviation>
+     <article_title>The role of complexity theory in quantum optics—a tutorial for BosonSampling</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Jonathan</given_name>
+       <surname>Olson</surname>
+      </contributor>
+     </contributors>
+     <volume>20</volume>
+     <issue>12</issue>
+     <first_page>123501</first_page>
+     <year>2018</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1088/2040-8986/aae74a</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.22331/q-2017-04-25-8">
+    <journal_cite fl_count="3">
+     <issn type="print">2469-9926</issn>
+     <issn type="electronic">2469-9934</issn>
+     <journal_title>Physical Review A</journal_title>
+     <journal_abbreviation>Phys. Rev. A</journal_abbreviation>
+     <article_title>Quantum simulation of partially distinguishable boson sampling</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Alexandra E.</given_name>
+       <surname>Moylett</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Peter S.</given_name>
+       <surname>Turner</surname>
+      </contributor>
+     </contributors>
+     <volume>97</volume>
+     <issue>6</issue>
+     <item_number item_number_type="article-number">062329</item_number>
+     <year>2018</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1103/PhysRevA.97.062329</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.22331/q-2017-04-25-8">
+    <journal_cite fl_count="1">
+     <issn type="print">1745-2473</issn>
+     <issn type="electronic">1745-2481</issn>
+     <journal_title>Nature Physics</journal_title>
+     <journal_abbreviation>Nature Phys</journal_abbreviation>
+     <article_title>On the complexity and verification of quantum random circuit sampling</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Adam</given_name>
+       <surname>Bouland</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Bill</given_name>
+       <surname>Fefferman</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Chinmay</given_name>
+       <surname>Nirkhe</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Umesh</given_name>
+       <surname>Vazirani</surname>
+      </contributor>
+     </contributors>
+     <volume>15</volume>
+     <issue>2</issue>
+     <first_page>159</first_page>
+     <year>2019</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1038/s41567-018-0318-2</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.22331/q-2017-04-25-8">
+    <journal_cite fl_count="0">
+     <issn type="electronic">2056-6387</issn>
+     <journal_title>npj Quantum Information</journal_title>
+     <journal_abbreviation>npj Quantum Inf</journal_abbreviation>
+     <article_title>Quantum superiority for verifying NP-complete problems with linear optics</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Juan Miguel</given_name>
+       <surname>Arrazola</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Eleni</given_name>
+       <surname>Diamanti</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Iordanis</given_name>
+       <surname>Kerenidis</surname>
+      </contributor>
+     </contributors>
+     <volume>4</volume>
+     <issue>1</issue>
+     <item_number item_number_type="article-number">56</item_number>
+     <year>2018</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1038/s41534-018-0103-1</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.22331/q-2017-04-25-8">
+    <journal_cite fl_count="14">
+     <issn type="print">0031-9007</issn>
+     <issn type="electronic">1079-7114</issn>
+     <journal_title>Physical Review Letters</journal_title>
+     <journal_abbreviation>Phys. Rev. Lett.</journal_abbreviation>
+     <article_title>Temperature Scaling Law for Quantum Annealing Optimizers</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Tameem</given_name>
+       <surname>Albash</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Victor</given_name>
+       <surname>Martin-Mayor</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Itay</given_name>
+       <surname>Hen</surname>
+      </contributor>
+     </contributors>
+     <volume>119</volume>
+     <issue>11</issue>
+     <item_number item_number_type="article-number">110502</item_number>
+     <year>2017</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1103/PhysRevLett.119.110502</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.22331/q-2017-04-25-8">
+    <journal_cite fl_count="4">
+     <issn type="print">15740137</issn>
+     <journal_title>Computer Science Review</journal_title>
+     <journal_abbreviation>Computer Science Review</journal_abbreviation>
+     <article_title>A Survey on quantum computing technology</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Laszlo</given_name>
+       <surname>Gyongyosi</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Sandor</given_name>
+       <surname>Imre</surname>
+      </contributor>
+     </contributors>
+     <volume>31</volume>
+     <first_page>51</first_page>
+     <year>2019</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1016/j.cosrev.2018.11.002</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.22331/q-2017-04-25-8">
+    <journal_cite fl_count="14">
+     <issn type="print">0031-9007</issn>
+     <issn type="electronic">1079-7114</issn>
+     <journal_title>Physical Review Letters</journal_title>
+     <journal_abbreviation>Phys. Rev. Lett.</journal_abbreviation>
+     <article_title>Rényi Entropies from Random Quenches in Atomic Hubbard and Spin Models</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>A.</given_name>
+       <surname>Elben</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>B.</given_name>
+       <surname>Vermersch</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>M.</given_name>
+       <surname>Dalmonte</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>J. I.</given_name>
+       <surname>Cirac</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>P.</given_name>
+       <surname>Zoller</surname>
+      </contributor>
+     </contributors>
+     <volume>120</volume>
+     <issue>5</issue>
+     <item_number item_number_type="article-number">050406</item_number>
+     <year>2018</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1103/PhysRevLett.120.050406</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.22331/q-2017-04-25-8">
+    <journal_cite fl_count="6">
+     <issn type="electronic">2160-3308</issn>
+     <journal_title>Physical Review X</journal_title>
+     <journal_abbreviation>Phys. Rev. X</journal_abbreviation>
+     <article_title>Architectures for Quantum Simulation Showing a Quantum Speedup</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Juan</given_name>
+       <surname>Bermejo-Vega</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Dominik</given_name>
+       <surname>Hangleiter</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Martin</given_name>
+       <surname>Schwarz</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Robert</given_name>
+       <surname>Raussendorf</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Jens</given_name>
+       <surname>Eisert</surname>
+      </contributor>
+     </contributors>
+     <volume>8</volume>
+     <issue>2</issue>
+     <item_number item_number_type="article-number">021010</item_number>
+     <year>2018</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1103/PhysRevX.8.021010</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.22331/q-2017-04-25-8">
+    <journal_cite fl_count="2">
+     <issn type="electronic">1999-4893</issn>
+     <journal_title>Algorithms</journal_title>
+     <journal_abbreviation>Algorithms</journal_abbreviation>
+     <article_title>From the Quantum Approximate Optimization Algorithm to a Quantum Alternating Operator Ansatz</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Stuart</given_name>
+       <surname>Hadfield</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Zhihui</given_name>
+       <surname>Wang</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Bryan</given_name>
+       <surname>O'Gorman</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Eleanor</given_name>
+       <surname>Rieffel</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Davide</given_name>
+       <surname>Venturelli</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Rupak</given_name>
+       <surname>Biswas</surname>
+      </contributor>
+     </contributors>
+     <volume>12</volume>
+     <issue>2</issue>
+     <first_page>34</first_page>
+     <year>2019</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.3390/a12020034</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.22331/q-2017-04-25-8">
+    <journal_cite fl_count="4">
+     <issn type="print">2469-9926</issn>
+     <issn type="electronic">2469-9934</issn>
+     <journal_title>Physical Review A</journal_title>
+     <journal_abbreviation>Phys. Rev. A</journal_abbreviation>
+     <article_title>Quantum supremacy in constant-time measurement-based computation: A unified architecture for sampling and verification</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Jacob</given_name>
+       <surname>Miller</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Stephen</given_name>
+       <surname>Sanders</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Akimasa</given_name>
+       <surname>Miyake</surname>
+      </contributor>
+     </contributors>
+     <volume>96</volume>
+     <issue>6</issue>
+     <item_number item_number_type="article-number">062320</item_number>
+     <year>2017</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1103/PhysRevA.96.062320</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.22331/q-2017-04-25-8">
+    <journal_cite fl_count="3">
+     <issn type="electronic">2160-3308</issn>
+     <journal_title>Physical Review X</journal_title>
+     <journal_abbreviation>Phys. Rev. X</journal_abbreviation>
+     <article_title>Pattern Recognition Techniques for Boson Sampling Validation</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Iris</given_name>
+       <surname>Agresti</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Niko</given_name>
+       <surname>Viggianiello</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Fulvio</given_name>
+       <surname>Flamini</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Nicolò</given_name>
+       <surname>Spagnolo</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Andrea</given_name>
+       <surname>Crespi</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Roberto</given_name>
+       <surname>Osellame</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Nathan</given_name>
+       <surname>Wiebe</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Fabio</given_name>
+       <surname>Sciarrino</surname>
+      </contributor>
+     </contributors>
+     <volume>9</volume>
+     <issue>1</issue>
+     <item_number item_number_type="article-number">011013</item_number>
+     <year>2019</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1103/PhysRevX.9.011013</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.22331/q-2017-04-25-8">
+    <journal_cite fl_count="5">
+     <issn type="print">2469-9926</issn>
+     <issn type="electronic">2469-9934</issn>
+     <journal_title>Physical Review A</journal_title>
+     <journal_abbreviation>Phys. Rev. A</journal_abbreviation>
+     <article_title>Quantum approximate optimization with Gaussian boson sampling</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Juan Miguel</given_name>
+       <surname>Arrazola</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Thomas R.</given_name>
+       <surname>Bromley</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Patrick</given_name>
+       <surname>Rebentrost</surname>
+      </contributor>
+     </contributors>
+     <volume>98</volume>
+     <issue>1</issue>
+     <item_number item_number_type="article-number">012322</item_number>
+     <year>2018</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1103/PhysRevA.98.012322</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.22331/q-2017-04-25-8">
+    <journal_cite fl_count="0">
+     <issn type="print">1364-5021</issn>
+     <issn type="electronic">1471-2946</issn>
+     <journal_title>Proceedings of the Royal Society A: Mathematical, Physical and Engineering Sciences</journal_title>
+     <journal_abbreviation>Proc. R. Soc. A</journal_abbreviation>
+     <article_title>Quantum advantage of unitary Clifford circuits with magic state inputs</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Mithuna</given_name>
+       <surname>Yoganathan</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Richard</given_name>
+       <surname>Jozsa</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Sergii</given_name>
+       <surname>Strelchuk</surname>
+      </contributor>
+     </contributors>
+     <volume>475</volume>
+     <issue>2225</issue>
+     <first_page>20180427</first_page>
+     <year>2019</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1098/rspa.2018.0427</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.22331/q-2017-04-25-8">
+    <journal_cite fl_count="0">
+     <issn type="electronic">2075-2180</issn>
+     <journal_title>Electronic Proceedings in Theoretical Computer Science</journal_title>
+     <journal_abbreviation>Electron. Proc. Theor. Comput. Sci.</journal_abbreviation>
+     <article_title>Information Theoretically Secure Hypothesis Test for Temporally Unstructured Quantum Computation (Extended Abstract)</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Daniel</given_name>
+       <surname>Mills</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Anna </given_name>
+       <surname>Pappa</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Theodoros</given_name>
+       <surname>Kapourniotis</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Elham</given_name>
+       <surname>Kashefi</surname>
+      </contributor>
+     </contributors>
+     <volume>266</volume>
+     <first_page>209</first_page>
+     <year>2018</year>
+     <publication_type/>
+     <doi type="journal_article">10.4204/EPTCS.266.14</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.22331/q-2017-04-25-8">
+    <journal_cite fl_count="6">
+     <issn type="print">0036-8075</issn>
+     <issn type="electronic">1095-9203</issn>
+     <journal_title>Science</journal_title>
+     <journal_abbreviation>Science</journal_abbreviation>
+     <article_title>Quantum advantage with shallow circuits</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Sergey</given_name>
+       <surname>Bravyi</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>David</given_name>
+       <surname>Gosset</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Robert</given_name>
+       <surname>König</surname>
+      </contributor>
+     </contributors>
+     <volume>362</volume>
+     <issue>6412</issue>
+     <first_page>308</first_page>
+     <year>2018</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1126/science.aar3106</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.22331/q-2017-04-25-8">
+    <journal_cite fl_count="46">
+     <issn type="print">0028-0836</issn>
+     <issn type="electronic">1476-4687</issn>
+     <journal_title>Nature</journal_title>
+     <journal_abbreviation>Nature</journal_abbreviation>
+     <article_title>Quantum computational supremacy</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Aram W.</given_name>
+       <surname>Harrow</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Ashley</given_name>
+       <surname>Montanaro</surname>
+      </contributor>
+     </contributors>
+     <volume>549</volume>
+     <issue>7671</issue>
+     <first_page>203</first_page>
+     <year>2017</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1038/nature23458</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.22331/q-2017-04-25-8">
+    <journal_cite fl_count="4">
+     <issn type="print">0031-9007</issn>
+     <issn type="electronic">1079-7114</issn>
+     <journal_title>Physical Review Letters</journal_title>
+     <journal_abbreviation>Phys. Rev. Lett.</journal_abbreviation>
+     <article_title>Impossibility of Classically Simulating One-Clean-Qubit Model with Multiplicative Error</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Keisuke</given_name>
+       <surname>Fujii</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Hirotada</given_name>
+       <surname>Kobayashi</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Tomoyuki</given_name>
+       <surname>Morimae</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Harumichi</given_name>
+       <surname>Nishimura</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Shuhei</given_name>
+       <surname>Tamate</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Seiichiro</given_name>
+       <surname>Tani</surname>
+      </contributor>
+     </contributors>
+     <volume>120</volume>
+     <issue>20</issue>
+     <item_number item_number_type="article-number">200502</item_number>
+     <year>2018</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1103/PhysRevLett.120.200502</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.22331/q-2017-04-25-8">
+    <journal_cite fl_count="3">
+     <issn type="electronic">2521-327X</issn>
+     <journal_title>Quantum</journal_title>
+     <journal_abbreviation>Quantum</journal_abbreviation>
+     <article_title>Strawberry Fields: A Software Platform for Photonic Quantum Computing</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Nathan</given_name>
+       <surname>Killoran</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Josh</given_name>
+       <surname>Izaac</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Nicolás</given_name>
+       <surname>Quesada</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Ville</given_name>
+       <surname>Bergholm</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Matthew</given_name>
+       <surname>Amy</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Christian</given_name>
+       <surname>Weedbrook</surname>
+      </contributor>
+     </contributors>
+     <volume>3</volume>
+     <first_page>129</first_page>
+     <item_number item_number_type="article-number">129</item_number>
+     <year>2019</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.22331/q-2019-03-11-129</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.22331/q-2017-04-25-8">
+    <journal_cite fl_count="2">
+     <issn type="electronic">2041-1723</issn>
+     <journal_title>Nature Communications</journal_title>
+     <journal_abbreviation>Nat Commun</journal_abbreviation>
+     <article_title>Fast-forwarding of Hamiltonians and exponentially precise measurements</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Yosi</given_name>
+       <surname>Atia</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Dorit</given_name>
+       <surname>Aharonov</surname>
+      </contributor>
+     </contributors>
+     <volume>8</volume>
+     <issue>1</issue>
+     <item_number item_number_type="article-number">1572</item_number>
+     <year>2017</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1038/s41467-017-01637-7</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.22331/q-2017-04-25-8">
+    <journal_cite fl_count="33">
+     <issn type="print">1745-2473</issn>
+     <issn type="electronic">1745-2481</issn>
+     <journal_title>Nature Physics</journal_title>
+     <journal_abbreviation>Nature Phys</journal_abbreviation>
+     <article_title>Classical boson sampling algorithms with superior performance to near-term experiments</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Alex</given_name>
+       <surname>Neville</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Chris</given_name>
+       <surname>Sparrow</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Raphaël</given_name>
+       <surname>Clifford</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Eric</given_name>
+       <surname>Johnston</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Patrick M.</given_name>
+       <surname>Birchall</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Ashley</given_name>
+       <surname>Montanaro</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Anthony</given_name>
+       <surname>Laing</surname>
+      </contributor>
+     </contributors>
+     <volume>13</volume>
+     <issue>12</issue>
+     <first_page>1153</first_page>
+     <year>2017</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1038/nphys4270</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.22331/q-2017-04-25-8">
+    <journal_cite fl_count="1">
+     <issn type="electronic">2045-2322</issn>
+     <journal_title>Scientific Reports</journal_title>
+     <journal_abbreviation>Sci Rep</journal_abbreviation>
+     <article_title>Quantum fluctuation theorem for error diagnostics in quantum annealers</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Bartłomiej</given_name>
+       <surname>Gardas</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Sebastian</given_name>
+       <surname>Deffner</surname>
+      </contributor>
+     </contributors>
+     <volume>8</volume>
+     <issue>1</issue>
+     <item_number item_number_type="article-number">17191</item_number>
+     <year>2018</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1038/s41598-018-35264-z</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.22331/q-2017-04-25-8">
+    <journal_cite fl_count="2">
+     <issn type="print">0028-0836</issn>
+     <issn type="electronic">1476-4687</issn>
+     <journal_title>Nature</journal_title>
+     <journal_abbreviation>Nature</journal_abbreviation>
+     <article_title>Supervised learning with quantum-enhanced feature spaces</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Vojtěch</given_name>
+       <surname>Havlíček</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Antonio D.</given_name>
+       <surname>Córcoles</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Kristan</given_name>
+       <surname>Temme</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Aram W.</given_name>
+       <surname>Harrow</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Abhinav</given_name>
+       <surname>Kandala</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Jerry M.</given_name>
+       <surname>Chow</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Jay M.</given_name>
+       <surname>Gambetta</surname>
+      </contributor>
+     </contributors>
+     <volume>567</volume>
+     <issue>7747</issue>
+     <first_page>209</first_page>
+     <year>2019</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1038/s41586-019-0980-2</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.22331/q-2017-04-25-8">
+    <journal_cite fl_count="26">
+     <issn type="print">0034-4885</issn>
+     <issn type="electronic">1361-6633</issn>
+     <journal_title>Reports on Progress in Physics</journal_title>
+     <journal_abbreviation>Rep. Prog. Phys.</journal_abbreviation>
+     <article_title>Machine learning &amp; artificial intelligence in the quantum domain: a review of recent progress</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Vedran</given_name>
+       <surname>Dunjko</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Hans J</given_name>
+       <surname>Briegel</surname>
+      </contributor>
+     </contributors>
+     <volume>81</volume>
+     <issue>7</issue>
+     <first_page>074001</first_page>
+     <year>2018</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1088/1361-6633/aab406</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.22331/q-2017-04-25-8">
+    <journal_cite fl_count="0">
+     <issn type="print">2469-9926</issn>
+     <issn type="electronic">2469-9934</issn>
+     <journal_title>Physical Review A</journal_title>
+     <journal_abbreviation>Phys. Rev. A</journal_abbreviation>
+     <article_title>Changing the circuit-depth complexity of measurement-based quantum computation with hypergraph states</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Mariami</given_name>
+       <surname>Gachechiladze</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Otfried</given_name>
+       <surname>Gühne</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Akimasa</given_name>
+       <surname>Miyake</surname>
+      </contributor>
+     </contributors>
+     <volume>99</volume>
+     <issue>5</issue>
+     <item_number item_number_type="article-number">052304</item_number>
+     <year>2019</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1103/PhysRevA.99.052304</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.22331/q-2017-04-25-8">
+    <journal_cite fl_count="44">
+     <issn type="print">0036-8075</issn>
+     <issn type="electronic">1095-9203</issn>
+     <journal_title>Science</journal_title>
+     <journal_abbreviation>Science</journal_abbreviation>
+     <article_title>A blueprint for demonstrating quantum supremacy with superconducting qubits</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>C.</given_name>
+       <surname>Neill</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>P.</given_name>
+       <surname>Roushan</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>K.</given_name>
+       <surname>Kechedzhi</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>S.</given_name>
+       <surname>Boixo</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>S. V.</given_name>
+       <surname>Isakov</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>V.</given_name>
+       <surname>Smelyanskiy</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>A.</given_name>
+       <surname>Megrant</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>B.</given_name>
+       <surname>Chiaro</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>A.</given_name>
+       <surname>Dunsworth</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>K.</given_name>
+       <surname>Arya</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>R.</given_name>
+       <surname>Barends</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>B.</given_name>
+       <surname>Burkett</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Y.</given_name>
+       <surname>Chen</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Z.</given_name>
+       <surname>Chen</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>A.</given_name>
+       <surname>Fowler</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>B.</given_name>
+       <surname>Foxen</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>M.</given_name>
+       <surname>Giustina</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>R.</given_name>
+       <surname>Graff</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>E.</given_name>
+       <surname>Jeffrey</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>T.</given_name>
+       <surname>Huang</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>J.</given_name>
+       <surname>Kelly</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>P.</given_name>
+       <surname>Klimov</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>E.</given_name>
+       <surname>Lucero</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>J.</given_name>
+       <surname>Mutus</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>M.</given_name>
+       <surname>Neeley</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>C.</given_name>
+       <surname>Quintana</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>D.</given_name>
+       <surname>Sank</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>A.</given_name>
+       <surname>Vainsencher</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>J.</given_name>
+       <surname>Wenner</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>T. C.</given_name>
+       <surname>White</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>H.</given_name>
+       <surname>Neven</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>J. M.</given_name>
+       <surname>Martinis</surname>
+      </contributor>
+     </contributors>
+     <volume>360</volume>
+     <issue>6385</issue>
+     <first_page>195</first_page>
+     <year>2018</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1126/science.aao4309</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.22331/q-2017-04-25-8">
+    <journal_cite fl_count="58">
+     <issn type="print">1745-2473</issn>
+     <issn type="electronic">1745-2481</issn>
+     <journal_title>Nature Physics</journal_title>
+     <journal_abbreviation>Nature Phys</journal_abbreviation>
+     <article_title>Characterizing quantum supremacy in near-term devices</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Sergio</given_name>
+       <surname>Boixo</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Sergei V.</given_name>
+       <surname>Isakov</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Vadim N.</given_name>
+       <surname>Smelyanskiy</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Ryan</given_name>
+       <surname>Babbush</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Nan</given_name>
+       <surname>Ding</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Zhang</given_name>
+       <surname>Jiang</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Michael J.</given_name>
+       <surname>Bremner</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>John M.</given_name>
+       <surname>Martinis</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Hartmut</given_name>
+       <surname>Neven</surname>
+      </contributor>
+     </contributors>
+     <volume>14</volume>
+     <issue>6</issue>
+     <first_page>595</first_page>
+     <year>2018</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1038/s41567-018-0124-x</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.22331/q-2017-04-25-8">
+    <journal_cite fl_count="0">
+     <issn type="print">2095-5138</issn>
+     <issn type="electronic">2053-714X</issn>
+     <journal_title>National Science Review</journal_title>
+     <article_title>Quantum supremacy: some fundamental concepts</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Man-Hong</given_name>
+       <surname>Yung</surname>
+      </contributor>
+     </contributors>
+     <volume>6</volume>
+     <issue>1</issue>
+     <first_page>22</first_page>
+     <year>2019</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1093/nsr/nwy072</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.22331/q-2017-04-25-8">
+    <journal_cite fl_count="2">
+     <issn type="electronic">2521-327X</issn>
+     <journal_title>Quantum</journal_title>
+     <journal_abbreviation>Quantum</journal_abbreviation>
+     <article_title>Anticoncentration theorems for schemes showing a quantum speedup</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Dominik</given_name>
+       <surname>Hangleiter</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Juan</given_name>
+       <surname>Bermejo-Vega</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Martin</given_name>
+       <surname>Schwarz</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Jens</given_name>
+       <surname>Eisert</surname>
+      </contributor>
+     </contributors>
+     <volume>2</volume>
+     <first_page>65</first_page>
+     <item_number item_number_type="article-number">65</item_number>
+     <year>2018</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.22331/q-2018-05-22-65</doi>
+    </journal_cite>
+   </forward_link>
+  </body>
+ </query_result>
+</crossref_result>

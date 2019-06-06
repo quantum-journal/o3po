@@ -13,7 +13,6 @@ include(dirname( __FILE__ ) . '/kses.php');
 
 require_once dirname( __FILE__ ) . '/../../o3po/includes/class-o3po-settings.php';
 
-
 if(!class_exists('PHPUnit_Framework_TestCase')){
         /**
          * Make sure the class PHPUnit_Framework_TestCase is always defined
@@ -26,8 +25,6 @@ if(!class_exists('PHPUnit_Framework_TestCase')){
     }
 }
 
-#$settings = O3PO_Settings::instance();
-#
 
 function plugin_dir_path($path) {
 
@@ -74,6 +71,23 @@ function add_filter( $hook, $callable ) {
     $filters[$hook][] = $callable;
 }
 
+function esc_html_filter( $text ) {
+
+    $replacements = array(
+        '#&(?!amp;)#' => '&amp;',
+        '#"#' => '&quot;',
+        "#'#" => '&#039;',
+        '#<#' => '&lt;',
+        '#>#' => '&gt;',
+    );
+    foreach($replacements as $expression => $replacement)
+        $text = preg_replace($expression, $replacement, $text);
+
+    return $text;
+}
+add_filter( 'esc_html', 'esc_html_filter' );
+
+
 function is_admin() {}
 
 function get_site_url() {
@@ -83,9 +97,9 @@ function get_site_url() {
 
 function get_option( $option, $default = false ) {
 
-    if($option === 'o3po-settings' or $option === 'o3po-setttings' or $option === 'quantum-journal-plugin-setttings')
+    if($option === 'o3po-settings')
         return array(
-            'production_site_url' => 'fake_production_site_url',
+            'production_site_url' => get_site_url(),#we test as if this were the production system
             'journal_title' => 'fake_journal_title',
             'journal_subtitle' => 'fake_journal_subtitle',
             'journal_description' => 'fake_journal_description',
@@ -101,13 +115,13 @@ function get_option( $option, $default = false ) {
             'license_name' => 'fake_license_name',
             'license_type' => 'fake_license_type',
             'license_version' => 'fake_license_version',
-            'license_url' => 'fake_license_url',
+            'license_url' => 'https://fake_license_url',
             'license_explanation' => 'fake_license_explanation',
             'crossref_id' => 'fake_crossref_id',
             'crossref_pw' => 'fake_crossref_pw',
-            'crossref_get_forward_links_url' => 'fake_crossref_get_forward_links_url',
-            'crossref_deposite_url' => 'fake_crossref_deposite_url',
-            'crossref_test_deposite_url' => 'fake_crossref_test_deposite_url',
+            'crossref_get_forward_links_url' => 'https://fake_crossref_get_forward_links_url',
+            'crossref_deposite_url' => 'https://fake_crossref_deposite_url',
+            'crossref_test_deposite_url' => 'https://fake_crossref_test_deposite_url',
             'crossref_email' => 'fake_crossref_email',
             'crossref_archive_locations' => 'fake_crossref_archive_locations',
             'ads_api_search_url' => 'https://api.adsabs.harvard.edu/v1/search/query',
@@ -118,16 +132,18 @@ function get_option( $option, $default = false ) {
             'arxiv_url_trackback_prefix' => 'fake_arxiv_url_trackback_prefix',
             'arxiv_doi_feed_identifier' => 'fake_arxiv_doi_feed_identifier',
             'doi_url_prefix' => 'fake_doi_url_prefix',
-            'scholastica_manuscripts_url' => 'fake_scholastica_manuscripts_url',
-            'scirate_url_abs_prefix' => 'fake_scirate_url_abs_prefix',
-            'orcid_url_prefix' => 'fake_orcid_url_prefix',
-            'fermats_library_url_prefix' => 'fake_fermats_library_url_prefix',
+            'scholastica_manuscripts_url' => 'https://fake_scholastica_manuscripts_url',
+            'scirate_url_abs_prefix' => 'https://fake_scirate_url_abs_prefix',
+            'orcid_url_prefix' => 'https://fake_orcid_url_prefix',
+            'fermats_library_url_prefix' => 'https://fake_fermats_library_url_prefix',
             'fermats_library_email' => 'fake_fermats_library_email',
-            'mathjax_url' => 'fake_mathjax_url',
-            'social_media_thumbnail_url' => 'fake_social_media_thumbnail_url',
-            'buffer_secret_email' => 'fake_buffer_secret_email',
-            'facebook_app_id' => 'fake_facebook_app_id',
-            'doaj_api_url' => 'fake_doaj_api_url',
+            'mathjax_url' => 'https://fake_mathjax_url',
+            'social_media_thumbnail_url' => 'https://fake_social_media_thumbnail_url',
+            'buffer_api_url' => 'https://fake_buffer_api_url',
+            'buffer_access_token' => '081fa8123a892134ba93241',
+            'buffer_profile_ids' => array('1513412357695652', '785663451345245'),
+            'facebook_app_id' => 'https://fake_facebook_app_id',
+            'doaj_api_url' => 'https://fake_doaj_api_url',
             'doaj_api_key' => 'fake_doaj_api_key',
             'doaj_language_code' => 'fake_doaj_language_code',
             'custom_search_page' => 'fake_custom_search_page',
@@ -136,6 +152,8 @@ function get_option( $option, $default = false ) {
             'eissn' => 'fake_eissn',
             'secondary_journal_eissn' => "fake_secondary_journal_eissn",
             'first_volume_year' => "2009",
+            'custom_search_page' => 'checked',
+            'page_template_for_publication_posts' => 'checked',
                      );
     elseif($option === 'blog_charset')
         return 'UTF-8';
@@ -161,6 +179,8 @@ function get_file_data( $file, $options ) {
 }
 
 function flush_rewrite_rules( $hard=false ) {}
+
+function add_rewrite_endpoint( $a, $b=Null ) {}
 
 $post_data = array();
 
@@ -247,7 +267,7 @@ class WP_Query
     public $post_count;
     public $found_posts;
 
-    function __construct( $input=null, $query_vars=null ) {
+    function __construct( $input=null, $query_vars=array() ) {
         global $posts;
 
         $this->query = $input;
@@ -257,6 +277,19 @@ class WP_Query
             $array = $input;
         else
             $array = array($input);
+
+        # turn 'key=value' type queries into $key => $value type ones
+        foreach($array as $key => $value){
+            if(is_numeric($key) and is_string($value) and strpos($value, '=') !== false)
+            {
+                $split = preg_split('/\s*=\s*/', $value);
+                if(!empty($split[0]) and isset($split[1]))
+                {
+                    $array[$split[0]] = $split[1];
+                    unset($array[$key]);
+                }
+            }
+        }
 
         if(isset($array['posts_per_page']))
         {
@@ -281,7 +314,7 @@ class WP_Query
                         break;
                     }
 
-                    if(!isset($posts[$id][$key]) or !in_array ($posts[$id][$key], $value))
+                    if(!isset($posts[$id][$key]) or !in_array($posts[$id][$key], $value))
                     {
                         $include_post = false;
                         break;
@@ -321,17 +354,38 @@ class WP_Query
 
         $post_data = array('current' => $current, 'ID' => $min_key);
     }
+
+    function is_search() {
+        return isset($this->query_vars['s']) ? true : false;
+    }
+
+    function is_main_query() {
+        return isset($this->query_vars['is_main']) ? $this->query_vars['is_main'] : false;
+    }
 }
 
-$global_query = new WP_Query();
-function set_global_query( $wp_query ) {
-    global $global_query;
+$wp_query = new WP_Query();
+function set_global_query( $query ) {
+    global $wp_query;
 
-    $global_query = $wp_query;
+    $wp_query = $query;
 }
+
+function get_global_query() {
+    global $wp_query;
+
+    return $wp_query;
+}
+
 
 function query_posts( $args ) {
-    set_global_query(new WP_Query($args));
+    set_global_query(new WP_Query($args, $args)); #this is a hack! I don't actually understand how the real query_posts() sets query vars.
+}
+
+function is_search() {
+    global $wp_query;
+
+    return $wp_query->is_search();
 }
 
 
@@ -349,47 +403,48 @@ function get_search_query() {
 }
 
 function have_posts() {
-    global $global_query;
+    global $wp_query;
 
-    if(!($global_query instanceof WP_Query))
-        throw(new Exception('You must first set the $global_query before you can use have_posts()'));
+    if(!($wp_query instanceof WP_Query))
+        throw(new Exception('You must first set the $wp_query before you can use have_posts()'));
 
-    return $global_query->have_posts();
+    return $wp_query->have_posts();
 }
 
 function the_post() {
-    global $global_query;
+    global $wp_query;
 
-    if(!($global_query instanceof WP_Query))
-        throw(new Exception('You must fist set the $global_query before you can use have_posts()'));
+    if(!($wp_query instanceof WP_Query))
+        throw(new Exception('You must fist set the $wp_query before you can use have_posts()'));
 
-    return $global_query->the_post();
+    return $wp_query->the_post();
 }
 
 
 function set_query_var( $var, $val ) {
-    global $global_query;
+    global $wp_query;
 
-    if(!($global_query instanceof WP_Query))
-        throw(new Exception('You must first set the $global_query before you can use get_query_var()'));
+    if(!($wp_query instanceof WP_Query))
+        throw(new Exception('You must first set the $wp_query before you can use get_query_var()'));
 
-    $global_query->query_vars[$var] = $val;
+    $wp_query->query_vars[$var] = $val;
 }
 
 function get_query_var( $var ) {
-    global $global_query;
+    global $wp_query;
 
-    if(!($global_query instanceof WP_Query))
-        throw(new Exception('You must first set the $global_query before you can use get_query_var()'));
+    if(!($wp_query instanceof WP_Query))
+        throw(new Exception('You must first set the $wp_query before you can use get_query_var()'));
 
-    return $global_query->query_vars[$var];
+    return $wp_query->query_vars[$var];
 }
 
 
-function has_post_thumbnail() {
+function has_post_thumbnail( $post_id=Null ) {
     global $posts;
 
-    $post_id = get_the_ID();
+    if($post_id === NUll)
+        $post_id = get_the_ID();
 
     return !empty($posts[$post_id]['thumbnail_id']);
 }
@@ -481,7 +536,12 @@ function current_time( $format ) {
 }
 
 function get_the_date( $format, $post_id ) {
-    return current_time( $format );
+    global $posts;
+
+    if($format !== 'Y-m-d')
+        throw Exception("Date format not implemented");
+
+    return $posts[$post_id]['date'];
 }
 
 function download_url( $url, $timeout_seconds ) {
@@ -668,36 +728,67 @@ function wp_mail( $to, $subject, $body, $headers, $attach=null) {
     return true;
 }
 
+
 function delete_transient() {}
 
-function get_transient() {
-    return false;
+$get_transient_returns = false;
+function get_transient( $transient ) {
+    global $get_transient_returns;
+
+    return $get_transient_returns;
 }
 
-function set_transient( $transient, $value, $expiration ) {}
+function set_transient( $transient, $value, $expiration=0 ) {}
 
 function wp_remote_get( $url, $args=array() ) {
         //return http_get( $url, $args );
 
     $local_file_urls = array(
         'https://arxiv.org/abs/0809.2542v4' => dirname(__FILE__) . '/arxiv/0809.2542v4.html',
+        'https://arxiv.org/abs/0809.2542v5' => dirname(__FILE__) . '/arxiv/0809.2542v5.html',
         'https://arxiv.org/abs/1609.09584v4' => dirname(__FILE__) . '/arxiv/1609.09584v4.html',
         'https://arxiv.org/abs/0908.2921v2' => dirname(__FILE__) . '/arxiv/0908.2921v2.html',
         'https://arxiv.org/abs/1806.02820v3' => dirname(__FILE__) . '/arxiv/1806.02820v3.html',
-        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0908.2921&fl=citation' => dirname(__FILE__) . '/ads/0908.2921.json',
+         'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0908.2921&fl=citation' => dirname(__FILE__) . '/ads/0908.2921.json',
         'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0809.2542&fl=citation' => dirname(__FILE__) . '/ads/0809.2542.json',
         'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2010CoTPh..54.1023Z+OR+bibcode:2011EPJB...81..155H+OR+bibcode:2011JSMTE..05..023Z+OR+bibcode:2014PhyA..414..240P&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => dirname(__FILE__) . '/ads/0809.2542_citations.json',
         'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:1806.02820&fl=citation' => dirname(__FILE__) . '/ads/1806.02820.json',
         'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2018arXiv180601279B+OR+bibcode:2018arXiv181009469B+OR+bibcode:2018arXiv181205117B&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => dirname(__FILE__) . '/ads/1806.02820_citation.json',
         'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:1610.01808&fl=citation' => dirname(__FILE__) . '/ads/1610.01808.json',
         'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2015arXiv151207892E+OR+bibcode:2016arXiv160800263B+OR+bibcode:2016arXiv161003632F+OR+bibcode:2016arXiv161201652L+OR+bibcode:2016arXiv161205903A+OR+bibcode:2017arXiv170309568K+OR+bibcode:2017arXiv170401998M+OR+bibcode:2017arXiv170500686N+OR+bibcode:2017arXiv170608913Y+OR+bibcode:2017arXiv170801875B+OR+bibcode:2017arXiv170903489H+OR+bibcode:2017arXiv171205384B+OR+bibcode:2017NatCo...8.1572A+OR+bibcode:2017npjQI...3...15L+OR+bibcode:2017PhRvA..95d2336M+OR+bibcode:2017PhRvL.118d0502G+OR+bibcode:2018arXiv180306775B+OR+bibcode:2018arXiv180603200Y+OR+bibcode:2018arXiv180906957H+OR+bibcode:2018QS&T....3b5004V+OR+bibcode:2018Sci...360..195N+OR+bibcode:2018Sci...362..308B&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => dirname(__FILE__) . '/ads/1610.01808_citations.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0000.0001&fl=citation' => dirname(__FILE__) . '/ads/0000.0001.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0000.0002&fl=citation' => dirname(__FILE__) . '/ads/0000.0002.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0000.0003&fl=citation' => array('headers' => array('x-ratelimit-remaining' => 0), 'body' => dirname(__FILE__) . '/ads/0000.0003.json'),
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0000.0004&fl=citation' => dirname(__FILE__) . '/ads/0000.0004.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2010Abcde..12.3456A&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => dirname(__FILE__) . '/ads/0000.0004_citations.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0000.0005&fl=citation' => dirname(__FILE__) . '/ads/0000.0005.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0000.0006&fl=citation' => dirname(__FILE__) . '/ads/0000.0006.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2015Phys...93.1143F&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => array('headers' => array('x-ratelimit-remaining' => 0), 'body' => dirname(__FILE__) . '/ads/0000.0006_citations.json'),
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0000.0007&fl=citation' => dirname(__FILE__) . '/ads/0000.0007.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2016Phys...12.4444F&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => array('headers' => array(), 'body' => dirname(__FILE__) . '/ads/0000.0007_citations.json'),
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0000.0008&fl=citation' => dirname(__FILE__) . '/ads/0000.0008.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2017XYZ....00001111&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => dirname(__FILE__) . '/ads/0000.0008_citations.json',
+        get_option('o3po-settings')['crossref_get_forward_links_url'] . '?usr=' . get_option('o3po-settings')['crossref_id'] . '&pwd=' . get_option('o3po-settings')['crossref_pw'] .'&doi=10.22331%2Fq-2017-04-25-8&include_postedcontent=true' => dirname(__FILE__) . '/crossref/q-2017-04-25-8.xml',
+        get_option('o3po-settings')['crossref_get_forward_links_url'] . '?usr=' . get_option('o3po-settings')['crossref_id'] . '&pwd=' . get_option('o3po-settings')['crossref_pw'] .'&doi=10.22331%2Fq-2018-08-06-79&include_postedcontent=true' => dirname(__FILE__) . '/crossref/q-2018-08-06-79.xml',
+        get_option('o3po-settings')['crossref_get_forward_links_url'] . '?usr=' . get_option('o3po-settings')['crossref_id'] . '&pwd=' . get_option('o3po-settings')['crossref_pw'] .'&doi=empty_response&include_postedcontent=true' => dirname(__FILE__) . '/crossref/empty_response.xml',
+        get_option('o3po-settings')['crossref_get_forward_links_url'] . '?usr=' . get_option('o3po-settings')['crossref_id'] . '&pwd=' . get_option('o3po-settings')['crossref_pw'] .'&doi=invalid_xml&include_postedcontent=true' => dirname(__FILE__) . '/crossref/invalid_xml.xml',
+        get_option('o3po-settings')['crossref_get_forward_links_url'] . '?usr=' . get_option('o3po-settings')['crossref_id'] . '&pwd=' . get_option('o3po-settings')['crossref_pw'] .'&doi=varied_cites&include_postedcontent=true' => dirname(__FILE__) . '/crossref/varied_cites.xml',
+        get_option('o3po-settings')['crossref_get_forward_links_url'] . '?usr=' . get_option('o3po-settings')['crossref_id'] . '&pwd=' . get_option('o3po-settings')['crossref_pw'] .'&doi=unhandled_forward_link_type&include_postedcontent=true' => dirname(__FILE__) . '/crossref/unhandled_forward_link_type.xml',
+        'https://api.bufferapp.com/1/profiles.json?access_token=1%2F345792aa62c_7' => dirname(__FILE__) . '/buffer/profile_ids.json',
+        'https://api.bufferapp.com/1/profiles.json?access_token=1%2F345792aa62c_9' => dirname(__FILE__) . '/buffer/profile_ids_error.json',
+        'https://api.bufferapp.com/1/profiles.json?access_token=1%2F345792aa62c_10' => array('Just some object that cannot tbe json_decoded and therefor leads to an error'),
                           );
+
     if(!empty($local_file_urls[$url]))
-        return array('headers'=>'' ,'body'=> file_get_contents($local_file_urls[$url]) );
-    elseif(strpos($url, get_option('o3po-settings')['crossref_get_forward_links_url']) === 0)
-        return array('body' => 'fake respose form crossref forward links url');
+        if(is_array($local_file_urls[$url]))
+            return array('headers'=>$local_file_urls[$url]['headers'] ,'body'=> file_get_contents($local_file_urls[$url]['body']) );
+        else
+            return array('headers'=>array() ,'body'=> file_get_contents($local_file_urls[$url]) );
+    /* elseif(strpos($url, get_option('o3po-settings')['crossref_get_forward_links_url']) === 0) */
+    /*     return array('body' => 'fake respose form crossref forward links url'); */
     else
-        throw new Exception('Fake wp_remote_get() does not know how to handle ' . $url);
+        return new WP_Error('unhandled_url', 'Fake wp_remote_get() does not know how to handle ' . $url);
+
 }
 
 function wp_verify_nonce() {
@@ -721,11 +812,54 @@ function remove_action() {}
 function wp_generate_password( $length ) {
     $string = '';
     for($i=0; $i<$length; $i++)
-        $string .= rand(0, 9); //This is just a face environemnt, so no security concerns
+        $string .= rand(0, 9); //This is just a fake environemnt, so no security concerns
     return $string;
 }
 
-function wp_remote_post( $url, $args = array() ) {}
+function wp_remote_post( $url, $args = array() ) {
+    $response_array = array(
+        'https://api.bufferapp.com/1/updates/create.json?access_token=1%252F345792aa62c_1' => dirname(__FILE__) . '/buffer/successful.json',
+        'https://api.bufferapp.com/1/updates/create.json?access_token=invalid_token' => dirname(__FILE__) . '/buffer/token_invalid.json',
+        'https://api.bufferapp.com/1/updates/create.json?access_token=1%252F345792aa62c_2' => dirname(__FILE__) . '/buffer/select_account.json',
+        'https://api.bufferapp.com/1/updates/create.json?access_token=1%252F345792aa62c_3' => dirname(__FILE__) . '/buffer/no_permission.json',
+        'https://invalid.api.bufferapp.com/1/updates/create.json?access_token=1%252F345792aa62c_5' => null,#dirname(__FILE__) . '/buffer/invalid.json',
+        'https://api.bufferapp.com/1/updates/create.json?access_token=1%252F345792aa62c_6' => new WP_Error('error', 'this url produces an error'),
+        'https://fake_buffer_api_url/updates/create.json?access_token=081fa8123a892134ba93241' => dirname(__FILE__) . '/buffer/successful.json',
+        'Einselection+without+pointer+states+by+Christian+Gogolin&media[photo]=f&attachment=true&shorten=false&now=false&top=false' => dirname(__FILE__) . '/buffer/successful.json',
+        'Dynamic+wetting+with+two+competing+adsorbates+by+Christian+Gogolin%2C+Christian+Meltzer%2C+Marvin+Willers%2C+and+Haye+Hinrichsen&media[photo]=f&attachment=true&shorten=false&now=false&top=false' => dirname(__FILE__) . '/buffer/invalid.json',
+        'The+boundaries+and+twist+defects+of+the+color+code+and+their+applications+to+topological+quantum+computation+by+Markus+S.+Kesselring%2C+Fernando+Pastawski%2C+Jens+Eisert%2C+and+Benjamin+J.+Brown&media[photo]=f&attachment=true&shorten=false&now=false&top=false' => dirname(__FILE__) . '/buffer/successful.json',
+        'https://fake_doaj_api_url.com?api_key=key' => dirname(__FILE__) . '/doaj/success.json',
+        'https://fake_doaj_api_url?api_key=fake_doaj_api_key' => dirname(__FILE__) . '/doaj/success.json',
+        'https://fake_crossref_test_deposite_url' => dirname(__FILE__) . '/crossref/deposit_success.xml',
+        'https://fake_crossref_deposite_url' => dirname(__FILE__) . '/crossref/deposit_success.xml',
+                             );
+
+    foreach(array_keys($response_array) as $key)
+    {
+        if(strpos($url, $key) !== false)
+        {
+            if(!empty($response_array[$key]) and is_string($response_array[$key]))
+                return array('body' => file_get_contents($response_array[$key]));
+            elseif(!empty($response_array[$key]) and (is_array($response_array[$key]) or is_wp_error($response_array[$key])))
+                return $response_array[$key];
+            else
+                return array();
+        }
+    }
+
+
+    /* if(in_array($url, array_keys($response_array))) */
+    /* { */
+    /*     if(!empty($response_array[$url]) and is_string($response_array[$url])) */
+    /*         return array('body' => file_get_contents($response_array[$url])); */
+    /*     elseif(!empty($response_array[$url]) and is_array($response_array[$url])) */
+    /*         return $response_array[$url]; */
+    /*     else */
+    /*         return array(); */
+    /* } */
+
+    echo("\nunhandled url in wp_remote_post() in bootstrap.php:" . $url . "\n");
+}
 
 function register_post_type( $post_type, $args ) {}
 
@@ -773,6 +907,11 @@ echo '<form role="search" method="get" class="search-form" action="' . 'http://s
 function get_template_part() {
 
     echo '';
+}
+
+function locate_template( $array ) {
+
+    return $array[0];
 }
 
 function the_posts_navigation() {
@@ -845,7 +984,7 @@ function settings_errors( $setting = '', $sanitize = false, $hide_on_update = fa
     echo $output;
 }
 
-function add_settings_errors( $setting, $code, $message, $type = 'error' ) {
+function add_settings_error( $setting, $code, $message, $type = 'error' ) {
     global $global_setting_errors;
 
     $global_setting_errors[] = array(
@@ -888,6 +1027,14 @@ function checked( $helper, $current=true, $echo=true, $type='checked' ) {
 
 function apply_filters( $hook, $orig_text, $text )
 {
+    global $filters;
+
+    if(!empty($filters[$hook]))
+    {
+        foreach($filters[$hook] as $callable)
+            $text = call_user_func($callable, $text);
+    }
+
     return $text;
 }
 
@@ -941,4 +1088,22 @@ function the_archive_description( $before = '', $after = '' ) {
 
 function get_the_archive_description() {
     return "bar";
+}
+
+function load_plugin_textdomain( $slug, $b, $dir ) {
+
+}
+
+function plugin_basename( $file  ) {
+
+    return 'fake_basename';
+}
+
+function get_bloginfo( $url ) {
+
+    return 134134;
+}
+
+function add_options_page($a, $b, $c, $d) {
+
 }
