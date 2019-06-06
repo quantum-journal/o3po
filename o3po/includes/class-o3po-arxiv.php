@@ -49,7 +49,6 @@ class O3PO_Arxiv {
                 @$dom->loadHTML($html);
                 $x_path = new DOMXPath($dom);
 
-
                 $number_authors = 0;
                 $author_given_names = array();
                 $author_surnames = array();
