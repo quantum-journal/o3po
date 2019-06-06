@@ -628,7 +628,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 		echo '		<td>';
 		echo '			<input type="text" id="' . $post_type . '_eprint" name="' . $post_type . '_eprint" class="' . $post_type . '_eprint_field required" placeholder="" value="' . esc_attr($eprint) . '">';
 		echo '                  <input type="checkbox" name="' . $post_type . '_fetch_metadata_from_arxiv"' . (empty($eprint) ? 'checked' : '' ) . '>Fetch title, authors, and abstract from the arXiv upon next Save/Update';
-		echo '			<p>(The arXiv identifier including the version and, for old eprints, the the prefix, so this should look like 1701.1234v5 or quant-ph/123456v3.)</p>';
+		echo '			<p>(The arXiv identifier including the version and, for old eprints, the prefix, e.g., 1701.1234v5 or quant-ph/123456v3.)</p>';
 		echo '		</td>';
 		echo '	</tr>';
 
@@ -1325,13 +1325,13 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                     $filecontents_without_comments = preg_replace('#(?<!\\\\)%.*#', '', $filecontents);//remove all comments
 
                         // Extract author, affiliation and similar information from the source
-                    preg_match_all('#\\\\(author|affiliation|affil|orcid|homepage)\s*([^{]*)\s*(?=\{((?:[^{}]++|\{(?3)\})*)\})#', $filecontents_without_comments, $author_info);//matches balanced parenthesis (Note the use of (?3) here!) to test changes go here https://regex101.com/r/bVHadc/1
+                    preg_match_all('#\\\\(author|affiliation|affil|address|orcid|homepage)\s*([^{]*)\s*(?=\{((?:[^{}]++|\{(?3)\})*)\})#', $filecontents_without_comments, $author_info);//matches balanced parenthesis (Note the use of (?3) here!) to test changes go here https://regex101.com/r/bVHadc/1
                     if(!empty($author_info[0]) && !empty($author_info[1]))
                     {
                         if($author_number !== -1)
                             $validation_result .= "WARNING: Found affiliations, ORCIDs, or author URLs in more than one file. Please check.\n";
 
-                        if(in_array('author', $author_info[1]) or in_array('affiliation', $author_info[1]) or in_array('affil', $author_info[1]))
+                        if(in_array('author', $author_info[1]) or in_array('affiliation', $author_info[1]) or in_array('affil', $author_info[1]) or in_array('address', $author_info[1]))
                             $validation_result .= "REVIEW: Author and affiliations data updated from arxiv source. Please check.\n";
                         if(in_array('orcid', $author_info[1]))
                             $validation_result .= "REVIEW: ORCID data updated from arxiv source. Please check.\n";
@@ -1366,14 +1366,14 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                                 $new_author_orcids[$author_number] = $author_info[3][$x];
                             else if( $author_info[1][$x] === 'homepage' and !empty($author_info[3][$x]))
                                 $new_author_urls[$author_number] = $author_info[3][$x];
-                            else if( $author_info[1][$x] === 'affiliation' or $author_info[1][$x] === 'affil')
+                            else if( $author_info[1][$x] === 'affiliation' or $author_info[1][$x] === 'affil' or $author_info[1][$x] === 'address')
                             {
                                 $current_affiliation = trim($author_info[3][$x], ' {}');
                                 $current_affiliation = O3PO_Latex::expand_latex_macros($new_author_latex_macro_definitions, $current_affiliation);
                                 $current_affiliation = O3PO_Latex::latex_to_utf8_outside_math_mode($current_affiliation);
                                 $current_affiliation = O3PO_Latex::normalize_whitespace_and_linebreak_characters($current_affiliation);
 
-                                if( $author_info[1][$x] === 'affiliation')
+                                if( $author_info[1][$x] === 'affiliation' or $author_info[1][$x] === 'address' )
                                 {
                                     if(!in_array($current_affiliation, $new_affiliations))
                                         $new_affiliations[] = $current_affiliation;

@@ -774,9 +774,9 @@ function wp_remote_get( $url, $args=array() ) {
         get_option('o3po-settings')['crossref_get_forward_links_url'] . '?usr=' . get_option('o3po-settings')['crossref_id'] . '&pwd=' . get_option('o3po-settings')['crossref_pw'] .'&doi=invalid_xml&include_postedcontent=true' => dirname(__FILE__) . '/crossref/invalid_xml.xml',
         get_option('o3po-settings')['crossref_get_forward_links_url'] . '?usr=' . get_option('o3po-settings')['crossref_id'] . '&pwd=' . get_option('o3po-settings')['crossref_pw'] .'&doi=varied_cites&include_postedcontent=true' => dirname(__FILE__) . '/crossref/varied_cites.xml',
         get_option('o3po-settings')['crossref_get_forward_links_url'] . '?usr=' . get_option('o3po-settings')['crossref_id'] . '&pwd=' . get_option('o3po-settings')['crossref_pw'] .'&doi=unhandled_forward_link_type&include_postedcontent=true' => dirname(__FILE__) . '/crossref/unhandled_forward_link_type.xml',
-
-
-
+        'https://api.bufferapp.com/1/profiles.json?access_token=1%2F345792aa62c_7' => dirname(__FILE__) . '/buffer/profile_ids.json',
+        'https://api.bufferapp.com/1/profiles.json?access_token=1%2F345792aa62c_9' => dirname(__FILE__) . '/buffer/profile_ids_error.json',
+        'https://api.bufferapp.com/1/profiles.json?access_token=1%2F345792aa62c_10' => array('Just some object that cannot tbe json_decoded and therefor leads to an error'),
                           );
 
     if(!empty($local_file_urls[$url]))
@@ -822,7 +822,8 @@ function wp_remote_post( $url, $args = array() ) {
         'https://api.bufferapp.com/1/updates/create.json?access_token=invalid_token' => dirname(__FILE__) . '/buffer/token_invalid.json',
         'https://api.bufferapp.com/1/updates/create.json?access_token=1%252F345792aa62c_2' => dirname(__FILE__) . '/buffer/select_account.json',
         'https://api.bufferapp.com/1/updates/create.json?access_token=1%252F345792aa62c_3' => dirname(__FILE__) . '/buffer/no_permission.json',
-        'https://invalid.api.bufferapp.com/1/updates/create.json?access_token=1%252F345792aa62c_5' => dirname(__FILE__) . '/buffer/invalid.json',
+        'https://invalid.api.bufferapp.com/1/updates/create.json?access_token=1%252F345792aa62c_5' => null,#dirname(__FILE__) . '/buffer/invalid.json',
+        'https://api.bufferapp.com/1/updates/create.json?access_token=1%252F345792aa62c_6' => new WP_Error('error', 'this url produces an error'),
         'https://fake_buffer_api_url/updates/create.json?access_token=081fa8123a892134ba93241' => dirname(__FILE__) . '/buffer/successful.json',
         'Einselection+without+pointer+states+by+Christian+Gogolin&media[photo]=f&attachment=true&shorten=false&now=false&top=false' => dirname(__FILE__) . '/buffer/successful.json',
         'Dynamic+wetting+with+two+competing+adsorbates+by+Christian+Gogolin%2C+Christian+Meltzer%2C+Marvin+Willers%2C+and+Haye+Hinrichsen&media[photo]=f&attachment=true&shorten=false&now=false&top=false' => dirname(__FILE__) . '/buffer/invalid.json',
@@ -839,7 +840,7 @@ function wp_remote_post( $url, $args = array() ) {
         {
             if(!empty($response_array[$key]) and is_string($response_array[$key]))
                 return array('body' => file_get_contents($response_array[$key]));
-            elseif(!empty($response_array[$key]) and is_array($response_array[$key]))
+            elseif(!empty($response_array[$key]) and (is_array($response_array[$key]) or is_wp_error($response_array[$key])))
                 return $response_array[$key];
             else
                 return array();

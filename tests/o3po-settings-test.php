@@ -162,24 +162,37 @@ class O3PO_SettingsTest extends PHPUnit_Framework_TestCase
 
 
 
-    public function validate_eissn_provider() {
+    public function validate_issn_provider() {
         return [
-            ['1234-5678', '1234-5678'],
-            ['1234-5678 ', '1234-5678'],
-            ['1234-567X', '1234-567X'],
-            ['@', ''],
-            ['asdf', ''],
-            ['123-456', ''],
+            ['0378-5955', '0378-5955', true],
+            ['2521-327X', '2521-327X', true],
+            ['  2521-327X ', '2521-327X', true],
+            ['1234-5678', '1234-5678', false],
+            ['1234-5678 ', '1234-5678', false],
+            ['1234-567X', '1234-567X', false],
+            [' 1234-567X  ', '1234-567X', false],
+            ['@', '@', false],
+            ['asdf', 'asdf', false],
+            ['123- 456', '123- 456', false],
+            ['', '', true],
+            ['   ', '', true],
                 ];
     }
 
         /**
-         * @dataProvider validate_eissn_provider
+         * @dataProvider validate_issn_provider
          * @depends test_initialize_settings
          */
-    public function test_validate_eissn( $eissn, $expected, $setting ) {
+    public function test_validate_issn( $issn, $expected, $valid, $setting ) {
+        global $global_setting_errors;
 
-        $this->assertSame($setting->validate_eissn('eissn', $eissn), $expected);
+        $global_setting_errors = array();
+        $this->assertSame($setting->validate_issn('eissn', $issn), $expected);
+
+        if(!$valid)
+            $this->assertNotEmpty($global_setting_errors);
+        else
+            $this->assertEmpty($global_setting_errors);
     }
 
 

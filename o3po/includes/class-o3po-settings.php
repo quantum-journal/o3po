@@ -1566,11 +1566,11 @@ class O3PO_Settings extends O3PO_Singleton {
                 'journal_subtitle' => 'trim_settings_field',
                 'journal_description' => 'trim_settings_field',
                 'journal_level_doi_suffix' => 'validate_doi_suffix',
-                'eissn' => 'trim_settings_field',
+                'eissn' => 'validate_issn',
                 'publisher' => 'trim_settings_field',
                 'secondary_journal_title' => 'trim_settings_field',
                 'secondary_journal_level_doi_suffix' => 'validate_doi_suffix',
-                'secondary_journal_eissn' => 'trim_settings_field',
+                'secondary_journal_eissn' => 'validate_issn',
                 'developer_email' => 'trim_settings_field',
                 'publisher_email' => 'trim_settings_field',
                 'publisher_country' => 'trim_settings_field',
@@ -1621,8 +1621,6 @@ class O3PO_Settings extends O3PO_Singleton {
                 'maintenance_mode' => 'checked_or_unchecked',
                 'volumes_endpoint' => 'trim_settings_field',
                 'doi_prefix' => 'validate_doi_prefix',
-                'eissn' => 'validate_eissn',
-                'secondary_journal_eissn' => 'validate_eissn',
                 'first_volume_year' => 'validate_first_volume_year',
                 'executive_board' => 'trim_settings_field',
                 'editor_in_chief' => 'trim_settings_field',
@@ -1683,24 +1681,6 @@ class O3PO_Settings extends O3PO_Singleton {
     }
 
         /**
-         * Clean user input to the eissn setting
-         *
-         * @since    0.1.0
-         * @access   private
-         * @param    string   $field    The field this was input to.
-         * @param    string   $eissn    User input.
-         */
-    public function validate_eissn( $field, $eissn ) {
-
-        $eissn = trim($eissn);
-        if(empty($eissn) or preg_match('/^[0-9]{4}-[0-9]{3}[0-9X]$/', $eissn))
-            return $eissn;
-
-        add_settings_error( $field, 'illegal-eissn', "The eISSN in '" . $this->settings_fields[$field]['title'] . "' must consist of two groups of four characters separated by a dash -, each of which must be a number 0-9, except the last, which may also be an upper case X. Field cleared.", 'error');
-        return "";
-    }
-
-        /**
          * Clean user input to the first_volume_year setting
          *
          * @since    0.1.0
@@ -1719,6 +1699,27 @@ class O3PO_Settings extends O3PO_Singleton {
     }
 
         /**
+         * Clean user input to issn type settings
+         *
+         * @since    0.3.0
+         * @access   private
+         * @param    string   $field    The field this was input to.
+         * @param    string   $input    User input.
+         */
+    public function validate_issn( $field, $input ) {
+
+        $input = trim($input);
+        if(empty($input))
+            return '';
+
+        if(!O3PO_Utility::valid_issn($input))
+            add_settings_error( $field, 'invalid-issn', "The ISSN in '" . $this->settings_fields[$field]['title'] . "' is invalid", 'error');
+
+        return $input;
+    }
+
+
+        /**
          * Clean user input to url type settings
          *
          * @since    0.3.0
@@ -1731,7 +1732,10 @@ class O3PO_Settings extends O3PO_Singleton {
         $input_trimmed = trim($input);
         $url = esc_url_raw(strip_tags(stripslashes($input_trimmed)));
 
-        if($url !== $input)
+        $parsed = parse_url($url);
+        if(empty($parsed['scheme']) or empty($parsed['host']))
+            add_settings_error( $field, 'url-validated', "The URL in '" . $this->settings_fields[$field]['title'] . "' was malformed. Please check.", 'error');
+        elseif($url !== $input)
             add_settings_error( $field, 'url-validated', "The URL in '" . $this->settings_fields[$field]['title'] . "' was malformed or contained special or illegal characters, which were removed or escaped. Please check.", 'updated');
         return $url;
     }
