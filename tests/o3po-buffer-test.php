@@ -98,6 +98,21 @@ class O3PO_BufferTest extends PHPUnit_Framework_TestCase
                 'top' => false,
                 'expected' => new WP_Error('buffer_error', 'The response from buffer.com could not be interpreted.'),
                   ),
+            array(
+                'buffer_url' => 'https://api.bufferapp.com/1',
+                'access_token' => '1%2F345792aa62c_6', #this produces a WP_Error in wp_remote_post()
+                'profile_ids' => '3514513134134',
+                'text' => 'test text',
+                'media' => array(
+                    'link' => 'https://quantum-journal.org/two-years-of-publications/',
+                    'photo' => 'https://quantum-journal.org/wp-content/uploads/2019/04/2years_publications_carnations.jpg',
+                                 ),
+                'attachment' => true,
+                'shorten' => false,
+                'now' => false,
+                'top' => false,
+                'expected' => new WP_Error('error', 'this url produces an error'),
+                  ),
                 ];
     }
 
@@ -111,4 +126,50 @@ class O3PO_BufferTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $response);
     }
 
+
+
+    function get_profile_information_provider() {
+        return [
+            array(
+                'https://api.bufferapp.com/1',
+                '1/345792aa62c_7',
+                array(
+                    array(
+                        'id' => '4352461346424513',
+                        'service' => 'twitter'
+                          ),
+                    array(
+                        'id' => '578c44fb3d66da874d311e98',
+                        'service' => 'facebook'
+                          ),
+                ),
+            ),
+            array(
+                'https://api.bufferapp.com/1',
+                '1/345792aa62c_8_unhandled',
+                new WP_Error('unhandled_url','Fake wp_remote_get() does not know how to handle https://api.bufferapp.com/1/profiles.json?access_token=1%2F345792aa62c_8_unhandled'),
+                  ),
+
+            array(
+                'https://api.bufferapp.com/1',
+                '1/345792aa62c_9',
+                new WP_Error('error','Some error'),
+                  ),
+
+
+            array(
+                'https://api.bufferapp.com/1',
+                '1/345792aa62c_10',
+                new WP_Error('exception', 'Undefined index: headers'),
+                  ),
+
+                ];
+    }
+
+        /**
+         * @dataProvider get_profile_information_provider
+         */
+    public function test_get_profile_information( $buffer_api_url, $access_token, $expected ){
+        $this->assertEquals(O3PO_Buffer::get_profile_information($buffer_api_url, $access_token), $expected);
+    }
 }

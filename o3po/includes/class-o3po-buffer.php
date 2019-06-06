@@ -166,7 +166,6 @@ class O3PO_Buffer {
             restore_error_handler();
         }
 
-
         return $profile_information;
     }
 
