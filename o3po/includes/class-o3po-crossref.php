@@ -127,6 +127,8 @@ class O3PO_Crossref {
 
         try
         {
+            $use_errors=libxml_use_internal_errors(true);
+
             $response = static::remote_get_cited_by($crossref_url, $crossref_id, $crossref_pw, $doi);
 
             if(is_wp_error($response))
@@ -135,13 +137,15 @@ class O3PO_Crossref {
                 throw new Exception("Could not fetch cited-by data for " . $doi . " from Crossref. No response.");
             else
             {
-                $use_errors=libxml_use_internal_errors(true);
                 $xml = simplexml_load_string($response['body']);
-                libxml_use_internal_errors($use_errors);
                 if ($xml === false) {
                     $error = "Could not fetch cited-by data for " . $doi . " from Crossref. This is normal if the DOI was registered recently.";
-                    foreach(libxml_get_errors() as $e) {
-                        $error .= " " . $e->message . ".";
+                    if(!empty(libxml_get_errors()))
+                    {
+                        /* foreach(libxml_get_errors() as $e) { */
+                        /*     $error .= " " . trim($e->message) . "."; */
+                        /* } */
+                        libxml_clear_errors();
                     }
                     throw new Exception($error);
                 }
@@ -150,6 +154,8 @@ class O3PO_Crossref {
             }
         } catch (Exception $e) {
             return new WP_Error("exception", $e->getMessage());
+        } finally {
+            libxml_use_internal_errors($use_errors);
         }
     }
 
@@ -179,20 +185,20 @@ class O3PO_Crossref {
             $bibentries = array();
 
             foreach ($body->forward_link as $f_link) {
-                if(isset($f_link->journal_cite))
+                if(!empty($f_link->journal_cite))
                     $cite = $f_link->journal_cite;
-                elseif(isset($f_link->book_cite))
+                elseif(!empty($f_link->book_cite))
                     $cite = $f_link->book_cite;
-                elseif(isset($f_link->conf_cite))
+                elseif(!empty($f_link->conf_cite))
                     $cite = $f_link->conf_cite;
-                elseif(isset($f_link->dissertation_cite))
+                elseif(!empty($f_link->dissertation_cite))
                     $cite = $f_link->dissertation_cite;
-                elseif(isset($f_link->report_cite))
+                elseif(!empty($f_link->report_cite))
                     $cite = $f_link->report_cite;
-                elseif(isset($f_link->standard_cite))
+                elseif(!empty($f_link->standard_cite))
                     $cite = $f_link->standard_cite;
                 else
-                    continue;
+                    throw new Exception("Encountered an unhandled forward link type.");
 
                 $authors = array();
                 if(!empty($cite->contributors->contributor))
