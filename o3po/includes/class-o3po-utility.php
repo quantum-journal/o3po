@@ -173,6 +173,34 @@ class O3PO_Utility
     }
 
         /**
+         * Verify that an issn is well formed.
+         *
+         * @since 0.3.0
+         * @param string    $issn    ISSN to be checked
+         * @return bool     Whether $issn is well formed.
+         */
+    static function valid_issn( $issn ) {
+
+        if(preg_match('#^[0-9]{4}-[0-9]{3}[0-9X]$#', $issn) !== 1)
+            return false;
+        $issn_without_dash = substr($issn, 0, 4) . substr($issn, 5, 4);
+        $check = 0;
+        for($i=8; $i>=2 ; $i--)
+        {
+            $check += $issn_without_dash[8-$i]*$i;
+        }
+        $check = $check % 11;
+        if($check !== 0)
+            $check = 11-$check;
+        if($check === 10)
+            $check = 'X';
+        else
+            $check = (string)$check;
+
+        return $check === $issn[8];
+    }
+
+        /**
          * Verify that an email is well formed.
          *
          * Based on https://stackoverflow.com/questions/201323/how-to-validate-an-email-address-using-a-regular-expression/1917982#1917982
