@@ -48,4 +48,33 @@ class O3PO_Relevanssi {
         return $block;
     }
 
+
+        /**
+         * Index a attached pdf if this has not already been done.
+         *
+         * @since  0.3.0
+         * @access public
+         * @param  int     $attachment_post_id   The ID of the attachment to index.
+         * @param  boolean $send_file            Whether to send the file or just the URL (default: false)
+         * @return boolean                       Whether the file has been uploaded and indexed.
+         */
+    public static function index_pdf_attachment_if_not_already_done( $attachment_post_id, $send_file = null ) {
+
+        if(!function_exists('relevanssi_index_pdf'))
+            return false;
+
+        $relevanssi_pdf_content = get_post_meta($attachment_post_id, '_relevanssi_pdf_content');
+        if(empty($relevanssi_pdf_content) or $relevanssi_pdf_content === 'NOT EXISTS' )
+        {
+            try
+            {
+                relevanssi_index_pdf($last_arxiv_pdf_attach_id, false, $send_file);
+                return true;
+            }
+            catch (Exception $e) {
+                return false;
+            }
+        }
+        return false;
+    }
 }
