@@ -1107,3 +1107,11 @@ function get_bloginfo( $url ) {
 function add_options_page($a, $b, $c, $d) {
 
 }
+
+function wp_enqueue_style( $handle, $src = '', $deps = array(), $ver = false, $media = 'all' ) {
+
+}
+
+function plugin_dir_url( $file ) {
+    return(dirname( __FILE__ ) . '/../../');
+}
