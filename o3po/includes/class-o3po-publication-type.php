@@ -667,7 +667,7 @@ abstract class O3PO_PublicationType {
         for ($x = 0; $x < $number_affiliations; $x++) {
             if ( empty( $affiliations[$x] ) )
                 $validation_result .= "ERROR: Affiliation " . ($x+1) . " is empty.\n" ;
-            if ( preg_match('#[\\\\]#', $affiliations[$x] ) )
+            if ( !empty($affiliations[$x]) and preg_match('#[\\\\]#', $affiliations[$x] ) )
                 $validation_result .= "WARNING: Affiliation " . ($x+1) . " contains suspicious looking special characters.\n" ;
             if ( strpos($all_appearing_affiliations, (string)($x+1) ) === false)
                 $validation_result .= "ERROR: Affiliation " . ($x+1) . " is not associated to any authors.\n" ;
