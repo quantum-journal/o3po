@@ -50,7 +50,7 @@ class O3PO_Relevanssi {
 
 
         /**
-         * Index a attached pdf if this has not already been done.
+         * Index an attached pdf if this has not already been done.
          *
          * @since  0.3.0
          * @access public
