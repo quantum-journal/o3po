@@ -2340,7 +2340,7 @@ abstract class O3PO_PublicationType {
 
         $doi_url_prefix = $this->get_journal_property('doi_url_prefix');
 
-        return '			 <p class="break-at-all-cost"><a id="' . esc_attr($entry['key']) . '">[' . esc_html($entry['ref']) . ']</a> ' . O3PO_Utility::make_slash_breakable_html(esc_html(htmlspecialchars($entry['text']))) . (!empty($entry['doi']) ? ' <br /><a href="' . esc_url(htmlspecialchars($doi_url_prefix . $entry['doi'])) . '">' . esc_html(htmlspecialchars($doi_url_prefix . $entry['doi'])) . '</a>' : '' ) . ( !empty($entry['eprint']) ? ' <br /><a href="' . esc_url($this->get_journal_property('arxiv_url_abs_prefix') . $entry['eprint']) . '">arXiv:' . $entry['eprint'] . '</a>' : '' ) . ( !empty($entry['url']) ? ' <br /><a style="width: 300px; word-wrap: break-all;" href="' . esc_url(htmlspecialchars($entry['url'])) . '">' . O3PO_Utility::make_slash_breakable_html(esc_url(htmlspecialchars($entry['url']))) . '</a>' : '' ) . '</p>';
+        return '			 <p class="break"><a id="' . esc_attr($entry['key']) . '">[' . esc_html($entry['ref']) . ']</a> ' . O3PO_Utility::make_slash_breakable_html(esc_html(htmlspecialchars($entry['text']))) . (!empty($entry['doi']) ? ' <br /><a href="' . esc_url(htmlspecialchars($doi_url_prefix . $entry['doi'])) . '">' . O3PO_Utility::make_slash_breakable_html(esc_url(htmlspecialchars($doi_url_prefix . $entry['doi']))) . '</a>' : '' ) . ( !empty($entry['eprint']) ? ' <br /><a href="' . esc_url($this->get_journal_property('arxiv_url_abs_prefix') . $entry['eprint']) . '">arXiv:' . esc_html($entry['eprint']) . '</a>' : '' ) . ( !empty($entry['url']) ? ' <br /><a href="' . esc_url(htmlspecialchars($entry['url'])) . '">' . O3PO_Utility::make_slash_breakable_html(esc_url(htmlspecialchars($entry['url']))) . '</a>' : '' ) . '</p>';
     }
 
 
@@ -2510,7 +2510,7 @@ abstract class O3PO_PublicationType {
         foreach($all_bibentries as $bibentry)
         {
             $citation_number += 1;
-            $cited_by_html .= '<p class="break-at-all-cost">' . '[' . esc_html($citation_number) . '] ';
+            $cited_by_html .= '<p class="break">' . '[' . esc_html($citation_number) . '] ';
             $cited_by_html .= $bibentry->get_formated_html($doi_url_prefix, $arxiv_url_abs_prefix);
             $cited_by_html .= '</p>' . "\n";
         }
