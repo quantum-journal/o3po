@@ -7,7 +7,7 @@ class O3PO_AdminTest extends PHPUnit_Framework_TestCase
 
     private $admin;
 
-    public function setUp() {
+    protected function setUp() {
         $this->admin = new O3PO_Admin( 'o3po', '0.3.0', 'O-3PO' );
     }
 
