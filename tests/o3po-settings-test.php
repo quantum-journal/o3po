@@ -65,8 +65,7 @@ class O3PO_SettingsTest extends PHPUnit_Framework_TestCase
         foreach($settings->get_all_settings_fields_map() as $id => $callable)
         {
             if(!in_array($id ,
-                         array('cited_by_refresh_seconds',
-                               'primary_publication_type_name',
+                         array('primary_publication_type_name',
                                'primary_publication_type_name_plural',
                                'secondary_publication_type_name',
                                'secondary_publication_type_name_plural',
