@@ -135,4 +135,11 @@ class O3PO_AdsTest extends PHPUnit_Framework_TestCase
 
     }
 
+
+    public function test_papers_with_many_citations() {
+
+        $result = O3PO_Ads::get_cited_by_bibentries( 'https://api.adsabs.harvard.edu/v1/search/query', 'no token necessary', '1801.00862' );
+        $this->assertEquals(131, count($result));
+    }
+
 }

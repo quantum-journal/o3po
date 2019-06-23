@@ -45,7 +45,7 @@ class O3PO_Ads {
         $eprint_without_version = preg_replace('#v[0-9]+$#', '', $eprint);
         $headers = array( 'Authorization' => 'Bearer:' . $api_token );
 
-        $url = $ads_api_search_url . '?q=' . 'arxiv:' . $eprint_without_version . '&fl=' . 'citation';
+        $url = $ads_api_search_url . '?q=' . 'arxiv:' . urlencode($eprint_without_version) . '&fl=' . 'citation';
         $response = get_transient('get_ads_cited_by_json_' . $url);
         if(empty($response)) {
             $response = wp_remote_get($url, array('headers' => $headers, 'timeout' => $timeout));
@@ -59,7 +59,6 @@ class O3PO_Ads {
             }
             set_transient('get_ads_cited_by_json_' . $url, $response, $storage_time);
         }
-
         $json = json_decode($response['body']);
         if($json === Null)
             return new WP_Error("json_decode_failed", "No response from ADS or unable to decode the received json data when getting the list of citing works.");
@@ -81,7 +80,15 @@ class O3PO_Ads {
          */
     private static function bibcodes_to_query_url( $ads_api_search_url, $bibcodes, $max_number_of_citations ) {
 
-        $citing_bibcodes_querey = 'bibcode:' . implode($bibcodes, '+OR+bibcode:');
+        $citing_bibcodes_querey = '';
+        foreach($bibcodes as $bibcode)
+        {
+            if(empty($citing_bibcodes_querey))
+                $citing_bibcodes_querey .= 'bibcode:';
+            else
+                $citing_bibcodes_querey .= '+OR+bibcode:';
+            $citing_bibcodes_querey .= urlencode($bibcode);
+        }
         $url = $ads_api_search_url . '?q=' . $citing_bibcodes_querey . '&fl=' . 'doi,title,author,page,issue,volume,year,pub,pubdate' . '&rows=' . $max_number_of_citations;
         return $url;
     }
@@ -120,7 +127,6 @@ class O3PO_Ads {
                  */
             $bibcode_chunks = array();
             foreach($bibcodes as $n => $bibcode){
-                echo("\nprocessing:".$bibcode);
                 if(count($bibcode_chunks) === 0) {
                     $bibcode_chunks[] = [$bibcode];
                     continue;
@@ -128,7 +134,6 @@ class O3PO_Ads {
                 else {
                     end($bibcode_chunks);
                     $last_key = key($bibcode_chunks);
-                    echo("\nlast key:".$last_key);
                     $bibcode_chunks[$last_key][] = $bibcode;
                 }
 
@@ -139,7 +144,6 @@ class O3PO_Ads {
                     $bibcode_chunks[] = [$bibcode];
                 }
             }
-            echo("\n".json_encode($bibcode_chunks));
 
             $all_bibentries = array();
             foreach($bibcode_chunks as $bibcodes) {
@@ -203,7 +207,6 @@ class O3PO_Ads {
             return new WP_Error('exception', 'There was an error parsing the data received from ADS: ' . $e->getMessage());
         }
 
-        echo("\nall bibentries:".count($all_bibentries));
         return $all_bibentries;
     }
 }
