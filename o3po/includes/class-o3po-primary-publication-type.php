@@ -1501,7 +1501,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                 $eprint = get_post_meta( $post_id, $post_type . '_eprint', true );
                 $eprint_without_version = preg_replace('#v[0-9]+$#', '', $eprint);
                 $arxiv_vanity_url = $settings->get_plugin_option('arxiv_vanity_url_prefix') . $eprint_without_version;
-                $content .= '<form action="' . esc_url($arxiv_vanity_url) . '" method="get"><input id="arxiv-vanity" type="submit" value="Read in Browser on arXiv vanity"></form>';
+                $content .= '<form action="' . esc_url($arxiv_vanity_url) . '" method="get"><input id="arxiv-vanity" type="submit" value="Read on arXiv Vanity"></form>';
             }
             $content .= '</div>';
             $content .= '</header>';

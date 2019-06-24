@@ -376,7 +376,7 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->add_settings_section('other_service_settings', 'Other services', array( $this, 'render_other_service_settings' ), $this->plugin_name . '-settings:other_service_settings');
         $this->add_settings_field('doi_url_prefix', 'Url prefix for DOI resolution', array( $this, 'render_doi_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('scirate_url_abs_prefix', 'Url prefix for scirate pages', array( $this, 'render_scirate_url_abs_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
-        $this->add_settings_field('arxiv_vanity_url_prefix', 'Url prefix for arXiv vanity pages', array( $this, 'render_arxiv_vanity_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
+        $this->add_settings_field('arxiv_vanity_url_prefix', 'Url prefix for arXiv Vanity pages', array( $this, 'render_arxiv_vanity_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('scholastica_manuscripts_url', 'Url of Scholastica manuscripts page', array( $this, 'render_scholastica_manuscripts_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('orcid_url_prefix', 'Orcid url prefix', array( $this, 'render_orcid_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('fermats_library_url_prefix', 'Url prefix for Fermats Library', array( $this, 'render_fermats_library_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
@@ -1333,7 +1333,7 @@ class O3PO_Settings extends O3PO_Singleton {
     public function render_arxiv_vanity_url_prefix_setting() {
 
         $this->render_setting('arxiv_vanity_url_prefix');
-        echo '<p>(The url prefix of arXiv vanity pages. If left blank no link to arXiv vanity is put on the publication pages.)</p>';
+        echo '<p>(The url prefix of arXiv vanity pages. If left blank no link to arXiv Vanity is put on the publication pages.)</p>';
 
     }
 
