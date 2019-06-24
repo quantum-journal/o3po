@@ -1,6 +1,8 @@
 <?php
 
-require_once dirname( __FILE__ ) . '/../o3po/admin/class-o3po-admin.php';
+require_once(dirname( __FILE__ ) . '/../o3po/admin/class-o3po-admin.php');
+#require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-publication-type.php');
+
 
 class O3PO_AdminTest extends PHPUnit_Framework_TestCase
 {
@@ -39,9 +41,6 @@ class O3PO_AdminTest extends PHPUnit_Framework_TestCase
     }
 
 
-       /**
-         * @doesNotPerformAssertions
-         */
     public function test_add_plugin_action_links() {
 
         ob_start();
@@ -55,4 +54,32 @@ class O3PO_AdminTest extends PHPUnit_Framework_TestCase
         $result = $dom->loadHTML($output);
         $this->assertNotFalse($result);
     }
+
+    public function test_enable_mathjax() {
+
+        $settings = O3PO_Settings::instance();
+        $settings->configure('o3po', '0.3.0', 'O-3PO', 'O3PO_PublicationType::get_active_publication_type_names');
+
+        ob_start();
+        echo "<div>";
+        $this->admin->enable_mathjax();
+        echo "</div>";
+        $output = ob_get_contents();
+        ob_end_clean();
+        $dom = new DOMDocument;
+        $result = $dom->loadHTML($output);
+        $this->assertNotFalse($result);
+    }
+
+    public function test_add_meta_data_explorer_page_to_menu() {
+
+        $this->admin->add_meta_data_explorer_page_to_menu();
+    }
+
+
+    #render_meta_data_explorer() needs fully set up journal and post types to work properly so we test in in o3po-journal-and-post-types-test.php
+    /* public function test_render_meta_data_explorer() { */
+
+    /*     $this->admin->render_meta_data_explorer(); */
+    /* } */
 }

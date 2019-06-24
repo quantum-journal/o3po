@@ -674,10 +674,18 @@ function wp_reset_postdata() {
     $post_data = array();
 }
 
-function get_the_title( $post_id ) {
+function get_the_title( $post_id=NULL ) {
     global $posts;
 
+    if($post_id === NUll)
+        $post_id = get_the_ID();
+
     return $posts[$post_id]['post_title'];
+}
+
+function get_the_excerpt( $post_id = NUll ) {
+
+    return mb_substr(get_the_content($post_id), 0, 100);
 }
 
 function the_content() {
@@ -700,16 +708,20 @@ function get_comments_number( $post_id=null ) {
 }
 
 
-function get_the_content() {
+function get_the_content($post_id=NULL) {
     global $posts;
 
-    $post_id = get_the_ID();
+    if($post_id===NULL)
+        $post_id = get_the_ID();
 
     return $posts[$post_id]['post_content'];
 }
 
-function get_permalink( $post_id ) {
+function get_permalink( $post_id=NULL ) {
     global $posts;
+
+   if($post_id === NUll)
+        $post_id = get_the_ID();
 
     return $posts[$post_id]['permalink'];
 }
@@ -1114,4 +1126,43 @@ function wp_enqueue_style( $handle, $src = '', $deps = array(), $ver = false, $m
 
 function plugin_dir_url( $file ) {
     return(dirname( __FILE__ ) . '/../../');
+}
+
+function add_menu_page( $page_title, $menu_title, $capability, $menu_slug, $function = '', $icon_url = '', $position = null ) {}
+
+class WP_Theme
+{
+    private $name;
+
+    public function __construct( $name ) {
+        $this->name = $name;
+    }
+
+    public function get($field) {
+
+        if($field === 'Name')
+            return $this->name;
+        else
+            throw new Exception('Not implemented');
+    }
+
+}
+
+function wp_get_theme( $stylesheet=null, $theme_root=null ) {
+
+    return new WP_Theme('OnePress');
+}
+
+$is_single = false;
+
+function is_single() {
+    global $is_single;
+    return $is_single;
+}
+
+function home_url( $path=null, $scheme=null ) {
+    if($scheme === null)
+        $scheme = 'https';
+
+    return $scheme . '://some.site' . $path;
 }

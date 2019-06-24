@@ -7,6 +7,7 @@ require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-journal.php');
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-primary-publication-type.php');
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-secondary-publication-type.php');
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-latex.php');
+require_once(dirname( __FILE__ ) . '/../o3po/admin/class-o3po-admin.php');
 
 
 class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
@@ -1325,6 +1326,73 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $this->assertNotFalse($result);
 
     }
+
+        /**
+         * @depends test_create_primary_publication_type
+         * @depends test_create_secondary_publication_type
+         */
+    function test_admin_render_meta_data_explorer( $primary_publication_type, $secondary_publication_type ) {
+        $admin = new O3PO_Admin( 'o3po', '0.3.0', 'O-3PO' );
+
+        #test without giving parameters
+        ob_start();
+        echo "<div>";
+        $admin->render_meta_data_explorer();
+        echo "</div>";
+        $output = ob_get_contents();
+        ob_end_clean();
+        $dom = new DOMDocument;
+        $result = $dom->loadHTML($output);
+        $this->assertNotFalse($result);
+
+        #test the meta-data tab for various combinations of parameters
+        global $_GET;
+        global $_POST;
+
+        $_GET['tab'] = 'meta-data';
+        $post_type_names = O3PO_PublicationType::get_active_publication_type_names();
+        $this->assertNotEmpty($post_type_names);
+
+        $output_formats = $admin->get_output_formats();
+        $this->assertNotEmpty($output_formats);
+
+        foreach($post_type_names as $post_type_name) {
+            foreach(array_merge($output_formats, ['a non-existing output format']) as $output_format) {
+                foreach(array_merge($admin->get_meta_data_fields(), ['title,number_authors,volume,doi']) as $meta_data_field_list) {
+
+                    $_GET['post_type'] = $post_type_name;
+                    $_GET['output_format'] = $output_format;
+                    $_GET['meta_data_field_list'] = $meta_data_field_list;
+
+                    ob_start();
+                    echo "<div>";
+                    $admin->render_meta_data_explorer();
+                    echo "</div>";
+                    $output = ob_get_contents();
+                    ob_end_clean();
+                    $dom = new DOMDocument;
+                    $result = $dom->loadHTML($output);
+                    $this->assertNotFalse($result);
+                }
+            }
+        }
+
+        #test the citation-metrics tab
+        $_GET['tab'] = 'citation-metrics';
+        $_POST['refresh'] = 'checked';
+        ob_start();
+        echo "<div>";
+        $admin->render_meta_data_explorer();
+        echo "</div>";
+        $output = ob_get_contents();
+        echo("\n".$output);
+        ob_end_clean();
+        $dom = new DOMDocument;
+        #$result = $dom->loadHTML($output);
+        #$this->assertNotFalse($result);
+    }
+
+
 
         /**
          * @doesNotPerformAssertions
