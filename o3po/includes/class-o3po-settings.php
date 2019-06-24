@@ -194,6 +194,7 @@ class O3PO_Settings extends O3PO_Singleton {
         'ads_api_search_url' => 'https://api.adsabs.harvard.edu/v1/search/query',
         'ads_api_token' => '',
         'relevanssi_mime_types_to_exclude' => '#(application/.*(tar|gz|gzip)|text/.*tex)#',
+        'relevanssi_index_pdfs_asynchronously' => "checked",
 
             /* The options below are currently not customizable.
              *
@@ -373,6 +374,11 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->add_settings_field('arxiv_paper_doi_feed_endpoint', 'Endpoint for the arXiv DOI feed', array( $this, 'render_arxiv_paper_doi_feed_endpoint_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings');
         $this->add_settings_field('arxiv_paper_doi_feed_days', 'Number of days in arXiv DOI feed', array( $this, 'render_arxiv_paper_doi_feed_days_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings');
 
+        $this->add_settings_section('buffer_settings', 'Buffer.com', array( $this, 'render_buffer_settings' ), $this->plugin_name . '-settings:buffer_settings');
+        $this->add_settings_field('buffer_api_url', 'Url of the buffer.com api', array( $this, 'render_buffer_api_url_setting' ), $this->plugin_name . '-settings:buffer_settings', 'buffer_settings');
+        $this->add_settings_field('buffer_access_token', 'Access token from buffer.com', array( $this, 'render_buffer_access_token_setting' ), $this->plugin_name . '-settings:buffer_settings', 'buffer_settings');
+        $this->add_settings_field('buffer_profile_ids', 'Profile IDs on buffer.com', array( $this, 'render_buffer_profile_ids_setting' ), $this->plugin_name . '-settings:buffer_settings', 'buffer_settings');
+
         $this->add_settings_section('other_service_settings', 'Other services', array( $this, 'render_other_service_settings' ), $this->plugin_name . '-settings:other_service_settings');
         $this->add_settings_field('doi_url_prefix', 'Url prefix for DOI resolution', array( $this, 'render_doi_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('scirate_url_abs_prefix', 'Url prefix for scirate pages', array( $this, 'render_scirate_url_abs_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
@@ -384,13 +390,11 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->add_settings_field('mathjax_url', 'MathJax url', array( $this, 'render_mathjax_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('social_media_thumbnail_url', 'Url of default thumbnail for social media', array( $this, 'render_social_media_thumbnail_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('facebook_app_id', 'Facebook app_id', array( $this, 'render_facebook_app_id_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
-        $this->add_settings_field('buffer_api_url', 'Url of the buffer.com api', array( $this, 'render_buffer_api_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
-        $this->add_settings_field('buffer_access_token', 'Access token from buffer.com', array( $this, 'render_buffer_access_token_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
-        $this->add_settings_field('buffer_profile_ids', 'Profile IDs on buffer.com', array( $this, 'render_buffer_profile_ids_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
-
 
         $this->add_settings_section('other_plugins_settings', 'Other plugins', array( $this, 'render_other_plugins_settings' ), $this->plugin_name . '-settings:other_plugins_settings');
         $this->add_settings_field('relevanssi_mime_types_to_exclude', 'Relevanssi mime types to exclude', array( $this, 'render_relevanssi_mime_types_to_exclude_setting' ), $this->plugin_name . '-settings:other_plugins_settings', 'other_plugins_settings');
+        $this->add_settings_field('relevanssi_index_pdfs_asynchronously', 'Index PDFs asynchronously', array( $this, 'render_relevanssi_index_pdfs_asynchronously_setting' ), $this->plugin_name . '-settings:other_plugins_settings', 'other_plugins_settings');
+
     }
 
         /**
@@ -486,6 +490,18 @@ class O3PO_Settings extends O3PO_Singleton {
     public function render_arxiv_settings() {
 
         echo '<p>Configure how ' . $this->plugin_name . ' interacts with the <a href="https://arxiv.org/">arXiv</a>.</p>';
+
+    }
+
+        /**
+         * Render the head of the Buffer.com settings part.
+         *
+         * @since    0.3.0
+         * @access   public
+         */
+    public function render_buffer_settings() {
+
+        echo '<p>Configure how ' . $this->plugin_name . ' interacts with <a href="https://arxiv.org/">Buffer.com</a>.</p>';
 
     }
 
@@ -1478,8 +1494,28 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_relevanssi_mime_types_to_exclude_setting() {
 
+        if(!function_exists('relevanssi_index_pdf'))
+            echo "<p>Please install relevanssi premium</p>";
+        else
+            echo "<p>Relevanssi premium installed</p>";
+
+        echo("<p>TODO: Verify that indexing actually works!</p>");
+
         $this->render_setting('relevanssi_mime_types_to_exclude');
         echo '<p>(Relevanssi Premium has the ability to index the content of attachments and thereby, e.g., enabled full text search in PDFs attached to publications. It however, by default, will index all attachment types and this is usually not desirable for the arXiv source files in .tex or .tar.gz format. Through this setting, mime types can be excluded from indexing by providing a php regular expression. All attachment posts whose mime type matches that regular expression are excluded from indexing via the <a href="https://www.relevanssi.com/knowledge-base/controlling-attachment-types-index/">relevanssi_do_not_index</a> filter. If left empty all post attachments are indexed if that feature is enable in Relevanssi Premium.)</p>';
+
+    }
+
+        /**
+         * Render the setting for whether to index pdf asynchronously.
+         *
+         * @since    0.3.0
+         * @access   public
+         */
+    public function render_relevanssi_index_pdfs_asynchronously_setting() {
+
+        $this->render_checkbox_setting('relevanssi_index_pdfs_asynchronously', 'Index pdfs after full text first requested via pdf endpoint');
+        echo '<p>(Relevanssi Premium has the ability to index the content of attachments and thereby, e.g., enabled full text search in PDFs attached to publications. The indexing however happens on another server and is thus slow when done during the publishing of a publication post. Checking this box allows to do the indexing instead in the background after the full text pdf has first been requested via the pdf endpoint.)</p>';
 
     }
 
@@ -1665,6 +1701,7 @@ class O3PO_Settings extends O3PO_Singleton {
                 'fermats_library_notification_subject_template' => 'trim_settings_field',
                 'fermats_library_notification_body_template' => 'leave_unchaged',
                 'relevanssi_mime_types_to_exclude' => 'trim_settings_field',
+                'relevanssi_index_pdfs_asynchronously' => 'checked_or_unchecked',
                 'cited_by_refresh_seconds' => 'validate_positive_integer',
 
                     /* The following settings cannot be customized by the user.
