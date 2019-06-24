@@ -19,6 +19,8 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-publi
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-email-templates.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-arxiv.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-relevanssi.php';
+
 
 /**
  * Class representing the primary publication type.
@@ -1042,13 +1044,37 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             exit();
         }
 
+            /* We deliver the pdf file through an output buffer
+             * so we can do a lengthy computation afterwards. */
+        ob_start();
+        ##################
         header('Content-Type: application/pdf');
         header('Content-Disposition: inline; filename="' . esc_html($doi_suffix) . '.pdf"' );//always return the same file name even if local revision number has changed
         readfile($file_path);
+        ##################
+        header('Content-Length: '.ob_get_length());
+        ob_end_flush();
+        flush();
+
+            /* We do this because now we can then submit the pdf for
+             * indexing to relevanssi. */
+        $settings = O3PO_Settings::instance();
+        $relevanssi_index_pdfs_asynchronously = $settings->get_plugin_option('relevanssi_index_pdfs_asynchronously');
+        if($relevanssi_index_pdfs_asynchronously === 'checked')
+        {
+            ignore_user_abort(true);
+            set_time_limit(30);
+            $arxiv_pdf_attach_ids = static::get_post_meta_field_containing_array($post_id, $post_type . '_arxiv_pdf_attach_ids');
+            $last_arxiv_pdf_attach_id = end($arxiv_pdf_attach_ids);
+            if(!empty($last_arxiv_pdf_attach_id))
+            {
+                $indexed = O3PO_Relevanssi::index_pdf_attachment_if_not_already_done( $attachment_post_id, $send_file = null );
+                static::update_post_meta($post_id, $post_type . '_indexed', $indexed);
+            }
+        }
+
         exit();
-
     }
-
 
        /**
         * Add /web-statement end point for serving a web statement of the licence.
@@ -1489,11 +1515,19 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             $content .= '<tr><td>Citation:</td><td>' . esc_html($this->get_formated_citation($post_id)) . '</td></tr>';
             $content .= '</table>';
             $content .= '<div class="publication-action-buttons">';
-            $content .= '<form action="' . esc_attr($this->get_pdf_pretty_permalink($post_id)) . '" method="get"><input id="fulltext" type="submit" value="full text pdf"></form>';
+            $content .= '<form action="' . esc_url($this->get_pdf_pretty_permalink($post_id)) . '" method="get"><input id="fulltext" type="submit" value="full text pdf"></form>';
             if ( $this->show_fermats_library_permalink($post_id) )
             {
                 $fermats_library_permalink = get_post_meta( $post_id, $post_type . '_fermats_library_permalink', true );
-                $content .= '<form action="' . esc_attr($fermats_library_permalink) . '" method="get"><input id="fermatslibrary" type="submit" value="comment on Fermat\'s library"></form>';
+                $content .= '<form action="' . esc_url($fermats_library_permalink) . '" method="get"><input id="fermatslibrary" type="submit" value="Comment on Fermat\'s library"></form>';
+            }
+
+            if(!empty($settings->get_plugin_option('arxiv_vanity_url_prefix')))
+            {
+                $eprint = get_post_meta( $post_id, $post_type . '_eprint', true );
+                $eprint_without_version = preg_replace('#v[0-9]+$#', '', $eprint);
+                $arxiv_vanity_url = $settings->get_plugin_option('arxiv_vanity_url_prefix') . $eprint_without_version;
+                $content .= '<form action="' . esc_url($arxiv_vanity_url) . '" method="get"><input id="arxiv-vanity" type="submit" value="Read on arXiv Vanity"></form>';
             }
             $content .= '</div>';
             $content .= '</header>';

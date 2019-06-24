@@ -1413,7 +1413,7 @@ abstract class O3PO_PublicationType {
 
 		$crossref_response = $crossref_url . " responded at " . date('Y-m-d H:i:s') . " with:\n";
 		if ( is_wp_error( $response ) ) {
-			$crossref_response .= 'ERROR: ' . $response->get_error_message();
+			$crossref_response = 'ERROR: ' . $response->get_error_message();
 		} else {
 			$crossref_response .= trim($response['body']);
 		}
@@ -1448,7 +1448,7 @@ abstract class O3PO_PublicationType {
 
         $doaj_response = $doaj_api_url . " responded at " . date('Y-m-d H:i:s') . " with:\n";
         if(is_wp_error($response))
-            $doaj_response .= 'ERROR: While submitting meta-data to DOAJ the following error occurred: ' . $response->get_error_message() . "\n";
+            $doaj_response = 'ERROR: While submitting meta-data to DOAJ the following error occurred: ' . $response->get_error_message() . "\n";
         elseif(!isset($response['body']) or strpos($doaj_response, 'created') !== false)
         {
             $doaj_response = 'ERROR: Did not get the expected response from DOAJ. This may indicate a problem with the meta-data upload, please check manually:' . "\n" . trim($response['body']) . "\n";
