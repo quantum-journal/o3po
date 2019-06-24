@@ -9,43 +9,53 @@ class O3PO_AdminTest extends PHPUnit_Framework_TestCase
 
     private $admin;
 
-    protected function setUp() {
-        $this->admin = new O3PO_Admin( 'o3po', '0.3.0', 'O-3PO' );
-    }
-
-
-    public function test_get_plugin_name() {
-
-        $this->assertEquals($this->admin->get_plugin_name(), 'o3po');
-    }
-
-    public function test_get_plugin_pretty_name() {
-
-        $this->assertEquals($this->admin->get_plugin_pretty_name(), 'O-3PO');
+    # As phpunit 8 requires a specification of a void return type for setUp(), as explained here https://thephp.cc/news/2019/02/help-my-tests-stopped-working, but PHP <7 does not support such declarations setUp() can no longer be used if the tests are to run across PHP versions.
+    public function test_setUp() {
+        return new O3PO_Admin( 'o3po', '0.3.0', 'O-3PO' );
     }
 
         /**
+         * @depends test_setUp
+         */
+    public function test_get_plugin_name( $admin ) {
+
+        $this->assertEquals($admin->get_plugin_name(), 'o3po');
+    }
+
+        /**
+         * @depends test_setUp
+         */
+    public function test_get_plugin_pretty_name( $admin ) {
+
+        $this->assertEquals($admin->get_plugin_pretty_name(), 'O-3PO');
+    }
+
+        /**
+         * @depends test_setUp
          * @doesNotPerformAssertions
          */
-    public function test_enqueue_styles() {
+    public function test_enqueue_styles( $admin ) {
 
-        $this->admin->enqueue_styles();
+        $admin->enqueue_styles();
     }
 
        /**
+         * @depends test_setUp
          * @doesNotPerformAssertions
          */
-    public function test_enqueue_scripts() {
+    public function test_enqueue_scripts( $admin ) {
 
-        $this->admin->enqueue_scripts();
+        $admin->enqueue_scripts();
     }
 
-
-    public function test_add_plugin_action_links() {
+        /**
+         * @depends test_setUp
+         */
+    public function test_add_plugin_action_links( $admin ) {
 
         ob_start();
         echo "<div>";
-        foreach($this->admin->add_plugin_action_links(array('<a href="foo">foo</a>')) as $link_html)
+        foreach($admin->add_plugin_action_links(array('<a href="foo">foo</a>')) as $link_html)
             echo($link_html);
         echo "</div>";
         $output = ob_get_contents();
@@ -55,14 +65,17 @@ class O3PO_AdminTest extends PHPUnit_Framework_TestCase
         $this->assertNotFalse($result);
     }
 
-    public function test_enable_mathjax() {
+        /**
+         * @depends test_setUp
+         */
+    public function test_enable_mathjax( $admin ) {
 
         $settings = O3PO_Settings::instance();
         $settings->configure('o3po', '0.3.0', 'O-3PO', 'O3PO_PublicationType::get_active_publication_type_names');
 
         ob_start();
         echo "<div>";
-        $this->admin->enable_mathjax();
+        $admin->enable_mathjax();
         echo "</div>";
         $output = ob_get_contents();
         ob_end_clean();
@@ -71,9 +84,12 @@ class O3PO_AdminTest extends PHPUnit_Framework_TestCase
         $this->assertNotFalse($result);
     }
 
-    public function test_add_meta_data_explorer_page_to_menu() {
+        /**
+         * @depends test_setUp
+         */
+    public function test_add_meta_data_explorer_page_to_menu( $admin ) {
 
-        $this->admin->add_meta_data_explorer_page_to_menu();
+        $admin->add_meta_data_explorer_page_to_menu();
     }
 
 
