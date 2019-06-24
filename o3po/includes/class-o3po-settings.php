@@ -92,7 +92,7 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   protected
          * @var      array     $settings_fields    Dictionary of all setting fields and their properties.
          */
-	protected $settings_field = array();
+	protected $settings_fields = array();
 
         /**
          * The dafaults for various options
@@ -121,6 +121,7 @@ class O3PO_Settings extends O3PO_Singleton {
         'arxiv_url_trackback_prefix' => 'http://arxiv.org/trackback/',
         'doi_url_prefix' => 'https://doi.org/',
         'scirate_url_abs_prefix' => 'https://scirate.com/arxiv/',
+        'arxiv_vanity_url_prefix' => 'https://www.arxiv-vanity.com/papers/',
         'orcid_url_prefix' => 'https://orcid.org/',
         'fermats_library_url_prefix' => 'https://fermatslibrary.com/s/',
         'doaj_api_url' => "https://doaj.org/api/v1/articles",
@@ -375,6 +376,7 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->add_settings_section('other_service_settings', 'Other services', array( $this, 'render_other_service_settings' ), $this->plugin_name . '-settings:other_service_settings');
         $this->add_settings_field('doi_url_prefix', 'Url prefix for DOI resolution', array( $this, 'render_doi_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('scirate_url_abs_prefix', 'Url prefix for scirate pages', array( $this, 'render_scirate_url_abs_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
+        $this->add_settings_field('arxiv_vanity_url_prefix', 'Url prefix for arXiv vanity pages', array( $this, 'render_arxiv_vanity_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('scholastica_manuscripts_url', 'Url of Scholastica manuscripts page', array( $this, 'render_scholastica_manuscripts_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('orcid_url_prefix', 'Orcid url prefix', array( $this, 'render_orcid_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('fermats_library_url_prefix', 'Url prefix for Fermats Library', array( $this, 'render_fermats_library_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
@@ -1321,6 +1323,20 @@ class O3PO_Settings extends O3PO_Singleton {
 
     }
 
+
+        /**
+         * Render the setting for the arXiv vanity URL prefix.
+         *
+         * @since    0.3.0
+         * @access   public
+         */
+    public function render_arxiv_vanity_url_prefix_setting() {
+
+        $this->render_setting('arxiv_vanity_url_prefix');
+        echo '<p>(The url prefix of arXiv vanity pages. If left blank no link to arXiv vanity is put on the publication pages.)</p>';
+
+    }
+
         /**
          * Render the setting for the ORCID URL prefix.
          *
@@ -1616,6 +1632,7 @@ class O3PO_Settings extends O3PO_Singleton {
                 'doi_url_prefix' => 'validate_url',
                 'scholastica_manuscripts_url' => 'validate_url',
                 'scirate_url_abs_prefix' => 'validate_url',
+                'arxiv_vanity_url_prefix' => 'validate_url',
                 'orcid_url_prefix' => 'validate_url',
                 'fermats_library_url_prefix' => 'validate_url',
                 'fermats_library_email' => 'trim_settings_field',
@@ -2017,7 +2034,6 @@ class O3PO_Settings extends O3PO_Singleton {
 
         add_settings_field($id, $title, $callback, $page, $section, $args);
         $this->settings_fields[$id] = array('title' => $title, 'callback' => $callback, 'page' => $page, 'section' => $section, 'args' => $args);
-
     }
 
 

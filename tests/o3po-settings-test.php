@@ -223,7 +223,9 @@ class O3PO_SettingsTest extends PHPUnit_Framework_TestCase
             ['https://doaj.org/api/v1/docs#!/CRUD_Articles/post_api_v1_articles', 'https://doaj.org/api/v1/docs#!/CRUD_Articles/post_api_v1_articles'],
             ['https://codex.wordpress.org/Function_Reference/get_post_thumbnail_id', 'https://codex.wordpress.org/Function_Reference/get_post_thumbnail_id'],
             ['ftp://fo.bar', 'ftp://fo.bar'], #in the fake wordpress environment of the test system esc_url and esc_url_raw currently have no effect, so this validation doesn't really work during unit tests
-            ['  https://foo.de  ', 'https://foo.de']
+            ['  https://foo.de  ', 'https://foo.de'],
+            ['foo.de', 'foo.de'],
+            ['/path/', '/path/'],
                 ];
     }
 
@@ -404,14 +406,11 @@ public function validate_array_as_comma_separated_list_provider() {
     }
 
         /**
-         * @runInSeparateProcess
-         * @preserveGlobalState disabled
          * @dataProvider validate_settings_provider
+         * @depends test_initialize_settings
          */
-    public function test_validate_settings( $input, $expected ) {
+    public function test_validate_settings( $input, $expected, $settings ) {
 
-        $this->test_initialize_settings();
-        $settings = O3PO_Settings::instance();
         $output = $settings->validate_settings($input);
 
         foreach($expected as $key => $val)
