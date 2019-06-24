@@ -199,7 +199,7 @@ class O3PO_Settings extends O3PO_Singleton {
              * Warning: The name of the paper-single.php templare must match
              * the primary_publication_type_name!
              */
-        'cited_by_refresh_seconds' => 60*60*12,
+        'cited_by_refresh_seconds' => '43200',#=60*60*12
         'primary_publication_type_name' => 'paper',
         'primary_publication_type_name_plural' => 'papers',
         'secondary_publication_type_name' => 'view',
@@ -304,6 +304,7 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->add_settings_field('custom_search_page', 'Display search page notice', array( $this, 'render_custom_search_page_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
         $this->add_settings_field('page_template_for_publication_posts', 'Force page template', array( $this, 'render_page_template_for_publication_posts_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
         $this->add_settings_field('page_template_abstract_header', 'Show a heading for the abstract', array( $this, 'render_page_template_abstract_header_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
+        $this->add_settings_field('cited_by_refresh_seconds', 'Refresh cited-by time', array( $this, 'render_cited_by_refresh_seconds_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
         $this->add_settings_field('maintenance_mode', 'Maintenance mode', array( $this, 'render_maintenance_mode_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
 
         $this->add_settings_section('journal_settings', 'Journal', array( $this, 'render_journal_settings' ), $this->plugin_name . '-settings:journal_settings');
@@ -583,6 +584,20 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->render_checkbox_setting('page_template_for_publication_posts', 'Show publication posts with the page template instead of the default post template of your theme. Some themes include information such as "Posted on ... by ..." on the post template, which may be inappropriate for publication posts.');
 
     }
+
+        /**
+         * Render the cited by refresh seconds field
+         *
+         * @sinde 0.3.0
+         * @access public
+         */
+    public function render_cited_by_refresh_seconds_setting() {
+
+        $this->render_setting('cited_by_refresh_seconds');
+        echo '<p>(Refresh the cited by data on publication pages at most every this many seconds. This affects how cited-by data is retrieved from Crossref and ADS.)</p>';
+
+    }
+
 
         /**
          * Render the setting to enabled maintenance mode.
@@ -1633,10 +1648,11 @@ class O3PO_Settings extends O3PO_Singleton {
                 'fermats_library_notification_subject_template' => 'trim_settings_field',
                 'fermats_library_notification_body_template' => 'leave_unchaged',
                 'relevanssi_mime_types_to_exclude' => 'trim_settings_field',
+                'cited_by_refresh_seconds' => 'validate_positive_integer',
+
                     /* The following settings cannot be customized by the user.
                      * validation method null ensures that these settings are never
                      * updated when user settings are saved and validated. */
-                'cited_by_refresh_seconds' => null,
                 'primary_publication_type_name' => null,
                 'primary_publication_type_name_plural' => null,
                 'secondary_publication_type_name' => null,

@@ -79,7 +79,7 @@ class O3PO_AdsTest extends PHPUnit_Framework_TestCase
                 'ads_api_search_url' => 'https://api.adsabs.harvard.edu/v1/search/query',
                 'api_token' => '',
                 'eprint' => '0000.0001',
-                'expected' => new WP_Error("json_decode_failed", "No response from ADS or unable to decode the received json data."),
+                'expected' => new WP_Error("json_decode_failed", "No response from ADS or unable to decode the received json data when getting the list of citing works."),
                   ),
             array(
                 'ads_api_search_url' => 'https://api.adsabs.harvard.edu/v1/search/query',
@@ -97,7 +97,7 @@ class O3PO_AdsTest extends PHPUnit_Framework_TestCase
                 'ads_api_search_url' => 'https://api.adsabs.harvard.edu/v1/search/query',
                 'api_token' => '',
                 'eprint' => '0000.0004',
-                'expected' => new WP_Error("json_decode_failed", "No response from ADS or unable to decode the received json data."),
+                'expected' => new WP_Error("json_decode_failed", "No response from ADS or unable to decode the received json data when querying for bibliographic information of citing works."),
                   ),
             array(
                 'ads_api_search_url' => 'https://api.adsabs.harvard.edu/v1/search/query',
@@ -133,6 +133,13 @@ class O3PO_AdsTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, O3PO_Ads::get_cited_by_bibentries( $ads_api_search_url, $api_token, $eprint ));
 
+    }
+
+
+    public function test_papers_with_many_citations() {
+
+        $result = O3PO_Ads::get_cited_by_bibentries( 'https://api.adsabs.harvard.edu/v1/search/query', 'no token necessary', '1801.00862' );
+        $this->assertEquals(131, count($result));
     }
 
 }
