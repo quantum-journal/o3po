@@ -135,12 +135,12 @@ class O3PO_Public {
                 $description = $specific_description;
         }
 
-        $journa_title = $settings->get_plugin_option('journal_title');
+        $journal_title = $settings->get_plugin_option('journal_title');
 
         echo '<meta property="og:type" content="article" />' . "\n";
         echo '<meta property="og:url" content="' . esc_attr($url) . '" />' . "\n";
         echo '<meta property="og:title" content="' . esc_attr($title) . '" />' . "\n";
-        echo '<meta property="og:site_name" content="' . esc_attr($journa_title) .'" />' . "\n";
+        echo '<meta property="og:site_name" content="' . esc_attr($journal_title) .'" />' . "\n";
         echo '<meta property="og:description" content="' . esc_attr($description) . '" />' . "\n";
 
         if(!empty($image_url))
