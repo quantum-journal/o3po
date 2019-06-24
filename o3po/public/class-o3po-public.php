@@ -13,6 +13,10 @@
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-utility.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-publication-type.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-journal.php';
+
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-secondary-publication-type.php';
+
 
 /**
  * The public-facing functionality of the plugin.
