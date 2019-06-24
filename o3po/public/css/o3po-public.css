@@ -59,11 +59,18 @@ p.copyright {
     padding-top: 1rem;
     padding-bottom: 1rem;
 }
+.break {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+}
 .break-at-all-cost {
     overflow-wrap: break-word;
     word-wrap: break-word;
     -ms-word-break: break-all;
-    word-break: break-all;
     word-break: break-all;
     -ms-hyphens: auto;
     -moz-hyphens: auto;

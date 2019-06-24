@@ -1414,7 +1414,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                                     }
                                     $was_affiliation_since_last_author = true;
                                 }
-                                if( $author_info[1][$x] === 'affil')
+                                elseif( $author_info[1][$x] === 'affil')
                                 {
                                     preg_match('/[0-9]*/', $author_info[2][$x], $affiliation_symb_from_optional_argument);
                                     if(!empty($affiliation_symb_from_optional_argument[0]) && is_int($affiliation_symb_from_optional_argument[0]))
