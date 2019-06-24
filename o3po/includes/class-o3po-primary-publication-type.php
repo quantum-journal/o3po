@@ -1515,11 +1515,19 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             $content .= '<tr><td>Citation:</td><td>' . esc_html($this->get_formated_citation($post_id)) . '</td></tr>';
             $content .= '</table>';
             $content .= '<div class="publication-action-buttons">';
-            $content .= '<form action="' . esc_attr($this->get_pdf_pretty_permalink($post_id)) . '" method="get"><input id="fulltext" type="submit" value="full text pdf"></form>';
+            $content .= '<form action="' . esc_url($this->get_pdf_pretty_permalink($post_id)) . '" method="get"><input id="fulltext" type="submit" value="full text pdf"></form>';
             if ( $this->show_fermats_library_permalink($post_id) )
             {
                 $fermats_library_permalink = get_post_meta( $post_id, $post_type . '_fermats_library_permalink', true );
-                $content .= '<form action="' . esc_attr($fermats_library_permalink) . '" method="get"><input id="fermatslibrary" type="submit" value="comment on Fermat\'s library"></form>';
+                $content .= '<form action="' . esc_url($fermats_library_permalink) . '" method="get"><input id="fermatslibrary" type="submit" value="Comment on Fermat\'s library"></form>';
+            }
+
+            if(!empty($settings->get_plugin_option('arxiv_vanity_url_prefix')))
+            {
+                $eprint = get_post_meta( $post_id, $post_type . '_eprint', true );
+                $eprint_without_version = preg_replace('#v[0-9]+$#', '', $eprint);
+                $arxiv_vanity_url = $settings->get_plugin_option('arxiv_vanity_url_prefix') . $eprint_without_version;
+                $content .= '<form action="' . esc_url($arxiv_vanity_url) . '" method="get"><input id="arxiv-vanity" type="submit" value="Read on arXiv Vanity"></form>';
             }
             $content .= '</div>';
             $content .= '</header>';
