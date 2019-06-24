@@ -10,12 +10,12 @@ class O3PO_AdminTest extends PHPUnit_Framework_TestCase
     private $admin;
 
     # As phpunit 8 requires a specification of a void return type for setUp(), as explained here https://thephp.cc/news/2019/02/help-my-tests-stopped-working, but PHP <7 does not support such declarations setUp() can no longer be used if the tests are to run across PHP versions.
-    public function test_setUp() {
+    public function test_construct() {
         return new O3PO_Admin( 'o3po', '0.3.0', 'O-3PO' );
     }
 
         /**
-         * @depends test_setUp
+         * @depends test_construct
          */
     public function test_get_plugin_name( $admin ) {
 
@@ -23,7 +23,7 @@ class O3PO_AdminTest extends PHPUnit_Framework_TestCase
     }
 
         /**
-         * @depends test_setUp
+         * @depends test_construct
          */
     public function test_get_plugin_pretty_name( $admin ) {
 
@@ -31,7 +31,7 @@ class O3PO_AdminTest extends PHPUnit_Framework_TestCase
     }
 
         /**
-         * @depends test_setUp
+         * @depends test_construct
          * @doesNotPerformAssertions
          */
     public function test_enqueue_styles( $admin ) {
@@ -40,7 +40,7 @@ class O3PO_AdminTest extends PHPUnit_Framework_TestCase
     }
 
        /**
-         * @depends test_setUp
+         * @depends test_construct
          * @doesNotPerformAssertions
          */
     public function test_enqueue_scripts( $admin ) {
@@ -49,7 +49,7 @@ class O3PO_AdminTest extends PHPUnit_Framework_TestCase
     }
 
         /**
-         * @depends test_setUp
+         * @depends test_construct
          */
     public function test_add_plugin_action_links( $admin ) {
 
@@ -66,7 +66,7 @@ class O3PO_AdminTest extends PHPUnit_Framework_TestCase
     }
 
         /**
-         * @depends test_setUp
+         * @depends test_construct
          */
     public function test_enable_mathjax( $admin ) {
 
@@ -85,7 +85,7 @@ class O3PO_AdminTest extends PHPUnit_Framework_TestCase
     }
 
         /**
-         * @depends test_setUp
+         * @depends test_construct
          */
     public function test_add_meta_data_explorer_page_to_menu( $admin ) {
 

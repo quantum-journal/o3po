@@ -1161,13 +1161,20 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
 
         /**
-         * @doesNotPerformAssertions
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
     public function test_add_custom_post_types_to_query( $primary_publication_type, $secondary_publication_type) {
-        $primary_publication_type->add_custom_post_types_to_query( new WP_Query() );
-        $secondary_publication_type->add_custom_post_types_to_query( new WP_Query() );
+        global $is_home;
+        $is_home = true;
+
+        $query = new WP_Query(null, array('is_main' => true));
+        $primary_publication_type->add_custom_post_types_to_query($query);
+        $this->assertEquals(array(null, 'post', $primary_publication_type->get_publication_type_name()), $query->get('post_type'));
+
+        $query = new WP_Query(null, array('is_main' => true));
+        $secondary_publication_type->add_custom_post_types_to_query($query);
+        $this->assertEquals(array(null, 'post', $secondary_publication_type->get_publication_type_name()), $query->get('post_type'));
     }
 
         /**

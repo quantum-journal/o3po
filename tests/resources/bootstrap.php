@@ -88,7 +88,9 @@ function esc_html_filter( $text ) {
 add_filter( 'esc_html', 'esc_html_filter' );
 
 
-function is_admin() {}
+function is_admin() {
+    return false;
+}
 
 function get_site_url() {
 
@@ -191,6 +193,15 @@ function get_post_type( $post_id ) {
         throw new Exception("Post with id=" . $post_id . " has no post_type.");
 
     return $posts[$post_id]['post_type'];
+}
+
+function get_post_field( $field, $post_id ) {
+    global $posts;
+
+    if(!isset($posts[$post_id][$field]))
+        throw new Exception("Post with id=" . $post_id . " has no field " . $field . ".");
+
+    return $posts[$post_id][$field];
 }
 
 function get_post_meta( $post_id, $key, $single = false ) {
@@ -333,6 +344,10 @@ class WP_Query
         return $this->query[$key];
     }
 
+    function set($key, $val) {
+        $this->query[$key] = $val;
+    }
+
     function have_posts() {
         return count($this->posts) > 0;
     }
@@ -363,6 +378,20 @@ class WP_Query
         return isset($this->query_vars['is_main']) ? $this->query_vars['is_main'] : false;
     }
 }
+
+function is_post_type_archive( $archive_name ) {
+    global $wp_query;
+
+    return isset($wp_query->query_vars['post_type']) and $wp_query->query_vars['post_type'] == $archive_name;
+}
+
+
+function is_category( $category_name ) {
+    global $wp_query;
+
+    return isset($wp_query->query_vars['category']) and $wp_query->query_vars['category'] == $category_name;
+}
+
 
 $wp_query = new WP_Query();
 function set_global_query( $query ) {
@@ -487,10 +516,17 @@ function get_post_thumbnail_id( $post_id ) {
 function wp_get_attachment_image_src( $post_id ) {
     global $posts;
 
+    if($post_id === 8356865345) #a special id we have set in get_theme_mod()
+        return 'https://some.site/logog.jpg';
+
     if(!isset($posts[$post_id]['attachment_image_src']))
         throw new Exception("Post with id=" . $post_id . " has no attachment_image_src.");
 
     return $posts[$post_id]['attachment_image_src'];
+}
+
+function wp_get_attachment_image( $post_id ) {
+    return '<img src="'.wp_get_attachment_image_src( $post_id ).'">';
 }
 
 function get_post_status( $ID = '' ) {
@@ -887,20 +923,17 @@ function is_home() {
     return $is_home;
 }
 
-$is_category = false;
-function is_category() {
-    global $is_category;
-    return $is_category;
-}
-
-
 function get_header() {
     echo '<!DOCTYPE html>
 <html lang="en-GB">
 <head><title>fake title</title></head><body>';
 }
 
-function get_theme_mod() {
+function get_theme_mod( $part=null ) {
+
+    if($part === 'custom_logo')
+        return 8356865345;#a special id we recognize in wp_get_attachment_image()
+
     return "";
 }
 
@@ -1168,4 +1201,12 @@ function home_url( $path=null, $scheme=null ) {
         $scheme = 'https';
 
     return $scheme . '://some.site' . $path;
+}
+
+function __( $input ) {
+    return $input;
+}
+
+function _x( $input ) {
+    return $input;
 }
