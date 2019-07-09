@@ -197,7 +197,7 @@ class O3PO_Journal {
         if ( !isset( $wp_query->query_vars[ $this->get_journal_property('volumes_endpoint') ] ) )
             return;
 
-        $extras = preg_split('#/#' , $wp_query->query_vars[ $this->get_journal_property('volumes_endpoint') ]);
+        $extras = preg_split('#/#u' , $wp_query->query_vars[ $this->get_journal_property('volumes_endpoint') ]);
 
         if(isset($extras[0]))
             $vol_num = (int)$extras[0];

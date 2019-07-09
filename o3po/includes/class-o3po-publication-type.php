@@ -489,7 +489,7 @@ abstract class O3PO_PublicationType {
 			$new_author_surnames[] = isset( $_POST[ $post_type . '_author_surnames' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_surnames' ][$x] ) : '';
 			$new_author_name_styles[] = isset( $_POST[ $post_type . '_author_name_styles' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_name_styles' ][$x] ) : 'western';
 			$affiliation_nums = isset( $_POST[ $post_type . '_author_affiliations' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_affiliations' ][$x] ) : '';
-			$affiliation_nums = trim( preg_replace("/[^,0-9]/", "", $affiliation_nums ), ',');
+			$affiliation_nums = trim( preg_replace("/[^,0-9]/u", "", $affiliation_nums ), ',');
 			$new_author_affiliations[] = $affiliation_nums;
 			$new_author_orcids[] = isset( $_POST[ $post_type . '_author_orcids' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_orcids' ][$x] ) : '';
             $new_author_urls[] = isset( $_POST[ $post_type . '_author_urls' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_urls' ][$x] ) : '';
@@ -597,7 +597,7 @@ abstract class O3PO_PublicationType {
         if( empty($journal) or empty($doi_prefix) or empty($publisher) )
             $validation_result .= "WARNING: The journal title (" . $journal . "), doi prefix (" . $doi_prefix . "), or publisher (" . $publisher . ") seem to be empty. Probably some some essential settings were not set. Please go to the settings page and configure them.\n";
 
-        if( O3PO_Latex::preg_match_outside_math_mode('#\\\\(?!cite)#', $abstract) !== 0)
+        if( O3PO_Latex::preg_match_outside_math_mode('#\\\\(?!cite)#u', $abstract) !== 0)
             $validation_result .= "WARNING: The abstract contains one or more backslashes that are not part of a \\\\cite command.\n" ;
         if( O3PO_Latex::strpos_outside_math_mode($abstract, '=') !== false )
             $validation_result .= "WARNING: The abstract contains an = sign that should probably be part of a mathematical formulat, please put dollar signs around the formula.\n" ;
@@ -620,9 +620,9 @@ abstract class O3PO_PublicationType {
             $validation_result .= "REVIEW: The doi suffix was set to ". $doi_suffix . ".\n";
         if ( empty($title) )
             $validation_result .= "ERROR: Title is empty.\n";
-        else if ( preg_match('/[<>]/', $title ) )
+        else if ( preg_match('/[<>]/u', $title ) )
             $validation_result .= "WARNING: Title contains < or > signs. If they are meant to represent math, the formulas should be enclosed in dollar signs and they should be replaced with \\\\lt and \\\\gt respectively (similarly <= and >= should be replaced by \\\\leq and \\\\geq).\n" ;
-        if ( empty($title_mathml) && preg_match('/[^\\\\]\$.*[^\\\\]\$/' , $title ) )
+        if ( empty($title_mathml) && preg_match('/[^\\\\]\$.*[^\\\\]\$/u' , $title ) )
             $validation_result .= "ERROR: Title contains math but no MathML variant was saved so far.\n";
         if ( empty( $pages ) or $pages < 0 )
             $validation_result .= "ERROR: Pages is invalid. Maybe you are trying to publish something that would break lexicographic ordering of DOIs?\n";
@@ -651,7 +651,7 @@ abstract class O3PO_PublicationType {
                 $validation_result .= "WARNING: Affiliations of author " . ($x+1) . " are empty.\n" ;
             else {
                 $last_affiliation_num = 0;
-                foreach(preg_split('/\s*,\s*/', $author_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY) as $affiliation_num) {
+                foreach(preg_split('/\s*,\s*/u', $author_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY) as $affiliation_num) {
                     if ($affiliation_num < 1 or $affiliation_num > $number_affiliations )
                         $validation_result .= "ERROR: At least one affiliation number of author " . ($x+1) . " does not correspond to an actual affiliation.\n" ;
                     if( $last_affiliation_num >= $affiliation_num )
@@ -667,7 +667,7 @@ abstract class O3PO_PublicationType {
         for ($x = 0; $x < $number_affiliations; $x++) {
             if ( empty( $affiliations[$x] ) )
                 $validation_result .= "ERROR: Affiliation " . ($x+1) . " is empty.\n" ;
-            if ( !empty($affiliations[$x]) and preg_match('#[\\\\]#', $affiliations[$x] ) )
+            if ( !empty($affiliations[$x]) and preg_match('#[\\\\]#u', $affiliations[$x] ) )
                 $validation_result .= "WARNING: Affiliation " . ($x+1) . " contains suspicious looking special characters.\n" ;
             if ( strpos($all_appearing_affiliations, (string)($x+1) ) === false)
                 $validation_result .= "ERROR: Affiliation " . ($x+1) . " is not associated to any authors.\n" ;
@@ -1040,14 +1040,14 @@ abstract class O3PO_PublicationType {
             for ($x = 0; $x < $number_authors; $x++) {
                 if(!empty($author_surnames[$x])) echo '<meta name="citation_author" content="' . esc_attr($author_given_names[$x] . " " . $author_surnames[$x]) . '">'."\n";
                 if ( !empty($author_affiliations) && !empty($author_affiliations[$x]) ) {
-                    foreach(preg_split('/\s*,\s*/', $author_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY) as $affiliation_num) {
+                    foreach(preg_split('/\s*,\s*/u', $author_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY) as $affiliation_num) {
                         if ( !empty($affiliations[$affiliation_num-1]) )
                             echo '<meta name="citation_author_institution" content="' . esc_attr($affiliations[$affiliation_num-1]) . '">' . "\n";
                     }
                 }
             }
         }
-        if(!empty($date_published)) echo '<meta name="citation_publication_date" content="' . preg_replace('/-/', '/', $date_published ) . '">'."\n";
+        if(!empty($date_published)) echo '<meta name="citation_publication_date" content="' . preg_replace('/-/u', '/', $date_published ) . '">'."\n";
         if(!empty($journal)) echo '<meta name="citation_journal_title" content="' . $journal . '">'."\n";
         if(!empty($volume)) echo '<meta name="citation_volume" content="' . $volume . '">'."\n";
         if(!empty($pages)) echo '<meta name="citation_firstpage" content="' . $pages . '">'."\n";
@@ -1253,7 +1253,7 @@ abstract class O3PO_PublicationType {
         if(!empty($this->get_journal_property('crossref_archive_locations')) && $journal === $this->get_journal_property('journal_title'))
         {
             $xml .= '	<archive_locations>' . "\n";
-            foreach(preg_split('/\s*,\s*/', $this->get_journal_property('crossref_archive_locations'))  as $archive_name)
+            foreach(preg_split('/\s*,\s*/u', $this->get_journal_property('crossref_archive_locations'))  as $archive_name)
                 $xml .= '	  <archive name="' . esc_attr(trim($archive_name)) . '"></archive>' . "\n";
             $xml .= '	</archive_locations>' . "\n";
         }
@@ -1301,7 +1301,7 @@ abstract class O3PO_PublicationType {
             $xml .= '	    <surname>' . esc_html($author_surnames[$x]) . '</surname>' . "\n";
                 // $xml .= '	    <suffix>{0,1}</suffix>' . "\n";
             if ( !empty($author_affiliations) && !empty($author_affiliations[$x]) ) {
-                foreach(preg_split('/\s*,\s*/', $author_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY) as $affiliation_num) {
+                foreach(preg_split('/\s*,\s*/u', $author_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY) as $affiliation_num) {
                     if ( !empty($affiliations[$affiliation_num-1]) )
 				     	$xml .= '	    <affiliation>' . esc_html($affiliations[$affiliation_num-1]) . '</affiliation>' . "\n";
                 }
@@ -1568,7 +1568,7 @@ abstract class O3PO_PublicationType {
             $xml .= '            <given-names>' . esc_html($author_given_names[$x]) . '</given-names>' . "\n";
             $xml .= '          </name>' . "\n";
             if ( !empty($author_affiliations) && !empty($author_affiliations[$x]) ) {
-                foreach(preg_split('/\s*,\s*/', $author_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY) as $affiliation_num) {
+                foreach(preg_split('/\s*,\s*/u', $author_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY) as $affiliation_num) {
                     $xml .= '          <xref ref-type="aff" rid="aff-' . $affiliation_num . '"/>' . "\n";
                 }
             }
@@ -1766,7 +1766,7 @@ abstract class O3PO_PublicationType {
 
             echo '<h4>Validation results</h4>';
             echo '<div style="width:100%; background-color: #fff; border: 1px solid #eee"><div style="margin:6pt 6pt 6pt 6pt">';
-            foreach(preg_split("/\n/", $validation_result, -1, PREG_SPLIT_NO_EMPTY) as $line){
+            foreach(preg_split("/\n/u", $validation_result, -1, PREG_SPLIT_NO_EMPTY) as $line){
                 $color = "green";
                 if(strpos($line, 'WARNING') !== false)
                     $color = "orange";

@@ -42,7 +42,7 @@ class O3PO_Ads {
         if(empty($eprint))
             return array();
 
-        $eprint_without_version = preg_replace('#v[0-9]+$#', '', $eprint);
+        $eprint_without_version = preg_replace('#v[0-9]+$#u', '', $eprint);
         $headers = array( 'Authorization' => 'Bearer:' . $api_token );
 
         $url = $ads_api_search_url . '?q=' . 'arxiv:' . urlencode($eprint_without_version) . '&fl=' . 'citation';
@@ -174,7 +174,7 @@ class O3PO_Ads {
                     $authors = array();
                     foreach($doc->author as $author)
                     {
-                        $names = preg_split('#\s*,\s*#', $author, -1, PREG_SPLIT_NO_EMPTY);
+                        $names = preg_split('#\s*,\s*#u', $author, -1, PREG_SPLIT_NO_EMPTY);
                         $authors[] = new O3PO_Author(!empty($names[1]) ? $names[1] : '', !empty($names[0]) ? $names[0] : '');
                     }
 

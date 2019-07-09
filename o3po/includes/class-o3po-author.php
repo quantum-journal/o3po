@@ -118,7 +118,7 @@ class O3PO_Author {
         if(is_array($affiliations))
             $this->affiliations = $affiliations;
         elseif(is_string($affiliations) == True)
-            $this->affiliations = preg_split('/\s*,\s*/', (string)$affiliations, -1, PREG_SPLIT_NO_EMPTY);
+            $this->affiliations = preg_split('/\s*,\s*/u', (string)$affiliations, -1, PREG_SPLIT_NO_EMPTY);
         else
             throw new InvalidArgumentException('The value given for $affiliations is neither an array not a string.');
 

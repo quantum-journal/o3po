@@ -193,7 +193,7 @@ class O3PO_Settings extends O3PO_Singleton {
         'editor_in_chief' => "",
         'ads_api_search_url' => 'https://api.adsabs.harvard.edu/v1/search/query',
         'ads_api_token' => '',
-        'relevanssi_mime_types_to_exclude' => '#(application/.*(tar|gz|gzip)|text/.*tex)#',
+        'relevanssi_mime_types_to_exclude' => '#(application/.*(tar|gz|gzip)|text/.*tex)#u',
         'relevanssi_index_pdfs_asynchronously' => "checked",
 
             /* The options below are currently not customizable.
@@ -1727,7 +1727,7 @@ class O3PO_Settings extends O3PO_Singleton {
     public function validate_doi_prefix( $field, $doi_prefix ) {
 
         $doi_prefix = trim($doi_prefix);
-        if(preg_match('/^[0-9.-]*$/', $doi_prefix))
+        if(preg_match('/^[0-9.-]*$/u', $doi_prefix))
             return $doi_prefix;
 
         add_settings_error( $field, 'illegal-doi-prefix', "The DOI prefix in '" . $this->settings_fields[$field]['title'] . "' may consist only of numbers 0-9, dot . and the dash - character. Field cleared.", 'error');
@@ -1745,7 +1745,7 @@ class O3PO_Settings extends O3PO_Singleton {
     public function validate_doi_suffix( $field, $doi_suffix ) {
 
         $doi_suffix = trim($doi_suffix);
-        if(preg_match('/^[a-zA-Z0-9.-]*$/', $doi_suffix))
+        if(preg_match('/^[a-zA-Z0-9.-]*$/u', $doi_suffix))
             return $doi_suffix;
 
         add_settings_error( $field, 'illegal-doi-suffix', "The DOI suffix in '" . $this->settings_fields[$field]['title'] . "' may consist only of lower and upper case English alphabet letters a-z and A-Z, numbers 0-9, dot . and the dash - character. Field cleared.", 'error');
@@ -1763,7 +1763,7 @@ class O3PO_Settings extends O3PO_Singleton {
     public function validate_first_volume_year( $field, $first_volume_year ) {
 
         $first_volume_year = trim($first_volume_year);
-        if(preg_match('/^[0-9]{4}$/', $first_volume_year)) //this will cause a year 10000 bug
+        if(preg_match('/^[0-9]{4}$/u', $first_volume_year)) //this will cause a year 10000 bug
             return $first_volume_year;
 
         add_settings_error( $field, 'illegal-first-volume-year', "The year in '" . $this->settings_fields[$field]['title'] . "' must consist of exactly four digits in the range 0-9. Field cleared.", 'error');
@@ -1825,7 +1825,7 @@ class O3PO_Settings extends O3PO_Singleton {
         try
         {
             $input = trim($input);
-            $array = preg_split('#,#', $input, Null, PREG_SPLIT_NO_EMPTY);
+            $array = preg_split('#,#u', $input, Null, PREG_SPLIT_NO_EMPTY);
             foreach($array as $key => $field)
                 $array[$key] = trim($field);
 
@@ -1850,7 +1850,7 @@ class O3PO_Settings extends O3PO_Singleton {
     public function validate_two_letter_country_code( $field, $input ) {
 
         $input = trim($input);
-        if(preg_match('/^[A-Z]{2}$/', $input))
+        if(preg_match('/^[A-Z]{2}$/u', $input))
             return $input;
 
         add_settings_error( $field, 'url-validated', "The two letter country code in '" . $this->settings_fields[$field]['title'] . "' was malformed. Field cleared.", 'error');
@@ -1868,7 +1868,7 @@ class O3PO_Settings extends O3PO_Singleton {
     public function validate_positive_integer( $field, $input ) {
 
         $input = trim($input);
-        if(preg_match('/^[1-9][0-9]*$/', $input))
+        if(preg_match('/^[1-9][0-9]*$/u', $input))
             return $input;
 
         add_settings_error( $field, 'not-a-positive-integer', "The input to the field '" . $this->settings_fields[$field]['title'] . "' was not a positive integer without leading zeros.", 'error');

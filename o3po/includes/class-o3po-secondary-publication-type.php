@@ -164,7 +164,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 			$new_reviewer_surnames[] = isset( $_POST[ $post_type . '_reviewer_surnames' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_reviewer_surnames' ][$x] ) : '';
 			$new_reviewer_name_styles[] = isset( $_POST[ $post_type . '_reviewer_name_styles' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_reviewer_name_styles' ][$x] ) : '';
 			$affiliation_nums = isset( $_POST[ $post_type . '_reviewer_affiliations' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_reviewer_affiliations' ][$x] ) : '';
-			$affiliation_nums = trim( preg_replace("/[^,0-9]/", "", $affiliation_nums ), ',');
+			$affiliation_nums = trim( preg_replace("/[^,0-9]/u", "", $affiliation_nums ), ',');
 			$new_reviewer_affiliations[] = $affiliation_nums;
 			$new_reviewer_orcids[] = isset( $_POST[ $post_type . '_reviewer_orcids' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_reviewer_orcids' ][$x] ) : '';
             $new_reviewer_urls[] = isset( $_POST[ $post_type . '_reviewer_urls' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_reviewer_urls' ][$x] ) : '';
@@ -277,7 +277,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                         $validation_result .= "WARNING: Affiliations of reviewer " . ($x+1) . " are empty.\n" ;
                     else {
                         $last_affiliation_num = 0;
-                        foreach(preg_split('/\s*,\s*/', $reviewer_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY) as $affiliation_num) {
+                        foreach(preg_split('/\s*,\s*/u', $reviewer_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY) as $affiliation_num) {
                             if ($affiliation_num < 1 or $affiliation_num > $number_reviewer_institutions )
                                 $validation_result .= "ERROR: At least one affiliation number of reviewer " . ($x+1) . " does not correspond to an actual affiliation.\n" ;
                             if( $last_affiliation_num >= $number_reviewer_institutions )
@@ -297,7 +297,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                 for ($x = 0; $x < $number_reviewer_institutions; $x++) {
                     if ( empty( $reviewer_institutions[$x] ) )
                         $validation_result .= "ERROR: Reviewer institution " . ($x+1) . " is empty.\n" ;
-                    if ( preg_match('#[\\\\]#', $reviewer_institutions[$x] ) )
+                    if ( preg_match('#[\\\\]#u', $reviewer_institutions[$x] ) )
                         $validation_result .= "WARNING: Reviewer institution " . ($x+1) . " contains suspicious looking special characters.\n" ;
                     if ( strpos($all_appearing_reviewer_affiliations, (string)($x+1) ) === false)
                         $validation_result .= "ERROR: Reviewer institution " . ($x+1) . " is not associated to any reviewers.\n" ;
@@ -375,7 +375,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                 $target_post_id = url_to_postid($suspected_post_url);
                 $target_post_type = get_post_type($target_post_id);
                 $target_eprint = get_post_meta( $target_post_id, $target_post_type . '_eprint', true );
-                $eprint_without_version = preg_replace('#v[0-9]*$#', '', $target_eprint);
+                $eprint_without_version = preg_replace('#v[0-9]*$#u', '', $target_eprint);
                 if(!empty($target_eprint) && !$this->environment->is_test_environment()) {
                         //trachback to the arxiv
                     $trackback_result .= trackback( $this->get_journal_property('arxiv_url_trackback_prefix') . $eprint_without_version , $title, $trackback_excerpt, $post_id );
@@ -481,7 +481,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
             $content .= '<p><a href="' . get_permalink($post_id) . '" class="abstract-in-excerpt">';
             $bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
             $trimmer_abstract = wp_html_excerpt( do_shortcode(O3PO_Latex::expand_cite_to_html(get_post_field('post_content', $post_id), $bbl)), 190, '&#8230;');
-            while( preg_match_all('/(?<!\\\\)\$/', $trimmer_abstract) % 2 !== 0 )
+            while( preg_match_all('/(?<!\\\\)\$/u', $trimmer_abstract) % 2 !== 0 )
             {
                 empty($i) ? $i = 1 : $i += 1;
                 $trimmer_abstract = wp_html_excerpt( get_post_meta( $post_id, $post_type . '_abstract', true ), 190+$i, '&#8230;');
@@ -859,7 +859,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                 if( !$all_authors_have_same_affiliation && !empty($author_affiliations) && !empty($author_affiliations[$x]) )
                 {
                     $content .= ' (';
-                    $this_authors_affiliations = preg_split('/\s*,\s*/', $author_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY);
+                    $this_authors_affiliations = preg_split('/\s*,\s*/u', $author_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY);
                     $this_authors_affiliations_count = count($this_authors_affiliations);
                     foreach($this_authors_affiliations as $y => $affiliation_num)
                     {
@@ -875,7 +875,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                 if( $x === $number_authors-2 ) $content .= "and ";
             }
             if(!empty($affiliations) && !empty(end($affiliations)) && $all_authors_have_same_affiliation && !empty($author_affiliations) ) {
-                $this_authors_affiliations = preg_split('/\s*,\s*/', $author_affiliations[0], -1, PREG_SPLIT_NO_EMPTY);
+                $this_authors_affiliations = preg_split('/\s*,\s*/u', $author_affiliations[0], -1, PREG_SPLIT_NO_EMPTY);
                 $this_authors_affiliations_count = count($this_authors_affiliations);
                 if($this_authors_affiliations_count > 0)
                 {
@@ -940,7 +940,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         $journal = get_post_meta( $post_id, $post_type . '_journal', true );
 
         $content = '';
-        $content .= '<p><em>This is ' . ( preg_match('/^[hH]?[aeiouAEIOU]/' , $type) ? 'an' : 'a') . ' ' . $type;
+        $content .= '<p><em>This is ' . ( preg_match('/^[hH]?[aeiouAEIOU]/u' , $type) ? 'an' : 'a') . ' ' . $type;
         if($type==="Leap")
             $content .= ' &mdash; a popular science article on quantum research written by scientists and reviewed by teenagers &mdash;';
 

@@ -199,11 +199,11 @@ class O3PO_Environment {
                 return array( 'error' => "Instead of the mime type " . $mime_type . " we were expecting, the remote server provided a file of mime type " . $actual_mime_type );
 
             if (empty($extension)) {
-                if( preg_match('#text/.*tex#', $mime_type) )
+                if( preg_match('#text/.*tex#u', $mime_type) )
                     $extension = 'tex';
-                else if( preg_match('#application/.*(tar|gz|gzip)#', $mime_type) )
+                else if( preg_match('#application/.*(tar|gz|gzip)#u', $mime_type) )
                     $extension = 'tar.gz';
-                else if( preg_match('#application/.*pdf#', $mime_type) )
+                else if( preg_match('#application/.*pdf#u', $mime_type) )
                     $extension = 'pdf';
                 else
                     $extension = 'unknown';
