@@ -193,7 +193,7 @@ class O3PO_Admin {
                 $output_format = $output_formats[0];
 
             if(isset( $_GET['meta_data_field_list'] ))
-                $meta_data_field_list = preg_split('/\s*,\s*/', $_GET['meta_data_field_list'], -1, PREG_SPLIT_NO_EMPTY);
+                $meta_data_field_list = preg_split('/\s*,\s*/u', $_GET['meta_data_field_list'], -1, PREG_SPLIT_NO_EMPTY);
             else
                 $meta_data_field_list = ['formated_authors', 'number_authors', 'title', 'corresponding_author_email'];
 
