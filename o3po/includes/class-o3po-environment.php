@@ -89,7 +89,7 @@ class O3PO_Environment {
     public function unique_filename_callback( $dir, $filename, $ext ) {
 
         $ext = strtolower($ext);
-        if($ext === '.gz' && substr($filename, -7) === '.tar.gz' ) $ext = '.tar.gz';
+        if($ext === '.gz' && mb_substr($filename, -7) === '.tar.gz' ) $ext = '.tar.gz';
         $number = '';
         while ( file_exists( $dir . "/$filename" ) ) {
             $new_number = (int) $number + 1;
@@ -290,7 +290,7 @@ class O3PO_Environment {
         $path = rtrim($path, '/').'/';
         $root = rtrim($root, '/').'/';
 
-        if ($root === '/' || $path === '/' || $root !== substr($path, 0, strlen($root)) )
+        if ($root === '/' || $path === '/' || $root !== mb_substr($path, 0, mb_strlen($root)) )
             return false;
 
         foreach(new RecursiveIteratorIterator( new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS), 	RecursiveIteratorIterator::CHILD_FIRST) as $entry ) {

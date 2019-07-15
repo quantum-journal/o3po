@@ -1261,9 +1261,9 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $new_author_latex_macro_definitions = array();
 
         try {
-            if ( preg_match('#text/.*tex#u', $mime_type) && substr($path_source, -4) === '.tex' ) // We got a single file
+            if ( preg_match('#text/.*tex#u', $mime_type) && mb_substr($path_source, -4) === '.tex' ) // We got a single file
                 $source_files = array(new SplFileInfo($path_source));
-            else if ( preg_match('#application/.*(tar|gz|gzip)#u', $mime_type) && substr($path_source, -7) === '.tar.gz' ) { // We got an archive
+            else if ( preg_match('#application/.*(tar|gz|gzip)#u', $mime_type) && mb_substr($path_source, -7) === '.tar.gz' ) { // We got an archive
 
                     /**
                      * PHP cannot correctly handle file names with dots, see this bug: https://bugs.php.net/bug.php?id=58852
@@ -1273,7 +1273,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                 try
                 {
                     $basename = pathinfo($path_source, PATHINFO_BASENAME);
-                    $basename_without_tar_gz = substr($basename, 0, -7);
+                    $basename_without_tar_gz = mb_substr($basename, 0, -7);
                     $path_source_copy_to_unlik_later = Null;
                     if(strpos($basename_without_tar_gz, '.') !== false)
                     {
@@ -1309,7 +1309,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 
                 //Loop over the source files
             foreach($source_files as $entry ) {
-                if($entry->isFile() && ( substr($entry->getPathname(), -4) === '.bbl' || substr($entry->getPathname(), -4) === '.tex' ) )
+                if($entry->isFile() && ( mb_substr($entry->getPathname(), -4) === '.bbl' || mb_substr($entry->getPathname(), -4) === '.tex' ) )
                 {
                     $filecontents = $this->environment->file_get_contents_utf8($entry->getPathname());
                     $filecontents_without_comments = preg_replace('#(?<!\\\\)%.*#u', '', $filecontents);//remove all comments
@@ -1328,7 +1328,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                         if(!empty($bbl))
                             $bbl .= "\n";
                         $bbl .= $thisbbl;
-                    } else if( substr($entry->getPathname(), -4) === '.bbl' && strpos( $filecontents, 'biblatex auxiliary file' ) !== false )  {
+                    } else if( mb_substr($entry->getPathname(), -4) === '.bbl' && mb_strpos( $filecontents, 'biblatex auxiliary file' ) !== false )  {
                         if(!empty($bbl))
                             $bbl .= "\n";
                         $bbl .= $filecontents . "\n";//here comments must be preserved as they contain clues for parsing
@@ -1345,7 +1345,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             $authors_since_last_affiliation = array();
 
             foreach($source_files as $entry ) {
-                if($entry->isFile() && ( substr($entry->getPathname(), -4) === '.tex' ) )
+                if($entry->isFile() && ( mb_substr($entry->getPathname(), -4) === '.tex' ) )
                 {
                     $filecontents = $this->environment->file_get_contents_utf8($entry->getPathname());
                     $filecontents_without_comments = preg_replace('#(?<!\\\\)%.*#u', '', $filecontents);//remove all comments

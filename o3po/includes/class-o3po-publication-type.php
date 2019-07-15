@@ -850,8 +850,8 @@ abstract class O3PO_PublicationType {
                     $subject .= $lead_ins[array_rand($lead_ins)];
                     $subject .= ': ' . $title . " by " . $authors;
                 }
-                if(strlen($subject)+1+strlen($post_url) > 280)
-                    $subject = substr($subject, 0, 280-(1+strlen($post_url)-3)) . '...';
+                if(mb_strlen($subject)+1+mb_strlen($post_url) > 280)
+                    $subject = mb_substr($subject, 0, 280-(1+mb_strlen($post_url)-3)) . '...';
                 $subject .= ' ' . $post_url;
                 $media = array(
                     'photo' => $image_url,
@@ -1147,7 +1147,7 @@ abstract class O3PO_PublicationType {
     public static function get_formated_citation( $post_id ) {
 
         $post_type = get_post_type($post_id);
-        return get_post_meta( $post_id, $post_type . '_journal', true ) . ' ' . get_post_meta( $post_id, $post_type . '_volume', true ) . ', ' . get_post_meta( $post_id, $post_type . '_pages', true ) . ' (' . substr( get_post_meta( $post_id, $post_type . '_date_published', true ), 0, 4 ) . ').';
+        return get_post_meta( $post_id, $post_type . '_journal', true ) . ' ' . get_post_meta( $post_id, $post_type . '_volume', true ) . ', ' . get_post_meta( $post_id, $post_type . '_pages', true ) . ' (' . mb_substr( get_post_meta( $post_id, $post_type . '_date_published', true ), 0, 4 ) . ').';
 
     }
 
@@ -1269,9 +1269,9 @@ abstract class O3PO_PublicationType {
             // We don't have issues but volumes
         $xml .= '      <journal_issue>' . "\n";
         $xml .= '	     <publication_date media_type="online">' . "\n";
-        $xml .= '	       <month>' . substr($date_published, 5, 2) . '</month>' . "\n";
-        $xml .= '	       <day>' . substr($date_published, 8, 2) .'</day>' . "\n";
-        $xml .= '	       <year>' . substr($date_published, 0, 4) . '</year>' . "\n";
+        $xml .= '	       <month>' . mb_substr($date_published, 5, 2) . '</month>' . "\n";
+        $xml .= '	       <day>' . mb_substr($date_published, 8, 2) .'</day>' . "\n";
+        $xml .= '	       <year>' . mb_substr($date_published, 0, 4) . '</year>' . "\n";
         $xml .= '	     </publication_date>' . "\n";
         $xml .= '	     <journal_volume>' . "\n";
         $xml .= '	       <volume>' . $volume . '</volume>' . "\n";
@@ -1319,9 +1319,9 @@ abstract class O3PO_PublicationType {
             $xml .= '	</jats:abstract>' . "\n";
         }
         $xml .= '	<publication_date media_type="online">' . "\n";
-        $xml .= '	    <month>' . substr($date_published, 5, 2) . '</month>' . "\n";
-        $xml .= '	    <day>' . substr($date_published, 8, 2) .'</day>' . "\n";
-        $xml .= '	    <year>' . substr($date_published, 0, 4) . '</year>' . "\n";
+        $xml .= '	    <month>' . mb_substr($date_published, 5, 2) . '</month>' . "\n";
+        $xml .= '	    <day>' . mb_substr($date_published, 8, 2) .'</day>' . "\n";
+        $xml .= '	    <year>' . mb_substr($date_published, 0, 4) . '</year>' . "\n";
         $xml .= '	</publication_date>' . "\n";
             // we only have article numbers which should go into the publisher_item  below, but despite what Crossref says in their documentation they don't handle this propperly so we have to add it also here
         $xml .= '	<pages>' . "\n";
@@ -1579,9 +1579,9 @@ abstract class O3PO_PublicationType {
             $xml .= '      <aff id="aff-' . ($n+1) . '">' . esc_html($affiliation) . '</aff>' . "\n";
 
         $xml .= '      <pub-date date-type="pub" publication-format="electronic" iso-8601-date="' . $date_published . '">' . "\n";
-        $xml .= '        <day>' . substr($date_published, 8, 2) . '</day>' . "\n";
-        $xml .= '        <month>' . substr($date_published, 5, 2) . '</month>' . "\n";
-        $xml .= '        <year>' . substr($date_published, 0, 4) . '</year>' . "\n";
+        $xml .= '        <day>' . mb_substr($date_published, 8, 2) . '</day>' . "\n";
+        $xml .= '        <month>' . mb_substr($date_published, 5, 2) . '</month>' . "\n";
+        $xml .= '        <year>' . mb_substr($date_published, 0, 4) . '</year>' . "\n";
         $xml .= '      </pub-date>' . "\n";
         $xml .= '      <volume>' . $volume . '</volume>' . "\n";
 //        $xml .= '  <issue>18</issue>' . "\n";
@@ -1589,7 +1589,7 @@ abstract class O3PO_PublicationType {
 //        $xml .= '  <lpage>10219</lpage>' . "\n";
         $xml .= '      <permissions>' . "\n";
         $xml .= '        <copyright-statement>' . 'This work is published under the ' . esc_html($this->get_journal_property('license_name')) . ' license ' . esc_html($this->get_journal_property('license_url')) . '.' . '</copyright-statement>' . "\n";
-        $xml .= '        <copyright-year>' . substr($date_published, 0, 4) .'</copyright-year>' . "\n";
+        $xml .= '        <copyright-year>' . mb_substr($date_published, 0, 4) .'</copyright-year>' . "\n";
         $xml .= '      </permissions>' . "\n";
         if( !empty($abstract) || !empty($abstract_mathml) )
         {
@@ -1670,9 +1670,9 @@ abstract class O3PO_PublicationType {
 
         $json_array["bibjson"]["title"] = $title;
         $json_array["bibjson"]["abstract"] = $abstract;
-        $json_array["bibjson"]["year"] = substr($date_published, 0, 4);
-        $json_array["bibjson"]["month"] = substr($date_published, 5, 2);
-        $json_array["bibjson"]["day"] = substr($date_published, 8, 2);
+        $json_array["bibjson"]["year"] = mb_substr($date_published, 0, 4);
+        $json_array["bibjson"]["month"] = mb_substr($date_published, 5, 2);
+        $json_array["bibjson"]["day"] = mb_substr($date_published, 8, 2);
         for ($x = 0; $x < $number_authors; $x++) {
             $author_array = array(
                 "name" => $author_given_names[$x] . ' ' . $author_surnames[$x]
@@ -1999,7 +1999,7 @@ abstract class O3PO_PublicationType {
 			$highest_pages_info = $this->journal->get_post_type_highest_pages_info( $post_id, array($this->get_publication_type_name()) );
 			$highest_pages = $highest_pages_info['pages'];
 			$highest_pages_date_published = $highest_pages_info['date_published'];
-			if ( $highest_pages_date_published === $date_published and strlen((string)$highest_pages) !== strlen((string)($highest_pages+1)))
+			if ( $highest_pages_date_published === $date_published and mb_strlen((string)$highest_pages) !== mb_strlen((string)($highest_pages+1)))
 				$pages = -1; //Throws an error during validation to ensure lexicographic ordering of DOIs
 			else
                 $pages = $highest_pages+1;
@@ -2620,13 +2620,13 @@ abstract class O3PO_PublicationType {
         $volume = get_post_meta( $post_id, $post_type . '_volume', true );
         $authors = $this->get_formated_authors_bibtex($post_id);
         $date_published = get_post_meta( $post_id, $post_type . '_date_published', true );
-        $month = substr( $date_published, 5, 2 );
+        $month = mb_substr( $date_published, 5, 2 );
         if( !empty($month) and 1 <= $month and $month <= 13 )
             $month = O3PO_Latex::get_month_string($month);
         else
             $month = '';
 
-        $year = substr( $date_published, 0, 4 );
+        $year = mb_substr( $date_published, 0, 4 );
         $author_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
         $doi = $this->get_doi($post_id);
         $doi_url_prefix = $this->get_journal_property('doi_url_prefix');

@@ -514,7 +514,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
     static public function utf8_to_latex($text) {
 
         foreach (self::get_latex_special_chars_reverse_dictionary() as $target => $substitute) {
-            if (mb_strlen($text) === strlen($text)) break;
+            if (mb_strlen($text) === strlen($text)) break; #check for multi byte characters
             $text = preg_replace('#'.$target.'#u', $substitute, $text);
         }
 
@@ -653,7 +653,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
             else
                 $default_argument = $default_argument[1];
 
-            $macroname = '\\\\' . mb_substr($macro_definition[2],1);//substr picks out the name of the macro without the leading \;
+            $macroname = '\\\\' . mb_substr($macro_definition[2],1);//mb_substr picks out the name of the macro without the leading \;
             $pattern = $macroname;
             $replacement = $macro_definition[5];
             if($num_arguments == 0)

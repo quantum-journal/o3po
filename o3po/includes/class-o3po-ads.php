@@ -138,7 +138,7 @@ class O3PO_Ads {
                 }
 
                 $url = static::bibcodes_to_query_url($ads_api_search_url, $bibcode_chunks[$last_key], $max_number_of_citations);
-                if(strlen($url) > 4000) #4094 seems to be the max for this api
+                if(mb_strlen($url) > 4000) #4094 seems to be the max for this api
                 {
                     array_pop($bibcode_chunks[$last_key]);
                     $bibcode_chunks[] = [$bibcode];
@@ -190,11 +190,11 @@ class O3PO_Ads {
                                            );
 
                     #post process the page and venue in case of arXiv citations
-                    if(substr($bibentry_data['page'], 0, 6 ) === 'arXiv:')
+                    if(mb_substr($bibentry_data['page'], 0, 6 ) === 'arXiv:')
                     {
-                        $bibentry_data['eprint'] = substr($bibentry_data['page'], 6);
+                        $bibentry_data['eprint'] = mb_substr($bibentry_data['page'], 6);
                         $bibentry_data['page'] = '';
-                        if(substr($bibentry_data['venue'], 0, 5 ) === 'arXiv')
+                        if(mb_substr($bibentry_data['venue'], 0, 5 ) === 'arXiv')
                             $bibentry_data['venue'] = '';
                     }
 

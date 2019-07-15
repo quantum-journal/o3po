@@ -250,7 +250,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         for ($x = 0; $x < $number_target_dois; $x++) {
             if ( empty( $target_dois[$x] ) )
                 $validation_result .= "WARNING: Target DOI " . ($x+1) . " is empty.\n" ;
-            else if( substr($target_dois[$x], 0, 8) !== $settings->get_plugin_option('doi_prefix') )
+            else if( mb_substr($target_dois[$x], 0, 8) !== $settings->get_plugin_option('doi_prefix') )
                 $validation_result .= "WARNING: Target DOI " . ($x+1) . " does not point to a paper of this publisher or it contains a prefix such as https://dx.doi.org/, which it shouldn't. Pleae check the DOI.\n" ;
         }
 
@@ -368,10 +368,10 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         $number_target_dois = get_post_meta( $post_id, $post_type . '_number_target_dois', true );
         $target_dois = static::get_post_meta_field_containing_array( $post_id, $post_type . '_target_dois');
         for ($x = 0; $x < $number_target_dois; $x++) {
-            if( substr($target_dois[$x], 0, 8) === $this->get_journal_property('doi_prefix') )
+            if( mb_substr($target_dois[$x], 0, 8) === $this->get_journal_property('doi_prefix') )
             {
                 $trackback_excerpt = $this->get_trackback_excerpt($post_id);
-                $suspected_post_url = '/' . $this->targe_publication_type_name_plural . substr($target_dois[$x], 8);
+                $suspected_post_url = '/' . $this->targe_publication_type_name_plural . mb_substr($target_dois[$x], 8);
                 $target_post_id = url_to_postid($suspected_post_url);
                 $target_post_type = get_post_type($target_post_id);
                 $target_eprint = get_post_meta( $target_post_id, $target_post_type . '_eprint', true );
@@ -751,8 +751,8 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         $reviewers_html .= O3PO_Utility::oxford_comma_implode($reviewer_names) . '<br />';
         if(!empty($reviewer_ages) and !empty($reviewer_grades))
         {
-            $reviewer_ages_filtered = array_filter($reviewer_ages,'strlen');
-            $reviewer_grades_filtered = array_filter($reviewer_grades,'strlen');
+            $reviewer_ages_filtered = array_filter($reviewer_ages,'mb_strlen');
+            $reviewer_grades_filtered = array_filter($reviewer_grades,'mb_strlen');
             if(!empty($reviewer_ages_filtered) and !empty($reviewer_grades_filtered))
             {
                 $min_age = min($reviewer_ages_filtered);
@@ -950,9 +950,9 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
             $content .= ' published in ' . $journal;
 
         for ($x = 0; $x < $number_target_dois; $x++) {
-            if( substr($target_dois[$x], 0, 8) === $this->get_journal_property('doi_prefix') )
+            if( mb_substr($target_dois[$x], 0, 8) === $this->get_journal_property('doi_prefix') )
             {
-                $target_post_id = url_to_postid( '/' . $this->targe_publication_type_name_plural . substr($target_dois[$x], 8) );
+                $target_post_id = url_to_postid( '/' . $this->targe_publication_type_name_plural . mb_substr($target_dois[$x], 8) );
                 $target_post_type = get_post_type( $target_post_id );
                 $target_title = get_post_meta( $target_post_id, $target_post_type . '_title', true );
                 $target_authors = static::get_formated_authors($target_post_id);
