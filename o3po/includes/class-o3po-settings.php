@@ -1545,7 +1545,7 @@ class O3PO_Settings extends O3PO_Singleton {
 
         $option = $this->get_plugin_option($id);
 
-        echo '<textarea class="regular-text ltr o3po-setting o3po-setting-text-multi-line" id="' . $this->plugin_name . '-settings-' . $id . '" name="' . $this->plugin_name . '-settings[' . $id . ']" rows="' . (substr_count( $option, "\n" )+1) . '">' . esc_html($option) . '</textarea>';
+        echo '<textarea class="regular-text ltr o3po-setting o3po-setting-text-multi-line" id="' . $this->plugin_name . '-settings-' . $id . '" name="' . $this->plugin_name . '-settings[' . $id . ']" rows="' . (mb_substr_count( $option, "\n" )+1) . '">' . esc_html($option) . '</textarea>';
 
     }
 

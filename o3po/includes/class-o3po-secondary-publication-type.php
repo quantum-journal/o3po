@@ -345,7 +345,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         $subject  = $this->environment->is_test_environment() ? 'TEST ' : ''.
                     O3PO_EmailTemplates::self_notification_subject(
                       $settings->get_plugin_option('self_notification_subject_template'),
-                    $journal, strtolower($type))['result'];
+                    $journal, mb_strtolower($type))['result'];
         $message  = $this->environment->is_test_environment() ? 'TEST ' : '' .
                     O3PO_EmailTemplates::self_notification_body(
                         $settings->get_plugin_option('self_notification_body_template'),

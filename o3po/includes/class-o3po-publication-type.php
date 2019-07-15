@@ -2088,7 +2088,7 @@ abstract class O3PO_PublicationType {
 		} else {
 			echo '<p>No entries found.</p>' . "\n";
 		}
-        echo '			<p>(The above was generated from the following bbl data that was extracted from the source files with some subsequent macro expansion (see below for which macros were expanded). If something with the above is not right you can edit the extracted bbl by modifying the text below, the references are then recalculated upon the next save/update. Please also report any problems to ' . $this->get_journal_property('developer_email') . ' so that they can be fixed and the automatic extraction improved. Keep in mind that your changes are overwritten if source files are downloaded again from the arXiv!</p><textarea name="' . $post_type . '_bbl" id="' . $post_type . '_bbl" rows="' . (min(substr_count( $bbl, "\n" )+1, 30)) . '" style="width: 100%; overflow: scroll;">' . esc_textarea($bbl) . '</textarea>';
+        echo '			<p>(The above was generated from the following bbl data that was extracted from the source files with some subsequent macro expansion (see below for which macros were expanded). If something with the above is not right you can edit the extracted bbl by modifying the text below, the references are then recalculated upon the next save/update. Please also report any problems to ' . $this->get_journal_property('developer_email') . ' so that they can be fixed and the automatic extraction improved. Keep in mind that your changes are overwritten if source files are downloaded again from the arXiv!</p><textarea name="' . $post_type . '_bbl" id="' . $post_type . '_bbl" rows="' . (min(mb_substr_count( $bbl, "\n" )+1, 30)) . '" style="width: 100%; overflow: scroll;">' . esc_textarea($bbl) . '</textarea>';
 
         echo '         <p>If you need to hand craft a bibliography you can start from the following template:</p>
 <textarea rows="10" style="width: 100%; overflow: scroll;">
@@ -2111,7 +2111,7 @@ abstract class O3PO_PublicationType {
                     $author_latex_macro_definition_summary = "";
                 $author_latex_macro_definition_summary .= '\\' . $author_latex_macro_definition[1] . '{' . $author_latex_macro_definition[2] . '}' . $author_latex_macro_definition[3] . $author_latex_macro_definition[4] . '{' . $author_latex_macro_definition[5] . '}' . "\n";
             }
-            echo '			<p>(In the source files the following latex commands were identified and expanded when generating the bbl above from the source.)</p><textarea name="' . $post_type . '_author_latex_macro_definitions" id="' . $post_type . '_author_latex_macro_definitions" rows="' . (min(substr_count( $author_latex_macro_definition_summary, "\n" )+1, 30)) . '" style="width: 100%; overflow: scroll;" readonly>' . esc_textarea($author_latex_macro_definition_summary) . '</textarea>';
+            echo '			<p>(In the source files the following latex commands were identified and expanded when generating the bbl above from the source.)</p><textarea name="' . $post_type . '_author_latex_macro_definitions" id="' . $post_type . '_author_latex_macro_definitions" rows="' . (min(mb_substr_count( $author_latex_macro_definition_summary, "\n" )+1, 30)) . '" style="width: 100%; overflow: scroll;" readonly>' . esc_textarea($author_latex_macro_definition_summary) . '</textarea>';
         }
 		echo '		</td>';
 		echo '	</tr>';
@@ -2143,7 +2143,7 @@ abstract class O3PO_PublicationType {
 			echo '	<tr>';
 			echo '		<th><label for="' . $post_type . '_crossref_response" class="' . $post_type . '_crossref_response_label">' . 'Crossref response' . '</label></th>';
 			echo '		<td>';
-			echo '			<textarea rows="' . (substr_count( $crossref_response, "\n" )+1) . '" style="width:100%;" readonly>' . esc_textarea($crossref_response) . '</textarea><p>(The response we got from Crossref when uploading the metadata.)</p>';
+			echo '			<textarea rows="' . (mb_substr_count( $crossref_response, "\n" )+1) . '" style="width:100%;" readonly>' . esc_textarea($crossref_response) . '</textarea><p>(The response we got from Crossref when uploading the metadata.)</p>';
 			echo '		</td>';
 			echo '	</tr>';
 		}
@@ -2176,7 +2176,7 @@ abstract class O3PO_PublicationType {
 			echo '	<tr>';
 			echo '		<th><label for="' . $post_type . '_doaj_response" class="' . $post_type . '_doaj_response_label">' . 'DOAJ response' . '</label></th>';
 			echo '		<td>';
-			echo '			<textarea rows="' . (substr_count( $doaj_response, "\n" )+2) . '" style="width:100%;" readonly>' . esc_textarea($doaj_response) . '</textarea><p>(The response we got from DOAJ when uploading the metadata.)</p>';
+			echo '			<textarea rows="' . (mb_substr_count( $doaj_response, "\n" )+2) . '" style="width:100%;" readonly>' . esc_textarea($doaj_response) . '</textarea><p>(The response we got from DOAJ when uploading the metadata.)</p>';
 			echo '		</td>';
 			echo '	</tr>';
 		}
@@ -2208,7 +2208,7 @@ abstract class O3PO_PublicationType {
 			echo '	<tr>';
 			echo '		<th><label for="' . $post_type . '_clockss_response" class="' . $post_type . '_clockss_response_label">' . 'CLOCKSS response' . '</label></th>';
 			echo '		<td>';
-			echo '			<textarea rows="' . (substr_count( $clockss_response, "\n" )+2) . '" style="width:100%;" readonly>' . esc_textarea($clockss_response) . '</textarea><p>(The response we got from CLOCKSS when uploading the metadata and full text pdf, if available.)</p>';
+			echo '			<textarea rows="' . (mb_substr_count( $clockss_response, "\n" )+2) . '" style="width:100%;" readonly>' . esc_textarea($clockss_response) . '</textarea><p>(The response we got from CLOCKSS when uploading the metadata and full text pdf, if available.)</p>';
 			echo '		</td>';
 			echo '	</tr>';
 		}
@@ -2689,7 +2689,7 @@ abstract class O3PO_PublicationType {
         $bibtex_html .= '<h3 class="toggle-following additional-info"><a href="javascript:void(0);" onclick="toggleFollowing(this);">&#9658; BibTeX data</a></h3>';
         $bibtex = $this->generate_bibtex($post_id);
 
-        $bibtex_html .= '<textarea class="bibtex initially-display-none-if-js" rows="' . (substr_count( $bibtex, "\n" )+1) . '" readonly>';
+        $bibtex_html .= '<textarea class="bibtex initially-display-none-if-js" rows="' . (mb_substr_count( $bibtex, "\n" )+1) . '" readonly>';
         $bibtex_html .= esc_textarea($bibtex);
         $bibtex_html .= '</textarea>';
 

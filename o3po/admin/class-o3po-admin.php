@@ -247,7 +247,7 @@ class O3PO_Admin {
                                 $value = '"' . $value . '"';
                             $out .= $value . ', ';
                         }
-                        $out = substr($out, 0, -2);
+                        $out = mb_substr($out, 0, -2);
                         $out .= "],\n";
                     }
                     else

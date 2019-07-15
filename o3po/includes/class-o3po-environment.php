@@ -88,7 +88,7 @@ class O3PO_Environment {
          * */
     public function unique_filename_callback( $dir, $filename, $ext ) {
 
-        $ext = strtolower($ext);
+        $ext = mb_strtolower($ext);
         if($ext === '.gz' && mb_substr($filename, -7) === '.tar.gz' ) $ext = '.tar.gz';
         $number = '';
         while ( file_exists( $dir . "/$filename" ) ) {

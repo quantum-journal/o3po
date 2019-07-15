@@ -757,7 +757,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 			echo '	<tr>';
 			echo '		<th><label for="' . $post_type . '_arxiv_fetch_results" class="' . $post_type . '_arxiv_fetch_results_label">' . 'ArXiv fetch result' . '</label></th>';
 			echo '		<td>';
-			echo '			<textarea rows="' . (substr_count( $arxiv_fetch_results, "\n" )+1) . '" cols="65" readonly>' . esc_textarea($arxiv_fetch_results) . '</textarea><p>(The result of fetching metadata from the arXiv.)</p>';
+			echo '			<textarea rows="' . (mb_substr_count( $arxiv_fetch_results, "\n" )+1) . '" cols="65" readonly>' . esc_textarea($arxiv_fetch_results) . '</textarea><p>(The result of fetching metadata from the arXiv.)</p>';
 			echo '		</td>';
 			echo '	</tr>';
 		}
@@ -1126,7 +1126,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $sha1 = get_transient($post_id . '_web_statement_sha1');
         if(empty($sha1))
         {
-            $sha1 = strtoupper(O3PO_Utility::base_convert_arbitrary_precision(sha1_file($file_path), 16, 32));
+            $sha1 = mb_strtoupper(O3PO_Utility::base_convert_arbitrary_precision(sha1_file($file_path), 16, 32));
             set_transient($post_id . '_web_statement_sha1', $sha1, 10*60);
         }
 

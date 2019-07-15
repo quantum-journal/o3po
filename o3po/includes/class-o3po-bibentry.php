@@ -215,7 +215,7 @@ class O3PO_Bibentry {
 
         $citation_cite_as = '';
 
-        if(!empty($this->meta_data['type']) and !in_array(strtolower($this->meta_data['type']), array('book', 'full_text')))
+        if(!empty($this->meta_data['type']) and !in_array(mb_strtolower($this->meta_data['type']), array('book', 'full_text')))
             $citation_cite_as .= ucfirst($this->meta_data['type']) . " ";
         if(!empty($this->meta_data['venue']))
             $citation_cite_as .= $this->meta_data['venue'] . " ";
@@ -313,8 +313,8 @@ class O3PO_Bibentry {
                 if(!empty($bibitem1->get('title')) and !empty($bibitem2->get('title')))
                 {
                     # using byte based string functions here because levenshtein() is also byte based
-                    $t1 = substr(strtolower($bibitem1->get('title')), 0, 255);
-                    $t2 = substr(strtolower($bibitem2->get('title')), 0, 255);
+                    $t1 = substr(mb_strtolower($bibitem1->get('title')), 0, 255);
+                    $t2 = substr(mb_strtolower($bibitem2->get('title')), 0, 255);
                     $l1 = strlen($t1);
                     $l2 = strlen($t2);
                     $lmin = min($l1, $l2);
@@ -331,8 +331,8 @@ class O3PO_Bibentry {
                     if(!empty($bibitem1->get_surnames()) and !empty($bibitem2->get_surnames()))
                     {
                         # using byte based string functions here because levenshtein() is also byte based
-                        $a1 = substr(strtolower($bibitem1->get_surnames()), 0, 255);
-                        $a2 = substr(strtolower($bibitem2->get_surnames()), 0, 255);
+                        $a1 = substr(mb_strtolower($bibitem1->get_surnames()), 0, 255);
+                        $a2 = substr(mb_strtolower($bibitem2->get_surnames()), 0, 255);
                         $l1 = strlen($a1);
                         $l2 = strlen($a2);
                         $lmin = min($l1, $l2);
