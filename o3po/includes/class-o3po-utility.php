@@ -35,25 +35,25 @@ class O3PO_Utility
          * */
     static public function check_orcid( $orcid ) {
 
-        if( !preg_match( '/([0-9]{4}-){3}[0-9]{3}[0-9X]/', $orcid) )
+        if( !preg_match( '/([0-9]{4}-){3}[0-9]{3}[0-9X]/u', $orcid) )
             return "is malformed";
         else {
-            $orcid_digits = preg_replace('/-/', '', $orcid );
-            $strlen = strlen( $orcid_digits );
+            $orcid_digits = preg_replace('/-/u', '', $orcid );
+            $strlen = mb_strlen( $orcid_digits );
             $total = 0;
             for( $i = 0; $i < $strlen-1; $i++ ) {
-                $digit = (int)substr( $orcid_digits, $i, 1 );
+                $digit = (int)mb_substr( $orcid_digits, $i, 1 );
                 $total = ($total + $digit) * 2;
             }
             $remainder = $total % 11;
             $result = (12 - $remainder) % 11;
             $result = $result === 10 ? "X" : $result;
-            $ok = substr( $orcid_digits, $strlen-1, 1 ) == $result;
+            $ok = mb_substr( $orcid_digits, $strlen-1, 1 ) == $result;
 
             if($ok)
                 return true;
             else
-                return "did not pass the checksum test with result=" . $result . " but last digit=" . substr( $orcid_digits, $strlen-1, 1 );
+                return "did not pass the checksum test with result=" . $result . " but last digit=" . mb_substr( $orcid_digits, $strlen-1, 1 );
         }
     }
 
@@ -76,7 +76,7 @@ class O3PO_Utility
             return "0";
 
         if(intval($frombase) != 10) {
-            $len = strlen($str);
+            $len = mb_strlen($str);
             $q = 0;
             for ($i=0; $i<$len; $i++) {
                 $r = base_convert($str[$i], $frombase, 10);
@@ -122,7 +122,7 @@ class O3PO_Utility
     static public function remove_stopwords( $text ) {
 
         foreach (static::$stop_words as $target) {
-            $text = preg_replace('#\\b( ' . $target . '|' . $target . ' |' . $target . ')\\b#i', '', $text);
+            $text = preg_replace('#\\b( ' . $target . '|' . $target . ' |' . $target . ')\\b#iu', '', $text);
         }
 
         return $text;
@@ -169,7 +169,7 @@ class O3PO_Utility
          * */
     static public function make_slash_breakable_html( $string ) {
         $zero_width_space = html_entity_decode('&#8203;', 0, 'UTF-8');
-        return preg_replace('#/#', '/' . $zero_width_space, $string );
+        return preg_replace('#/#u', '/' . $zero_width_space, $string );
     }
 
         /**
@@ -181,9 +181,9 @@ class O3PO_Utility
          */
     static function valid_issn( $issn ) {
 
-        if(preg_match('#^[0-9]{4}-[0-9]{3}[0-9X]$#', $issn) !== 1)
+        if(preg_match('#^[0-9]{4}-[0-9]{3}[0-9X]$#u', $issn) !== 1)
             return false;
-        $issn_without_dash = substr($issn, 0, 4) . substr($issn, 5, 4);
+        $issn_without_dash = mb_substr($issn, 0, 4) . mb_substr($issn, 5, 4);
         $check = 0;
         for($i=8; $i>=2 ; $i--)
         {
@@ -264,7 +264,7 @@ class O3PO_Utility
    (?<WSP>             [\x20\x09])
  )
 
- (?&address)/x", $email) ? true : false);
+ (?&address)/xu", $email) ? true : false);
     }
 
         /**

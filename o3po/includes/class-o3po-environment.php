@@ -88,8 +88,8 @@ class O3PO_Environment {
          * */
     public function unique_filename_callback( $dir, $filename, $ext ) {
 
-        $ext = strtolower($ext);
-        if($ext === '.gz' && substr($filename, -7) === '.tar.gz' ) $ext = '.tar.gz';
+        $ext = mb_strtolower($ext);
+        if($ext === '.gz' && mb_substr($filename, -7) === '.tar.gz' ) $ext = '.tar.gz';
         $number = '';
         while ( file_exists( $dir . "/$filename" ) ) {
             $new_number = (int) $number + 1;
@@ -199,11 +199,11 @@ class O3PO_Environment {
                 return array( 'error' => "Instead of the mime type " . $mime_type . " we were expecting, the remote server provided a file of mime type " . $actual_mime_type );
 
             if (empty($extension)) {
-                if( preg_match('#text/.*tex#', $mime_type) )
+                if( preg_match('#text/.*tex#u', $mime_type) )
                     $extension = 'tex';
-                else if( preg_match('#application/.*(tar|gz|gzip)#', $mime_type) )
+                else if( preg_match('#application/.*(tar|gz|gzip)#u', $mime_type) )
                     $extension = 'tar.gz';
-                else if( preg_match('#application/.*pdf#', $mime_type) )
+                else if( preg_match('#application/.*pdf#u', $mime_type) )
                     $extension = 'pdf';
                 else
                     $extension = 'unknown';
@@ -290,7 +290,7 @@ class O3PO_Environment {
         $path = rtrim($path, '/').'/';
         $root = rtrim($root, '/').'/';
 
-        if ($root === '/' || $path === '/' || $root !== substr($path, 0, strlen($root)) )
+        if ($root === '/' || $path === '/' || $root !== mb_substr($path, 0, mb_strlen($root)) )
             return false;
 
         foreach(new RecursiveIteratorIterator( new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS), 	RecursiveIteratorIterator::CHILD_FIRST) as $entry ) {

@@ -362,6 +362,10 @@ ab' , 'äb'],
             [["a\n\n\n\n\nb", False, True] , "a\n\nb"],
             [["a\n", False, True] , "a"],
             [["\nb", False, True] , "b"],
+            [["\ná", False, True] , "á"],
+            [["\ntà ", False, True] , "tà"],
+            [['tà  d', True, False], 'tà d'],
+            [['tà d', True, False], 'tà d'],
                 ];
     }
 

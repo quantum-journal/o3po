@@ -46,8 +46,8 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 $latex_text_converted .= '$' . $line . '$';
             else { //Outside math mode
                 foreach (self::get_latex_special_chars_dictionary() as $target => $substitute) {
-                    $line = preg_replace('#'.'(?<!\\\\)'.$target.'#', $substitute, $line);
-                    if( strpos($line, '\\') === false ) break;
+                    $line = preg_replace('#'.'(?<!\\\\)'.$target.'#u', $substitute, $line);
+                    if( mb_strpos($line, '\\') === false ) break;
                 }
                 if($clean)
                 {
@@ -55,7 +55,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                     {
                         $line = str_replace($target, $substitute, $line);
                     }
-                    $line = preg_replace('#  +#', ' ', $line);
+                    $line = preg_replace('#  +#u', ' ', $line);
                 }
                 $latex_text_converted .= $line;
             }
@@ -74,13 +74,14 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
          */
     static public function preg_split_at_latex_math_mode_delimters( $text ) {
 
-        return preg_split('#(?<!\\\\)(?:\$\$|\$|\\\\\[|\\\\\]|\\\\\(|\\\\\)|\\\\(?:begin|end)\s*{(?:equation|align|eqarray|gather|displaymath)\**})#', $text);
+        return preg_split('#(?<!\\\\)(?:\$\$|\$|\\\\\[|\\\\\]|\\\\\(|\\\\\)|\\\\(?:begin|end)\s*{(?:equation|align|eqarray|gather|displaymath)\**})#u', $text);
     }
 
 
         /**
          * Strpos in latex code, but only taking into account the part of
-         * code that is not in math mode.
+         * code that is not in math mode. This function uses the multi byte
+         * safe mb_str_pos() function.
          *
          * @since    0.1.0
          * @access   public
@@ -95,10 +96,10 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
         foreach ($latex_lines as $x => $line) {
             if ($x % 2 !== 1) //Outside math mode
             {
-                $result = strpos($line, $string);
+                $result = mb_strpos($line, $string);
                 if($result !== false)
                     return $result+$strlen_so_far;
-                $strlen_so_far += strlen($line);
+                $strlen_so_far += mb_strlen($line);
             }
         }
 
@@ -122,7 +123,6 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
 
         $latex_lines = self::preg_split_at_latex_math_mode_delimters($subject);
         $result = 0;
-        $strlen_so_far = 0;
         foreach ($latex_lines as $x => $line) {
             if ($x % 2 !== 1) //Outside math mode
             {
@@ -156,7 +156,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
     static public function parse_bbl( $bbl ) {
 
         $citations = array();
-        $bbls = preg_split('/(% \$ biblatex auxiliary file \$|\\\\begin{thebibliography}|\\\\begin{references})/', $bbl, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        $bbls = preg_split('/(% \$ biblatex auxiliary file \$|\\\\begin{thebibliography}|\\\\begin{references})/u', $bbl, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
         foreach($bbls as $individual_bbl)
             $citations = array_merge($citations, static::parse_single_bbl($individual_bbl));
 
@@ -176,7 +176,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
          */
     static public function parse_single_bbl( $bbl ) {
 
-        preg_match('/% \$ (biblatex bbl format|biblatex) version ([0-9.]*) \$/' , $bbl, $version);
+        preg_match('/% \$ (biblatex bbl format|biblatex) version ([0-9.]*) \$/u' , $bbl, $version);
         if( !empty($version[1]))
             $biblatex = $version[1];
         else
@@ -193,24 +193,24 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 '(?<!\\\\)%.*' => '', //remove all comments
                                        );
 
-            $entries = preg_split('/\\\\entry/', $bbl, -1, PREG_SPLIT_NO_EMPTY);
+            $entries = preg_split('/\\\\entry/u', $bbl, -1, PREG_SPLIT_NO_EMPTY);
             foreach($entries as $n => $entry) {
-                if(strpos($entry, '\\endentry' ) === false ) continue;
+                if(mb_strpos($entry, '\\endentry' ) === false ) continue;
 
-                preg_match('/^\s*({[^}]*})({[^}]*})/' , $entry, $args);
+                preg_match('/^\s*({[^}]*})({[^}]*})/u' , $entry, $args);
                 if(!empty($args[1]))
-                    $citations[$n]['key'] = substr($args[1], 1, -1);
+                    $citations[$n]['key'] = mb_substr($args[1], 1, -1);
                 if(!empty($args[2]))
-                    $citations[$n]['type'] = substr($args[2], 1, -1);
+                    $citations[$n]['type'] = mb_substr($args[2], 1, -1);
                 $citations[$n]['ref'] = $n;
 
-                preg_match('#\\\\name\{[^}]*\}\{[^}]*\}\{\}(?=\{((?:[^{}]++|\{(?1)\})*)\})#', $entry, $name);//matches balanced parenthesis (Note the use of (?1) here!) to test changes go here https://regex101.com/r/bVHadc/1
-                foreach(preg_split('/{{hash=/', $name[1], -1, PREG_SPLIT_NO_EMPTY) as $i => $author_bbl) {
+                preg_match('#\\\\name\{[^}]*\}\{[^}]*\}\{\}(?=\{((?:[^{}]++|\{(?1)\})*)\})#u', $entry, $name);//matches balanced parenthesis (Note the use of (?1) here!) to test changes go here https://regex101.com/r/bVHadc/1
+                foreach(preg_split('/{{hash=/u', $name[1], -1, PREG_SPLIT_NO_EMPTY) as $i => $author_bbl) {
                     if($i === 0) continue;
-                    preg_match('#family={(.*?)},#', $author_bbl, $family );
-                    preg_match('#familyi={(.*?)},#', $author_bbl, $familyi );
-                    preg_match('#given={(.*?)},#', $author_bbl, $given );
-                    preg_match('#giveni={(.*?)},#', $author_bbl, $giveni );
+                    preg_match('#family={(.*?)},#u', $author_bbl, $family );
+                    preg_match('#familyi={(.*?)},#u', $author_bbl, $familyi );
+                    preg_match('#given={(.*?)},#u', $author_bbl, $given );
+                    preg_match('#giveni={(.*?)},#u', $author_bbl, $giveni );
 
                     if(!empty($family[1]))
                         $citations[$n]['author'][$i]['family'] = $family[1];
@@ -222,22 +222,22 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                         $citations[$n]['author'][$i]['giveni'] = $giveni[1];
                 }
 
-                preg_match('#\\\\list{publisher}{[^}*]}(?=\{((?:[^{}]++|\{(?1)\})++)\})#', $entry, $publisher);
+                preg_match('#\\\\list{publisher}{[^}*]}(?=\{((?:[^{}]++|\{(?1)\})++)\})#u', $entry, $publisher);
                 if(!empty($publisher[1]))
                     $citations[$n]['publisher'] = str_replace('%', '', $publisher[1]);
 
-                preg_match('#\\\\verb{doi}\s*?\\\\verb ([^\s]*)\s*\\\\endverb#', $entry, $doi);
+                preg_match('#\\\\verb{doi}\s*?\\\\verb ([^\s]*)\s*\\\\endverb#u', $entry, $doi);
                 if(!empty($doi[1]))
                     $citations[$n]['doi'] = $doi[1];
 
                 if(empty($citations[$n]['doi']))
                 {
-                    preg_match('#\\\\verb{url}\s*?\\\\verb ([^\s]*)\s*\\\\endverb#', $entry, $url);
+                    preg_match('#\\\\verb{url}\s*?\\\\verb ([^\s]*)\s*\\\\endverb#u', $entry, $url);
                     if(!empty($url[1]))
                         $citations[$n]['url'] = $url[1];
                 }
 
-                preg_match('#\\\\verb{eprint}\s*?\\\\verb ([^\s]*)\s*\\\\endverb#', $entry, $eprint);
+                preg_match('#\\\\verb{eprint}\s*?\\\\verb ([^\s]*)\s*\\\\endverb#u', $entry, $eprint);
                 if(!empty($eprint[1]))
                     $citations[$n]['eprint'] = $eprint[1];
 
@@ -258,7 +258,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                     'editor',
                                 );
                 foreach( $fields as $field) {
-                    preg_match('#\\\\field{' . $field .'}{*([^}]*)}*#', $entry, $arg);
+                    preg_match('#\\\\field{' . $field .'}{*([^}]*)}*#u', $entry, $arg);
                     if(!empty($arg[1]))
                         $citations[$n][$field] = $arg[1];
                 }
@@ -352,13 +352,13 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 foreach ($str_replacements as $target => $substitute)
                     $text = str_replace($target, $substitute, $text);
                 foreach ($preg_replacements as $target => $substitute) {
-                    $text = preg_replace('#'.$target.'#', $substitute, $text);
-                    if( strpos($text, '\\') === false ) break;
+                    $text = preg_replace('#'.$target.'#u', $substitute, $text);
+                    if( mb_strpos($text, '\\') === false ) break;
                 }
                 $text = self::normalize_whitespace_and_linebreak_characters($text, true, true);
                 $text = self::latex_to_utf8_outside_math_mode($text);
 
-                $text = preg_replace('!\s+!', ' ', $text);
+                $text = preg_replace('#\s+#u', ' ', $text);
                 $text = trim($text, ". \t\n\r\0\x0B\s");
 
                     //$text = iconv(mb_detect_encoding($text, mb_detect_order(), true), "UTF-8", $text);
@@ -368,17 +368,17 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
         }
         else //no biblatex
         {
-            $bbl = preg_replace('#(?<!\\\\)%.*#', '', $bbl); //remove all comments
+            $bbl = preg_replace('#(?<!\\\\)%.*#u', '', $bbl); //remove all comments
 
-            $contains_thebibliography_environment = preg_match('/\\\\begin{thebibliography}{([^}]*)}/' , $bbl, $longest_item);
-            $contains_references_environment = preg_match('/\\\\begin{references}/' , $bbl);
+            $contains_thebibliography_environment = preg_match('/\\\\begin{thebibliography}{([^}]*)}/u' , $bbl, $longest_item);
+            $contains_references_environment = preg_match('/\\\\begin{references}/u' , $bbl);
             if( !$contains_thebibliography_environment || (!empty($longest_item[1]) && ctype_digit($longest_item[1])) )
                 $style = 'numeric';
             else
                 $style = 'author-year';
 
-            $bbl = preg_replace('#\\\\(newcommand|providecommand|def)(?:\{| +|)(\\\\[@a-zA-Z]+)(?:\}| +|)(\[[0-9]\]|)(\[[^]]*\]|)(?=\{((?:[^{}]++|\{(?5)\})*)\})#', '', $bbl); //remove all \newcommand and similar (Note the use of (?5) here!) to test changes go here https://regex101.com/r/g7LCUO/1
-            $entries = preg_split('/\\\\bibitem\s*(?=[[{])/', $bbl, -1, PREG_SPLIT_NO_EMPTY);
+            $bbl = preg_replace('#\\\\(newcommand|providecommand|def)(?:\{| +|)(\\\\[@a-zA-Z]+)(?:\}| +|)(\[[0-9]\]|)(\[[^]]*\]|)(?=\{((?:[^{}]++|\{(?5)\})*)\})#u', '', $bbl); //remove all \newcommand and similar (Note the use of (?5) here!) to test changes go here https://regex101.com/r/g7LCUO/1
+            $entries = preg_split('/\\\\bibitem\s*(?=[[{])/u', $bbl, -1, PREG_SPLIT_NO_EMPTY);
 
             $citations = array();
 
@@ -432,13 +432,13 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                                        );
 
             foreach($entries as $n => $entry) {
-                $entry = preg_replace('#(\\\\end{thebibliography}|\\\\end{references}).*#s', '', $entry);
-                if(strpos($entry, 'begin{thebibliography}' ) !== false || strpos($entry, 'begin{references}' ) !==false || empty($entry) || ($n === 0 && !$contains_thebibliography_environment && !$contains_references_environment) ) continue;
+                $entry = preg_replace('#(\\\\end{thebibliography}|\\\\end{references}).*#su', '', $entry);
+                if(mb_strpos($entry, 'begin{thebibliography}' ) !== false || mb_strpos($entry, 'begin{references}' ) !==false || empty($entry) || ($n === 0 && !$contains_thebibliography_environment && !$contains_references_environment) ) continue;
 
                 $citations[$n] = array();
-                preg_match('/^\s*(|\[[^\]]*\]){([^}]*)}/' , $entry, $args);
-                if( $style !== 'numeric' && !empty($args[1]) && strlen($args[1]) >= 3) {
-                    $key = substr($args[1], 1, -1);
+                preg_match('/^\s*(|\[[^\]]*\]){([^}]*)}/u' , $entry, $args);
+                if( $style !== 'numeric' && !empty($args[1]) && mb_strlen($args[1]) >= 3) {
+                    $key = mb_substr($args[1], 1, -1);
                     $key = trim(self::latex_to_utf8_outside_math_mode($key));
                     $citations[$n]['ref'] = $key;
                 }
@@ -449,37 +449,37 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                     $citations[$n]['key'] = $args[2];
 
                 if(isset($args[0]))
-                    $entry = substr($entry, strlen($args[0]));
+                    $entry = mb_substr($entry, mb_strlen($args[0]));
 
-			preg_match('#\\\\doi\s*{([^}]*)}#', $entry, $doi);
+			preg_match('#\\\\doi\s*{([^}]*)}#u', $entry, $doi);
 			if(empty($doi[1]))
-				preg_match('#\\\\(?:href|url)\s*{.*(?:doi\.org/|dx\.doi\.org/|\\\\doibase\s*)([^}]*)}#', $entry, $doi);
+				preg_match('#\\\\(?:href|url)\s*{.*(?:doi\.org/|dx\.doi\.org/|\\\\doibase\s*)([^}]*)}#u', $entry, $doi);
 			if(empty($doi[1]))
-				preg_match('#\\\\path\s*{doi:([^}]*)}#', $entry, $doi);
+				preg_match('#\\\\path\s*{doi:([^}]*)}#u', $entry, $doi);
             if(empty($doi[1]))
-				preg_match('#(?:http|https)://(?:doi\.org|dx\.doi\.org)/([^}\s]*)#', $entry, $doi);
+				preg_match('#(?:http|https)://(?:doi\.org|dx\.doi\.org)/([^}\s]*)#u', $entry, $doi);
             if(!empty($doi[1]))
                 $citations[$n]['doi'] = static::un_escape_url($doi[1]);
 
-			preg_match('#\\\\(href\s*|Eprint)(@noop|)\s*{.*arxiv\.org/abs/([^}]*)}#', $entry, $eprint);
+			preg_match('#\\\\(href\s*|Eprint)(@noop|)\s*{.*arxiv\.org/abs/([^}]*)}#u', $entry, $eprint);
 			if(empty($eprint[3]))
-				preg_match('#(arxiv|arXiv)(:)(/*[a-z*-]*/*[0-9]+\.?[0-9]+v*[0-9]*)#', $entry, $eprint);
+				preg_match('#(arxiv|arXiv)(:)(/*[a-z*-]*/*[0-9]+\.?[0-9]+v*[0-9]*)#u', $entry, $eprint);
 			if(empty($eprint[3]))
-				preg_match('#()()(quant-ph/[0-9]+\.?[0-9]+v*[0-9]*)#', $entry, $eprint);
+				preg_match('#()()(quant-ph/[0-9]+\.?[0-9]+v*[0-9]*)#u', $entry, $eprint);
 			if(empty($eprint[3]))
-				preg_match('#(http|https)://(arxiv.org/abs)/(quant-ph/[0-9]+\.?[0-9]+v*[0-9]*|[0-9]+\.?[0-9]+v*[0-9]*)#', $entry, $eprint);
+				preg_match('#(http|https)://(arxiv.org/abs)/(quant-ph/[0-9]+\.?[0-9]+v*[0-9]*|[0-9]+\.?[0-9]+v*[0-9]*)#u', $entry, $eprint);
             if(!empty($eprint[3]))
                 $citations[$n]['eprint'] = $eprint[3];
 
-			preg_match('#\\\\(url)(@noop|)\s*{([^}]*)}#', $entry, $url);
+			preg_match('#\\\\(url)(@noop|)\s*{([^}]*)}#u', $entry, $url);
 			if(empty($url[3]) && empty($citations[$n]['eprint']) && empty($citations[$n]['doi']))
-				preg_match('#\\\\(href)(@noop|)\s*{([^}]*)}#', $entry, $url);
+				preg_match('#\\\\(href)(@noop|)\s*{([^}]*)}#u', $entry, $url);
 			if(empty($url[3]))
-				preg_match('#()()((?:http|https)://[-a-zA-Z0-9@:%._\+~\#=\\\\]{2,256}\.[a-z]{2,6}\b[-a-zA-Z0-9@:%_\+.~\#?&////=\\\\]*)#', $entry, $url);
+				preg_match('#()()((?:http|https)://[-a-zA-Z0-9@:%._\+~\#=\\\\]{2,256}\.[a-z]{2,6}\b[-a-zA-Z0-9@:%_\+.~\#?&////=\\\\]*)#u', $entry, $url);
             if(!empty($url[3]))
                 $citations[$n]['url'] = static::un_escape_url($url[3]);
 
-            if(!empty($citations[$n]['url']) && ( (!empty($citations[$n]['doi']) &&  strpos($citations[$n]['url'], $citations[$n]['doi']) !== false || strpos($citations[$n]['url'], 'doi.org/') !== false) || (!empty($citations[$n]['eprint']) && strpos($citations[$n]['url'], $citations[$n]['eprint']) !== false )))
+            if(!empty($citations[$n]['url']) && ( (!empty($citations[$n]['doi']) &&  mb_strpos($citations[$n]['url'], $citations[$n]['doi']) !== false || mb_strpos($citations[$n]['url'], 'doi.org/') !== false) || (!empty($citations[$n]['eprint']) && mb_strpos($citations[$n]['url'], $citations[$n]['eprint']) !== false )))
                 unset($citations[$n]['url']);
 
             $text = $entry;
@@ -488,12 +488,12 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 $text = str_replace($target, $substitute, $text);
 
             foreach ($preg_replacements as $target => $substitute) {
-                $text = preg_replace('#'.$target.'#', $substitute, $text);
-                if( strpos($text, '\\') === false ) break;
+                $text = preg_replace('#'.$target.'#u', $substitute, $text);
+                if( mb_strpos($text, '\\') === false ) break;
             }
             $text = self::latex_to_utf8_outside_math_mode($text);
 
-            $text = preg_replace('!\s+!', ' ', $text);
+            $text = preg_replace('#\s+#u', ' ', $text);
             $text = trim($text, ". \t\n\r\0\x0B\s");
 
             $citations[$n]['text'] = $text . '.';
@@ -514,8 +514,8 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
     static public function utf8_to_latex($text) {
 
         foreach (self::get_latex_special_chars_reverse_dictionary() as $target => $substitute) {
-            if (mb_strlen($text) === strlen($text)) break;
-            $text = preg_replace('#'.$target.'#', $substitute, $text);
+            if (mb_strlen($text) === strlen($text)) break; #check for multi byte characters
+            $text = preg_replace('#'.$target.'#u', $substitute, $text);
         }
 
         return $text;
@@ -536,7 +536,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
             if ($x % 2 === 1) {//In math mode
                 $bibtex .= '{$' . $part . '$}';
             } else { //Outside math mode
-                $part = preg_replace('/([A-Z]{2,}|(?<!^)[A-Z]+)/', '{'."$1".'}', $part);
+                $part = preg_replace('/([A-Z]{2,}|(?<!^)[A-Z]+)/u', '{'."$1".'}', $part);
                 $bibtex .= self::utf8_to_latex($part);
             }
         }
@@ -564,8 +564,8 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
          */
     static public function extract_latex_macros( $latex_source ) {
 
-        $latex_source_without_comments = preg_replace('#(?<!\\\\)%.*#', '', $latex_source);
-        preg_match_all('#\\\\(newcommand|providecommand|def)(?:\{| *)(\\\\[@a-zA-Z]+)(?:\}| *)(\[[0-9]\]|)(\[[^]]*\]|)(?=\{((?:[^{}]++|\{(?5)\})*)\})#', $latex_source_without_comments, $latex_macro_definitions, PREG_SET_ORDER);//matches \newcommand and friends and takes into account balanced parenthesis (Note the use of (?5) here!) to test changes go here https://regex101.com/r/g7LCUO/1
+        $latex_source_without_comments = preg_replace('#(?<!\\\\)%.*#u', '', $latex_source);
+        preg_match_all('#\\\\(newcommand|providecommand|def)(?:\{| *)(\\\\[@a-zA-Z]+)(?:\}| *)(\[[0-9]\]|)(\[[^]]*\]|)(?=\{((?:[^{}]++|\{(?5)\})*)\})#u', $latex_source_without_comments, $latex_macro_definitions, PREG_SET_ORDER);//matches \newcommand and friends and takes into account balanced parenthesis (Note the use of (?5) here!) to test changes go here https://regex101.com/r/g7LCUO/1
 
         return $latex_macro_definitions;
     }
@@ -635,7 +635,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
          */
     static public function expand_latex_macros( $macro_definitions, $text ) {
 
-        if(strpos($text, '\\') === false || empty($macro_definitions))
+        if(mb_strpos($text, '\\') === false || empty($macro_definitions))
             return $text;
 
         $macro_definitions = array_merge_recursive($macro_definitions, static::$additional_default_macros);
@@ -643,22 +643,22 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
         $patterns_and_replacements = array();
         foreach($macro_definitions as $macro_definition)
         {
-            if(empty($macro_definition[3]) || preg_match('#[0-9]+#',$macro_definition[3], $num_arguments) !== 1 )
+            if(empty($macro_definition[3]) || preg_match('#[0-9]+#u',$macro_definition[3], $num_arguments) !== 1 )
                 $num_arguments = 0;
             else
                 $num_arguments = $num_arguments[0];
 
-            if(empty($macro_definition[4]) || preg_match('#^\[(.*)\]$#',$macro_definition[4], $default_argument) !== 1 )
+            if(empty($macro_definition[4]) || preg_match('#^\[(.*)\]$#u',$macro_definition[4], $default_argument) !== 1 )
                 $default_argument = false;
             else
                 $default_argument = $default_argument[1];
 
-            $macroname = '\\\\' . substr($macro_definition[2],1);//substr picks out the name of the macro without the leading \;
+            $macroname = '\\\\' . mb_substr($macro_definition[2],1);//mb_substr picks out the name of the macro without the leading \;
             $pattern = $macroname;
             $replacement = $macro_definition[5];
             if($num_arguments == 0)
             {
-                if(preg_match('#[^a-zA-Z]#', substr($macro_definition[2],1))!==1)
+                if(preg_match('#[^a-zA-Z]#u', mb_substr($macro_definition[2],1))!==1)
                     $pattern .= '(?=[^a-zA-Z])\s*'; //If macro name is not a special character make sure it is not followed by letters to prevent expanding \e in things like \emph and eat following space characters
             }
             else
@@ -669,11 +669,11 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                     else
                         $pattern .= '\s*(?=\{((?:[^{}]++|\{(?' . $i . ')\})*)\})\s*{(?' . $i . ')}';
 
-                    $replacement = str_replace ( '#' . $i , '\\'.$i ,  $replacement );
+                    $replacement = str_replace( '#' . $i , '\\'.$i ,  $replacement );
                 }
             $pattern = '\\\\(?:newcommand|providecommand|def)[\s{]*' . $macroname . '(*SKIP)(*FAIL)|' . $pattern; //prevent expanion in the definition of the macro
-            $pattern = '#' . $pattern . '#';
-            $replacement = str_replace ('\$', '\\\\\$', $replacement);// espace $ in replacement as it has a special meaning
+            $pattern = '#' . $pattern . '#u';
+            $replacement = str_replace('\$', '\\\\\$', $replacement);// espace $ in replacement as it has a special meaning
 
             $patterns_and_replacements[] = array($pattern,$replacement);
 
@@ -690,7 +690,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 $new_text = preg_replace($patterns_and_replacement[0], $patterns_and_replacement[1], $new_text);
             }
 
-            $new_text = preg_replace('#\\\\csname\s*(.*)\\\\endcsname#', '\\\\$1', $new_text);
+            $new_text = preg_replace('#\\\\csname\s*(.*)\\\\endcsname#u', '\\\\$1', $new_text);
 
             if($new_text === $text)
                 break;
@@ -738,10 +738,10 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
 
         foreach (self::get_utf8_to_ascii_dictionary() as $target => $substitute) {
             if (mb_strlen($text) === strlen($text)) break;
-            $text = preg_replace('#'.$target.'#', $substitute, $text);
+            $text = preg_replace('#'.$target.'#u', $substitute, $text);
         }
 
-        return preg_replace('/[^a-zA-Z]/', '', $text);
+        return preg_replace('/[^a-zA-Z]/u', '', $text);
     }
 
         /**
@@ -755,12 +755,12 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
     static public function title_to_key_suffix( $text ) {
 
         $text = trim(O3PO_Utility::remove_stopwords($text));
-        $words = preg_split('/( |-|\\$)/', $text, -1, PREG_SPLIT_NO_EMPTY);
+        $words = preg_split('/( |-|\\$)/u', $text, -1, PREG_SPLIT_NO_EMPTY);
         $key = '';
         if(!empty($words[0]))
             $key .= $words[0];
         $i = 1;
-        while($i < count($words) && strlen($key)+strlen($words[$i])<20)
+        while($i < count($words) && mb_strlen($key)+mb_strlen($words[$i])<20)
         {
         if(!empty($words[$i]))
             $key .= $words[$i];
@@ -768,7 +768,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
         }
         $key = self::utf8_to_closest_latin_letter_string($key);
 
-        return strtolower($key);
+        return mb_strtolower($key);
     }
 
 
@@ -1457,7 +1457,7 @@ class O3PO_Latex_Dictionary_Provider
          */
     public static function expand_cite_to_html( $text, $bbl ) {
 
-        preg_match_all('#\\\\cite\{\s*([^}]*)\s*\}#', $text, $refs, PREG_PATTERN_ORDER);
+        preg_match_all('#\\\\cite\{\s*([^}]*)\s*\}#u', $text, $refs, PREG_PATTERN_ORDER);
         if(empty($refs) or empty($refs[1]))
             return $text;
 
@@ -1470,13 +1470,13 @@ class O3PO_Latex_Dictionary_Provider
         foreach($refs[1] as $x => $ref)
         {
             $replacement = '[';
-            foreach(preg_split('#\s*,\s*#', $ref, -1, PREG_SPLIT_NO_EMPTY) as $bibtex_key) {
+            foreach(preg_split('#\s*,\s*#u', $ref, -1, PREG_SPLIT_NO_EMPTY) as $bibtex_key) {
                 $replacement .= '<a onclick="document.getElementById(\'references\').style.display=\'block\';" href="#' . $bibtex_key . '">' . ( isset($bibtex_key_dict[$bibtex_key]) ? $bibtex_key_dict[$bibtex_key] : '?' )  . '</a>,';
             }
             $replacement = rtrim($replacement,',');
             $replacement .= ']';
 
-            $text = preg_replace('#\\' . $refs[0][$x] . '#', $replacement, $text);
+            $text = preg_replace('#\\' . $refs[0][$x] . '#u', $replacement, $text);
         }
 
         return $text;
@@ -1493,7 +1493,7 @@ class O3PO_Latex_Dictionary_Provider
          */
     static public function normalize_whitespace_and_linebreak_characters( $text, $single_line=true, $remove_extra_newlines=false) {
         if($remove_extra_newlines)
-            $text = preg_replace('#(?<!\n)\n(?!\n)#', ' ', $text);
+            $text = preg_replace('#(?<!\n)\n(?!\n)#u', ' ', $text);
 
         foreach(array(
                     '\\\\\\\\(\s*|\s*\[.*?\])' => "\n",
@@ -1502,18 +1502,17 @@ class O3PO_Latex_Dictionary_Provider
                     '\\\\(hspace|vspace)\s*{[^}]*?}\h*' => " ",
                     '\\\\(smallskip|medskip|bigskip)(?![a-zA-Z])\h*' => " ",
                       ) as $target => $replacement )
-            $text = preg_replace('#' . $target . '#', $replacement, $text);
+            $text = preg_replace('#' . $target . '#u', $replacement, $text);
 
         if($single_line)
             $text = str_replace("\n", ' ', $text);
 
         $text = str_replace("\t", ' ', $text);
         $text = join("\n", array_map("trim", explode("\n", $text)));
-        $text = trim(preg_replace('#\h\h+#', ' ', $text));
+        $text = trim(preg_replace('#\h\h+#u', ' ', $text));
 
         if($remove_extra_newlines)
-            $text = preg_replace('#\n\n\n+#', "\n\n", $text);
-
+            $text = preg_replace('#\n\n\n+#u', "\n\n", $text);
 
         return $text;
     }
@@ -1531,7 +1530,7 @@ class O3PO_Latex_Dictionary_Provider
 
         $bbl = '';
 
-        preg_match_all('/(\\\\begin{thebibliography}.*?\\\\end{thebibliography}|\\\\begin{references}.*?\\\\end{references})/s', $latex, $matches, PREG_PATTERN_ORDER);
+        preg_match_all('/(\\\\begin{thebibliography}.*?\\\\end{thebibliography}|\\\\begin{references}.*?\\\\end{references})/su', $latex, $matches, PREG_PATTERN_ORDER);
         if(!empty($matches[0])) {
             $i = 0;
             while(isset($matches[0][$i]))
@@ -1557,7 +1556,7 @@ class O3PO_Latex_Dictionary_Provider
 
         $abstract = '';
 
-        preg_match_all('/\\\\begin{abstract}(.*?)\\\\end{abstract}/s', $latex, $matches, PREG_PATTERN_ORDER);
+        preg_match_all('/\\\\begin{abstract}(.*?)\\\\end{abstract}/su', $latex, $matches, PREG_PATTERN_ORDER);
         if(!empty($matches[1])) {
             $i = 0;
             while(isset($matches[1][$i]))

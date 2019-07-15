@@ -489,7 +489,7 @@ abstract class O3PO_PublicationType {
 			$new_author_surnames[] = isset( $_POST[ $post_type . '_author_surnames' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_surnames' ][$x] ) : '';
 			$new_author_name_styles[] = isset( $_POST[ $post_type . '_author_name_styles' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_name_styles' ][$x] ) : 'western';
 			$affiliation_nums = isset( $_POST[ $post_type . '_author_affiliations' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_affiliations' ][$x] ) : '';
-			$affiliation_nums = trim( preg_replace("/[^,0-9]/", "", $affiliation_nums ), ',');
+			$affiliation_nums = trim( preg_replace("/[^,0-9]/u", "", $affiliation_nums ), ',');
 			$new_author_affiliations[] = $affiliation_nums;
 			$new_author_orcids[] = isset( $_POST[ $post_type . '_author_orcids' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_orcids' ][$x] ) : '';
             $new_author_urls[] = isset( $_POST[ $post_type . '_author_urls' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_urls' ][$x] ) : '';
@@ -597,7 +597,7 @@ abstract class O3PO_PublicationType {
         if( empty($journal) or empty($doi_prefix) or empty($publisher) )
             $validation_result .= "WARNING: The journal title (" . $journal . "), doi prefix (" . $doi_prefix . "), or publisher (" . $publisher . ") seem to be empty. Probably some some essential settings were not set. Please go to the settings page and configure them.\n";
 
-        if( O3PO_Latex::preg_match_outside_math_mode('#\\\\(?!cite)#', $abstract) !== 0)
+        if( O3PO_Latex::preg_match_outside_math_mode('#\\\\(?!cite)#u', $abstract) !== 0)
             $validation_result .= "WARNING: The abstract contains one or more backslashes that are not part of a \\\\cite command.\n" ;
         if( O3PO_Latex::strpos_outside_math_mode($abstract, '=') !== false )
             $validation_result .= "WARNING: The abstract contains an = sign that should probably be part of a mathematical formulat, please put dollar signs around the formula.\n" ;
@@ -620,9 +620,9 @@ abstract class O3PO_PublicationType {
             $validation_result .= "REVIEW: The doi suffix was set to ". $doi_suffix . ".\n";
         if ( empty($title) )
             $validation_result .= "ERROR: Title is empty.\n";
-        else if ( preg_match('/[<>]/', $title ) )
+        else if ( preg_match('/[<>]/u', $title ) )
             $validation_result .= "WARNING: Title contains < or > signs. If they are meant to represent math, the formulas should be enclosed in dollar signs and they should be replaced with \\\\lt and \\\\gt respectively (similarly <= and >= should be replaced by \\\\leq and \\\\geq).\n" ;
-        if ( empty($title_mathml) && preg_match('/[^\\\\]\$.*[^\\\\]\$/' , $title ) )
+        if ( empty($title_mathml) && preg_match('/[^\\\\]\$.*[^\\\\]\$/u' , $title ) )
             $validation_result .= "ERROR: Title contains math but no MathML variant was saved so far.\n";
         if ( empty( $pages ) or $pages < 0 )
             $validation_result .= "ERROR: Pages is invalid. Maybe you are trying to publish something that would break lexicographic ordering of DOIs?\n";
@@ -651,7 +651,7 @@ abstract class O3PO_PublicationType {
                 $validation_result .= "WARNING: Affiliations of author " . ($x+1) . " are empty.\n" ;
             else {
                 $last_affiliation_num = 0;
-                foreach(preg_split('/\s*,\s*/', $author_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY) as $affiliation_num) {
+                foreach(preg_split('/\s*,\s*/u', $author_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY) as $affiliation_num) {
                     if ($affiliation_num < 1 or $affiliation_num > $number_affiliations )
                         $validation_result .= "ERROR: At least one affiliation number of author " . ($x+1) . " does not correspond to an actual affiliation.\n" ;
                     if( $last_affiliation_num >= $affiliation_num )
@@ -667,7 +667,7 @@ abstract class O3PO_PublicationType {
         for ($x = 0; $x < $number_affiliations; $x++) {
             if ( empty( $affiliations[$x] ) )
                 $validation_result .= "ERROR: Affiliation " . ($x+1) . " is empty.\n" ;
-            if ( !empty($affiliations[$x]) and preg_match('#[\\\\]#', $affiliations[$x] ) )
+            if ( !empty($affiliations[$x]) and preg_match('#[\\\\]#u', $affiliations[$x] ) )
                 $validation_result .= "WARNING: Affiliation " . ($x+1) . " contains suspicious looking special characters.\n" ;
             if ( strpos($all_appearing_affiliations, (string)($x+1) ) === false)
                 $validation_result .= "ERROR: Affiliation " . ($x+1) . " is not associated to any authors.\n" ;
@@ -850,8 +850,8 @@ abstract class O3PO_PublicationType {
                     $subject .= $lead_ins[array_rand($lead_ins)];
                     $subject .= ': ' . $title . " by " . $authors;
                 }
-                if(strlen($subject)+1+strlen($post_url) > 280)
-                    $subject = substr($subject, 0, 280-(1+strlen($post_url)-3)) . '...';
+                if(mb_strlen($subject)+1+mb_strlen($post_url) > 280)
+                    $subject = mb_substr($subject, 0, 280-(1+mb_strlen($post_url)-3)) . '...';
                 $subject .= ' ' . $post_url;
                 $media = array(
                     'photo' => $image_url,
@@ -1040,14 +1040,14 @@ abstract class O3PO_PublicationType {
             for ($x = 0; $x < $number_authors; $x++) {
                 if(!empty($author_surnames[$x])) echo '<meta name="citation_author" content="' . esc_attr($author_given_names[$x] . " " . $author_surnames[$x]) . '">'."\n";
                 if ( !empty($author_affiliations) && !empty($author_affiliations[$x]) ) {
-                    foreach(preg_split('/\s*,\s*/', $author_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY) as $affiliation_num) {
+                    foreach(preg_split('/\s*,\s*/u', $author_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY) as $affiliation_num) {
                         if ( !empty($affiliations[$affiliation_num-1]) )
                             echo '<meta name="citation_author_institution" content="' . esc_attr($affiliations[$affiliation_num-1]) . '">' . "\n";
                     }
                 }
             }
         }
-        if(!empty($date_published)) echo '<meta name="citation_publication_date" content="' . preg_replace('/-/', '/', $date_published ) . '">'."\n";
+        if(!empty($date_published)) echo '<meta name="citation_publication_date" content="' . preg_replace('/-/u', '/', $date_published ) . '">'."\n";
         if(!empty($journal)) echo '<meta name="citation_journal_title" content="' . $journal . '">'."\n";
         if(!empty($volume)) echo '<meta name="citation_volume" content="' . $volume . '">'."\n";
         if(!empty($pages)) echo '<meta name="citation_firstpage" content="' . $pages . '">'."\n";
@@ -1147,7 +1147,7 @@ abstract class O3PO_PublicationType {
     public static function get_formated_citation( $post_id ) {
 
         $post_type = get_post_type($post_id);
-        return get_post_meta( $post_id, $post_type . '_journal', true ) . ' ' . get_post_meta( $post_id, $post_type . '_volume', true ) . ', ' . get_post_meta( $post_id, $post_type . '_pages', true ) . ' (' . substr( get_post_meta( $post_id, $post_type . '_date_published', true ), 0, 4 ) . ').';
+        return get_post_meta( $post_id, $post_type . '_journal', true ) . ' ' . get_post_meta( $post_id, $post_type . '_volume', true ) . ', ' . get_post_meta( $post_id, $post_type . '_pages', true ) . ' (' . mb_substr( get_post_meta( $post_id, $post_type . '_date_published', true ), 0, 4 ) . ').';
 
     }
 
@@ -1253,7 +1253,7 @@ abstract class O3PO_PublicationType {
         if(!empty($this->get_journal_property('crossref_archive_locations')) && $journal === $this->get_journal_property('journal_title'))
         {
             $xml .= '	<archive_locations>' . "\n";
-            foreach(preg_split('/\s*,\s*/', $this->get_journal_property('crossref_archive_locations'))  as $archive_name)
+            foreach(preg_split('/\s*,\s*/u', $this->get_journal_property('crossref_archive_locations'))  as $archive_name)
                 $xml .= '	  <archive name="' . esc_attr(trim($archive_name)) . '"></archive>' . "\n";
             $xml .= '	</archive_locations>' . "\n";
         }
@@ -1269,9 +1269,9 @@ abstract class O3PO_PublicationType {
             // We don't have issues but volumes
         $xml .= '      <journal_issue>' . "\n";
         $xml .= '	     <publication_date media_type="online">' . "\n";
-        $xml .= '	       <month>' . substr($date_published, 5, 2) . '</month>' . "\n";
-        $xml .= '	       <day>' . substr($date_published, 8, 2) .'</day>' . "\n";
-        $xml .= '	       <year>' . substr($date_published, 0, 4) . '</year>' . "\n";
+        $xml .= '	       <month>' . mb_substr($date_published, 5, 2) . '</month>' . "\n";
+        $xml .= '	       <day>' . mb_substr($date_published, 8, 2) .'</day>' . "\n";
+        $xml .= '	       <year>' . mb_substr($date_published, 0, 4) . '</year>' . "\n";
         $xml .= '	     </publication_date>' . "\n";
         $xml .= '	     <journal_volume>' . "\n";
         $xml .= '	       <volume>' . $volume . '</volume>' . "\n";
@@ -1301,7 +1301,7 @@ abstract class O3PO_PublicationType {
             $xml .= '	    <surname>' . esc_html($author_surnames[$x]) . '</surname>' . "\n";
                 // $xml .= '	    <suffix>{0,1}</suffix>' . "\n";
             if ( !empty($author_affiliations) && !empty($author_affiliations[$x]) ) {
-                foreach(preg_split('/\s*,\s*/', $author_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY) as $affiliation_num) {
+                foreach(preg_split('/\s*,\s*/u', $author_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY) as $affiliation_num) {
                     if ( !empty($affiliations[$affiliation_num-1]) )
 				     	$xml .= '	    <affiliation>' . esc_html($affiliations[$affiliation_num-1]) . '</affiliation>' . "\n";
                 }
@@ -1319,9 +1319,9 @@ abstract class O3PO_PublicationType {
             $xml .= '	</jats:abstract>' . "\n";
         }
         $xml .= '	<publication_date media_type="online">' . "\n";
-        $xml .= '	    <month>' . substr($date_published, 5, 2) . '</month>' . "\n";
-        $xml .= '	    <day>' . substr($date_published, 8, 2) .'</day>' . "\n";
-        $xml .= '	    <year>' . substr($date_published, 0, 4) . '</year>' . "\n";
+        $xml .= '	    <month>' . mb_substr($date_published, 5, 2) . '</month>' . "\n";
+        $xml .= '	    <day>' . mb_substr($date_published, 8, 2) .'</day>' . "\n";
+        $xml .= '	    <year>' . mb_substr($date_published, 0, 4) . '</year>' . "\n";
         $xml .= '	</publication_date>' . "\n";
             // we only have article numbers which should go into the publisher_item  below, but despite what Crossref says in their documentation they don't handle this propperly so we have to add it also here
         $xml .= '	<pages>' . "\n";
@@ -1568,7 +1568,7 @@ abstract class O3PO_PublicationType {
             $xml .= '            <given-names>' . esc_html($author_given_names[$x]) . '</given-names>' . "\n";
             $xml .= '          </name>' . "\n";
             if ( !empty($author_affiliations) && !empty($author_affiliations[$x]) ) {
-                foreach(preg_split('/\s*,\s*/', $author_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY) as $affiliation_num) {
+                foreach(preg_split('/\s*,\s*/u', $author_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY) as $affiliation_num) {
                     $xml .= '          <xref ref-type="aff" rid="aff-' . $affiliation_num . '"/>' . "\n";
                 }
             }
@@ -1579,9 +1579,9 @@ abstract class O3PO_PublicationType {
             $xml .= '      <aff id="aff-' . ($n+1) . '">' . esc_html($affiliation) . '</aff>' . "\n";
 
         $xml .= '      <pub-date date-type="pub" publication-format="electronic" iso-8601-date="' . $date_published . '">' . "\n";
-        $xml .= '        <day>' . substr($date_published, 8, 2) . '</day>' . "\n";
-        $xml .= '        <month>' . substr($date_published, 5, 2) . '</month>' . "\n";
-        $xml .= '        <year>' . substr($date_published, 0, 4) . '</year>' . "\n";
+        $xml .= '        <day>' . mb_substr($date_published, 8, 2) . '</day>' . "\n";
+        $xml .= '        <month>' . mb_substr($date_published, 5, 2) . '</month>' . "\n";
+        $xml .= '        <year>' . mb_substr($date_published, 0, 4) . '</year>' . "\n";
         $xml .= '      </pub-date>' . "\n";
         $xml .= '      <volume>' . $volume . '</volume>' . "\n";
 //        $xml .= '  <issue>18</issue>' . "\n";
@@ -1589,7 +1589,7 @@ abstract class O3PO_PublicationType {
 //        $xml .= '  <lpage>10219</lpage>' . "\n";
         $xml .= '      <permissions>' . "\n";
         $xml .= '        <copyright-statement>' . 'This work is published under the ' . esc_html($this->get_journal_property('license_name')) . ' license ' . esc_html($this->get_journal_property('license_url')) . '.' . '</copyright-statement>' . "\n";
-        $xml .= '        <copyright-year>' . substr($date_published, 0, 4) .'</copyright-year>' . "\n";
+        $xml .= '        <copyright-year>' . mb_substr($date_published, 0, 4) .'</copyright-year>' . "\n";
         $xml .= '      </permissions>' . "\n";
         if( !empty($abstract) || !empty($abstract_mathml) )
         {
@@ -1670,9 +1670,9 @@ abstract class O3PO_PublicationType {
 
         $json_array["bibjson"]["title"] = $title;
         $json_array["bibjson"]["abstract"] = $abstract;
-        $json_array["bibjson"]["year"] = substr($date_published, 0, 4);
-        $json_array["bibjson"]["month"] = substr($date_published, 5, 2);
-        $json_array["bibjson"]["day"] = substr($date_published, 8, 2);
+        $json_array["bibjson"]["year"] = mb_substr($date_published, 0, 4);
+        $json_array["bibjson"]["month"] = mb_substr($date_published, 5, 2);
+        $json_array["bibjson"]["day"] = mb_substr($date_published, 8, 2);
         for ($x = 0; $x < $number_authors; $x++) {
             $author_array = array(
                 "name" => $author_given_names[$x] . ' ' . $author_surnames[$x]
@@ -1766,7 +1766,7 @@ abstract class O3PO_PublicationType {
 
             echo '<h4>Validation results</h4>';
             echo '<div style="width:100%; background-color: #fff; border: 1px solid #eee"><div style="margin:6pt 6pt 6pt 6pt">';
-            foreach(preg_split("/\n/", $validation_result, -1, PREG_SPLIT_NO_EMPTY) as $line){
+            foreach(preg_split("/\n/u", $validation_result, -1, PREG_SPLIT_NO_EMPTY) as $line){
                 $color = "green";
                 if(strpos($line, 'WARNING') !== false)
                     $color = "orange";
@@ -1999,7 +1999,7 @@ abstract class O3PO_PublicationType {
 			$highest_pages_info = $this->journal->get_post_type_highest_pages_info( $post_id, array($this->get_publication_type_name()) );
 			$highest_pages = $highest_pages_info['pages'];
 			$highest_pages_date_published = $highest_pages_info['date_published'];
-			if ( $highest_pages_date_published === $date_published and strlen((string)$highest_pages) !== strlen((string)($highest_pages+1)))
+			if ( $highest_pages_date_published === $date_published and mb_strlen((string)$highest_pages) !== mb_strlen((string)($highest_pages+1)))
 				$pages = -1; //Throws an error during validation to ensure lexicographic ordering of DOIs
 			else
                 $pages = $highest_pages+1;
@@ -2088,7 +2088,7 @@ abstract class O3PO_PublicationType {
 		} else {
 			echo '<p>No entries found.</p>' . "\n";
 		}
-        echo '			<p>(The above was generated from the following bbl data that was extracted from the source files with some subsequent macro expansion (see below for which macros were expanded). If something with the above is not right you can edit the extracted bbl by modifying the text below, the references are then recalculated upon the next save/update. Please also report any problems to ' . $this->get_journal_property('developer_email') . ' so that they can be fixed and the automatic extraction improved. Keep in mind that your changes are overwritten if source files are downloaded again from the arXiv!</p><textarea name="' . $post_type . '_bbl" id="' . $post_type . '_bbl" rows="' . (min(substr_count( $bbl, "\n" )+1, 30)) . '" style="width: 100%; overflow: scroll;">' . esc_textarea($bbl) . '</textarea>';
+        echo '			<p>(The above was generated from the following bbl data that was extracted from the source files with some subsequent macro expansion (see below for which macros were expanded). If something with the above is not right you can edit the extracted bbl by modifying the text below, the references are then recalculated upon the next save/update. Please also report any problems to ' . $this->get_journal_property('developer_email') . ' so that they can be fixed and the automatic extraction improved. Keep in mind that your changes are overwritten if source files are downloaded again from the arXiv!</p><textarea name="' . $post_type . '_bbl" id="' . $post_type . '_bbl" rows="' . (min(mb_substr_count( $bbl, "\n" )+1, 30)) . '" style="width: 100%; overflow: scroll;">' . esc_textarea($bbl) . '</textarea>';
 
         echo '         <p>If you need to hand craft a bibliography you can start from the following template:</p>
 <textarea rows="10" style="width: 100%; overflow: scroll;">
@@ -2111,7 +2111,7 @@ abstract class O3PO_PublicationType {
                     $author_latex_macro_definition_summary = "";
                 $author_latex_macro_definition_summary .= '\\' . $author_latex_macro_definition[1] . '{' . $author_latex_macro_definition[2] . '}' . $author_latex_macro_definition[3] . $author_latex_macro_definition[4] . '{' . $author_latex_macro_definition[5] . '}' . "\n";
             }
-            echo '			<p>(In the source files the following latex commands were identified and expanded when generating the bbl above from the source.)</p><textarea name="' . $post_type . '_author_latex_macro_definitions" id="' . $post_type . '_author_latex_macro_definitions" rows="' . (min(substr_count( $author_latex_macro_definition_summary, "\n" )+1, 30)) . '" style="width: 100%; overflow: scroll;" readonly>' . esc_textarea($author_latex_macro_definition_summary) . '</textarea>';
+            echo '			<p>(In the source files the following latex commands were identified and expanded when generating the bbl above from the source.)</p><textarea name="' . $post_type . '_author_latex_macro_definitions" id="' . $post_type . '_author_latex_macro_definitions" rows="' . (min(mb_substr_count( $author_latex_macro_definition_summary, "\n" )+1, 30)) . '" style="width: 100%; overflow: scroll;" readonly>' . esc_textarea($author_latex_macro_definition_summary) . '</textarea>';
         }
 		echo '		</td>';
 		echo '	</tr>';
@@ -2143,7 +2143,7 @@ abstract class O3PO_PublicationType {
 			echo '	<tr>';
 			echo '		<th><label for="' . $post_type . '_crossref_response" class="' . $post_type . '_crossref_response_label">' . 'Crossref response' . '</label></th>';
 			echo '		<td>';
-			echo '			<textarea rows="' . (substr_count( $crossref_response, "\n" )+1) . '" style="width:100%;" readonly>' . esc_textarea($crossref_response) . '</textarea><p>(The response we got from Crossref when uploading the metadata.)</p>';
+			echo '			<textarea rows="' . (mb_substr_count( $crossref_response, "\n" )+1) . '" style="width:100%;" readonly>' . esc_textarea($crossref_response) . '</textarea><p>(The response we got from Crossref when uploading the metadata.)</p>';
 			echo '		</td>';
 			echo '	</tr>';
 		}
@@ -2176,7 +2176,7 @@ abstract class O3PO_PublicationType {
 			echo '	<tr>';
 			echo '		<th><label for="' . $post_type . '_doaj_response" class="' . $post_type . '_doaj_response_label">' . 'DOAJ response' . '</label></th>';
 			echo '		<td>';
-			echo '			<textarea rows="' . (substr_count( $doaj_response, "\n" )+2) . '" style="width:100%;" readonly>' . esc_textarea($doaj_response) . '</textarea><p>(The response we got from DOAJ when uploading the metadata.)</p>';
+			echo '			<textarea rows="' . (mb_substr_count( $doaj_response, "\n" )+2) . '" style="width:100%;" readonly>' . esc_textarea($doaj_response) . '</textarea><p>(The response we got from DOAJ when uploading the metadata.)</p>';
 			echo '		</td>';
 			echo '	</tr>';
 		}
@@ -2208,7 +2208,7 @@ abstract class O3PO_PublicationType {
 			echo '	<tr>';
 			echo '		<th><label for="' . $post_type . '_clockss_response" class="' . $post_type . '_clockss_response_label">' . 'CLOCKSS response' . '</label></th>';
 			echo '		<td>';
-			echo '			<textarea rows="' . (substr_count( $clockss_response, "\n" )+2) . '" style="width:100%;" readonly>' . esc_textarea($clockss_response) . '</textarea><p>(The response we got from CLOCKSS when uploading the metadata and full text pdf, if available.)</p>';
+			echo '			<textarea rows="' . (mb_substr_count( $clockss_response, "\n" )+2) . '" style="width:100%;" readonly>' . esc_textarea($clockss_response) . '</textarea><p>(The response we got from CLOCKSS when uploading the metadata and full text pdf, if available.)</p>';
 			echo '		</td>';
 			echo '	</tr>';
 		}
@@ -2620,13 +2620,13 @@ abstract class O3PO_PublicationType {
         $volume = get_post_meta( $post_id, $post_type . '_volume', true );
         $authors = $this->get_formated_authors_bibtex($post_id);
         $date_published = get_post_meta( $post_id, $post_type . '_date_published', true );
-        $month = substr( $date_published, 5, 2 );
+        $month = mb_substr( $date_published, 5, 2 );
         if( !empty($month) and 1 <= $month and $month <= 13 )
             $month = O3PO_Latex::get_month_string($month);
         else
             $month = '';
 
-        $year = substr( $date_published, 0, 4 );
+        $year = mb_substr( $date_published, 0, 4 );
         $author_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
         $doi = $this->get_doi($post_id);
         $doi_url_prefix = $this->get_journal_property('doi_url_prefix');
@@ -2689,7 +2689,7 @@ abstract class O3PO_PublicationType {
         $bibtex_html .= '<h3 class="toggle-following additional-info"><a href="javascript:void(0);" onclick="toggleFollowing(this);">&#9658; BibTeX data</a></h3>';
         $bibtex = $this->generate_bibtex($post_id);
 
-        $bibtex_html .= '<textarea class="bibtex initially-display-none-if-js" rows="' . (substr_count( $bibtex, "\n" )+1) . '" readonly>';
+        $bibtex_html .= '<textarea class="bibtex initially-display-none-if-js" rows="' . (mb_substr_count( $bibtex, "\n" )+1) . '" readonly>';
         $bibtex_html .= esc_textarea($bibtex);
         $bibtex_html .= '</textarea>';
 

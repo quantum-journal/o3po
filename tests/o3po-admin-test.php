@@ -1,8 +1,6 @@
 <?php
 
 require_once(dirname( __FILE__ ) . '/../o3po/admin/class-o3po-admin.php');
-#require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-publication-type.php');
-
 
 class O3PO_AdminTest extends PHPUnit_Framework_TestCase
 {
