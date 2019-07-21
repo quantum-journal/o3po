@@ -598,7 +598,7 @@ abstract class O3PO_PublicationType {
             $validation_result .= "WARNING: The journal title (" . $journal . "), doi prefix (" . $doi_prefix . "), or publisher (" . $publisher . ") seem to be empty. Probably some some essential settings were not set. Please go to the settings page and configure them.\n";
 
         if( O3PO_Latex::preg_match_outside_math_mode('#\\\\(?!cite)#u', $abstract) !== 0)
-            $validation_result .= "WARNING: The abstract contains one or more backslashes that are not part of a \\\\cite command.\n" ;
+            $validation_result .= "WARNING: The abstract contains one or more backslashes that are not part of a \\\\cite command or inside a formula.\n" ;
         if( O3PO_Latex::strpos_outside_math_mode($abstract, '=') !== false )
             $validation_result .= "WARNING: The abstract contains an = sign that should probably be part of a mathematical formulat, please put dollar signs around the formula.\n" ;
         if( O3PO_Latex::strpos_outside_math_mode($abstract, '<') !== false )
@@ -618,6 +618,25 @@ abstract class O3PO_PublicationType {
 
         if ($doi_suffix_was_changed_on_last_save === "true")
             $validation_result .= "REVIEW: The doi suffix was set to ". $doi_suffix . ".\n";
+
+        $post_thumbnail_id = get_post_thumbnail_id( $post_id );
+        if(!empty($post_thumbnail_id)) {
+            $image_data = wp_get_attachment_image_src($post_thumbnail_id, "Full");
+            if(is_array($image_data))
+            {
+                $width = (int)($image_data[1]);
+                $height = (int)($image_data[2]);
+                if($width !== 2*$height)
+                    $validation_result .= "WARNING: The featured image aspect ration of " . $width . ":". $height . " is not 2:1.\n";
+                if($width < 400 or $height < 200)
+                    $validation_result .= "WARNING: The featured image is too small.\n";
+            }
+            else
+                $validation_result .= "WARNING: A featured image is set but the size could not be checked.\n";
+        }
+        else
+            $validation_result .= "WARNING: No featured image.\n";
+
         if ( empty($title) )
             $validation_result .= "ERROR: Title is empty.\n";
         else if ( preg_match('/[<>]/u', $title ) )
@@ -637,8 +656,12 @@ abstract class O3PO_PublicationType {
         for ($x = 0; $x < $number_authors; $x++) {
             if ( empty( $author_given_names[$x] ) )
                 $validation_result .= "WARNING: Author " . ($x+1) . " Given name is empty.\n" ;
+            elseif ( strpos($author_given_names[$x], ' ') !== false )
+                $validation_result .= "WARNING: Author " . ($x+1) . " Given name contains a space. If this is because of a middle name, make sure it is in the right box, depending on whether it is a second given name or surname.\n" ;
             if ( empty( $author_surnames[$x] ) )
                 $validation_result .= "ERROR: Author " . ($x+1) . " Surname is empty.\n" ;
+            elseif ( strpos($author_surnames[$x], ' ') !== false )
+                $validation_result .= "WARNING: Author " . ($x+1) . " Surname contains a space. If this is because of a middle name, make sure it is in the right box, depending on whether it is a second given name or surname.\n" ;
             if ( empty( $author_name_styles[$x] ) )
                 $validation_result .= "WARNING: Author " . ($x+1) . " name style is empty.\n" ;
             if ( !empty( $author_orcids[$x] ) )
