@@ -3046,6 +3046,9 @@ abstract class O3PO_PublicationType {
 
         global $post;
 
+        if(!is_object($post))
+            return $link;
+
         $post_id = $post->ID;
         $post_type = get_post_type($post_id);
 
