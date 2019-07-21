@@ -91,7 +91,7 @@ class O3PO_Buffer {
                                             'body' => $body,
                                             'timeout' => $timeout,
                                             'method'    => 'POST'
-                                                        ));
+                                                                          ) );
 
             if(is_wp_error($response))
                 return $response;
