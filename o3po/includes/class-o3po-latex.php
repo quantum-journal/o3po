@@ -659,7 +659,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
             if($num_arguments == 0)
             {
                 if(preg_match('#[^a-zA-Z]#u', mb_substr($macro_definition[2],1))!==1)
-                    $pattern .= '(?=[^a-zA-Z])\s*'; //If macro name is not a special character make sure it is not followed by letters to prevent expanding \e in things like \emph and eat following space characters
+                    $pattern .= '(?![a-zA-Z])\s*'; //If macro name is not a special character make sure it is not followed by letters to prevent expanding \e in things like \emph and eat following space characters
             }
             else
                 for($i=1; $i <= $num_arguments; $i++)
@@ -674,10 +674,10 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
             $pattern = '\\\\(?:newcommand|providecommand|def)[\s{]*' . $macroname . '(*SKIP)(*FAIL)|' . $pattern; //prevent expanion in the definition of the macro
             $pattern = '#' . $pattern . '#u';
             $replacement = str_replace('\$', '\\\\\$', $replacement);// espace $ in replacement as it has a special meaning
+            if(preg_match('#\\\\[a-zA-Z]+$#', $replacement)===1) #If replacement ends with an all letter latex macro add a space to allow correct expansion of that macro in following expansion rounds
+                $replacement .= " ";
 
             $patterns_and_replacements[] = array($pattern,$replacement);
-
-//        echo $macroname . "  :   ".  $pattern . ' => ' . $replacement . "\n\n";
         }
 
         $runs = 4;

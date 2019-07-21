@@ -488,6 +488,11 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                                                                                                     )],
 
 
+            [dirname(__FILE__) . '/resources/arxiv/1812.11437v3.tar.gz', "application/x-tar", array(
+                    "validation_result" => array('#Author and affiliations data updated from arxiv source#'),
+                    "affiliations" => array('#Instituto de Física, Universidad Nacional Autónoma de México, México, D.F., México#', '#Institute of Physics, Slovak Academy of Sciences, Dúbravská cesta 9, Bratislava 84511, Slovakia#', '#Faculty of Informatics, Masaryk University, Botanická 68a, 60200 Brno, Czech Republic#', '#Faculty of Physics, University of Vienna, 1090 Vienna, Austria#'),
+                    'num_dois' => 24,
+                                                                                                    )],
 
             ];
 
