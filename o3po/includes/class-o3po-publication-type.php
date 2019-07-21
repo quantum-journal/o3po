@@ -2116,14 +2116,16 @@ abstract class O3PO_PublicationType {
         echo '         <p>If you need to hand craft a bibliography you can start from the following template:</p>
 <textarea rows="10" style="width: 100%; overflow: scroll;">
 \begin{thebibliography}{99}
+
 \bibitem{Author2000}
   Name Surname, Name Surname, and Name Surname,
   Journal Name, 13 123-125 (2000),
-  \doi{10.22331/idonotexist}.}
+  \doi{10.22331/idonotexist}.
 
 \bibitem{Author2018}
   Name Surname and Name Surname,
-  \href{http://arxiv.org/abs/1804.00000}{arXiv:1804.00000}.}
+  \href{http://arxiv.org/abs/1804.00000}{arXiv:1804.00000}.
+
 \end{thebibliography}</textarea>';
 
         if(!empty($author_latex_macro_definitions))
