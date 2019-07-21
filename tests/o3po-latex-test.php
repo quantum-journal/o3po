@@ -165,6 +165,43 @@ class O3PO_LatexTest extends PHPUnit_Framework_TestCase
 
 
 
+
+    public function expand_latex_macros_provider() {
+
+        return [
+            array(
+                'definitions' => array(
+            ['\newcommand{\unam}', 'newcommand', '\unam', '', '', 'Universidad Nacional Aut\'onoma de M\'exico, M\'exico, D.F., M\'exico'],
+            ['\newcommand{\ifunam}', 'newcommand', '\ifunam', '', '', 'Instituto de F\'{\i}sica, \unam'],
+            ['\newcommand{\ifoo}', 'newcommand', '\ifoo', '', '', 'bar']
+                                       ),
+                'cases' => array(
+                    '\unamx' => '\unamx',
+                    '\unamx ' => '\unamx ',
+                    '\unam' => 'Universidad Nacional Aut\'onoma de M\'exico, M\'exico, D.F., M\'exico',
+                    '\unam ' => 'Universidad Nacional Aut\'onoma de M\'exico, M\'exico, D.F., M\'exico',
+                    '\ifunam' => 'Instituto de F\'{\i}sica, Universidad Nacional Aut\'onoma de M\'exico, M\'exico, D.F., M\'exico',
+                    '\ifunam abc' => 'Instituto de F\'{\i}sica, Universidad Nacional Aut\'onoma de M\'exico, M\'exico, D.F., M\'exicoabc',
+                    'abc \ifunam' => 'abc Instituto de F\'{\i}sica, Universidad Nacional Aut\'onoma de M\'exico, M\'exico, D.F., M\'exico',
+                    'abc \ifunam abc' => 'abc Instituto de F\'{\i}sica, Universidad Nacional Aut\'onoma de M\'exico, M\'exico, D.F., M\'exicoabc',
+                                 ),
+                  )
+                ];
+    }
+
+
+        /**
+         * @dataProvider expand_latex_macros_provider
+         */
+    public function test_expand_latex_macros($macro_definitions, $cases) {
+
+        foreach($cases as $input => $output)
+            $this->assertSame(O3PO_Latex::expand_latex_macros( $macro_definitions, $input ), $output);
+
+    }
+
+
+
     public function latex_to_utf8_outside_math_mode_test_case_provider() {
         return [
             ["\\'  \n a" , "á"],
