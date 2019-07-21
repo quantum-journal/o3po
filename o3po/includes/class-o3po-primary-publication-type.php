@@ -1068,8 +1068,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             $last_arxiv_pdf_attach_id = end($arxiv_pdf_attach_ids);
             if(!empty($last_arxiv_pdf_attach_id))
             {
-                $indexed = O3PO_Relevanssi::index_pdf_attachment_if_not_already_done( $attachment_post_id, $send_file = null );
-                static::update_post_meta($post_id, $post_type . '_indexed', $indexed);
+                O3PO_Relevanssi::index_pdf_attachment_if_not_already_done( $last_arxiv_pdf_attach_id, false );
             }
         }
 

@@ -42,7 +42,7 @@ class O3PO_Buffer {
          * @parm   array $media       An associative array of media to be attached to the update containing some of the following parameters: link, description, title, picture, photo, thumbnail.
          * @return boolean|WP_Error   Returns true on success or a WP_Error in case an error occurred.
          */
-    public static function create_update( $buffer_url, $access_token, $profile_ids, $text='', $media=array(), $attachment=true, $shorten=false, $now=false, $top=false, $timeout=10 ) {
+    public static function create_update( $buffer_url, $access_token, $profile_ids, $text='', $media=array(), $attachment=true, $shorten=false, $now=false, $top=false, $timeout=15 ) {
 
         try
         {

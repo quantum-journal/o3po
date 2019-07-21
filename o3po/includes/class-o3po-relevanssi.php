@@ -68,8 +68,8 @@ class O3PO_Relevanssi {
         {
             try
             {
-                relevanssi_index_pdf($last_arxiv_pdf_attach_id, false, $send_file);
-                return true;
+                $result = relevanssi_index_pdf($attachment_post_id, false, $send_file);
+                return is_array($result) and isset($result['success']) and $result['success'] === true;
             }
             catch (Exception $e) {
                 return false;
