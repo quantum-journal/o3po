@@ -598,7 +598,9 @@ abstract class O3PO_PublicationType {
             $validation_result .= "WARNING: The journal title (" . $journal . "), doi prefix (" . $doi_prefix . "), or publisher (" . $publisher . ") seem to be empty. Probably some some essential settings were not set. Please go to the settings page and configure them.\n";
 
         if( O3PO_Latex::preg_match_outside_math_mode('#\\\\(?!cite)#u', $abstract) !== 0)
-            $validation_result .= "WARNING: The abstract contains one or more backslashes that are not part of a \\\\cite command or inside a formula.\n" ;
+            $validation_result .= "WARNING: The abstract contains one or more backslashes that are neither part of a \\\\cite command nor inside of a formula.\n" ;
+        if( O3PO_Latex::preg_match_outside_math_mode('#\\\\cite#u', $abstract) !== 0)
+            $validation_result .= "INFO: In the abstract \\\\cite commands are replaced by links to the bibliography if it contains matching bibitems.\n" ;
         if( O3PO_Latex::strpos_outside_math_mode($abstract, '=') !== false )
             $validation_result .= "WARNING: The abstract contains an = sign that should probably be part of a mathematical formulat, please put dollar signs around the formula.\n" ;
         if( O3PO_Latex::strpos_outside_math_mode($abstract, '<') !== false )
