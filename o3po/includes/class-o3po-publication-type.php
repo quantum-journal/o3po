@@ -697,7 +697,7 @@ abstract class O3PO_PublicationType {
             if ( strpos($all_appearing_affiliations, (string)($x+1) ) === false)
                 $validation_result .= "ERROR: Affiliation " . ($x+1) . " is not associated to any authors.\n" ;
             if ( strpos($all_appearing_affiliations, (string)($x) ) !== false and strpos($all_appearing_affiliations, (string)($x+1) ) !== false and strpos($all_appearing_affiliations, (string)($x) ) > strpos($all_appearing_affiliations, (string)($x+1) ) )
-                $validation_result .= "ERROR: Affiliation " . ($x) . " appears after first appearance of " . ($x+1) . "\n" ;
+                $validation_result .= "WARNING: Affiliation " . ($x) . " is first referenced after the first reference to affiliation " . ($x+1) . ".\n" ;
         }
 
         if ( empty($corresponding_author_email) )
