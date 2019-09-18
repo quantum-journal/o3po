@@ -1404,15 +1404,18 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                                     if(!in_array($current_affiliation, $new_affiliations))
                                         $new_affiliations[] = $current_affiliation;
 
-                                    foreach($authors_since_last_affiliation as $author_number_since_last_affiliation)
+                                    if(empty($author_info[2][$x])) # if there is no optional argument add this affiliation to preceding authors
                                     {
-                                        if(empty($new_author_affiliations[$author_number_since_last_affiliation]))
-                                            $new_author_affiliations[$author_number_since_last_affiliation] = '';
-                                        else
-                                            $new_author_affiliations[$author_number_since_last_affiliation] .= ',';
-                                        $new_author_affiliations[$author_number_since_last_affiliation] .= (array_search($current_affiliation, $new_affiliations , true)+1);
+                                        foreach($authors_since_last_affiliation as $author_number_since_last_affiliation)
+                                        {
+                                            if(empty($new_author_affiliations[$author_number_since_last_affiliation]))
+                                                $new_author_affiliations[$author_number_since_last_affiliation] = '';
+                                            else
+                                                $new_author_affiliations[$author_number_since_last_affiliation] .= ',';
+                                            $new_author_affiliations[$author_number_since_last_affiliation] .= (array_search($current_affiliation, $new_affiliations , true)+1);
+                                        }
+                                        $was_affiliation_since_last_author = true;
                                     }
-                                    $was_affiliation_since_last_author = true;
                                 }
                                 elseif( $author_info[1][$x] === 'affil')
                                 {
