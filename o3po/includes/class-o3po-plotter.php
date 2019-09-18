@@ -33,6 +33,7 @@ class O3PO_Plotter {
          * @access public
          * @param  array $data       Array of data to be displayed as a histogram. Can be a dictionary, in which case the values will be interpreted as the data.
          * @param  float $x_delta    The width of the bins (in x direction) of the histogram.
+         * @param  int   $max_x_labels    The maximum number of labels on the x axis.
          * @param  int   $max_y_labels    The maximum number of labels on the y axis.
          * @param  string $max_width HTML length for the maximum width, below that takes 100% of the available space
          * @param  string $height    HTML length for the height of the plot
@@ -108,8 +109,23 @@ class O3PO_Plotter {
     }
 
 
-
+        /**
+         * Array of tags of referencable captions.
+         *
+         * @since 0.3.0
+         * @access private
+         * @var $caption_refs Array of tags of referencable captions.
+         */
     private $caption_refs;
+
+
+        /**
+         * Array of the most recent referencable caption by caption type.
+         *
+         * @since 0.3.0
+         * @access private
+         * @var $last_num Array of the most recent referencable caption by caption type.
+         */
     private $last_num;
 
         /**

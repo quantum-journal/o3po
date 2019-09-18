@@ -407,7 +407,13 @@ class O3PO {
 	}
 
 
-
+        /**
+         * Generate a journal config from a settings object.
+         *
+         * @since     0.3.0
+         * @param     O3PO_Settings  $settings  A settings object.
+         * @return    array    Journal config.
+         */
     public static function journal_config_from_settings( $settings ) {
 
         $journal_config_properties = O3PO_Journal::get_journal_config_properties();
