@@ -413,4 +413,23 @@ ab' , 'äb'],
         $this->assertSame($expected, O3PO_Latex::normalize_whitespace_and_linebreak_characters($input[0], $input[1], $input[2]));
     }
 
+
+    public function expand_cite_to_html_provider() {
+        return [
+            ["abc", "abc"],
+            ['\cite{CampisiRMP}', '[<a onclick="document.getElementById(\'references\').style.display=\'block\';" href="#CampisiRMP">2</a>]'],
+            ['\cite{CampisiRMP,GooldReview}', '[<a onclick="document.getElementById(\'references\').style.display=\'block\';" href="#CampisiRMP">2</a>,<a onclick="document.getElementById(\'references\').style.display=\'block\';" href="#GooldReview">3</a>]'],
+            ['\cite[Section 2]{GooldReview}', '[<a onclick="document.getElementById(\'references\').style.display=\'block\';" href="#GooldReview">3</a>, Section 2]'],
+                ];
+    }
+
+        /**
+         * @dataProvider expand_cite_to_html_provider
+         */
+    public function test_expand_cite_to_html( $input, $expected ) {
+
+        $bbl = file_get_contents(dirname( __FILE__ ) . "/resources/test_bibliography.bbl");
+        $this->assertSame($expected, O3PO_Latex::expand_cite_to_html($input, $bbl));
+    }
+
 }
