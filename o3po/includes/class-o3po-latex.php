@@ -421,7 +421,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 '\\\\(bf|tt|sf|sl)(series|family)[\s{]' => '',
                 '\\\\text(em|it|bf|tt|rm|sl|sc)[\s{]' => '',
                 '\\\\emph[\s{]' => '',
-                '\\\\(em|it|tt|bf|sl)(?![a-zA-Z])' => '',
+                '\\\\(em|it|tt|bf|sl)(|shape)(?![a-zA-Z])' => '',
                 '\\\\text(super|sub)script' => '',
                 '\\\\spaceskip=' => '',
                 '\\\\fontdimen[0-9]*' => '',
