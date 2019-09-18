@@ -1457,8 +1457,9 @@ class O3PO_Latex_Dictionary_Provider
          */
     public static function expand_cite_to_html( $text, $bbl ) {
 
-        preg_match_all('#\\\\cite\{\s*([^}]*)\s*\}#u', $text, $refs, PREG_PATTERN_ORDER);
-        if(empty($refs) or empty($refs[1]))
+        preg_match_all('#\\\\cite\s*(?:\[(?<optional>[^]]*)\]|)\s*\{\s*(?<items>[^}]*)\s*\}#u', $text, $refs, PREG_SET_ORDER);
+
+        if(empty($refs))
             return $text;
 
         $parsed_bbl = static::parse_bbl($bbl);
@@ -1467,16 +1468,18 @@ class O3PO_Latex_Dictionary_Provider
             $bibtex_key_dict[$entry['key']] = $n+1;
         }
 
-        foreach($refs[1] as $x => $ref)
+        foreach($refs as $ref)
         {
             $replacement = '[';
-            foreach(preg_split('#\s*,\s*#u', $ref, -1, PREG_SPLIT_NO_EMPTY) as $bibtex_key) {
+            foreach(preg_split('#\s*,\s*#u', $ref['items'], -1, PREG_SPLIT_NO_EMPTY) as $bibtex_key) {
                 $replacement .= '<a onclick="document.getElementById(\'references\').style.display=\'block\';" href="#' . $bibtex_key . '">' . ( isset($bibtex_key_dict[$bibtex_key]) ? $bibtex_key_dict[$bibtex_key] : '?' )  . '</a>,';
             }
+            if(!empty($ref['optional']))
+                $replacement .= ' ' . $ref['optional'];
             $replacement = rtrim($replacement,',');
             $replacement .= ']';
 
-            $text = preg_replace('#\\' . $refs[0][$x] . '#u', $replacement, $text);
+            $text = str_replace($ref[0], $replacement, $text);
         }
 
         return $text;
