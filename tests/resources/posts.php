@@ -89,7 +89,7 @@ $posts = array(
                ),
     5 => array(
         'post_type' => 'paper',
-        'post_content' => 'fake_post_content5',
+        'post_content' => '',#empty
         'paper_nonce' => 'fake_nonce',
         'thumbnail_id' => 2,
         'post_status' => 'private',

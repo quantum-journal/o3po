@@ -7,6 +7,7 @@ require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-journal.php');
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-primary-publication-type.php');
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-secondary-publication-type.php');
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-latex.php');
+require_once(dirname( __FILE__ ) . '/../o3po/admin/class-o3po-admin.php');
 
 
 class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
@@ -487,6 +488,11 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                                                                                                     )],
 
 
+            [dirname(__FILE__) . '/resources/arxiv/1812.11437v3.tar.gz', "application/x-tar", array(
+                    "validation_result" => array('#Author and affiliations data updated from arxiv source#'),
+                    "affiliations" => array('#Instituto de Física, Universidad Nacional Autónoma de México, México, D.F., México#', '#Institute of Physics, Slovak Academy of Sciences, Dúbravská cesta 9, Bratislava 84511, Slovakia#', '#Faculty of Informatics, Masaryk University, Botanická 68a, 60200 Brno, Czech Republic#', '#Faculty of Physics, University of Vienna, 1090 Vienna, Austria#'),
+                    'num_dois' => 24,
+                                                                                                    )],
 
             ];
 
@@ -1160,13 +1166,20 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
 
         /**
-         * @doesNotPerformAssertions
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
     public function test_add_custom_post_types_to_query( $primary_publication_type, $secondary_publication_type) {
-        $primary_publication_type->add_custom_post_types_to_query( new WP_Query() );
-        $secondary_publication_type->add_custom_post_types_to_query( new WP_Query() );
+        global $is_home;
+        $is_home = true;
+
+        $query = new WP_Query(null, array('is_main' => true));
+        $primary_publication_type->add_custom_post_types_to_query($query);
+        $this->assertEquals(array(null, 'post', $primary_publication_type->get_publication_type_name()), $query->get('post_type'));
+
+        $query = new WP_Query(null, array('is_main' => true));
+        $secondary_publication_type->add_custom_post_types_to_query($query);
+        $this->assertEquals(array(null, 'post', $secondary_publication_type->get_publication_type_name()), $query->get('post_type'));
     }
 
         /**
@@ -1325,6 +1338,73 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $this->assertNotFalse($result);
 
     }
+
+        /**
+         * @depends test_create_primary_publication_type
+         * @depends test_create_secondary_publication_type
+         */
+    function test_admin_render_meta_data_explorer( $primary_publication_type, $secondary_publication_type ) {
+        $admin = new O3PO_Admin( 'o3po', '0.3.0', 'O-3PO' );
+
+        #test without giving parameters
+        ob_start();
+        echo "<div>";
+        $admin->render_meta_data_explorer();
+        echo "</div>";
+        $output = ob_get_contents();
+        ob_end_clean();
+        $dom = new DOMDocument;
+        $result = $dom->loadHTML($output);
+        $this->assertNotFalse($result);
+
+        #test the meta-data tab for various combinations of parameters
+        global $_GET;
+        global $_POST;
+
+        $_GET['tab'] = 'meta-data';
+        $post_type_names = O3PO_PublicationType::get_active_publication_type_names();
+        $this->assertNotEmpty($post_type_names);
+
+        $output_formats = $admin->get_output_formats();
+        $this->assertNotEmpty($output_formats);
+
+        foreach($post_type_names as $post_type_name) {
+            foreach(array_merge($output_formats, ['a non-existing output format']) as $output_format) {
+                foreach(array_merge($admin->get_meta_data_fields(), ['title,number_authors,volume,doi']) as $meta_data_field_list) {
+
+                    $_GET['post_type'] = $post_type_name;
+                    $_GET['output_format'] = $output_format;
+                    $_GET['meta_data_field_list'] = $meta_data_field_list;
+
+                    ob_start();
+                    echo "<div>";
+                    $admin->render_meta_data_explorer();
+                    echo "</div>";
+                    $output = ob_get_contents();
+                    ob_end_clean();
+                    $dom = new DOMDocument;
+                    $result = $dom->loadHTML($output);
+                    $this->assertNotFalse($result);
+                }
+            }
+        }
+
+        #test the citation-metrics tab
+        $_GET['tab'] = 'citation-metrics';
+        $_POST['refresh'] = 'checked';
+        ob_start();
+        echo "<div>";
+        $admin->render_meta_data_explorer();
+        echo "</div>";
+        $output = ob_get_contents();
+        echo("\n".$output);
+        ob_end_clean();
+        $dom = new DOMDocument;
+        #$result = $dom->loadHTML($output);
+        #$this->assertNotFalse($result);
+    }
+
+
 
         /**
          * @doesNotPerformAssertions

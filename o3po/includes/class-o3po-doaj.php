@@ -33,7 +33,7 @@ class O3PO_Doaj {
          * @param     string  $doaj_api_key  The DOAJ API key
          * @return    array|WP_Error         The result of a wp_remote_post() call or a WP_Error in case of errors
          */
-    public static function remote_post_meta_data_to_doaj( $doaj_json, $doaj_api_url, $doaj_api_key ) {
+    public static function remote_post_meta_data_to_doaj( $doaj_json, $doaj_api_url, $doaj_api_key, $timeout=10 ) {
 
             // Construct the HTTP POST call
 		$headers = array( 'content-type' => 'application/json', 'accept' => 'application/json');
@@ -45,6 +45,7 @@ class O3PO_Doaj {
         $response = wp_remote_post( $doaj_api_url_with_key, array(
                                         'headers' => $headers,
                                         'body' => $payload,
+                                        'timeout' => $timeout,
                                         'method'    => 'POST'
                                                                   ) );
 

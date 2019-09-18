@@ -3952,7 +3952,7 @@ function esc_html( $text ) {
 	$safe_text = wp_check_invalid_utf8( $text );
 	$safe_text = _wp_specialchars( $safe_text, ENT_QUOTES );
 	/**
-	 * WARNING: IN THIS FAKE WP ENVIRONEMNT, WE MAY NOT BE REPRODUCING THE BEHAVIOR OF esc_html FULLY!!!
+	 * WARNING: IN THIS FAKED WP ENVIRONEMNT, WE MAY NOT BE REPRODUCING THE BEHAVIOR OF esc_html FULLY!!!
 	 *
 	 * Filters a string cleaned and escaped for output in HTML.
 	 *

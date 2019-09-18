@@ -63,7 +63,6 @@ class O3PO_Admin {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
         $this->plugin_pretty_name = $plugin_pretty_name;
-
 	}
 
         /**
@@ -186,30 +185,15 @@ class O3PO_Admin {
             else
                 $post_type = $post_type_names[0];
 
-            $publication_type_with_eprint = O3PO_PublicationType::get_active_publication_types($post_type_names[0]);
+            $output_formats = $this->get_output_formats();
 
-            $output_formats = [
-                'python'
-            ];
             if(isset( $_GET['output_format'] ))
                 $output_format = $_GET['output_format'];
             else
                 $output_format = $output_formats[0];
 
-            $meta_data_field_map = [
-                'doi' => array('callable' => array('O3PO_PublicationType', 'get_doi'), 'field_type' => 'string'),
-                'eprint' => array('callable' => array($publication_type_with_eprint, 'get_eprint'), 'field_type' => 'string'),
-                'get_arxiv_upload_date' => array('callable' => array($publication_type_with_eprint, 'get_arxiv_upload_date'), 'field_type' => 'string'),
-                'volume' => array('callable' => array('O3PO_PublicationType', 'get_volume'), 'field_type' => 'int'),
-                'page' => array('callable' => array('O3PO_PublicationType', 'get_page'), 'field_type' => 'int'),
-                'date_published' => array('callable' => array('O3PO_PublicationType', 'get_date_published'), 'field_type' => 'string'),
-                'formated_authors' => array('callable' => array('O3PO_PublicationType', 'get_formated_authors'), 'field_type' => 'string'),
-                'number_authors' => array('callable' => array('O3PO_PublicationType', 'get_number_authors'), 'field_type' => 'int'),
-                'title' => array('callable' => array('O3PO_PublicationType', 'get_title'), 'field_type' => 'string'),
-                'corresponding_author_email' => array('callable' => array('O3PO_PublicationType', 'get_corresponding_author_email'), 'field_type' => 'string'),
-            ];
             if(isset( $_GET['meta_data_field_list'] ))
-                $meta_data_field_list = preg_split('/\s*,\s*/', $_GET['meta_data_field_list'], -1, PREG_SPLIT_NO_EMPTY);
+                $meta_data_field_list = preg_split('/\s*,\s*/u', $_GET['meta_data_field_list'], -1, PREG_SPLIT_NO_EMPTY);
             else
                 $meta_data_field_list = ['formated_authors', 'number_authors', 'title', 'corresponding_author_email'];
 
@@ -230,7 +214,7 @@ class O3PO_Admin {
             $html .= '<label for="' . 'meta_data_field_list' . '">Comma separated list of meta-data elements to export:</label><br /><input style="width:100%;" type="text" name="' . 'meta_data_field_list" id="' . 'meta_data_field_list" placeholder="' . '' . '" value="' . implode($meta_data_field_list, ', ') . '" />';
             $html .= '<p>The available elements are (beware that nor all of them will work for all publication types!):</p>';
             $html .= '<ul>';
-            foreach(array_keys($meta_data_field_map) as $field)
+            foreach(array_keys($this->get_meta_data_field_map()) as $field)
                 $html .= '<li>' . esc_html($field) . '</li>';
             $html .= '</ul>';
             $html .= '<input id="submit" type="submit" value="Generate table"></form>';
@@ -256,12 +240,14 @@ class O3PO_Admin {
                         $out .= "[";
                         foreach($meta_data_field_list as $field)
                         {
-                            $value = call_user_func($meta_data_field_map[$field]['callable'], $post_id);
-                            if($meta_data_field_map[$field]['field_type'] === 'string')
+                            $value = call_user_func($this->get_meta_data_field_map()[$field]['callable'], $post_id);
+                            if(is_wp_error($value))
+                                $value = '"'.$value->get_error_message().'"';
+                            elseif($this->get_meta_data_field_map()[$field]['field_type'] === 'string')
                                 $value = '"' . $value . '"';
                             $out .= $value . ', ';
                         }
-                        $out = substr($out, 0, -2);
+                        $out = mb_substr($out, 0, -2);
                         $out .= "],\n";
                     }
                     else
@@ -390,6 +376,7 @@ class O3PO_Admin {
 
 ?>
         <script type="text/x-mathjax-config">
+        //<![CDATA[
         MathJax.Hub.Config({
               tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']], processEscapes: true},
                     extensions: ["toMathML.js"]
@@ -441,7 +428,7 @@ class O3PO_Admin {
                                         }
                                     }
                                     output = output.replace(/\r?\n|\r/g, '');//remove newlines
-                                    output = output.replace(/>\s*</g, '><');//remove superflous whitespace
+                                    output = output.replace(/>\s*[<]/g, '><');//remove superflous whitespace (Warning: we must use [<] here instead of just <, as </ is interpreted as the beginning of a html closing tag)
                                     output = output.replace(/<!--.*?-->/g, '');//remove commets
                                     output = output.replace(/<([\/]?)/g, '<$1mml:');//Add the mml: namespace because crossref wants it like that
                                     output = output.replace(/xmlns=/g, 'xmlns:mml=');
@@ -466,6 +453,7 @@ class O3PO_Admin {
                 PreviewAndMathML.update(anchor.value, anchor.id);
 	        }
 	    }
+        //]]>
         </script>
 <?php
 
@@ -491,6 +479,48 @@ class O3PO_Admin {
     public function get_plugin_pretty_name() {
 
         return $this->plugin_pretty_name;
+    }
+
+
+        /**
+         *
+         * @since 0.3.0
+         */
+    public function get_meta_data_explorer_tabs() {
+
+        return $meta_data_explorer_tabs;
+    }
+
+    public function get_output_formats() {
+
+        return [
+            'python'
+                ];
+    }
+
+    public function get_meta_data_field_map() {
+
+        $post_type_names = O3PO_PublicationType::get_active_publication_type_names();
+        $publication_type_with_eprint = O3PO_PublicationType::get_active_publication_types($post_type_names[0]);
+
+        return [
+            'doi' => array('callable' => array('O3PO_PublicationType', 'get_doi'), 'field_type' => 'string'),
+            'eprint' => array('callable' => array($publication_type_with_eprint, 'get_eprint'), 'field_type' => 'string'),
+            'get_arxiv_upload_date' => array('callable' => array($publication_type_with_eprint, 'get_arxiv_upload_date'), 'field_type' => 'string'),
+            'volume' => array('callable' => array('O3PO_PublicationType', 'get_volume'), 'field_type' => 'int'),
+            'page' => array('callable' => array('O3PO_PublicationType', 'get_page'), 'field_type' => 'int'),
+            'date_published' => array('callable' => array('O3PO_PublicationType', 'get_date_published'), 'field_type' => 'string'),
+            'formated_authors' => array('callable' => array('O3PO_PublicationType', 'get_formated_authors'), 'field_type' => 'string'),
+            'number_authors' => array('callable' => array('O3PO_PublicationType', 'get_number_authors'), 'field_type' => 'int'),
+            'title' => array('callable' => array('O3PO_PublicationType', 'get_title'), 'field_type' => 'string'),
+            'corresponding_author_email' => array('callable' => array('O3PO_PublicationType', 'get_corresponding_author_email'), 'field_type' => 'string'),
+                ];
+    }
+
+
+    public function get_meta_data_fields() {
+
+        return array_keys($this->get_meta_data_field_map());
     }
 
 }

@@ -92,7 +92,7 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   protected
          * @var      array     $settings_fields    Dictionary of all setting fields and their properties.
          */
-	protected $settings_field = array();
+	protected $settings_fields = array();
 
         /**
          * The dafaults for various options
@@ -121,6 +121,7 @@ class O3PO_Settings extends O3PO_Singleton {
         'arxiv_url_trackback_prefix' => 'http://arxiv.org/trackback/',
         'doi_url_prefix' => 'https://doi.org/',
         'scirate_url_abs_prefix' => 'https://scirate.com/arxiv/',
+        'arxiv_vanity_url_prefix' => 'https://www.arxiv-vanity.com/papers/',
         'orcid_url_prefix' => 'https://orcid.org/',
         'fermats_library_url_prefix' => 'https://fermatslibrary.com/s/',
         'doaj_api_url' => "https://doaj.org/api/v1/articles",
@@ -192,14 +193,15 @@ class O3PO_Settings extends O3PO_Singleton {
         'editor_in_chief' => "",
         'ads_api_search_url' => 'https://api.adsabs.harvard.edu/v1/search/query',
         'ads_api_token' => '',
-        'relevanssi_mime_types_to_exclude' => '#(application/.*(tar|gz|gzip)|text/.*tex)#',
+        'relevanssi_mime_types_to_exclude' => '#(application/.*(tar|gz|gzip)|text/.*tex)#u',
+        'relevanssi_index_pdfs_asynchronously' => "checked",
 
             /* The options below are currently not customizable.
              *
              * Warning: The name of the paper-single.php templare must match
              * the primary_publication_type_name!
              */
-        'cited_by_refresh_seconds' => 60*60*12,
+        'cited_by_refresh_seconds' => '43200',#=60*60*12
         'primary_publication_type_name' => 'paper',
         'primary_publication_type_name_plural' => 'papers',
         'secondary_publication_type_name' => 'view',
@@ -304,6 +306,7 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->add_settings_field('custom_search_page', 'Display search page notice', array( $this, 'render_custom_search_page_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
         $this->add_settings_field('page_template_for_publication_posts', 'Force page template', array( $this, 'render_page_template_for_publication_posts_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
         $this->add_settings_field('page_template_abstract_header', 'Show a heading for the abstract', array( $this, 'render_page_template_abstract_header_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
+        $this->add_settings_field('cited_by_refresh_seconds', 'Refresh cited-by time', array( $this, 'render_cited_by_refresh_seconds_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
         $this->add_settings_field('maintenance_mode', 'Maintenance mode', array( $this, 'render_maintenance_mode_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
 
         $this->add_settings_section('journal_settings', 'Journal', array( $this, 'render_journal_settings' ), $this->plugin_name . '-settings:journal_settings');
@@ -371,9 +374,15 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->add_settings_field('arxiv_paper_doi_feed_endpoint', 'Endpoint for the arXiv DOI feed', array( $this, 'render_arxiv_paper_doi_feed_endpoint_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings');
         $this->add_settings_field('arxiv_paper_doi_feed_days', 'Number of days in arXiv DOI feed', array( $this, 'render_arxiv_paper_doi_feed_days_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings');
 
+        $this->add_settings_section('buffer_settings', 'Buffer.com', array( $this, 'render_buffer_settings' ), $this->plugin_name . '-settings:buffer_settings');
+        $this->add_settings_field('buffer_api_url', 'Url of the buffer.com api', array( $this, 'render_buffer_api_url_setting' ), $this->plugin_name . '-settings:buffer_settings', 'buffer_settings');
+        $this->add_settings_field('buffer_access_token', 'Access token from buffer.com', array( $this, 'render_buffer_access_token_setting' ), $this->plugin_name . '-settings:buffer_settings', 'buffer_settings');
+        $this->add_settings_field('buffer_profile_ids', 'Profile IDs on buffer.com', array( $this, 'render_buffer_profile_ids_setting' ), $this->plugin_name . '-settings:buffer_settings', 'buffer_settings');
+
         $this->add_settings_section('other_service_settings', 'Other services', array( $this, 'render_other_service_settings' ), $this->plugin_name . '-settings:other_service_settings');
         $this->add_settings_field('doi_url_prefix', 'Url prefix for DOI resolution', array( $this, 'render_doi_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('scirate_url_abs_prefix', 'Url prefix for scirate pages', array( $this, 'render_scirate_url_abs_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
+        $this->add_settings_field('arxiv_vanity_url_prefix', 'Url prefix for arXiv Vanity pages', array( $this, 'render_arxiv_vanity_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('scholastica_manuscripts_url', 'Url of Scholastica manuscripts page', array( $this, 'render_scholastica_manuscripts_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('orcid_url_prefix', 'Orcid url prefix', array( $this, 'render_orcid_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('fermats_library_url_prefix', 'Url prefix for Fermats Library', array( $this, 'render_fermats_library_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
@@ -381,13 +390,11 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->add_settings_field('mathjax_url', 'MathJax url', array( $this, 'render_mathjax_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('social_media_thumbnail_url', 'Url of default thumbnail for social media', array( $this, 'render_social_media_thumbnail_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
         $this->add_settings_field('facebook_app_id', 'Facebook app_id', array( $this, 'render_facebook_app_id_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
-        $this->add_settings_field('buffer_api_url', 'Url of the buffer.com api', array( $this, 'render_buffer_api_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
-        $this->add_settings_field('buffer_access_token', 'Access token from buffer.com', array( $this, 'render_buffer_access_token_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
-        $this->add_settings_field('buffer_profile_ids', 'Profile IDs on buffer.com', array( $this, 'render_buffer_profile_ids_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
-
 
         $this->add_settings_section('other_plugins_settings', 'Other plugins', array( $this, 'render_other_plugins_settings' ), $this->plugin_name . '-settings:other_plugins_settings');
         $this->add_settings_field('relevanssi_mime_types_to_exclude', 'Relevanssi mime types to exclude', array( $this, 'render_relevanssi_mime_types_to_exclude_setting' ), $this->plugin_name . '-settings:other_plugins_settings', 'other_plugins_settings');
+        $this->add_settings_field('relevanssi_index_pdfs_asynchronously', 'Index PDFs asynchronously', array( $this, 'render_relevanssi_index_pdfs_asynchronously_setting' ), $this->plugin_name . '-settings:other_plugins_settings', 'other_plugins_settings');
+
     }
 
         /**
@@ -483,6 +490,18 @@ class O3PO_Settings extends O3PO_Singleton {
     public function render_arxiv_settings() {
 
         echo '<p>Configure how ' . $this->plugin_name . ' interacts with the <a href="https://arxiv.org/">arXiv</a>.</p>';
+
+    }
+
+        /**
+         * Render the head of the Buffer.com settings part.
+         *
+         * @since    0.3.0
+         * @access   public
+         */
+    public function render_buffer_settings() {
+
+        echo '<p>Configure how ' . $this->plugin_name . ' interacts with <a href="https://arxiv.org/">Buffer.com</a>.</p>';
 
     }
 
@@ -583,6 +602,20 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->render_checkbox_setting('page_template_for_publication_posts', 'Show publication posts with the page template instead of the default post template of your theme. Some themes include information such as "Posted on ... by ..." on the post template, which may be inappropriate for publication posts.');
 
     }
+
+        /**
+         * Render the cited by refresh seconds field
+         *
+         * @sinde 0.3.0
+         * @access public
+         */
+    public function render_cited_by_refresh_seconds_setting() {
+
+        $this->render_setting('cited_by_refresh_seconds');
+        echo '<p>(Refresh the cited by data on publication pages at most every this many seconds. This affects how cited-by data is retrieved from Crossref and ADS.)</p>';
+
+    }
+
 
         /**
          * Render the setting to enabled maintenance mode.
@@ -1306,6 +1339,20 @@ class O3PO_Settings extends O3PO_Singleton {
 
     }
 
+
+        /**
+         * Render the setting for the arXiv vanity URL prefix.
+         *
+         * @since    0.3.0
+         * @access   public
+         */
+    public function render_arxiv_vanity_url_prefix_setting() {
+
+        $this->render_setting('arxiv_vanity_url_prefix');
+        echo '<p>(The url prefix of arXiv vanity pages. If left blank no link to arXiv Vanity is put on the publication pages.)</p>';
+
+    }
+
         /**
          * Render the setting for the ORCID URL prefix.
          *
@@ -1447,8 +1494,28 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_relevanssi_mime_types_to_exclude_setting() {
 
+        if(!function_exists('relevanssi_index_pdf'))
+            echo "<p>Please install relevanssi premium</p>";
+        else
+            echo "<p>Relevanssi premium installed</p>";
+
+        echo("<p>TODO: Verify that indexing actually works!</p>");
+
         $this->render_setting('relevanssi_mime_types_to_exclude');
         echo '<p>(Relevanssi Premium has the ability to index the content of attachments and thereby, e.g., enabled full text search in PDFs attached to publications. It however, by default, will index all attachment types and this is usually not desirable for the arXiv source files in .tex or .tar.gz format. Through this setting, mime types can be excluded from indexing by providing a php regular expression. All attachment posts whose mime type matches that regular expression are excluded from indexing via the <a href="https://www.relevanssi.com/knowledge-base/controlling-attachment-types-index/">relevanssi_do_not_index</a> filter. If left empty all post attachments are indexed if that feature is enable in Relevanssi Premium.)</p>';
+
+    }
+
+        /**
+         * Render the setting for whether to index pdf asynchronously.
+         *
+         * @since    0.3.0
+         * @access   public
+         */
+    public function render_relevanssi_index_pdfs_asynchronously_setting() {
+
+        $this->render_checkbox_setting('relevanssi_index_pdfs_asynchronously', 'Index pdfs after full text first requested via pdf endpoint');
+        echo '<p>(Relevanssi Premium has the ability to index the content of attachments and thereby, e.g., enabled full text search in PDFs attached to publications. The indexing however happens on another server and is thus slow when done during the publishing of a publication post. Checking this box allows to do the indexing instead in the background after the full text pdf has first been requested via the pdf endpoint.)</p>';
 
     }
 
@@ -1478,7 +1545,7 @@ class O3PO_Settings extends O3PO_Singleton {
 
         $option = $this->get_plugin_option($id);
 
-        echo '<textarea class="regular-text ltr o3po-setting o3po-setting-text-multi-line" id="' . $this->plugin_name . '-settings-' . $id . '" name="' . $this->plugin_name . '-settings[' . $id . ']" rows="' . (substr_count( $option, "\n" )+1) . '">' . esc_html($option) . '</textarea>';
+        echo '<textarea class="regular-text ltr o3po-setting o3po-setting-text-multi-line" id="' . $this->plugin_name . '-settings-' . $id . '" name="' . $this->plugin_name . '-settings[' . $id . ']" rows="' . (mb_substr_count( $option, "\n" )+1) . '">' . esc_html($option) . '</textarea>';
 
     }
 
@@ -1601,6 +1668,7 @@ class O3PO_Settings extends O3PO_Singleton {
                 'doi_url_prefix' => 'validate_url',
                 'scholastica_manuscripts_url' => 'validate_url',
                 'scirate_url_abs_prefix' => 'validate_url',
+                'arxiv_vanity_url_prefix' => 'validate_url',
                 'orcid_url_prefix' => 'validate_url',
                 'fermats_library_url_prefix' => 'validate_url',
                 'fermats_library_email' => 'trim_settings_field',
@@ -1633,8 +1701,12 @@ class O3PO_Settings extends O3PO_Singleton {
                 'fermats_library_notification_subject_template' => 'trim_settings_field',
                 'fermats_library_notification_body_template' => 'leave_unchaged',
                 'relevanssi_mime_types_to_exclude' => 'trim_settings_field',
+                'relevanssi_index_pdfs_asynchronously' => 'checked_or_unchecked',
+                'cited_by_refresh_seconds' => 'validate_positive_integer',
 
-                'cited_by_refresh_seconds' => null,
+                    /* The following settings cannot be customized by the user.
+                     * validation method null ensures that these settings are never
+                     * updated when user settings are saved and validated. */
                 'primary_publication_type_name' => null,
                 'primary_publication_type_name_plural' => null,
                 'secondary_publication_type_name' => null,
@@ -1655,7 +1727,7 @@ class O3PO_Settings extends O3PO_Singleton {
     public function validate_doi_prefix( $field, $doi_prefix ) {
 
         $doi_prefix = trim($doi_prefix);
-        if(preg_match('/^[0-9.-]*$/', $doi_prefix))
+        if(preg_match('/^[0-9.-]*$/u', $doi_prefix))
             return $doi_prefix;
 
         add_settings_error( $field, 'illegal-doi-prefix', "The DOI prefix in '" . $this->settings_fields[$field]['title'] . "' may consist only of numbers 0-9, dot . and the dash - character. Field cleared.", 'error');
@@ -1673,7 +1745,7 @@ class O3PO_Settings extends O3PO_Singleton {
     public function validate_doi_suffix( $field, $doi_suffix ) {
 
         $doi_suffix = trim($doi_suffix);
-        if(preg_match('/^[a-zA-Z0-9.-]*$/', $doi_suffix))
+        if(preg_match('/^[a-zA-Z0-9.-]*$/u', $doi_suffix))
             return $doi_suffix;
 
         add_settings_error( $field, 'illegal-doi-suffix', "The DOI suffix in '" . $this->settings_fields[$field]['title'] . "' may consist only of lower and upper case English alphabet letters a-z and A-Z, numbers 0-9, dot . and the dash - character. Field cleared.", 'error');
@@ -1691,7 +1763,7 @@ class O3PO_Settings extends O3PO_Singleton {
     public function validate_first_volume_year( $field, $first_volume_year ) {
 
         $first_volume_year = trim($first_volume_year);
-        if(preg_match('/^[0-9]{4}$/', $first_volume_year)) //this will cause a year 10000 bug
+        if(preg_match('/^[0-9]{4}$/u', $first_volume_year)) //this will cause a year 10000 bug
             return $first_volume_year;
 
         add_settings_error( $field, 'illegal-first-volume-year', "The year in '" . $this->settings_fields[$field]['title'] . "' must consist of exactly four digits in the range 0-9. Field cleared.", 'error');
@@ -1753,7 +1825,7 @@ class O3PO_Settings extends O3PO_Singleton {
         try
         {
             $input = trim($input);
-            $array = preg_split('#,#', $input, Null, PREG_SPLIT_NO_EMPTY);
+            $array = preg_split('#,#u', $input, Null, PREG_SPLIT_NO_EMPTY);
             foreach($array as $key => $field)
                 $array[$key] = trim($field);
 
@@ -1778,7 +1850,7 @@ class O3PO_Settings extends O3PO_Singleton {
     public function validate_two_letter_country_code( $field, $input ) {
 
         $input = trim($input);
-        if(preg_match('/^[A-Z]{2}$/', $input))
+        if(preg_match('/^[A-Z]{2}$/u', $input))
             return $input;
 
         add_settings_error( $field, 'url-validated', "The two letter country code in '" . $this->settings_fields[$field]['title'] . "' was malformed. Field cleared.", 'error');
@@ -1796,7 +1868,7 @@ class O3PO_Settings extends O3PO_Singleton {
     public function validate_positive_integer( $field, $input ) {
 
         $input = trim($input);
-        if(preg_match('/^[1-9][0-9]*$/', $input))
+        if(preg_match('/^[1-9][0-9]*$/u', $input))
             return $input;
 
         add_settings_error( $field, 'not-a-positive-integer', "The input to the field '" . $this->settings_fields[$field]['title'] . "' was not a positive integer without leading zeros.", 'error');
@@ -1999,7 +2071,6 @@ class O3PO_Settings extends O3PO_Singleton {
 
         add_settings_field($id, $title, $callback, $page, $section, $args);
         $this->settings_fields[$id] = array('title' => $title, 'callback' => $callback, 'page' => $page, 'section' => $section, 'args' => $args);
-
     }
 
 

@@ -8,7 +8,7 @@
 * Donate link: https://quantum-journal.org/donate/
 * Tags: publishing, open-access
 * Requires at least: 4.0.1
-* Tested up to: 5.2.0
+* Tested up to: 5.2.1
 * Requires PHP: 5.6
 * Stable tag: 1.0.0
 * License: GPLv3 or later
@@ -28,22 +28,22 @@ DO NOT USE THIS ON A PRODUCTION SITE!
 
 O-3PO offers the following features:
 
-* Automatic download of TeX source code and PDF from the arXiv
+* Automatic download of LaTeX source code and PDF from the arXiv
 * Automatic extraction of meta-data
 * Automagic interpretation of references and DOI links
-* Interfaces with [Crossref REST API](https://api.crossref.org/)
-* Interfaces with [DOAJ API](https://doaj.org/api/v1/docs)
-* Interfaces with [arXiv](https://arxiv.org/help/api/index)
-* Interfaces with [CLOCKSS](https://www.clockss.org/clockss/Home)
-* Interfaces with [Buffer.com](https://buffer.com/app)
-* Interfaces with [Fermat's library](https://fermatslibrary.com/)
-* Interfaces with [NASA ads](https://ui.adsabs.harvard.edu/)
-* Customizable email templates for author communication
+* DOI registration at and cited-by retrieval from [Crossref REST API](https://api.crossref.org/)
+* Meta-data deposition at the [DOAJ API](https://doaj.org/api/v1/docs)
+* Article source and pdf download as well as meta-data extraction from, and journal reference feed for the [arXiv](https://arxiv.org/help/api/index)
+* Meta-data and full text deposition in the [CLOCKSS](https://www.clockss.org/clockss/Home) archive
+* Posting of updates on publications to the [Buffer.com](https://buffer.com/app) queue
+* Linking to [Fermat's library](https://fermatslibrary.com/)
+* Cited-by information retrieval from [NASA ads](https://ui.adsabs.harvard.edu/)
+* Merging of cited-by information from multiple sources and bibliometrics calculation
+* Automatic and customizable emails for author communication
 * Search centered navigation of articles
 * Integration of publications in to RSS feed
-* Brows journal content by volume
-* Web-statement endpoint
-* Collection and display of cited-by data as well as computation of citation statistics
+* Presentation of journal content by volume
+* Web-statement endpoint for the verification of licenses
 
 ## Works best with
 

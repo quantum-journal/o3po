@@ -88,7 +88,9 @@ function esc_html_filter( $text ) {
 add_filter( 'esc_html', 'esc_html_filter' );
 
 
-function is_admin() {}
+function is_admin() {
+    return false;
+}
 
 function get_site_url() {
 
@@ -191,6 +193,15 @@ function get_post_type( $post_id ) {
         throw new Exception("Post with id=" . $post_id . " has no post_type.");
 
     return $posts[$post_id]['post_type'];
+}
+
+function get_post_field( $field, $post_id ) {
+    global $posts;
+
+    if(!isset($posts[$post_id][$field]))
+        throw new Exception("Post with id=" . $post_id . " has no field " . $field . ".");
+
+    return $posts[$post_id][$field];
 }
 
 function get_post_meta( $post_id, $key, $single = false ) {
@@ -333,6 +344,10 @@ class WP_Query
         return $this->query[$key];
     }
 
+    function set($key, $val) {
+        $this->query[$key] = $val;
+    }
+
     function have_posts() {
         return count($this->posts) > 0;
     }
@@ -363,6 +378,20 @@ class WP_Query
         return isset($this->query_vars['is_main']) ? $this->query_vars['is_main'] : false;
     }
 }
+
+function is_post_type_archive( $archive_name ) {
+    global $wp_query;
+
+    return isset($wp_query->query_vars['post_type']) and $wp_query->query_vars['post_type'] == $archive_name;
+}
+
+
+function is_category( $category_name ) {
+    global $wp_query;
+
+    return isset($wp_query->query_vars['category']) and $wp_query->query_vars['category'] == $category_name;
+}
+
 
 $wp_query = new WP_Query();
 function set_global_query( $query ) {
@@ -487,10 +516,17 @@ function get_post_thumbnail_id( $post_id ) {
 function wp_get_attachment_image_src( $post_id ) {
     global $posts;
 
+    if($post_id === 8356865345) #a special id we have set in get_theme_mod()
+        return 'https://some.site/logog.jpg';
+
     if(!isset($posts[$post_id]['attachment_image_src']))
         throw new Exception("Post with id=" . $post_id . " has no attachment_image_src.");
 
     return $posts[$post_id]['attachment_image_src'];
+}
+
+function wp_get_attachment_image( $post_id ) {
+    return '<img src="'.wp_get_attachment_image_src( $post_id ).'">';
 }
 
 function get_post_status( $ID = '' ) {
@@ -674,10 +710,18 @@ function wp_reset_postdata() {
     $post_data = array();
 }
 
-function get_the_title( $post_id ) {
+function get_the_title( $post_id=NULL ) {
     global $posts;
 
+    if($post_id === NUll)
+        $post_id = get_the_ID();
+
     return $posts[$post_id]['post_title'];
+}
+
+function get_the_excerpt( $post_id = NUll ) {
+
+    return mb_substr(get_the_content($post_id), 0, 100);
 }
 
 function the_content() {
@@ -700,16 +744,20 @@ function get_comments_number( $post_id=null ) {
 }
 
 
-function get_the_content() {
+function get_the_content($post_id=NULL) {
     global $posts;
 
-    $post_id = get_the_ID();
+    if($post_id===NULL)
+        $post_id = get_the_ID();
 
     return $posts[$post_id]['post_content'];
 }
 
-function get_permalink( $post_id ) {
+function get_permalink( $post_id=NULL ) {
     global $posts;
+
+   if($post_id === NUll)
+        $post_id = get_the_ID();
 
     return $posts[$post_id]['permalink'];
 }
@@ -755,7 +803,7 @@ function wp_remote_get( $url, $args=array() ) {
         'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:1806.02820&fl=citation' => dirname(__FILE__) . '/ads/1806.02820.json',
         'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2018arXiv180601279B+OR+bibcode:2018arXiv181009469B+OR+bibcode:2018arXiv181205117B&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => dirname(__FILE__) . '/ads/1806.02820_citation.json',
         'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:1610.01808&fl=citation' => dirname(__FILE__) . '/ads/1610.01808.json',
-        'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2015arXiv151207892E+OR+bibcode:2016arXiv160800263B+OR+bibcode:2016arXiv161003632F+OR+bibcode:2016arXiv161201652L+OR+bibcode:2016arXiv161205903A+OR+bibcode:2017arXiv170309568K+OR+bibcode:2017arXiv170401998M+OR+bibcode:2017arXiv170500686N+OR+bibcode:2017arXiv170608913Y+OR+bibcode:2017arXiv170801875B+OR+bibcode:2017arXiv170903489H+OR+bibcode:2017arXiv171205384B+OR+bibcode:2017NatCo...8.1572A+OR+bibcode:2017npjQI...3...15L+OR+bibcode:2017PhRvA..95d2336M+OR+bibcode:2017PhRvL.118d0502G+OR+bibcode:2018arXiv180306775B+OR+bibcode:2018arXiv180603200Y+OR+bibcode:2018arXiv180906957H+OR+bibcode:2018QS&T....3b5004V+OR+bibcode:2018Sci...360..195N+OR+bibcode:2018Sci...362..308B&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => dirname(__FILE__) . '/ads/1610.01808_citations.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2015arXiv151207892E+OR+bibcode:2016arXiv160800263B+OR+bibcode:2016arXiv161003632F+OR+bibcode:2016arXiv161201652L+OR+bibcode:2016arXiv161205903A+OR+bibcode:2017arXiv170309568K+OR+bibcode:2017arXiv170401998M+OR+bibcode:2017arXiv170500686N+OR+bibcode:2017arXiv170608913Y+OR+bibcode:2017arXiv170801875B+OR+bibcode:2017arXiv170903489H+OR+bibcode:2017arXiv171205384B+OR+bibcode:2017NatCo...8.1572A+OR+bibcode:2017npjQI...3...15L+OR+bibcode:2017PhRvA..95d2336M+OR+bibcode:2017PhRvL.118d0502G+OR+bibcode:2018arXiv180306775B+OR+bibcode:2018arXiv180603200Y+OR+bibcode:2018arXiv180906957H+OR+bibcode:2018QS%26T....3b5004V+OR+bibcode:2018Sci...360..195N+OR+bibcode:2018Sci...362..308B&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => dirname(__FILE__) . '/ads/1610.01808_citations.json',
         'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0000.0001&fl=citation' => dirname(__FILE__) . '/ads/0000.0001.json',
         'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0000.0002&fl=citation' => dirname(__FILE__) . '/ads/0000.0002.json',
         'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0000.0003&fl=citation' => array('headers' => array('x-ratelimit-remaining' => 0), 'body' => dirname(__FILE__) . '/ads/0000.0003.json'),
@@ -777,6 +825,9 @@ function wp_remote_get( $url, $args=array() ) {
         'https://api.bufferapp.com/1/profiles.json?access_token=1%2F345792aa62c_7' => dirname(__FILE__) . '/buffer/profile_ids.json',
         'https://api.bufferapp.com/1/profiles.json?access_token=1%2F345792aa62c_9' => dirname(__FILE__) . '/buffer/profile_ids_error.json',
         'https://api.bufferapp.com/1/profiles.json?access_token=1%2F345792aa62c_10' => array('Just some object that cannot tbe json_decoded and therefor leads to an error'),
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:1801.00862&fl=citation' => dirname(__FILE__) . '/ads/1801.00862.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2016arXiv161003183R+OR+bibcode:2017arXiv170207688W+OR+bibcode:2017arXiv171105395J+OR+bibcode:2017arXiv171201356C+OR+bibcode:2017arXiv171209762K+OR+bibcode:2018arXiv180201157L+OR+bibcode:2018arXiv180304167V+OR+bibcode:2018arXiv180307128S+OR+bibcode:2018arXiv180309954F+OR+bibcode:2018arXiv180404168L+OR+bibcode:2018arXiv180405404R+OR+bibcode:2018arXiv180410368H+OR+bibcode:2018arXiv180411084A+OR+bibcode:2018arXiv180501450C+OR+bibcode:2018arXiv180504492K+OR+bibcode:2018arXiv180508138H+OR+bibcode:2018arXiv180510224T+OR+bibcode:2018arXiv180511089D+OR+bibcode:2018arXiv180601861S+OR+bibcode:2018arXiv180602145F+OR+bibcode:2018arXiv180602287G+OR+bibcode:2018arXiv180604344O+OR+bibcode:2018arXiv180607241P+OR+bibcode:2018arXiv180608321W+OR+bibcode:2018arXiv180609729V+OR+bibcode:2018arXiv180700429L+OR+bibcode:2018arXiv180700792A+OR+bibcode:2018arXiv180704564B+OR+bibcode:2018arXiv180704792K+OR+bibcode:2018arXiv180704973C+OR+bibcode:2018arXiv180709228A+OR+bibcode:2018arXiv180800128B+OR+bibcode:2018arXiv180802449F+OR+bibcode:2018arXiv180803623E+OR+bibcode:2018arXiv180805661Z+OR+bibcode:2018arXiv180807375C+OR+bibcode:2018arXiv180808927A+OR+bibcode:2018arXiv180810402M+OR+bibcode:2018arXiv180901302D+OR+bibcode:2018arXiv180902573L+OR+bibcode:2018arXiv180904485N+OR+bibcode:2018arXiv181000193S+OR+bibcode:2018arXiv181003176G+OR+bibcode:2018arXiv181004681M+OR+bibcode:2018arXiv181007765S+OR+bibcode:2018arXiv181010584C+OR+bibcode:2018arXiv181011922D+OR+bibcode:2018arXiv181012484S+OR+bibcode:2018arXiv181012745H+OR+bibcode:2018arXiv181013411F+OR+bibcode:2018arXiv181103629H+OR+bibcode:2018arXiv181104636A+OR+bibcode:2018arXiv181105675B+OR+bibcode:2018arXiv181110085P+OR+bibcode:2018arXiv181202746B+OR+bibcode:2018arXiv181204735R+OR+bibcode:2018arXiv181206323G+OR+bibcode:2018arXiv181208190J+OR+bibcode:2018arXiv181208767Y+OR+bibcode:2018arXiv181208778E+OR+bibcode:2018arXiv181209976C+OR+bibcode:2018NatSR...8.5445K+OR+bibcode:2018NatSR...814304M+OR+bibcode:2018Natur.560..456K+OR+bibcode:2018npjQI...4...65G+OR+bibcode:2018PhRvA..97c2346A+OR+bibcode:2018PhRvA..97f2104M+OR+bibcode:2018PhRvA..97f2113S+OR+bibcode:2018PhRvA..98a2322A+OR+bibcode:2018PhRvA..98a2324D+OR+bibcode:2018PhRvA..98b2322B+OR+bibcode:2018PhRvL.121d0502L+OR+bibcode:2018PhRvP...9d4036J+OR+bibcode:2018PhRvX...8c1016A+OR+bibcode:2018PhyOJ..11...51G+OR+bibcode:2018PLoSO..1306704M+OR+bibcode:2018QS%26T....3d5002S+OR+bibcode:2019arXiv190100015M+OR+bibcode:2019arXiv190100848R+OR+bibcode:2019arXiv190102406S+OR+bibcode:2019arXiv190103322S+OR+bibcode:2019arXiv190103431L+OR+bibcode:2019arXiv190105003C+OR+bibcode:2019arXiv190105374H+OR+bibcode:2019arXiv190105895D+OR+bibcode:2019arXiv190109070R+OR+bibcode:2019arXiv190109988K+OR+bibcode:2019arXiv190200991S+OR+bibcode:2019arXiv190202417P+OR+bibcode:2019arXiv190202663L+OR+bibcode:2019arXiv190204971T+OR+bibcode:2019arXiv190206749C+OR+bibcode:2019arXiv190206888S+OR+bibcode:2019arXiv190208324B+OR+bibcode:2019arXiv190209483N+OR+bibcode:2019arXiv190210171N+OR+bibcode:2019arXiv190302964B+OR+bibcode:2019arXiv190303276M+OR+bibcode:2019arXiv190304500B+OR+bibcode:2019arXiv190305786M+OR+bibcode:2019arXiv190309575B+OR+bibcode:2019arXiv190310963N+OR+bibcode:2019arXiv190400102P+OR+bibcode:2019arXiv190402013S+OR+bibcode:2019arXiv190402214C+OR+bibcode:2019arXiv190402276L+OR+bibcode:2019arXiv190404323A+OR+bibcode:2019arXiv190409602D+OR+bibcode:2019arXiv190411528H+OR+bibcode:2019arXiv190411590L+OR+bibcode:2019arXiv190411935C+OR+bibcode:2019arXiv190412139I+OR+bibcode:2019arXiv190505118O+OR+bibcode:2019arXiv190505275Z+OR+bibcode:2019arXiv190507240R+OR+bibcode:2019arXiv190508768S+OR+bibcode:2019arXiv190508821W+OR+bibcode:2019arXiv190511349M+OR+bibcode:2019arXiv190511458S+OR+bibcode:2019arXiv190512700C+OR+bibcode:2019arXiv190513107B+OR+bibcode:2019arXiv190513311C+OR+bibcode:2019arXiv190600476S+OR+bibcode:2019arXiv190606343S+OR+bibcode:2019Natur.567..209H&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => dirname(__FILE__) . '/ads/1801.00862_citations_1.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2019Natur.567..491K+OR+bibcode:2019npjQI...5...11O+OR+bibcode:2019QS%26T....4bLT03A+OR+bibcode:2019QuIP...18..198C+OR+bibcode:2019SciA....5.2761H+OR+bibcode:2019SPIE11022E..2VZ&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => dirname(__FILE__) . '/ads/1801.00862_citations_2.json',
                           );
 
     if(!empty($local_file_urls[$url]))
@@ -872,20 +923,17 @@ function is_home() {
     return $is_home;
 }
 
-$is_category = false;
-function is_category() {
-    global $is_category;
-    return $is_category;
-}
-
-
 function get_header() {
     echo '<!DOCTYPE html>
 <html lang="en-GB">
 <head><title>fake title</title></head><body>';
 }
 
-function get_theme_mod() {
+function get_theme_mod( $part=null ) {
+
+    if($part === 'custom_logo')
+        return 8356865345;#a special id we recognize in wp_get_attachment_image()
+
     return "";
 }
 
@@ -1106,4 +1154,59 @@ function get_bloginfo( $url ) {
 
 function add_options_page($a, $b, $c, $d) {
 
+}
+
+function wp_enqueue_style( $handle, $src = '', $deps = array(), $ver = false, $media = 'all' ) {
+
+}
+
+function plugin_dir_url( $file ) {
+    return(dirname( __FILE__ ) . '/../../');
+}
+
+function add_menu_page( $page_title, $menu_title, $capability, $menu_slug, $function = '', $icon_url = '', $position = null ) {}
+
+class WP_Theme
+{
+    private $name;
+
+    public function __construct( $name ) {
+        $this->name = $name;
+    }
+
+    public function get($field) {
+
+        if($field === 'Name')
+            return $this->name;
+        else
+            throw new Exception('Not implemented');
+    }
+
+}
+
+function wp_get_theme( $stylesheet=null, $theme_root=null ) {
+
+    return new WP_Theme('OnePress');
+}
+
+$is_single = false;
+
+function is_single() {
+    global $is_single;
+    return $is_single;
+}
+
+function home_url( $path=null, $scheme=null ) {
+    if($scheme === null)
+        $scheme = 'https';
+
+    return $scheme . '://some.site' . $path;
+}
+
+function __( $input ) {
+    return $input;
+}
+
+function _x( $input ) {
+    return $input;
 }

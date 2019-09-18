@@ -42,7 +42,7 @@ class O3PO_Buffer {
          * @parm   array $media       An associative array of media to be attached to the update containing some of the following parameters: link, description, title, picture, photo, thumbnail.
          * @return boolean|WP_Error   Returns true on success or a WP_Error in case an error occurred.
          */
-    public static function create_update( $buffer_url, $access_token, $profile_ids, $text='', $media=array(), $attachment=true, $shorten=false, $now=false, $top=false ) {
+    public static function create_update( $buffer_url, $access_token, $profile_ids, $text='', $media=array(), $attachment=true, $shorten=false, $now=false, $top=false, $timeout=15 ) {
 
         try
         {
@@ -86,30 +86,12 @@ class O3PO_Buffer {
             $body['now'] = ( $now ? 'true' : 'false' );
             $body['top'] = ( $top ? 'true' : 'false' );
 
-/*             $request = $buffer_api_url_with_token; */
-/*             foreach($profile_ids as $profile_id) */
-/*                 $request .= '&profile_ids[]=' . urlencode($profile_id); */
-/*             $request .= '&text=' . urlencode($text); */
-/*             foreach($media_parts as $media_part) */
-/*                 if(isset($media[$media_part])) */
-/*                     $request .= '&media[' . $media_part . ']=' . urlencode($media[$media_part]); */
-/*             $request .= '&attachment=' . ( $attachment ? 'true' : 'false' ); */
-/*             $request .= '&shorten=' . ( $shorten ? 'true' : 'false' ); */
-/*             $request .= '&now=' . ( $now ? 'true' : 'false' ); */
-/*             $request .= '&top=' . ( $top ? 'true' : 'false' ); */
-
-/*             $response = wp_remote_post( $request, array( */
-/*                                             'headers' => $headers, */
-/*                                             'method'    => 'POST' */
-/*                                                         )); */
-
-            #echo(json_encode($body));
-
             $response = wp_remote_post( $buffer_api_url_with_token, array(
                                             'headers' => $headers,
                                             'body' => $body,
+                                            'timeout' => $timeout,
                                             'method'    => 'POST'
-                                                        ));
+                                                                          ) );
 
             if(is_wp_error($response))
                 return $response;
@@ -132,8 +114,14 @@ class O3PO_Buffer {
 
 
         /**
+         * Get a list of services and profiles that are accessible via a given acces token.
          *
-         *
+         * @since 0.3.0
+         * @access public
+         * @parm   string $buffer_url        Url of the Buffer.com api.
+         * @param  string $access_token      Access token.
+         * @param  int    $timeout          Timeout of the request in seconds (default 2)
+         * @return array|WP_Error     An array of associative array with fields 'srevice' and 'id' containing the service names and corresponding ids.
          */
     public static function get_profile_information( $buffer_api_url, $access_token, $timeout=2 ) {
 
