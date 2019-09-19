@@ -1575,8 +1575,12 @@ class O3PO_Latex_Dictionary_Provider
 
 
         /**
+         * Un-escape a LaTeX style escaped url.
          *
-         *
+         * @sinde 0.3.0
+         * @access public
+         * @param string $latex_url LaTeX style escaped url.
+         * @return string Url without LaTeX escape sequences.
          */
     static public function un_escape_url( $latex_url ) {
         foreach (array('\\%' => '%', '\\#' => '#', '\\_' => '_') as $target => $substitute)

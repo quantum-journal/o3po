@@ -1740,7 +1740,7 @@ class O3PO_Settings extends O3PO_Singleton {
          * @since    0.1.0
          * @access   private
          * @param    string   $field    The field this was input to.
-         * @param    string   $doi_prefix    User input.
+         * @param    string   $doi_suffix    User input.
          */
     public function validate_doi_suffix( $field, $doi_suffix ) {
 

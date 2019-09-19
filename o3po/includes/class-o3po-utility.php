@@ -307,6 +307,14 @@ class O3PO_Utility
         return sqrt(array_sum($sum_of_squares)/(count($array)-1));
     }
 
+        /**
+         * Compute the median.
+         *
+         * @since 0.3.0
+         * @access public
+         * @param array $array Array for which to compute the standard deviation.
+         * @return float|int Median of the array.
+         */
     public static function array_median( $array ) {
 
         if(!is_array($array))

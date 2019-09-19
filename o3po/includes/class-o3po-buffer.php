@@ -32,15 +32,17 @@ class O3PO_Buffer {
          *
          * @since  0.3.0
          * @access public
-         * @parm   string $buffer_url        Url of the Buffer.com api.
+         * @param   string $buffer_url        Url of the Buffer.com api.
          * @param  string $access_token      Access token.
-         * @parm   array|string $profile_ids An array of Buffer profile id’s of an individual id that the status update should be sent to.
-         * @parm   string $text       The status update text.
-         * @parm   boolean $shorten   If shorten is false links within the text will not be automatically shortened, otherwise they will.
-         * @parm   boolean $now       If now is set, this update will be sent immediately to all profiles instead of being added to the buffer.
-         * @parm   boolean $top       If top is set, this update will be added to the top of the buffer and will become the next update sent.
-         * @parm   array $media       An associative array of media to be attached to the update containing some of the following parameters: link, description, title, picture, photo, thumbnail.
-         * @return boolean|WP_Error   Returns true on success or a WP_Error in case an error occurred.
+         * @param   array|string $profile_ids An array of Buffer profile id’s of an individual id that the status update should be sent to.
+         * @param   string $text       The status update text.
+         * @param   array $media       An associative array of media to be attached to the update containing some of the following parameters: link, description, title, picture, photo, thumbnail.
+         * @param   boolean $attachment Whether a link in the text should automatically populate the media parameter if media is empty.
+         * @param   boolean $shorten   If shorten is false links within the text will not be automatically shortened, otherwise they will.
+         * @param   boolean $now       If now is set, this update will be sent immediately to all profiles instead of being added to the buffer.
+         * @param   boolean $top       If top is set, this update will be added to the top of the buffer and will become the next update sent.
+         * @param   int     $timeout   Maximum number of seconds to wait for a response (default 15 seconds).
+         * @return boolean|WP_Error    Returns true on success or a WP_Error in case an error occurred.
          */
     public static function create_update( $buffer_url, $access_token, $profile_ids, $text='', $media=array(), $attachment=true, $shorten=false, $now=false, $top=false, $timeout=15 ) {
 
@@ -118,9 +120,9 @@ class O3PO_Buffer {
          *
          * @since 0.3.0
          * @access public
-         * @parm   string $buffer_url        Url of the Buffer.com api.
+         * @param  string $buffer_api_url        Url of the Buffer.com api.
          * @param  string $access_token      Access token.
-         * @param  int    $timeout          Timeout of the request in seconds (default 2)
+         * @param  int    $timeout          Timeout of the request in seconds (default 2 seconds)
          * @return array|WP_Error     An array of associative array with fields 'srevice' and 'id' containing the service names and corresponding ids.
          */
     public static function get_profile_information( $buffer_api_url, $access_token, $timeout=2 ) {

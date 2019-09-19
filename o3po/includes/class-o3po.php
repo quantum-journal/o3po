@@ -424,6 +424,14 @@ class O3PO {
         return $journal_config;
     }
 
+        /**
+         * Setup the primary journal.
+         *
+         * @since 0.3.0
+         * @access public
+         * @param $settings O3PO_Settings Settings object from which to initialize the journal.
+         * @return O3PO_Journal Configured journal.
+         */
     public static function setup_primary_journal( $settings ) {
         $journal_config = static::journal_config_from_settings($settings);
 
@@ -436,6 +444,14 @@ class O3PO {
         return new O3PO_Journal($journal_config);
     }
 
+        /**
+         * Setup the secondary journal.
+         *
+         * @since 0.3.0
+         * @access public
+         * @param $settings O3PO_Settings Settings object from which to initialize the journal.
+         * @return O3PO_Journal Configured journal.
+         */
     public static function setup_secondary_journal( $settings ) {
 
         $journal_config = static::journal_config_from_settings($settings);
