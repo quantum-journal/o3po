@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <meta charset="utf-8"/>
+    <title>API Documentation</title>
+    <meta name="author" content=""/>
+    <meta name="description" content=""/>
+
+    <link href="../css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/prism.css" rel="stylesheet" media="all"/>
+    <link href="../css/template.css" rel="stylesheet" media="all"/>
+    
+    <!--[if lt IE 9]>
+    <script src="../js/html5.js"></script>
+    <![endif]-->
+    <script src="../js/jquery-1.11.0.min.js"></script>
+    <script src="../js/ui/1.10.4/jquery-ui.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/jquery.smooth-scroll.js"></script>
+    <script src="../js/prism.min.js"></script>
+    <!-- TODO: Add http://jscrollpane.kelvinluck.com/ to style the scrollbars for browsers not using webkit-->
+    <script type="text/javascript">
+    function loadExternalCodeSnippets() {
+        Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(function (pre) {
+            var src = pre.getAttribute('data-src');
+            var extension = (src.match(/\.(\w+)$/) || [, ''])[1];
+            var language = 'php';
+
+            var code = document.createElement('code');
+            code.className = 'language-' + language;
+
+            pre.textContent = '';
+
+            code.textContent = 'Loading…';
+
+            pre.appendChild(code);
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('GET', src, true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+
+                    if (xhr.status < 400 && xhr.responseText) {
+                        code.textContent = xhr.responseText;
+
+                        Prism.highlightElement(code);
+                    }
+                    else if (xhr.status >= 400) {
+                        code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
+                    }
+                    else {
+                        code.textContent = '✖ Error: File does not exist or is empty';
+                    }
+                }
+            };
+
+            xhr.send(null);
+        });
+    }
+
+    $(document).ready(function(){
+        loadExternalCodeSnippets();
+    });
+    $('#source-view').on('shown', function () {
+        loadExternalCodeSnippets();
+    })
+</script>
+
+    <link rel="shortcut icon" href="../images/favicon.ico"/>
+    <link rel="apple-touch-icon" href="../images/apple-touch-icon.png"/>
+    <link rel="apple-touch-icon" sizes="72x72" href="../images/apple-touch-icon-72x72.png"/>
+    <link rel="apple-touch-icon" sizes="114x114" href="../images/apple-touch-icon-114x114.png"/>
+</head>
+<body>
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <i class="icon-ellipsis-vertical"></i>
+            </a>
+            <a class="brand" href="../index.html">API Documentation</a>
+
+            <div class="nav-collapse">
+                <ul class="nav pull-right">
+                                        <li class="dropdown" id="charts-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Charts <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../graphs/class.html">
+                                    <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="reports-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Reports <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../reports/errors.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">0</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/markers.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">0</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/deprecated.html">
+                                                                                                            <i class="icon-list-alt"></i>&#160;Deprecated <span class="label label-info pull-right">0</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--<div class="go_to_top">-->
+    <!--<a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>-->
+    <!--</div>-->
+</div>
+
+<div id="___" class="container-fluid">
+        <section class="row-fluid">
+        <div class="span2 sidebar">
+                                <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-739536137"></a>
+                                <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
+            </div>
+            <div id="namespace-739536137" class="accordion-body collapse in">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/O3PO.html">O3PO</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Activator.html">O3PO_Activator</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Admin.html">O3PO_Admin</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Ads.html">O3PO_Ads</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Arxiv.html">O3PO_Arxiv</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Author.html">O3PO_Author</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Bibentry.html">O3PO_Bibentry</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Buffer.html">O3PO_Buffer</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Clockss.html">O3PO_Clockss</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Crossref.html">O3PO_Crossref</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Deactivator.html">O3PO_Deactivator</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Doaj.html">O3PO_Doaj</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_EmailTemplates.html">O3PO_EmailTemplates</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Environment.html">O3PO_Environment</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_i18n.html">O3PO_i18n</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Journal.html">O3PO_Journal</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Latex.html">O3PO_Latex</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Latex_Dictionary_Provider.html">O3PO_Latex_Dictionary_Provider</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Loader.html">O3PO_Loader</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Plotter.html">O3PO_Plotter</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_PrimaryPublicationType.html">O3PO_PrimaryPublicationType</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Public.html">O3PO_Public</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_PublicationType.html">O3PO_PublicationType</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Relevanssi.html">O3PO_Relevanssi</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_SecondaryPublicationType.html">O3PO_SecondaryPublicationType</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Settings.html">O3PO_Settings</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Singleton.html">O3PO_Singleton</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Utility.html">O3PO_Utility</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        </div>
+    </section>
+    <section class="row-fluid">
+        <div class="span10 offset2">
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <nav>
+                                                <a href="../namespaces/default.html">\</a> <i class="icon-level-up"></i>
+                                            </nav>
+                    <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal"><i class="icon-code"></i></a>
+
+                    <h1><small>\</small>O3PO_Buffer</h1>
+                    <p><em>Encapsulates the interface with the external service Buffer.com.</em></p>
+                    <p>Provides methods to interface with Buffer.com.</p>
+                    
+                                        
+                    <section id="summary">
+                        <h2>Summary</h2>
+                        <section class="row-fluid heading">
+                            <section class="span4">
+                                <a href="#methods">Methods</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#properties">Properties</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#constants">Constants</a>
+                            </section>
+                        </section>
+                        <section class="row-fluid public">
+                            <section class="span4">
+                                                                    <a href="../classes/O3PO_Buffer.html#method_create_update" class="">create_update()</a><br />
+                                                                    <a href="../classes/O3PO_Buffer.html#method_get_profile_information" class="">get_profile_information()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No public properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No constants found</em>
+                                                            </section>
+                        </section>
+                        <section class="row-fluid protected">
+                            <section class="span4">
+                                                                    <em>No protected methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No protected properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                        <section class="row-fluid private">
+                            <section class="span4">
+                                                                    <em>No private methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No private properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                    </section>
+                </div>
+                <aside class="span4 detailsbar">
+                                        
+                    
+                    <dl>
+                        <dt>File</dt>
+                            <dd><a href="../files/includes.class-o3po-buffer.html"><div class="path-wrapper">includes/class-o3po-buffer.php</div></a></dd>
+                                                <dt>Package</dt>
+                            <dd><div class="namespace-wrapper">O3PO\O3PO/includes</div></dd>
+                                                <dt>Class hierarchy</dt>
+                            <dd class="hierarchy">
+                                                                                                                                                                    <div class="namespace-wrapper">\O3PO_Buffer</div>
+                            </dd>
+
+                        
+                        
+                        
+                        
+                                                                        </dl>
+                    <h2>Tags</h2>
+                    <table class="table table-condensed">
+                                            <tr>
+                            <th>
+                                author
+                            </th>
+                            <td>
+                                                                    <p>Christian Gogolin <a href="mailto:o3po@quantum-journal.org">o3po@quantum-journal.org</a></p>
+                                                            </td>
+                        </tr>
+                                        </table>
+                </aside>
+            </div>
+
+                        
+                        
+                                    <a id="methods" name="methods"></a>
+            <div class="row-fluid">
+                <div class="span8 content class"><h2>Methods</h2></div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_create_update" name="method_create_update" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">create_update()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">create_update(string  <span class="argument">$buffer_url</span>, string  <span class="argument">$access_token</span>, array|string  <span class="argument">$profile_ids</span>, string  <span class="argument">$text = &#039;&#039;</span>, array  <span class="argument">$media = array()</span>, boolean  <span class="argument">$attachment = true</span>, boolean  <span class="argument">$shorten = false</span>, boolean  <span class="argument">$now = false</span>, boolean  <span class="argument">$top = false</span>, integer  <span class="argument">$timeout = 15</span>) : boolean|\WP_Error</pre>
+                <p><em>Http post meta data to Buffer.</em></p>
+                <p>Schedule a social media update via Buffer.com's api.
+For more information see here
+<a href="https://buffer.com/developers/api/updates">https://buffer.com/developers/api/updates</a></p>
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$buffer_url </td>
+                                <td><p>Url of the Buffer.com api.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$access_token </td>
+                                <td><p>Access token.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>array|string</td>
+                                <td>$profile_ids </td>
+                                <td><p>An array of Buffer profile id’s of an individual id that the status update should be sent to.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$text </td>
+                                <td><p>The status update text.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$media </td>
+                                <td><p>An associative array of media to be attached to the update containing some of the following parameters: link, description, title, picture, photo, thumbnail.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$attachment </td>
+                                <td><p>Whether a link in the text should automatically populate the media parameter if media is empty.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$shorten </td>
+                                <td><p>If shorten is false links within the text will not be automatically shortened, otherwise they will.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$now </td>
+                                <td><p>If now is set, this update will be sent immediately to all profiles instead of being added to the buffer.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$top </td>
+                                <td><p>If top is set, this update will be added to the top of the buffer and will become the next update sent.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>integer</td>
+                                <td>$timeout </td>
+                                <td><p>Maximum number of seconds to wait for a response (default 15 seconds).</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    boolean|\WP_Error
+                                            &mdash; <p>Returns true on success or a WP_Error in case an error occurred.</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            0.3.0                                
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_get_profile_information" name="method_get_profile_information" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">get_profile_information()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">get_profile_information(string  <span class="argument">$buffer_api_url</span>, string  <span class="argument">$access_token</span>, integer  <span class="argument">$timeout = 2</span>) : array|\WP_Error</pre>
+                <p><em>Get a list of services and profiles that are accessible via a given acces token.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$buffer_api_url </td>
+                                <td><p>Url of the Buffer.com api.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$access_token </td>
+                                <td><p>Access token.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>integer</td>
+                                <td>$timeout </td>
+                                <td><p>Timeout of the request in seconds (default 2 seconds)</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    array|\WP_Error
+                                            &mdash; <p>An array of associative array with fields 'srevice' and 'id' containing the service names and corresponding ids.</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            since
+                        </th>
+                        <td>
+                                                            0.3.0                                
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                                    </div>
+    </section>
+
+    <div id="source-view" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="source-view-label" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="source-view-label">class-o3po-buffer.php</h3>
+        </div>
+        <div class="modal-body">
+            <pre data-src="../files/includes/class-o3po-buffer.php.txt" class="language-php line-numbers"></pre>
+        </div>
+    </div>
+
+    <footer class="row-fluid">
+        <section class="span10 offset2">
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <section class="row-fluid footer-sections">
+                        <section class="span4">
+                                                        <h1><i class="icon-code"></i></h1>
+                            <div>
+                                <ul>
+                                                                    </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-bar-chart"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../graphs/class.html">Class Hierarchy Diagram</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-pushpin"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../reports/errors.html">Errors</a></li>
+                                    <li><a href="../reports/markers.html">Markers</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                    </section>
+                </section>
+            </section>
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <hr />
+                    Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
+                    on September 19th, 2019 at 09:31.
+                </section>
+            </section>
+        </section>
+    </footer>
+</div>
+
+</body>
+</html>
