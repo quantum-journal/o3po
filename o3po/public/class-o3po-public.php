@@ -12,11 +12,14 @@
 
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-utility.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-publication-type.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-journal.php';
+
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-secondary-publication-type.php';
+
 
 /**
  * The public-facing functionality of the plugin.
- *
- * Defines the plugin name, version, and hooks.
  *
  * @package    O3PO
  * @subpackage O3PO/public
@@ -24,53 +27,53 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-setti
  */
 class O3PO_Public {
 
-	/**
-	 * The ID of this plugin.
-	 *
-	 * @since    0.1.0
-	 * @access   private
-	 * @var      string    $plugin_name    The ID of this plugin.
-	 */
+        /**
+         * The ID of this plugin.
+         *
+         * @since    0.1.0
+         * @access   private
+         * @var      string    $plugin_name    The ID of this plugin.
+         */
 	private $plugin_name;
 
-	/**
-	 * The version of this plugin.
-	 *
-	 * @since    0.1.0
-	 * @access   private
-	 * @var      string    $version    The current version of this plugin.
-	 */
+        /**
+         * The version of this plugin.
+         *
+         * @since    0.1.0
+         * @access   private
+         * @var      string    $version    The current version of this plugin.
+         */
 	private $version;
 
-	/**
-	 * Initialize the class and set its properties.
-	 *
-	 * @since    0.1.0
-	 * @param    string    $plugin_name    The name of the plugin.
-	 * @param    string    $version        The version of this plugin.
-	 */
+        /**
+         * Initialize the class and set its properties.
+         *
+         * @since    0.1.0
+         * @param    string    $plugin_name    The name of the plugin.
+         * @param    string    $version        The version of this plugin.
+         */
 	public function __construct( $plugin_name, $version ) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 	}
 
-	/**
-	 * Register the stylesheets for the public-facing side of the site.
-	 *
-	 * @since    0.1.0
-	 */
+        /**
+         * Register the stylesheets for the public-facing side of the site.
+         *
+         * @since    0.1.0
+         */
 	public function enqueue_styles() {
 
-		/**
-		 * An instance of this class should be passed to the run() function
-		 * defined in O3PO_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The O3PO_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
+            /**
+             * An instance of this class should be passed to the run() function
+             * defined in O3PO_Loader as all of the hooks are defined
+             * in that particular class.
+             *
+             * The O3PO_Loader will then create the relationship
+             * between the defined hooks and the functions defined in this
+             * class.
+             */
 
 		wp_enqueue_style( $this->plugin_name . '-public.css', plugin_dir_url( __FILE__ ) . 'css/' . $this->plugin_name . '-public.css', array(), $this->version, 'all' );
 
@@ -80,34 +83,34 @@ class O3PO_Public {
 
 	}
 
-	/**
-	 * Register the JavaScript for the public-facing side of the site.
-	 *
-	 * @since    0.1.0
-	 */
+        /**
+         * Register the JavaScript for the public-facing side of the site.
+         *
+         * @since    0.1.0
+         */
 	public function enqueue_scripts() {
 
-		/**
-		 * An instance of this class should be passed to the run() function
-		 * defined in O3PO_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The O3PO_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
+            /**
+             * An instance of this class should be passed to the run() function
+             * defined in O3PO_Loader as all of the hooks are defined
+             * in that particular class.
+             *
+             * The O3PO_Loader will then create the relationship
+             * between the defined hooks and the functions defined in this
+             * class.
+             */
 
 //		wp_enqueue_script( $this->plugin_name . '-public.js', plugin_dir_url( __FILE__ ) . 'js/' . $this->plugin_name . '-public.js', array( 'jquery' ), $this->version, false );
 
 	}
 
-	/**
-	 * Add opne graph (OG) meta tags describing the respective page. This
-	 * data is used by social networks to generate excerpts for sharing.
-	 *
-	 * @since    0.1.0
-	 * @access   public
-	 */
+        /**
+         * Add opne graph (OG) meta tags describing the respective page. This
+         * data is used by social networks to generate excerpts for sharing.
+         *
+         * @since    0.1.0
+         * @access   public
+         */
     public function add_open_graph_meta_tags_for_social_media() {
         $settings = O3PO_Settings::instance();
 
@@ -116,18 +119,10 @@ class O3PO_Public {
         $url = get_site_url();
         $description = $settings->get_plugin_option('journal_description');
         $facebook_app_id = $settings->get_plugin_option('facebook_app_id');
-        if (is_single())
+        if(is_single())
         {
-            if(has_post_thumbnail())
-            {
-                $specific_image_url = wp_get_attachment_image_src(get_post_thumbnail_id(), "Full")[0];
-                if(!empty($specific_image_url))
-                {
-                        /* $size = getimagesize($specific_image_url); */
-                        /* if(!empty($size) && $size[0] >= 200 && $size[1] >= 200) */
-                    $image_url = $specific_image_url;
-                }
-            }
+
+            $image_url = O3PO_PublicationType::get_social_media_thumbnail_src(get_the_ID());
 
             $specific_title = get_the_title();
             if(!empty($specific_title))
@@ -144,28 +139,28 @@ class O3PO_Public {
                 $description = $specific_description;
         }
 
-        $journa_title = $settings->get_plugin_option('journal_title');
+        $journal_title = $settings->get_plugin_option('journal_title');
 
         echo '<meta property="og:type" content="article" />' . "\n";
         echo '<meta property="og:url" content="' . esc_attr($url) . '" />' . "\n";
         echo '<meta property="og:title" content="' . esc_attr($title) . '" />' . "\n";
-        echo '<meta property="og:site_name" content="' . esc_attr($journa_title) .'" />' . "\n";
+        echo '<meta property="og:site_name" content="' . esc_attr($journal_title) .'" />' . "\n";
         echo '<meta property="og:description" content="' . esc_attr($description) . '" />' . "\n";
 
-    if(!empty($image_url))
-        echo '<meta property="og:image" content="' .$image_url . '" />' . "\n";
+        if(!empty($image_url))
+            echo '<meta property="og:image" content="' .$image_url . '" />' . "\n";
 
-    if(!empty($facebook_app_id))
-        echo '<meta property="fb:app_id" content="' .$facebook_app_id . '" />' . "\n";
+        if(!empty($facebook_app_id))
+            echo '<meta property="fb:app_id" content="' .$facebook_app_id . '" />' . "\n";
 
     }
 
-    /**
-	 * Enable MathJax on all public pages.
-	 *
-	 * @since    0.1.0
-	 * @access   public
-	 */
+        /**
+         * Enable MathJax on all public pages.
+         *
+         * @since    0.1.0
+         * @access   public
+         */
     public function enable_mathjax() {
 
         $settings = O3PO_Settings::instance();
@@ -181,14 +176,14 @@ class O3PO_Public {
     }
 
 
-    /**
-	 * Fix some invalid html generated by WordPress as part of the logo.
-	 *
-	 * To be added to the 'get_custom_logo' filter.
-	 *
-	 * @since    0.1.0
-	 * @access   public
-	 */
+        /**
+         * Fix some invalid html generated by WordPress as part of the logo.
+         *
+         * To be added to the 'get_custom_logo' filter.
+         *
+         * @since    0.1.0
+         * @access   public
+         */
     public function fix_custom_logo_html() {
 
         $custom_logo_id = get_theme_mod( 'custom_logo' );
@@ -202,64 +197,22 @@ class O3PO_Public {
         return $html;
     }
 
-
-    /**
-	 * Replace search.php with a custom search template so that we can
-     * customize the search page.
-	 *
-	 * @since    0.1.0
-	 * @access   public
-	 * @param    string    $template    Path to template file.
-	 */
-    public function install_custom_search_page_template( $template ){
-
-        global $wp_query;
-
-        if ($wp_query->is_search)
-            return dirname( __FILE__ ) . '/templates/search.php';
-        else
-            return $template;
-    }
-
         /**
-         * Get custom post type single template.
+         * Add search based extended navigation to the main page.
          *
-         * For posts of the primary publication type we want full controle over how their page appears. We do this
-         * by installing a custom 'single_template' derived from that of the OnePress
-         * theme and install it here via the filter of the same name.
+         * Add a search interface, some statistics about the number of publications and volumes, and links to the respective volume pand publication type pages to the main page just before the loop starts.
          *
-         * To be added to the 'single_template' filter.
+         * To be added to the 'loop_start' action.
          *
-         * @since     0.1.0
-         * @access    public
-         * @param     string     $single_template     The name of the single template that we might want to replace.
+         * @since      0.1.0
+         * @access     public
+         * @param      string    $query      Query that lead to the current loop.
          */
-    public function primary_publication_type_template( $single_template ) {
-
-        global $post;
-
-        $settings = O3PO_Settings::instance();
-        $primary_publication_type_name = $settings->get_plugin_option('primary_publication_type_name');
-
-        if ($post->post_type === $primary_publication_type_name) {
-            $single_template = dirname( __FILE__ ) . '/templates/single-' . $primary_publication_type_name . '.php';
-        }
-
-        return $single_template;
-    }
-
-    /**
-	 * Add a search interaface to the main page just before the loop starts.
-	 *
-	 * @since      0.1.0
-	 * @access     public
-	 * @param      string    $query      Query that lead to the current loop.
-	 */
     public function extended_search_and_navigation_at_loop_start( $query ){
 
-        if(is_front_page()) {
-            $settings = O3PO_Settings::instance();
+        $settings = O3PO_Settings::instance();
 
+        if(is_home() and $query->is_main_query() and !is_admin()) {
                 /* To get all post types from the primary and secondary journals we could do the following,
                  * but in the text we are outputting, we are only mentioning the primary and secondary post types
                  * and so it is more honest to take precisely these counts. As of version 0.1.0 these
@@ -286,19 +239,43 @@ var search_field = document.getElementsByClassName("search-field");
         search_field[i].placeholder=\'Doi, title, author, arXiv id, ...\';
     }
 </script>';
-            echo $settings->get_plugin_option('journal_title') . ' has published <a href="' . $settings->get_plugin_option('primary_publication_type_name_plural') . '/">' . $primary_journal_post_count . ' ' . ucfirst($primary_journal_post_count > 1 ? $settings->get_plugin_option('primary_publication_type_name_plural') : $settings->get_plugin_option('primary_publication_type_name')) . '</a> in <a href="volumes/">' . (getdate()["year"] - ($settings->get_plugin_option('first_volume_year')-1)) . ' Volumes</a>, as well as <a href="'. $settings->get_plugin_option('secondary_publication_type_name_plural') . '/">' . $secondary_journal_post_count . ' ' . ucfirst($secondary_journal_post_count > 1 ? $settings->get_plugin_option('secondary_publication_type_name_plural') : $settings->get_plugin_option('secondary_publication_type_name') ) . '</a> in ' . $settings->get_plugin_option('secondary_journal_title') . '.';
+            echo $settings->get_plugin_option('journal_title') . ' has published <a href="/' . $settings->get_plugin_option('primary_publication_type_name_plural') . '/">' . $primary_journal_post_count . ' ' . ucfirst($primary_journal_post_count > 1 ? $settings->get_plugin_option('primary_publication_type_name_plural') : $settings->get_plugin_option('primary_publication_type_name')) . '</a> in <a href="/' . $settings->get_plugin_option('volumes_endpoint') . '">' . (getdate()["year"] - ($settings->get_plugin_option('first_volume_year')-1)) . ' Volumes</a>, as well as <a href="/'. $settings->get_plugin_option('secondary_publication_type_name_plural') . '/">' . $secondary_journal_post_count . ' ' . ucfirst($secondary_journal_post_count > 1 ? $settings->get_plugin_option('secondary_publication_type_name_plural') : $settings->get_plugin_option('secondary_publication_type_name') ) . '</a> in ' . $settings->get_plugin_option('secondary_journal_title') . '.';
             echo '</div>';
             echo '</div>';
         }
     }
 
-    /**
-	 * Add a help text for listing pages showing posts from the secondary journal just before the loop starts.
-	 *
-	 * @since    0.1.0
-	 * @access   public
-	 * @param    string    $query      Query that lead to the current loop.
-	 */
+
+        /**
+         * Add a search form above the search results just before the loop starts.
+         *
+         * To be added to the 'loop_start' action.
+         *
+         * @since      0.1.0
+         * @access     public
+         * @param      string    $query      Query that lead to the current loop.
+         */
+    public function search_form_at_loop_start_on_search_page( $query ){
+
+        if(is_search() and !is_admin()) {
+            echo '<div class="search-results">';
+            echo '<div class="hentry">';
+            get_search_form();
+            echo '</div>';
+            echo '</div>';
+        }
+
+    }
+
+
+
+        /**
+         * Add a help text for listing pages showing posts from the secondary journal just before the loop starts.
+         *
+         * @since    0.1.0
+         * @access   public
+         * @param    string    $query      Query that lead to the current loop.
+         */
     public function secondary_journal_help_text( $query )
     {
         $settings = O3PO_Settings::instance();
@@ -310,11 +287,11 @@ var search_field = document.getElementsByClassName("search-field");
         else
             foreach(O3PO_SecondaryPublicationType::get_associated_categories() as $category)
             {
-            if(is_category($category))
-            {
-                $show_help_on_this_page = true;
-                break;
-            }
+                if(is_category($category))
+                {
+                    $show_help_on_this_page = true;
+                    break;
+                }
             }
         if($show_help_on_this_page)
         {

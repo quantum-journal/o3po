@@ -8,6 +8,10 @@
  */
 
 include(dirname( __FILE__ ) . '/posts.php');
+include(dirname( __FILE__ ) . '/formatting.php');
+include(dirname( __FILE__ ) . '/kses.php');
+
+require_once dirname( __FILE__ ) . '/../../o3po/includes/class-o3po-settings.php';
 
 if(!class_exists('PHPUnit_Framework_TestCase')){
         /**
@@ -67,18 +71,37 @@ function add_filter( $hook, $callable ) {
     $filters[$hook][] = $callable;
 }
 
-function is_admin() {}
+function esc_html_filter( $text ) {
+
+    $replacements = array(
+        '#&(?!amp;)#' => '&amp;',
+        '#"#' => '&quot;',
+        "#'#" => '&#039;',
+        '#<#' => '&lt;',
+        '#>#' => '&gt;',
+    );
+    foreach($replacements as $expression => $replacement)
+        $text = preg_replace($expression, $replacement, $text);
+
+    return $text;
+}
+add_filter( 'esc_html', 'esc_html_filter' );
+
+
+function is_admin() {
+    return false;
+}
 
 function get_site_url() {
 
-    return 'https://foo.bar.com/';
+    return 'https://foo.bar.com';
 }
 
 function get_option( $option, $default = false ) {
 
-    if($option === 'o3po-setttings' or 'quantum-journal-plugin-setttings')
+    if($option === 'o3po-settings')
         return array(
-            'production_site_url' => 'fake_production_site_url',
+            'production_site_url' => get_site_url(),#we test as if this were the production system
             'journal_title' => 'fake_journal_title',
             'journal_subtitle' => 'fake_journal_subtitle',
             'journal_description' => 'fake_journal_description',
@@ -94,31 +117,35 @@ function get_option( $option, $default = false ) {
             'license_name' => 'fake_license_name',
             'license_type' => 'fake_license_type',
             'license_version' => 'fake_license_version',
-            'license_url' => 'fake_license_url',
+            'license_url' => 'https://fake_license_url',
             'license_explanation' => 'fake_license_explanation',
             'crossref_id' => 'fake_crossref_id',
             'crossref_pw' => 'fake_crossref_pw',
-            'crossref_get_forward_links_url' => 'fake_crossref_get_forward_links_url',
-            'crossref_deposite_url' => 'fake_crossref_deposite_url',
-            'crossref_test_deposite_url' => 'fake_crossref_test_deposite_url',
+            'crossref_get_forward_links_url' => 'https://fake_crossref_get_forward_links_url',
+            'crossref_deposite_url' => 'https://fake_crossref_deposite_url',
+            'crossref_test_deposite_url' => 'https://fake_crossref_test_deposite_url',
             'crossref_email' => 'fake_crossref_email',
             'crossref_archive_locations' => 'fake_crossref_archive_locations',
+            'ads_api_search_url' => 'https://api.adsabs.harvard.edu/v1/search/query',
+            'ads_api_token' => '',
             'arxiv_url_abs_prefix' => 'https://arxiv.org/abs/',
             'arxiv_url_pdf_prefix' => 'https://arxiv.org/pdf/',
             'arxiv_url_source_prefix' => 'https://arxiv.org/e-print/',
             'arxiv_url_trackback_prefix' => 'fake_arxiv_url_trackback_prefix',
             'arxiv_doi_feed_identifier' => 'fake_arxiv_doi_feed_identifier',
             'doi_url_prefix' => 'fake_doi_url_prefix',
-            'scholastica_manuscripts_url' => 'fake_scholastica_manuscripts_url',
-            'scirate_url_abs_prefix' => 'fake_scirate_url_abs_prefix',
-            'orcid_url_prefix' => 'fake_orcid_url_prefix',
-            'fermats_library_url_prefix' => 'fake_fermats_library_url_prefix',
+            'scholastica_manuscripts_url' => 'https://fake_scholastica_manuscripts_url',
+            'scirate_url_abs_prefix' => 'https://fake_scirate_url_abs_prefix',
+            'orcid_url_prefix' => 'https://fake_orcid_url_prefix',
+            'fermats_library_url_prefix' => 'https://fake_fermats_library_url_prefix',
             'fermats_library_email' => 'fake_fermats_library_email',
-            'mathjax_url' => 'fake_mathjax_url',
-            'social_media_thumbnail_url' => 'fake_social_media_thumbnail_url',
-            'buffer_secret_email' => 'fake_buffer_secret_email',
-            'facebook_app_id' => 'fake_facebook_app_id',
-            'doaj_api_url' => 'fake_doaj_api_url',
+            'mathjax_url' => 'https://fake_mathjax_url',
+            'social_media_thumbnail_url' => 'https://fake_social_media_thumbnail_url',
+            'buffer_api_url' => 'https://fake_buffer_api_url',
+            'buffer_access_token' => '081fa8123a892134ba93241',
+            'buffer_profile_ids' => array('1513412357695652', '785663451345245'),
+            'facebook_app_id' => 'https://fake_facebook_app_id',
+            'doaj_api_url' => 'https://fake_doaj_api_url',
             'doaj_api_key' => 'fake_doaj_api_key',
             'doaj_language_code' => 'fake_doaj_language_code',
             'custom_search_page' => 'fake_custom_search_page',
@@ -127,7 +154,13 @@ function get_option( $option, $default = false ) {
             'eissn' => 'fake_eissn',
             'secondary_journal_eissn' => "fake_secondary_journal_eissn",
             'first_volume_year' => "2009",
+            'custom_search_page' => 'checked',
+            'page_template_for_publication_posts' => 'checked',
                      );
+    elseif($option === 'blog_charset')
+        return 'UTF-8';
+    elseif($option === 'rewrite_rules')
+        return array();
     else
         throw(new Exception("We don't know how to fake the option " . $option . "."));
 
@@ -149,6 +182,8 @@ function get_file_data( $file, $options ) {
 
 function flush_rewrite_rules( $hard=false ) {}
 
+function add_rewrite_endpoint( $a, $b=Null ) {}
+
 $post_data = array();
 
 function get_post_type( $post_id ) {
@@ -160,6 +195,15 @@ function get_post_type( $post_id ) {
     return $posts[$post_id]['post_type'];
 }
 
+function get_post_field( $field, $post_id ) {
+    global $posts;
+
+    if(!isset($posts[$post_id][$field]))
+        throw new Exception("Post with id=" . $post_id . " has no field " . $field . ".");
+
+    return $posts[$post_id][$field];
+}
+
 function get_post_meta( $post_id, $key, $single = false ) {
     global $posts;
 
@@ -169,9 +213,11 @@ function get_post_meta( $post_id, $key, $single = false ) {
         throw new Exception("Post with id=" . $post_id . " has no meta-data.");
     if(!isset($posts[$post_id]['meta'][$key]))
     {
-        throw new Exception("Post with id=" . $post_id . " has no meta-data for key=" . $key . ".");
-       /* echo("\nPost with id=" . $post_id . " has no meta-data for key=" . $key . "\n"); */
-       /* return "fake!"; */
+        #throw new Exception("Post with id=" . $post_id . " has no meta-data for key=" . $key . ".");
+        if($single)
+            return '';
+        else
+            return array();
     }
 
 
@@ -184,10 +230,10 @@ function get_all_post_metas( $post_id ) {
     return $posts[$post_id]['meta'];
 }
 
-function schedule_post_for_publication($post_id) {
+function set_post_status($post_id, $status) {
     global $posts;
 
-    return $posts[$post_id]['post_status'] = 'publish';
+    return $posts[$post_id]['post_status'] = $status;
 }
 
 function wp_nonce_field( $action, $name, $referer=true, $echo=true ) {}
@@ -207,14 +253,20 @@ class WP_Error
     function get_error_message() {
         return $this->message;
     }
+
+    function get_error_code() {
+        return $this->code;
+    }
 }
 
 class WP_Post
 {
     public $ID;
+    public $post_type;
 
-    public function __construct( $post_id ) {
+    public function __construct( $post_id, $post_type='post' ) {
         $this->ID = $post_id;
+        $this->post_type = $post_type;
     }
 }
 
@@ -222,16 +274,39 @@ class WP_Query
 {
     private $posts;
     private $query;
+    public $query_vars;
+    public $post_count;
+    public $found_posts;
 
-    function __construct( $input=null ) {
+    function __construct( $input=null, $query_vars=array() ) {
         global $posts;
 
         $this->query = $input;
+        $this->query_vars = $query_vars;
 
         if(is_array($input))
             $array = $input;
         else
             $array = array($input);
+
+        # turn 'key=value' type queries into $key => $value type ones
+        foreach($array as $key => $value){
+            if(is_numeric($key) and is_string($value) and strpos($value, '=') !== false)
+            {
+                $split = preg_split('/\s*=\s*/', $value);
+                if(!empty($split[0]) and isset($split[1]))
+                {
+                    $array[$split[0]] = $split[1];
+                    unset($array[$key]);
+                }
+            }
+        }
+
+        if(isset($array['posts_per_page']))
+        {
+            $max_posts_to_return = $array['posts_per_page'];
+            unset($array['posts_per_page']);
+        }
 
         $this->posts = array();
         if(!empty($posts) and $input !== null)
@@ -250,8 +325,7 @@ class WP_Query
                         break;
                     }
 
-
-                    if(!isset($posts[$id][$key]) or !in_array ($posts[$id][$key], $value))
+                    if(!isset($posts[$id][$key]) or !in_array($posts[$id][$key], $value))
                     {
                         $include_post = false;
                         break;
@@ -261,10 +335,17 @@ class WP_Query
                     $this->posts[$id] = $post;
             }
         }
+
+        $this->post_count = count($this->posts);
+        $this->found_posts = $this->post_count;
     }
 
     function get($key) {
         return $this->query[$key];
+    }
+
+    function set($key, $val) {
+        $this->query[$key] = $val;
     }
 
     function have_posts() {
@@ -288,14 +369,54 @@ class WP_Query
 
         $post_data = array('current' => $current, 'ID' => $min_key);
     }
+
+    function is_search() {
+        return isset($this->query_vars['s']) ? true : false;
+    }
+
+    function is_main_query() {
+        return isset($this->query_vars['is_main']) ? $this->query_vars['is_main'] : false;
+    }
 }
 
-$global_query = new WP_Query();
-function set_global_query( $wp_query ) {
-    global $global_query;
+function is_post_type_archive( $archive_name ) {
+    global $wp_query;
 
-    $global_query = $wp_query;
+    return isset($wp_query->query_vars['post_type']) and $wp_query->query_vars['post_type'] == $archive_name;
 }
+
+
+function is_category( $category_name ) {
+    global $wp_query;
+
+    return isset($wp_query->query_vars['category']) and $wp_query->query_vars['category'] == $category_name;
+}
+
+
+$wp_query = new WP_Query();
+function set_global_query( $query ) {
+    global $wp_query;
+
+    $wp_query = $query;
+}
+
+function get_global_query() {
+    global $wp_query;
+
+    return $wp_query;
+}
+
+
+function query_posts( $args ) {
+    set_global_query(new WP_Query($args, $args)); #this is a hack! I don't actually understand how the real query_posts() sets query vars.
+}
+
+function is_search() {
+    global $wp_query;
+
+    return $wp_query->is_search();
+}
+
 
 $global_search_query = '';
 function set_global_search_query( $string ) {
@@ -311,28 +432,48 @@ function get_search_query() {
 }
 
 function have_posts() {
-    global $global_query;
+    global $wp_query;
 
-    if(!($global_query instanceof WP_Query))
-        throw(new Exception('You must first set the $global_query before you can use have_posts()'));
+    if(!($wp_query instanceof WP_Query))
+        throw(new Exception('You must first set the $wp_query before you can use have_posts()'));
 
-    return $global_query->have_posts();
+    return $wp_query->have_posts();
 }
 
 function the_post() {
-    global $global_query;
+    global $wp_query;
 
-    if(!($global_query instanceof WP_Query))
-        throw(new Exception('You must fist set the $global_query before you can use have_posts()'));
+    if(!($wp_query instanceof WP_Query))
+        throw(new Exception('You must fist set the $wp_query before you can use have_posts()'));
 
-    return $global_query->the_post();
+    return $wp_query->the_post();
 }
 
 
-function has_post_thumbnail() {
+function set_query_var( $var, $val ) {
+    global $wp_query;
+
+    if(!($wp_query instanceof WP_Query))
+        throw(new Exception('You must first set the $wp_query before you can use get_query_var()'));
+
+    $wp_query->query_vars[$var] = $val;
+}
+
+function get_query_var( $var ) {
+    global $wp_query;
+
+    if(!($wp_query instanceof WP_Query))
+        throw(new Exception('You must first set the $wp_query before you can use get_query_var()'));
+
+    return $wp_query->query_vars[$var];
+}
+
+
+function has_post_thumbnail( $post_id=Null ) {
     global $posts;
 
-    $post_id = get_the_ID();
+    if($post_id === NUll)
+        $post_id = get_the_ID();
 
     return !empty($posts[$post_id]['thumbnail_id']);
 }
@@ -341,6 +482,12 @@ function the_post_thumbnail() {
     global $posts;
 
     $post_id = get_the_ID();
+
+    return '<img src="' . esc_url($posts[$posts[$post_id]['thumbnail_id']]['attachment_url']) . '" >';
+}
+
+function get_the_post_thumbnail($post_id, $size = 'post-thumbnail') {
+    global $posts;
 
     return '<img src="' . esc_url($posts[$posts[$post_id]['thumbnail_id']]['attachment_url']) . '" >';
 }
@@ -369,10 +516,17 @@ function get_post_thumbnail_id( $post_id ) {
 function wp_get_attachment_image_src( $post_id ) {
     global $posts;
 
+    if($post_id === 8356865345) #a special id we have set in get_theme_mod()
+        return 'https://some.site/logog.jpg';
+
     if(!isset($posts[$post_id]['attachment_image_src']))
         throw new Exception("Post with id=" . $post_id . " has no attachment_image_src.");
 
     return $posts[$post_id]['attachment_image_src'];
+}
+
+function wp_get_attachment_image( $post_id ) {
+    return '<img src="'.wp_get_attachment_image_src( $post_id ).'">';
 }
 
 function get_post_status( $ID = '' ) {
@@ -386,25 +540,12 @@ function get_post_status( $ID = '' ) {
     return $posts[$post_id]['post_status'];
 }
 
-function esc_html( $text ) {
+function get_post_mime_type( $post_id ) {
+    global $posts;
 
-    return 'esc_html' . $text;
+    return $posts[$post_id]['mime_type'];
 }
 
-function esc_attr__( $text ) {
-
-    return 'esc_attr__' . $text;
-}
-
-function esc_attr( $text ) {
-
-    return 'esc_attr' . $text;
-}
-
-function esc_url( $text ) {
-
-    return 'esc_url' . $text;
-}
 
 function wp_get_attachment_url($id) {
     global $posts;
@@ -431,7 +572,12 @@ function current_time( $format ) {
 }
 
 function get_the_date( $format, $post_id ) {
-    return current_time( $format );
+    global $posts;
+
+    if($format !== 'Y-m-d')
+        throw Exception("Date format not implemented");
+
+    return $posts[$post_id]['date'];
 }
 
 function download_url( $url, $timeout_seconds ) {
@@ -446,6 +592,10 @@ function download_url( $url, $timeout_seconds ) {
         'https://arxiv.org/e-print/0908.2921v2' => dirname(__FILE__) . '/arxiv/0908.2921v2.tex',
         'https://arxiv.org/pdf/0809.2542v4' => dirname(__FILE__) . '/arxiv/0809.2542v4.pdf',
         'https://arxiv.org/e-print/0809.2542v4' => dirname(__FILE__) . '/arxiv/0809.2542v4.tar.gz',
+        'https://arxiv.org/e-print/1708.05489v2' => dirname(__FILE__) . '/arxiv/1708.05489v2.tar.gz',
+        'https://arxiv.org/e-print/1711.04662v3' => dirname(__FILE__) . '/arxiv/1711.04662v3.tar.gz',
+        'https://arxiv.org/pdf/1806.02820v3' => dirname(__FILE__) . '/arxiv/1806.02820v3.pdf',
+        'https://arxiv.org/e-print/1806.02820v3' => dirname(__FILE__) . '/arxiv/1806.02820v3.tar.gz',
     );
     if(!empty($special_urls[$url]))
         copy($special_urls[$url], $tmpfile);
@@ -549,6 +699,8 @@ function wp_update_post( $array ) {
 function update_post_meta( $post_id, $key, $value ) {
     global $posts;
 
+    serialize($value); #test that value is serializable. We save the plain value for simplicity.
+
     $posts[$post_id]['meta'][$key] = $value;
 }
 
@@ -558,10 +710,18 @@ function wp_reset_postdata() {
     $post_data = array();
 }
 
-function get_the_title( $post_id ) {
+function get_the_title( $post_id=NULL ) {
     global $posts;
 
+    if($post_id === NUll)
+        $post_id = get_the_ID();
+
     return $posts[$post_id]['post_title'];
+}
+
+function get_the_excerpt( $post_id = NUll ) {
+
+    return mb_substr(get_the_content($post_id), 0, 100);
 }
 
 function the_content() {
@@ -584,16 +744,20 @@ function get_comments_number( $post_id=null ) {
 }
 
 
-function get_the_content() {
+function get_the_content($post_id=NULL) {
     global $posts;
 
-    $post_id = get_the_ID();
+    if($post_id===NULL)
+        $post_id = get_the_ID();
 
     return $posts[$post_id]['post_content'];
 }
 
-function get_permalink( $post_id ) {
+function get_permalink( $post_id=NULL ) {
     global $posts;
+
+   if($post_id === NUll)
+        $post_id = get_the_ID();
 
     return $posts[$post_id]['permalink'];
 }
@@ -612,34 +776,70 @@ function wp_mail( $to, $subject, $body, $headers, $attach=null) {
     return true;
 }
 
+
 function delete_transient() {}
 
-function get_transient() {
-    return false;
+$get_transient_returns = false;
+function get_transient( $transient ) {
+    global $get_transient_returns;
+
+    return $get_transient_returns;
 }
 
-function set_transient( $transient, $value, $expiration ) {}
-
-
-function sanitize_text_field( $string ) {
-
-    return $string;
-}
+function set_transient( $transient, $value, $expiration=0 ) {}
 
 function wp_remote_get( $url, $args=array() ) {
         //return http_get( $url, $args );
 
     $local_file_urls = array(
         'https://arxiv.org/abs/0809.2542v4' => dirname(__FILE__) . '/arxiv/0809.2542v4.html',
+        'https://arxiv.org/abs/0809.2542v5' => dirname(__FILE__) . '/arxiv/0809.2542v5.html',
         'https://arxiv.org/abs/1609.09584v4' => dirname(__FILE__) . '/arxiv/1609.09584v4.html',
         'https://arxiv.org/abs/0908.2921v2' => dirname(__FILE__) . '/arxiv/0908.2921v2.html',
+        'https://arxiv.org/abs/1806.02820v3' => dirname(__FILE__) . '/arxiv/1806.02820v3.html',
+         'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0908.2921&fl=citation' => dirname(__FILE__) . '/ads/0908.2921.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0809.2542&fl=citation' => dirname(__FILE__) . '/ads/0809.2542.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2010CoTPh..54.1023Z+OR+bibcode:2011EPJB...81..155H+OR+bibcode:2011JSMTE..05..023Z+OR+bibcode:2014PhyA..414..240P&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => dirname(__FILE__) . '/ads/0809.2542_citations.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:1806.02820&fl=citation' => dirname(__FILE__) . '/ads/1806.02820.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2018arXiv180601279B+OR+bibcode:2018arXiv181009469B+OR+bibcode:2018arXiv181205117B&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => dirname(__FILE__) . '/ads/1806.02820_citation.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:1610.01808&fl=citation' => dirname(__FILE__) . '/ads/1610.01808.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2015arXiv151207892E+OR+bibcode:2016arXiv160800263B+OR+bibcode:2016arXiv161003632F+OR+bibcode:2016arXiv161201652L+OR+bibcode:2016arXiv161205903A+OR+bibcode:2017arXiv170309568K+OR+bibcode:2017arXiv170401998M+OR+bibcode:2017arXiv170500686N+OR+bibcode:2017arXiv170608913Y+OR+bibcode:2017arXiv170801875B+OR+bibcode:2017arXiv170903489H+OR+bibcode:2017arXiv171205384B+OR+bibcode:2017NatCo...8.1572A+OR+bibcode:2017npjQI...3...15L+OR+bibcode:2017PhRvA..95d2336M+OR+bibcode:2017PhRvL.118d0502G+OR+bibcode:2018arXiv180306775B+OR+bibcode:2018arXiv180603200Y+OR+bibcode:2018arXiv180906957H+OR+bibcode:2018QS%26T....3b5004V+OR+bibcode:2018Sci...360..195N+OR+bibcode:2018Sci...362..308B&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => dirname(__FILE__) . '/ads/1610.01808_citations.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0000.0001&fl=citation' => dirname(__FILE__) . '/ads/0000.0001.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0000.0002&fl=citation' => dirname(__FILE__) . '/ads/0000.0002.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0000.0003&fl=citation' => array('headers' => array('x-ratelimit-remaining' => 0), 'body' => dirname(__FILE__) . '/ads/0000.0003.json'),
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0000.0004&fl=citation' => dirname(__FILE__) . '/ads/0000.0004.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2010Abcde..12.3456A&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => dirname(__FILE__) . '/ads/0000.0004_citations.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0000.0005&fl=citation' => dirname(__FILE__) . '/ads/0000.0005.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0000.0006&fl=citation' => dirname(__FILE__) . '/ads/0000.0006.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2015Phys...93.1143F&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => array('headers' => array('x-ratelimit-remaining' => 0), 'body' => dirname(__FILE__) . '/ads/0000.0006_citations.json'),
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0000.0007&fl=citation' => dirname(__FILE__) . '/ads/0000.0007.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2016Phys...12.4444F&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => array('headers' => array(), 'body' => dirname(__FILE__) . '/ads/0000.0007_citations.json'),
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0000.0008&fl=citation' => dirname(__FILE__) . '/ads/0000.0008.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2017XYZ....00001111&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => dirname(__FILE__) . '/ads/0000.0008_citations.json',
+        get_option('o3po-settings')['crossref_get_forward_links_url'] . '?usr=' . get_option('o3po-settings')['crossref_id'] . '&pwd=' . get_option('o3po-settings')['crossref_pw'] .'&doi=10.22331%2Fq-2017-04-25-8&include_postedcontent=true' => dirname(__FILE__) . '/crossref/q-2017-04-25-8.xml',
+        get_option('o3po-settings')['crossref_get_forward_links_url'] . '?usr=' . get_option('o3po-settings')['crossref_id'] . '&pwd=' . get_option('o3po-settings')['crossref_pw'] .'&doi=10.22331%2Fq-2018-08-06-79&include_postedcontent=true' => dirname(__FILE__) . '/crossref/q-2018-08-06-79.xml',
+        get_option('o3po-settings')['crossref_get_forward_links_url'] . '?usr=' . get_option('o3po-settings')['crossref_id'] . '&pwd=' . get_option('o3po-settings')['crossref_pw'] .'&doi=empty_response&include_postedcontent=true' => dirname(__FILE__) . '/crossref/empty_response.xml',
+        get_option('o3po-settings')['crossref_get_forward_links_url'] . '?usr=' . get_option('o3po-settings')['crossref_id'] . '&pwd=' . get_option('o3po-settings')['crossref_pw'] .'&doi=invalid_xml&include_postedcontent=true' => dirname(__FILE__) . '/crossref/invalid_xml.xml',
+        get_option('o3po-settings')['crossref_get_forward_links_url'] . '?usr=' . get_option('o3po-settings')['crossref_id'] . '&pwd=' . get_option('o3po-settings')['crossref_pw'] .'&doi=varied_cites&include_postedcontent=true' => dirname(__FILE__) . '/crossref/varied_cites.xml',
+        get_option('o3po-settings')['crossref_get_forward_links_url'] . '?usr=' . get_option('o3po-settings')['crossref_id'] . '&pwd=' . get_option('o3po-settings')['crossref_pw'] .'&doi=unhandled_forward_link_type&include_postedcontent=true' => dirname(__FILE__) . '/crossref/unhandled_forward_link_type.xml',
+        'https://api.bufferapp.com/1/profiles.json?access_token=1%2F345792aa62c_7' => dirname(__FILE__) . '/buffer/profile_ids.json',
+        'https://api.bufferapp.com/1/profiles.json?access_token=1%2F345792aa62c_9' => dirname(__FILE__) . '/buffer/profile_ids_error.json',
+        'https://api.bufferapp.com/1/profiles.json?access_token=1%2F345792aa62c_10' => array('Just some object that cannot tbe json_decoded and therefor leads to an error'),
+        'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:1801.00862&fl=citation' => dirname(__FILE__) . '/ads/1801.00862.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2016arXiv161003183R+OR+bibcode:2017arXiv170207688W+OR+bibcode:2017arXiv171105395J+OR+bibcode:2017arXiv171201356C+OR+bibcode:2017arXiv171209762K+OR+bibcode:2018arXiv180201157L+OR+bibcode:2018arXiv180304167V+OR+bibcode:2018arXiv180307128S+OR+bibcode:2018arXiv180309954F+OR+bibcode:2018arXiv180404168L+OR+bibcode:2018arXiv180405404R+OR+bibcode:2018arXiv180410368H+OR+bibcode:2018arXiv180411084A+OR+bibcode:2018arXiv180501450C+OR+bibcode:2018arXiv180504492K+OR+bibcode:2018arXiv180508138H+OR+bibcode:2018arXiv180510224T+OR+bibcode:2018arXiv180511089D+OR+bibcode:2018arXiv180601861S+OR+bibcode:2018arXiv180602145F+OR+bibcode:2018arXiv180602287G+OR+bibcode:2018arXiv180604344O+OR+bibcode:2018arXiv180607241P+OR+bibcode:2018arXiv180608321W+OR+bibcode:2018arXiv180609729V+OR+bibcode:2018arXiv180700429L+OR+bibcode:2018arXiv180700792A+OR+bibcode:2018arXiv180704564B+OR+bibcode:2018arXiv180704792K+OR+bibcode:2018arXiv180704973C+OR+bibcode:2018arXiv180709228A+OR+bibcode:2018arXiv180800128B+OR+bibcode:2018arXiv180802449F+OR+bibcode:2018arXiv180803623E+OR+bibcode:2018arXiv180805661Z+OR+bibcode:2018arXiv180807375C+OR+bibcode:2018arXiv180808927A+OR+bibcode:2018arXiv180810402M+OR+bibcode:2018arXiv180901302D+OR+bibcode:2018arXiv180902573L+OR+bibcode:2018arXiv180904485N+OR+bibcode:2018arXiv181000193S+OR+bibcode:2018arXiv181003176G+OR+bibcode:2018arXiv181004681M+OR+bibcode:2018arXiv181007765S+OR+bibcode:2018arXiv181010584C+OR+bibcode:2018arXiv181011922D+OR+bibcode:2018arXiv181012484S+OR+bibcode:2018arXiv181012745H+OR+bibcode:2018arXiv181013411F+OR+bibcode:2018arXiv181103629H+OR+bibcode:2018arXiv181104636A+OR+bibcode:2018arXiv181105675B+OR+bibcode:2018arXiv181110085P+OR+bibcode:2018arXiv181202746B+OR+bibcode:2018arXiv181204735R+OR+bibcode:2018arXiv181206323G+OR+bibcode:2018arXiv181208190J+OR+bibcode:2018arXiv181208767Y+OR+bibcode:2018arXiv181208778E+OR+bibcode:2018arXiv181209976C+OR+bibcode:2018NatSR...8.5445K+OR+bibcode:2018NatSR...814304M+OR+bibcode:2018Natur.560..456K+OR+bibcode:2018npjQI...4...65G+OR+bibcode:2018PhRvA..97c2346A+OR+bibcode:2018PhRvA..97f2104M+OR+bibcode:2018PhRvA..97f2113S+OR+bibcode:2018PhRvA..98a2322A+OR+bibcode:2018PhRvA..98a2324D+OR+bibcode:2018PhRvA..98b2322B+OR+bibcode:2018PhRvL.121d0502L+OR+bibcode:2018PhRvP...9d4036J+OR+bibcode:2018PhRvX...8c1016A+OR+bibcode:2018PhyOJ..11...51G+OR+bibcode:2018PLoSO..1306704M+OR+bibcode:2018QS%26T....3d5002S+OR+bibcode:2019arXiv190100015M+OR+bibcode:2019arXiv190100848R+OR+bibcode:2019arXiv190102406S+OR+bibcode:2019arXiv190103322S+OR+bibcode:2019arXiv190103431L+OR+bibcode:2019arXiv190105003C+OR+bibcode:2019arXiv190105374H+OR+bibcode:2019arXiv190105895D+OR+bibcode:2019arXiv190109070R+OR+bibcode:2019arXiv190109988K+OR+bibcode:2019arXiv190200991S+OR+bibcode:2019arXiv190202417P+OR+bibcode:2019arXiv190202663L+OR+bibcode:2019arXiv190204971T+OR+bibcode:2019arXiv190206749C+OR+bibcode:2019arXiv190206888S+OR+bibcode:2019arXiv190208324B+OR+bibcode:2019arXiv190209483N+OR+bibcode:2019arXiv190210171N+OR+bibcode:2019arXiv190302964B+OR+bibcode:2019arXiv190303276M+OR+bibcode:2019arXiv190304500B+OR+bibcode:2019arXiv190305786M+OR+bibcode:2019arXiv190309575B+OR+bibcode:2019arXiv190310963N+OR+bibcode:2019arXiv190400102P+OR+bibcode:2019arXiv190402013S+OR+bibcode:2019arXiv190402214C+OR+bibcode:2019arXiv190402276L+OR+bibcode:2019arXiv190404323A+OR+bibcode:2019arXiv190409602D+OR+bibcode:2019arXiv190411528H+OR+bibcode:2019arXiv190411590L+OR+bibcode:2019arXiv190411935C+OR+bibcode:2019arXiv190412139I+OR+bibcode:2019arXiv190505118O+OR+bibcode:2019arXiv190505275Z+OR+bibcode:2019arXiv190507240R+OR+bibcode:2019arXiv190508768S+OR+bibcode:2019arXiv190508821W+OR+bibcode:2019arXiv190511349M+OR+bibcode:2019arXiv190511458S+OR+bibcode:2019arXiv190512700C+OR+bibcode:2019arXiv190513107B+OR+bibcode:2019arXiv190513311C+OR+bibcode:2019arXiv190600476S+OR+bibcode:2019arXiv190606343S+OR+bibcode:2019Natur.567..209H&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => dirname(__FILE__) . '/ads/1801.00862_citations_1.json',
+        'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2019Natur.567..491K+OR+bibcode:2019npjQI...5...11O+OR+bibcode:2019QS%26T....4bLT03A+OR+bibcode:2019QuIP...18..198C+OR+bibcode:2019SciA....5.2761H+OR+bibcode:2019SPIE11022E..2VZ&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => dirname(__FILE__) . '/ads/1801.00862_citations_2.json',
                           );
+
     if(!empty($local_file_urls[$url]))
-        return array('headers'=>'' ,'body'=> file_get_contents($local_file_urls[$url]) );
-    elseif(strpos($url, get_option('o3po-setttings')['crossref_get_forward_links_url']) === 0)
-        return array('body' => 'fake respose form crossref forward links url');
+        if(is_array($local_file_urls[$url]))
+            return array('headers'=>$local_file_urls[$url]['headers'] ,'body'=> file_get_contents($local_file_urls[$url]['body']) );
+        else
+            return array('headers'=>array() ,'body'=> file_get_contents($local_file_urls[$url]) );
+    /* elseif(strpos($url, get_option('o3po-settings')['crossref_get_forward_links_url']) === 0) */
+    /*     return array('body' => 'fake respose form crossref forward links url'); */
     else
-        throw new Exception('Fake wp_remote_get() does not know how to handle ' . $url);
+        return new WP_Error('unhandled_url', 'Fake wp_remote_get() does not know how to handle ' . $url);
+
 }
 
 function wp_verify_nonce() {
@@ -660,18 +860,57 @@ function wp_is_post_revision() {
 
 function remove_action() {}
 
-function wp_slash( $input ) {
-    return $input;
-}
-
 function wp_generate_password( $length ) {
     $string = '';
     for($i=0; $i<$length; $i++)
-        $string .= rand(0, 9); //This is just a face environemnt, so no security concerns
+        $string .= rand(0, 9); //This is just a fake environemnt, so no security concerns
     return $string;
 }
 
-function wp_remote_post( $url, $args = array() ) {}
+function wp_remote_post( $url, $args = array() ) {
+    $response_array = array(
+        'https://api.bufferapp.com/1/updates/create.json?access_token=1%252F345792aa62c_1' => dirname(__FILE__) . '/buffer/successful.json',
+        'https://api.bufferapp.com/1/updates/create.json?access_token=invalid_token' => dirname(__FILE__) . '/buffer/token_invalid.json',
+        'https://api.bufferapp.com/1/updates/create.json?access_token=1%252F345792aa62c_2' => dirname(__FILE__) . '/buffer/select_account.json',
+        'https://api.bufferapp.com/1/updates/create.json?access_token=1%252F345792aa62c_3' => dirname(__FILE__) . '/buffer/no_permission.json',
+        'https://invalid.api.bufferapp.com/1/updates/create.json?access_token=1%252F345792aa62c_5' => null,#dirname(__FILE__) . '/buffer/invalid.json',
+        'https://api.bufferapp.com/1/updates/create.json?access_token=1%252F345792aa62c_6' => new WP_Error('error', 'this url produces an error'),
+        'https://fake_buffer_api_url/updates/create.json?access_token=081fa8123a892134ba93241' => dirname(__FILE__) . '/buffer/successful.json',
+        'Einselection+without+pointer+states+by+Christian+Gogolin&media[photo]=f&attachment=true&shorten=false&now=false&top=false' => dirname(__FILE__) . '/buffer/successful.json',
+        'Dynamic+wetting+with+two+competing+adsorbates+by+Christian+Gogolin%2C+Christian+Meltzer%2C+Marvin+Willers%2C+and+Haye+Hinrichsen&media[photo]=f&attachment=true&shorten=false&now=false&top=false' => dirname(__FILE__) . '/buffer/invalid.json',
+        'The+boundaries+and+twist+defects+of+the+color+code+and+their+applications+to+topological+quantum+computation+by+Markus+S.+Kesselring%2C+Fernando+Pastawski%2C+Jens+Eisert%2C+and+Benjamin+J.+Brown&media[photo]=f&attachment=true&shorten=false&now=false&top=false' => dirname(__FILE__) . '/buffer/successful.json',
+        'https://fake_doaj_api_url.com?api_key=key' => dirname(__FILE__) . '/doaj/success.json',
+        'https://fake_doaj_api_url?api_key=fake_doaj_api_key' => dirname(__FILE__) . '/doaj/success.json',
+        'https://fake_crossref_test_deposite_url' => dirname(__FILE__) . '/crossref/deposit_success.xml',
+        'https://fake_crossref_deposite_url' => dirname(__FILE__) . '/crossref/deposit_success.xml',
+                             );
+
+    foreach(array_keys($response_array) as $key)
+    {
+        if(strpos($url, $key) !== false)
+        {
+            if(!empty($response_array[$key]) and is_string($response_array[$key]))
+                return array('body' => file_get_contents($response_array[$key]));
+            elseif(!empty($response_array[$key]) and (is_array($response_array[$key]) or is_wp_error($response_array[$key])))
+                return $response_array[$key];
+            else
+                return array();
+        }
+    }
+
+
+    /* if(in_array($url, array_keys($response_array))) */
+    /* { */
+    /*     if(!empty($response_array[$url]) and is_string($response_array[$url])) */
+    /*         return array('body' => file_get_contents($response_array[$url])); */
+    /*     elseif(!empty($response_array[$url]) and is_array($response_array[$url])) */
+    /*         return $response_array[$url]; */
+    /*     else */
+    /*         return array(); */
+    /* } */
+
+    echo("\nunhandled url in wp_remote_post() in bootstrap.php:" . $url . "\n");
+}
 
 function register_post_type( $post_type, $args ) {}
 
@@ -684,20 +923,17 @@ function is_home() {
     return $is_home;
 }
 
-$is_category = false;
-function is_category() {
-    global $is_category;
-    return $is_category;
-}
-
-
 function get_header() {
     echo '<!DOCTYPE html>
 <html lang="en-GB">
 <head><title>fake title</title></head><body>';
 }
 
-function get_theme_mod() {
+function get_theme_mod( $part=null ) {
+
+    if($part === 'custom_logo')
+        return 8356865345;#a special id we recognize in wp_get_attachment_image()
+
     return "";
 }
 
@@ -721,12 +957,20 @@ function get_template_part() {
     echo '';
 }
 
+function locate_template( $array ) {
+
+    return $array[0];
+}
+
 function the_posts_navigation() {
 
     echo '';
 }
 
 $global_settings = array();
+$wp_settings_fields = array();
+$wp_settings_sections = array();
+
 function register_setting( $option_group, $option_name, $args = array() ) {
     global $global_settings;
 
@@ -738,7 +982,7 @@ function register_setting( $option_group, $option_name, $args = array() ) {
 }
 
 function add_settings_section( $id, $title, $callback, $page ) {
-    global $global_settings;
+    global $global_settings, $wp_settings_sections;
 
     if(empty($global_settings['sections']))
         $global_settings['sections'] = array();
@@ -749,10 +993,15 @@ function add_settings_section( $id, $title, $callback, $page ) {
         'page' => $page,
         'fields' => array(),
                                                );
+
+    if(!isset($wp_settings_sections[$page]))
+        $wp_settings_sections[$page] = array();
+
+    $wp_settings_sections[$page][$id] = array('id' => $id, 'title' => $title, 'callback' => $callback);
 }
 
-function add_settings_field( $id, $title, $callback, $page ) {
-    global $global_settings;
+function add_settings_field( $id, $title, $callback, $page, $section = 'default', $args = array() ) {
+    global $global_settings, $wp_settings_fields;
 
     $keys = array_keys($global_settings['sections']);
     $last_settings_section_id = end($keys);
@@ -764,8 +1013,36 @@ function add_settings_field( $id, $title, $callback, $page ) {
         'page' => $page,
                                                                                    );
 
-//    print("\nglobal_settings=" . json_encode($global_settings['sections']) . "\n" );
+    $wp_settings_fields[$page][$section][$id] = array('id' => $id, 'title' => $title, 'callback' => $callback, 'args' => $args);
 }
+
+$global_setting_errors = array();
+
+function settings_errors( $setting = '', $sanitize = false, $hide_on_update = false ) {
+    global $global_setting_errors;
+
+    $output = '';
+    foreach ( $global_setting_errors as $key => $details ) {
+        $css_id = 'setting-error-' . $details['code'];
+        $css_class = $details['type'] . ' settings-error notice is-dismissible';
+        $output .= "<div id='$css_id' class='$css_class'> \n";
+        $output .= "<p><strong>{$details['message']}</strong></p>";
+        $output .= "</div> \n";
+    }
+    echo $output;
+}
+
+function add_settings_error( $setting, $code, $message, $type = 'error' ) {
+    global $global_setting_errors;
+
+    $global_setting_errors[] = array(
+        'setting' => $setting,
+        'code'    => $code,
+        'message' => $message,
+        'type'    => $type
+                                     );
+}
+
 
 function settings_fields( $option_group ) {
 
@@ -773,6 +1050,8 @@ function settings_fields( $option_group ) {
 
 function do_settings_sections( $id ) {
     global $global_settings;
+
+    $id = substr($id, strpos($id, ":") + 1);
 
     call_user_func($global_settings['sections'][$id]['callback']);
     foreach($global_settings['sections'][$id]['fields'] as $id => $properties)
@@ -792,4 +1071,142 @@ function checked( $helper, $current=true, $echo=true, $type='checked' ) {
         echo $result;
 
     return $result;
+}
+
+function apply_filters( $hook, $orig_text, $text )
+{
+    global $filters;
+
+    if(!empty($filters[$hook]))
+    {
+        foreach($filters[$hook] as $callable)
+            $text = call_user_func($callable, $text);
+    }
+
+    return $text;
+}
+
+/**
+ * Stripped down version of the original wp_allowed_protocols()
+ */
+function wp_allowed_protocols() {
+    static $protocols = array();
+
+    if ( empty( $protocols ) ) {
+        $protocols = array( 'http', 'https', 'ftp', 'ftps', 'mailto', 'news', 'irc', 'gopher', 'nntp', 'feed', 'telnet', 'mms', 'rtsp', 'svn', 'tel', 'fax', 'xmpp', 'webcal', 'urn' );
+    }
+
+    /* if ( ! did_action( 'wp_loaded' ) ) { */
+    /*     /\** */
+    /*      * Filters the list of protocols allowed in HTML attributes. */
+    /*      * */
+    /*      * @since 3.0.0 */
+    /*      * */
+    /*      * @param array $protocols Array of allowed protocols e.g. 'http', 'ftp', 'tel', and more. */
+    /*      *\/ */
+    /*     $protocols = array_unique( (array) apply_filters( 'kses_allowed_protocols', $protocols ) ); */
+    /* } */
+
+    return $protocols;
+}
+
+function wp_load_alloptions() {
+    return array();
+}
+
+function the_archive_title( $before = '', $after = '' ) {
+    $title = get_the_archive_title();
+
+    if ( ! empty( $title ) ) {
+        echo $before . $title . $after;
+    }
+}
+
+function get_the_archive_title() {
+    return "foo";
+}
+
+function the_archive_description( $before = '', $after = '' ) {
+    $title = get_the_archive_description();
+
+    if ( ! empty( $title ) ) {
+        echo $before . $title . $after;
+    }
+}
+
+function get_the_archive_description() {
+    return "bar";
+}
+
+function load_plugin_textdomain( $slug, $b, $dir ) {
+
+}
+
+function plugin_basename( $file  ) {
+
+    return 'fake_basename';
+}
+
+function get_bloginfo( $url ) {
+
+    return 134134;
+}
+
+function add_options_page($a, $b, $c, $d) {
+
+}
+
+function wp_enqueue_style( $handle, $src = '', $deps = array(), $ver = false, $media = 'all' ) {
+
+}
+
+function plugin_dir_url( $file ) {
+    return(dirname( __FILE__ ) . '/../../');
+}
+
+function add_menu_page( $page_title, $menu_title, $capability, $menu_slug, $function = '', $icon_url = '', $position = null ) {}
+
+class WP_Theme
+{
+    private $name;
+
+    public function __construct( $name ) {
+        $this->name = $name;
+    }
+
+    public function get($field) {
+
+        if($field === 'Name')
+            return $this->name;
+        else
+            throw new Exception('Not implemented');
+    }
+
+}
+
+function wp_get_theme( $stylesheet=null, $theme_root=null ) {
+
+    return new WP_Theme('OnePress');
+}
+
+$is_single = false;
+
+function is_single() {
+    global $is_single;
+    return $is_single;
+}
+
+function home_url( $path=null, $scheme=null ) {
+    if($scheme === null)
+        $scheme = 'https';
+
+    return $scheme . '://some.site' . $path;
+}
+
+function __( $input ) {
+    return $input;
+}
+
+function _x( $input ) {
+    return $input;
 }

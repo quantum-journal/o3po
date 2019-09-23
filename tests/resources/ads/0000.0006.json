@@ -1,0 +1,1 @@
+{"responseHeader":{"status":0,"QTime":8,"params":{"q":"arxiv:0000.0004","x-amzn-trace-id":"Root=1-5c2e050d-df5f6f174662e88c5838a083","fl":"citation","start":"0","rows":"10","wt":"json"}},"response":{"numFound":1,"start":0,"docs":[{"citation":["2015Phys...93.1143F"]}]}}

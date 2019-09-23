@@ -165,6 +165,43 @@ class O3PO_LatexTest extends PHPUnit_Framework_TestCase
 
 
 
+
+    public function expand_latex_macros_provider() {
+
+        return [
+            array(
+                'definitions' => array(
+            ['\newcommand{\unam}', 'newcommand', '\unam', '', '', 'Universidad Nacional Aut\'onoma de M\'exico, M\'exico, D.F., M\'exico'],
+            ['\newcommand{\ifunam}', 'newcommand', '\ifunam', '', '', 'Instituto de F\'{\i}sica, \unam'],
+            ['\newcommand{\ifoo}', 'newcommand', '\ifoo', '', '', 'bar']
+                                       ),
+                'cases' => array(
+                    '\unamx' => '\unamx',
+                    '\unamx ' => '\unamx ',
+                    '\unam' => 'Universidad Nacional Aut\'onoma de M\'exico, M\'exico, D.F., M\'exico',
+                    '\unam ' => 'Universidad Nacional Aut\'onoma de M\'exico, M\'exico, D.F., M\'exico',
+                    '\ifunam' => 'Instituto de F\'{\i}sica, Universidad Nacional Aut\'onoma de M\'exico, M\'exico, D.F., M\'exico',
+                    '\ifunam abc' => 'Instituto de F\'{\i}sica, Universidad Nacional Aut\'onoma de M\'exico, M\'exico, D.F., M\'exicoabc',
+                    'abc \ifunam' => 'abc Instituto de F\'{\i}sica, Universidad Nacional Aut\'onoma de M\'exico, M\'exico, D.F., M\'exico',
+                    'abc \ifunam abc' => 'abc Instituto de F\'{\i}sica, Universidad Nacional Aut\'onoma de M\'exico, M\'exico, D.F., M\'exicoabc',
+                                 ),
+                  )
+                ];
+    }
+
+
+        /**
+         * @dataProvider expand_latex_macros_provider
+         */
+    public function test_expand_latex_macros($macro_definitions, $cases) {
+
+        foreach($cases as $input => $output)
+            $this->assertSame(O3PO_Latex::expand_latex_macros( $macro_definitions, $input ), $output);
+
+    }
+
+
+
     public function latex_to_utf8_outside_math_mode_test_case_provider() {
         return [
             ["\\'  \n a" , "á"],
@@ -178,7 +215,7 @@ class O3PO_LatexTest extends PHPUnit_Framework_TestCase
             ["\\'a    " , "á    "],
             ["\\'{a}" , "á"],
             ["\\'{\\a}" , "á"],
-            ["\\'xax " , "\\'xax "],
+            ["\\'bax " , "\\'bax "],
             ["\\'{a" , "\\'{a"],
             ["\\'{\\a" , "\\'{\\a"],
             ["\\`  \n a" , "à"],
@@ -192,7 +229,7 @@ class O3PO_LatexTest extends PHPUnit_Framework_TestCase
             ["\\`a    " , "à    "],
             ["\\`{a}" , "à"],
             ["\\`{\\a}" , "à"],
-            ["\\`xax " , "\\`xax "],
+            ["\\`bax " , "\\`bax "],
             ["\\`{a" , "\\`{a"],
             ["\\`{\\a" , "\\`{\\a"],
             ["\\`a}" , "à}"],
@@ -238,5 +275,161 @@ ab' , 'äb'],
         $this->assertSame($expected, O3PO_Latex::latex_to_utf8_outside_math_mode($input, false));
     }
 
+
+    public function utf8_to_closest_latin_letter_string_provider() {
+        return [
+            ['foo' , 'foo'],
+            ['ä' , 'a'],
+            ['á' , 'a'],
+            ['ç' , 'c'],
+            ['ü562457189(&(L' , 'uL'],
+                ];
+    }
+
+        /**
+         * @dataProvider utf8_to_closest_latin_letter_string_provider
+         */
+    public function test_utf8_to_closest_latin_letter_string( $input, $expected ) {
+        $this->assertSame($expected, O3PO_Latex::utf8_to_closest_latin_letter_string($input));
+    }
+
+
+
+    public function preg_split_at_latex_math_mode_delimters_provider() {
+        return [
+            ['foo' , ['foo']],
+            ['foo \\$ bar' , ['foo \\$ bar']],
+            ['foo $a$ bar' , ['foo ', 'a', ' bar']],
+            ['foo $$a$$ bar' , ['foo ', 'a', ' bar']],
+            ['foo \\[a\\] bar' , ['foo ', 'a', ' bar']],
+            ['foo \\(a\\) bar' , ['foo ', 'a', ' bar']],
+            ['foo \\begin{equation}a\\end{equation} bar' , ['foo ', 'a', ' bar']],
+            ['foo \\begin{align*}a\\end{align*} bar' , ['foo ', 'a', ' bar']],
+            ['$a$ bar' , ['', 'a', ' bar']],
+            ['foo $a$' , ['foo ', 'a', '']],
+            ['$a$' , ['', 'a', '']],
+            ['\\begin{abstract} foo \\(a\\) bar' , ['\\begin{abstract} foo ', 'a', ' bar']],
+
+                ];
+    }
+
+        /**
+         * @dataProvider preg_split_at_latex_math_mode_delimters_provider
+         */
+    public function test_preg_split_at_latex_math_mode_delimters( $input, $expected ) {
+        $this->assertSame($expected, O3PO_Latex::preg_split_at_latex_math_mode_delimters($input));
+    }
+
+    public function strpos_outside_math_mode_provider() {
+        return [
+            [['foo', 'o'] , 1],
+            [['foo', 'x'] , false],
+            [['foo $x$', 'x'] , false],
+            [['foo $x$ bar', 'a'] , 6],
+            [['foo $x$ \\bar', '\\'] , 5],
+            [[' \\begin{abstract} foo $x$', '\\'] , 1],
+            [['\\begin{abstract} foo $x$', '\\'] , 0],
+            [['\\begin{equation} x + \alpha = 4 \\end{equation}', '\\'] , false],
+            [['\\begin{equation} x + \alpha = 4 \\end{equation} x', 'x'] , 1],
+                ];
+    }
+
+        /**
+         * @dataProvider strpos_outside_math_mode_provider
+         */
+    public function test_strpos_outside_math_mode( $input, $expected ) {
+        $this->assertSame($expected, O3PO_Latex::strpos_outside_math_mode($input[0], $input[1]));
+    }
+
+
+    public function preg_match_outside_math_mode_provider() {
+        return [
+            [['#o#', 'foo'] , 1],
+            [['#x#', 'foo'] , 0],
+            [['#x#', 'foo $x$'] , 0],
+            [['#a#', 'foo $x$ bar'] , 1],
+            [['#\\\\#', 'foo $x$ \\bar'] , 1],
+            [['#\\\\#', '\\begin{abstract} foo $x$'] , 1],
+            [['#\\\\#', '\\begin{abstract} foo $x$ \\bar'] , 2],
+            [['#\\\\#', 'abc \\begin{equation} x + \alpha = 4 \\end{equation}'] , 0],
+            [['#x#', '\\begin{equation} x + \alpha = 4 \\end{equation} x'] , 1],
+            [['#\\\\#', 'foo \\cite{a} $x$ bar \\cite{b}'] , 2],
+            [['#\\\\(?!cite)#', 'foo \\cite{a} $x$ bar \\cite{b}'] , 0],
+            [['##', 'foo $x$'] , 2],
+                ];
+    }
+
+        /**
+         * @dataProvider preg_match_outside_math_mode_provider
+         */
+    public function test_preg_match_outside_math_mode( $input, $expected ) {
+        $this->assertSame($expected, O3PO_Latex::preg_match_outside_math_mode($input[0], $input[1]));
+    }
+
+
+    public function normalize_whitespace_and_linebreak_characters_provider() {
+        return [
+            [["abc", True, False] , "abc"],
+            [["a \t c", True, False] , "a c"],
+            [["a\smallskip c", True, False] , "a c"],
+            [["a\medskip c", True, False] , "a c"],
+            [["a\bigskip c", False, False] , "a c"],
+            [["ab  c  ", True, False] , "ab c"],
+            [["  a  bc", True, False] , "a bc"],
+            [["ab\nc", False, False] , "ab\nc"],
+            [["ab\nc", True, False] , "ab c"],
+            [["ab\\newline c", True, False] , "ab c"],
+            [["ab\\newline c", False, False] , "ab\nc"],
+            [["ab\\linebreak c", True, False] , "ab c"],
+            [["ab\\linebreak c", False, False] , "ab\nc"],
+            [["ab\\\\ c", True, False] , "ab c"],
+            [["ab\\\\ c", False, False] , "ab\nc"],
+            [["ab\\newlinec", false, False] , "ab\\newlinec"],
+            [["ab\\newlinec", True, False] , "ab\\newlinec"],
+            [["ab\\newline c", False, False] , "ab\nc"],
+            [["a\\newline ab", False, False] , "a\nab"],
+            [["a\\\\b", False, False] , "a\nb"],
+            [["a\\\\\\newline b", False, False] , "a\n\nb"],
+            [["a\\hspace{2cm}b", False, False] , "a b"],
+            [["a\nb", False, True] , "a b"],
+            [["a\n\nb", False, True] , "a\n\nb"],
+            [["a\\newline\n ab", False, True] , "a\nab"],
+            [["a\\newline\n\n ab", False, True] , "a\n\nab"],
+            [["a\\newline\n\n\n ab", False, True] , "a\n\nab"],
+            [["a\n\n\n\n\nb", False, True] , "a\n\nb"],
+            [["a\n", False, True] , "a"],
+            [["\nb", False, True] , "b"],
+            [["\ná", False, True] , "á"],
+            [["\ntà ", False, True] , "tà"],
+            [['tà  d', True, False], 'tà d'],
+            [['tà d', True, False], 'tà d'],
+                ];
+    }
+
+        /**
+         * @dataProvider normalize_whitespace_and_linebreak_characters_provider
+         */
+    public function test_normalize_whitespace_and_linebreak_characters( $input, $expected ) {
+        $this->assertSame($expected, O3PO_Latex::normalize_whitespace_and_linebreak_characters($input[0], $input[1], $input[2]));
+    }
+
+
+    public function expand_cite_to_html_provider() {
+        return [
+            ["abc", "abc"],
+            ['\cite{CampisiRMP}', '[<a onclick="document.getElementById(\'references\').style.display=\'block\';" href="#CampisiRMP">2</a>]'],
+            ['\cite{CampisiRMP,GooldReview}', '[<a onclick="document.getElementById(\'references\').style.display=\'block\';" href="#CampisiRMP">2</a>,<a onclick="document.getElementById(\'references\').style.display=\'block\';" href="#GooldReview">3</a>]'],
+            ['\cite[Section 2]{GooldReview}', '[<a onclick="document.getElementById(\'references\').style.display=\'block\';" href="#GooldReview">3</a>, Section 2]'],
+                ];
+    }
+
+        /**
+         * @dataProvider expand_cite_to_html_provider
+         */
+    public function test_expand_cite_to_html( $input, $expected ) {
+
+        $bbl = file_get_contents(dirname( __FILE__ ) . "/resources/test_bibliography.bbl");
+        $this->assertSame($expected, O3PO_Latex::expand_cite_to_html($input, $bbl));
+    }
 
 }

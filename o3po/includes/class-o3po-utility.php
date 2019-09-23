@@ -3,7 +3,7 @@
 /**
  * A collection of various utility functions.
  *
- * @link       http://example.com
+ * @link       https://quantum-journal.org/o3po/
  * @since      0.1.0
  *
  * @package    O3PO
@@ -35,25 +35,25 @@ class O3PO_Utility
          * */
     static public function check_orcid( $orcid ) {
 
-        if( !preg_match( '/([0-9]{4}-){3}[0-9]{3}[0-9X]/', $orcid) )
+        if( !preg_match( '/([0-9]{4}-){3}[0-9]{3}[0-9X]/u', $orcid) )
             return "is malformed";
         else {
-            $orcid_digits = preg_replace('/-/', '', $orcid );
-            $strlen = strlen( $orcid_digits );
+            $orcid_digits = preg_replace('/-/u', '', $orcid );
+            $strlen = mb_strlen( $orcid_digits );
             $total = 0;
             for( $i = 0; $i < $strlen-1; $i++ ) {
-                $digit = (int)substr( $orcid_digits, $i, 1 );
+                $digit = (int)mb_substr( $orcid_digits, $i, 1 );
                 $total = ($total + $digit) * 2;
             }
             $remainder = $total % 11;
             $result = (12 - $remainder) % 11;
             $result = $result === 10 ? "X" : $result;
-            $ok = substr( $orcid_digits, $strlen-1, 1 ) == $result;
+            $ok = mb_substr( $orcid_digits, $strlen-1, 1 ) == $result;
 
             if($ok)
                 return true;
             else
-                return "did not pass the checksum test with result=" . $result . " but last digit=" . substr( $orcid_digits, $strlen-1, 1 );
+                return "did not pass the checksum test with result=" . $result . " but last digit=" . mb_substr( $orcid_digits, $strlen-1, 1 );
         }
     }
 
@@ -76,7 +76,7 @@ class O3PO_Utility
             return "0";
 
         if(intval($frombase) != 10) {
-            $len = strlen($str);
+            $len = mb_strlen($str);
             $q = 0;
             for ($i=0; $i<$len; $i++) {
                 $r = base_convert($str[$i], $frombase, 10);
@@ -122,7 +122,7 @@ class O3PO_Utility
     static public function remove_stopwords( $text ) {
 
         foreach (static::$stop_words as $target) {
-            $text = preg_replace('#\\b( ' . $target . '|' . $target . ' |' . $target . ')\\b#i', '', $text);
+            $text = preg_replace('#\\b( ' . $target . '|' . $target . ' |' . $target . ')\\b#iu', '', $text);
         }
 
         return $text;
@@ -169,7 +169,35 @@ class O3PO_Utility
          * */
     static public function make_slash_breakable_html( $string ) {
         $zero_width_space = html_entity_decode('&#8203;', 0, 'UTF-8');
-        return preg_replace('#/#', '/' . $zero_width_space, $string );
+        return preg_replace('#/#u', '/' . $zero_width_space, $string );
+    }
+
+        /**
+         * Verify that an issn is well formed.
+         *
+         * @since 0.3.0
+         * @param string    $issn    ISSN to be checked
+         * @return bool     Whether $issn is well formed.
+         */
+    static function valid_issn( $issn ) {
+
+        if(preg_match('#^[0-9]{4}-[0-9]{3}[0-9X]$#u', $issn) !== 1)
+            return false;
+        $issn_without_dash = mb_substr($issn, 0, 4) . mb_substr($issn, 5, 4);
+        $check = 0;
+        for($i=8; $i>=2 ; $i--)
+        {
+            $check += $issn_without_dash[8-$i]*$i;
+        }
+        $check = $check % 11;
+        if($check !== 0)
+            $check = 11-$check;
+        if($check === 10)
+            $check = 'X';
+        else
+            $check = (string)$check;
+
+        return $check === $issn[8];
     }
 
         /**
@@ -179,10 +207,11 @@ class O3PO_Utility
          *
          * @since 0.2.0
          * @param string    $email    Email to be checked
+         * @return bool     Whether $email is well formed.
          */
     static function valid_email( $email )
     {
-        return( preg_match(
+        return(preg_match(
             "/(?(DEFINE)
    (?<address>         (?&mailbox) | (?&group))
    (?<mailbox>         (?&name_addr) | (?&addr_spec))
@@ -235,7 +264,73 @@ class O3PO_Utility
    (?<WSP>             [\x20\x09])
  )
 
- (?&address)/x", $email));
+ (?&address)/xu", $email) ? true : false);
+    }
+
+        /**
+         * Compute the mean
+         *
+         * @since 0.3.0
+         * @access public
+         * @param array $array Array for which to compute the mean.
+         * @return int|float Mean of the array.
+         */
+    public static function array_mean( $array ) {
+
+        if (!is_array($array))
+            throw new DomainException('Input is not an array');
+
+        return array_sum($array) / count($array);
+    }
+
+        /**
+         * Compute the standard deviation
+         *
+         * @since 0.3.0
+         * @access public
+         * @param array $array Array for which to compute the standard deviation.
+         * @return float Standard deviation of the array.
+         */
+    public static function array_stddev( $array ) {
+
+        if (!is_array($array))
+            throw new DomainException('Input is not an array');
+
+        if(count($array)<2)
+            return 0.0;
+
+        $mean = static::array_mean($array);
+        $sum_of_squares = array();
+        foreach($array as $elem)
+            $sum_of_squares[] = ($elem - $mean)*($elem - $mean);
+
+        return sqrt(array_sum($sum_of_squares)/(count($array)-1));
+    }
+
+        /**
+         * Compute the median.
+         *
+         * @since 0.3.0
+         * @access public
+         * @param array $array Array for which to compute the standard deviation.
+         * @return float|int Median of the array.
+         */
+    public static function array_median( $array ) {
+
+        if(!is_array($array))
+            throw new DomainException('Input is not an array');
+
+        if(empty($array))
+            throw new DomainException('Input array is empty');
+
+        $count = count($array);
+        $middle_index = floor($count / 2);
+        sort($array, SORT_NUMERIC);
+        $median = $array[$middle_index];
+        if ($count % 2 == 0) {
+            $median = ($median + $array[$middle_index - 1]) / 2;
+        }
+        return $median;
     }
 
 }

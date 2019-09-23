@@ -3,7 +3,7 @@
 /**
  * Provide information about and functions to interact with the environment in which this plugin is running.
  *
- * @link       http://example.com
+ * @link       https://quantum-journal.org/o3po/
  * @since      0.1.0
  *
  * @package    O3PO
@@ -70,15 +70,7 @@ class O3PO_Environment {
     public function modify_css_if_in_test_environment() {
 
         if($this->is_test_environment())
-        {
-?>
-            <style>
-            .site-header, div#wpadminbar {
-                background-color: #49cf44;
-            }
-            </style>
-<?php
-        }
+            echo '<style>div#wpadminbar {background-color: #49cf44;}</style>';
     }
 
         /**
@@ -94,10 +86,10 @@ class O3PO_Environment {
          * @param    string     $filename   Base Filename.
          * @param    string     $ext        Desired extension.
          * */
-    private function unique_filename_callback( $dir, $filename, $ext ) {
+    public function unique_filename_callback( $dir, $filename, $ext ) {
 
-        $ext = strtolower($ext);
-        if($ext === '.gz' && substr($filename, -7) === '.tar.gz' ) $ext = '.tar.gz';
+        $ext = mb_strtolower($ext);
+        if($ext === '.gz' && mb_substr($filename, -7) === '.tar.gz' ) $ext = '.tar.gz';
         $number = '';
         while ( file_exists( $dir . "/$filename" ) ) {
             $new_number = (int) $number + 1;
@@ -122,12 +114,47 @@ class O3PO_Environment {
          * */
     public function custom_upload_mimes( $mime_types=array() ) {
 
-        $mime_types['pdf'] = 'application/pdf';
-        $mime_types['tex'] = 'text/x-tex';
-        $mime_types['tar.gz'] = 'application/x-tar';
+        if(!array_key_exists('pdf', $mime_types)) $mime_types['pdf'] = 'application/pdf';
+        if(!array_key_exists('tex', $mime_types)) $mime_types['tex'] = 'text/x-tex';
+        if(!array_key_exists('gz', $mime_types)) $mime_types['gz'] = 'application/gzip';
+        if(!array_key_exists('tar.gz', $mime_types)) $mime_types['tar.gz'] = 'application/gzip'; #just to be sure we also add this
 
         return $mime_types;
     }
+
+        /**
+         * Works around a bug in WP that disallows upload of files to the media library even if they are marked as allowed via the 'upload_mimes' filter.
+         *
+         * To be added to the 'wp_check_filetype_and_ext' filter.
+         *
+         * @since 0.3.0
+         * @access public
+         * @param array  $data                      File data array containing 'ext', 'type', and
+         *                                          'proper_filename' keys.
+         * @param string $file                      Full path to the file.
+         * @param string $filename                  The name of the file (may differ from $file due to
+         *                                          $file being in a tmp directory).
+         * @param array  $mimes                     Key is the file extension with value as the mime type.
+         * @return
+         */
+    public function disable_real_mime_check_for_selected_extensions( $data, $file, $filename, $mimes ) {
+        $wp_filetype = wp_check_filetype($filename, $mimes);
+
+        $ext = $wp_filetype['ext'];
+        $type = $wp_filetype['type'];
+        $proper_filename = $data['proper_filename'];
+
+        # If the filename is gz (or tar.gz, although WP 5.0.1 treats tar.gz as gz)
+        # we return the original file data, thereby reversing the change of $ext
+        # and $type to false, that is done by WP during wp_check_filetype_and_ext()
+        # for file types that WP "doesn't like" even though we explicitly allowed
+        # them via custom_upload_mimes().
+        if($ext === "gz" or $ext === "tar.gz")
+            return compact( 'ext', 'type', 'proper_filename' );
+        else
+            return $data;
+    }
+
 
         /**
          * Download a file to the WordPress media library.
@@ -172,11 +199,11 @@ class O3PO_Environment {
                 return array( 'error' => "Instead of the mime type " . $mime_type . " we were expecting, the remote server provided a file of mime type " . $actual_mime_type );
 
             if (empty($extension)) {
-                if( preg_match('#text/.*tex#', $mime_type) )
+                if( preg_match('#text/.*tex#u', $mime_type) )
                     $extension = 'tex';
-                else if( preg_match('#application/.*(tar|gz|gzip)#', $mime_type) )
+                else if( preg_match('#application/.*(tar|gz|gzip)#u', $mime_type) )
                     $extension = 'tar.gz';
-                else if( preg_match('#application/.*pdf#', $mime_type) )
+                else if( preg_match('#application/.*pdf#u', $mime_type) )
                     $extension = 'pdf';
                 else
                     $extension = 'unknown';
@@ -214,7 +241,7 @@ class O3PO_Environment {
             $results = wp_handle_sideload( $file, $overrides );
 
             if ( !empty( $results['error'] ) ) {
-                return array( 'error' => "Failed to put file of mime type " . $mime_type . " into uploads directory because Wordpress said: " . $results['error'] );
+                return array( 'error' => "Failed to put file " . $file['name'] . " of mime type " . $file['type'] . " into uploads directory because Wordpress said: " . $results['error'] );
             } else {
                 $filepath  = $results['file']; // Full path to the file
 
@@ -234,9 +261,7 @@ class O3PO_Environment {
                 $attach_data = wp_generate_attachment_metadata( $attach_id, $filename );
                 wp_update_attachment_metadata( $attach_id, $attach_data );
 
-                    //$local_url = $results['url'];  // URL to the file in the uploads dir
-                    //$mime_type = $results['type']; // MIME type of the file
-
+                $results['mime_type'] = $mime_type;
                 $results['attach_id'] = $attach_id;
                 return $results;
             }
@@ -260,12 +285,12 @@ class O3PO_Environment {
          * @param    string    $path    Path to file/folder to delete.
          * @param    string    $root    Root folder to which to restric the deleting.
          * */
-    public function save_recursive_remove_dir( $path, $root ) {
+    public static function save_recursive_remove_dir( $path, $root ) {
 
         $path = rtrim($path, '/').'/';
         $root = rtrim($root, '/').'/';
 
-        if ($root === '/' || $path === '/' || $root !== substr($path, 0, strlen($root)) )
+        if ($root === '/' || $path === '/' || $root !== mb_substr($path, 0, mb_strlen($root)) )
             return false;
 
         foreach(new RecursiveIteratorIterator( new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS), 	RecursiveIteratorIterator::CHILD_FIRST) as $entry ) {

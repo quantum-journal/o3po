@@ -4,11 +4,11 @@
 
 
 
-* Contributors: cgogolin
+* Contributors: cgogolin, johannesjmeyer, drever
 * Donate link: https://quantum-journal.org/donate/
 * Tags: publishing, open-access
 * Requires at least: 4.0.1
-* Tested up to: 4.9.8
+* Tested up to: 5.2.1
 * Requires PHP: 5.6
 * Stable tag: 1.0.0
 * License: GPLv3 or later
@@ -22,34 +22,34 @@ O-3PO powers the website of [Quantum - the open journal for quantum science](htt
 
 This is beta software, which still may contain site-specific and/or not well tested code.
 
-DO NOT USE THIS ON A PRODUCTION SITE!
-
 ## Description
 
 O-3PO offers the following features:
 
-* Automatic download of TeX source code and PDF from the arXiv
+* Automatic download of LaTeX source code and PDF from the arXiv
 * Automatic extraction of meta-data
 * Automagic interpretation of references and DOI links
-* Interfaces with [Crossref REST API](https://api.crossref.org/)
-* Interfaces with [DOAJ API](https://doaj.org/api/v1/docs)
-* Interfaces with [arXiv](https://arxiv.org/help/api/index)
-* Interfaces with [CLOCKSS](https://www.clockss.org/clockss/Home)
-* Interfaces with [Buffer.com](https://buffer.com/app)
-* Interfaces with [Fermat's library](https://fermatslibrary.com/)
+* DOI registration at and cited-by retrieval from [Crossref REST API](https://api.crossref.org/)
+* Meta-data deposition at the [DOAJ API](https://doaj.org/api/v1/docs)
+* Article source and pdf download as well as meta-data extraction from, and journal reference feed for the [arXiv](https://arxiv.org/help/api/index)
+* Meta-data and full text deposition in the [CLOCKSS](https://www.clockss.org/clockss/Home) archive
+* Posting of updates on publications to the [Buffer.com](https://buffer.com/app) queue
+* Linking to [Fermat's library](https://fermatslibrary.com/)
+* Cited-by information retrieval from [NASA ads](https://ui.adsabs.harvard.edu/)
+* Merging of cited-by information from multiple sources and bibliometrics calculation
+* Automatic and customizable emails for author communication
 * Search centered navigation of articles
-* RSS integration feed
-* arXiv recent papers feed endpoint
-* PDF endpoint
-* Volume endpoint
-* Web-statement endpoint
+* Integration of publications in to RSS feed
+* Presentation of journal content by volume
+* Web-statement endpoint for the verification of licenses
+* Transformation of \cite commands into hyperlinks referencing bibliography items
 
 ## Works best with
 
 * [OnePress theme](https://www.famethemes.com/themes/onepress/)
 * [Relevanssi](https://wordpress.org/plugins/relevanssi/)
 
-In fact, certain features of O-3PO currently only work correctly in conjunction with the OnePress theme.
+In fact, certain features of O-3PO may only work correctly in conjunction with the OnePress theme.
 
 ## Installation
 
@@ -59,7 +59,7 @@ In fact, certain features of O-3PO currently only work correctly in conjunction 
 
 ## Installation
 
-O-3PO uses the PHPUnit testing framework. You can run all tests locally by executing `make run-tests`.
+O-3PO uses the PHPUnit testing framework. You can run all tests locally by executing `make test`.
 
 ## Documentation
 
@@ -70,7 +70,7 @@ The documentation can be build locally by running `make docs`.
 ## Bugs, limitations, and to do
 
 * Move fix_custom_logo_html into separate plug-in
-* Disable the fall-back loading of options from the `quantum-journal-plugin` context.
+* Move remaining onepress related customizations into a separate plug-in
 
 ## Frequently Asked Questions
 
@@ -88,6 +88,18 @@ It is obviously a play on the name of humanoid robot character from a series of 
 
 ## Changelog
 
+### 0.3.0
+* Added maintenance mode.
+* O-3PO is now largely theme independent.
+* Settings page completely redesigned.
+* Email templates and various other aspects of the plugin are now customizable.
+* Tweaked appearance of publications.
+* Code quality and test coverage improved.
+* Improved cited-by data parsing.
+* Support for buffer.com https api
+* Greatly improved documentation of settings
+* Better test coverage
+* Support for \cite commands and improved parsing of \affiliation macros
 ### 0.2.2
 * Settings page now uses password text fields for sensitive settings.
 * Fixed file name of full text pdf download.

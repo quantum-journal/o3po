@@ -1,0 +1,1 @@
+{"responseHeader":{"status":0,"QTime":6,"params":{"q":"arxiv:1806.02820","x-amzn-trace-id":"Root=1-5c2e07ab-0bb5d7f836932b28f41a9bda","fl":"citation","start":"0","rows":"10","wt":"json"}},"response":{"numFound":1,"start":0,"docs":[{"citation":["2018arXiv180601279B","2018arXiv181009469B","2018arXiv181205117B"]}]}}

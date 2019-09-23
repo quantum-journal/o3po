@@ -27,9 +27,12 @@ table.meta-data-table td {
 p.authors, p.authors a {
     font-size: 1.5rem;
 }
+h3.abstract-header {
+    padding-top: 1rem;
+    margin-bottom: 0rem;
+}
 p.abstract {
     text-align: justify;
-    padding-top: 1rem;
 }
 h3.additional-info {
     padding-top: 1rem;
@@ -56,11 +59,18 @@ p.copyright {
     padding-top: 1rem;
     padding-bottom: 1rem;
 }
+.break {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+}
 .break-at-all-cost {
     overflow-wrap: break-word;
     word-wrap: break-word;
     -ms-word-break: break-all;
-    word-break: break-all;
     word-break: break-all;
     -ms-hyphens: auto;
     -moz-hyphens: auto;
@@ -89,9 +99,14 @@ form.search-form input.search-submit {
 }
 /* make header and sidebar invisible when printing */
 @media print
-{    
+{
     .addtoany_share_save_container, .addtoany_share_save_container *, input#print-btn, div.sidebar, div.sidebar *, div#header-section, div#header-section *
     {
         display: none !important;
     }
+}
+div.publication-action-buttons form {
+    display: inline-block;
+    margin-right: 1em;
+    margin-bottom: 1rem;
 }
