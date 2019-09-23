@@ -90,6 +90,8 @@ class O3PO_Crossref {
          * @param    string   $crossref_id     The id for which to submit this upload.
          * @param    string   $crossref_pw     The password corresponding to the crossref_id.
          * @param    string   $doi             The doi for which cited-by data is to be retrieved.
+         * @param    int      $storage_time    The maximal time for which to cache the response in a transient (default 600 seconds).
+         * @param    int      $timeout         Maximum time to wait for a response (default 6 seconds).
          * @return   mixed    Response of wp_remote_get() from Crossref or WP_Error.
          */
     private static function remote_get_cited_by( $crossref_url, $crossref_id, $crossref_pw, $doi, $storage_time=60*10, $timeout=6 ) {
@@ -172,11 +174,11 @@ class O3PO_Crossref {
          * @return   array Array of bibentries citing the given DOI
          *
          */
-    public static function get_cited_by_bibentries( $crossref_url, $login_id, $login_passwd, $doi ) {
+    public static function get_cited_by_bibentries( $crossref_url, $crossref_id, $crossref_pw, $doi ) {
 
         try
         {
-            $body = O3PO_Crossref::get_cited_by_xml_body($crossref_url, $login_id, $login_passwd, $doi);
+            $body = O3PO_Crossref::get_cited_by_xml_body($crossref_url, $crossref_id, $crossref_pw, $doi);
 
             if(is_wp_error($body))
                 return $body;

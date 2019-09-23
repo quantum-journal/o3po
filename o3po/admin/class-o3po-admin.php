@@ -57,6 +57,7 @@ class O3PO_Admin {
          * @since    0.1.0
          * @param    string    $plugin_name   The name of this plugin.
          * @param    string    $version       The version of this plugin.
+         * @param    string    $plugin_pretty_name    The pretty name of this plugin.
          */
 	public function __construct( $plugin_name, $version, $plugin_pretty_name ) {
 
@@ -483,14 +484,24 @@ class O3PO_Admin {
 
 
         /**
+         * Get the array of tabs in the meta-data explorer.
          *
          * @since 0.3.0
+         * @access public
+         * @return array Array of slugs and labels of the tabs of the meta-data explorer.
          */
     public function get_meta_data_explorer_tabs() {
 
         return $meta_data_explorer_tabs;
     }
 
+        /**
+         * Get the array of output formats of the meta-data explorer.
+         *
+         * @since 0.3.0
+         * @access public
+         * @return array Array of output formats of the meta-data explorer.
+         */
     public function get_output_formats() {
 
         return [
@@ -498,6 +509,13 @@ class O3PO_Admin {
                 ];
     }
 
+        /**
+         * Get the dictionary of meta-data fields and their corresponding callables.
+         *
+         * @since 0.3.0
+         * @access public
+         * @return array dictionary of meta-data fields and their corresponding callables.
+         */
     public function get_meta_data_field_map() {
 
         $post_type_names = O3PO_PublicationType::get_active_publication_type_names();
@@ -517,7 +535,13 @@ class O3PO_Admin {
                 ];
     }
 
-
+        /**
+         * Get the array of all meta-data fields.
+         *
+         * @since 0.3.0
+         * @access public
+         * @return array array of meta-data fields.
+         */
     public function get_meta_data_fields() {
 
         return array_keys($this->get_meta_data_field_map());

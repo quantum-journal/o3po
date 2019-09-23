@@ -22,8 +22,6 @@ O-3PO powers the website of [Quantum - the open journal for quantum science](htt
 
 This is beta software, which still may contain site-specific and/or not well tested code.
 
-DO NOT USE THIS ON A PRODUCTION SITE!
-
 ## Description
 
 O-3PO offers the following features:
@@ -44,13 +42,14 @@ O-3PO offers the following features:
 * Integration of publications in to RSS feed
 * Presentation of journal content by volume
 * Web-statement endpoint for the verification of licenses
+* Transformation of \cite commands into hyperlinks referencing bibliography items
 
 ## Works best with
 
 * [OnePress theme](https://www.famethemes.com/themes/onepress/)
 * [Relevanssi](https://wordpress.org/plugins/relevanssi/)
 
-In fact, certain features of O-3PO currently only work correctly in conjunction with the OnePress theme.
+In fact, certain features of O-3PO may only work correctly in conjunction with the OnePress theme.
 
 ## Installation
 
@@ -100,6 +99,7 @@ It is obviously a play on the name of humanoid robot character from a series of 
 * Support for buffer.com https api
 * Greatly improved documentation of settings
 * Better test coverage
+* Support for \cite commands and improved parsing of \affiliation macros
 ### 0.2.2
 * Settings page now uses password text fields for sensitive settings.
 * Fixed file name of full text pdf download.

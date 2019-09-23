@@ -2426,7 +2426,13 @@ abstract class O3PO_PublicationType {
     }
 
         /**
+         * Get cited-by data.
          *
+         * @sinde 0.3.0
+         * @access public
+         * @param  int    $post_id     Id of the post.
+         * @param  boolean  $fetch_if_outdated     Whether to fetch new data from remote services if the cached data is considered outdated (default true).
+         * @return array Array containing cited-by data in various formats.
          */
     public function get_cited_by_data( $post_id, $fetch_if_outdated=true ) {
 
@@ -3159,6 +3165,7 @@ abstract class O3PO_PublicationType {
          * @since 0.3.0
          * @access    public
          * @param     int     $post_id     Id of the post.
+         * @param     string  $field       The field to get.
          */
     public static function get_post_meta( $post_id, $field ) {
 
@@ -3186,6 +3193,9 @@ abstract class O3PO_PublicationType {
          * Get the citation counts for all publications of the given type.
          *
          * @since 0.3.0
+         * @access public
+         * @param boolean $fetch_if_outdated Whether to fetch new data if the currently cached one is considered outdated.
+         * @return array Array with information about citation counts.
          */
     public function get_all_citation_counts($fetch_if_outdated = false) {
 

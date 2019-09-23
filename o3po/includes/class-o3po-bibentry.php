@@ -282,6 +282,8 @@ class O3PO_Bibentry {
          *
          * @since 0.3.0
          * @access public
+         * @param O3PO_Bibentry $bibitem1 First bibentry to match.
+         * @param O3PO_Bibentry $bibitem2 First bibentry to match.
          * @return bool     True if bibentries are considered similar enough to probably represent the same bibliographic item, false otherwise.
          */
     public static function match($bibitem1, $bibitem2) {

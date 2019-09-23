@@ -129,6 +129,7 @@ class O3PO_Author {
          *
          * @since 0.3.0
          * @access public
+         * @param string $field The field whose value to get.
          * @return string Value of the $field.
          */
     public function get( $field ) {

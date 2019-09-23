@@ -151,6 +151,7 @@ class O3PO_Arxiv {
          * @since  0.3.0
          * @access public
          * @param  O3PO_Environment  $environment                  The environment to use for downloading
+         * @param string $arxiv_url_source_prefix  The url prefix under which arXiv source can be found.
          * @param  string            $eprint                       The eprint whose source is to be downloaded
          * @param  string            $file_name_without_extension  The desired filename without extension of the local file after the download.
          * @param  int               $post_id                      Id of the post to which to attach the download.
