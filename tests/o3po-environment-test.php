@@ -27,9 +27,19 @@ class O3PO_Environment_Test extends PHPUnit_Framework_TestCase
          * @depends test_construct_test_environment
          */
     public function test_get_plugin_pretty_name( $production_environment, $test_environment ) {
-
+        ob_start();
         $production_environment->modify_css_if_in_test_environment();
+        $output = ob_get_contents();
+        ob_end_clean();
+        $this->assertEmpty($output);
+
+        ob_start();
         $test_environment->modify_css_if_in_test_environment();
+        $output = ob_get_contents();
+        ob_end_clean();
+        $dom = new DOMDocument;
+        $result = $dom->loadHTML($output);
+        $this->assertNotFalse($result);
 
     }
 
