@@ -494,7 +494,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
             $text = self::latex_to_utf8_outside_math_mode($text);
 
             $text = preg_replace('#\s+#u', ' ', $text);
-            $text = trim($text, ". \t\n\r\0\x0B\s");
+            $text = trim($text, ". \t\n\r\0\x0B");
 
             $citations[$n]['text'] = $text . '.';
             }
