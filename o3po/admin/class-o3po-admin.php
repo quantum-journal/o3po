@@ -492,7 +492,7 @@ class O3PO_Admin {
          */
     public function get_meta_data_explorer_tabs() {
 
-        return $meta_data_explorer_tabs;
+        return $this->meta_data_explorer_tabs;
     }
 
         /**

@@ -301,5 +301,13 @@ class O3PO_BibentryTest extends PHPUnit_Framework_TestCase
     }
 
 
+        /**
+         * @dataProvider bibentry_provider
+         */
+    public function test_get( $bibentry, $expected_text, $expected_html, $expected_surnames ) {
+
+        $this->assertEquals('', $bibentry->get('no-value-for-this-field'));
+
+    }
 
 }

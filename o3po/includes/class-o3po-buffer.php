@@ -98,8 +98,7 @@ class O3PO_Buffer {
             if(is_wp_error($response))
                 return $response;
             elseif(empty($response['body']))
-                return new WP_Error("buffer_error", 'The response from buffer.com could not be interpreted.');
-
+                return new WP_Error("buffer_error", 'The response from buffer.com could not be interpreted.'); // @codeCoverageIgnore
             $json = json_decode($response['body']);
             if(isset($json->success) and $json->success === true)
                 return true;
