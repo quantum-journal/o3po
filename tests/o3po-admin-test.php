@@ -91,6 +91,14 @@ class O3PO_AdminTest extends PHPUnit_Framework_TestCase
     }
 
 
+        /**
+         * @depends test_construct
+         */
+    public function test_get_meta_data_explorer_tabs( $admin ) {
+
+        $admin->get_meta_data_explorer_tabs();
+    }
+
     #render_meta_data_explorer() needs fully set up journal and post types to work properly so we test in in o3po-journal-and-post-types-test.php
     /* public function test_render_meta_data_explorer() { */
 
