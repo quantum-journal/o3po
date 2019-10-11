@@ -897,9 +897,12 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
             $content .= '<tr><td>Doi:</td><td><a href="' . esc_attr($this->get_journal_property('doi_url_prefix') . $doi) . '">' . esc_html($this->get_journal_property('doi_url_prefix') . $doi ) . '</a></td></tr>';
             $content .= '<tr><td>Citation:</td><td>' . esc_html($citation) . '</td></tr>';
             $content .= '</table>';
+
             $content .= '<div class="publication-action-buttons">';
-            $content .= '<form action="javascript:if(window.print)window.print()" method="post"><input style="display:none;" id="print-btn" type="submit" value="print page"></form>';
+            /* $content .= '<form action="javascript:if(window.print)window.print()" method="post"><input style="display:none;" id="print-btn" type="submit" value="print page"></form>'; */
+            $content .= '<button id="print-btn" style="display:none;" class="btn-theme-primary pirate-forms-submit-button" type="submit" onclick="if(window.print)window.print()">Print page</button>';
             $content .= '</div>';
+
             $content .= '<script type="text/javascript">document.getElementById("print-btn").style.display = "inline-block";</script>';//show button only if browser supports java script
             $content .= '</header>';
 
