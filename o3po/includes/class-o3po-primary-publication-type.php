@@ -1504,35 +1504,33 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             $content .= '<table class="meta-data-table">';
             $content .= '<tr><td>Published:</td><td>' . esc_html($this->get_formated_date_published( $post_id )) .  ', ' . $this->get_formated_volume_html($post_id) . ', page ' . esc_html(get_post_meta( $post_id, $post_type . '_pages', true )) . '</td></tr>';
             $content .= '<tr><td>Eprint:</td><td><a href="' . esc_attr($settings->get_plugin_option('arxiv_url_abs_prefix') . get_post_meta( $post_id, $post_type . '_eprint', true ) ) . '">arXiv:' . esc_html(get_post_meta( $post_id, $post_type . '_eprint', true )) . '</a></td></tr>';
-            if(!empty($settings->get_plugin_option('scirate_url_abs_prefix')))
-            {
-                $scirate_url = $settings->get_plugin_option('scirate_url_abs_prefix') . get_post_meta( $post_id, $post_type . '_eprint', true );
-                $content .= '<tr><td>Scirate:</td><td><a href="' . esc_attr($scirate_url) . '">' . esc_html($scirate_url) . '</a></td></tr>';
-            }
             $doi = get_post_meta( $post_id, $post_type . '_doi_prefix', true ) . '/' .  get_post_meta( $post_id, $post_type . '_doi_suffix', true );
             $content .= '<tr><td>Doi:</td><td><a href="' . esc_attr($settings->get_plugin_option('doi_url_prefix') . $doi) . '">' . esc_html($settings->get_plugin_option('doi_url_prefix') . $doi ) . '</a></td></tr>';
-            /* if ( $this->show_fermats_library_permalink($post_id) ) { */
-            /*     $fermats_library_permalink = get_post_meta( $post_id, $post_type . '_fermats_library_permalink', true ); */
-            /*     $content .= '<tr><td>Fermat&#39;s library:</td><td><a href="' . esc_attr($fermats_library_permalink) . '">' . esc_html($fermats_library_permalink) . '</a></td></tr>'; */
-            /* } */
             $content .= '<tr><td>Citation:</td><td>' . esc_html($this->get_formated_citation($post_id)) . '</td></tr>';
             $content .= '</table>';
-            $content .= '<div class="publication-action-buttons">';
-            $content .= '<form action="' . esc_url($this->get_pdf_pretty_permalink($post_id)) . '" method="get"><input id="fulltext" type="submit" value="full text pdf"></form>';
-            if ( $this->show_fermats_library_permalink($post_id) )
-            {
-                $fermats_library_permalink = get_post_meta( $post_id, $post_type . '_fermats_library_permalink', true );
-                $content .= '<form action="' . esc_url($fermats_library_permalink) . '" method="get"><input id="fermatslibrary" type="submit" value="Comment on Fermat\'s library"></form>';
-            }
 
+            $content .= '<div class="publication-action-buttons">';
+            $content .= '<a href="' . esc_url($this->get_pdf_pretty_permalink($post_id)) . '" ><button id="fulltext" class="btn-theme-primary pirate-forms-submit-button" type="button">Get full text pdf</button></a>';
             if(!empty($settings->get_plugin_option('arxiv_vanity_url_prefix')))
             {
                 $eprint = get_post_meta( $post_id, $post_type . '_eprint', true );
                 $eprint_without_version = preg_replace('#v[0-9]+$#u', '', $eprint);
                 $arxiv_vanity_url = $settings->get_plugin_option('arxiv_vanity_url_prefix') . $eprint_without_version;
-                $content .= '<form action="' . esc_url($arxiv_vanity_url) . '" method="get"><input id="arxiv-vanity" type="submit" value="Read on arXiv Vanity"></form>';
+                $content .= '<a href="' . esc_url($arxiv_vanity_url) . '" ><button id="arxiv-vanity" class="btn-theme-primary pirate-forms-submit-button" type="button">Read on arXiv Vanity</button></a>';
+            }
+            if($this->show_fermats_library_permalink($post_id))
+            {
+                $fermats_library_permalink = get_post_meta( $post_id, $post_type . '_fermats_library_permalink', true );
+                $content .= '<a href="' . esc_url($fermats_library_permalink) . '" ><button id="fermats-library" class="btn-theme-primary pirate-forms-submit-button" type="button">Comment on Fermat\'s library</button></a>';
             }
             $content .= '</div>';
+
+            if(!empty($settings->get_plugin_option('scirate_url_abs_prefix')))
+            {
+                $scirate_url = $settings->get_plugin_option('scirate_url_abs_prefix') . get_post_meta( $post_id, $post_type . '_eprint', true );
+                $content .= '<p>Find this '. $post_type . ' interesting or want to discuss? <a href="' . esc_attr($scirate_url) . '">Scite or leave a comment on SciRate</a>.<p>';
+            }
+
             $content .= '</header>';
             $content .= '<div class="entry-content">';
 
@@ -1543,6 +1541,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             $content .= '<p class="abstract">';
             $content .= nl2br(esc_html( get_post_meta( $post_id, $post_type . '_abstract', true )) );
             $content .= '</p>';
+
             $bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
             $content = O3PO_Latex::expand_cite_to_html($content, $bbl);
             if ( has_post_thumbnail( ) ) {
