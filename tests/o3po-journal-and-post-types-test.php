@@ -312,7 +312,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             $content = $primary_publication_type->get_the_content($orig_content);
 
             $post_type = get_post_type($post_id);
-            if($post_type == 'paper')
+            if($post_type == $primary_publication_type->get_publication_type_name())
             {
                 foreach( array(
                          '#' . $settings->get_plugin_option('license_url')  . '#',
@@ -1238,7 +1238,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             $content = $primary_publication_type->get_feed_content($orig_content);
 
             $post_type = get_post_type($post_id);
-            if($post_type == 'paper')
+            if($post_type == $primary_publication_type->get_publication_type_name())
             {
                 foreach( array(
                              '#' . $settings->get_plugin_option('doi_url_prefix')  . '#',
@@ -1280,7 +1280,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             $content = $primary_publication_type->get_the_excerpt($orig_content);
 
             $post_type = get_post_type($post_id);
-            if($post_type == 'paper')
+            if($post_type == $primary_publication_type->get_publication_type_name())
             {
                 foreach( array(
                              '#' . $settings->get_plugin_option('doi_url_prefix')  . '#',
@@ -1324,7 +1324,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             $content = $secondary_publication_type->get_the_excerpt($orig_content);
 
             $post_type = get_post_type($post_id);
-            if($post_type == 'paper')
+            if($post_type == $secondary_publication_type->get_publication_type_name())
             {
                 foreach( array(
                              '#' . $settings->get_plugin_option('doi_url_prefix')  . '#',
