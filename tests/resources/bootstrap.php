@@ -13,6 +13,11 @@ include(dirname( __FILE__ ) . '/kses.php');
 
 require_once dirname( __FILE__ ) . '/../../o3po/includes/class-o3po-settings.php';
 
+                                 define("EP_PERMALINK", 1);
+                                 define("EP_PAGES", 4096);
+                                 define("EP_ROOT", 64);
+                                 define("ABSPATH", dirname( __FILE__ ) . '/' );
+
 if(!class_exists('PHPUnit_Framework_TestCase')){
         /**
          * Make sure the class PHPUnit_Framework_TestCase is always defined
@@ -188,6 +193,9 @@ $post_data = array();
 
 function get_post_type( $post_id ) {
     global $posts;
+
+    if(empty($post_id))
+        throw new Exception("post_id must not be empty");
 
     if(!isset($posts[$post_id]['post_type']))
         throw new Exception("Post with id=" . $post_id . " has no post_type.");
@@ -394,6 +402,7 @@ function is_category( $category_name ) {
 
 
 $wp_query = new WP_Query();
+$old_wp_query = new WP_Query();
 function set_global_query( $query ) {
     global $wp_query;
 
@@ -408,8 +417,20 @@ function get_global_query() {
 
 
 function query_posts( $args ) {
+    global $old_wp_query;
+
+    $old_wp_query = get_global_query();
+
     set_global_query(new WP_Query($args, $args)); #this is a hack! I don't actually understand how the real query_posts() sets query vars.
 }
+
+
+function wp_reset_query() {
+    global $old_wp_query;
+
+    set_global_query($old_wp_query);
+}
+
 
 function is_search() {
     global $wp_query;
@@ -832,9 +853,9 @@ function wp_remote_get( $url, $args=array() ) {
 
     if(!empty($local_file_urls[$url]))
         if(is_array($local_file_urls[$url]))
-            return array('headers'=>$local_file_urls[$url]['headers'] ,'body'=> file_get_contents($local_file_urls[$url]['body']) );
+            return array('headers'=>$local_file_urls[$url]['headers'] ,'body'=> file_get_contents($local_file_urls[$url]['body']), 'response' => array('code' => 200) );
         else
-            return array('headers'=>array() ,'body'=> file_get_contents($local_file_urls[$url]) );
+            return array('headers'=>array() ,'body'=> file_get_contents($local_file_urls[$url]), 'response' => array('code' => 200) );
     /* elseif(strpos($url, get_option('o3po-settings')['crossref_get_forward_links_url']) === 0) */
     /*     return array('body' => 'fake respose form crossref forward links url'); */
     else
@@ -1228,4 +1249,28 @@ function wp_check_filetype( $filename, $mimes = null ) {
     }
 
     return compact( 'ext', 'type' );
+}
+
+
+function wp_remote_retrieve_response_code( $response ) {
+
+    if ( is_wp_error( $response ) || ! isset( $response['response'] ) || ! is_array( $response['response'] ) ) {
+        return '';
+    }
+
+    return $response['response']['code'];
+}
+
+
+function url_to_postid( $url ) {
+
+    switch($url)
+    {
+        case '/papers/q-test-1742-04-01/':
+            return 8;
+        case '/papers/doi-that-does-not-exist/':
+            return null;
+        default:
+            throw(new Exception("We don't know what to return for url=" . $url));
+    }
 }

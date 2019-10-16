@@ -349,9 +349,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          */
     public function test_download_to_media_library( $url, $filename, $extension, $mime_type, $parent_post_id, $expected_error, $environment ) {
 
-        if(!defined('ABSPATH'))
-            define( 'ABSPATH', dirname( __FILE__ ) . '/resources/' );
-
         $results = $environment->download_to_media_library($url, $filename, $extension, $mime_type, $parent_post_id);
 
         if(empty($results['error']))
@@ -390,7 +387,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         return [
             ['unused_prefix', true],
-            ['fake_paper_doi_suffix', false],
+            ['q-test-1742-04-01', false],
             ['fake_journal_level_doi_suffix-' . current_time("Y-m-d") . '-3', false],
             ['q-2004-04-25-8', true],
         ];
@@ -602,9 +599,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         #init settings here instead of depending on test_initialize_settings because O3PO_Settings is a singleton
         $this->test_initialize_settings();
-
-        if(!defined('ABSPATH'))
-            define( 'ABSPATH', dirname( __FILE__ ) . '/resources/' );
 
         $primary_publication_type_class = new ReflectionClass('O3PO_PrimaryPublicationType');
 
@@ -1050,9 +1044,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         #init settings here instead of depending on test_initialize_settings because O3PO_Settings is a singleton
         $this->test_initialize_settings();
 
-        if(!defined('ABSPATH'))
-            define( 'ABSPATH', dirname( __FILE__ ) . '/resources/' );
-
         $post_type = get_post_type($post_id);
         if ( $primary_publication_type->get_publication_type_name() == $post_type )
             $class = new ReflectionClass('O3PO_PrimaryPublicationType');
@@ -1100,9 +1091,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         #init settings here instead of depending on test_initialize_settings because O3PO_Settings is a singleton
         $this->test_initialize_settings();
-
-        if(!defined('ABSPATH'))
-            define( 'ABSPATH', dirname( __FILE__ ) . '/resources/' );
 
         $post_type = get_post_type($post_id);
         if ( $primary_publication_type->get_publication_type_name() == $post_type )
@@ -1193,6 +1181,343 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(array(null, 'post', $secondary_publication_type->get_publication_type_name()), $query->get('post_type'));
     }
 
+
+        /**
+         * @depends test_create_primary_publication_type
+         */
+    public function test_get_last_arxiv_source_url( $primary_publication_type ) {
+        global $posts;
+
+        $class = new ReflectionClass('O3PO_PrimaryPublicationType');
+
+        $method = $class->getMethod('get_last_arxiv_source_url');
+        $method->setAccessible(true);
+
+        foreach($posts as $post_id => $post_data)
+        {
+            $post_type = get_post_type($post_id);
+            if ( $primary_publication_type->get_publication_type_name() !== $post_type )
+                continue;
+
+            $last_source_url = $method->invokeArgs($primary_publication_type, array($post_id));
+
+            try
+            {
+                $source_attach_ids = $post_data['meta']['paper_arxiv_source_attach_ids'];
+                if(!empty($source_attach_ids))
+                    $this->assertSame($posts[end($source_attach_ids)]['attachment_url'], $last_source_url);
+                else
+                    $this->assertEmpty($last_source_url);
+            }
+            catch(Exception $e)
+            {
+                $this->assertEmpty($last_source_url);
+            }
+        }
+
+    }
+
+        /**
+         * @depends test_create_primary_publication_type
+         * @depends test_initialize_settings
+         */
+    public function test_primary_get_feed_content( $primary_publication_type, $settings ) {
+        global $posts;
+        global $post;
+
+        foreach($posts as $post_id => $post_data)
+        {
+            $post = new WP_Post($post_id);
+            set_global_query(new WP_Query(array('ID' => $post_id)));
+            the_post();
+
+            if(isset($posts[$post_id]['post_content']))
+                $orig_content = $posts[$post_id]['post_content'];
+            else
+                $orig_content = '';
+            $content = $primary_publication_type->get_feed_content($orig_content);
+
+            $post_type = get_post_type($post_id);
+            if($post_type == 'paper')
+            {
+                foreach( array(
+                             '#' . $settings->get_plugin_option('doi_url_prefix')  . '#',
+                           )
+                         as $regexp)
+                    $this->assertRegexp($regexp, $content);
+            }
+            else
+                $this->assertSame($orig_content, $content);
+
+            $content = preg_replace('#(main|header)#', 'div', $content); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
+
+            $dom = new DOMDocument;
+            $result = $dom->loadHTML('<div>' . $content . '</div>');
+//            $this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
+            $this->assertNotFalse($result);
+        }
+    }
+
+
+        /**
+         * @depends test_create_primary_publication_type
+         * @depends test_initialize_settings
+         */
+    public function test_primary_get_the_excerpt( $primary_publication_type, $settings ) {
+        global $posts;
+        global $post;
+
+        foreach($posts as $post_id => $post_data)
+        {
+            $post = new WP_Post($post_id);
+            set_global_query(new WP_Query(array('ID' => $post_id)));
+            the_post();
+
+            if(isset($posts[$post_id]['post_content']))
+                $orig_content = $posts[$post_id]['post_content'];
+            else
+                $orig_content = '';
+            $content = $primary_publication_type->get_the_excerpt($orig_content);
+
+            $post_type = get_post_type($post_id);
+            if($post_type == 'paper')
+            {
+                foreach( array(
+                             '#' . $settings->get_plugin_option('doi_url_prefix')  . '#',
+                           )
+                         as $regexp)
+                    $this->assertRegexp($regexp, $content);
+            }
+            else
+                $this->assertSame($orig_content, $content);
+
+            $content = preg_replace('#(main|header)#', 'div', $content); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
+
+            $dom = new DOMDocument;
+            $result = $dom->loadHTML('<div>' . $content . '</div>');
+//            $this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
+            $this->assertNotFalse($result);
+        }
+    }
+
+
+
+
+        /**
+         * @depends test_create_secondary_publication_type
+         * @depends test_initialize_settings
+         */
+    public function test_secondary_get_the_excerpt( $secondary_publication_type, $settings ) {
+        global $posts;
+        global $post;
+
+        foreach($posts as $post_id => $post_data)
+        {
+            $post = new WP_Post($post_id);
+            set_global_query(new WP_Query(array('ID' => $post_id)));
+            the_post();
+
+            if(isset($posts[$post_id]['post_content']))
+                $orig_content = $posts[$post_id]['post_content'];
+            else
+                $orig_content = '';
+            $content = $secondary_publication_type->get_the_excerpt($orig_content);
+
+            $post_type = get_post_type($post_id);
+            if($post_type == 'paper')
+            {
+                foreach( array(
+                             '#' . $settings->get_plugin_option('doi_url_prefix')  . '#',
+                           )
+                         as $regexp)
+                    $this->assertRegexp($regexp, $content);
+            }
+            else
+                $this->assertSame($orig_content, $content);
+
+            $content = preg_replace('#(main|header)#', 'div', $content); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
+
+            $dom = new DOMDocument;
+            $result = $dom->loadHTML('<div>' . $content . '</div>');
+//            $this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
+            $this->assertNotFalse($result);
+        }
+    }
+
+
+        /**
+         * @depends test_create_primary_publication_type
+         */
+    public function test_add_pdf_endpoint( $primary_publication_type ) {
+
+        $primary_publication_type->add_pdf_endpoint();
+
+    }
+
+
+    public function pdf_endpoint_request_query_provider() {
+
+        $paper = 'paper'; # 'paper' should ideally be $primary_publication_type->get_publication_type_name()
+
+        return [
+            array(new WP_Query(), ''),
+            array(new WP_Query(null, array('pdf' => 'pdf')), ''),
+            array(new WP_Query(null, array('pdf' => 'pdf', 'post_type' => $paper, $paper => 'doi-that-does-not-exist')), 'ERROR'),
+            array(new WP_Query(null, array('pdf' => 'pdf', 'post_type' => $paper, $paper => 'q-test-1742-04-01')), '%PDF-1.4'),
+        ];
+    }
+
+        /**
+         * @runInSeparateProcess
+         * @preserveGlobalState disabled
+         * @dataProvider pdf_endpoint_request_query_provider
+         * @depends test_create_primary_publication_type
+         */
+    public function test_handle_pdf_endpoint_request( $wp_query, $expected, $primary_publication_type ) {
+
+            /* We must initialize a settings object for handle_pdf_endpoint_request() to work, but we also must runInSeparateProcess with preserveGlobalState disabled because we modify the headers in handle_pdf_endpoint_request(). Because O3PO_Settings is a singleton, we therefore cannot depend on test_initialize_settings(), but must run it here.
+             */
+        $settings = $this->test_initialize_settings();
+
+        ob_start();
+        $primary_publication_type->handle_pdf_endpoint_request( $wp_query , true);
+        $output = ob_get_contents();
+        ob_end_clean();
+
+        if(!empty($expected))
+            $this->assertRegExp('#'.$expected.'#', $output);
+    }
+
+
+        /**
+         * @depends test_create_primary_publication_type
+         */
+    public function test_add_web_statement_endpoint( $primary_publication_type ) {
+
+        $primary_publication_type->add_web_statement_endpoint();
+
+    }
+
+
+    public function web_statement_endpoint_request_query_provider() {
+
+        $paper = 'paper'; # 'paper' should ideally be $primary_publication_type->get_publication_type_name()
+
+        return [
+            array(new WP_Query(), ''),
+            array(new WP_Query(null, array('web-statement' => 'web-statement')), ''),
+            array(new WP_Query(null, array('web-statement' => 'web-statement', 'post_type' => $paper, $paper => 'doi-that-does-not-exist')), 'ERROR'),
+            array(new WP_Query(null, array('web-statement' => 'web-statement', 'post_type' => $paper, $paper => 'q-test-1742-04-01')), 'is licensed under'),
+        ];
+
+    }
+
+
+        /**
+         * @runInSeparateProcess
+         * @preserveGlobalState disabled
+         * @dataProvider web_statement_endpoint_request_query_provider
+         * @depends test_create_primary_publication_type
+         */
+    public function test_handle_web_statement_endpoint_request( $wp_query, $expected, $primary_publication_type ) {
+
+            /* We must initialize a settings object for handle_web_statement_endpoint_request() to work, but we also must runInSeparateProcess with preserveGlobalState disabled because we modify the headers in handle_pdf_endpoint_request(). Because O3PO_Settings is a singleton, we therefore cannot depend on test_initialize_settings(), but must run it here.
+             */
+        $settings = $this->test_initialize_settings();
+
+        ob_start();
+        $primary_publication_type->handle_web_statement_endpoint_request( $wp_query , true);
+        $output = ob_get_contents();
+        ob_end_clean();
+
+        if(!empty($expected))
+            $this->assertRegExp('#'.$expected.'#', $output);
+    }
+
+
+
+        /**
+         * @depends test_create_primary_publication_type
+         */
+    public function test_add_axiv_paper_doi_feed_endpoint( $primary_publication_type ) {
+
+        $primary_publication_type->add_axiv_paper_doi_feed_endpoint();
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+    public function axiv_paper_doi_feed_endpoint_request_query_provider() {
+
+        $paper = 'paper'; # 'paper' should ideally be $primary_publication_type->get_publication_type_name()
+        $settings = $this->test_initialize_settings();
+        $endpoint_suffix = $settings->get_plugin_option('arxiv_paper_doi_feed_endpoint');
+
+
+        return [
+            array(new WP_Query(), ''),
+            array(new WP_Query(null, array($endpoint_suffix => $endpoint_suffix)), ''),
+            array(new WP_Query(null, array($endpoint_suffix => $endpoint_suffix, 'post_type' => $paper)), 'identifier="fake_arxiv_doi_feed_identifier"'),
+        ];
+    }
+
+        /**
+         * @runInSeparateProcess
+         * @preserveGlobalState disabled
+         * @dataProvider axiv_paper_doi_feed_endpoint_request_query_provider
+         * @depends test_create_primary_publication_type
+         */
+    public function test_handle_arxiv_paper_doi_feed_endpoint_request( $wp_query, $expected, $primary_publication_type ) {
+
+            /* We must initialize a settings object for handle_arxiv_paper_doi_feed_endpoint_request() to work, but we also must runInSeparateProcess with preserveGlobalState disabled because we modify the headers in handle_arxiv_paper_doi_feed_endpoint_request(). Because O3PO_Settings is a singleton, we therefore cannot depend on test_initialize_settings(), but must run it here.
+             */
+        $settings = $this->test_initialize_settings();
+
+        ob_start();
+        $primary_publication_type->handle_arxiv_paper_doi_feed_endpoint_request( $wp_query , true);
+        $output = ob_get_contents();
+        ob_end_clean();
+
+        if(!empty($expected))
+            $this->assertRegExp('#'.$expected.'#', $output);
+    }
+
+
+
+
+
+
+        /**
+         * @depends test_create_primary_publication_type
+         */
+    public function test_add_dublin_core_and_highwire_press_meta_tags( $primary_publication_type ) {
+        global $posts;
+        global $post;
+        global $is_single;
+
+        $is_single = true;
+
+        foreach($posts as $post_id => $post_data)
+        {
+            $post = new WP_Post($post_id);
+            set_global_query(new WP_Query(array('ID' => $post_id)));
+            the_post();
+
+            echo("\n" . $primary_publication_type->add_dublin_core_and_highwire_press_meta_tags());
+        }
+    }
+
+
+
+
         /**
          * @depends test_setup_primary_journal
          * @depends test_setup_environment
@@ -1220,6 +1545,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $this->assertNotFalse($result);
 
     }
+
 
     function volumes_endpoint_volume_1_provider() {
 
@@ -1274,7 +1600,6 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          */
     public function test_execution_of_various_journal_functions( $journal ) {
 
-        define( 'EP_ROOT', 'EP_ROOT' );
         $journal->add_volumes_endpoint();
 
         $this->expectException(Exception::class);
