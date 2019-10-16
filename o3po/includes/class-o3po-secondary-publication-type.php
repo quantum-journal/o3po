@@ -976,10 +976,14 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         /**
          * Output meta tags describing this publication type.
          *
+         * Overwrites and calls function of same name in O3PO_Publication_Type.
+         *
+         * To be added to the 'wp_head' action.
+         *
          * @since     0.1.0
          * @access    public
          */
-    public function the_meta_tags() {
+    public function add_dublin_core_and_highwire_press_meta_tags() {
 
         $post_id = get_the_ID();
         $post_type = get_post_type($post_id);
@@ -987,7 +991,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         if ( !is_single() || $post_type !== $this->get_publication_type_name())
             return;
 
-        parent::the_meta_tags();
+        parent::add_dublin_core_and_highwire_press_meta_tags();
     }
 
         /**
