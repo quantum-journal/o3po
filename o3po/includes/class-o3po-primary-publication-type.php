@@ -1266,10 +1266,11 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 
         $post_id = get_the_ID();
         $post_type = get_post_type($post_id);
-        $eprint = get_post_meta( $post_id, $post_type . '_eprint', true );
 
         if ( !is_single() || $post_type !== $this->get_publication_type_name())
             return;
+
+        $eprint = get_post_meta( $post_id, $post_type . '_eprint', true );
 
         parent::the_meta_tags();
 
