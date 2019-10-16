@@ -1497,8 +1497,9 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         /**
          * @depends test_create_primary_publication_type
+         * @depends test_create_secondary_publication_type
          */
-    public function test_add_dublin_core_and_highwire_press_meta_tags( $primary_publication_type ) {
+    public function test_add_dublin_core_and_highwire_press_meta_tags( $primary_publication_type, $secondary_publication_type ) {
         global $posts;
         global $post;
         global $is_single;
@@ -1511,7 +1512,23 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             set_global_query(new WP_Query(array('ID' => $post_id)));
             the_post();
 
-            echo("\n" . $primary_publication_type->add_dublin_core_and_highwire_press_meta_tags());
+            $post_type = get_post_type($post_id);
+
+            ob_start();
+            if($primary_publication_type->get_publication_type_name() == $post_type)
+                $primary_publication_type->add_dublin_core_and_highwire_press_meta_tags();
+            elseif($secondary_publication_type->get_publication_type_name() == $post_type)
+                $secondary_publication_type->add_dublin_core_and_highwire_press_meta_tags();
+
+            $output = ob_get_contents();
+            ob_end_clean();
+
+            if($primary_publication_type->get_publication_type_name() == $post_type or $secondary_publication_type->get_publication_type_name() == $post_type)
+            {
+                $dom = new DOMDocument;
+                $result = $dom->loadHTML($output);
+                $this->assertNotFalse($result);
+            }
         }
     }
 

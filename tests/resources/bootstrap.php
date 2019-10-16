@@ -1274,3 +1274,11 @@ function url_to_postid( $url ) {
             throw(new Exception("We don't know what to return for url=" . $url));
     }
 }
+
+
+function do_shortcode( $content, $ignore_html = false ) {
+
+    #not really implemented....
+
+    return $content;
+}
