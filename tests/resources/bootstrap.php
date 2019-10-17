@@ -529,25 +529,27 @@ function get_post_thumbnail_id( $post_id ) {
     global $posts;
 
     if(!isset($posts[$post_id]['thumbnail_id']))
-        throw new Exception("Post with id=" . $post_id . " has no thumbnail_id.");
+        #throw new Exception("Post with id=" . $post_id . " has no thumbnail_id.");
+        return '';
 
     return $posts[$post_id]['thumbnail_id'];
 }
 
-function wp_get_attachment_image_src( $post_id ) {
+function wp_get_attachment_image_src( $post_id, $size = 'thumbnail', $icon = false ) {
     global $posts;
 
     if($post_id === 8356865345) #a special id we have set in get_theme_mod()
-        return 'https://some.site/logog.jpg';
+        return array('https://some.site/logog.jpg', 400, 300, false);
 
     if(!isset($posts[$post_id]['attachment_image_src']))
-        throw new Exception("Post with id=" . $post_id . " has no attachment_image_src.");
+        #hrow new Exception("Post with id=" . $post_id . " has no attachment_image_src.");
+        return false;
 
-    return $posts[$post_id]['attachment_image_src'];
+    return array($posts[$post_id]['attachment_image_src'], 800, 400, false);
 }
 
-function wp_get_attachment_image( $post_id ) {
-    return '<img src="'.wp_get_attachment_image_src( $post_id ).'">';
+function wp_get_attachment_image( $post_id, $size = 'thumbnail', $icon = false, $attr = '' ) {
+    return '<img src="'.wp_get_attachment_image_src( $post_id )[0].'">';
 }
 
 function get_post_status( $ID = '' ) {
@@ -1211,11 +1213,17 @@ function wp_get_theme( $stylesheet=null, $theme_root=null ) {
 }
 
 $is_single = false;
-
 function is_single() {
     global $is_single;
     return $is_single;
 }
+
+$is_feed = false;
+function is_feed() {
+    global $is_feed;
+    return $is_feed;
+}
+
 
 function home_url( $path=null, $scheme=null ) {
     if($scheme === null)
@@ -1267,9 +1275,11 @@ function url_to_postid( $url ) {
     switch($url)
     {
         case '/papers/q-test-1742-04-01/':
-            return 8;
+            return 1;
         case '/papers/doi-that-does-not-exist/':
             return null;
+        case '/papers/fake_journal_level_doi_suffix-' . current_time("Y-m-d") . '-3' . '/':
+            return 8;
         default:
             throw(new Exception("We don't know what to return for url=" . $url));
     }
@@ -1281,4 +1291,10 @@ function do_shortcode( $content, $ignore_html = false ) {
     #not really implemented....
 
     return $content;
+}
+
+function trackback( $trackback_url, $title, $excerpt, $ID ) {
+
+    #not really implemented
+    return null;
 }

@@ -121,6 +121,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             ['the_admin_panel_crossref'],
             ['the_admin_panel_doaj'],
             ['the_admin_panel_arxiv'],
+            ['admin_page_extra_css'],
                 ];
     }
 
@@ -1169,6 +1170,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
          * @depends test_create_secondary_publication_type
          */
     public function test_add_custom_post_types_to_query( $primary_publication_type, $secondary_publication_type) {
+
         global $is_home;
         $is_home = true;
 
@@ -1179,7 +1181,133 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $query = new WP_Query(null, array('is_main' => true));
         $secondary_publication_type->add_custom_post_types_to_query($query);
         $this->assertEquals(array(null, 'post', $secondary_publication_type->get_publication_type_name()), $query->get('post_type'));
+
     }
+
+
+        /**
+         * @depends test_create_primary_publication_type
+         * @depends test_create_secondary_publication_type
+         */
+    public function test_add_custom_post_types_to_rss_feed( $primary_publication_type, $secondary_publication_type) {
+
+        $request = array('feed' => true);
+        $request = $primary_publication_type->add_custom_post_types_to_rss_feed($request);
+        $this->assertEquals(array('feed' => true, 'post_type' => array('post', $primary_publication_type->get_publication_type_name())), $request);
+
+        $request = array('feed' => true, 'post_type' => 'some_post_type');
+        $request = $primary_publication_type->add_custom_post_types_to_rss_feed($request);
+        $this->assertEquals(array('feed' => true, 'post_type' => 'some_post_type'), $request);
+
+
+
+        $request = array('feed' => true);
+        $request = $secondary_publication_type->add_custom_post_types_to_rss_feed($request);
+        $this->assertEquals(array('feed' => true, 'post_type' => array('post', $secondary_publication_type->get_publication_type_name())), $request);
+
+        $request = array('feed' => true, 'post_type' => 'some_post_type');
+        $request = $secondary_publication_type->add_custom_post_types_to_rss_feed($request);
+        $this->assertEquals(array('feed' => true, 'post_type' => 'some_post_type'), $request);
+
+
+    }
+
+
+        /**
+         * @depends test_create_primary_publication_type
+         * @depends test_create_secondary_publication_type
+         */
+    public function test_the_author_feed( $primary_publication_type, $secondary_publication_type) {
+
+        global $posts;
+        global $post;
+        global $is_feed;
+
+        $is_feed_orig = $is_feed;
+
+        foreach($posts as $post_id => $post_data)
+        {
+            $post = new WP_Post($post_id);
+            set_global_query(new WP_Query(array('ID' => $post_id)));
+            the_post();
+
+            $post_type = get_post_type($post_id);
+            $orgi_name = 'Foo Bar';
+
+            $is_feed = false;
+            $this->assertSame( $orgi_name, $primary_publication_type->the_author_feed($orgi_name));
+            $this->assertSame( $orgi_name, $secondary_publication_type->the_author_feed($orgi_name));
+
+            $is_feed = true;
+
+            if($post_type == $primary_publication_type->get_publication_type_name())
+                $this->assertSame( $primary_publication_type->get_formated_authors($post_id), $primary_publication_type->the_author_feed($orgi_name));
+            elseif($post_type == $secondary_publication_type->get_publication_type_name())
+                $this->assertSame( $secondary_publication_type->get_formated_authors($post_id), $secondary_publication_type->the_author_feed($orgi_name));
+            else
+            {
+                $this->assertSame( $orgi_name, $primary_publication_type->the_author_feed($orgi_name));
+                $this->assertSame( $orgi_name, $secondary_publication_type->the_author_feed($orgi_name));
+            }
+        }
+
+        $is_feed = $is_feed_orig;
+    }
+
+
+
+
+
+
+        /**
+         * @depends test_create_primary_publication_type
+         * @depends test_create_secondary_publication_type
+         */
+    public function test_get_the_author_and_get_the_author_posts_link( $primary_publication_type, $secondary_publication_type) {
+
+        global $posts;
+        global $post;
+
+        foreach($posts as $post_id => $post_data)
+        {
+            $post = new WP_Post($post_id);
+            set_global_query(new WP_Query(array('ID' => $post_id)));
+            the_post();
+
+            $post_type = get_post_type($post_id);
+            $orig_name = 'Foo Bar';
+            $orig_link = '/foo/bar/';
+
+            if($post_type == $primary_publication_type->get_publication_type_name())
+            {
+                $journal = $primary_publication_type->get_post_meta( $post_id, 'journal' );
+                $this->assertSame( $journal, $primary_publication_type->get_the_author($orig_name));
+                $link = '/' . $primary_publication_type->get_publication_type_name_plural();
+                $this->assertSame($link, $primary_publication_type->get_the_author_posts_link($orig_link));
+
+            }
+            elseif($post_type == $secondary_publication_type->get_publication_type_name())
+            {
+                $journal = $secondary_publication_type->get_post_meta( $post_id, 'journal' );
+                $this->assertSame( $journal, $secondary_publication_type->get_the_author($orig_name));
+                $link = '/' . $secondary_publication_type->get_publication_type_name_plural();
+                $this->assertSame($link, $secondary_publication_type->get_the_author_posts_link($orig_link));
+            }
+            else
+            {
+                $this->assertSame( $orig_name, $primary_publication_type->get_the_author($orig_name));
+                $this->assertSame( $orig_name, $secondary_publication_type->get_the_author($orig_name));
+
+
+                $this->assertSame($orig_link, $primary_publication_type->get_the_author_posts_link($orig_link));
+                $this->assertSame($orig_link, $secondary_publication_type->get_the_author_posts_link($orig_link));
+            }
+        }
+
+    }
+
+
+
 
 
         /**
@@ -1345,7 +1473,88 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
     }
 
 
+
         /**
+         * @depends test_create_secondary_publication_type
+         * @depends test_initialize_settings
+         */
+    public function test_get_trackback_excerpt( $secondary_publication_type, $settings ) {
+        global $posts;
+        global $post;
+
+        foreach($posts as $post_id => $post_data)
+        {
+            $post = new WP_Post($post_id);
+            set_global_query(new WP_Query(array('ID' => $post_id)));
+            the_post();
+
+            $class = new ReflectionClass('O3PO_SecondaryPublicationType');
+            $method = $class->getMethod('get_trackback_excerpt');
+            $method->setAccessible(true);
+
+            $content = $method->invokeArgs($secondary_publication_type, array($post_id));
+
+            $post_type = get_post_type($post_id);
+            if($post_type == $secondary_publication_type->get_publication_type_name())
+            {
+                foreach( array(
+                             '#' . $post_data['post_content']  . '#',
+                             '#' . $type = get_post_meta( $post_id, $post_type . '_type', true ) . '#',
+                           )
+                         as $regexp)
+                {
+                    $this->assertRegexp($regexp, $content);
+                }
+            }
+            else
+                $this->assertEmpty($content);
+
+            $content = preg_replace('#(main|header)#', 'div', $content); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
+
+            $dom = new DOMDocument;
+            $result = $dom->loadHTML('<div>' . $content . '</div>');
+//            $this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
+            $this->assertNotFalse($result);
+        }
+    }
+
+
+        /**
+         * @doesNotPerformAssertions
+         */
+    public function test_get_default_number_reviews() {
+
+        $class = new ReflectionClass('O3PO_SecondaryPublicationType');
+        $method = $class->getMethod('get_default_number_reviewers');
+        $method->setAccessible(true);
+        $method->invoke(null); #this is a static method, so passing null
+
+    }
+
+        /**
+         * @doesNotPerformAssertions
+         * @depends test_create_primary_publication_type
+         * @depends test_create_secondary_publication_type
+         */
+    public function test_get_default_number_authors( $primary_publication_type, $secondary_publication_type) {
+
+        $primary_publication_type->get_default_number_authors();
+        $secondary_publication_type->get_default_number_authors();
+
+    }
+
+        /**
+         * @depends test_create_secondary_publication_type
+         */
+    public function test_get_pdf_pretty_permalink( $secondary_publication_type ) {
+
+        $this->assertEmpty($secondary_publication_type->get_pdf_pretty_permalink(1));
+
+    }
+
+
+        /**
+         * @doesNotPerformAssertions
          * @depends test_create_primary_publication_type
          */
     public function test_add_pdf_endpoint( $primary_publication_type ) {
@@ -1363,7 +1572,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             array(new WP_Query(), ''),
             array(new WP_Query(null, array('pdf' => 'pdf')), ''),
             array(new WP_Query(null, array('pdf' => 'pdf', 'post_type' => $paper, $paper => 'doi-that-does-not-exist')), 'ERROR'),
-            array(new WP_Query(null, array('pdf' => 'pdf', 'post_type' => $paper, $paper => 'q-test-1742-04-01')), '%PDF-1.4'),
+            array(new WP_Query(null, array('pdf' => 'pdf', 'post_type' => $paper, $paper => 'fake_journal_level_doi_suffix-' . current_time("Y-m-d") . '-3')), '%PDF-1.4'), #doi of paper post with id 8
         ];
     }
 
@@ -1390,6 +1599,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
 
         /**
+         * @doesNotPerformAssertions
          * @depends test_create_primary_publication_type
          */
     public function test_add_web_statement_endpoint( $primary_publication_type ) {
@@ -1407,7 +1617,8 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             array(new WP_Query(), ''),
             array(new WP_Query(null, array('web-statement' => 'web-statement')), ''),
             array(new WP_Query(null, array('web-statement' => 'web-statement', 'post_type' => $paper, $paper => 'doi-that-does-not-exist')), 'ERROR'),
-            array(new WP_Query(null, array('web-statement' => 'web-statement', 'post_type' => $paper, $paper => 'q-test-1742-04-01')), 'is licensed under'),
+            array(new WP_Query(null, array('web-statement' => 'web-statement', 'post_type' => $paper, $paper => 'fake_journal_level_doi_suffix-' . current_time("Y-m-d") . '-3')), 'is licensed under'),
+            array(new WP_Query(null, array('web-statement' => 'web-statement', 'post_type' => $paper, $paper => 'q-test-1742-04-01')), 'ERROR: file_path is empty'),
         ];
 
     }
@@ -1437,6 +1648,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
 
         /**
+         * @doesNotPerformAssertions
          * @depends test_create_primary_publication_type
          */
     public function test_add_axiv_paper_doi_feed_endpoint( $primary_publication_type ) {
@@ -1531,6 +1743,52 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             }
         }
     }
+
+
+
+
+
+
+
+        /**
+         * @depends test_create_primary_publication_type
+         * @depends test_create_secondary_publication_type
+         */
+    public function test_the_java_script_single_page( $primary_publication_type, $secondary_publication_type ) {
+        global $posts;
+        global $post;
+        global $is_single;
+
+        $is_single = true;
+
+        foreach($posts as $post_id => $post_data)
+        {
+            $post = new WP_Post($post_id);
+            set_global_query(new WP_Query(array('ID' => $post_id)));
+            the_post();
+
+            $post_type = get_post_type($post_id);
+
+            ob_start();
+            if($primary_publication_type->get_publication_type_name() == $post_type)
+                $primary_publication_type->the_java_script_single_page();
+            elseif($secondary_publication_type->get_publication_type_name() == $post_type)
+                $secondary_publication_type->the_java_script_single_page();
+
+            $output = ob_get_contents();
+            ob_end_clean();
+
+            if($primary_publication_type->get_publication_type_name() == $post_type or $secondary_publication_type->get_publication_type_name() == $post_type)
+            {
+                $dom = new DOMDocument;
+                $result = $dom->loadHTML($output);
+                $this->assertNotFalse($result);
+            }
+            else
+                $this->assertEmpty($output);
+        }
+    }
+
 
 
 
@@ -1755,6 +2013,25 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $dom = new DOMDocument;
         #$result = $dom->loadHTML($output);
         #$this->assertNotFalse($result);
+    }
+
+
+
+        /**
+         * @depends test_create_primary_publication_type
+         * @depends test_create_secondary_publication_type
+         * @depends test_initialize_settings
+         */
+    function test_get_social_media_thumbnail_src( $primary_publication_type, $secondary_publication_type, $settings ) {
+
+        # a post with feature image
+        $this->assertSame(wp_get_attachment_image_src(get_post_thumbnail_id(1), "Full")[0], $primary_publication_type->get_social_media_thumbnail_src(1));
+        $this->assertSame(wp_get_attachment_image_src(get_post_thumbnail_id(1), "Full")[0], $secondary_publication_type->get_social_media_thumbnail_src(1));
+
+        # a post without feature image
+        $this->assertSame($settings->get_plugin_option('social_media_thumbnail_url'), $primary_publication_type->get_social_media_thumbnail_src(5));
+        $this->assertSame($settings->get_plugin_option('social_media_thumbnail_url'), $secondary_publication_type->get_social_media_thumbnail_src(5));
+
     }
 
 
