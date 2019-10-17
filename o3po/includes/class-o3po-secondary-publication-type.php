@@ -248,9 +248,10 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 
         $settings = O3PO_Settings::instance();
         for ($x = 0; $x < $number_target_dois; $x++) {
+            $doi_prefix = $this->get_journal_property('doi_prefix');
             if ( empty( $target_dois[$x] ) )
                 $validation_result .= "WARNING: Target DOI " . ($x+1) . " is empty.\n" ;
-            else if( mb_substr($target_dois[$x], 0, 8) !== $settings->get_plugin_option('doi_prefix') )
+            else if( mb_substr($target_dois[$x], 0, mb_strlen($doi_prefix)) !== $doi_prefix )
                 $validation_result .= "WARNING: Target DOI " . ($x+1) . " does not point to a paper of this publisher or it contains a prefix such as https://dx.doi.org/, which it shouldn't. Pleae check the DOI.\n" ;
         }
 
@@ -368,17 +369,18 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         $number_target_dois = get_post_meta( $post_id, $post_type . '_number_target_dois', true );
         $target_dois = static::get_post_meta_field_containing_array( $post_id, $post_type . '_target_dois');
         for ($x = 0; $x < $number_target_dois; $x++) {
-            if( mb_substr($target_dois[$x], 0, 8) === $this->get_journal_property('doi_prefix') )
+            $doi_prefix = $this->get_journal_property('doi_prefix');
+            if( mb_substr($target_dois[$x], 0, mb_strlen($doi_prefix)) === $doi_prefix )
             {
                 $trackback_excerpt = $this->get_trackback_excerpt($post_id);
-                $suspected_post_url = '/' . $this->targe_publication_type_name_plural . mb_substr($target_dois[$x], 8);
+                $suspected_post_url = '/' . $this->targe_publication_type_name_plural . '/' . mb_substr($target_dois[$x], mb_strlen($doi_prefix)+1) . '/';
                 $target_post_id = url_to_postid($suspected_post_url);
                 $target_post_type = get_post_type($target_post_id);
                 $target_eprint = get_post_meta( $target_post_id, $target_post_type . '_eprint', true );
                 $eprint_without_version = preg_replace('#v[0-9]*$#u', '', $target_eprint);
                 if(!empty($target_eprint) && !$this->environment->is_test_environment()) {
                         //trachback to the arxiv
-                    $trackback_result .= trackback( $this->get_journal_property('arxiv_url_trackback_prefix') . $eprint_without_version , $title, $trackback_excerpt, $post_id );
+                    trackback( $this->get_journal_property('arxiv_url_trackback_prefix') . $eprint_without_version , $title, $trackback_excerpt, $post_id );
                     $validation_result .= 'INFO: Trackback to the arXiv for ' . $eprint_without_version . ' sent.' . "\n";
                 }
                     //trachback to ourselves
@@ -945,28 +947,29 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         $content = '';
         $content .= '<p><em>This is ' . ( preg_match('/^[hH]?[aeiouAEIOU]/u' , $type) ? 'an' : 'a') . ' ' . $type;
         if($type==="Leap")
-            $content .= ' &mdash; a popular science article on quantum research written by scientists and reviewed by teenagers &mdash;';
+            $content .= ' &mdash; a popular science article on quantum research written by scientists and reviewed by teenagers';
 
         if($number_target_dois>0)
-            $content .= ' on ';
-        else
-            $content .= ' published in ' . $journal;
-
-        for ($x = 0; $x < $number_target_dois; $x++) {
-            if( mb_substr($target_dois[$x], 0, 8) === $this->get_journal_property('doi_prefix') )
-            {
-                $target_post_id = url_to_postid( '/' . $this->targe_publication_type_name_plural . mb_substr($target_dois[$x], 8) );
-                $target_post_type = get_post_type( $target_post_id );
-                $target_title = get_post_meta( $target_post_id, $target_post_type . '_title', true );
-                $target_authors = static::get_formated_authors($target_post_id);
-                $target_citation = static::get_formated_citation($target_post_id);
-                $content .= '<a href="' . $this->get_journal_property('doi_url_prefix') . $target_dois[$x] . '">&quot;' . $target_title . '&quot;</a> by ' . $target_authors . ', published in ' . rtrim($target_citation, '.');
-                if( $x < $number_target_dois-1 and $number_target_dois > 2) $formated_authors .= ",";
-                if( $x < $number_target_dois-1 ) $formated_authors .= " ";
-                if( $x === $number_target_dois-2 ) $formated_authors .= "and ";
+        {
+            $content .= ' &mdash; on ';
+            for ($x = 0; $x < $number_target_dois; $x++) {
+                $doi_prefix = $this->get_journal_property('doi_prefix');
+                if( mb_substr($target_dois[$x], 0, mb_strlen($doi_prefix)) === $doi_prefix )
+                {
+                    $suspected_post_url = '/' . $this->targe_publication_type_name_plural . '/' . mb_substr($target_dois[$x], mb_strlen($doi_prefix)+1) . '/';
+                    $target_post_id = url_to_postid($suspected_post_url);
+                    $target_post_type = get_post_type( $target_post_id );
+                    $target_title = get_post_meta( $target_post_id, $target_post_type . '_title', true );
+                    $target_authors = static::get_formated_authors($target_post_id);
+                    $target_citation = static::get_formated_citation($target_post_id);
+                    $content .= '<a href="' . $this->get_journal_property('doi_url_prefix') . $target_dois[$x] . '">&quot;' . $target_title . '&quot;</a> by ' . $target_authors . ', published in ' . rtrim($target_citation, '.');
+                    if( $x < $number_target_dois-1 and $number_target_dois > 2) $formated_authors .= ",";
+                    if( $x < $number_target_dois-1 ) $formated_authors .= " ";
+                    if( $x === $number_target_dois-2 ) $formated_authors .= "and ";
+                }
+                else
+                    $content .= '<a href="' . $this->get_journal_property('doi_url_prefix') . $target_dois[$x] . '">' . $target_dois[$x] . '</a>';
             }
-            else
-                $content .= '<a href="' . $this->get_journal_property('doi_url_prefix') . $target_dois[$x] . '">' . $target_dois[$x] . '</a>';
         }
         $content .= ".</em></p>\n";
 
