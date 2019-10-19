@@ -13,6 +13,11 @@ include(dirname( __FILE__ ) . '/kses.php');
 
 require_once dirname( __FILE__ ) . '/../../o3po/includes/class-o3po-settings.php';
 
+                                 define("EP_PERMALINK", 1);
+                                 define("EP_PAGES", 4096);
+                                 define("EP_ROOT", 64);
+                                 define("ABSPATH", dirname( __FILE__ ) . '/' );
+
 if(!class_exists('PHPUnit_Framework_TestCase')){
         /**
          * Make sure the class PHPUnit_Framework_TestCase is always defined
@@ -188,6 +193,9 @@ $post_data = array();
 
 function get_post_type( $post_id ) {
     global $posts;
+
+    if(empty($post_id))
+        throw new Exception("post_id must not be empty");
 
     if(!isset($posts[$post_id]['post_type']))
         throw new Exception("Post with id=" . $post_id . " has no post_type.");
@@ -394,6 +402,7 @@ function is_category( $category_name ) {
 
 
 $wp_query = new WP_Query();
+$old_wp_query = new WP_Query();
 function set_global_query( $query ) {
     global $wp_query;
 
@@ -408,8 +417,20 @@ function get_global_query() {
 
 
 function query_posts( $args ) {
+    global $old_wp_query;
+
+    $old_wp_query = get_global_query();
+
     set_global_query(new WP_Query($args, $args)); #this is a hack! I don't actually understand how the real query_posts() sets query vars.
 }
+
+
+function wp_reset_query() {
+    global $old_wp_query;
+
+    set_global_query($old_wp_query);
+}
+
 
 function is_search() {
     global $wp_query;
@@ -508,25 +529,27 @@ function get_post_thumbnail_id( $post_id ) {
     global $posts;
 
     if(!isset($posts[$post_id]['thumbnail_id']))
-        throw new Exception("Post with id=" . $post_id . " has no thumbnail_id.");
+        #throw new Exception("Post with id=" . $post_id . " has no thumbnail_id.");
+        return '';
 
     return $posts[$post_id]['thumbnail_id'];
 }
 
-function wp_get_attachment_image_src( $post_id ) {
+function wp_get_attachment_image_src( $post_id, $size = 'thumbnail', $icon = false ) {
     global $posts;
 
     if($post_id === 8356865345) #a special id we have set in get_theme_mod()
-        return 'https://some.site/logog.jpg';
+        return array('https://some.site/logog.jpg', 400, 300, false);
 
     if(!isset($posts[$post_id]['attachment_image_src']))
-        throw new Exception("Post with id=" . $post_id . " has no attachment_image_src.");
+        #hrow new Exception("Post with id=" . $post_id . " has no attachment_image_src.");
+        return false;
 
-    return $posts[$post_id]['attachment_image_src'];
+    return array($posts[$post_id]['attachment_image_src'], 800, 400, false);
 }
 
-function wp_get_attachment_image( $post_id ) {
-    return '<img src="'.wp_get_attachment_image_src( $post_id ).'">';
+function wp_get_attachment_image( $post_id, $size = 'thumbnail', $icon = false, $attr = '' ) {
+    return '<img src="'.wp_get_attachment_image_src( $post_id )[0].'">';
 }
 
 function get_post_status( $ID = '' ) {
@@ -832,9 +855,9 @@ function wp_remote_get( $url, $args=array() ) {
 
     if(!empty($local_file_urls[$url]))
         if(is_array($local_file_urls[$url]))
-            return array('headers'=>$local_file_urls[$url]['headers'] ,'body'=> file_get_contents($local_file_urls[$url]['body']) );
+            return array('headers'=>$local_file_urls[$url]['headers'] ,'body'=> file_get_contents($local_file_urls[$url]['body']), 'response' => array('code' => 200) );
         else
-            return array('headers'=>array() ,'body'=> file_get_contents($local_file_urls[$url]) );
+            return array('headers'=>array() ,'body'=> file_get_contents($local_file_urls[$url]), 'response' => array('code' => 200) );
     /* elseif(strpos($url, get_option('o3po-settings')['crossref_get_forward_links_url']) === 0) */
     /*     return array('body' => 'fake respose form crossref forward links url'); */
     else
@@ -1190,11 +1213,17 @@ function wp_get_theme( $stylesheet=null, $theme_root=null ) {
 }
 
 $is_single = false;
-
 function is_single() {
     global $is_single;
     return $is_single;
 }
+
+$is_feed = false;
+function is_feed() {
+    global $is_feed;
+    return $is_feed;
+}
+
 
 function home_url( $path=null, $scheme=null ) {
     if($scheme === null)
@@ -1228,4 +1257,44 @@ function wp_check_filetype( $filename, $mimes = null ) {
     }
 
     return compact( 'ext', 'type' );
+}
+
+
+function wp_remote_retrieve_response_code( $response ) {
+
+    if ( is_wp_error( $response ) || ! isset( $response['response'] ) || ! is_array( $response['response'] ) ) {
+        return '';
+    }
+
+    return $response['response']['code'];
+}
+
+
+function url_to_postid( $url ) {
+
+    switch($url)
+    {
+        case '/papers/q-test-1742-04-01/':
+            return 1;
+        case '/papers/doi-that-does-not-exist/':
+            return null;
+        case '/papers/fake_journal_level_doi_suffix-' . current_time("Y-m-d") . '-3' . '/':
+            return 8;
+        default:
+            throw(new Exception("We don't know what to return for url=" . $url));
+    }
+}
+
+
+function do_shortcode( $content, $ignore_html = false ) {
+
+    #not really implemented....
+
+    return $content;
+}
+
+function trackback( $trackback_url, $title, $excerpt, $ID ) {
+
+    #not really implemented
+    return null;
 }

@@ -1000,7 +1000,6 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
     public function add_pdf_endpoint() {
 
         add_rewrite_endpoint( 'pdf', EP_PERMALINK | EP_PAGES );
-            // flush_rewrite_rules( true );  //// <---------- REMOVE THIS WHEN DONE TESTING
 
     }
 
@@ -1008,40 +1007,57 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         /**
          * Handle request to the /pdf endpoint for serving the full text pdf.
          *
+         * For PHPUnit testing this function needs a way to suppress the
+         * calls to exit(), which are otherwise necessary to prevent other
+         * parts of WordPress from adding additional output to the PDF
+         * we want to deliver. This can be done with the optional parameter
+         * $do_not_exit which defaults to false.
+         *
          * To be added to the 'parse_request' action.
          *
          * @since     0.1.0
          * @access    public
-         * @param     WP_Query   $wp_query   The WP_Query to be handled.
+         * @param     WP_Query   $wp_query    The WP_Query to be handled.
+         * @param     boolean    $do_not_exit Prevent this function from calling exit() and return instead.
          */
-   public function handle_pdf_endpoint_request( $wp_query ) {
+    public function handle_pdf_endpoint_request( $wp_query, $do_not_exit=false ) {
 
         if ( !isset( $wp_query->query_vars[ 'pdf' ] ) )
             return;
-        if ( !isset($wp_query->query_vars[ 'post_type' ]) or $wp_query->query_vars[ 'post_type' ] !== $this->get_publication_type_name())
+        if ( !isset($wp_query->query_vars[ 'post_type' ]) or $wp_query->query_vars[ 'post_type' ] !== $this->get_publication_type_name() or !isset($wp_query->query_vars[ $this->get_publication_type_name() ]) )
             return;
 
         $post_id = url_to_postid( '/' . $this->get_publication_type_name_plural() . '/' . $wp_query->query_vars[ $this->get_publication_type_name() ] . '/');
-        if ( empty($post_id) )
+        if(empty($post_id))
         {
             header('Content-Type: text/plain');
             echo "ERROR: post_id is empty";
-            exit();
+            if(!$do_not_exit)
+                exit(); // @codeCoverageIgnore
+            else
+                return;
         }
         $post_type = get_post_type($post_id);
         $doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
-        $file_path = static::get_last_arxiv_pdf_path($post_id);
-        if ( empty($file_path) )
-        {
-            header('Content-Type: text/plain');
-            echo "ERROR: file_path is empty";
-            exit();
-        }
-        if ( empty($doi_suffix) )
+        if(empty($doi_suffix))
         {
             header('Content-Type: text/plain');
             echo "ERROR: doi_suffix is empty";
-            exit();
+            if(!$do_not_exit)
+                exit(); // @codeCoverageIgnore
+            else
+                return;
+        }
+
+        $file_path = static::get_last_arxiv_pdf_path($post_id);
+        if(empty($file_path))
+        {
+            header('Content-Type: text/plain');
+            echo "ERROR: file_path is empty";
+            if(!$do_not_exit)
+                exit(); // @codeCoverageIgnore
+            else
+                return;
         }
 
             /* We deliver the pdf file through an output buffer
@@ -1072,7 +1088,10 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             }
         }
 
-        exit();
+        if(!$do_not_exit)
+            exit(); // @codeCoverageIgnore
+        else
+            return;
     }
 
        /**
@@ -1085,20 +1104,24 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
     public static function add_web_statement_endpoint() {
 
         add_rewrite_endpoint( 'web-statement', EP_PERMALINK | EP_PAGES );
-            //flush_rewrite_rules( true );  //// <---------- REMOVE THIS WHEN DONE TESTING
 
     }
 
        /**
         * Handle requests to the /web-statement end point for serving a web statement of the licence.
-        *
+        * For PHPUnit testing this function needs a way to suppress the
+        * calls to exit(), which are otherwise necessary to prevent other
+        * parts of WordPress from adding additional output to the web statement
+        * we want to deliver. This can be done with the optional parameter
+        * $do_not_exit which defaults to false.
         * To be added to the 'parse_request' action.
         *
         * @since     0.1.0
         * @access    public
-        * @param     WP_Query   $wp_query   The WP_Query to be handled.
+        * @param     WP_Query   $wp_query    The WP_Query to be handled.
+        * @param     boolean    $do_not_exit Prevent this function from calling exit() and return instead.
         * */
-    public function handle_web_statement_endpoint_request( $wp_query ) {
+    public function handle_web_statement_endpoint_request( $wp_query, $do_not_exit=false ) {
 
         if ( !isset( $wp_query->query_vars[ 'web-statement' ] ) )
             return;
@@ -1110,16 +1133,32 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         {
             header('Content-Type: text/plain');
             echo "ERROR: post_id is empty";
-            exit();
+            if(!$do_not_exit)
+                exit(); // @codeCoverageIgnore
+            else
+                return;
         }
         $post_type = get_post_type($post_id);
         $doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
+        if(empty($doi_suffix))
+        {
+            header('Content-Type: text/plain');
+            echo "ERROR: doi_suffix is empty";
+            if(!$do_not_exit)
+                exit(); // @codeCoverageIgnore
+            else
+                return;
+        }
+
         $file_path = static::get_last_arxiv_pdf_path($post_id);
         if ( empty($file_path) )
         {
             header('Content-Type: text/plain');
             echo "ERROR: file_path is empty";
-            exit();
+            if(!$do_not_exit)
+                exit(); // @codeCoverageIgnore
+            else
+                return;
         }
 
         $sha1 = get_transient($post_id . '_web_statement_sha1');
@@ -1140,8 +1179,11 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         echo '</span>' . "\n";
         echo '</body>' . "\n";
         echo '</html>' . "\n";
-        exit();
 
+        if(!$do_not_exit)
+            exit(); // @codeCoverageIgnore
+        else
+            return;
     }
 
         /**
@@ -1158,7 +1200,6 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $endpoint_suffix = $settings->get_plugin_option('arxiv_paper_doi_feed_endpoint');
 
         add_rewrite_endpoint( $endpoint_suffix, EP_ROOT );
-            // flush_rewrite_rules( true );  //// <---------- ONLY COMMENT IN WHILE TESTING
 
     }
 
@@ -1170,8 +1211,9 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         * @since    0.1.0
         * @access   public
         * @param    WP_Query   $wp_query   The WP_Query to be handled.
+        * @param     boolean   $do_not_exit Prevent this function from calling exit() and return instead.
         */
-    public function handle_arxiv_paper_doi_feed_endpoint_request( $wp_query ) {
+    public function handle_arxiv_paper_doi_feed_endpoint_request( $wp_query, $do_not_exit=false ) {
 
         $settings = O3PO_Settings::instance();
         $endpoint_suffix = $settings->get_plugin_option('arxiv_paper_doi_feed_endpoint');
@@ -1207,26 +1249,34 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 
 
         echo '</preprint>' . "\n";
-        exit();
 
+        if(!$do_not_exit)
+            exit(); // @codeCoverageIgnore
+        else
+            return;
     }
 
         /**
          * Output meta tags describing this publication type.
          *
+         * Overwrites and calls function of same name in O3PO_Publication_Type.
+         *
+         * To be added to the 'wp_head' action.
+         *
          * @since     0.1.0
          * @access    public
          */
-    public function the_meta_tags() {
+    public function add_dublin_core_and_highwire_press_meta_tags() {
 
         $post_id = get_the_ID();
         $post_type = get_post_type($post_id);
-        $eprint = get_post_meta( $post_id, $post_type . '_eprint', true );
 
         if ( !is_single() || $post_type !== $this->get_publication_type_name())
             return;
 
-        parent::the_meta_tags();
+        $eprint = get_post_meta( $post_id, $post_type . '_eprint', true );
+
+        parent::add_dublin_core_and_highwire_press_meta_tags();
 
         $pdf_url = static::get_pdf_pretty_permalink($post_id);
 

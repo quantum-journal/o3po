@@ -964,22 +964,14 @@ abstract class O3PO_PublicationType {
          *
          * @since    0.1.0
          * @access   public
-         * @param    WP_query    $query    The query to which this post type is maybe to be added.
+         * @param    arry    $request    The request to which this post type is maybe to be added.
          */
-    public final function add_custom_post_types_to_rss_feed( $query ) {
+    public final function add_custom_post_types_to_rss_feed( $request ) {
 
-        if (isset($query['feed']) && !isset($query['post_type']))
-            $query['post_type'] = array_merge( array( 'post' ), array($this->get_publication_type_name()) );
-        return $query;
+        if (isset($request['feed']) && !isset($request['post_type']))
+            $request['post_type'] = array_merge( array( 'post' ), array($this->get_publication_type_name()) );
+        return $request;
     }
-        /*     /\* We want custom posts to appear in the rss feed. We do this by */
-        /*      * adding this function to the 'request' filter.*\/ */
-        /* public static final function add_custom_post_types_to_rss_feed($qv) { */
-        /*     if (isset($qv['feed']) && !isset($qv['post_type'])) */
-        /*         $qv['post_type'] = array_merge( array( 'post' ) , static::get_active_publication_type_names() ); */
-        /*     return $qv; */
-        /* } */
-
 
         /**
          * Modify the author reported on the feed for publication posts.
@@ -2103,7 +2095,7 @@ abstract class O3PO_PublicationType {
 			$parsed_bbl = O3PO_Latex::parse_bbl($bbl);
 			if( !empty($parsed_bbl) ) {
 				foreach($parsed_bbl as $n => $entry) {
-					static::the_formated_bibliography_entry_html($entry);
+                    echo $this->get_formated_bibliography_entry_html($entry);
 					if( O3PO_Latex::strpos_outside_math_mode($entry['text'], '\\') !== false ) echo '<p style="color:red;">WARNING: This entry still contains one or more backslashes. Probably this means we have not recognized some LaTeX commmand, but it can also be ok if the entry contains a mathematical formula.</p>';
                     if( empty($entry['doi']) ) echo '<p style="color:orange;">WARNING: No DOI found for this entry. Does it really not have one?</p>';
 				}
@@ -2308,19 +2300,6 @@ abstract class O3PO_PublicationType {
          * @access   public
          * @param    int    $post_id     Id of the post.
          */
-    public function the_formated_bibliography_html( $post_id ) {
-
-        echo $this->get_formated_bibliography_html($post_id);
-
-    }
-
-        /**
-         * Echo the html formated bibliography.
-         *
-         * @since    0.1.0
-         * @access   public
-         * @param    int    $post_id     Id of the post.
-         */
     public function get_formated_bibliography_html( $post_id ) {
 
         $post_type = get_post_type($post_id);
@@ -2340,20 +2319,6 @@ abstract class O3PO_PublicationType {
     }
 
         /**
-         * Echo a formated bibliography entry.
-         *
-         * @since    0.1.0
-         * @access   public
-         * @param    array  $entry       Array describing the bibliography entry.
-         */
-    public function the_formated_bibliography_entry_html( $entry ) {
-
-        echo $this->get_formated_bibliography_entry_html($entry);
-
-    }
-
-
-        /**
          * Get a formated bibliography entry.
          *
          * Expects a entry of a bibliography such as those that can be
@@ -2368,20 +2333,6 @@ abstract class O3PO_PublicationType {
         $doi_url_prefix = $this->get_journal_property('doi_url_prefix');
 
         return '			 <p class="break"><a id="' . esc_attr($entry['key']) . '">[' . esc_html($entry['ref']) . ']</a> ' . O3PO_Utility::make_slash_breakable_html(esc_html(htmlspecialchars($entry['text']))) . (!empty($entry['doi']) ? ' <br /><a href="' . esc_url(htmlspecialchars($doi_url_prefix . $entry['doi'])) . '">' . O3PO_Utility::make_slash_breakable_html(esc_url(htmlspecialchars($doi_url_prefix . $entry['doi']))) . '</a>' : '' ) . ( !empty($entry['eprint']) ? ' <br /><a href="' . esc_url($this->get_journal_property('arxiv_url_abs_prefix') . $entry['eprint']) . '">arXiv:' . esc_html($entry['eprint']) . '</a>' : '' ) . ( !empty($entry['url']) ? ' <br /><a href="' . esc_url(htmlspecialchars($entry['url'])) . '">' . O3PO_Utility::make_slash_breakable_html(esc_url(htmlspecialchars($entry['url']))) . '</a>' : '' ) . '</p>';
-    }
-
-
-        /**
-         * Echo the thml formated bibliography.
-         *
-         * @since    0.1.0
-         * @access   public
-         * @param    int    $post_id     Id of the post.
-         */
-    public function the_bibliography( $post_id ) {
-
-        echo $this->get_bibliography_html($post_id);
-
     }
 
         /**
@@ -2567,19 +2518,6 @@ abstract class O3PO_PublicationType {
     }
 
         /**
-         * Echo the html formated cited by information.
-         *
-         * @since    0.1.0
-         * @access   public
-         * @param    int    $post_id     Id of the post.
-         */
-    public function the_cited_by( $post_id ) {
-
-        echo $this->get_cited_by($post_id);
-
-    }
-
-        /**
          * Get the html formated cited by information.
          *
          * Echos the cited-by date including a heading for use in the single
@@ -2690,21 +2628,6 @@ abstract class O3PO_PublicationType {
         return $bibtex;
     }
 
-
-        /**
-         * Echo the html formated bibtex data.
-         *
-         * @since    0.1.0
-         * @access   public
-         * @param    int     $post_id     Id of the post.
-         */
-    public function the_bibtex_data( $post_id ) {
-
-        echo $this->get_bibtex_html($post_id);
-
-    }
-
-
         /**
          * Get the html formated bibtex data.
          *
@@ -2727,21 +2650,6 @@ abstract class O3PO_PublicationType {
         $bibtex_html .= '</textarea>';
 
         return $bibtex_html;
-    }
-
-
-        /**
-         * Echo the polupar summary.
-         *
-         * Echo the popilar summary if available. To be used in the single
-         * templates.
-         *
-         * @since  0.1.0
-         * @access public
-         * @param  int    $post_id     Id of the post.
-         */
-    public static function the_popular_summary( $post_id ) {
-        echo static::get_popular_summary( $post_id );
     }
 
         /**
@@ -2810,19 +2718,6 @@ abstract class O3PO_PublicationType {
         }
 
         return O3PO_Latex::utf8_to_latex($formated_authors);
-    }
-
-        /**
-         * Echo the license_information.
-         *
-         * @since     0.1.0
-         * @access    public
-         * @param     int      $post_id   Id of the post.
-         */
-    public function the_license_information( $post_id ) {
-
-        echo $this->get_license_information($post_id);
-
     }
 
         /**
@@ -2955,13 +2850,20 @@ abstract class O3PO_PublicationType {
          *
          * @since    0.1.0
          * @access   public
+         * @param int     $post_id    The Id of the post that is views (defaults to null). If left empty global $post is used.
          */
-    public function admin_page_extra_css() {
+    public function admin_page_extra_css( $post_id = null) {
 
         global $post;
-        if(empty($post))
-            return;
-        $post_id = $post->ID;
+
+        if(empty($post_id))
+        {
+            if(empty($post))
+                return;
+
+            $post_id = $post->ID;
+        }
+
         if(empty($post_id))
             return;
         $post_type = get_post_type($post_id);
