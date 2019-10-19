@@ -159,6 +159,17 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         $new_reviewers_summary = isset( $_POST[ $post_type . '_reviewers_summary' ] ) ? $_POST[ $post_type . '_reviewers_summary' ] : '';
 
 		$new_number_reviewers = isset( $_POST[ $post_type . '_number_reviewers' ] ) ? sanitize_text_field( $_POST[ $post_type . '_number_reviewers' ] ) : '';
+
+        $new_reviewer_given_names[] = array();
+        $new_reviewer_surnames[] = array();
+        $new_reviewer_name_styles[] = array();
+        $affiliation_nums = array();
+        $affiliation_nums = array();
+        $new_reviewer_affiliations[] = array();
+        $new_reviewer_orcids[] = array();
+        $new_reviewer_urls[] = array();
+        $new_reviewer_ages[] = array();
+        $new_reviewer_grades[] = array();
 		for ($x = 0; $x < $new_number_reviewers; $x++) {
 			$new_reviewer_given_names[] = isset( $_POST[ $post_type . '_reviewer_given_names' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_reviewer_given_names' ][$x] ) : '';
 			$new_reviewer_surnames[] = isset( $_POST[ $post_type . '_reviewer_surnames' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_reviewer_surnames' ][$x] ) : '';
@@ -384,8 +395,11 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                     $validation_result .= 'INFO: Trackback to the arXiv for ' . $eprint_without_version . ' sent.' . "\n";
                 }
                     //trachback to ourselves
-                trackback( get_site_url() . $suspected_post_url, $title, $trackback_excerpt, $post_id );
-                $validation_result .= 'INFO: Trackback to ' . $suspected_post_url . ' sent.' . "\n";
+                $response = trackback( get_site_url() . $suspected_post_url, $title, $trackback_excerpt, $post_id );
+                if(is_wp_error($response))
+                    $validation_result .= 'WARNING: Trackback to ' . get_site_url() . $suspected_post_url . ' could not be sent: ' . $response->get_error_message() . "\n";
+                else
+                    $validation_result .= 'INFO: Trackback to ' . get_site_url() . $suspected_post_url . ' sent successfully.' . "\n";
             }
         }
 
