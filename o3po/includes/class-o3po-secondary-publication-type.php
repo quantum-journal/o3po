@@ -965,7 +965,9 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 
         if($number_target_dois>0)
         {
-            $content .= ' &mdash; on ';
+            if($type==="Leap")
+                $content .= ' &mdash;';
+            $content .= ' on ';
             for ($x = 0; $x < $number_target_dois; $x++) {
                 $doi_prefix = $this->get_journal_property('doi_prefix');
                 if( mb_substr($target_dois[$x], 0, mb_strlen($doi_prefix)) === $doi_prefix )
