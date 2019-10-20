@@ -287,10 +287,10 @@ class O3PO_Admin {
 
                 if(!empty($citations_data['errors']))
                 {
-                    $html .= '<p>The following errors occurred while fetching and calculating citation counts for this type: <ul>';
+                    $html .= '<p>The following errors occurred while fetching and calculating citation counts for this type:</p><ul>';
                     foreach($citations_data['errors'] as $error)
                         $html .= '<li>' . esc_html($error->get_error_code() . ' ' . $error->get_error_message() . " ") . '</li>';
-                    $html .= '</ul></p>';
+                    $html .= '</ul>';
                 }
 
                 $citations_this_type = $citations_data['citation_count'];
