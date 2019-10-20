@@ -2,7 +2,7 @@
 
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-settings.php');
 
-class O3PO_SettingsTest extends PHPUnit_Framework_TestCase
+class O3PO_SettingsTest extends O3PO_TestCase
 {
 
     public function fake_get_active_publication_type_names() {
@@ -48,10 +48,7 @@ class O3PO_SettingsTest extends PHPUnit_Framework_TestCase
             $settings->render_settings_page();
             $output = ob_get_contents();
             ob_end_clean();
-            $dom = new DOMDocument;
-            $result = $dom->loadHTML($output);
-                //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
-            $this->assertNotFalse($result);
+            $this->assertValidHTMLFragment($output);
 
             $combined_output .= $output;
         }
@@ -93,10 +90,8 @@ class O3PO_SettingsTest extends PHPUnit_Framework_TestCase
             $output = ob_get_contents();
             ob_end_clean();
             $get_transient_returns = false;
-            $dom = new DOMDocument;
-            $result = $dom->loadHTML($output);
-                //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
-            $this->assertNotFalse($result);
+
+            $this->assertValidHTMLFragment($output);
         }
 
         preg_match_all('#id="' . $settings->get_plugin_name() . '-settings-(.*?)"#', $combined_output, $matches);
@@ -116,10 +111,7 @@ class O3PO_SettingsTest extends PHPUnit_Framework_TestCase
         $settings->render_array_as_comma_separated_list_setting('maintenance_mode');#call this on a non-list setting to make sure it executes on non-initialized settings
         $output = ob_get_contents();
         ob_end_clean();
-        $dom = new DOMDocument;
-        $result = $dom->loadHTML($output);
-            //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
-        $this->assertNotFalse($result);
+        $this->assertValidHTMLFragment($output);
     }
 
 

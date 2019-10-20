@@ -7,16 +7,20 @@
  * the plugin calls.
  */
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+define("EP_PERMALINK", 1);
+define("EP_PAGES", 4096);
+define("EP_ROOT", 64);
+define("ABSPATH", dirname( __FILE__ ) . '/' );
+
 include(dirname( __FILE__ ) . '/posts.php');
 include(dirname( __FILE__ ) . '/formatting.php');
 include(dirname( __FILE__ ) . '/kses.php');
 
-require_once dirname( __FILE__ ) . '/../../o3po/includes/class-o3po-settings.php';
-
-                                 define("EP_PERMALINK", 1);
-                                 define("EP_PAGES", 4096);
-                                 define("EP_ROOT", 64);
-                                 define("ABSPATH", dirname( __FILE__ ) . '/' );
+require_once(dirname( __FILE__ ) . '/../../o3po/includes/class-o3po-settings.php');
 
 if(!class_exists('PHPUnit_Framework_TestCase')){
         /**
@@ -30,6 +34,19 @@ if(!class_exists('PHPUnit_Framework_TestCase')){
     }
 }
 
+
+class O3PO_TestCase extends PHPUnit_Framework_TestCase
+{
+    public function assertValidHTMLFragment( $html ) {
+
+        $dom = new DOMDocument;
+        $result = $dom->loadHTML('<div>' . $html . '</div>');
+        $this->assertNotFalse($result);
+            //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
+
+        return($result);
+    }
+}
 
 function plugin_dir_path($path) {
 

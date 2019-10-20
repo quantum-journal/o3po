@@ -2,7 +2,7 @@
 
 require_once(dirname( __FILE__ ) . '/../o3po/admin/class-o3po-admin.php');
 
-class O3PO_AdminTest extends PHPUnit_Framework_TestCase
+class O3PO_AdminTest extends O3PO_TestCase
 {
 
     private $admin;
@@ -52,15 +52,12 @@ class O3PO_AdminTest extends PHPUnit_Framework_TestCase
     public function test_add_plugin_action_links( $admin ) {
 
         ob_start();
-        echo "<div>";
         foreach($admin->add_plugin_action_links(array('<a href="foo">foo</a>')) as $link_html)
             echo($link_html);
-        echo "</div>";
         $output = ob_get_contents();
         ob_end_clean();
-        $dom = new DOMDocument;
-        $result = $dom->loadHTML($output);
-        $this->assertNotFalse($result);
+        $this->assertValidHTMLFragment($output);
+
     }
 
         /**
@@ -72,14 +69,11 @@ class O3PO_AdminTest extends PHPUnit_Framework_TestCase
         $settings->configure('o3po', '0.3.0', 'O-3PO', 'O3PO_PublicationType::get_active_publication_type_names');
 
         ob_start();
-        echo "<div>";
         $admin->enable_mathjax();
-        echo "</div>";
         $output = ob_get_contents();
         ob_end_clean();
-        $dom = new DOMDocument;
-        $result = $dom->loadHTML($output);
-        $this->assertNotFalse($result);
+        $this->assertValidHTMLFragment($output);
+
     }
 
         /**

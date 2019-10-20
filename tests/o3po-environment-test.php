@@ -1,8 +1,8 @@
 <?php
 
-require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-environment.php';
+require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-environment.php');
 
-class O3PO_Environment_Test extends PHPUnit_Framework_TestCase
+class O3PO_Environment_Test extends O3PO_TestCase
 {
 
     # As phpunit 8 requires a specification of a void return type for setUp(), as explained here https://thephp.cc/news/2019/02/help-my-tests-stopped-working, but PHP <7 does not support such declarations setUp() can no longer be used if the tests are to run across PHP versions.
@@ -37,9 +37,7 @@ class O3PO_Environment_Test extends PHPUnit_Framework_TestCase
         $test_environment->modify_css_if_in_test_environment();
         $output = ob_get_contents();
         ob_end_clean();
-        $dom = new DOMDocument;
-        $result = $dom->loadHTML($output);
-        $this->assertNotFalse($result);
+        $this->assertValidHTMLFragment($output);
 
     }
 

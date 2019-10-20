@@ -10,7 +10,7 @@ require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-latex.php');
 require_once(dirname( __FILE__ ) . '/../o3po/admin/class-o3po-admin.php');
 
 
-class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
+class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
 {
 
     public function test_initialize_settings()
@@ -147,12 +147,8 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             $method->invokeArgs($primary_publication_type, array($post_id));
             $output = ob_get_contents();
             ob_end_clean();
+            $this->assertValidHTMLFragment($output);
 
-            $dom = new DOMDocument;
-
-            $result = $dom->loadHTML('<div>' . $output . '<div>');
-                //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
-            $this->assertNotFalse($result);
         }
     }
 
@@ -199,11 +195,8 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             $method->invokeArgs($secondary_publication_type, array($post_id));
             $output = ob_get_contents();
             ob_end_clean();
+            $this->assertValidHTMLFragment($output);
 
-            $dom = new DOMDocument;
-            $result = $dom->loadHTML('<div>' . $output . '</div>');
-                //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
-            $this->assertNotFalse($result);
         }
     }
 
@@ -221,10 +214,8 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             $output = ob_get_contents();
             ob_end_clean();
 
-            $dom = new DOMDocument;
-            $result = $dom->loadHTML('<div>' . $output . '</div>');
-//            $this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
-            $this->assertNotFalse($result);
+            $this->assertValidHTMLFragment($output);
+
         }
     }
 
@@ -242,10 +233,8 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             $output = ob_get_contents();
             ob_end_clean();
 
-            $dom = new DOMDocument;
-            $result = $dom->loadHTML('<div>' . $output . '</div>');
-//            $this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
-            $this->assertNotFalse($result);
+            $this->assertValidHTMLFragment($output);
+
         }
     }
 
@@ -282,12 +271,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             else
                 $this->assertSame($orig_content, $content);
 
-            $content = preg_replace('#(main|header)#', 'div', $content); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
+            $output = preg_replace('#(main|header)#', 'div', $content); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
 
-            $dom = new DOMDocument;
-            $result = $dom->loadHTML('<div>' . $content . '</div>');
-//            $this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
-            $this->assertNotFalse($result);
+            $this->assertValidHTMLFragment($output);
+
         }
     }
 
@@ -326,11 +313,8 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                 $this->assertSame($orig_content, $content);
 
             $content = preg_replace('#(main|header)#', 'div', $content); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
+            $this->assertValidHTMLFragment($content);
 
-            $dom = new DOMDocument;
-            $result = $dom->loadHTML('<div>' . $content . '</div>');
-//            $this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
-            $this->assertNotFalse($result);
         }
     }
 
@@ -548,13 +532,8 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
                 $this->assertFalse( O3PO_Latex::strpos_outside_math_mode($entry['text'], '\\'), "The text " . $entry['text'] . " extracted from the bbl in " . $path_source . " still contains one ore more backslashes that were not caught by parse_bbl");
 
-                $dom = new DOMDocument;
-                #print("\n\n" . $primary_publication_type->get_formated_bibliography_entry_html($entry) . "\n\n");
-
-                $result = $dom->loadHTML('<div>' . $primary_publication_type->get_formated_bibliography_entry_html($entry) . '</div>');
-                    // $this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
-                $this->assertNotFalse($result);
-
+                $output = $primary_publication_type->get_formated_bibliography_entry_html($entry);
+                $this->assertValidHTMLFragment($output);
 
                 if( !empty($entry['doi']) )
                     $num_dois += 1;
@@ -1377,12 +1356,10 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             else
                 $this->assertSame($orig_content, $content);
 
-            $content = preg_replace('#(main|header)#', 'div', $content); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
+            $output = preg_replace('#(main|header)#', 'div', $content); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
 
-            $dom = new DOMDocument;
-            $result = $dom->loadHTML('<div>' . $content . '</div>');
-//            $this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
-            $this->assertNotFalse($result);
+            $this->assertValidHTMLFragment($output);
+
         }
     }
 
@@ -1419,12 +1396,9 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             else
                 $this->assertSame($orig_content, $content);
 
-            $content = preg_replace('#(main|header)#', 'div', $content); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
+            $output = preg_replace('#(main|header)#', 'div', $content); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
+            $this->assertValidHTMLFragment($output);
 
-            $dom = new DOMDocument;
-            $result = $dom->loadHTML('<div>' . $content . '</div>');
-//            $this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
-            $this->assertNotFalse($result);
         }
     }
 
@@ -1463,12 +1437,9 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             else
                 $this->assertSame($orig_content, $content);
 
-            $content = preg_replace('#(main|header)#', 'div', $content); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
+            $output = preg_replace('#(main|header)#', 'div', $content); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
+            $this->assertValidHTMLFragment($output);
 
-            $dom = new DOMDocument;
-            $result = $dom->loadHTML('<div>' . $content . '</div>');
-//            $this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
-            $this->assertNotFalse($result);
         }
     }
 
@@ -1509,12 +1480,9 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
             else
                 $this->assertEmpty($content);
 
-            $content = preg_replace('#(main|header)#', 'div', $content); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
+            $output = preg_replace('#(main|header)#', 'div', $content); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
+            $this->assertValidHTMLFragment($output);
 
-            $dom = new DOMDocument;
-            $result = $dom->loadHTML('<div>' . $content . '</div>');
-//            $this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
-            $this->assertNotFalse($result);
         }
     }
 
@@ -1737,9 +1705,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
             if($primary_publication_type->get_publication_type_name() == $post_type or $secondary_publication_type->get_publication_type_name() == $post_type)
             {
-                $dom = new DOMDocument;
-                $result = $dom->loadHTML($output);
-                $this->assertNotFalse($result);
+                $this->assertValidHTMLFragment($output);
             }
         }
     }
@@ -1780,9 +1746,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
             if($primary_publication_type->get_publication_type_name() == $post_type or $secondary_publication_type->get_publication_type_name() == $post_type)
             {
-                $dom = new DOMDocument;
-                $result = $dom->loadHTML($output);
-                $this->assertNotFalse($result);
+                $this->assertValidHTMLFragment($output);
             }
             else
                 $this->assertEmpty($output);
@@ -1814,10 +1778,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         ob_end_clean();
         $output = preg_replace('#(main|header)#', 'div', $output); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
 
-        $dom = new DOMDocument;
-        $result = $dom->loadHTML($output);
-            //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
-        $this->assertNotFalse($result);
+        $this->assertValidHTMLFragment($output);
 
     }
 
@@ -1862,11 +1823,8 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $output = ob_get_contents();
         ob_end_clean();
         $output = preg_replace('#(main|header)#', 'div', $output); # this is a brutal hack because $dom->loadHTML cannot cope with html 5
+        $this->assertValidHTMLFragment($output);
 
-        $dom = new DOMDocument;
-        $result = $dom->loadHTML($output);
-            //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
-        $this->assertNotFalse($result);
     }
 
 
@@ -1899,9 +1857,8 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         set_global_query(new WP_Query("ID=1341351341341349889" , array('s' => 'search term'))); #global search query that will not yields results, so we expect the search form to be modified
         $this->assertNotSame($form, $journal->add_notice_to_search_form($form));
-        $dom = new DOMDocument;
-        $result = $dom->loadHTML('<div>' . $journal->add_notice_to_search_form($form) . '</div>');
-        $this->assertNotFalse($result);
+        $output = $journal->add_notice_to_search_form($form);
+        $this->assertValidHTMLFragment($output);
 
         global $_GET;
         $_GET["reason"]="title-click";
@@ -1914,9 +1871,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $output = ob_get_contents();
         ob_end_clean();
 
-        $dom = new DOMDocument;
-        $result = $dom->loadHTML('<div>' . $output . '</div>');
-        $this->assertNotFalse($result);
+        $this->assertValidHTMLFragment($outpu);
 
         #and then one that has posts
         $main_search_query = new WP_Query("post_type=paper", array('s' => 'search term', 'is_main' => true));
@@ -1925,10 +1880,8 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $this->assertSame($main_search_query, $journal->add_notice_to_search_results_at_loop_start($main_search_query));
         $output = ob_get_contents();
         ob_end_clean();
+        $this->assertValidHTMLFragment($output);
 
-        $dom = new DOMDocument;
-        $result = $dom->loadHTML('<div>' . $output . '</div>');
-        $this->assertNotFalse($result);
     }
 
 
@@ -1942,11 +1895,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
 
         $cited_by_data = $primary_publication_type->get_cited_by_data(12);
         $this->assertSame($cited_by_data['citation_count'], count($cited_by_data['all_bibentries']));
-
-        $dom = new DOMDocument;
-        $result = $dom->loadHTML('<div>' . $cited_by_data['html'] . '<div>');
-            //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
-        $this->assertNotFalse($result);
+        $this->assertValidHTMLFragment($cited_by_data['html']);
 
     }
 
@@ -1964,9 +1913,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         echo "</div>";
         $output = ob_get_contents();
         ob_end_clean();
-        $dom = new DOMDocument;
-        $result = $dom->loadHTML($output);
-        $this->assertNotFalse($result);
+        $this->assertValidHTMLFragment($output);
 
         #test the meta-data tab for various combinations of parameters
         global $_GET;
@@ -1993,9 +1940,7 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
                     echo "</div>";
                     $output = ob_get_contents();
                     ob_end_clean();
-                    $dom = new DOMDocument;
-                    $result = $dom->loadHTML($output);
-                    $this->assertNotFalse($result);
+                    $this->assertValidHTMLFragment($output);
                 }
             }
         }
@@ -2004,15 +1949,11 @@ class O3PO_JournalAndPublicationTypesTest extends PHPUnit_Framework_TestCase
         $_GET['tab'] = 'citation-metrics';
         $_POST['refresh'] = 'checked';
         ob_start();
-        echo "<div>";
         $admin->render_meta_data_explorer();
-        echo "</div>";
         $output = ob_get_contents();
-        echo("\n".$output);
         ob_end_clean();
-        $dom = new DOMDocument;
-        #$result = $dom->loadHTML($output);
-        #$this->assertNotFalse($result);
+        $this->assertValidHTMLFragment($output);
+
     }
 
 

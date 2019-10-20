@@ -3,7 +3,7 @@
 require_once(dirname( __FILE__ ) . '/../o3po/public/class-o3po-public.php');
 
 
-class O3PO_PublicTest extends PHPUnit_Framework_TestCase
+class O3PO_PublicTest extends O3PO_TestCase
 {
 
     private $public;
@@ -72,9 +72,7 @@ class O3PO_PublicTest extends PHPUnit_Framework_TestCase
         echo "</div>";
         $output = ob_get_contents();
         ob_end_clean();
-        $dom = new DOMDocument;
-        $result = $dom->loadHTML($output);
-        $this->assertNotFalse($result);
+        $this->assertValidHTMLFragment($output);
 
         $is_single = $orig_is_single;
     }
@@ -100,9 +98,7 @@ class O3PO_PublicTest extends PHPUnit_Framework_TestCase
         echo "</div>";
         $output = ob_get_contents();
         ob_end_clean();
-        $dom = new DOMDocument;
-        $result = $dom->loadHTML($output);
-        $this->assertNotFalse($result);
+        $this->assertValidHTMLFragment($output);
 
         $is_single = $orig_is_single;
         $is_home = $orig_is_home;
@@ -131,9 +127,7 @@ class O3PO_PublicTest extends PHPUnit_Framework_TestCase
         echo "</div>";
         $output = ob_get_contents();
         ob_end_clean();
-        $dom = new DOMDocument;
-        $result = $dom->loadHTML($output);
-        $this->assertNotFalse($result);
+        $this->assertValidHTMLFragment($output);
 
         $is_single = $orig_is_single;
         $is_home = $orig_is_home;
@@ -171,9 +165,7 @@ class O3PO_PublicTest extends PHPUnit_Framework_TestCase
         echo "</div>";
         $output = ob_get_contents();
         ob_end_clean();
-        $dom = new DOMDocument;
-        $result = $dom->loadHTML($output);
-        $this->assertNotFalse($result);
+        $this->assertValidHTMLFragment($output);
 
         $is_single = $orig_is_single;
         $is_home = $orig_is_home;
