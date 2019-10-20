@@ -1871,7 +1871,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         $output = ob_get_contents();
         ob_end_clean();
 
-        $this->assertValidHTMLFragment($outpu);
+        $this->assertValidHTMLFragment($output);
 
         #and then one that has posts
         $main_search_query = new WP_Query("post_type=paper", array('s' => 'search term', 'is_main' => true));

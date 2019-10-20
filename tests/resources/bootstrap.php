@@ -40,9 +40,16 @@ class O3PO_TestCase extends PHPUnit_Framework_TestCase
     public function assertValidHTMLFragment( $html ) {
 
         $dom = new DOMDocument;
-        $result = $dom->loadHTML('<div>' . $html . '</div>');
-        $this->assertNotFalse($result);
+        try
+        {
+            $result = $dom->loadHTML('<div>' . $html . '</div>');
+            $this->assertNotFalse($result);
             //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
+        }
+        catch(Exception $e)
+        {
+            $this->assertNotFalse(false, "The following html caused the error " . $e->getMessage() . "\n" . $html);
+        }
 
         return($result);
     }
