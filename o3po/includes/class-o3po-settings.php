@@ -132,6 +132,7 @@ class O3PO_Settings extends O3PO_Singleton {
         'custom_search_page' => "checked",
         'page_template_for_publication_posts' => "unchecked",
         'page_template_abstract_header' => '',
+        'trackbacks_from_secondary_directly_into_database' => "unchecked",
         'maintenance_mode' => 'unchecked',
 
         'self_notification_subject_template' =>
@@ -306,6 +307,7 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->add_settings_field('custom_search_page', 'Display search page notice', array( $this, 'render_custom_search_page_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
         $this->add_settings_field('page_template_for_publication_posts', 'Force page template', array( $this, 'render_page_template_for_publication_posts_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
         $this->add_settings_field('page_template_abstract_header', 'Show a heading for the abstract', array( $this, 'render_page_template_abstract_header_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
+        $this->add_settings_field('trackbacks_from_secondary_directly_into_database', 'Write trackbacks directly', array( $this, 'render_trackbacks_from_secondary_directly_into_database_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
         $this->add_settings_field('cited_by_refresh_seconds', 'Refresh cited-by time', array( $this, 'render_cited_by_refresh_seconds_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
         $this->add_settings_field('maintenance_mode', 'Maintenance mode', array( $this, 'render_maintenance_mode_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
 
@@ -588,6 +590,18 @@ class O3PO_Settings extends O3PO_Singleton {
 
         $this->render_setting('page_template_abstract_header');
         echo '<p>An optional header that is displayed before the abstract on the pages of individual publications.</p>';
+
+    }
+
+        /**
+         * Render the setting for whether to write trackbacks directly.
+         *
+         * @since    0.3.1
+         * @access   public
+         */
+    public function render_trackbacks_from_secondary_directly_into_database_setting() {
+
+        $this->render_checkbox_setting('trackbacks_from_secondary_directly_into_database', 'Publication posts in the secondary journal targeting posts published in the primary journal send <a href="https://en.support.wordpress.com/comments/trackbacks/">Trackbacks</a> to the targeted post(s). Unfortunately, sending such Trackbacks does not work reliably on many WordPress instances. You can check this box to instead have ' . $this->plugin_pretty_name . ' write the such Trackbacks directly into the local database via wp_new_comment() instead of using trackback().' );
 
     }
 
@@ -1686,6 +1700,7 @@ class O3PO_Settings extends O3PO_Singleton {
                 'search_form_on_search_page' => 'checked_or_unchecked',
                 'page_template_for_publication_posts' => 'checked_or_unchecked',
                 'page_template_abstract_header' => 'trim_settings_field',
+                'trackbacks_from_secondary_directly_into_database' => 'checked_or_unchecked',
                 'maintenance_mode' => 'checked_or_unchecked',
                 'volumes_endpoint' => 'trim_settings_field',
                 'doi_prefix' => 'validate_doi_prefix',
