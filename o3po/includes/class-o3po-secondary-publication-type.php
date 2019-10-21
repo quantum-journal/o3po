@@ -390,8 +390,8 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         $number_target_dois = get_post_meta( $post_id, $post_type . '_number_target_dois', true );
         $target_dois = static::get_post_meta_field_containing_array( $post_id, $post_type . '_target_dois');
         $trackback_excerpt = $this->get_trackback_excerpt($post_id);
+        $doi_prefix = $this->get_journal_property('doi_prefix');
         for ($x = 0; $x < $number_target_dois; $x++) {
-            $doi_prefix = $this->get_journal_property('doi_prefix');
             if( mb_substr($target_dois[$x], 0, mb_strlen($doi_prefix)) === $doi_prefix )
             {
                 $suspected_post_url = '/' . $this->target_publication_type_name_plural . '/' . mb_substr($target_dois[$x], mb_strlen($doi_prefix)+1) . '/';
