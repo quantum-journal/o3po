@@ -497,7 +497,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @access   private
          * @param    int      $post_id    Id of the post.
          */
-    private function get_trackback_excerpt( $post_id ) {
+    public function get_trackback_excerpt( $post_id ) {
 
         $post_type = get_post_type($post_id);
         if ( $post_type === $this->get_publication_type_name() ) {
