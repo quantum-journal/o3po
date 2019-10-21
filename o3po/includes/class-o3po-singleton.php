@@ -20,7 +20,12 @@
  * @subpackage O3PO/includes
  * @author     Christian Gogolin <o3po@quantum-journal.org>
  */
-class O3PO_Singleton
+class O3PO_Singleton {
+    use O3PO_Singleton_Trait;
+}
+
+
+trait O3PO_Singleton_Trait
 {
     /**
      * Retuns the singleton
