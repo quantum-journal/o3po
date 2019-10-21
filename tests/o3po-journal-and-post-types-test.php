@@ -1469,8 +1469,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
             if($post_type == $secondary_publication_type->get_publication_type_name())
             {
                 foreach( array(
-                             '#' . $post_data['post_content']  . '#',
-                             '#' . $type = get_post_meta( $post_id, $post_type . '_type', true ) . '#',
+                             '#' . substr($post_data['post_content'], 0, 5)  . '#',
                            )
                          as $regexp)
                 {
