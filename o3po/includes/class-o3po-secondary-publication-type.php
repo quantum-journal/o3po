@@ -386,7 +386,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         else
             $validation_result .= 'INFO: Email notification of publication to publisher sent.' . "\n";
 
-            // Send trackbacks to the arXiv and ourselves
+            // Send Trackbacks to the arXiv and ourselves
         $number_target_dois = get_post_meta( $post_id, $post_type . '_number_target_dois', true );
         $target_dois = static::get_post_meta_field_containing_array( $post_id, $post_type . '_target_dois');
         $trackback_excerpt = $this->get_trackback_excerpt($post_id);
@@ -396,19 +396,21 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
             {
                 $suspected_post_url = '/' . $this->target_publication_type_name_plural . '/' . mb_substr($target_dois[$x], mb_strlen($doi_prefix)+1) . '/';
                 $target_post_id = url_to_postid($suspected_post_url);
+                if($target_post_id === 0)
+                    continue;
+
                 $target_post_type = get_post_type($target_post_id);
                 $target_eprint = get_post_meta( $target_post_id, $target_post_type . '_eprint', true );
                 $eprint_without_version = preg_replace('#v[0-9]*$#u', '', $target_eprint);
                 if(!empty($target_eprint) && !$this->environment->is_test_environment()) {
-                        //Send trackback to the arxiv
+                        //Send Trackback to the arxiv
                     trackback( $this->get_journal_property('arxiv_url_trackback_prefix') . $eprint_without_version , $title, $trackback_excerpt, $post_id );
                     $validation_result .= 'INFO: Trackback to the arXiv for ' . $eprint_without_version . ' sent.' . "\n";
                 }
 
-
                 if($settings->get_plugin_option('trackbacks_from_secondary_directly_into_database') !== 'checked')
                 {
-                        //Send trackback to ourselves via trackback()
+                        //Send Trackback to ourselves via trackback()
                     $response = trackback( get_site_url() . $suspected_post_url, $title, $trackback_excerpt, $post_id );
                     if(is_wp_error($response))
                         $validation_result .= 'WARNING: Trackback to ' . get_site_url() . $suspected_post_url . ' could not be sent: ' . $response->get_error_message() . "\n";
@@ -418,12 +420,13 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                 }
                 else
                 {
-                        //Put trackback comment directly into database with wp_new_comment()
+                        //Put Trackback comment directly into database with wp_new_comment()
                     if(empty($corresponding_author_has_been_notifed_date) || $this->environment->is_test_environment()) {
                         global $current_user;
+                        $journal = get_post_meta( $post_id, $post_type . '_journal', true );
                         $commentdata = array(
                             'comment_post_ID' => $target_post_id,
-                            'comment_author' => $sub_type . ' in ' . $this->get_publication_type_name() . ' by ' . static::get_formated_authors($post_id) . ': "' . $title . '"', //This is the only think displayed in most themes, so we put more information than just the author
+                            'comment_author' => $sub_type . ' in ' . $journal . ' by ' . static::get_formated_authors($post_id) . ' "' . $title . '"', //This is the only thing displayed in most themes, so we put more information than just the author
                             'comment_author_email' => '',
                             'comment_author_url' => $post_url,
                             'comment_content' => $trackback_excerpt,
@@ -431,12 +434,16 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                             'comment_parent' => 0, //0 because it is not a reply to another comment
                             'user_id' => $current_user->ID,
                                              );
-                        $response = wp_new_comment($commentdata);
-                        if(is_wp_error($response))
-                            $validation_result .= 'WARNING: Trackback to ' . get_site_url() . $suspected_post_url . ' could not be put into database: ' . $response->get_error_message() . "\n";
+                        $comment_id = wp_new_comment($commentdata, true);
+                        if(is_wp_error($comment_id))
+                            $validation_result .= 'WARNING: Trackback to ' . get_site_url() . $suspected_post_url . ' could not be put into database: ' . $comment_id->get_error_message() . "\n";
+                        elseif($comment_id === false)
+                            $validation_result .= 'WARNING: Trackback to ' . get_site_url() . $suspected_post_url . ' could not be put into database for an unknown reason.' . "\n";
                         else
+                        {
                             $validation_result .= 'INFO: Trackback to ' . get_site_url() . $suspected_post_url . ' put into database successfully.' . "\n";
-
+                            wp_set_comment_status( $comment_id, 'approve', true ); # always attempt to approve the comment
+                        }
                     }
                 }
             }
@@ -484,7 +491,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
     }
 
         /**
-         * Get the excerpt for trackbacks.
+         * Get the excerpt for Trackbacks.
          *
          * @since    0.1.0
          * @access   private
