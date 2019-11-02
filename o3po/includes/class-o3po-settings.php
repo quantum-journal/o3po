@@ -38,7 +38,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-buffe
  * @subpackage O3PO/includes
  * @author     Christian Gogolin <o3po@quantum-journal.org>
  */
-class O3PO_Settings  {
+class O3PO_Settings extends O3PO_Form {
     use O3PO_Singleton_Trait;
 
         /**
@@ -299,7 +299,7 @@ class O3PO_Settings  {
          */
     public function register_settings() {
 
-        register_setting( $this->plugin_name . '-settings', $this->plugin_name . '-settings', array( $this, 'validate_settings' ) );
+        register_setting( $this->plugin_name . '-settings', $this->plugin_name . '-settings', array( $this, 'validate_input' ) );
 
         $this->add_settings_section('plugin_settings', 'Plugin', array( $this, 'render_plugin_settings' ), $this->plugin_name . '-settings:plugin_settings');
         $this->add_settings_field('production_site_url', 'Production site url', array( $this, 'render_production_site_url_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
@@ -1709,13 +1709,13 @@ class O3PO_Settings  {
                 'executive_board' => 'trim',
                 'editor_in_chief' => 'trim',
                 'self_notification_subject_template' => 'trim',
-                'self_notification_body_template' => 'leave_unchaged',
+                'self_notification_body_template' => 'accept_as_is',
                 'author_notification_subject_template' => 'trim',
-                'author_notification_body_template' => 'leave_unchaged',
+                'author_notification_body_template' => 'accept_as_is',
                 'author_notification_secondary_subject_template' => 'trim',
-                'author_notification_secondary_body_template' => 'leave_unchaged',
+                'author_notification_secondary_body_template' => 'accept_as_is',
                 'fermats_library_notification_subject_template' => 'trim',
-                'fermats_library_notification_body_template' => 'leave_unchaged',
+                'fermats_library_notification_body_template' => 'accept_as_is',
                 'relevanssi_mime_types_to_exclude' => 'trim',
                 'relevanssi_index_pdfs_asynchronously' => 'checked_or_unchecked',
                 'cited_by_refresh_seconds' => 'validate_positive_integer',
@@ -1941,40 +1941,17 @@ class O3PO_Settings  {
         return $input;
     }
 
-        /**
-         * Trim user input to settings
-         *
-         * @since    0.3.0
-         * @access   private
-         * @param    string   $field    The field this was input to.
-         * @param    string   $input    User input.
-         */
-    public function trim( $field, $input ) {
 
-        return trim($input);
-    }
 
         /**
-         * Leave user input to settings unchanged.
-         *
-         * @since    0.3.0
-         * @access   private
-         * @param    string   $field    The field this was input to.
-         * @param    string   $input    User input.
-         */
-    public function leave_unchaged( $field, $input ) {
-
-        return $input;
-    }
-
-        /**
-         * Validate settings.
+         * Validate input to settings.
          *
          * @since    0.1.0
+         * @since    0.4.0    Renamed.
          * @access   public
-         * @param    string    $input    Value of the setting to validate.
+         * @param    array    $input    Array of values of the fields to validate.
          */
-    public function validate_settings( $input ) {
+    public function validate_input( $input ) {
 
         $newinput = array();
         foreach($this->get_all_settings_fields_map() as $field => $validation_method)
