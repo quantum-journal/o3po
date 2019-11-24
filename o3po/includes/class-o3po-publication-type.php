@@ -543,7 +543,7 @@ abstract class O3PO_PublicationType {
 		update_post_meta( $post_id, $post_type . '_doi_suffix', $new_doi_suffix );
 		update_post_meta( $post_id, $post_type . '_corresponding_author_email', $new_corresponding_author_email );
         update_post_meta( $post_id, $post_type . '_bbl', $new_bbl );
-        update_post_meta( $post_id, $post_type . '_buffer_email', $new_buffer_email );
+        update_post_meta( $post_id, $post_type . '_buffer_email', $new_buffer_email ); #we keep using the buffer_email and buffer_email_xxx fields for compatibility, even though the new buffer.com interface does no longer send emails but uses the buffer.com api
         update_post_meta( $post_id, $post_type . '_buffer_special_text', $new_buffer_special_text );
 
     }
