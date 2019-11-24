@@ -513,7 +513,7 @@ abstract class O3PO_PublicationType {
         if ($old_doi_suffix === $new_doi_suffix)
            update_post_meta( $post_id, $post_type . '_doi_suffix_was_changed_on_last_save', "false" );
         else {
-           if ( !$this->journal->doi_suffix_stil_free($new_doi_suffix, $this->get_active_publication_type_names()) )
+           if ( !$this->journal->doi_suffix_still_free($new_doi_suffix, $this->get_active_publication_type_names()) )
                  $new_doi_suffix = '';
                  update_post_meta( $post_id, $post_type . '_doi_suffix_was_changed_on_last_save', "true" );
         }
