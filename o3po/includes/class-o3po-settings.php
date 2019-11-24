@@ -1672,7 +1672,7 @@ class O3PO_Settings extends O3PO_Singleton {
                 'publisher' => 'trim_settings_field',
                 'secondary_journal_title' => 'trim_settings_field',
                 'secondary_journal_level_doi_suffix' => 'validate_doi_suffix',
-                'secondary_journal_eissn' => 'validate_issn',
+                'secondary_journal_eissn' => 'trim_settings_field',
                 'developer_email' => 'trim_settings_field',
                 'publisher_email' => 'trim_settings_field',
                 'publisher_country' => 'trim_settings_field',
