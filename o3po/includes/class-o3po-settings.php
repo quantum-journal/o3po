@@ -134,6 +134,7 @@ class O3PO_Settings extends O3PO_Singleton {
         'page_template_abstract_header' => '',
         'trackbacks_from_secondary_directly_into_database' => "unchecked",
         'maintenance_mode' => 'unchecked',
+        'doi_suffix_template' => '[journal_level_doi_suffix]-[date]-[page]',
 
         'self_notification_subject_template' =>
         "A [publication_type_name] has been published/updated by [journal]",
@@ -317,6 +318,7 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->add_settings_field('journal_subtitle', 'Journal subtitle', array( $this, 'render_journal_subtitle_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings');
         $this->add_settings_field('journal_description', 'Journal description', array( $this, 'render_journal_description_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings');
         $this->add_settings_field('journal_level_doi_suffix', 'Journal level DOI suffix', array( $this, 'render_journal_level_doi_suffix_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings');
+        $this->add_settings_field('journal_doi_template', 'DOI suffix template', array( $this, 'render_doi_suffix_template_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings');
         $this->add_settings_field('eissn', 'eISSN', array( $this, 'render_eissn_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings');
         $this->add_settings_field('publisher', 'Publisher', array( $this, 'render_publisher_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings');
         $this->add_settings_field('secondary_journal_title', 'Secondary journal title', array( $this, 'render_secondary_journal_title_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings');
@@ -706,8 +708,26 @@ class O3PO_Settings extends O3PO_Singleton {
     public function render_journal_level_doi_suffix_setting() {
 
         $this->render_setting('journal_level_doi_suffix');
-        echo('<p>(This is used as both the journal level DOI suffix and to generate the DOIs of your publications via the scheme [doi_prefix]/[journal_level_doi_suffix]-[date]-[page], where [date] is the <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO_8601</a> formated publication date and [page] is an article number that counts up starting at 1.  See the <a href="https://support.crossref.org/hc/en-us/articles/214569903-Journal-level-DOIs">Crossref website</a> for more background.)</p>');
+        echo('<p>(This is used as both the journal level DOI suffix and to generate the DOIs of your publications via the scheme [doi_prefix]/doi_suffix_template. See journal settings DOI suffix template for more information on how the template is substituted.');
 
+    }
+
+        /**
+         * Render the setting for the DOI suffix template.
+         *
+         * @since    0.1.0
+         * @access   public
+         */
+    public function render_doi_suffix_template_setting() {
+
+        $this->render_setting('doi_suffix_template');
+        echo('<p>The DOI suffix template is used to specify the DOI suffix. The following shortcodes are available: <ul>'
+                  .'<li><emph>[journal_level_doi_suffix]</emph>: The journal level DOI suffix</li>'
+                  .'<li><emph>[volume]</emph>: The volume in which the article appears</li>'
+                  .'<li><emph>[page]</emph>: An article number that counts up starting at 1 </li>'
+                  .'<li><emph>[date]</emph>: The <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO_8601</a> formated publication date </emph></li></ul><br>'
+              .'See the <a href="https://support.crossref.org/hc/en-us/articles/214569903-Journal-level-DOIs">Crossref website</a> for more background.'
+              .'</p>');
     }
 
         /**
@@ -1647,7 +1667,8 @@ class O3PO_Settings extends O3PO_Singleton {
                 'journal_subtitle' => 'trim_settings_field',
                 'journal_description' => 'trim_settings_field',
                 'journal_level_doi_suffix' => 'validate_doi_suffix',
-                'eissn' => 'validate_issn',
+                'doi_suffix_template' => 'trim_settings_field',
+                'eissn' => 'trim_settings_field',
                 'publisher' => 'trim_settings_field',
                 'secondary_journal_title' => 'trim_settings_field',
                 'secondary_journal_level_doi_suffix' => 'validate_doi_suffix',

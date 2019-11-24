@@ -81,6 +81,7 @@ class O3PO_Journal {
             'doaj_language_code',
             'doi_prefix',
             'journal_level_doi_suffix',
+            'doi_suffix_template',
             'doi_url_prefix',
             'eissn',
             'fermats_library_email', //from primary

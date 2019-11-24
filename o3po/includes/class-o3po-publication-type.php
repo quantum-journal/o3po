@@ -483,41 +483,40 @@ abstract class O3PO_PublicationType {
 
         $new_title = isset( $_POST[ $post_type . '_title' ] ) ? $_POST[ $post_type . '_title' ] : '';
         $new_title_mathml = isset( $_POST[ $post_type . '_title_mathml' ] ) ? $_POST[ $post_type . '_title_mathml' ] : '';
-		$new_number_authors = isset( $_POST[ $post_type . '_number_authors' ] ) ? sanitize_text_field( $_POST[ $post_type . '_number_authors' ] ) : '';
-		for ($x = 0; $x < $new_number_authors; $x++) {
-			$new_author_given_names[] = isset( $_POST[ $post_type . '_author_given_names' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_given_names' ][$x] ) : '';
-			$new_author_surnames[] = isset( $_POST[ $post_type . '_author_surnames' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_surnames' ][$x] ) : '';
-			$new_author_name_styles[] = isset( $_POST[ $post_type . '_author_name_styles' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_name_styles' ][$x] ) : 'western';
-			$affiliation_nums = isset( $_POST[ $post_type . '_author_affiliations' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_affiliations' ][$x] ) : '';
-			$affiliation_nums = trim( preg_replace("/[^,0-9]/u", "", $affiliation_nums ), ',');
-			$new_author_affiliations[] = $affiliation_nums;
-			$new_author_orcids[] = isset( $_POST[ $post_type . '_author_orcids' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_orcids' ][$x] ) : '';
-            $new_author_urls[] = isset( $_POST[ $post_type . '_author_urls' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_urls' ][$x] ) : '';
-		}
+        $new_number_authors = isset( $_POST[ $post_type . '_number_authors' ] ) ? sanitize_text_field( $_POST[ $post_type . '_number_authors' ] ) : '';
+	for ($x = 0; $x < $new_number_authors; $x++) {
+             $new_author_given_names[] = isset( $_POST[ $post_type . '_author_given_names' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_given_names' ][$x] ) : '';
+             $new_author_surnames[] = isset( $_POST[ $post_type . '_author_surnames' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_surnames' ][$x] ) : '';
+             $new_author_name_styles[] = isset( $_POST[ $post_type . '_author_name_styles' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_name_styles' ][$x] ) : 'western';
+             $affiliation_nums = isset( $_POST[ $post_type . '_author_affiliations' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_affiliations' ][$x] ) : '';
+             $affiliation_nums = trim( preg_replace("/[^,0-9]/", "", $affiliation_nums ), ',');
+             $new_author_affiliations[] = $affiliation_nums;
+             $new_author_orcids[] = isset( $_POST[ $post_type . '_author_orcids' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_orcids' ][$x] ) : '';
+             $new_author_urls[] = isset( $_POST[ $post_type . '_author_urls' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_urls' ][$x] ) : '';
+        }
         $new_number_affiliations = isset( $_POST[ $post_type . '_number_affiliations' ] ) ? sanitize_text_field( $_POST[ $post_type . '_number_affiliations' ] ) : '';
         $new_affiliations = array();
-		for ($x = 0; $x < $new_number_affiliations; $x++) {
-			$new_affiliations[] = isset( $_POST[ $post_type . '_affiliations' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_affiliations' ][$x] ) : '';
-		}
+        for ($x = 0; $x < $new_number_affiliations; $x++) {
+             $new_affiliations[] = isset( $_POST[ $post_type . '_affiliations' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_affiliations' ][$x] ) : '';
+        }
         $new_date_published = isset( $_POST[ $post_type . '_date_published' ] ) ? sanitize_text_field( $_POST[ $post_type . '_date_published' ] ) : '';
-		$new_journal = isset( $_POST[ $post_type . '_journal' ] ) ? sanitize_text_field( $_POST[ $post_type . '_journal' ] ) : '';
-		$new_volume = isset( $_POST[ $post_type . '_volume' ] ) ? sanitize_text_field( $_POST[ $post_type . '_volume' ] ) : '';
-		$new_pages = isset( $_POST[ $post_type . '_pages' ] ) ? sanitize_text_field( $_POST[ $post_type . '_pages' ] ) : '';
-		$new_doi_prefix = $this->get_journal_property('doi_prefix');
+        $new_journal = isset( $_POST[ $post_type . '_journal' ] ) ? sanitize_text_field( $_POST[ $post_type . '_journal' ] ) : '';
+        $new_volume = isset( $_POST[ $post_type . '_volume' ] ) ? sanitize_text_field( $_POST[ $post_type . '_volume' ] ) : '';
+        $new_pages = isset( $_POST[ $post_type . '_pages' ] ) ? sanitize_text_field( $_POST[ $post_type . '_pages' ] ) : '';
+        $new_doi_prefix = $this->get_journal_property('doi_prefix');
         $old_doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
-		if ( !empty($new_date_published) and !empty($new_pages) ) {
-			$new_doi_suffix = $this->get_journal_property('journal_level_doi_suffix') . "-" . $new_date_published . "-" . $new_pages;
-		}
-		else {
-			$new_doi_suffix = '';
-		}
-		if ($old_doi_suffix === $new_doi_suffix)
-			update_post_meta( $post_id, $post_type . '_doi_suffix_was_changed_on_last_save', "false" );
-		else {
-			if ( !$this->journal->doi_suffix_still_free($new_doi_suffix, $this->get_active_publication_type_names()) )
-				$new_doi_suffix = '';
-			update_post_meta( $post_id, $post_type . '_doi_suffix_was_changed_on_last_save', "true" );
-		}
+        $new_doi_suffix = static::get_doi_suffix( $this->get_journal_property('doi_suffix_template'), 
+                                                  $this->get_journal_property('journal_level_doi_suffix'), 
+                                                  $new_date_published, 
+                                                  $new_volume,
+                                                  $new_pages );
+        if ($old_doi_suffix === $new_doi_suffix)
+           update_post_meta( $post_id, $post_type . '_doi_suffix_was_changed_on_last_save', "false" );
+        else {
+           if ( !$this->journal->doi_suffix_stil_free($new_doi_suffix, $this->get_active_publication_type_names()) )
+                 $new_doi_suffix = '';
+                 update_post_meta( $post_id, $post_type . '_doi_suffix_was_changed_on_last_save', "true" );
+        }
         $new_corresponding_author_email = isset( $_POST[ $post_type . '_corresponding_author_email' ] ) ? sanitize_text_field( $_POST[ $post_type . '_corresponding_author_email' ] ) : '';
         $new_buffer_email = isset($_POST[ $post_type . '_buffer_email' ]) ? sanitize_text_field( $_POST[ $post_type . '_buffer_email' ]) : ''; #we keep using the buffer_email and buffer_email_xxx fields for compatibility, even though the new buffer.com interface does no longer send emails but uses the buffer.com api
         $new_buffer_special_text = isset($_POST[ $post_type . '_buffer_special_text' ]) ? sanitize_text_field( $_POST[ $post_type . '_buffer_special_text' ]) : '';
@@ -544,9 +543,15 @@ abstract class O3PO_PublicationType {
 		update_post_meta( $post_id, $post_type . '_doi_suffix', $new_doi_suffix );
 		update_post_meta( $post_id, $post_type . '_corresponding_author_email', $new_corresponding_author_email );
         update_post_meta( $post_id, $post_type . '_bbl', $new_bbl );
-        update_post_meta( $post_id, $post_type . '_buffer_email', $new_buffer_email ); #we keep using the buffer_email and buffer_email_xxx fields for compatibility, even though the new buffer.com interface does no longer send emails but uses the buffer.com api
+        update_post_meta( $post_id, $post_type . '_buffer_email', $new_buffer_email );
         update_post_meta( $post_id, $post_type . '_buffer_special_text', $new_buffer_special_text );
 
+    }
+
+    private function get_doi_suffix( $doi_suffix_template, $doi_suffix, $date_published, $volume, $pages ){
+        return str_replace( array( '[journal_level_doi_suffix]', '[date]', '[page]', '[volume]' ),
+                            array( $doi_suffix, $date_published, $pages, $volume ),
+                            $doi_suffix_template );
     }
 
         /**
@@ -2069,7 +2074,9 @@ abstract class O3PO_PublicationType {
 		echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_doi" class="' . $post_type . '_doi_label">' . 'Doi' . '</label></th>';
 		echo '		<td>';
-		echo '			<input type="text" readonly value="' . esc_attr($doi) . '" ><br /><p>(The doi is automatically calculated from the above meta data and is of the form ' . $this->get_journal_property('journal_level_doi_suffix') . '-YYYY-MM-DD-pages. If not enough information is available, it is not set and the post is forced to private)</p>';
+		echo '			<input type="text" readonly value="' . esc_attr($doi) . '" ><br /><p>(The doi is automatically calculated from the above meta data and is of the form ' 
+                     . str_replace( '[journal_level_doi_suffix]', $this->get_journal_property('journal_level_doi_suffix'), $this->get_journal_property('doi_suffix_template') ) 
+                     . '. If not enough information is available, it is not set and the post is forced to private)</p>';
 		echo '		</td>';
 		echo '	</tr>';
 
