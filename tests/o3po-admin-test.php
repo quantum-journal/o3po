@@ -81,6 +81,7 @@ class O3PO_AdminTest extends O3PO_TestCase
 
         /**
          * @depends test_construct
+         * @doesNotPerformAssertions
          */
     public function test_add_meta_data_explorer_page_to_menu( $admin ) {
 
@@ -90,6 +91,7 @@ class O3PO_AdminTest extends O3PO_TestCase
 
         /**
          * @depends test_construct
+         * @doesNotPerformAssertions
          */
     public function test_get_meta_data_explorer_tabs( $admin ) {
 
