@@ -229,13 +229,19 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 preg_match('#\\\\verb{doi}\s*?\\\\verb ([^\s]*)\s*\\\\endverb#u', $entry, $doi);
                 if(!empty($doi[1]))
                     $citations[$n]['doi'] = $doi[1];
-
                 if(empty($citations[$n]['doi']))
                 {
-                    preg_match('#\\\\verb{url}\s*?\\\\verb ([^\s]*)\s*\\\\endverb#u', $entry, $url);
-                    if(!empty($url[1]))
-                        $citations[$n]['url'] = $url[1];
+                    preg_match('#(?:http|https)://(?:doi\.org|dx\.doi\.org)/([^}\s]*)#u', $entry, $doi);
+                    if(!empty($doi[1]))
+                        $citations[$n]['doi'] = static::un_escape_url($doi[1]);
                 }
+
+                preg_match('#\\\\verb{url}\s*?\\\\verb ([^\s]*)\s*\\\\endverb#u', $entry, $url);
+                if(!empty($url[1]))
+                    $citations[$n]['url'] = $url[1];
+
+                if(!empty($citations[$n]['url']) && ( (!empty($citations[$n]['doi']) &&  mb_strpos($citations[$n]['url'], $citations[$n]['doi']) !== false || mb_strpos($citations[$n]['url'], 'doi.org/') !== false) || (!empty($citations[$n]['eprint']) && mb_strpos($citations[$n]['url'], $citations[$n]['eprint']) !== false )))
+                    unset($citations[$n]['url']);
 
                 preg_match('#\\\\verb{eprint}\s*?\\\\verb ([^\s]*)\s*\\\\endverb#u', $entry, $eprint);
                 if(!empty($eprint[1]))
