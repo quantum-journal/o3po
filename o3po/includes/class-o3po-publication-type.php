@@ -505,7 +505,7 @@ abstract class O3PO_PublicationType {
         $new_pages = isset( $_POST[ $post_type . '_pages' ] ) ? sanitize_text_field( $_POST[ $post_type . '_pages' ] ) : '';
         $new_doi_prefix = $this->get_journal_property('doi_prefix');
         $old_doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
-        $new_doi_suffix = static::get_doi_suffix( $this->get_journal_property('doi_suffix_template'), 
+        $new_doi_suffix = O3PO_Utility::format_doi_suffix( $this->get_journal_property('doi_suffix_template'), 
                                                   $this->get_journal_property('journal_level_doi_suffix'), 
                                                   $new_date_published, 
                                                   $new_volume,
@@ -546,12 +546,6 @@ abstract class O3PO_PublicationType {
         update_post_meta( $post_id, $post_type . '_buffer_email', $new_buffer_email ); #we keep using the buffer_email and buffer_email_xxx fields for compatibility, even though the new buffer.com interface does no longer send emails but uses the buffer.com api
         update_post_meta( $post_id, $post_type . '_buffer_special_text', $new_buffer_special_text );
 
-    }
-
-    private function get_doi_suffix( $doi_suffix_template, $doi_suffix, $date_published, $volume, $pages ){
-        return str_replace( array( '[journal_level_doi_suffix]', '[date]', '[page]', '[volume]' ),
-                            array( $doi_suffix, $date_published, $pages, $volume ),
-                            $doi_suffix_template );
     }
 
         /**
