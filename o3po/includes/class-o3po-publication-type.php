@@ -2411,7 +2411,7 @@ abstract class O3PO_PublicationType {
             update_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries_last_fetch_attempt_timestamp', $crossref_bibentries_last_fetch_attempt_timestamp);
 
             $new_crossref_bibentries = O3PO_Crossref::get_cited_by_bibentries($crossref_url, $login_id, $login_passwd, $doi);
-            if(!empty($new_crossref_bibentries) or !is_wp_error($new_crossref_bibentries) or empty($crossref_bibentries) or is_wp_error($crossref_bibentries))
+            if((!empty($new_crossref_bibentries) and !is_wp_error($new_crossref_bibentries)) or empty($crossref_bibentries) or is_wp_error($crossref_bibentries))
             {
                 $crossref_bibentries = $new_crossref_bibentries;
                 update_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries', $crossref_bibentries );
@@ -2430,7 +2430,7 @@ abstract class O3PO_PublicationType {
 
             $new_ads_bibentries = O3PO_Ads::get_cited_by_bibentries($ads_api_search_url, $ads_api_token, $eprint);
 
-            if(!empty($new_ads_bibentries) or !is_wp_error($new_ads_bibentries) or empty($ads_bibentries) or is_wp_error($ads_bibentries))
+            if((!empty($new_ads_bibentries) and !is_wp_error($new_ads_bibentries)) or empty($ads_bibentries) or is_wp_error($ads_bibentries))
             {
                 $ads_bibentries = $new_ads_bibentries;
                 update_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries', $ads_bibentries );
