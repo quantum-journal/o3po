@@ -308,8 +308,13 @@ ab' , 'äb'],
             ['$a$ bar' , ['', 'a', ' bar']],
             ['foo $a$' , ['foo ', 'a', '']],
             ['$a$' , ['', 'a', '']],
+            ['$$a$$' , ['', 'a', '']],
+            ['foo $$a$$ bar $x$' , ['foo ', 'a', ' bar ', 'x', '']],
             ['\\begin{abstract} foo \\(a\\) bar' , ['\\begin{abstract} foo ', 'a', ' bar']],
-
+            [['foo $a$ bar', -1, PREG_SPLIT_DELIM_CAPTURE], ['foo ', '$', 'a', '$', ' bar']],
+            [['foo \[a\] bar', -1, PREG_SPLIT_DELIM_CAPTURE], ['foo ', '\[', 'a', '\]', ' bar']],
+            [['foo $$a$$ bar $x$', -1, PREG_SPLIT_DELIM_CAPTURE], ['foo ', '$$', 'a', '$$', ' bar ', '$', 'x', '$', '']],
+            [['foo $$a$$ bar $x$ ', -1, PREG_SPLIT_DELIM_CAPTURE], ['foo ', '$$', 'a', '$$', ' bar ', '$', 'x', '$', ' ']],
                 ];
     }
 
@@ -317,7 +322,12 @@ ab' , 'äb'],
          * @dataProvider preg_split_at_latex_math_mode_delimters_provider
          */
     public function test_preg_split_at_latex_math_mode_delimters( $input, $expected ) {
-        $this->assertSame($expected, O3PO_Latex::preg_split_at_latex_math_mode_delimters($input));
+        if(is_array($input))
+            $this->assertSame($expected, O3PO_Latex::preg_split_at_latex_math_mode_delimters($input[0], $input[1], $input[2]));
+        else
+            $this->assertSame($expected, O3PO_Latex::preg_split_at_latex_math_mode_delimters($input));
+
+        $this->assertSame($input[0], implode(O3PO_Latex::preg_split_at_latex_math_mode_delimters($input[0], -1, PREG_SPLIT_DELIM_CAPTURE), ''));
     }
 
     public function strpos_outside_math_mode_provider() {

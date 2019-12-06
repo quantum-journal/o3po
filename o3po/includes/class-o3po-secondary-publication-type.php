@@ -518,41 +518,20 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
             return '';
     }
 
+
         /**
-         * Get the excerpt of a this publication type.
+         * Get the text basis for the text part of the excerpt
          *
-         * As we modify the content in get_the_content() we
-         * construct the excerpt from scratch,
+         * In this case we return the post content.
          *
-         * To be added to the 'get_the_excerpt' filter.
-         *
-         * @since 0.1.0
-         * @param string    $content    Content to be filtered.
+         * @since 0.3.1
+         * @access public
+         * @param int $post_id The ID of the post.
+         * @return The basis for the text of the excerpt.
          */
-    public function get_the_excerpt( $content ) {
+    public function get_basis_for_excerpt( $post_id ) {
 
-        global $post;
-
-        $post_id = $post->ID;
-        $post_type = get_post_type($post_id);
-
-        if ( $post_type === $this->get_publication_type_name() ) {
-            $content = '';
-            $content .= '<p class="authors-in-excerpt">' . static::get_formated_authors( $post_id ) . ',</p>' . "\n";
-            $content .= '<p class="citation-in-excerpt"><a href="' . $this->get_journal_property('doi_url_prefix') . static::get_doi($post_id) . '">' . static::get_formated_citation($post_id) . '</a></p>' . "\n";
-            $content .= '<p><a href="' . get_permalink($post_id) . '" class="abstract-in-excerpt">';
-            $bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
-            $trimmer_abstract = wp_html_excerpt( do_shortcode(O3PO_Latex::expand_cite_to_html(get_post_field('post_content', $post_id), $bbl)), 190, '&#8230;');
-            while( preg_match_all('/(?<!\\\\)\$/u', $trimmer_abstract) % 2 !== 0 )
-            {
-                empty($i) ? $i = 1 : $i += 1;
-                $trimmer_abstract = wp_html_excerpt( get_post_meta( $post_id, $post_type . '_abstract', true ), 190+$i, '&#8230;');
-            }
-            $content .= esc_html ( $trimmer_abstract );
-            $content .= '</a></p>';
-        }
-
-        return $content;
+        return get_post_field('post_content', $post_id);
     }
 
         /**

@@ -1976,6 +1976,42 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
 
 
 
+
+    function html_latex_excerpt_provider() {
+
+        return [
+            ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", 190, "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris"],
+            ['abcdef', 4, 'abcd'],
+            ['abcdef', 40, 'abcdef'],
+            ['', 40, ''],
+            ['', 0, ''],
+            ['ab $\sin(x)$ cdef $x$ aaa', 4, 'ab'],
+            ['ab $\sin(x)$ cdef $x$ aaa', 5, 'ab'],
+            ['ab $\sin(x)$ cdef $x$ aaa', 15, 'ab $\sin(x)$ cdef'],
+            ['ab $$\sin(x)$$ cdef $x$ aaa', 16, 'ab $$\sin(x)$$ cdef'],
+            ['ab $$\sin(x)$$ cdef $x$ aaa', 15, 'ab $$\sin(x)$$ cdef'],
+            ['ab $$\sin(x)$$ cdef $x$ aaa', 14, 'ab $$\sin(x)$$ cde'],
+            ['ab $$\sin(x)$$ cdef $x$ aaa', 12, 'ab $$\sin(x)$$ c'],
+            ['ab $$\sin(x)$$ cdef $x$ aaa', 11, 'ab $$\sin(x)$$'],
+            ['ab $$\sin(x)$$ cdef $x$ aaa', 10, 'ab $$\sin(x)$$'],
+            ['ab $$\sin(x)$$ cdef $x$ aaa', 9, 'ab'],
+            ['ab $$\sin(x)$$ cdef $x$ aaa', 50, 'ab $$\sin(x)$$ cdef $x$ aaa'],
+            ['$\cos(1)$', 7, '$\cos(1)$'],
+            ['$\cos(1)$', 2, ''],
+        ];
+    }
+
+        /**
+         * @dataProvider html_latex_excerpt_provider
+         * @depends test_create_primary_publication_type
+         */
+    public function test_html_latex_excerpt( $text, $len, $expected, $primary_publication_type ) {
+        $this->assertSame($expected, $primary_publication_type->html_latex_excerpt($text, $len));
+
+    }
+
+
+
         /**
          * @doesNotPerformAssertions
          */
