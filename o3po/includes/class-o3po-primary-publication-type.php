@@ -929,42 +929,22 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
     }
 
         /**
-         * Get the excertp
+         * Get the text basis for the text part of the excerpt
          *
-         * Used to generate the excerpt for lists of posts.
+         * In this case we return the abstract.
          *
-         * To be added to the 'get_the_excerpt' filter.
-         *
-         * @since  0.1.0
+         * @since 0.3.1
          * @access public
-         * @param  string     $content     Content to be ammended.
+         * @param int $post_id The ID of the post.
+         * @return The basis for the text of the excerpt.
          */
-    public function get_the_excerpt( $content ) {
+    public function get_basis_for_excerpt( $post_id ) {
 
-        global $post;
-
-        $post_id = $post->ID;
         $post_type = get_post_type($post_id);
 
-        if ( $post_type === $this->get_publication_type_name() ) {
-            $content = '';
-            $content .= '<p class="authors-in-excerpt">' . static::get_formated_authors( $post_id ) . ',</p>' . "\n";
-            $content .= '<p class="citation-in-excerpt"><a href="' . $this->get_journal_property('doi_url_prefix') . static::get_doi($post_id) . '">' . static::get_formated_citation($post_id) . '</a></p>' . "\n";
-            $content .= '<p><a href="' . get_permalink($post_id) . '" class="abstract-in-excerpt">';
-            $trimmer_abstract = wp_html_excerpt( get_post_meta( $post_id, $post_type . '_abstract', true ), 190, '&#8230;');
-            while( preg_match_all('/(?<!\\\\)\$/u', $trimmer_abstract) % 2 !== 0 )
-            {
-                empty($i) ? $i = 1 : $i += 1;
-                $trimmer_abstract = wp_html_excerpt( get_post_meta( $post_id, $post_type . '_abstract', true ), 190+$i, '&#8230;');
-            }
-            $content .= esc_html ( $trimmer_abstract );
-            $content .= '</a></p>';
-            $bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
-            $content = O3PO_Latex::expand_cite_to_html($content, $bbl);
-        }
-
-        return $content;
+        return get_post_meta( $post_id, $post_type . '_abstract', true );
     }
+
 
         /**
          * Get the pretty permalink of the pdf associated with a post.

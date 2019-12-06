@@ -3155,6 +3155,96 @@ abstract class O3PO_PublicationType {
     }
 
 
+        /**
+         * Get the text basis for the text part of the excerpt
+         *
+         * To be overwritten in any sub-class.
+         *
+         * @since 0.3.1
+         * @access public
+         * @param int $post_id The ID of the post.
+         * @return The basis for the text of the excerpt.
+         */
+    abstract public function get_basis_for_excerpt( $post_id );
+
+
+        /**
+         * Get the excerpt of a this publication type.
+         *
+         * As we modify the content in get_the_content() we
+         * construct the excerpt from scratch,
+         *
+         * To be added to the 'get_the_excerpt' filter.
+         *
+         * @since 0.1.0
+         * @param string    $content    Content to be filtered.
+         */
+    public function get_the_excerpt( $content ) {
+
+        global $post;
+
+        $post_id = $post->ID;
+        $post_type = get_post_type($post_id);
+
+        if ( $post_type === $this->get_publication_type_name() ) {
+            $content = '';
+            $content .= '<p class="authors-in-excerpt">' . static::get_formated_authors( $post_id ) . ',</p>' . "\n";
+            $content .= '<p class="citation-in-excerpt"><a href="' . $this->get_journal_property('doi_url_prefix') . static::get_doi($post_id) . '">' . static::get_formated_citation($post_id) . '</a></p>' . "\n";
+            $content .= '<p><a href="' . get_permalink($post_id) . '" class="abstract-in-excerpt">';
+            $basis_for_excerpt = $this->get_basis_for_excerpt($post_id);
+            $bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
+            $trimmer_abstract = $this->html_latex_excerpt(do_shortcode(O3PO_Latex::expand_cite_to_html($basis_for_excerpt, $bbl)), 190, '&#8230;');
+            $content .= esc_html($trimmer_abstract);
+            $content .= '</a></p>';
+        }
+
+        return $content;
+    }
+
+        /**
+         * Get the src of the feature image.
+         *
+         * Safely extracts not more than the first $count characters from a string
+         * containing html and LaTeX code (including mathematical formulas).
+         *
+         * @since  0.3.1
+         * @access public
+         * @param string $str String to get the excerpt from.
+         * @param int $count Maximum number of characters to take.
+         * @param string $more (Optional) What to append if $str needs to be trimmed. Defaults to empty string. Default value: null
+         * @return string The excerpt.
+         */
+    public static function html_latex_excerpt( $str, $count, $more=null ) {
+
+        if(empty($str))
+            return '';
+
+        $str = wp_strip_all_tags($str, true);
+        $parts = O3PO_Latex::preg_split_at_latex_math_mode_delimters($str);
+        $parts_with_delimiters = O3PO_Latex::preg_split_at_latex_math_mode_delimters($str, -1, PREG_SPLIT_DELIM_CAPTURE);
+
+        $num_parts_to_take_entirely = 0;
+        while(mb_strlen(implode(array_slice($parts, 0, $num_parts_to_take_entirely+1), '')) <= $count and $num_parts_to_take_entirely < count($parts))
+            $num_parts_to_take_entirely += 1;
+
+        $num_parts_with_delimiters = 2*$num_parts_to_take_entirely;
+        if($num_parts_to_take_entirely % 2 === 1) $num_parts_with_delimiters -= 1;
+        $count_from_parts_taken_entirely = mb_strlen(implode(array_slice($parts, 0, $num_parts_to_take_entirely), ''));
+        $excerpt = implode(array_slice($parts_with_delimiters, 0, $num_parts_with_delimiters), '');
+
+
+        if($count_from_parts_taken_entirely < $count && $num_parts_to_take_entirely % 2 === 0 && !empty($parts_with_delimiters[$num_parts_with_delimiters]))
+        {
+            $excerpt .= mb_substr($parts_with_delimiters[$num_parts_with_delimiters], 0, $count-$count_from_parts_taken_entirely);
+            $excerpt = preg_replace('/&[^;\s]{0,6}$/u', '', $excerpt);
+        }
+
+        if($str !== $excerpt)
+            $excerpt = rtrim($excerpt) . $more;
+
+        return $excerpt;
+    }
+
 
         /**
          * Get the src of the feature image.
