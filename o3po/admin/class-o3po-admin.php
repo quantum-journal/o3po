@@ -263,7 +263,7 @@ class O3PO_Admin {
         }
         elseif($active_tab === 'citation-metrics')
         {
-            $html .= '<h3>Crossref cited-by citation statistics</h3>';
+            $html .= '<h3>Cited-by citation statistics</h3>';
 
             $settings = O3PO_Settings::instance();
             $doi_prefix = $settings->get_plugin_option('doi_prefix');

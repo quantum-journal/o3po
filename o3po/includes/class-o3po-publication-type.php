@@ -2409,16 +2409,25 @@ abstract class O3PO_PublicationType {
         {
             $crossref_bibentries_last_fetch_attempt_timestamp = time();
             update_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries_last_fetch_attempt_timestamp', $crossref_bibentries_last_fetch_attempt_timestamp);
-
-            $new_crossref_bibentries = O3PO_Crossref::get_cited_by_bibentries($crossref_url, $login_id, $login_passwd, $doi);
-            if((!empty($new_crossref_bibentries) and !is_wp_error($new_crossref_bibentries)) or empty($crossref_bibentries) or is_wp_error($crossref_bibentries))
+            $crossref_fetch_result = O3PO_Crossref::get_cited_by_bibentries($crossref_url, $login_id, $login_passwd, $doi);
+            if(is_wp_error($crossref_fetch_result))
             {
-                $crossref_bibentries = $new_crossref_bibentries;
+                update_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries_last_fetch_attempt_error', $crossref_fetch_result);
+            }
+            else
+            {
+                $crossref_bibentries = $crossref_fetch_result;
                 update_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries', $crossref_bibentries );
                 $crossref_bibentries_timestamp = time();
                 update_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries_timestamp', $crossref_bibentries_timestamp);
+                update_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries_last_fetch_attempt_error', null);
             }
         }
+        $crossref_bibentries_last_fetch_attempt_error = get_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries_last_fetch_attempt_error', true );
+        if(empty($crossref_bibentries))
+            $crossref_bibentries = array();
+        if(is_wp_error($crossref_bibentries) and empty($crossref_bibentries_last_fetch_attempt_error))
+            $crossref_bibentries_last_fetch_attempt_error = $crossref_bibentries; #for backward compatibility
 
         $ads_bibentries = get_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries', true );
         $ads_bibentries_timestamp = get_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries_timestamp', true );
@@ -2427,40 +2436,47 @@ abstract class O3PO_PublicationType {
         {
             $ads_bibentries_last_fetch_attempt_timestamp = time();
             update_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries_last_fetch_attempt_timestamp', $ads_bibentries_last_fetch_attempt_timestamp);
-
-            $new_ads_bibentries = O3PO_Ads::get_cited_by_bibentries($ads_api_search_url, $ads_api_token, $eprint);
-
-            if((!empty($new_ads_bibentries) and !is_wp_error($new_ads_bibentries)) or empty($ads_bibentries) or is_wp_error($ads_bibentries))
+            $ads_fetch_result = O3PO_Ads::get_cited_by_bibentries($ads_api_search_url, $ads_api_token, $eprint);
+            if(is_wp_error($ads_fetch_result))
             {
-                $ads_bibentries = $new_ads_bibentries;
+                update_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries_last_fetch_attempt_error', $ads_fetch_result);
+            }
+            else
+            {
+                $ads_bibentries = $ads_fetch_result;
                 update_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries', $ads_bibentries );
                 $ads_bibentries_timestamp = time();
                 update_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries_timestamp', $ads_bibentries_timestamp);
+                update_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries_last_fetch_attempt_error', null);
             }
         }
+        if(empty($ads_bibentries))
+            $ads_bibentries = array();
+        $ads_bibentries_last_fetch_attempt_error = get_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries_last_fetch_attempt_error', true );
+        if(is_wp_error($ads_bibentries) and empty($ads_bibentries_last_fetch_attempt_error))
+            $ads_bibentries_last_fetch_attempt_error = $ads_bibentries; #for backward compatibility
 
         $cited_by_html = '';
 
         $errors = array();
-        $error_explanations = array();
-        if(is_wp_error($crossref_bibentries))
+        $explanations = array();
+        if(is_wp_error($crossref_bibentries_last_fetch_attempt_error))
         {
-            $errors[] = $crossref_bibentries;
-            $error_explanations[] = 'Could not fetch <a href="https://www.crossref.org/services/cited-by/">Crossref cited-by data</a> (last attempt ' . date("Y-m-d H:i:s", $crossref_bibentries_last_fetch_attempt_timestamp) . '): ' . esc_html($crossref_bibentries->get_error_message());
-            $crossref_bibentries = array();
+            $errors[] = $crossref_bibentries_last_fetch_attempt_error;
+            $explanations[] = 'Could not fetch <a href="https://www.crossref.org/services/cited-by/">Crossref cited-by data</a> during last attempt ' . date("Y-m-d H:i:s", $crossref_bibentries_last_fetch_attempt_timestamp) . ': ' . esc_html($crossref_bibentries->get_error_message());
         }
         elseif(empty($crossref_bibentries))
-            $error_explanations[] = 'On <a href="https://www.crossref.org/services/cited-by/">Crossref\'s cited-by service</a> no data on citing works was found (last attempt ' . date("Y-m-d H:i:s", $crossref_bibentries_last_fetch_attempt_timestamp) . ').';
+            $explanations[] = 'On <a href="https://www.crossref.org/services/cited-by/">Crossref\'s cited-by service</a> no data on citing works was found (last attempt ' . date("Y-m-d H:i:s", $crossref_bibentries_last_fetch_attempt_timestamp) . ').';
 
 
-        if (is_wp_error($ads_bibentries))
+        if(is_wp_error($ads_bibentries_last_fetch_attempt_error))
         {
-            $errors[] = $ads_bibentries;
-            $error_explanations[] = 'Could not fetch <a href="https://ui.adsabs.harvard.edu/">ADS cited-by data</a> (last attempt ' . date("Y-m-d H:i:s", $ads_bibentries_last_fetch_attempt_timestamp) . '): ' . esc_html($ads_bibentries->get_error_message());
-            $ads_bibentries = array();
+            $errors[] = $ads_bibentries_last_fetch_attempt_error;
+            $explanations[] = 'Could not fetch <a href="https://ui.adsabs.harvard.edu/">ADS cited-by data</a> during last attempt ' . date("Y-m-d H:i:s", $ads_bibentries_last_fetch_attempt_timestamp) . ': ' . esc_html($ads_bibentries->get_error_message());
         }
         elseif(empty($ads_bibentries))
-            $error_explanations[] = 'On <a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a> no data on citing works was found (last attempt ' . date("Y-m-d H:i:s", $ads_bibentries_last_fetch_attempt_timestamp) . ').';
+            $explanations[] = 'On <a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a> no data on citing works was found (last attempt ' . date("Y-m-d H:i:s", $ads_bibentries_last_fetch_attempt_timestamp) . ').';
+
 
         if(!empty($crossref_bibentries) and !empty($ads_bibentries))
         {
@@ -2481,12 +2497,12 @@ abstract class O3PO_PublicationType {
         $timestamps = array();
         if(!empty($crossref_bibentries))
         {
-            $sources[] = '<a href="https://www.crossref.org/services/cited-by/">Crossref\'s cited-by service</a> (last updated ' . date("Y-m-d H:i:s", $crossref_bibentries_timestamp) . ')';
+            $sources[] = '<a href="https://www.crossref.org/services/cited-by/">Crossref\'s cited-by service</a> (last updated successfully ' . date("Y-m-d H:i:s", $crossref_bibentries_timestamp) . ')';
             $timestamps[] = $crossref_bibentries_timestamp;
         }
         if(!empty($ads_bibentries))
         {
-            $sources[] = '<a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a>  (last updated ' . date("Y-m-d H:i:s", $ads_bibentries_timestamp) . ')';
+            $sources[] = '<a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a>  (last updated successfully ' . date("Y-m-d H:i:s", $ads_bibentries_timestamp) . ')';
             $timestamps[] = $ads_bibentries_timestamp;
         }
 
@@ -2502,8 +2518,8 @@ abstract class O3PO_PublicationType {
         if(!empty($sources))
             $cited_by_html .= '<p>The above citations are from ' . implode($sources, ' and ') . '. The list may be incomplete as not all publishers provide suitable and complete citation data.</p>';
 
-        if(!empty($error_explanations))
-            $cited_by_html .= '<p>' . implode($error_explanations, ' ') . '</p>';
+        if(!empty($explanations))
+            $cited_by_html .= '<p>' . implode($explanations, ' ') . '</p>';
 
         return array(
             'html' => $cited_by_html,
