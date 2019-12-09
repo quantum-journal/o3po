@@ -91,6 +91,8 @@ It is obviously a play on the name of humanoid robot character from a series of 
 ### 0.3.1
 * Use button instead of form/input elements for action buttons (full text, print, ...)
 * improved generation of Trackbacks
+* Fixed truncation of formulas when creating excerpts
+* Extract DOIs from ULRs as a fallback also from BibLaTeX bibliographies
 * Minor bug fixes
 ### 0.3.0
 * Added maintenance mode.
