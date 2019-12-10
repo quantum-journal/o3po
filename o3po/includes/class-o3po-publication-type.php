@@ -2426,8 +2426,12 @@ abstract class O3PO_PublicationType {
         $crossref_bibentries_last_fetch_attempt_error = get_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries_last_fetch_attempt_error', true );
         if(empty($crossref_bibentries))
             $crossref_bibentries = array();
-        if(is_wp_error($crossref_bibentries) and empty($crossref_bibentries_last_fetch_attempt_error))
-            $crossref_bibentries_last_fetch_attempt_error = $crossref_bibentries; #for backward compatibility
+        if(is_wp_error($crossref_bibentries)) #for backward compatibility
+        {
+            $crossref_bibentries = array();
+            if(empty($crossref_bibentries_last_fetch_attempt_error))
+                $crossref_bibentries_last_fetch_attempt_error = $crossref_bibentries;
+        }
 
         $ads_bibentries = get_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries', true );
         $ads_bibentries_timestamp = get_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries_timestamp', true );
@@ -2453,8 +2457,12 @@ abstract class O3PO_PublicationType {
         if(empty($ads_bibentries))
             $ads_bibentries = array();
         $ads_bibentries_last_fetch_attempt_error = get_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries_last_fetch_attempt_error', true );
-        if(is_wp_error($ads_bibentries) and empty($ads_bibentries_last_fetch_attempt_error))
-            $ads_bibentries_last_fetch_attempt_error = $ads_bibentries; #for backward compatibility
+        if(is_wp_error($ads_bibentries)) #for backward compatibility
+        {
+            $ads_bibentries = array();
+            if(empty($ads_bibentries_last_fetch_attempt_error))
+                $ads_bibentries_last_fetch_attempt_error = $ads_bibentries;
+        }
 
         $cited_by_html = '';
 
@@ -2463,7 +2471,7 @@ abstract class O3PO_PublicationType {
         if(is_wp_error($crossref_bibentries_last_fetch_attempt_error))
         {
             $errors[] = $crossref_bibentries_last_fetch_attempt_error;
-            $explanations[] = 'Could not fetch <a href="https://www.crossref.org/services/cited-by/">Crossref cited-by data</a> during last attempt ' . date("Y-m-d H:i:s", $crossref_bibentries_last_fetch_attempt_timestamp) . ': ' . esc_html($crossref_bibentries->get_error_message());
+            $explanations[] = 'Could not fetch <a href="https://www.crossref.org/services/cited-by/">Crossref cited-by data</a> during last attempt ' . date("Y-m-d H:i:s", $crossref_bibentries_last_fetch_attempt_timestamp) . ': ' . esc_html($crossref_bibentries_last_fetch_attempt_error->get_error_message());
         }
         elseif(empty($crossref_bibentries))
             $explanations[] = 'On <a href="https://www.crossref.org/services/cited-by/">Crossref\'s cited-by service</a> no data on citing works was found (last attempt ' . date("Y-m-d H:i:s", $crossref_bibentries_last_fetch_attempt_timestamp) . ').';
@@ -2472,7 +2480,7 @@ abstract class O3PO_PublicationType {
         if(is_wp_error($ads_bibentries_last_fetch_attempt_error))
         {
             $errors[] = $ads_bibentries_last_fetch_attempt_error;
-            $explanations[] = 'Could not fetch <a href="https://ui.adsabs.harvard.edu/">ADS cited-by data</a> during last attempt ' . date("Y-m-d H:i:s", $ads_bibentries_last_fetch_attempt_timestamp) . ': ' . esc_html($ads_bibentries->get_error_message());
+            $explanations[] = 'Could not fetch <a href="https://ui.adsabs.harvard.edu/">ADS cited-by data</a> during last attempt ' . date("Y-m-d H:i:s", $ads_bibentries_last_fetch_attempt_timestamp) . ': ' . esc_html($ads_bibentries_last_fetch_attempt_error->get_error_message());
         }
         elseif(empty($ads_bibentries))
             $explanations[] = 'On <a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a> no data on citing works was found (last attempt ' . date("Y-m-d H:i:s", $ads_bibentries_last_fetch_attempt_timestamp) . ').';

@@ -142,7 +142,7 @@ class O3PO_Admin {
     public function add_meta_data_explorer_page_to_menu() {
         add_menu_page(
             $this->get_plugin_pretty_name() . ' meta-data explorer',
-            $this->get_plugin_pretty_name(),
+            $this->get_plugin_pretty_name() . ' meta-data',
             'administrator',
             $this->get_plugin_name() . '-meta-data-explorer',
             array($this, 'render_meta_data_explorer'),
