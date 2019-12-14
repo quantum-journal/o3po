@@ -505,9 +505,9 @@ abstract class O3PO_PublicationType {
         $new_pages = isset( $_POST[ $post_type . '_pages' ] ) ? sanitize_text_field( $_POST[ $post_type . '_pages' ] ) : '';
         $new_doi_prefix = $this->get_journal_property('doi_prefix');
         $old_doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
-        $new_doi_suffix = O3PO_Utility::format_doi_suffix( $this->get_journal_property('doi_suffix_template'), 
-                                                  $this->get_journal_property('journal_level_doi_suffix'), 
-                                                  $new_date_published, 
+        $new_doi_suffix = O3PO_Utility::format_doi_suffix( $this->get_journal_property('doi_suffix_template'),
+                                                  $this->get_journal_property('journal_level_doi_suffix'),
+                                                  $new_date_published,
                                                   $new_volume,
                                                   $new_pages );
         if ($old_doi_suffix === $new_doi_suffix)
@@ -2068,9 +2068,9 @@ abstract class O3PO_PublicationType {
 		echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_doi" class="' . $post_type . '_doi_label">' . 'Doi' . '</label></th>';
 		echo '		<td>';
-		echo '			<input type="text" readonly value="' . esc_attr($doi) . '" ><br /><p>(The doi is automatically calculated from the above meta data and is of the form ' 
-                     . str_replace( '[journal_level_doi_suffix]', $this->get_journal_property('journal_level_doi_suffix'), $this->get_journal_property('doi_suffix_template') ) 
-                     . '. If not enough information is available, it is not set and the post is forced to private)</p>';
+		echo '			<input type="text" readonly value="' . esc_attr($doi) . '" ><br /><p>(The doi is automatically calculated from the above meta data and is of the form '
+                     . str_replace( '[journal_level_doi_suffix]', $this->get_journal_property('journal_level_doi_suffix'), $this->get_journal_property('doi_suffix_template') )
+                     . ', this can be configured in the <a href="wp-admin/options-general.php?page=o3po-settings&tab=journal_settings">journal settings</a>. If not enough information is available the doi is not set and the post is forced to private)</p>';
 		echo '		</td>';
 		echo '	</tr>';
 
