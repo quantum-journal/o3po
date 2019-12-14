@@ -2070,7 +2070,7 @@ abstract class O3PO_PublicationType {
 		echo '		<td>';
 		echo '			<input type="text" readonly value="' . esc_attr($doi) . '" ><br /><p>(The doi is automatically calculated from the above meta data and is of the form '
                      . str_replace( '[journal_level_doi_suffix]', $this->get_journal_property('journal_level_doi_suffix'), $this->get_journal_property('doi_suffix_template') )
-                     . ', this can be configured in the <a href="wp-admin/options-general.php?page=o3po-settings&tab=journal_settings">journal settings</a>. If not enough information is available the doi is not set and the post is forced to private)</p>';
+                     . ', this can be configured in the <a href="/wp-admin/options-general.php?page=o3po-settings&amp;tab=journal_settings">journal settings</a>. If not enough information is available the doi is not set and the post is forced to private)</p>';
 		echo '		</td>';
 		echo '	</tr>';
 
