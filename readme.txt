@@ -88,9 +88,13 @@ It is obviously a play on the name of humanoid robot character from a series of 
 
 ## Changelog
 
+### 0.4.0
+* Keep fetched cited-by data in case of errors when fetching fresh data from external services
 ### 0.3.1
 * Use button instead of form/input elements for action buttons (full text, print, ...)
 * improved generation of Trackbacks
+* Fixed truncation of formulas when creating excerpts
+* Extract DOIs from ULRs as a fallback also from BibLaTeX bibliographies
 * Minor bug fixes
 ### 0.3.0
 * Added maintenance mode.
