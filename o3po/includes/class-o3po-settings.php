@@ -722,10 +722,10 @@ class O3PO_Settings extends O3PO_Singleton {
 
         $this->render_setting('doi_suffix_template');
         echo('<p>The DOI suffix template is used to specify the DOI suffix. The following shortcodes are available: <ul>'
-                  .'<li><emph>[journal_level_doi_suffix]</emph>: The journal level DOI suffix</li>'
-                  .'<li><emph>[volume]</emph>: The volume in which the article appears</li>'
-                  .'<li><emph>[page]</emph>: An article number that counts up starting at 1 </li>'
-                  .'<li><emph>[date]</emph>: The <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO_8601</a> formated publication date </emph></li></ul><br>'
+                  .'<li>[journal_level_doi_suffix]: The journal level DOI suffix</li>'
+                  .'<li>[volume]: The volume in which the article appears</li>'
+                  .'<li>[page]: An article number that counts up starting at 1 </li>'
+                  .'<li>[date]: The <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO_8601</a> formated publication date</li></ul><br>'
               .'See the <a href="https://support.crossref.org/hc/en-us/articles/214569903-Journal-level-DOIs">Crossref website</a> for more background.'
               .'</p>');
     }
