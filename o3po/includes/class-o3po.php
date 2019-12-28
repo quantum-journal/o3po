@@ -273,6 +273,8 @@ class O3PO {
         $this->loader->add_action( 'load-post.php', Null, 'O3PO_PublicationType::init_metabox' );
         $this->loader->add_action( 'load-post-new.php', Null, 'O3PO_PublicationType::init_metabox' );
 
+        $this->loader->add_action( 'admin_init', Null, 'O3PO_PublicationType::register_settings' );
+
         if(!empty($settings->get_plugin_option('relevanssi_mime_types_to_exclude')))
             $this->loader->add_filter( 'relevanssi_do_not_index', null, 'O3PO_Relevanssi::exclude_mime_types_by_regexp', 10, 2 );
 
