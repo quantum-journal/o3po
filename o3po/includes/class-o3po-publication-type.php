@@ -3379,6 +3379,8 @@ abstract class O3PO_PublicationType {
          */
     public static function register_settings() {
 
+        rethink this!
+
         $settings = O3PO_Settings::instance();
         $plugin_name = $settings->get_plugin_name();
 
