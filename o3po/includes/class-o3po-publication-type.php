@@ -3397,7 +3397,7 @@ abstract class O3PO_PublicationType {
     public static function validate_doi_suffix_template( $field, $input ) {
 
         $settings = O3PO_Settings::instance();
-        $default = $settings->get_option_defaults()[$field];
+        $default = $settings->get_plugin_option_default($field);
 
         $input_trimmed = trim($input);
         $expanded_input = self::$doi_template->example_expanded();
