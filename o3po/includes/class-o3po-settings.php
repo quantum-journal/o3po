@@ -107,26 +107,26 @@ class O3PO_Settings extends O3PO_Singleton {
         #'license_version' => '4.0',
         #'license_url' => 'https://creativecommons.org/licenses/by/4.0/',
         #'license_explanation' => 'Copyright remains with the original copyright holders such as the authors or their institutions.',
-        'mathjax_url' => 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js',
+        #'mathjax_url' => 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js',
         #'crossref_get_forward_links_url' => 'https://doi.crossref.org/servlet/getForwardLinks',
         #'crossref_deposite_url' => 'https://doi.crossref.org/servlet/deposit',
         #'crossref_test_deposite_url' => 'https://test.crossref.org/servlet/deposit',
-        'clockss_ftp_url' => 'ftp.clockss.org',
-        'arxiv_doi_feed_identifier' => '',
-        'arxiv_paper_doi_feed_endpoint' => 'arxiv_paper_doi_feed',
-        'arxiv_paper_doi_feed_days' => '365',
-        'arxiv_url_abs_prefix' => 'https://arxiv.org/abs/',
-        'arxiv_url_pdf_prefix' => 'https://arxiv.org/pdf/',
-        'arxiv_url_source_prefix' => 'https://arxiv.org/e-print/',
-        'arxiv_url_trackback_prefix' => 'http://arxiv.org/trackback/',
-        'doi_url_prefix' => 'https://doi.org/',
-        'scirate_url_abs_prefix' => 'https://scirate.com/arxiv/',
-        'arxiv_vanity_url_prefix' => 'https://www.arxiv-vanity.com/papers/',
-        'orcid_url_prefix' => 'https://orcid.org/',
-        'fermats_library_url_prefix' => 'https://fermatslibrary.com/s/',
-        'doaj_api_url' => "https://doaj.org/api/v1/articles",
-        'doaj_language_code' => "EN",
-        'buffer_api_url' => 'https://api.bufferapp.com/1',
+        #'clockss_ftp_url' => 'ftp.clockss.org',
+        /* 'arxiv_doi_feed_identifier' => '', */
+        /* 'arxiv_paper_doi_feed_endpoint' => 'arxiv_paper_doi_feed', */
+        /* 'arxiv_paper_doi_feed_days' => '365', */
+        /* 'arxiv_url_abs_prefix' => 'https://arxiv.org/abs/', */
+        /* 'arxiv_url_pdf_prefix' => 'https://arxiv.org/pdf/', */
+        /* 'arxiv_url_source_prefix' => 'https://arxiv.org/e-print/', */
+        /* 'arxiv_url_trackback_prefix' => 'http://arxiv.org/trackback/', */
+        /* 'doi_url_prefix' => 'https://doi.org/', */
+        /* 'scirate_url_abs_prefix' => 'https://scirate.com/arxiv/', */
+        /* 'arxiv_vanity_url_prefix' => 'https://www.arxiv-vanity.com/papers/', */
+        #'orcid_url_prefix' => 'https://orcid.org/',
+        #'fermats_library_url_prefix' => 'https://fermatslibrary.com/s/',
+        #'doaj_api_url' => "https://doaj.org/api/v1/articles",
+        #'doaj_language_code' => "EN",
+        #'buffer_api_url' => 'https://api.bufferapp.com/1',
         #'extended_search_and_navigation' => "checked",
         #'search_form_on_search_page' => "checked",
         #'custom_search_page' => "checked",
@@ -193,22 +193,22 @@ class O3PO_Settings extends O3PO_Singleton {
 
         /* 'executive_board' => "", */
         /* 'editor_in_chief' => "", */
-        'ads_api_search_url' => 'https://api.adsabs.harvard.edu/v1/search/query',
-        'ads_api_token' => '',
-        'relevanssi_mime_types_to_exclude' => '#(application/.*(tar|gz|gzip)|text/.*tex)#u',
-        'relevanssi_index_pdfs_asynchronously' => "checked",
+        #'ads_api_search_url' => 'https://api.adsabs.harvard.edu/v1/search/query',
+        #'ads_api_token' => '',
+        #'relevanssi_mime_types_to_exclude' => '#(application/.*(tar|gz|gzip)|text/.*tex)#u',
+        #'relevanssi_index_pdfs_asynchronously' => "checked",
 
             /* The options below are currently not customizable.
              *
              * Warning: The name of the paper-single.php templare must match
              * the primary_publication_type_name!
              */
-        'cited_by_refresh_seconds' => '43200',#=60*60*12
-        'primary_publication_type_name' => 'paper',
-        'primary_publication_type_name_plural' => 'papers',
-        'secondary_publication_type_name' => 'view',
-        'secondary_publication_type_name_plural' => 'views',
-        'volumes_endpoint' => 'volumes',
+        #'cited_by_refresh_seconds' => '43200',#=60*60*12
+        /* 'primary_publication_type_name' => 'paper', */
+        /* 'primary_publication_type_name_plural' => 'papers', */
+        /* 'secondary_publication_type_name' => 'view', */
+        /* 'secondary_publication_type_name_plural' => 'views', */
+        /* 'volumes_endpoint' => 'volumes', */
                                      );
 
         /**
@@ -226,6 +226,8 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->version = $version;
         $this->plugin_pretty_name = $plugin_pretty_name;
         $this->active_post_type_names_callback = $active_post_type_names_callback;
+
+        $this->specify_all_settings();
 
 	}
 
@@ -301,6 +303,29 @@ class O3PO_Settings extends O3PO_Singleton {
 
         register_setting( $this->plugin_name . '-settings', $this->plugin_name . '-settings', array( $this, 'validate_settings' ) );
 
+        foreach($this->settings_sections as $id => $specification)
+            add_settings_section($id, $specification['title'], $specification['callback'], $specification['page']);
+
+        foreach($this->settings_fields as $id => $specification)
+            if(isset($specification['title'])) # fake fields do not have titles
+                add_settings_field($id, $specification['title'], $specification['callback'], $specification['page'], $specification['section'], $specification['args']);
+    }
+
+
+        /**
+         * All settings sections and fields are specified here.
+         *
+         *
+         *
+         */
+    private function specify_all_settings() {
+
+        $this->add_fake_settings_field('primary_publication_type_name', 'paper');
+        $this->add_fake_settings_field('primary_publication_type_name_plural', 'papers');
+        $this->add_fake_settings_field('secondary_publication_type_name', 'view');
+        $this->add_fake_settings_field('secondary_publication_type_name_plural', 'views');
+        $this->add_fake_settings_field('volumes_endpoint', 'volumes');
+
         $this->add_settings_section('plugin_settings', 'Plugin', array( $this, 'render_plugin_settings' ), $this->plugin_name . '-settings:plugin_settings');
         $this->add_settings_field('production_site_url', 'Production site url', array( $this, 'render_production_site_url_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings', array(), array($this, 'validate_url'), '');
         $this->add_settings_field('extended_search_and_navigation', 'Add search and navigation to home page', array( $this, 'render_extended_search_and_navigation_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings', array(), array($this, 'checked_or_unchecked'), 'checked');
@@ -309,7 +334,7 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->add_settings_field('page_template_for_publication_posts', 'Force page template', array( $this, 'render_page_template_for_publication_posts_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings', array(), array($this, 'checked_or_unchecked'), 'unchecked');
         $this->add_settings_field('page_template_abstract_header', 'Show a heading for the abstract', array( $this, 'render_page_template_abstract_header_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings', array(), array($this, 'trim_settings_field'), '');
         $this->add_settings_field('trackbacks_from_secondary_directly_into_database', 'Write Trackbacks directly', array( $this, 'render_trackbacks_from_secondary_directly_into_database_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings', array(), array($this, 'checked_or_unchecked'), 'unchecked');
-        $this->add_settings_field('cited_by_refresh_seconds', 'Refresh cited-by time', array( $this, 'render_cited_by_refresh_seconds_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings', array(), array($this, 'validate_positive_integer'), '43200');
+        $this->add_settings_field('cited_by_refresh_seconds', 'Refresh cited-by time', array( $this, 'render_cited_by_refresh_seconds_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings', array(), array($this, 'validate_positive_integer'), '43200');#=60*60*12
         $this->add_settings_field('maintenance_mode', 'Maintenance mode', array( $this, 'render_maintenance_mode_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings', array(), array($this, 'checked_or_unchecked'), 'unchecked');
 
         $this->add_settings_section('journal_settings', 'Journal', array( $this, 'render_journal_settings' ), $this->plugin_name . '-settings:journal_settings');
@@ -326,7 +351,7 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->add_settings_field('secondary_journal_eissn', 'Secondary journal eISSN', array( $this, 'render_secondary_journal_eissn_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'validate_issn'), '');
         $this->add_settings_field('developer_email', 'Email of developer', array( $this, 'render_developer_email_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
         $this->add_settings_field('publisher_email', 'Email of publisher', array( $this, 'render_publisher_email_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
-        $this->add_settings_field('first_volume_year', 'Year of first volume', array( $this, 'render_first_volume_year_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings');
+        $this->add_settings_field('first_volume_year', 'Year of first volume', array( $this, 'render_first_volume_year_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'validate_first_volume_year'), '2017');
         $this->add_settings_field('publisher_country', 'Country of publisher', array( $this, 'render_publisher_country_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
         $this->add_settings_field('license_name', 'License name', array( $this, 'render_license_name_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), 'Creative Commons Attribution 4.0 International (CC BY 4.0)');
         $this->add_settings_field('license_type', 'License type', array( $this, 'render_license_type_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), 'CC BY');
@@ -402,51 +427,49 @@ class O3PO_Settings extends O3PO_Singleton {
         Email settings need a validation method
         $this->add_settings_field('crossref_archive_locations', 'Archive locations', array( $this, 'render_crossref_archive_locations_setting' ), $this->plugin_name . '-settings:crossref_settings', 'crossref_settings', array(), array($this, 'trim_settings_field'), '');
 
-        Got until here with refactoring settings!
-
         $this->add_settings_section('ads_settings', 'ADS', array( $this, 'render_ads_settings' ), $this->plugin_name . '-settings:ads_settings');
-        $this->add_settings_field('ads_api_search_url', 'ADS API URL', array( $this, 'render_ads_api_search_url_setting' ), $this->plugin_name . '-settings:ads_settings', 'ads_settings');
-        $this->add_settings_field('ads_api_token', 'ADS API token', array( $this, 'render_ads_api_token_setting' ), $this->plugin_name . '-settings:ads_settings', 'ads_settings');
+        $this->add_settings_field('ads_api_search_url', 'ADS API URL', array( $this, 'render_ads_api_search_url_setting' ), $this->plugin_name . '-settings:ads_settings', 'ads_settings', array(), array($this, 'validate_url'), 'https://api.adsabs.harvard.edu/v1/search/query');
+        $this->add_settings_field('ads_api_token', 'ADS API token', array( $this, 'render_ads_api_token_setting' ), $this->plugin_name . '-settings:ads_settings', 'ads_settings', array(), array($this, 'trim_settings_field'), '');
 
         $this->add_settings_section('clockss_settings', 'Clockss', array( $this, 'render_clockss_settings' ), $this->plugin_name . '-settings:clockss_settings');
-        $this->add_settings_field('clockss_ftp_url', 'Clockss FTP URL', array( $this, 'render_clockss_ftp_url_setting' ), $this->plugin_name . '-settings:clockss_settings', 'clockss_settings');
-        $this->add_settings_field('clockss_username', 'Clockss Username', array( $this, 'render_clockss_username_setting' ), $this->plugin_name . '-settings:clockss_settings', 'clockss_settings');
-        $this->add_settings_field('clockss_password', 'Clockss Password', array( $this, 'render_clockss_password_setting' ), $this->plugin_name . '-settings:clockss_settings', 'clockss_settings');
+        $this->add_settings_field('clockss_ftp_url', 'Clockss FTP URL', array( $this, 'render_clockss_ftp_url_setting' ), $this->plugin_name . '-settings:clockss_settings', 'clockss_settings', array(), array($this, 'trim_settings_field'), 'ftp.clockss.org'); #cannot use validate_url here because it prepends https:// or ftp:// and we want to save the raw url
+        $this->add_settings_field('clockss_username', 'Clockss Username', array( $this, 'render_clockss_username_setting' ), $this->plugin_name . '-settings:clockss_settings', 'clockss_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->add_settings_field('clockss_password', 'Clockss Password', array( $this, 'render_clockss_password_setting' ), $this->plugin_name . '-settings:clockss_settings', 'clockss_settings', array(), array($this, 'trim_settings_field'), '');
 
         $this->add_settings_section('doaj_settings', 'DOAJ', array( $this, 'render_doaj_settings' ), $this->plugin_name . '-settings:doaj_settings');
-        $this->add_settings_field('doaj_api_url', 'DOAJ API url', array( $this, 'render_doaj_api_url_setting' ), $this->plugin_name . '-settings:doaj_settings', 'doaj_settings');
-        $this->add_settings_field('doaj_api_key', 'DOAJ API key', array( $this, 'render_doaj_api_key_setting' ), $this->plugin_name . '-settings:doaj_settings', 'doaj_settings');
-        $this->add_settings_field('doaj_language_code', 'DOAJ langugage code (two upper case letters)', array( $this, 'render_doaj_language_code_setting' ), $this->plugin_name . '-settings:doaj_settings', 'doaj_settings');
+        $this->add_settings_field('doaj_api_url', 'DOAJ API url', array( $this, 'render_doaj_api_url_setting' ), $this->plugin_name . '-settings:doaj_settings', 'doaj_settings', array(), array($this, 'validate_url'), 'https://doaj.org/api/v1/articles');
+        $this->add_settings_field('doaj_api_key', 'DOAJ API key', array( $this, 'render_doaj_api_key_setting' ), $this->plugin_name . '-settings:doaj_settings', 'doaj_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->add_settings_field('doaj_language_code', 'DOAJ langugage code (two upper case letters)', array( $this, 'render_doaj_language_code_setting' ), $this->plugin_name . '-settings:doaj_settings', 'doaj_settings', array(), array($this, 'validate_two_letter_country_code'), 'EN');
 
         $this->add_settings_section('arxiv_settings', 'ArXiv', array( $this, 'render_arxiv_settings' ), $this->plugin_name . '-settings:arxiv_settings');
-        $this->add_settings_field('arxiv_url_abs_prefix', 'Url prefix for abstract pages', array( $this, 'render_arxiv_url_abs_prefix_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings');
-        $this->add_settings_field('arxiv_url_pdf_prefix', 'Url prefix for pdfs', array( $this, 'render_arxiv_url_pdf_prefix_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings');
-        $this->add_settings_field('arxiv_url_source_prefix', 'Url prefix for eprint source', array( $this, 'render_arxiv_url_source_prefix_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings');
-        $this->add_settings_field('arxiv_url_trackback_prefix', 'Url prefix for Trackbacks', array( $this, 'render_arxiv_url_trackback_prefix_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings');
-        $this->add_settings_field('arxiv_doi_feed_identifier', 'Indentifier for the DOI feed', array( $this, 'render_arxiv_doi_feed_identifier_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings');
-        $this->add_settings_field('arxiv_paper_doi_feed_endpoint', 'Endpoint for the arXiv DOI feed', array( $this, 'render_arxiv_paper_doi_feed_endpoint_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings');
-        $this->add_settings_field('arxiv_paper_doi_feed_days', 'Number of days in arXiv DOI feed', array( $this, 'render_arxiv_paper_doi_feed_days_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings');
+        $this->add_settings_field('arxiv_url_abs_prefix', 'Url prefix for abstract pages', array( $this, 'render_arxiv_url_abs_prefix_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings', array(), array($this, 'validate_url'), 'https://arxiv.org/abs/');
+        $this->add_settings_field('arxiv_url_pdf_prefix', 'Url prefix for pdfs', array( $this, 'render_arxiv_url_pdf_prefix_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings', array(), array($this, 'validate_url'), 'https://arxiv.org/pdf/');
+        $this->add_settings_field('arxiv_url_source_prefix', 'Url prefix for eprint source', array( $this, 'render_arxiv_url_source_prefix_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings', array(), array($this, 'validate_url'), 'https://arxiv.org/e-print/');
+        $this->add_settings_field('arxiv_url_trackback_prefix', 'Url prefix for Trackbacks', array( $this, 'render_arxiv_url_trackback_prefix_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings', array(), array($this, 'validate_url'), 'http://arxiv.org/trackback/');
+        $this->add_settings_field('arxiv_doi_feed_identifier', 'Indentifier for the DOI feed', array( $this, 'render_arxiv_doi_feed_identifier_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->add_settings_field('arxiv_paper_doi_feed_endpoint', 'Endpoint for the arXiv DOI feed', array( $this, 'render_arxiv_paper_doi_feed_endpoint_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings', array(), array($this, 'trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed'), 'arxiv_paper_doi_feed');
+        $this->add_settings_field('arxiv_paper_doi_feed_days', 'Number of days in arXiv DOI feed', array( $this, 'render_arxiv_paper_doi_feed_days_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings', array(), array($this, 'validate_positive_integer'), '365');
 
         $this->add_settings_section('buffer_settings', 'Buffer.com', array( $this, 'render_buffer_settings' ), $this->plugin_name . '-settings:buffer_settings');
-        $this->add_settings_field('buffer_api_url', 'Url of the buffer.com api', array( $this, 'render_buffer_api_url_setting' ), $this->plugin_name . '-settings:buffer_settings', 'buffer_settings');
-        $this->add_settings_field('buffer_access_token', 'Access token from buffer.com', array( $this, 'render_buffer_access_token_setting' ), $this->plugin_name . '-settings:buffer_settings', 'buffer_settings');
-        $this->add_settings_field('buffer_profile_ids', 'Profile IDs on buffer.com', array( $this, 'render_buffer_profile_ids_setting' ), $this->plugin_name . '-settings:buffer_settings', 'buffer_settings');
+        $this->add_settings_field('buffer_api_url', 'Url of the buffer.com api', array( $this, 'render_buffer_api_url_setting' ), $this->plugin_name . '-settings:buffer_settings', 'buffer_settings', array(), array($this, 'validate_url'), 'https://api.bufferapp.com/1');
+        $this->add_settings_field('buffer_access_token', 'Access token from buffer.com', array( $this, 'render_buffer_access_token_setting' ), $this->plugin_name . '-settings:buffer_settings', 'buffer_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->add_settings_field('buffer_profile_ids', 'Profile IDs on buffer.com', array( $this, 'render_buffer_profile_ids_setting' ), $this->plugin_name . '-settings:buffer_settings', 'buffer_settings', array(), array($this, 'validate_array_as_comma_separated_list'), '');
 
         $this->add_settings_section('other_service_settings', 'Other services', array( $this, 'render_other_service_settings' ), $this->plugin_name . '-settings:other_service_settings');
-        $this->add_settings_field('doi_url_prefix', 'Url prefix for DOI resolution', array( $this, 'render_doi_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
-        $this->add_settings_field('scirate_url_abs_prefix', 'Url prefix for scirate pages', array( $this, 'render_scirate_url_abs_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
-        $this->add_settings_field('arxiv_vanity_url_prefix', 'Url prefix for arXiv Vanity pages', array( $this, 'render_arxiv_vanity_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
-        $this->add_settings_field('scholastica_manuscripts_url', 'Url of Scholastica manuscripts page', array( $this, 'render_scholastica_manuscripts_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
-        $this->add_settings_field('orcid_url_prefix', 'Orcid url prefix', array( $this, 'render_orcid_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
-        $this->add_settings_field('fermats_library_url_prefix', 'Url prefix for Fermats Library', array( $this, 'render_fermats_library_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
-        $this->add_settings_field('fermats_library_email', 'Email for Fermats Library', array( $this, 'render_fermats_library_email_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
-        $this->add_settings_field('mathjax_url', 'MathJax url', array( $this, 'render_mathjax_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
-        $this->add_settings_field('social_media_thumbnail_url', 'Url of default thumbnail for social media', array( $this, 'render_social_media_thumbnail_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
-        $this->add_settings_field('facebook_app_id', 'Facebook app_id', array( $this, 'render_facebook_app_id_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings');
+        $this->add_settings_field('doi_url_prefix', 'Url prefix for DOI resolution', array( $this, 'render_doi_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), 'https://doi.org/');
+        $this->add_settings_field('scirate_url_abs_prefix', 'Url prefix for scirate pages', array( $this, 'render_scirate_url_abs_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), 'https://scirate.com/arxiv/');
+        $this->add_settings_field('arxiv_vanity_url_prefix', 'Url prefix for arXiv Vanity pages', array( $this, 'render_arxiv_vanity_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), 'https://www.arxiv-vanity.com/papers/');
+        $this->add_settings_field('scholastica_manuscripts_url', 'Url of Scholastica manuscripts page', array( $this, 'render_scholastica_manuscripts_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), '');
+        $this->add_settings_field('orcid_url_prefix', 'Orcid url prefix', array( $this, 'render_orcid_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), 'https://orcid.org/');
+        $this->add_settings_field('fermats_library_url_prefix', 'Url prefix for Fermats Library', array( $this, 'render_fermats_library_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), 'https://fermatslibrary.com/s/');
+        $this->add_settings_field('fermats_library_email', 'Email for Fermats Library', array( $this, 'render_fermats_library_email_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->add_settings_field('mathjax_url', 'MathJax url', array( $this, 'render_mathjax_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js');
+        $this->add_settings_field('social_media_thumbnail_url', 'Url of default thumbnail for social media', array( $this, 'render_social_media_thumbnail_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), '');
+        $this->add_settings_field('facebook_app_id', 'Facebook app_id', array( $this, 'render_facebook_app_id_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings', array(), array($this, 'trim_settings_field'), '');
 
         $this->add_settings_section('other_plugins_settings', 'Other plugins', array( $this, 'render_other_plugins_settings' ), $this->plugin_name . '-settings:other_plugins_settings');
-        $this->add_settings_field('relevanssi_mime_types_to_exclude', 'Relevanssi mime types to exclude', array( $this, 'render_relevanssi_mime_types_to_exclude_setting' ), $this->plugin_name . '-settings:other_plugins_settings', 'other_plugins_settings');
-        $this->add_settings_field('relevanssi_index_pdfs_asynchronously', 'Index PDFs asynchronously', array( $this, 'render_relevanssi_index_pdfs_asynchronously_setting' ), $this->plugin_name . '-settings:other_plugins_settings', 'other_plugins_settings');
+        $this->add_settings_field('relevanssi_mime_types_to_exclude', 'Relevanssi mime types to exclude', array( $this, 'render_relevanssi_mime_types_to_exclude_setting' ), $this->plugin_name . '-settings:other_plugins_settings', 'other_plugins_settings', array(), array($this, 'trim_settings_field'), '#(application/.*(tar|gz|gzip)|text/.*tex)#u');
+        $this->add_settings_field('relevanssi_index_pdfs_asynchronously', 'Index PDFs asynchronously', array( $this, 'render_relevanssi_index_pdfs_asynchronously_setting' ), $this->plugin_name . '-settings:other_plugins_settings', 'other_plugins_settings', array(), array($this, 'checked_or_unchecked'), 'checked');
 
     }
 
@@ -1719,34 +1742,34 @@ class O3PO_Settings extends O3PO_Singleton {
                 #'crossref_test_deposite_url' => 'validate_url',
                 #'crossref_email' => 'trim_settings_field',
                 #'crossref_archive_locations' => 'trim_settings_field',
-                'ads_api_search_url' => 'validate_url',
-                'ads_api_token' => 'trim_settings_field',
-                'clockss_ftp_url' => 'trim_settings_field', #cannot use validate_url here because it prepends https:// or ftp:// and we want to save the raw url
-                'clockss_username' => 'trim_settings_field',
-                'clockss_password' => 'trim_settings_field',
-                'arxiv_url_abs_prefix' => 'validate_url',
-                'arxiv_url_pdf_prefix' => 'validate_url',
-                'arxiv_url_source_prefix' => 'validate_url',
-                'arxiv_url_trackback_prefix' => 'validate_url',
-                'arxiv_doi_feed_identifier' => 'trim_settings_field',
-                'arxiv_paper_doi_feed_endpoint' => 'trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed',
-                'arxiv_paper_doi_feed_days' => 'validate_positive_integer',
-                'doi_url_prefix' => 'validate_url',
+                #'ads_api_search_url' => 'validate_url',
+                #'ads_api_token' => 'trim_settings_field',
+                #'clockss_ftp_url' => 'trim_settings_field', #cannot use validate_url here because it prepends https:// or ftp:// and we want to save the raw url
+                #'clockss_username' => 'trim_settings_field',
+                #'clockss_password' => 'trim_settings_field',
+                #'arxiv_url_abs_prefix' => 'validate_url',
+                #'arxiv_url_pdf_prefix' => 'validate_url',
+                #'arxiv_url_source_prefix' => 'validate_url',
+                #'arxiv_url_trackback_prefix' => 'validate_url',
+                /* 'arxiv_doi_feed_identifier' => 'trim_settings_field', */
+                /* 'arxiv_paper_doi_feed_endpoint' => 'trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed', */
+                /* 'arxiv_paper_doi_feed_days' => 'validate_positive_integer', */
+                #'doi_url_prefix' => 'validate_url',
                 'scholastica_manuscripts_url' => 'validate_url',
-                'scirate_url_abs_prefix' => 'validate_url',
-                'arxiv_vanity_url_prefix' => 'validate_url',
-                'orcid_url_prefix' => 'validate_url',
-                'fermats_library_url_prefix' => 'validate_url',
-                'fermats_library_email' => 'trim_settings_field',
-                'mathjax_url' => 'validate_url',
-                'social_media_thumbnail_url' => 'trim_settings_field',
-                'buffer_api_url' => 'validate_url',
-                'buffer_access_token' => 'trim_settings_field',
-                'buffer_profile_ids' => 'validate_array_as_comma_separated_list',
-                'facebook_app_id' => 'trim_settings_field',
-                'doaj_api_url' => 'trim_settings_field',
-                'doaj_api_key' => 'trim_settings_field',
-                'doaj_language_code' => 'validate_two_letter_country_code',
+                #'scirate_url_abs_prefix' => 'validate_url',
+                #'arxiv_vanity_url_prefix' => 'validate_url',
+                #'orcid_url_prefix' => 'validate_url',
+                #'fermats_library_url_prefix' => 'validate_url',
+                #'fermats_library_email' => 'trim_settings_field',
+                #'mathjax_url' => 'validate_url',
+                #'social_media_thumbnail_url' => 'trim_settings_field',
+                /* 'buffer_api_url' => 'validate_url', */
+                /* 'buffer_access_token' => 'trim_settings_field', */
+                /* 'buffer_profile_ids' => 'validate_array_as_comma_separated_list', */
+                #'facebook_app_id' => 'trim_settings_field',
+                /* 'doaj_api_url' => 'trim_settings_field', */
+                /* 'doaj_api_key' => 'trim_settings_field', */
+                /* 'doaj_language_code' => 'validate_two_letter_country_code', */
                 #'custom_search_page' => 'checked_or_unchecked',
                 #'extended_search_and_navigation' => 'checked_or_unchecked',
                 #'search_form_on_search_page' => 'checked_or_unchecked',
@@ -1767,17 +1790,17 @@ class O3PO_Settings extends O3PO_Singleton {
                 /* 'author_notification_secondary_body_template' => 'leave_unchaged', */
                 /* 'fermats_library_notification_subject_template' => 'trim_settings_field', */
                 /* 'fermats_library_notification_body_template' => 'leave_unchaged', */
-                'relevanssi_mime_types_to_exclude' => 'trim_settings_field',
-                'relevanssi_index_pdfs_asynchronously' => 'checked_or_unchecked',
+                #'relevanssi_mime_types_to_exclude' => 'trim_settings_field',
+                #'relevanssi_index_pdfs_asynchronously' => 'checked_or_unchecked',
                 #'cited_by_refresh_seconds' => 'validate_positive_integer',
 
                     /* The following settings cannot be customized by the user.
                      * validation method null ensures that these settings are never
                      * updated when user settings are saved and validated. */
-                'primary_publication_type_name' => null,
-                'primary_publication_type_name_plural' => null,
-                'secondary_publication_type_name' => null,
-                'secondary_publication_type_name_plural' => null,
+                /* 'primary_publication_type_name' => null, */
+                /* 'primary_publication_type_name_plural' => null, */
+                /* 'secondary_publication_type_name' => null, */
+                /* 'secondary_publication_type_name_plural' => null, */
                                                    );
 
         return self::$all_settings_fields_map;
@@ -2069,7 +2092,7 @@ class O3PO_Settings extends O3PO_Singleton {
         if(isset($this->settings_fields[$id]) and isset($this->settings_fields[$id]['default']))
             return $this->settings_fields[$id]['default'];
 
-        throw new Exception('Plugin option '. $id . ' has not default value.');
+        throw new Exception('Plugin option '. $id . ' has no default value.');
     }
 
         /**
@@ -2096,9 +2119,11 @@ class O3PO_Settings extends O3PO_Singleton {
 
 
         /**
-         * Wrapper around Wordpress' add_settings_section()
+         * Specify a settings section.
          *
          * Keeps a record of all settings sections in $this->settings_sections.
+         * They are then added with Wordpress' add_settings_section() in
+         * register_settings().
          *
          * @since  0.3.0
          * @access private
@@ -2111,15 +2136,16 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function add_settings_section( $id, $title, $callback, $page ) {
 
-        add_settings_section($id, $title, $callback, $page);
         $this->settings_sections[$id] = array('title' => $title, 'callback' => $callback, 'page' => $page);
 
     }
 
         /**
-         * Wrapper around Wordpress' add_settings_field()
+         * Specify a settings field.
          *
          * Keeps a record of all settings sections in $this->settings_sections.
+         * They are then added with Wordpress' add_settings_field() in
+         * register_settings().
          *
          * @since  0.3.0
          * @access private
@@ -2148,8 +2174,27 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function add_settings_field($id, $title, $callback, $page, $section, $args, $validation_callable, $default ) {
 
-        add_settings_field($id, $title, $callback, $page, $section, $args);
+        #add_settings_field($id, $title, $callback, $page, $section, $args);
         $this->settings_fields[$id] = array('title' => $title, 'callback' => $callback, 'page' => $page, 'section' => $section, 'args' => $args, 'validation_callable' => $validation_callable, 'default' => $default);
 
     }
+
+        /**
+         * Add a fake settings field
+         *
+         * Fake fields cannot be modified, but have default values that
+         * can be used to avoid hard coding values in other classes.
+         *
+         * @since  0.3.0
+         * @access private
+         * @param string   $id       Slug-name to identify the section. Used in the 'id' attribute of tags.
+         * @param string   $default  Default value for the settings field.
+         */
+    public function add_fake_settings_field($id, $default ) {
+
+        $this->settings_fields[$id] = array('default' => $default);
+
+    }
+
+
 }
