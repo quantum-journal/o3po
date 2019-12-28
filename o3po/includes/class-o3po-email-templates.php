@@ -20,6 +20,43 @@
  */
 class O3PO_EmailTemplates {
 
+
+    private static $self_notification_subject_template;
+    private static $self_notification_body_template;
+
+    private static $author_notification_subject_template;
+    private static $author_notification_body_template;
+
+    private static $fermats_library_notification_subject_template;
+    private static $fermats_library_notification_body_template;
+
+    private static $templates = array(
+        'self_notification_subject' => new O3PO_ShortcodeTemplate($this->get_journal_property('self_notification_subject_template'), Here need to pull template from settings, which means we can only do when instanciating => this class must become a singleton?
+                                                                  array("[journal]" => array(
+                                                                            'description' => "The journal name",
+                                                                            'example' => 'New Journal',
+                                                                                             ),
+                                                                        "[publication_type_name]" => array(
+                                                                            'description' => "The type of the publication",
+                                                                            'example' => 'paper',
+                                                                                                           ),
+                                                                        ));
+                                                                  ),
+        'self_notification_body'
+        'author_notification_subject'
+        'author_notification_body'
+        'fermats_library_notification_subject'
+        'fermats_library_notification_body'
+    );
+
+
+
+    public static function get_template( $template ) {
+
+    }
+
+
+
         /**
          * Replace the short codes in the self notification subject template.
          *
@@ -68,7 +105,7 @@ class O3PO_EmailTemplates {
                                                   $doi_url_prefix,
                                                   $doi ){
 
-       $doi_hex_encoded = static::hex_encode($doi);
+       $doi_hex_encoded = rawurlencode($doi);
        $short_codes = array("[journal]" => "The journal name",
                          "[publication_type_name]" => "The type of the publication",
                          "[title]" => "The title of the publication",
@@ -78,7 +115,7 @@ class O3PO_EmailTemplates {
                          "[doi]" => "The DOI",
                          "[doi_hex_encoded]" => "The DOI encoded in hex (use this when escaping problems occur)");
        return array('short_codes' => $short_codes,
-                  'result' => str_replace(array_keys($short_codes),
+                    'result' => str_replace(array_keys($short_codes),
                          array($journal, $publication_type_name, $title, $authors, $url, $doi_url_prefix, $doi, $doi_hex_encoded),
                          $email_template));
    }
@@ -129,7 +166,7 @@ class O3PO_EmailTemplates {
    public static function author_notification_body($email_template,
                                     $journal, $executive_board, $editor_in_chief, $publisher_email,
                                     $publication_type_name, $title, $authors, $url, $doi_url_prefix, $doi, $journal_reference){
-       $doi_hex_encoded = static::hex_encode($doi);
+       $doi_hex_encoded = rawurlencode($doi);
        $short_codes = array("[journal]" => "The journal name",
                           "[executive_board]" => "Names of the executive board members",
                           "[editor_in_chief]" => "Names of the editor in chief",
@@ -194,7 +231,7 @@ class O3PO_EmailTemplates {
    public static function fermats_library_notification_body($email_template
                                     , $journal
                                     , $publication_type_name, $title, $authors, $url, $doi_url_prefix, $doi, $fermats_library_permalink){
-       $doi_hex_encoded = static::hex_encode($doi);
+       $doi_hex_encoded = rawurlencode($doi);
        $short_codes = array("[journal]" => "The type of the publication",
                           "[publication_type_name]" => "The type of the publication",
                           "[title]" => "The title of the article",
@@ -229,7 +266,7 @@ class O3PO_EmailTemplates {
          }
          $render_function .= "'');";
 
-         $template_result = eval($render_function);
+         $template_result = eval($render_function); The render short code functions should be reworked
          $short_codes = $template_result['short_codes'];
 
          $result = '<p>The following shortcodes are available:</p>';
@@ -239,18 +276,4 @@ class O3PO_EmailTemplates {
          }
          return $result . '</ul>';
    }
-
-       /**
-        * Encode the DOI into hex to escape URL parameters.
-        *
-        * @since  0.3.0
-        * @access public
-        * @param  string $doi The DOI that should be encoded.
-        * @return string The hex encoded DOI.
-        */
-   private static function hex_encode($doi) {
-
-       return rawurlencode($doi);
-   }
-
 }
