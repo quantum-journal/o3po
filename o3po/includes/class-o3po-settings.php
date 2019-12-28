@@ -102,11 +102,11 @@ class O3PO_Settings extends O3PO_Singleton {
          * @var      array    $option_defaults    Array of the defaults for various options.
          */
     private $option_defaults = array(
-        'license_name' => 'Creative Commons Attribution 4.0 International (CC BY 4.0)',
-        'license_type' => 'CC BY',
-        'license_version' => '4.0',
-        'license_url' => 'https://creativecommons.org/licenses/by/4.0/',
-        'license_explanation' => 'Copyright remains with the original copyright holders such as the authors or their institutions.',
+        #'license_name' => 'Creative Commons Attribution 4.0 International (CC BY 4.0)',
+        #'license_type' => 'CC BY',
+        #'license_version' => '4.0',
+        #'license_url' => 'https://creativecommons.org/licenses/by/4.0/',
+        #'license_explanation' => 'Copyright remains with the original copyright holders such as the authors or their institutions.',
         'mathjax_url' => 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js',
         'crossref_get_forward_links_url' => 'https://doi.crossref.org/servlet/getForwardLinks',
         'crossref_deposite_url' => 'https://doi.crossref.org/servlet/deposit',
@@ -127,14 +127,14 @@ class O3PO_Settings extends O3PO_Singleton {
         'doaj_api_url' => "https://doaj.org/api/v1/articles",
         'doaj_language_code' => "EN",
         'buffer_api_url' => 'https://api.bufferapp.com/1',
-        'extended_search_and_navigation' => "checked",
-        'search_form_on_search_page' => "checked",
-        'custom_search_page' => "checked",
-        'page_template_for_publication_posts' => "unchecked",
-        'page_template_abstract_header' => '',
-        'trackbacks_from_secondary_directly_into_database' => "unchecked",
-        'maintenance_mode' => 'unchecked',
-        'doi_suffix_template' => '[journal_level_doi_suffix]-[date]-[page]',
+        #'extended_search_and_navigation' => "checked",
+        #'search_form_on_search_page' => "checked",
+        #'custom_search_page' => "checked",
+        #'page_template_for_publication_posts' => "unchecked",
+        #'page_template_abstract_header' => '',
+        #'trackbacks_from_secondary_directly_into_database' => "unchecked",
+        #'maintenance_mode' => 'unchecked',
+        #'doi_suffix_template' => '[journal_level_doi_suffix]-[date]-[page]',
 
         'self_notification_subject_template' =>
         "A [publication_type_name] has been published/updated by [journal]",
@@ -302,37 +302,39 @@ class O3PO_Settings extends O3PO_Singleton {
         register_setting( $this->plugin_name . '-settings', $this->plugin_name . '-settings', array( $this, 'validate_settings' ) );
 
         $this->add_settings_section('plugin_settings', 'Plugin', array( $this, 'render_plugin_settings' ), $this->plugin_name . '-settings:plugin_settings');
-        $this->add_settings_field('production_site_url', 'Production site url', array( $this, 'render_production_site_url_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
-        $this->add_settings_field('extended_search_and_navigation', 'Add search and navigation to home page', array( $this, 'render_extended_search_and_navigation_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
-        $this->add_settings_field('search_form_on_search_page', 'Add a search form to the search page', array( $this, 'render_search_form_on_search_page_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
-        $this->add_settings_field('custom_search_page', 'Display search page notice', array( $this, 'render_custom_search_page_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
-        $this->add_settings_field('page_template_for_publication_posts', 'Force page template', array( $this, 'render_page_template_for_publication_posts_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
-        $this->add_settings_field('page_template_abstract_header', 'Show a heading for the abstract', array( $this, 'render_page_template_abstract_header_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
-        $this->add_settings_field('trackbacks_from_secondary_directly_into_database', 'Write Trackbacks directly', array( $this, 'render_trackbacks_from_secondary_directly_into_database_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
-        $this->add_settings_field('cited_by_refresh_seconds', 'Refresh cited-by time', array( $this, 'render_cited_by_refresh_seconds_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
-        $this->add_settings_field('maintenance_mode', 'Maintenance mode', array( $this, 'render_maintenance_mode_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings');
+        $this->add_settings_field('production_site_url', 'Production site url', array( $this, 'render_production_site_url_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings', array(), array($this, 'validate_url'), '');
+        $this->add_settings_field('extended_search_and_navigation', 'Add search and navigation to home page', array( $this, 'render_extended_search_and_navigation_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings', array(), array($this, 'checked_or_unchecked'), 'checked');
+        $this->add_settings_field('search_form_on_search_page', 'Add a search form to the search page', array( $this, 'render_search_form_on_search_page_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings', array(), array($this, 'checked_or_unchecked'), 'checked');
+        $this->add_settings_field('custom_search_page', 'Display search page notice', array( $this, 'render_custom_search_page_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings', array(), array($this, 'checked_or_unchecked'), 'checked');
+        $this->add_settings_field('page_template_for_publication_posts', 'Force page template', array( $this, 'render_page_template_for_publication_posts_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings', array(), array($this, 'checked_or_unchecked'), 'unchecked');
+        $this->add_settings_field('page_template_abstract_header', 'Show a heading for the abstract', array( $this, 'render_page_template_abstract_header_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->add_settings_field('trackbacks_from_secondary_directly_into_database', 'Write Trackbacks directly', array( $this, 'render_trackbacks_from_secondary_directly_into_database_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings', array(), array($this, 'checked_or_unchecked'), 'unchecked');
+        $this->add_settings_field('cited_by_refresh_seconds', 'Refresh cited-by time', array( $this, 'render_cited_by_refresh_seconds_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings', array(), array($this, 'validate_positive_integer'), '43200');
+        $this->add_settings_field('maintenance_mode', 'Maintenance mode', array( $this, 'render_maintenance_mode_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings', array(), array($this, 'checked_or_unchecked'), 'unchecked');
 
         $this->add_settings_section('journal_settings', 'Journal', array( $this, 'render_journal_settings' ), $this->plugin_name . '-settings:journal_settings');
-        $this->add_settings_field('doi_prefix', 'DOI prefix', array( $this, 'render_doi_prefix_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings');
-        $this->add_settings_field('journal_title', 'Journal title', array( $this, 'render_journal_title_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings');
-        $this->add_settings_field('journal_subtitle', 'Journal subtitle', array( $this, 'render_journal_subtitle_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings');
-        $this->add_settings_field('journal_description', 'Journal description', array( $this, 'render_journal_description_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings');
-        $this->add_settings_field('journal_level_doi_suffix', 'Journal level DOI suffix', array( $this, 'render_journal_level_doi_suffix_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings');
-        $this->add_settings_field('journal_doi_template', 'DOI suffix template', array( $this, 'render_doi_suffix_template_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings');
-        $this->add_settings_field('eissn', 'eISSN', array( $this, 'render_eissn_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings');
-        $this->add_settings_field('publisher', 'Publisher', array( $this, 'render_publisher_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings');
-        $this->add_settings_field('secondary_journal_title', 'Secondary journal title', array( $this, 'render_secondary_journal_title_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings');
-        $this->add_settings_field('secondary_journal_level_doi_suffix', 'Secondary journal level DOI suffix', array( $this, 'render_secondary_journal_level_doi_suffix_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings');
-        $this->add_settings_field('secondary_journal_eissn', 'Secondary journal eISSN', array( $this, 'render_secondary_journal_eissn_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings');
-        $this->add_settings_field('developer_email', 'Email of developer', array( $this, 'render_developer_email_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings');
-        $this->add_settings_field('publisher_email', 'Email of publisher', array( $this, 'render_publisher_email_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings');
+        $this->add_settings_field('doi_prefix', 'DOI prefix', array( $this, 'render_doi_prefix_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'validate_doi_prefix'), '');
+        $this->add_settings_field('journal_title', 'Journal title', array( $this, 'render_journal_title_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->add_settings_field('journal_subtitle', 'Journal subtitle', array( $this, 'render_journal_subtitle_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->add_settings_field('journal_description', 'Journal description', array( $this, 'render_journal_description_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->add_settings_field('journal_level_doi_suffix', 'Journal level DOI suffix', array( $this, 'render_journal_level_doi_suffix_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'validate_doi_suffix'), '');
+        #$this->add_settings_field('journal_doi_template', 'DOI suffix template', array( $this, 'render_doi_suffix_template_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings'); this is now added in the O3PO_PublicationType class
+        $this->add_settings_field('eissn', 'eISSN', array( $this, 'render_eissn_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'validate_issn'), '');
+        $this->add_settings_field('publisher', 'Publisher', array( $this, 'render_publisher_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->add_settings_field('secondary_journal_title', 'Secondary journal title', array( $this, 'render_secondary_journal_title_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->add_settings_field('secondary_journal_level_doi_suffix', 'Secondary journal level DOI suffix', array( $this, 'render_secondary_journal_level_doi_suffix_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'validate_doi_suffix'), '');
+        $this->add_settings_field('secondary_journal_eissn', 'Secondary journal eISSN', array( $this, 'render_secondary_journal_eissn_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'validate_issn'), '');
+        $this->add_settings_field('developer_email', 'Email of developer', array( $this, 'render_developer_email_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->add_settings_field('publisher_email', 'Email of publisher', array( $this, 'render_publisher_email_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
         $this->add_settings_field('first_volume_year', 'Year of first volume', array( $this, 'render_first_volume_year_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings');
-        $this->add_settings_field('publisher_country', 'Country of publisher', array( $this, 'render_publisher_country_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings');
-        $this->add_settings_field('license_name', 'License name', array( $this, 'render_license_name_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings');
-        $this->add_settings_field('license_type', 'License type', array( $this, 'render_license_type_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings');
-        $this->add_settings_field('license_version', 'License version', array( $this, 'render_license_version_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings');
-        $this->add_settings_field('license_url', 'License url', array( $this, 'render_license_url_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings');
-        $this->add_settings_field('license_explanation', 'License explanation string', array( $this, 'render_license_explanation_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings');
+        $this->add_settings_field('publisher_country', 'Country of publisher', array( $this, 'render_publisher_country_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->add_settings_field('license_name', 'License name', array( $this, 'render_license_name_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), 'Creative Commons Attribution 4.0 International (CC BY 4.0)');
+        $this->add_settings_field('license_type', 'License type', array( $this, 'render_license_type_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), 'CC BY');
+        $this->add_settings_field('license_version', 'License version', array( $this, 'render_license_version_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '4.0');
+        $this->add_settings_field('license_url', 'License url', array( $this, 'render_license_url_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'validate_url'), 'https://creativecommons.org/licenses/by/4.0/');
+        $this->add_settings_field('license_explanation', 'License explanation string', array( $this, 'render_license_explanation_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), 'Copyright remains with the original copyright holders such as the authors or their institutions.');
+
+        Got until here with refactoring settings!
 
         $this->add_settings_section('email_settings', 'Email', array($this , 'render_email_settings'), $this->plugin_name . '-settings:email_settings');
         $this->add_settings_field('executive_board' , 'The names of the executive board members' , array($this, 'render_executive_board') , $this->plugin_name . '-settings:email_settings', 'email_settings');
@@ -712,23 +714,6 @@ class O3PO_Settings extends O3PO_Singleton {
 
     }
 
-        /**
-         * Render the setting for the DOI suffix template.
-         *
-         * @since    0.1.0
-         * @access   public
-         */
-    public function render_doi_suffix_template_setting() {
-
-        $this->render_setting('doi_suffix_template');
-        echo('<p>The DOI suffix template is used to specify the DOI suffix. The following shortcodes are available: <ul>'
-                  .'<li>[journal_level_doi_suffix]: The journal level DOI suffix</li>'
-                  .'<li>[volume]: The volume in which the article appears</li>'
-                  .'<li>[page]: An article number that counts up starting at 1 </li>'
-                  .'<li>[date]: The <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO_8601</a> formated publication date</li></ul><br>'
-              .'See the <a href="https://support.crossref.org/hc/en-us/articles/214569903-Journal-level-DOIs">Crossref website</a> for more background.'
-              .'</p>');
-    }
 
         /**
          * Render the setting for the EISSN.
@@ -1487,7 +1472,6 @@ class O3PO_Settings extends O3PO_Singleton {
     public function render_buffer_access_token_setting() {
 
         $this->render_password_setting('buffer_access_token');
-        $post_types = O3PO_Utility::oxford_comma_implode(call_user_func($this->active_post_type_names_callback));
         echo '<p>(Create an access token <a href="https://buffer.com/developers/apps/create">here</a>.)</p>';
 
     }
@@ -1662,25 +1646,25 @@ class O3PO_Settings extends O3PO_Singleton {
 
         if(empty(self::$all_settings_fields_map))
             self::$all_settings_fields_map = array(
-                'production_site_url' => 'validate_url',
-                'journal_title' => 'trim_settings_field',
-                'journal_subtitle' => 'trim_settings_field',
-                'journal_description' => 'trim_settings_field',
-                'journal_level_doi_suffix' => 'validate_doi_suffix',
-                'doi_suffix_template' => 'trim_settings_field',
-                'eissn' => 'validate_issn',
-                'publisher' => 'trim_settings_field',
-                'secondary_journal_title' => 'trim_settings_field',
-                'secondary_journal_level_doi_suffix' => 'validate_doi_suffix',
-                'secondary_journal_eissn' => 'validate_issn',
-                'developer_email' => 'trim_settings_field',
-                'publisher_email' => 'trim_settings_field',
-                'publisher_country' => 'trim_settings_field',
-                'license_name' => 'trim_settings_field',
-                'license_type' => 'trim_settings_field',
-                'license_version' => 'trim_settings_field',
-                'license_url' => 'validate_url',
-                'license_explanation' => 'trim_settings_field',
+                #'production_site_url' => 'validate_url',
+                #'journal_title' => 'trim_settings_field',
+                #'journal_subtitle' => 'trim_settings_field',
+                #'journal_description' => 'trim_settings_field',
+                #'journal_level_doi_suffix' => 'validate_doi_suffix',
+                #'doi_suffix_template' => 'validate_doi_suffix_template',
+                #'eissn' => 'validate_issn',
+                #'publisher' => 'trim_settings_field',
+                #'secondary_journal_title' => 'trim_settings_field',
+                #'secondary_journal_level_doi_suffix' => 'validate_doi_suffix',
+                #'secondary_journal_eissn' => 'validate_issn',
+                #'developer_email' => 'trim_settings_field',
+                #'publisher_email' => 'trim_settings_field',
+                #'publisher_country' => 'trim_settings_field',
+                #'license_name' => 'trim_settings_field',
+                #'license_type' => 'trim_settings_field',
+                #'license_version' => 'trim_settings_field',
+                #'license_url' => 'validate_url',
+                #'license_explanation' => 'trim_settings_field',
                 'crossref_id' => 'trim_settings_field',
                 'crossref_pw' => 'trim_settings_field',
                 'crossref_get_forward_links_url' => 'validate_url',
@@ -1716,15 +1700,15 @@ class O3PO_Settings extends O3PO_Singleton {
                 'doaj_api_url' => 'trim_settings_field',
                 'doaj_api_key' => 'trim_settings_field',
                 'doaj_language_code' => 'validate_two_letter_country_code',
-                'custom_search_page' => 'checked_or_unchecked',
-                'extended_search_and_navigation' => 'checked_or_unchecked',
-                'search_form_on_search_page' => 'checked_or_unchecked',
-                'page_template_for_publication_posts' => 'checked_or_unchecked',
-                'page_template_abstract_header' => 'trim_settings_field',
-                'trackbacks_from_secondary_directly_into_database' => 'checked_or_unchecked',
-                'maintenance_mode' => 'checked_or_unchecked',
+                #'custom_search_page' => 'checked_or_unchecked',
+                #'extended_search_and_navigation' => 'checked_or_unchecked',
+                #'search_form_on_search_page' => 'checked_or_unchecked',
+                #'page_template_for_publication_posts' => 'checked_or_unchecked',
+                #'page_template_abstract_header' => 'trim_settings_field',
+                #'trackbacks_from_secondary_directly_into_database' => 'checked_or_unchecked',
+                #'maintenance_mode' => 'checked_or_unchecked',
                 'volumes_endpoint' => 'trim_settings_field',
-                'doi_prefix' => 'validate_doi_prefix',
+                #'doi_prefix' => 'validate_doi_prefix',
                 'first_volume_year' => 'validate_first_volume_year',
                 'executive_board' => 'trim_settings_field',
                 'editor_in_chief' => 'trim_settings_field',
@@ -1738,7 +1722,7 @@ class O3PO_Settings extends O3PO_Singleton {
                 'fermats_library_notification_body_template' => 'leave_unchaged',
                 'relevanssi_mime_types_to_exclude' => 'trim_settings_field',
                 'relevanssi_index_pdfs_asynchronously' => 'checked_or_unchecked',
-                'cited_by_refresh_seconds' => 'validate_positive_integer',
+                #'cited_by_refresh_seconds' => 'validate_positive_integer',
 
                     /* The following settings cannot be customized by the user.
                      * validation method null ensures that these settings are never
@@ -1771,7 +1755,7 @@ class O3PO_Settings extends O3PO_Singleton {
     }
 
         /**
-         * Clean user input to the doi_prefix setting
+         * Clean user input to the doi_suffix setting
          *
          * @since    0.1.0
          * @access   private
@@ -1845,8 +1829,10 @@ class O3PO_Settings extends O3PO_Singleton {
             add_settings_error( $field, 'url-validated', "The URL in '" . $this->settings_fields[$field]['title'] . "' was malformed. Please check.", 'error');
         elseif($url !== $input)
             add_settings_error( $field, 'url-validated', "The URL in '" . $this->settings_fields[$field]['title'] . "' was malformed or contained special or illegal characters, which were removed or escaped. Please check.", 'updated');
+
         return $url;
     }
+
 
         /**
          * Break a comma separated list into an array of fields
@@ -1872,7 +1858,6 @@ class O3PO_Settings extends O3PO_Singleton {
             return array();
         }
     }
-
 
 
         /**
@@ -1943,7 +1928,7 @@ class O3PO_Settings extends O3PO_Singleton {
         if(empty($input))
         {
             add_settings_error( $field, 'must-not-be-empty', "The field '" . $this->settings_fields[$field]['title'] . "' must not be empty. Reset to default value.", 'error');
-            $input = $this->option_defaults[$field];
+            $input = $this->get_plugin_option_default($field);
         }
         if(empty($input))
             $input = 'this-field-must-not-be-empty';
@@ -1997,10 +1982,11 @@ class O3PO_Settings extends O3PO_Singleton {
     public function validate_settings( $input ) {
 
         $newinput = array();
-        foreach($this->get_all_settings_fields_map() as $field => $validation_method)
+        foreach($this->settings_fields[$id] as $field => $specification)
         {
-            if(isset($input[$field]) and $validation_method !== null)
-                $newinput[$field] = $this->$validation_method($field, $input[$field]);
+
+            if(isset($input[$field]) and isset($specification['validation_callable']))
+                $newinput[$field] = call_user_func($specification['validation_callable'], $field, $input[$field]);
             else
                 $newinput[$field] = $this->get_plugin_option($field);
         }
@@ -2013,25 +1999,30 @@ class O3PO_Settings extends O3PO_Singleton {
          *
          * @since    0.1.0
          * @acceess  prublic
-         * @param    int    $id     Id of the setting.
+         * @param    int    $id     Id of the option.
          */
     public function get_plugin_option( $id ) {
 
         $options = get_option($this->plugin_name . '-settings', array());
         if(array_key_exists($id, $options))
             return $options[$id];
+        else
+            return get_plugin_option_default($id);
+    }
 
-        if(isset($this->option_defaults[$id]))
-            return $this->option_defaults[$id];
+        /**
+         * Get the default value of a plugin option by id.
+         *
+         * @since    0.3.0+
+         * @acceess  prublic
+         * @param    int    $id     Id of the option.
+         */
+    public function get_plugin_option_default( $id ) {
 
+        if(isset($this->settings_fields[$id]) and isset($this->settings_fields[$id]['default']))
+            return $this->settings_fields[$id]['default'];
 
-        foreach($this->get_all_settings_fields_map() as $field => $callable)
-        {
-            if($field === $id)
-                return "";
-        }
-
-        throw new Exception('The non existing plugin option '. $id . ' was requested.');
+        throw new Exception('Plugin option '. $id . ' has not default value.');
     }
 
         /**
@@ -2091,10 +2082,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @param string   $page     The slug-name of the settings page on which to show the section. Built-in pages include
          *                           'general', 'reading', 'writing', 'discussion', 'media', etc. Create your own using
          *                           add_options_page();
-         * @param string   $section  Optional. The slug-name of the section of the settings page
-         *                           in which to show the box. Default 'default'.
+         * @param string   $section  The slug-name of the section of the settings page
+         *                           in which to show the box.
          * @param array    $args {
-         *     Optional. Extra arguments used when outputting the field.
+         *     Extra arguments used when outputting the field. May be an empty array().
          *
          *     @type string $label_for When supplied, the setting title will be wrapped
          *                             in a `<label>` element, its `for` attribute populated
@@ -2102,22 +2093,16 @@ class O3PO_Settings extends O3PO_Singleton {
          *     @type string $class     CSS Class to be added to the `<tr>` element when the
          *                             field is output.
          * }
+         * @param callable $validation_callable Callable to use during validation of settings.
+         *                                      Must take a field ID and input as parameters
+         *                                      and return a valid value for the field. Should
+         *                                      call add_settings_error() to indicate problems.
+         * @param string   $default  Default value for the settings field.
          */
-    public function add_settings_field($id, $title, $callback, $page, $section='default', $args=array() ) {
+    public function add_settings_field($id, $title, $callback, $page, $section, $args, $validation_callable, $default ) {
 
         add_settings_field($id, $title, $callback, $page, $section, $args);
-        $this->settings_fields[$id] = array('title' => $title, 'callback' => $callback, 'page' => $page, 'section' => $section, 'args' => $args);
-    }
+        $this->settings_fields[$id] = array('title' => $title, 'callback' => $callback, 'page' => $page, 'section' => $section, 'args' => $args, 'validation_callable' => $validation_callable, 'default' => $default);
 
-
-        /**
-         * Return the defaults of all options.
-         *
-         * @sinde 0.3.0
-         * @access public
-         * @return array  Array of all default options.
-         */
-    public function get_option_defaults() {
-        return $this->option_defaults;
     }
 }
