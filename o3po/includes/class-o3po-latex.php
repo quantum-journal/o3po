@@ -1061,6 +1061,8 @@ class O3PO_Latex_Dictionary_Provider
                 '\\\\etalchar{?\+}?' => '⁺',
                 '\\\\textquoteright' => '’',
                 '\\\\textquoteleft' => '‘',
+                '\\\\textquotedblleft' => '"',
+                '\\\\textquotedblright' => '"',
                                                     );
         return self::$latex_special_chars_dictionary;
     }
