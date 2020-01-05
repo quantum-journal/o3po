@@ -963,7 +963,7 @@ abstract class O3PO_PublicationType {
          *
          * @since    0.1.0
          * @access   public
-         * @param    arry    $request    The request to which this post type is maybe to be added.
+         * @param    array    $request    The request to which this post type is maybe to be added.
          */
     public final function add_custom_post_types_to_rss_feed( $request ) {
 
@@ -994,22 +994,6 @@ abstract class O3PO_PublicationType {
             return $display_name;
         }
     }
-        /* Should we make this non static and then modify this post type? */
-        /*     /\* We return a fake author name for publication type posts */
-        /*      * on the rss feed.*\/ */
-        /* public static function the_author_feed( $display_name ) { */
-        /*     global $post; */
-        /*     $post_id = $post->ID; */
-        /*     $post_type = get_post_type($post_id); */
-
-        /*     if ( is_feed() && in_array( $post_type, static::get_active_publication_type_names() ) ) { */
-        /*         return esc_html(static::get_formated_authors($post_id)); */
-        /*     } */
-        /*     else */
-        /*     { */
-        /*         return $display_name; */
-        /*     } */
-        /* } */
 
         /**
          * Add Dublin Core and Highwire Press meta tags.

@@ -855,6 +855,7 @@ class O3PO_Latex_Dictionary_Provider
     static public function get_latex_special_chars_dictionary() {
         if(self::$latex_special_chars_dictionary===null)
             self::$latex_special_chars_dictionary = array(
+                # We are not treating \kern <len> , \hskip <len>, \hspace{<len>}, \hphantom{<stuff>}
                     /* '\\\\\\\\' => "\n", better ignore these as, depending on context, they should be replaced by a newline, a whitespace, or by nothing */
                     /* '\\\\linebreak(?![a-zA-Z])' => "\n", */
                 '\\\\ifmmode.*?\\\\else[ {}\n\r]*(.*?)\\\\fi[ {}]*' => '$1',
@@ -866,6 +867,14 @@ class O3PO_Latex_Dictionary_Provider
                 '\\\\textemdash(?![a-zA-Z])' => '—',
                 '\\\\textendash(?![a-zA-Z])' => '–',
                 '\\\\&' => '&',
+                '\\\\,' => ' ',
+                '\\\\!' => ' ',
+                '\\\\>' => ' ',
+                '\\\\;' => ' ',
+                '\\\\:' => ' ',
+                '\\\\enspace' => ' ',
+                '\\\\quad' => ' ',
+                '\\\\qquad' => ' ',
                 '\\\\ss(\s*\{\s*\}|\s+|(?![a-zA-Z]))' => 'ß',
                 '\\\\L(\s*\{\s*\}|\s+|(?![a-zA-Z]))' => 'Ł',
                 '\\\\l(\s*\{\s*\}|\s+|(?![a-zA-Z]))' => 'ł',
@@ -1052,6 +1061,8 @@ class O3PO_Latex_Dictionary_Provider
                 '\\\\etalchar{?\+}?' => '⁺',
                 '\\\\textquoteright' => '’',
                 '\\\\textquoteleft' => '‘',
+                '\\\\textquotedblleft' => '"',
+                '\\\\textquotedblright' => '"',
                                                     );
         return self::$latex_special_chars_dictionary;
     }
