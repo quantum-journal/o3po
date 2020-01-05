@@ -964,7 +964,7 @@ abstract class O3PO_PublicationType {
          *
          * @since    0.1.0
          * @access   public
-         * @param    arry    $request    The request to which this post type is maybe to be added.
+         * @param    array    $request    The request to which this post type is maybe to be added.
          */
     public final function add_custom_post_types_to_rss_feed( $request ) {
 
