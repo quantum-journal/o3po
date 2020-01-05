@@ -539,6 +539,7 @@ abstract class O3PO_PublicationType {
         $new_pages = isset( $_POST[ $post_type . '_pages' ] ) ? sanitize_text_field( $_POST[ $post_type . '_pages' ] ) : '';
         $new_doi_prefix = $this->get_journal_property('doi_prefix');
         $old_doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
+
         $new_doi_suffix = $this->construct_doi_suffix($new_date_published, $new_volume, $new_pages);
         if ($old_doi_suffix === $new_doi_suffix)
            update_post_meta( $post_id, $post_type . '_doi_suffix_was_changed_on_last_save', "false" );
@@ -993,7 +994,7 @@ abstract class O3PO_PublicationType {
          *
          * @since    0.1.0
          * @access   public
-         * @param    arry    $request    The request to which this post type is maybe to be added.
+         * @param    array    $request    The request to which this post type is maybe to be added.
          */
     public final function add_custom_post_types_to_rss_feed( $request ) {
 
@@ -1024,22 +1025,6 @@ abstract class O3PO_PublicationType {
             return $display_name;
         }
     }
-        /* Should we make this non static and then modify this post type? */
-        /*     /\* We return a fake author name for publication type posts */
-        /*      * on the rss feed.*\/ */
-        /* public static function the_author_feed( $display_name ) { */
-        /*     global $post; */
-        /*     $post_id = $post->ID; */
-        /*     $post_type = get_post_type($post_id); */
-
-        /*     if ( is_feed() && in_array( $post_type, static::get_active_publication_type_names() ) ) { */
-        /*         return esc_html(static::get_formated_authors($post_id)); */
-        /*     } */
-        /*     else */
-        /*     { */
-        /*         return $display_name; */
-        /*     } */
-        /* } */
 
         /**
          * Add Dublin Core and Highwire Press meta tags.

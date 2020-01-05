@@ -786,6 +786,24 @@ class O3PO_Settings extends O3PO_Singleton {
 
 
         /**
+         * Render the setting for the DOI suffix template.
+         *
+         * @since    0.1.0
+         * @access   public
+         */
+    public function render_doi_suffix_template_setting() {
+
+        $this->render_setting('doi_suffix_template');
+        echo('<p>The DOI suffix template is used to specify the DOI suffix. The following shortcodes are available: <ul>'
+                  .'<li>[journal_level_doi_suffix]: The journal level DOI suffix</li>'
+                  .'<li>[volume]: The volume in which the article appears</li>'
+                  .'<li>[page]: An article number that counts up starting at 1 </li>'
+                  .'<li>[date]: The <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO_8601</a> formated publication date</li></ul><br>'
+              .'See the <a href="https://support.crossref.org/hc/en-us/articles/214569903-Journal-level-DOIs">Crossref website</a> for more background.'
+              .'</p>');
+    }
+
+        /**
          * Render the setting for the EISSN.
          *
          * @since    0.1.0
@@ -1587,8 +1605,6 @@ class O3PO_Settings extends O3PO_Singleton {
         else
             echo "<p>Relevanssi premium installed</p>";
 
-        echo("<p>TODO: Verify that indexing actually works!</p>");
-
         $this->render_setting('relevanssi_mime_types_to_exclude');
         echo '<p>(Relevanssi Premium has the ability to index the content of attachments and thereby, e.g., enabled full text search in PDFs attached to publications. It however, by default, will index all attachment types and this is usually not desirable for the arXiv source files in .tex or .tar.gz format. Through this setting, mime types can be excluded from indexing by providing a php regular expression. All attachment posts whose mime type matches that regular expression are excluded from indexing via the <a href="https://www.relevanssi.com/knowledge-base/controlling-attachment-types-index/">relevanssi_do_not_index</a> filter. If left empty all post attachments are indexed if that feature is enable in Relevanssi Premium.)</p>';
 
@@ -1716,6 +1732,7 @@ class O3PO_Settings extends O3PO_Singleton {
 
         if(empty(self::$all_settings_fields_map))
             self::$all_settings_fields_map = array(
+
                 #'production_site_url' => 'validate_url',
                 #'journal_title' => 'trim_settings_field',
                 #'journal_subtitle' => 'trim_settings_field',
@@ -1755,6 +1772,7 @@ class O3PO_Settings extends O3PO_Singleton {
                 /* 'arxiv_paper_doi_feed_endpoint' => 'trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed', */
                 /* 'arxiv_paper_doi_feed_days' => 'validate_positive_integer', */
                 #'doi_url_prefix' => 'validate_url',
+
                 'scholastica_manuscripts_url' => 'validate_url',
                 #'scirate_url_abs_prefix' => 'validate_url',
                 #'arxiv_vanity_url_prefix' => 'validate_url',
