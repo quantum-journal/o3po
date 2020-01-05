@@ -913,13 +913,17 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         if ( $post_type === $this->get_publication_type_name() ) {
             $old_content = $content;
             $abstract = get_post_meta( $post_id, $post_type . '_abstract', true );
+            $post_content = get_post_field('post_content', $post_id);
             $bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
             $doi = static::get_doi( $post_id );
             $content = '';
             $content .= '<p>' . static::get_formated_citation($post_id) . '</p>';
             $content .= '<a href="' . $this->get_journal_property('doi_url_prefix') . $doi . '">' . $this->get_journal_property('doi_url_prefix') . $doi . '</a>';
-            $content .= '<p>' . esc_html($abstract) . '</p>';
-            $content .= $old_content;
+            $content .= '<p class="abstract">' . esc_html($abstract) . '</p>';
+            if(!empty($post_content))
+                $content .= '<p class="further-content">' . $post_content . '</p>';
+            #$content .= $old_content;
+
             $content = O3PO_Latex::expand_cite_to_html($content, $bbl);
             return $content;
         }
