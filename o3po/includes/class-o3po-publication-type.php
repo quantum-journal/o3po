@@ -877,7 +877,8 @@ abstract class O3PO_PublicationType {
                 }
                 if(mb_strlen($subject)+1+mb_strlen($post_url) > 280)
                     $subject = mb_substr($subject, 0, 280-(1+mb_strlen($post_url)-3)) . '...';
-                $subject .= ' ' . $post_url;
+                #$subject .= ' ' . $post_url;
+                $subject .= ' ' . $this->get_journal_property('doi_url_prefix') . static::get_doi($post_id);
                 $media = array(
                     'photo' => $image_url,
                     'link' => $post_url,
