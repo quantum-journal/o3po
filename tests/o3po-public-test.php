@@ -3,12 +3,15 @@
 require_once(dirname( __FILE__ ) . '/../o3po/public/class-o3po-public.php');
 
 
-class O3PO_PublicTest extends PHPUnit_Framework_TestCase
+class O3PO_PublicTest extends O3PO_TestCase
 {
 
     private $public;
 
         # As phpunit 8 requires a specification of a void return type for setUp(), as explained here https://thephp.cc/news/2019/02/help-my-tests-stopped-working, but PHP <7 does not support such declarations setUp() can no longer be used if the tests are to run across PHP versions.
+        /**
+         * @doesNotPerformAssertions
+         */
     public function test_construct() {
         $public = new O3PO_Public( 'o3po', '0.3.0' );
 
@@ -72,9 +75,7 @@ class O3PO_PublicTest extends PHPUnit_Framework_TestCase
         echo "</div>";
         $output = ob_get_contents();
         ob_end_clean();
-        $dom = new DOMDocument;
-        $result = $dom->loadHTML($output);
-        $this->assertNotFalse($result);
+        $this->assertValidHTMLFragment($output);
 
         $is_single = $orig_is_single;
     }
@@ -100,9 +101,7 @@ class O3PO_PublicTest extends PHPUnit_Framework_TestCase
         echo "</div>";
         $output = ob_get_contents();
         ob_end_clean();
-        $dom = new DOMDocument;
-        $result = $dom->loadHTML($output);
-        $this->assertNotFalse($result);
+        $this->assertValidHTMLFragment($output);
 
         $is_single = $orig_is_single;
         $is_home = $orig_is_home;
@@ -131,9 +130,7 @@ class O3PO_PublicTest extends PHPUnit_Framework_TestCase
         echo "</div>";
         $output = ob_get_contents();
         ob_end_clean();
-        $dom = new DOMDocument;
-        $result = $dom->loadHTML($output);
-        $this->assertNotFalse($result);
+        $this->assertValidHTMLFragment($output);
 
         $is_single = $orig_is_single;
         $is_home = $orig_is_home;
@@ -171,9 +168,7 @@ class O3PO_PublicTest extends PHPUnit_Framework_TestCase
         echo "</div>";
         $output = ob_get_contents();
         ob_end_clean();
-        $dom = new DOMDocument;
-        $result = $dom->loadHTML($output);
-        $this->assertNotFalse($result);
+        $this->assertValidHTMLFragment($output);
 
         $is_single = $orig_is_single;
         $is_home = $orig_is_home;

@@ -27,6 +27,7 @@ class O3PO_Bibentry {
          *
          * @sinde 0.3.0
          * @access private
+         * @var array Array holding the meta-data of this bibtentry.
          */
     private $meta_data;
 
@@ -36,6 +37,7 @@ class O3PO_Bibentry {
          *
          * @sinde 0.3.0
          * @access private
+         * @var Array of all supported meta-data fields
          */
     private static $meta_data_fields = array(
         'authors',
@@ -61,6 +63,7 @@ class O3PO_Bibentry {
         'volume',
         'year',
     );
+
 
         /**
          * Construct a bibtentry.
@@ -99,6 +102,7 @@ class O3PO_Bibentry {
          * @return mixed The string or array stored in the field.
          */
     public function get( $field ) {
+
         if(isset($this->meta_data[$field]))
             return $this->meta_data[$field];
         else

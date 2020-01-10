@@ -16,10 +16,10 @@
 .content-area form.search-form input.search-submit {
     width: auto;
 }
-table.meta-data-table {
+table.meta-data-table, table.more-links-table {
     border: none;
 }
-table.meta-data-table td {
+table.meta-data-table td, table.more-links-table td {
     border: none;
     text-align: left;
     padding-left: 0;
@@ -29,7 +29,7 @@ p.authors, p.authors a {
 }
 h3.abstract-header {
     padding-top: 1rem;
-    margin-bottom: 0rem;
+    margin-bottom: 1rem;
 }
 p.abstract {
     text-align: justify;
@@ -105,7 +105,7 @@ form.search-form input.search-submit {
         display: none !important;
     }
 }
-div.publication-action-buttons form {
+div.publication-action-buttons button {
     display: inline-block;
     margin-right: 1em;
     margin-bottom: 1rem;

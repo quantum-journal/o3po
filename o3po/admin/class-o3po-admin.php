@@ -142,7 +142,7 @@ class O3PO_Admin {
     public function add_meta_data_explorer_page_to_menu() {
         add_menu_page(
             $this->get_plugin_pretty_name() . ' meta-data explorer',
-            $this->get_plugin_pretty_name(),
+            $this->get_plugin_pretty_name() . ' meta-data',
             'administrator',
             $this->get_plugin_name() . '-meta-data-explorer',
             array($this, 'render_meta_data_explorer'),
@@ -263,7 +263,7 @@ class O3PO_Admin {
         }
         elseif($active_tab === 'citation-metrics')
         {
-            $html .= '<h3>Crossref cited-by citation statistics</h3>';
+            $html .= '<h3>Cited-by citation statistics</h3>';
 
             $settings = O3PO_Settings::instance();
             $doi_prefix = $settings->get_plugin_option('doi_prefix');
@@ -287,10 +287,10 @@ class O3PO_Admin {
 
                 if(!empty($citations_data['errors']))
                 {
-                    $html .= '<p>The following errors occurred while fetching and calculating citation counts for this type: <ul>';
+                    $html .= '<p>The following errors occurred while fetching and calculating citation counts for this type:</p><ul>';
                     foreach($citations_data['errors'] as $error)
                         $html .= '<li>' . esc_html($error->get_error_code() . ' ' . $error->get_error_message() . " ") . '</li>';
-                    $html .= '</ul></p>';
+                    $html .= '</ul>';
                 }
 
                 $citations_this_type = $citations_data['citation_count'];
@@ -492,7 +492,7 @@ class O3PO_Admin {
          */
     public function get_meta_data_explorer_tabs() {
 
-        return $meta_data_explorer_tabs;
+        return $this->meta_data_explorer_tabs;
     }
 
         /**

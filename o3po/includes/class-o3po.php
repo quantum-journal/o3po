@@ -338,6 +338,13 @@ class O3PO {
         $this->loader->add_action('parse_request', $this->primary_publication_type, 'handle_arxiv_paper_doi_feed_endpoint_request' , 1 );
         $this->loader->add_filter('the_content', $this->primary_publication_type, 'get_the_content');
         $this->loader->add_filter('get_the_excerpt', $this->primary_publication_type, 'get_the_excerpt', 1) ;//Use get_the_excerpt instead of 'the_excerpt' to also affect get_the_excerpt(). The low priority number is crucial to ensure early execution and prevent (expensive) auto generation of excerpt from content via wp_trim_excerpt() (see default-filters.php in WP)
+
+        # For RSS feed testing the WP caching mechanism can be disabled by commenting in the following
+        /* $callback = function() { */
+        /*     return 2; */
+        /* }; */
+        /* add_filter('wp_feed_cache_transient_lifetime', $callback); */
+
         $this->loader->add_filter('the_content_feed', $this->primary_publication_type, 'get_feed_content', 1); //The low priority number is crucial to ensure early execution and prevent (expensive) auto generation of excerpt from content via wp_trim_excerpt() (see default-filters.php in WP)
         $this->loader->add_filter('the_excerpt_rss', $this->primary_publication_type, 'get_feed_content', 1); //The low priority number is crucial to ensure early execution and prevent (expensive) auto generation of excerpt from content via wp_trim_excerpt() (see default-filters.php in WP)
         $this->loader->add_filter('transition_post_status', $this->primary_publication_type, 'on_transition_post_status', 10, 3);
