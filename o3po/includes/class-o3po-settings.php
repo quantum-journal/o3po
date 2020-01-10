@@ -95,123 +95,6 @@ class O3PO_Settings extends O3PO_Singleton {
 	protected $settings_fields = array();
 
         /**
-         * The dafaults for various options
-         *
-         * @since    0.1.0
-         * @access   private
-         * @var      array    $option_defaults    Array of the defaults for various options.
-         */
-    private $option_defaults = array(
-        #'license_name' => 'Creative Commons Attribution 4.0 International (CC BY 4.0)',
-        #'license_type' => 'CC BY',
-        #'license_version' => '4.0',
-        #'license_url' => 'https://creativecommons.org/licenses/by/4.0/',
-        #'license_explanation' => 'Copyright remains with the original copyright holders such as the authors or their institutions.',
-        #'mathjax_url' => 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js',
-        #'crossref_get_forward_links_url' => 'https://doi.crossref.org/servlet/getForwardLinks',
-        #'crossref_deposite_url' => 'https://doi.crossref.org/servlet/deposit',
-        #'crossref_test_deposite_url' => 'https://test.crossref.org/servlet/deposit',
-        #'clockss_ftp_url' => 'ftp.clockss.org',
-        /* 'arxiv_doi_feed_identifier' => '', */
-        /* 'arxiv_paper_doi_feed_endpoint' => 'arxiv_paper_doi_feed', */
-        /* 'arxiv_paper_doi_feed_days' => '365', */
-        /* 'arxiv_url_abs_prefix' => 'https://arxiv.org/abs/', */
-        /* 'arxiv_url_pdf_prefix' => 'https://arxiv.org/pdf/', */
-        /* 'arxiv_url_source_prefix' => 'https://arxiv.org/e-print/', */
-        /* 'arxiv_url_trackback_prefix' => 'http://arxiv.org/trackback/', */
-        /* 'doi_url_prefix' => 'https://doi.org/', */
-        /* 'scirate_url_abs_prefix' => 'https://scirate.com/arxiv/', */
-        /* 'arxiv_vanity_url_prefix' => 'https://www.arxiv-vanity.com/papers/', */
-        #'orcid_url_prefix' => 'https://orcid.org/',
-        #'fermats_library_url_prefix' => 'https://fermatslibrary.com/s/',
-        #'doaj_api_url' => "https://doaj.org/api/v1/articles",
-        #'doaj_language_code' => "EN",
-        #'buffer_api_url' => 'https://api.bufferapp.com/1',
-        #'extended_search_and_navigation' => "checked",
-        #'search_form_on_search_page' => "checked",
-        #'custom_search_page' => "checked",
-        #'page_template_for_publication_posts' => "unchecked",
-        #'page_template_abstract_header' => '',
-        #'trackbacks_from_secondary_directly_into_database' => "unchecked",
-        #'maintenance_mode' => 'unchecked',
-        #'doi_suffix_template' => '[journal_level_doi_suffix]-[date]-[page]',
-
-        #'self_notification_subject_template' =>
-        #"A [publication_type_name] has been published/updated by [journal]",
-        /* 'self_notification_body_template' => */
-        /* "[journal] has published/updated the following [publication_type_name]\n". */
-        /* "Title:   [title] \n". */
-        /* "Authors: [authors] \n". */
-        /* "URL:     [url]\n". */
-        /* "DOI:     [doi_url_prefix][doi]\n", */
-        /* 'author_notification_subject_template' => */
-        /* "[journal] has published your [publication_type_name]", */
-        /* 'author_notification_body_template' => */
-        /* "Dear [authors],\n\n". */
-        /* "Congratulations! Your [publication_type_name] '[title]' has been published by [journal] and is now available under:\n\n". */
-        /* "[post_url]\n\n". */
-        /* "Your work has been assigned the following journal reference and DOI\n\n". */
-        /* "Journal reference: [journal_reference]\n". */
-        /* "DOI:               [doi_url_prefix][doi]\n\n". */
-        /* "We kindly ask you to log in on the arXiv under https://arxiv.org/user/login and add this information to the page of your work there. Thank you very much!\n\n". */
-        /* "In case you have an ORCID you can go to http://search.crossref.org/?q=[doi] to conveniently add your new publication to your profile.\n\n". */
-        /* "Please be patient, it can take several hours until the DOI has been activated by Crossref.\n\n". */
-        /* "If you have any feedback or ideas for how to improve the peer-review and publishing process, or any other question, please let us know under [publisher_email]\n\n". */
-        /* "Best regards,\n\n". */
-        /* "[executive_board]\n". */
-        /* "Executive Board\n", */
-        /* 'author_notification_secondary_subject_template' => */
-        /* "[journal] has published your [publication_type_name]", */
-        /* 'author_notification_secondary_body_template' => */
-        /* "Dear [authors],\n\n". */
-        /* "Congratulations! Your [publication_type_name] '[title]' has been published by [journal] and is now available under:\n\n". */
-        /* "[post_url]\n\n". */
-        /* "Your [publication_type_name] has been assigned the following journal reference and DOI\n\n". */
-        /* "Journal reference: [journal_reference]\n". */
-        /* "DOI:               [doi_url_prefix][doi]\n\n". */
-        /* "In case you have an ORCID you can go to http://search.crossref.org/?q=[doi] to conveniently add your new publication to your profile.\n\n". */
-        /* "Please be patient, it can take several hours before the above link works.\n\n". */
-        /* "If you have any feedback or ideas for how to improve the peer-review and publishing process, or any other question, please let us know under [publisher_email]\n\n". */
-        /* "Thank you for writing this [publication_type_name] for [journal]!\n\n". */
-        /* "Best regards,\n\n". */
-        /* "[executive_board]\n". */
-        /* "Executive Board\n", */
-        /* 'fermats_library_notification_subject_template' => */
-        /* "[journal] has a new [publication_type_name] for Fermat's library", */
-        /* 'fermats_library_notification_body_template' => */
-        /* "Dear team at Fermat's library,\n\n". */
-        /* "[journal] has published the following [publication_type_name]:\n\n". */
-        /* "Title:     [title]\n". */
-        /* "Author(s): [authors]\n". */
-        /* "URL:       [post_url]\n". */
-        /* "DOI:       [doi_url_prefix][doi]\n". */
-        /* "\n". */
-        /* "Please post it on Fermat's library under the permalink: [fermats_library_permalink]\n". */
-        /* "Thank you very much!\n\n". */
-        /* "Kind regards,\n\n". */
-        /* "The Executive Board\n", */
-
-        /* 'executive_board' => "", */
-        /* 'editor_in_chief' => "", */
-        #'ads_api_search_url' => 'https://api.adsabs.harvard.edu/v1/search/query',
-        #'ads_api_token' => '',
-        #'relevanssi_mime_types_to_exclude' => '#(application/.*(tar|gz|gzip)|text/.*tex)#u',
-        #'relevanssi_index_pdfs_asynchronously' => "checked",
-
-            /* The options below are currently not customizable.
-             *
-             * Warning: The name of the paper-single.php templare must match
-             * the primary_publication_type_name!
-             */
-        #'cited_by_refresh_seconds' => '43200',#=60*60*12
-        /* 'primary_publication_type_name' => 'paper', */
-        /* 'primary_publication_type_name_plural' => 'papers', */
-        /* 'secondary_publication_type_name' => 'view', */
-        /* 'secondary_publication_type_name_plural' => 'views', */
-        /* 'volumes_endpoint' => 'volumes', */
-                                     );
-
-        /**
          * Configure the settings singleton.
          *
          * @since    0.1.0
@@ -349,8 +232,8 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->specify_settings_field('secondary_journal_title', 'Secondary journal title', array( $this, 'render_secondary_journal_title_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
         $this->specify_settings_field('secondary_journal_level_doi_suffix', 'Secondary journal level DOI suffix', array( $this, 'render_secondary_journal_level_doi_suffix_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'validate_doi_suffix'), '');
         $this->specify_settings_field('secondary_journal_eissn', 'Secondary journal eISSN', array( $this, 'render_secondary_journal_eissn_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'validate_issn'), '');
-        $this->specify_settings_field('developer_email', 'Email of developer', array( $this, 'render_developer_email_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
-        $this->specify_settings_field('publisher_email', 'Email of publisher', array( $this, 'render_publisher_email_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->specify_settings_field('developer_email', 'Email of developer', array( $this, 'render_developer_email_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'validate_email'), '');
+        $this->specify_settings_field('publisher_email', 'Email of publisher', array( $this, 'render_publisher_email_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'validate_email'), '');
         $this->specify_settings_field('first_volume_year', 'Year of first volume', array( $this, 'render_first_volume_year_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'validate_first_volume_year'), '2017');
         $this->specify_settings_field('publisher_country', 'Country of publisher', array( $this, 'render_publisher_country_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
         $this->specify_settings_field('license_name', 'License name', array( $this, 'render_license_name_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), 'Creative Commons Attribution 4.0 International (CC BY 4.0)');
@@ -368,7 +251,7 @@ class O3PO_Settings extends O3PO_Singleton {
                                   "Title:   [title] \n".
                                   "Authors: [authors] \n".
                                   "URL:     [url]\n".
-                                  "DOI:     [doi_url_prefix][doi]\n",
+                                  "DOI:     [doi_url_prefix][doi]\n"
                                   );
         $this->specify_settings_field('author_notification_subject_template', 'Author notification subject template', array($this, 'render_author_notification_subject_template_settings'), $this->plugin_name . '-settings:email_settings', 'email_settings', array(), array($this, 'trim_settings_field'), "[journal] has published your [publication_type_name]");
         $this->specify_settings_field('author_notification_body_template' , 'Author notification body template' , array($this, 'render_author_notification_body_template_settings') , $this->plugin_name . '-settings:email_settings', 'email_settings', array(), array($this, 'leave_unchaged'),
@@ -384,7 +267,7 @@ class O3PO_Settings extends O3PO_Singleton {
                                   "If you have any feedback or ideas for how to improve the peer-review and publishing process, or any other question, please let us know under [publisher_email]\n\n".
                                   "Best regards,\n\n".
                                   "[executive_board]\n".
-                                  "Executive Board\n",
+                                  "Executive Board\n"
                                   );
         $this->specify_settings_field('author_notification_secondary_subject_template' , 'Author notification subject template for the secondary journal' , array($this, 'render_author_notification_secondary_subject_template_settings') , $this->plugin_name . '-settings:email_settings', 'email_settings', array(), array($this, 'trim_settings_field'), "[journal] has published your [publication_type_name]");
         $this->specify_settings_field('author_notification_secondary_body_template' , 'Author notification body template for the secondary journal' , array($this, 'render_author_notification_secondary_body_template_settings') , $this->plugin_name . '-settings:email_settings', 'email_settings', array(), array($this, 'leave_unchaged'),
@@ -424,7 +307,6 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->specify_settings_field('crossref_deposite_url', 'Crossref deposite url', array( $this, 'render_crossref_deposite_url_setting' ), $this->plugin_name . '-settings:crossref_settings', 'crossref_settings', array(), array($this, 'validate_url'), 'https://doi.crossref.org/servlet/deposit');
         $this->specify_settings_field('crossref_test_deposite_url', 'Crossref deposite url for testing', array( $this, 'render_crossref_test_deposite_url_setting' ), $this->plugin_name . '-settings:crossref_settings', 'crossref_settings', array(), array($this, 'validate_url'), 'https://test.crossref.org/servlet/deposit');
         $this->specify_settings_field('crossref_email', 'Email for communication with Crossref', array( $this, 'render_crossref_email_setting' ), $this->plugin_name . '-settings:crossref_settings', 'crossref_settings', array(), array($this, 'validate_email'), '');
-        Email settings need a validation method
         $this->specify_settings_field('crossref_archive_locations', 'Archive locations', array( $this, 'render_crossref_archive_locations_setting' ), $this->plugin_name . '-settings:crossref_settings', 'crossref_settings', array(), array($this, 'trim_settings_field'), '');
 
         $this->specify_settings_section('ads_settings', 'ADS', array( $this, 'render_ads_settings' ), $this->plugin_name . '-settings:ads_settings');
@@ -462,7 +344,7 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->specify_settings_field('scholastica_manuscripts_url', 'Url of Scholastica manuscripts page', array( $this, 'render_scholastica_manuscripts_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), '');
         $this->specify_settings_field('orcid_url_prefix', 'Orcid url prefix', array( $this, 'render_orcid_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), 'https://orcid.org/');
         $this->specify_settings_field('fermats_library_url_prefix', 'Url prefix for Fermats Library', array( $this, 'render_fermats_library_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), 'https://fermatslibrary.com/s/');
-        $this->specify_settings_field('fermats_library_email', 'Email for Fermats Library', array( $this, 'render_fermats_library_email_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->specify_settings_field('fermats_library_email', 'Email for Fermats Library', array( $this, 'render_fermats_library_email_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings', array(), array($this, 'validate_email'), '');
         $this->specify_settings_field('mathjax_url', 'MathJax url', array( $this, 'render_mathjax_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js');
         $this->specify_settings_field('social_media_thumbnail_url', 'Url of default thumbnail for social media', array( $this, 'render_social_media_thumbnail_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), '');
         $this->specify_settings_field('facebook_app_id', 'Facebook app_id', array( $this, 'render_facebook_app_id_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings', array(), array($this, 'trim_settings_field'), '');
@@ -1773,7 +1655,7 @@ class O3PO_Settings extends O3PO_Singleton {
                 /* 'arxiv_paper_doi_feed_days' => 'validate_positive_integer', */
                 #'doi_url_prefix' => 'validate_url',
 
-                'scholastica_manuscripts_url' => 'validate_url',
+                #'scholastica_manuscripts_url' => 'validate_url',
                 #'scirate_url_abs_prefix' => 'validate_url',
                 #'arxiv_vanity_url_prefix' => 'validate_url',
                 #'orcid_url_prefix' => 'validate_url',
@@ -1795,9 +1677,9 @@ class O3PO_Settings extends O3PO_Singleton {
                 #'page_template_abstract_header' => 'trim_settings_field',
                 #'trackbacks_from_secondary_directly_into_database' => 'checked_or_unchecked',
                 #'maintenance_mode' => 'checked_or_unchecked',
-                'volumes_endpoint' => 'trim_settings_field',
+                #'volumes_endpoint' => 'trim_settings_field',
                 #'doi_prefix' => 'validate_doi_prefix',
-                'first_volume_year' => 'validate_first_volume_year',
+                #'first_volume_year' => 'validate_first_volume_year',
                 #'executive_board' => 'trim_settings_field',
                 #'editor_in_chief' => 'trim_settings_field',
                 #'self_notification_subject_template' => 'trim_settings_field',
@@ -1874,8 +1756,8 @@ class O3PO_Settings extends O3PO_Singleton {
         if(preg_match('/^[0-9]{4}$/u', $first_volume_year)) //this will cause a year 10000 bug
             return $first_volume_year;
 
-        add_settings_error( $field, 'illegal-first-volume-year', "The year in '" . $this->settings_fields[$field]['title'] . "' must consist of exactly four digits in the range 0-9. Field cleared.", 'error');
-        return "";
+        add_settings_error( $field, 'illegal-first-volume-year', "The year in '" . $this->settings_fields[$field]['title'] . "' must consist of exactly four digits in the range 0-9. Field reset to default.", 'error');
+        return $this->settings_fields[$field]['default'];
     }
 
         /**
@@ -1894,10 +1776,29 @@ class O3PO_Settings extends O3PO_Singleton {
 
         if(!O3PO_Utility::valid_issn($input))
             add_settings_error( $field, 'invalid-issn', "The ISSN in '" . $this->settings_fields[$field]['title'] . "' is invalid", 'error');
+        fields should always be reset to defults!
 
         return $input;
     }
 
+
+        /**
+         * Clean user input to email type settings
+         *
+         * @since    0.3.1+
+         * @access   private
+         * @param    string   $field    The field this was input to.
+         * @param    string   $input    User input.
+         */
+    public function validate_email( $field, $input ) {
+
+        $input_trimmed = trim($input);
+        if(O3PO_Utility::valid_email($input_trimmed))
+            return $input_trimmed;
+
+        add_settings_error( $field, 'invalid-email', "The input '" . $input . "' to '" . $this->settings_fields[$field]['title'] . "' was not a valid email address. Field cleared.", 'error');
+        return '';
+    }
 
         /**
          * Clean user input to url type settings
@@ -1914,7 +1815,10 @@ class O3PO_Settings extends O3PO_Singleton {
 
         $parsed = parse_url($url);
         if(empty($parsed['scheme']) or empty($parsed['host']))
-            add_settings_error( $field, 'url-validated', "The URL in '" . $this->settings_fields[$field]['title'] . "' was malformed. Please check.", 'error');
+        {
+            add_settings_error( $field, 'url-validated', "The URL '" . $input . "' given in '" . $this->settings_fields[$field]['title'] . "' was malformed. Field cleared.", 'error');
+            return '';
+        }
         elseif($url !== $input)
             add_settings_error( $field, 'url-validated', "The URL in '" . $this->settings_fields[$field]['title'] . "' was malformed or contained special or illegal characters, which were removed or escaped. Please check.", 'updated');
 
@@ -2192,7 +2096,9 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function specify_settings_field($id, $title, $callback, $page, $section, $args, $validation_callable, $default ) {
 
-        check that section exists!
+        if(!isset($this->settings_sections[$section]))
+            throw new Exception('Cannot add settings field ' . $id . ' to non-existing section ' . $section . '.');
+
         $this->settings_fields[$id] = array('title' => $title, 'callback' => $callback, 'page' => $page, 'section' => $section, 'args' => $args, 'validation_callable' => $validation_callable, 'default' => $default);
 
     }
@@ -2210,7 +2116,6 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function specify_fake_settings_field($id, $default ) {
 
-        check that section exists!
         $this->settings_fields[$id] = array('default' => $default);
 
     }
