@@ -851,6 +851,7 @@ abstract class O3PO_PublicationType {
                 $title = get_post_meta( $post_id, $post_type . '_title', true );
                 $authors = static::get_formated_authors($post_id);
         		$post_url = get_permalink( $post_id );
+                $doi_url = $this->get_journal_property('doi_url_prefix') . static::get_doi($post_id);
                 $journal = get_post_meta( $post_id, $post_type . '_journal', true );
                 $lead_ins = array(
                     "Published in " . $journal,
@@ -875,10 +876,9 @@ abstract class O3PO_PublicationType {
                     $subject .= $lead_ins[array_rand($lead_ins)];
                     $subject .= ': ' . $title . " by " . $authors;
                 }
-                if(mb_strlen($subject)+1+mb_strlen($post_url) > 280)
-                    $subject = mb_substr($subject, 0, 280-(1+mb_strlen($post_url)-3)) . '...';
-                #$subject .= ' ' . $post_url;
-                $subject .= ' ' . $this->get_journal_property('doi_url_prefix') . static::get_doi($post_id);
+                if(mb_strlen($subject)+1+mb_strlen($doi_url) > 280)
+                    $subject = mb_substr($subject, 0, 280-(1+mb_strlen($doi_url)-3)) . '...';
+                $subject .= ' ' . $doi_url;
                 $media = array(
                     'photo' => $image_url,
                     'link' => $post_url,
