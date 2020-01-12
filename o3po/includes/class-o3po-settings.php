@@ -1714,14 +1714,14 @@ class O3PO_Settings extends O3PO_Singleton {
          * @param    string   $field    The field this was input to.
          * @param    string   $doi_prefix    User input.
          */
-    public function validate_doi_prefix( $field, $doi_prefix ) {
+    public function validate_doi_prefix( $field, $input ) {
 
-        $doi_prefix = trim($doi_prefix);
+        $doi_prefix = trim($input);
         if(preg_match('/^[0-9.-]*$/u', $doi_prefix))
             return $doi_prefix;
 
-        add_settings_error( $field, 'illegal-doi-prefix', "The DOI prefix in '" . $this->settings_fields[$field]['title'] . "' may consist only of numbers 0-9, dot . and the dash - character. Field cleared.", 'error');
-        return "";
+        add_settings_error( $field, 'illegal-doi-prefix', "The DOI prefix '" . $input ."' given in '" . $this->settings_fields[$field]['title'] . "' may consist only of numbers 0-9, dot . and the dash - character. Field reset.", 'error');
+        return $this->get_plugin_option_default($field);
     }
 
         /**
@@ -1732,14 +1732,14 @@ class O3PO_Settings extends O3PO_Singleton {
          * @param    string   $field    The field this was input to.
          * @param    string   $doi_suffix    User input.
          */
-    public function validate_doi_suffix( $field, $doi_suffix ) {
+    public function validate_doi_suffix( $field, $input ) {
 
-        $doi_suffix = trim($doi_suffix);
+        $doi_suffix = trim($input);
         if(preg_match('/^[a-zA-Z0-9.-]*$/u', $doi_suffix))
             return $doi_suffix;
 
-        add_settings_error( $field, 'illegal-doi-suffix', "The DOI suffix in '" . $this->settings_fields[$field]['title'] . "' may consist only of lower and upper case English alphabet letters a-z and A-Z, numbers 0-9, dot . and the dash - character. Field cleared.", 'error');
-        return "";
+        add_settings_error( $field, 'illegal-doi-suffix', "The DOI suffix '" . $input ."' given in '" . $this->settings_fields[$field]['title'] . "' may consist only of lower and upper case English alphabet letters a-z and A-Z, numbers 0-9, dot . and the dash - character. Field reset.", 'error');
+        return $this->get_plugin_option_default($field);
     }
 
         /**
@@ -1750,14 +1750,14 @@ class O3PO_Settings extends O3PO_Singleton {
          * @param    string   $field    The field this was input to.
          * @param    string   $first_volume_year    User input.
          */
-    public function validate_first_volume_year( $field, $first_volume_year ) {
+    public function validate_first_volume_year( $field, $input ) {
 
-        $first_volume_year = trim($first_volume_year);
+        $first_volume_year = trim($input);
         if(preg_match('/^[0-9]{4}$/u', $first_volume_year)) //this will cause a year 10000 bug
             return $first_volume_year;
 
-        add_settings_error( $field, 'illegal-first-volume-year', "The year in '" . $this->settings_fields[$field]['title'] . "' must consist of exactly four digits in the range 0-9. Field reset to default.", 'error');
-        return $this->settings_fields[$field]['default'];
+        add_settings_error( $field, 'illegal-first-volume-year', "The year '" . $input ."' given in '" . $this->settings_fields[$field]['title'] . "' must consist of exactly four digits in the range 0-9. Field reset.", 'error');
+        return $this->get_plugin_option_default($field);
     }
 
         /**
@@ -1770,15 +1770,13 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function validate_issn( $field, $input ) {
 
-        $input = trim($input);
-        if(empty($input))
-            return '';
+        $trimmed_input = trim($input);
 
-        if(!O3PO_Utility::valid_issn($input))
-            add_settings_error( $field, 'invalid-issn', "The ISSN in '" . $this->settings_fields[$field]['title'] . "' is invalid", 'error');
-        fields should always be reset to defults!
+        if(O3PO_Utility::valid_issn($trimmed_input))
+            return $trimmed_input;
 
-        return $input;
+        add_settings_error( $field, 'invalid-issn', "The ISSN '" . $input ."' given in '" . $this->settings_fields[$field]['title'] . "' is invalid. Field rest.", 'error');
+        return $this->get_plugin_option_default($field);
     }
 
 
@@ -1796,9 +1794,10 @@ class O3PO_Settings extends O3PO_Singleton {
         if(O3PO_Utility::valid_email($input_trimmed))
             return $input_trimmed;
 
-        add_settings_error( $field, 'invalid-email', "The input '" . $input . "' to '" . $this->settings_fields[$field]['title'] . "' was not a valid email address. Field cleared.", 'error');
-        return '';
+        add_settings_error( $field, 'invalid-email', "The input '" . $input . "' to '" . $this->settings_fields[$field]['title'] . "' was not a valid email address. Field reset.", 'error');
+        return $this->get_plugin_option_default($field);
     }
+
 
         /**
          * Clean user input to url type settings
@@ -1816,11 +1815,14 @@ class O3PO_Settings extends O3PO_Singleton {
         $parsed = parse_url($url);
         if(empty($parsed['scheme']) or empty($parsed['host']))
         {
-            add_settings_error( $field, 'url-validated', "The URL '" . $input . "' given in '" . $this->settings_fields[$field]['title'] . "' was malformed. Field cleared.", 'error');
-            return '';
+            add_settings_error( $field, 'url-validated', "The URL '" . $input . "' given in '" . $this->settings_fields[$field]['title'] . "' was malformed. Field reset.", 'error');
+            return $this->get_plugin_option_default($field);
         }
         elseif($url !== $input)
-            add_settings_error( $field, 'url-validated', "The URL in '" . $this->settings_fields[$field]['title'] . "' was malformed or contained special or illegal characters, which were removed or escaped. Please check.", 'updated');
+        {
+            add_settings_error( $field, 'url-validated', "The URL '" . $input . "' given in '" . $this->settings_fields[$field]['title'] . "' was malformed or contained special or illegal characters, which were removed or escaped. Please check.", 'updated');
+            return $url;
+        }
 
         return $url;
     }
@@ -1846,8 +1848,8 @@ class O3PO_Settings extends O3PO_Singleton {
             return $array;
         }
         catch (Exception $e) {
-            add_settings_error( $field, 'not-comma-separated-list', "The input to '" . $this->settings_fields[$field]['title'] . "' could not be interpreted as a comma separated list.", 'error');
-            return array();
+            add_settings_error( $field, 'not-comma-separated-list', "The input to '" . $this->settings_fields[$field]['title'] . "' could not be interpreted as a comma separated list. Field reset.", 'error');
+            return $this->get_plugin_option_default($field);
         }
     }
 
@@ -1866,9 +1868,10 @@ class O3PO_Settings extends O3PO_Singleton {
         if(preg_match('/^[A-Z]{2}$/u', $input))
             return $input;
 
-        add_settings_error( $field, 'url-validated', "The two letter country code in '" . $this->settings_fields[$field]['title'] . "' was malformed. Field cleared.", 'error');
-        return "";
+        add_settings_error( $field, 'url-validated', "The two letter country code '" . $input . "' given in '" . $this->settings_fields[$field]['title'] . "' was malformed. Field reset.", 'error');
+        return $this->get_plugin_option_default($field);
     }
+
 
         /**
          * Validate positive integer
@@ -1884,10 +1887,10 @@ class O3PO_Settings extends O3PO_Singleton {
         if(preg_match('/^[1-9][0-9]*$/u', $input))
             return $input;
 
-        add_settings_error( $field, 'not-a-positive-integer', "The input to the field '" . $this->settings_fields[$field]['title'] . "' was not a positive integer without leading zeros.", 'error');
-
-        return "1";
+        add_settings_error( $field, 'not-a-positive-integer', "The input '" . $input . "' given in '" . $this->settings_fields[$field]['title'] . "' was not a positive integer without leading zeros. Field reset.", 'error');
+        return $this->get_plugin_option_default($field);
     }
+
 
         /**
          * Restrict input to checked or unchecked
@@ -1902,9 +1905,10 @@ class O3PO_Settings extends O3PO_Singleton {
         if($input === "checked" or $input === "unchecked")
             return $input;
 
-        add_settings_error( $field, 'not-checked-or-unchecked', "The field '" . $this->settings_fields[$field]['title'] . "' must be either checked or unchecked. Set to unchecked.", 'error');
-        return 'unchecked';
+        add_settings_error( $field, 'not-checked-or-unchecked', "The field '" . $this->settings_fields[$field]['title'] . "' must be either checked or unchecked. Field reset.", 'error');
+        return $this->get_plugin_option_default($field);
     }
+
 
         /**
          * Trim user input to settings
@@ -1919,11 +1923,11 @@ class O3PO_Settings extends O3PO_Singleton {
         $input = trim($input);
         if(empty($input))
         {
-            add_settings_error( $field, 'must-not-be-empty', "The field '" . $this->settings_fields[$field]['title'] . "' must not be empty. Reset to default value.", 'error');
+            add_settings_error( $field, 'must-not-be-empty', "The field '" . $this->settings_fields[$field]['title'] . "' must not be empty. Field reset.", 'error');
             $input = $this->get_plugin_option_default($field);
         }
         if(empty($input))
-            $input = 'this-field-must-not-be-empty';
+            $input = $this->get_plugin_option_default($field);
 
         if($input !== $this->get_plugin_option($field))
         {
@@ -1938,6 +1942,7 @@ class O3PO_Settings extends O3PO_Singleton {
         return $input;
     }
 
+
         /**
          * Trim user input to settings
          *
@@ -1951,6 +1956,7 @@ class O3PO_Settings extends O3PO_Singleton {
         return trim($input);
     }
 
+
         /**
          * Leave user input to settings unchanged.
          *
@@ -1963,6 +1969,7 @@ class O3PO_Settings extends O3PO_Singleton {
 
         return $input;
     }
+
 
         /**
          * Validate settings.
@@ -1985,6 +1992,7 @@ class O3PO_Settings extends O3PO_Singleton {
 
         return $newinput;
     }
+
 
         /**
          * Get the value of a plugin option by id.
