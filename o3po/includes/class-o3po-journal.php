@@ -33,13 +33,24 @@ class O3PO_Journal {
     private $journal_config = array();
 
         /**
+         * The shortcode template used to construct DOIs.
+         *
+         * @since    0.3.0+
+         * @access   private
+         * @var      O3PO_ShortcodeTemplate    The shortcode template used to construct DOIs.
+         */
+    private $doi_template;
+
+        /**
          * Initialize the journal.
          *
          * @since    0.1.0
          * @access   public
-         * @param    array    $journal_config   Array with values for the keys retuned by get_journal_config_properties().
+         * @param    array    $journal_config   Array with values for the keys returned by get_journal_config_properties().
          */
 	public function __construct( $journal_config ) {
+
+        specify_settings();
 
 		$this->journal_config = $journal_config;
 
@@ -47,6 +58,33 @@ class O3PO_Journal {
         foreach($this->get_journal_config_properties() as $journal_config_property)
             $this->get_journal_property($journal_config_property);
 
+        $this->doi_template = $this->construct_doi_suffix_shortcode_template($this->get_journal_property('doi_suffix_template'));
+    }
+
+
+    private construct_doi_suffix_shortcode_template( $doi_suffix_template )
+    {
+        return new O3PO_ShortcodeTemplate(
+            $doi_suffix_template,
+            array(
+                '[journal_level_doi_suffix]' => array(
+                    'description' => 'The journal level DOI suffix',
+                    'example' => $doi_suffix,
+                                                      ),
+                '[date]' => array(
+                    'description' => 'The <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO_8601</a> formated publication date',
+                    'example' => '2019-12-31',
+                                  ),
+                '[volume]' => array(
+                    'description' => 'The volume in which the article appears',
+                    'example' => '3',
+                                    ),
+                '[page]' => array(
+                    'description' => 'An article number that counts up starting at 1',
+                    'example' => '1',
+                                  ),
+                  );
+                                          );
 	}
 
 
@@ -193,8 +231,6 @@ class O3PO_Journal {
          * */
     public function handle_volumes_endpoint_request( $wp_query ) {
 
-        $settings = O3PO_Settings::instance();
-
         if ( !isset( $wp_query->query_vars[ $this->get_journal_property('volumes_endpoint') ] ) )
             return;
 
@@ -233,8 +269,6 @@ class O3PO_Journal {
          */
     public function volume_navigation_at_loop_start( $wp_query ) {
 
-        $settings = O3PO_Settings::instance();
-
         if ( !isset( $wp_query->query_vars[ $this->get_journal_property('volumes_endpoint') ] ) )
             return;
 
@@ -243,18 +277,18 @@ class O3PO_Journal {
 
         $content = "";
         if ( empty($vol_num) or $vol_num < 1 ) {
-            $last_volume = getdate()["year"] - ($settings->get_plugin_option('first_volume_year')-1);
-            $content .= '<h1>Volumes published by ' . $settings->get_plugin_option('journal_title') . '</h1>';
+            $last_volume = getdate()["year"] - ($this->get_journal_property('first_volume_year')-1);
+            $content .= '<h1>Volumes published by ' . $this->get_journal_property('journal_title') . '</h1>';
             $content .= '<p>&larr; <a href="' . get_site_url() . '">back to main page</a><p>';
             $content .= '<ul>';
             for ($volume = 1; $volume <= $last_volume; $volume++) {
                 $count_in_this_volume = $this->get_count_of_volume($volume, $this->get_journal_property('publication_type_name'));
-                $content .= '  <li><a href="' . get_site_url() . '/volumes/' . $volume . '/">Volume ' . $volume . ' (' . ($volume+($settings->get_plugin_option('first_volume_year')-1)) . ') ' . $count_in_this_volume . ' ' . ($count_in_this_volume==1 ? $this->get_journal_property('publication_type_name') : $this->get_journal_property('publication_type_name_plural')) . '</a></li>';
+                $content .= '  <li><a href="' . get_site_url() . '/volumes/' . $volume . '/">Volume ' . $volume . ' (' . ($volume+($this->get_journal_property('first_volume_year')-1)) . ') ' . $count_in_this_volume . ' ' . ($count_in_this_volume==1 ? $this->get_journal_property('publication_type_name') : $this->get_journal_property('publication_type_name_plural')) . '</a></li>';
             }
             $content .= '</ul>';
         }
         else {
-            $content .= '<h1>' . $this->get_count_of_volume($vol_num, $this->get_journal_property('publication_type_name')) . ' ' . $this->get_journal_property('publication_type_name_plural') . ' in Volume ' . $vol_num . ' (' . ($vol_num+($settings->get_plugin_option('first_volume_year')-1)) . ')</h1>';
+            $content .= '<h1>' . $this->get_count_of_volume($vol_num, $this->get_journal_property('publication_type_name')) . ' ' . $this->get_journal_property('publication_type_name_plural') . ' in Volume ' . $vol_num . ' (' . ($vol_num+($this->get_journal_property('first_volume_year')-1)) . ')</h1>';
             $content .= '<p>&larr; <a href="' . get_site_url() . '/volumes/">back to all volumes</a><p>';
         }
 
@@ -364,8 +398,7 @@ class O3PO_Journal {
             $notice .= '<div class="hentry">';
             $notice .= '<div class="important-box">';
 
-            $settings = O3PO_Settings::instance();
-            $journal_title = $settings->get_plugin_option('journal_title');
+            $journal_title = $this->get_journal_property('journal_title');
             if(!empty($_GET["reason"]) and $_GET["reason"]==="title-click") {
                 if(!have_posts()) {
                     $notice .= "<h3>The manuscript whose title you clicked is not published in " . $journal_title . "</h3>";
@@ -619,4 +652,96 @@ for (i = 0; i < elemets_to_condense.length; i++) {
         return $my_query->found_posts;
     }
 
+
+        /**
+         * Specifies class specific settings sections and fields.
+         *
+         * @since    0.3.1+
+         * @access   public
+         */
+    public static function specify_settings() {
+
+        $settings = O3PO_Settings::instance();
+
+        $settings->specify_settings_field('journal_doi_template', 'DOI suffix template', 'O3PO_Journal::render_doi_suffix_template_setting', 'journal_settings', 'journal_settings', array(), 'O3PO_Journal::validate_doi_suffix_template', '[journal_level_doi_suffix]-[date]-[page]');
+
+    }
+
+
+        /**
+         * Render the setting for the DOI suffix template.
+         *
+         * @since    0.3.1+
+         * @access   public
+         */
+    public static function render_doi_suffix_template_setting() {
+
+        $settings = O3PO_Settings::instance();
+        $settings->render_setting('doi_suffix_template');
+
+        echo('<p>The DOI suffix template is used to specify the DOI suffix. The following shortcodes are available: <ul>');
+        $shotcodes = $this->doi_template->get_shortcodes();
+        foreach($shortcodes as $shortcode => $specification)
+        {
+            echo('<li>' . $shortcode . ': ' . $specification['description'] . '(example: ' . $specification['example'] . ')</li>');
+        }
+        echo('</ul>See the <a href="https://support.crossref.org/hc/en-us/articles/214569903-Journal-level-DOIs">Crossref website</a> for more background.</p>');
+    }
+
+
+        /**
+         * Clean user input to the doi_suffix_template setting
+         *
+         * @since    0.3.0+
+         * @access   private
+         * @param    string   $field    The field this was input to.
+         * @param    string   $input    User input.
+         */
+    public static function validate_doi_suffix_template( $field, $input ) {
+
+        $settings = O3PO_Settings::instance();
+        $input_trimmed = trim($input);
+        $example_panded = $this->construct_doi_suffix_shortcode_template($input)->example_expanded();
+        $in_url = esc_url_raw(strip_tags(stripslashes($expanded_input)));
+
+        if($input !== $input_trimmed or $in_url !== $example_panded)
+        {
+            add_settings_error( $field, 'url-validated', "The template '" . $input . "' given in in '" . $settings->get_plugin_option_title($field) . "' was malformed or contained special or illegal characters. Field reset.", 'error');
+            return $settings->get_plugin_option_default($field);
+        }
+
+        if(mb_strpos($input, '[page]') === false)
+        {
+            add_settings_error( $field, 'url-validated', "The template '" . $input . "' given in in '" . $settings->get_plugin_option_title($field) . "' did not contain the [page] shortcode, which is needed to ensure uniqueness of the DOIs. Field reset.", 'error');
+            return $settings->get_plugin_option_default($field);;
+        }
+
+        return $input;
+    }
+
+
+
+        /**
+         * Construct the doi suffix for publications.
+         *
+         * Returns the doi suffix according to the template
+         * specified in settings.
+         *
+         * @since  0.3.1+
+         * @access private
+         * @param  string $date_published A date in ISO_8601 format.
+         * @param  string|int $volume The volume for which to construct the DOI.
+         * @param  string|int $pages The page/article number for which to construct the DOI.
+         * @return string The doi suffix constructed according to the template of this publication type.
+         */
+    public function construct_doi_suffix( $date_published, $volume, $pages ) {
+
+        $doi_suffix = $this->get_journal_property('journal_level_doi_suffix');
+        return $this->doi_template->expanded(array(
+                                                 '[journal_level_doi_suffix]' => $doi_suffix,
+                                                 '[date]' => $date_published,
+                                                 '[volume]' => str($volume),
+                                                 '[page]' => str($page),
+                                                   ), true);
+    }
 }

@@ -68,6 +68,15 @@ class O3PO_Settings extends O3PO_Singleton {
 	protected $version;
 
         /**
+         * Whether this singleton had already been configured.
+         *
+         * @since    0.3.1+
+         * @access   protected
+         * @var      string    $version    Whether this singleton had already been configured.
+         */
+	protected $configured = false;
+
+        /**
          * The callback from which to get the active post type names.
          *
          * @since    0.1.0
@@ -94,25 +103,62 @@ class O3PO_Settings extends O3PO_Singleton {
          */
 	protected $settings_fields = array();
 
+
+        /**
+         * Retuns the settings singleton
+         *
+         * Also checks whether it has been configured.
+         *
+         * @since    0.3.1+
+         */
+    public static function instance($plugin_name=null, $plugin_pretty_name=null, $version=null, $active_post_type_names_callback=null)
+    {
+        $settings = parent::instance();
+        if(!$settings->configured())
+            if($plugin_name!==null and $plugin_pretty_name!==null and $version!==null and $active_post_type_names_callback!==null)
+                $settings->configure($plugin_name, $plugin_pretty_name, $version, $active_post_type_names_callback);
+            else
+                throw new Exception("Settings object must be configured on first initialization. Not configuration given.");
+        else
+            if($plugin_name!==null or $plugin_pretty_name!==null or $version!==null or $active_post_type_names_callback!==null)
+                throw new Exception("Settings object must be configured on first initialization. Already configured.");
+
+        return $settings;
+    }
+
+
         /**
          * Configure the settings singleton.
          *
          * @since    0.1.0
+         * @access   private
          * @param    string    $plugin_name                      Simple name of this plugin.
          * @param    string    $plugin_pretty_name               Pretty name of this plugin.
          * @param    string    $version                          Version of this plugin.
          * @param    callback  $active_post_type_names_callback  The callback from which to get the active post type names.
          */
-	public function configure( $plugin_name, $plugin_pretty_name, $version, $active_post_type_names_callback ) {
+	private function configure( $plugin_name, $plugin_pretty_name, $version, $active_post_type_names_callback ) {
 
         $this->plugin_name = $plugin_name;
         $this->version = $version;
         $this->plugin_pretty_name = $plugin_pretty_name;
         $this->active_post_type_names_callback = $active_post_type_names_callback;
 
-        $this->specify_all_settings();
+        $this->specify_settings();
+        O3PO_Journal::specify_settings($this);
 
+        $this->configured = true;
 	}
+
+        /**
+         *
+         *
+         */
+    public function configured() {
+
+        return $this->configured;
+    }
+
 
         /**
          * Add the settings page to the admin menu.
@@ -196,12 +242,12 @@ class O3PO_Settings extends O3PO_Singleton {
 
 
         /**
-         * All settings sections and fields are specified here.
+         * Specifies plugin wide settings sections and fields.
          *
          *
          *
          */
-    private function specify_all_settings() {
+    private function specify_settings() {
 
         $this->specify_fake_settings_field('primary_publication_type_name', 'paper');
         $this->specify_fake_settings_field('primary_publication_type_name_plural', 'papers');
@@ -209,149 +255,90 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->specify_fake_settings_field('secondary_publication_type_name_plural', 'views');
         $this->specify_fake_settings_field('volumes_endpoint', 'volumes');
 
-        $this->specify_settings_section('plugin_settings', 'Plugin', array( $this, 'render_plugin_settings' ), $this->plugin_name . '-settings:plugin_settings');
-        $this->specify_settings_field('production_site_url', 'Production site url', array( $this, 'render_production_site_url_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings', array(), array($this, 'validate_url'), '');
-        $this->specify_settings_field('extended_search_and_navigation', 'Add search and navigation to home page', array( $this, 'render_extended_search_and_navigation_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings', array(), array($this, 'checked_or_unchecked'), 'checked');
-        $this->specify_settings_field('search_form_on_search_page', 'Add a search form to the search page', array( $this, 'render_search_form_on_search_page_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings', array(), array($this, 'checked_or_unchecked'), 'checked');
-        $this->specify_settings_field('custom_search_page', 'Display search page notice', array( $this, 'render_custom_search_page_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings', array(), array($this, 'checked_or_unchecked'), 'checked');
-        $this->specify_settings_field('page_template_for_publication_posts', 'Force page template', array( $this, 'render_page_template_for_publication_posts_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings', array(), array($this, 'checked_or_unchecked'), 'unchecked');
-        $this->specify_settings_field('page_template_abstract_header', 'Show a heading for the abstract', array( $this, 'render_page_template_abstract_header_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings', array(), array($this, 'trim_settings_field'), '');
-        $this->specify_settings_field('trackbacks_from_secondary_directly_into_database', 'Write Trackbacks directly', array( $this, 'render_trackbacks_from_secondary_directly_into_database_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings', array(), array($this, 'checked_or_unchecked'), 'unchecked');
-        $this->specify_settings_field('cited_by_refresh_seconds', 'Refresh cited-by time', array( $this, 'render_cited_by_refresh_seconds_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings', array(), array($this, 'validate_positive_integer'), '43200');#=60*60*12
-        $this->specify_settings_field('maintenance_mode', 'Maintenance mode', array( $this, 'render_maintenance_mode_setting' ), $this->plugin_name . '-settings:plugin_settings', 'plugin_settings', array(), array($this, 'checked_or_unchecked'), 'unchecked');
+        $this->specify_settings_section('plugin_settings', 'Plugin', array( $this, 'render_plugin_settings' ), 'plugin_settings');
+        $this->specify_settings_field('production_site_url', 'Production site url', array( $this, 'render_production_site_url_setting' ), 'plugin_settings', 'plugin_settings', array(), array($this, 'validate_url'), '');
+        $this->specify_settings_field('extended_search_and_navigation', 'Add search and navigation to home page', array( $this, 'render_extended_search_and_navigation_setting' ), 'plugin_settings', 'plugin_settings', array(), array($this, 'checked_or_unchecked'), 'checked');
+        $this->specify_settings_field('search_form_on_search_page', 'Add a search form to the search page', array( $this, 'render_search_form_on_search_page_setting' ), 'plugin_settings', 'plugin_settings', array(), array($this, 'checked_or_unchecked'), 'checked');
+        $this->specify_settings_field('custom_search_page', 'Display search page notice', array( $this, 'render_custom_search_page_setting' ), 'plugin_settings', 'plugin_settings', array(), array($this, 'checked_or_unchecked'), 'checked');
+        $this->specify_settings_field('page_template_for_publication_posts', 'Force page template', array( $this, 'render_page_template_for_publication_posts_setting' ), 'plugin_settings', 'plugin_settings', array(), array($this, 'checked_or_unchecked'), 'unchecked');
+        $this->specify_settings_field('page_template_abstract_header', 'Show a heading for the abstract', array( $this, 'render_page_template_abstract_header_setting' ), 'plugin_settings', 'plugin_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->specify_settings_field('trackbacks_from_secondary_directly_into_database', 'Write Trackbacks directly', array( $this, 'render_trackbacks_from_secondary_directly_into_database_setting' ), 'plugin_settings', 'plugin_settings', array(), array($this, 'checked_or_unchecked'), 'unchecked');
+        $this->specify_settings_field('cited_by_refresh_seconds', 'Refresh cited-by time', array( $this, 'render_cited_by_refresh_seconds_setting' ), 'plugin_settings', 'plugin_settings', array(), array($this, 'validate_positive_integer'), '43200');#=60*60*12
+        $this->specify_settings_field('maintenance_mode', 'Maintenance mode', array( $this, 'render_maintenance_mode_setting' ), 'plugin_settings', 'plugin_settings', array(), array($this, 'checked_or_unchecked'), 'unchecked');
 
-        $this->specify_settings_section('journal_settings', 'Journal', array( $this, 'render_journal_settings' ), $this->plugin_name . '-settings:journal_settings');
-        $this->specify_settings_field('doi_prefix', 'DOI prefix', array( $this, 'render_doi_prefix_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'validate_doi_prefix'), '');
-        $this->specify_settings_field('journal_title', 'Journal title', array( $this, 'render_journal_title_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
-        $this->specify_settings_field('journal_subtitle', 'Journal subtitle', array( $this, 'render_journal_subtitle_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
-        $this->specify_settings_field('journal_description', 'Journal description', array( $this, 'render_journal_description_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
-        $this->specify_settings_field('journal_level_doi_suffix', 'Journal level DOI suffix', array( $this, 'render_journal_level_doi_suffix_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'validate_doi_suffix'), '');
-        #$this->specify_settings_field('journal_doi_template', 'DOI suffix template', array( $this, 'render_doi_suffix_template_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings'); this is now added in the O3PO_PublicationType class
-        $this->specify_settings_field('eissn', 'eISSN', array( $this, 'render_eissn_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'validate_issn'), '');
-        $this->specify_settings_field('publisher', 'Publisher', array( $this, 'render_publisher_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
-        $this->specify_settings_field('secondary_journal_title', 'Secondary journal title', array( $this, 'render_secondary_journal_title_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
-        $this->specify_settings_field('secondary_journal_level_doi_suffix', 'Secondary journal level DOI suffix', array( $this, 'render_secondary_journal_level_doi_suffix_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'validate_doi_suffix'), '');
-        $this->specify_settings_field('secondary_journal_eissn', 'Secondary journal eISSN', array( $this, 'render_secondary_journal_eissn_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'validate_issn'), '');
-        $this->specify_settings_field('developer_email', 'Email of developer', array( $this, 'render_developer_email_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'validate_email'), '');
-        $this->specify_settings_field('publisher_email', 'Email of publisher', array( $this, 'render_publisher_email_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'validate_email'), '');
-        $this->specify_settings_field('first_volume_year', 'Year of first volume', array( $this, 'render_first_volume_year_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'validate_first_volume_year'), '2017');
-        $this->specify_settings_field('publisher_country', 'Country of publisher', array( $this, 'render_publisher_country_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
-        $this->specify_settings_field('license_name', 'License name', array( $this, 'render_license_name_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), 'Creative Commons Attribution 4.0 International (CC BY 4.0)');
-        $this->specify_settings_field('license_type', 'License type', array( $this, 'render_license_type_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), 'CC BY');
-        $this->specify_settings_field('license_version', 'License version', array( $this, 'render_license_version_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '4.0');
-        $this->specify_settings_field('license_url', 'License url', array( $this, 'render_license_url_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'validate_url'), 'https://creativecommons.org/licenses/by/4.0/');
-        $this->specify_settings_field('license_explanation', 'License explanation string', array( $this, 'render_license_explanation_setting' ), $this->plugin_name . '-settings:journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), 'Copyright remains with the original copyright holders such as the authors or their institutions.');
+        $this->specify_settings_section('journal_settings', 'Journal', array( $this, 'render_journal_settings' ), 'journal_settings');
+        $this->specify_settings_field('doi_prefix', 'DOI prefix', array( $this, 'render_doi_prefix_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'validate_doi_prefix'), '');
+        $this->specify_settings_field('journal_title', 'Journal title', array( $this, 'render_journal_title_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->specify_settings_field('journal_subtitle', 'Journal subtitle', array( $this, 'render_journal_subtitle_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->specify_settings_field('journal_description', 'Journal description', array( $this, 'render_journal_description_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->specify_settings_field('journal_level_doi_suffix', 'Journal level DOI suffix', array( $this, 'render_journal_level_doi_suffix_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'validate_doi_suffix'), '');
+        $this->specify_settings_field('eissn', 'eISSN', array( $this, 'render_eissn_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'validate_issn'), '');
+        $this->specify_settings_field('publisher', 'Publisher', array( $this, 'render_publisher_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->specify_settings_field('secondary_journal_title', 'Secondary journal title', array( $this, 'render_secondary_journal_title_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->specify_settings_field('secondary_journal_level_doi_suffix', 'Secondary journal level DOI suffix', array( $this, 'render_secondary_journal_level_doi_suffix_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'validate_doi_suffix'), '');
+        $this->specify_settings_field('secondary_journal_eissn', 'Secondary journal eISSN', array( $this, 'render_secondary_journal_eissn_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'validate_issn'), '');
+        $this->specify_settings_field('developer_email', 'Email of developer', array( $this, 'render_developer_email_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'validate_email'), '');
+        $this->specify_settings_field('publisher_email', 'Email of publisher', array( $this, 'render_publisher_email_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'validate_email'), '');
+        $this->specify_settings_field('first_volume_year', 'Year of first volume', array( $this, 'render_first_volume_year_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'validate_first_volume_year'), '2017');
+        $this->specify_settings_field('publisher_country', 'Country of publisher', array( $this, 'render_publisher_country_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->specify_settings_field('license_name', 'License name', array( $this, 'render_license_name_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), 'Creative Commons Attribution 4.0 International (CC BY 4.0)');
+        $this->specify_settings_field('license_type', 'License type', array( $this, 'render_license_type_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), 'CC BY');
+        $this->specify_settings_field('license_version', 'License version', array( $this, 'render_license_version_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '4.0');
+        $this->specify_settings_field('license_url', 'License url', array( $this, 'render_license_url_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'validate_url'), 'https://creativecommons.org/licenses/by/4.0/');
+        $this->specify_settings_field('license_explanation', 'License explanation string', array( $this, 'render_license_explanation_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), 'Copyright remains with the original copyright holders such as the authors or their institutions.');
 
-        $this->specify_settings_section('email_settings', 'Email', array($this , 'render_email_settings'), $this->plugin_name . '-settings:email_settings');
-        $this->specify_settings_field('executive_board' , 'The names of the executive board members' , array($this, 'render_executive_board') , $this->plugin_name . '-settings:email_settings', 'email_settings', array(), array($this, 'trim_settings_field'), '');
-        $this->specify_settings_field('editor_in_chief' , 'The name of the editor in chief' , array($this, 'render_editor_in_chief') , $this->plugin_name . '-settings:email_settings', 'email_settings', array(), array($this, 'trim_settings_field'), '');
-        $this->specify_settings_field('self_notification_subject_template', 'Self notification subject template', array($this, 'render_self_notification_subject_template_settings'),$this->plugin_name . '-settings:email_settings', 'email_settings', array(), array($this, 'trim_settings_field'), "A [publication_type_name] has been published/updated by [journal]");
-        $this->specify_settings_field('self_notification_body_template', 'Self notification body template', array($this, 'render_self_notification_body_template_settings'), $this->plugin_name . '-settings:email_settings', 'email_settings', array(), array($this, 'leave_unchaged'),
-                                  "[journal] has published/updated the following [publication_type_name]\n".
-                                  "Title:   [title] \n".
-                                  "Authors: [authors] \n".
-                                  "URL:     [url]\n".
-                                  "DOI:     [doi_url_prefix][doi]\n"
-                                  );
-        $this->specify_settings_field('author_notification_subject_template', 'Author notification subject template', array($this, 'render_author_notification_subject_template_settings'), $this->plugin_name . '-settings:email_settings', 'email_settings', array(), array($this, 'trim_settings_field'), "[journal] has published your [publication_type_name]");
-        $this->specify_settings_field('author_notification_body_template' , 'Author notification body template' , array($this, 'render_author_notification_body_template_settings') , $this->plugin_name . '-settings:email_settings', 'email_settings', array(), array($this, 'leave_unchaged'),
-                                  "Dear [authors],\n\n".
-                                  "Congratulations! Your [publication_type_name] '[title]' has been published by [journal] and is now available under:\n\n".
-                                  "[post_url]\n\n".
-                                  "Your work has been assigned the following journal reference and DOI\n\n".
-                                  "Journal reference: [journal_reference]\n".
-                                  "DOI:               [doi_url_prefix][doi]\n\n".
-                                  "We kindly ask you to log in on the arXiv under https://arxiv.org/user/login and add this information to the page of your work there. Thank you very much!\n\n".
-                                  "In case you have an ORCID you can go to http://search.crossref.org/?q=[doi] to conveniently add your new publication to your profile.\n\n".
-                                  "Please be patient, it can take several hours until the DOI has been activated by Crossref.\n\n".
-                                  "If you have any feedback or ideas for how to improve the peer-review and publishing process, or any other question, please let us know under [publisher_email]\n\n".
-                                  "Best regards,\n\n".
-                                  "[executive_board]\n".
-                                  "Executive Board\n"
-                                  );
-        $this->specify_settings_field('author_notification_secondary_subject_template' , 'Author notification subject template for the secondary journal' , array($this, 'render_author_notification_secondary_subject_template_settings') , $this->plugin_name . '-settings:email_settings', 'email_settings', array(), array($this, 'trim_settings_field'), "[journal] has published your [publication_type_name]");
-        $this->specify_settings_field('author_notification_secondary_body_template' , 'Author notification body template for the secondary journal' , array($this, 'render_author_notification_secondary_body_template_settings') , $this->plugin_name . '-settings:email_settings', 'email_settings', array(), array($this, 'leave_unchaged'),
-                                  "Dear [authors],\n\n".
-                                  "Congratulations! Your [publication_type_name] '[title]' has been published by [journal] and is now available under:\n\n".
-                                  "[post_url]\n\n".
-                                  "Your [publication_type_name] has been assigned the following journal reference and DOI\n\n".
-                                  "Journal reference: [journal_reference]\n".
-                                  "DOI:               [doi_url_prefix][doi]\n\n".
-                                  "In case you have an ORCID you can go to http://search.crossref.org/?q=[doi] to conveniently add your new publication to your profile.\n\n".
-                                  "Please be patient, it can take several hours before the above link works.\n\n".
-                                  "If you have any feedback or ideas for how to improve the peer-review and publishing process, or any other question, please let us know under [publisher_email]\n\n".
-                                  "Thank you for writing this [publication_type_name] for [journal]!\n\n".
-                                  "Best regards,\n\n".
-                                  "[executive_board]\n".
-                                  "Executive Board\n"
-                                  );
-        $this->specify_settings_field('fermats_library_subject_template' , 'Fermats library subject template' , array($this, 'render_fermats_library_subject_template_settings') , $this->plugin_name . '-settings:email_settings', 'email_settings', array(), array($this, 'trim_settings_field'), "[journal] has a new [publication_type_name] for Fermat's library");
-        $this->specify_settings_field('fermats_library_body_template' , 'Fermats library body template' , array($this, 'render_fermats_library_body_template_settings') , $this->plugin_name . '-settings:email_settings', 'email_settings', array(), array($this, 'leave_unchaged'),
-                                  "Dear team at Fermat's library,\n\n".
-                                  "[journal] has published the following [publication_type_name]:\n\n".
-                                  "Title:     [title]\n".
-                                  "Author(s): [authors]\n".
-                                  "URL:       [post_url]\n".
-                                  "DOI:       [doi_url_prefix][doi]\n".
-                                  "\n".
-                                  "Please post it on Fermat's library under the permalink: [fermats_library_permalink]\n".
-                                  "Thank you very much!\n\n".
-                                  "Kind regards,\n\n".
-                                  "The Executive Board\n"
-                                  );
+        $this->specify_settings_section('crossref_settings', 'Crossref', array( $this, 'render_crossref_settings' ), 'crossref_settings');
+        $this->specify_settings_field('crossref_id', 'Crossref ID', array( $this, 'render_crossref_id_setting' ), 'crossref_settings', 'crossref_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->specify_settings_field('crossref_pw', 'Crossref password', array( $this, 'render_crossref_pw_setting' ), 'crossref_settings', 'crossref_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->specify_settings_field('crossref_get_forward_links_url', 'Crossref get forward links url', array( $this, 'render_crossref_get_forward_links_url_setting' ), 'crossref_settings', 'crossref_settings', array(), array($this, 'validate_url'), 'https://doi.crossref.org/servlet/getForwardLinks');
+        $this->specify_settings_field('crossref_deposite_url', 'Crossref deposite url', array( $this, 'render_crossref_deposite_url_setting' ), 'crossref_settings', 'crossref_settings', array(), array($this, 'validate_url'), 'https://doi.crossref.org/servlet/deposit');
+        $this->specify_settings_field('crossref_test_deposite_url', 'Crossref deposite url for testing', array( $this, 'render_crossref_test_deposite_url_setting' ), 'crossref_settings', 'crossref_settings', array(), array($this, 'validate_url'), 'https://test.crossref.org/servlet/deposit');
+        $this->specify_settings_field('crossref_email', 'Email for communication with Crossref', array( $this, 'render_crossref_email_setting' ), 'crossref_settings', 'crossref_settings', array(), array($this, 'validate_email'), '');
+        $this->specify_settings_field('crossref_archive_locations', 'Archive locations', array( $this, 'render_crossref_archive_locations_setting' ), 'crossref_settings', 'crossref_settings', array(), array($this, 'trim_settings_field'), '');
 
-        $this->specify_settings_section('crossref_settings', 'Crossref', array( $this, 'render_crossref_settings' ), $this->plugin_name . '-settings:crossref_settings');
-        $this->specify_settings_field('crossref_id', 'Crossref ID', array( $this, 'render_crossref_id_setting' ), $this->plugin_name . '-settings:crossref_settings', 'crossref_settings', array(), array($this, 'trim_settings_field'), '');
-        $this->specify_settings_field('crossref_pw', 'Crossref password', array( $this, 'render_crossref_pw_setting' ), $this->plugin_name . '-settings:crossref_settings', 'crossref_settings', array(), array($this, 'trim_settings_field'), '');
-        $this->specify_settings_field('crossref_get_forward_links_url', 'Crossref get forward links url', array( $this, 'render_crossref_get_forward_links_url_setting' ), $this->plugin_name . '-settings:crossref_settings', 'crossref_settings', array(), array($this, 'validate_url'), 'https://doi.crossref.org/servlet/getForwardLinks');
-        $this->specify_settings_field('crossref_deposite_url', 'Crossref deposite url', array( $this, 'render_crossref_deposite_url_setting' ), $this->plugin_name . '-settings:crossref_settings', 'crossref_settings', array(), array($this, 'validate_url'), 'https://doi.crossref.org/servlet/deposit');
-        $this->specify_settings_field('crossref_test_deposite_url', 'Crossref deposite url for testing', array( $this, 'render_crossref_test_deposite_url_setting' ), $this->plugin_name . '-settings:crossref_settings', 'crossref_settings', array(), array($this, 'validate_url'), 'https://test.crossref.org/servlet/deposit');
-        $this->specify_settings_field('crossref_email', 'Email for communication with Crossref', array( $this, 'render_crossref_email_setting' ), $this->plugin_name . '-settings:crossref_settings', 'crossref_settings', array(), array($this, 'validate_email'), '');
-        $this->specify_settings_field('crossref_archive_locations', 'Archive locations', array( $this, 'render_crossref_archive_locations_setting' ), $this->plugin_name . '-settings:crossref_settings', 'crossref_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->specify_settings_section('ads_settings', 'ADS', array( $this, 'render_ads_settings' ), 'ads_settings');
+        $this->specify_settings_field('ads_api_search_url', 'ADS API URL', array( $this, 'render_ads_api_search_url_setting' ), 'ads_settings', 'ads_settings', array(), array($this, 'validate_url'), 'https://api.adsabs.harvard.edu/v1/search/query');
+        $this->specify_settings_field('ads_api_token', 'ADS API token', array( $this, 'render_ads_api_token_setting' ), 'ads_settings', 'ads_settings', array(), array($this, 'trim_settings_field'), '');
 
-        $this->specify_settings_section('ads_settings', 'ADS', array( $this, 'render_ads_settings' ), $this->plugin_name . '-settings:ads_settings');
-        $this->specify_settings_field('ads_api_search_url', 'ADS API URL', array( $this, 'render_ads_api_search_url_setting' ), $this->plugin_name . '-settings:ads_settings', 'ads_settings', array(), array($this, 'validate_url'), 'https://api.adsabs.harvard.edu/v1/search/query');
-        $this->specify_settings_field('ads_api_token', 'ADS API token', array( $this, 'render_ads_api_token_setting' ), $this->plugin_name . '-settings:ads_settings', 'ads_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->specify_settings_section('clockss_settings', 'Clockss', array( $this, 'render_clockss_settings' ), 'clockss_settings');
+        $this->specify_settings_field('clockss_ftp_url', 'Clockss FTP URL', array( $this, 'render_clockss_ftp_url_setting' ), 'clockss_settings', 'clockss_settings', array(), array($this, 'trim_settings_field'), 'ftp.clockss.org'); #cannot use validate_url here because it prepends https:// or ftp:// and we want to save the raw url
+        $this->specify_settings_field('clockss_username', 'Clockss Username', array( $this, 'render_clockss_username_setting' ), 'clockss_settings', 'clockss_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->specify_settings_field('clockss_password', 'Clockss Password', array( $this, 'render_clockss_password_setting' ), 'clockss_settings', 'clockss_settings', array(), array($this, 'trim_settings_field'), '');
 
-        $this->specify_settings_section('clockss_settings', 'Clockss', array( $this, 'render_clockss_settings' ), $this->plugin_name . '-settings:clockss_settings');
-        $this->specify_settings_field('clockss_ftp_url', 'Clockss FTP URL', array( $this, 'render_clockss_ftp_url_setting' ), $this->plugin_name . '-settings:clockss_settings', 'clockss_settings', array(), array($this, 'trim_settings_field'), 'ftp.clockss.org'); #cannot use validate_url here because it prepends https:// or ftp:// and we want to save the raw url
-        $this->specify_settings_field('clockss_username', 'Clockss Username', array( $this, 'render_clockss_username_setting' ), $this->plugin_name . '-settings:clockss_settings', 'clockss_settings', array(), array($this, 'trim_settings_field'), '');
-        $this->specify_settings_field('clockss_password', 'Clockss Password', array( $this, 'render_clockss_password_setting' ), $this->plugin_name . '-settings:clockss_settings', 'clockss_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->specify_settings_section('doaj_settings', 'DOAJ', array( $this, 'render_doaj_settings' ), 'doaj_settings');
+        $this->specify_settings_field('doaj_api_url', 'DOAJ API url', array( $this, 'render_doaj_api_url_setting' ), 'doaj_settings', 'doaj_settings', array(), array($this, 'validate_url'), 'https://doaj.org/api/v1/articles');
+        $this->specify_settings_field('doaj_api_key', 'DOAJ API key', array( $this, 'render_doaj_api_key_setting' ), 'doaj_settings', 'doaj_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->specify_settings_field('doaj_language_code', 'DOAJ langugage code (two upper case letters)', array( $this, 'render_doaj_language_code_setting' ), 'doaj_settings', 'doaj_settings', array(), array($this, 'validate_two_letter_country_code'), 'EN');
 
-        $this->specify_settings_section('doaj_settings', 'DOAJ', array( $this, 'render_doaj_settings' ), $this->plugin_name . '-settings:doaj_settings');
-        $this->specify_settings_field('doaj_api_url', 'DOAJ API url', array( $this, 'render_doaj_api_url_setting' ), $this->plugin_name . '-settings:doaj_settings', 'doaj_settings', array(), array($this, 'validate_url'), 'https://doaj.org/api/v1/articles');
-        $this->specify_settings_field('doaj_api_key', 'DOAJ API key', array( $this, 'render_doaj_api_key_setting' ), $this->plugin_name . '-settings:doaj_settings', 'doaj_settings', array(), array($this, 'trim_settings_field'), '');
-        $this->specify_settings_field('doaj_language_code', 'DOAJ langugage code (two upper case letters)', array( $this, 'render_doaj_language_code_setting' ), $this->plugin_name . '-settings:doaj_settings', 'doaj_settings', array(), array($this, 'validate_two_letter_country_code'), 'EN');
+        $this->specify_settings_section('arxiv_settings', 'ArXiv', array( $this, 'render_arxiv_settings' ), 'arxiv_settings');
+        $this->specify_settings_field('arxiv_url_abs_prefix', 'Url prefix for abstract pages', array( $this, 'render_arxiv_url_abs_prefix_setting' ), 'arxiv_settings', 'arxiv_settings', array(), array($this, 'validate_url'), 'https://arxiv.org/abs/');
+        $this->specify_settings_field('arxiv_url_pdf_prefix', 'Url prefix for pdfs', array( $this, 'render_arxiv_url_pdf_prefix_setting' ), 'arxiv_settings', 'arxiv_settings', array(), array($this, 'validate_url'), 'https://arxiv.org/pdf/');
+        $this->specify_settings_field('arxiv_url_source_prefix', 'Url prefix for eprint source', array( $this, 'render_arxiv_url_source_prefix_setting' ), 'arxiv_settings', 'arxiv_settings', array(), array($this, 'validate_url'), 'https://arxiv.org/e-print/');
+        $this->specify_settings_field('arxiv_url_trackback_prefix', 'Url prefix for Trackbacks', array( $this, 'render_arxiv_url_trackback_prefix_setting' ), 'arxiv_settings', 'arxiv_settings', array(), array($this, 'validate_url'), 'http://arxiv.org/trackback/');
+        $this->specify_settings_field('arxiv_doi_feed_identifier', 'Indentifier for the DOI feed', array( $this, 'render_arxiv_doi_feed_identifier_setting' ), 'arxiv_settings', 'arxiv_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->specify_settings_field('arxiv_paper_doi_feed_endpoint', 'Endpoint for the arXiv DOI feed', array( $this, 'render_arxiv_paper_doi_feed_endpoint_setting' ), 'arxiv_settings', 'arxiv_settings', array(), array($this, 'trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed'), 'arxiv_paper_doi_feed');
+        $this->specify_settings_field('arxiv_paper_doi_feed_days', 'Number of days in arXiv DOI feed', array( $this, 'render_arxiv_paper_doi_feed_days_setting' ), 'arxiv_settings', 'arxiv_settings', array(), array($this, 'validate_positive_integer'), '365');
 
-        $this->specify_settings_section('arxiv_settings', 'ArXiv', array( $this, 'render_arxiv_settings' ), $this->plugin_name . '-settings:arxiv_settings');
-        $this->specify_settings_field('arxiv_url_abs_prefix', 'Url prefix for abstract pages', array( $this, 'render_arxiv_url_abs_prefix_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings', array(), array($this, 'validate_url'), 'https://arxiv.org/abs/');
-        $this->specify_settings_field('arxiv_url_pdf_prefix', 'Url prefix for pdfs', array( $this, 'render_arxiv_url_pdf_prefix_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings', array(), array($this, 'validate_url'), 'https://arxiv.org/pdf/');
-        $this->specify_settings_field('arxiv_url_source_prefix', 'Url prefix for eprint source', array( $this, 'render_arxiv_url_source_prefix_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings', array(), array($this, 'validate_url'), 'https://arxiv.org/e-print/');
-        $this->specify_settings_field('arxiv_url_trackback_prefix', 'Url prefix for Trackbacks', array( $this, 'render_arxiv_url_trackback_prefix_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings', array(), array($this, 'validate_url'), 'http://arxiv.org/trackback/');
-        $this->specify_settings_field('arxiv_doi_feed_identifier', 'Indentifier for the DOI feed', array( $this, 'render_arxiv_doi_feed_identifier_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings', array(), array($this, 'trim_settings_field'), '');
-        $this->specify_settings_field('arxiv_paper_doi_feed_endpoint', 'Endpoint for the arXiv DOI feed', array( $this, 'render_arxiv_paper_doi_feed_endpoint_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings', array(), array($this, 'trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed'), 'arxiv_paper_doi_feed');
-        $this->specify_settings_field('arxiv_paper_doi_feed_days', 'Number of days in arXiv DOI feed', array( $this, 'render_arxiv_paper_doi_feed_days_setting' ), $this->plugin_name . '-settings:arxiv_settings', 'arxiv_settings', array(), array($this, 'validate_positive_integer'), '365');
+        $this->specify_settings_section('buffer_settings', 'Buffer.com', array( $this, 'render_buffer_settings' ), 'buffer_settings');
+        $this->specify_settings_field('buffer_api_url', 'Url of the buffer.com api', array( $this, 'render_buffer_api_url_setting' ), 'buffer_settings', 'buffer_settings', array(), array($this, 'validate_url'), 'https://api.bufferapp.com/1');
+        $this->specify_settings_field('buffer_access_token', 'Access token from buffer.com', array( $this, 'render_buffer_access_token_setting' ), 'buffer_settings', 'buffer_settings', array(), array($this, 'trim_settings_field'), '');
+        $this->specify_settings_field('buffer_profile_ids', 'Profile IDs on buffer.com', array( $this, 'render_buffer_profile_ids_setting' ), 'buffer_settings', 'buffer_settings', array(), array($this, 'validate_array_as_comma_separated_list'), '');
 
-        $this->specify_settings_section('buffer_settings', 'Buffer.com', array( $this, 'render_buffer_settings' ), $this->plugin_name . '-settings:buffer_settings');
-        $this->specify_settings_field('buffer_api_url', 'Url of the buffer.com api', array( $this, 'render_buffer_api_url_setting' ), $this->plugin_name . '-settings:buffer_settings', 'buffer_settings', array(), array($this, 'validate_url'), 'https://api.bufferapp.com/1');
-        $this->specify_settings_field('buffer_access_token', 'Access token from buffer.com', array( $this, 'render_buffer_access_token_setting' ), $this->plugin_name . '-settings:buffer_settings', 'buffer_settings', array(), array($this, 'trim_settings_field'), '');
-        $this->specify_settings_field('buffer_profile_ids', 'Profile IDs on buffer.com', array( $this, 'render_buffer_profile_ids_setting' ), $this->plugin_name . '-settings:buffer_settings', 'buffer_settings', array(), array($this, 'validate_array_as_comma_separated_list'), '');
+        $this->specify_settings_section('other_service_settings', 'Other services', array( $this, 'render_other_service_settings' ), 'other_service_settings');
+        $this->specify_settings_field('doi_url_prefix', 'Url prefix for DOI resolution', array( $this, 'render_doi_url_prefix_setting' ), 'other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), 'https://doi.org/');
+        $this->specify_settings_field('scirate_url_abs_prefix', 'Url prefix for scirate pages', array( $this, 'render_scirate_url_abs_prefix_setting' ), 'other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), 'https://scirate.com/arxiv/');
+        $this->specify_settings_field('arxiv_vanity_url_prefix', 'Url prefix for arXiv Vanity pages', array( $this, 'render_arxiv_vanity_url_prefix_setting' ), 'other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), 'https://www.arxiv-vanity.com/papers/');
+        $this->specify_settings_field('scholastica_manuscripts_url', 'Url of Scholastica manuscripts page', array( $this, 'render_scholastica_manuscripts_url_setting' ), 'other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), '');
+        $this->specify_settings_field('orcid_url_prefix', 'Orcid url prefix', array( $this, 'render_orcid_url_prefix_setting' ), 'other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), 'https://orcid.org/');
+        $this->specify_settings_field('fermats_library_url_prefix', 'Url prefix for Fermats Library', array( $this, 'render_fermats_library_url_prefix_setting' ), 'other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), 'https://fermatslibrary.com/s/');
+        $this->specify_settings_field('fermats_library_email', 'Email for Fermats Library', array( $this, 'render_fermats_library_email_setting' ), 'other_service_settings', 'other_service_settings', array(), array($this, 'validate_email'), '');
+        $this->specify_settings_field('mathjax_url', 'MathJax url', array( $this, 'render_mathjax_url_setting' ), 'other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js');
+        $this->specify_settings_field('social_media_thumbnail_url', 'Url of default thumbnail for social media', array( $this, 'render_social_media_thumbnail_url_setting' ), 'other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), '');
+        $this->specify_settings_field('facebook_app_id', 'Facebook app_id', array( $this, 'render_facebook_app_id_setting' ), 'other_service_settings', 'other_service_settings', array(), array($this, 'trim_settings_field'), '');
 
-        $this->specify_settings_section('other_service_settings', 'Other services', array( $this, 'render_other_service_settings' ), $this->plugin_name . '-settings:other_service_settings');
-        $this->specify_settings_field('doi_url_prefix', 'Url prefix for DOI resolution', array( $this, 'render_doi_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), 'https://doi.org/');
-        $this->specify_settings_field('scirate_url_abs_prefix', 'Url prefix for scirate pages', array( $this, 'render_scirate_url_abs_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), 'https://scirate.com/arxiv/');
-        $this->specify_settings_field('arxiv_vanity_url_prefix', 'Url prefix for arXiv Vanity pages', array( $this, 'render_arxiv_vanity_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), 'https://www.arxiv-vanity.com/papers/');
-        $this->specify_settings_field('scholastica_manuscripts_url', 'Url of Scholastica manuscripts page', array( $this, 'render_scholastica_manuscripts_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), '');
-        $this->specify_settings_field('orcid_url_prefix', 'Orcid url prefix', array( $this, 'render_orcid_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), 'https://orcid.org/');
-        $this->specify_settings_field('fermats_library_url_prefix', 'Url prefix for Fermats Library', array( $this, 'render_fermats_library_url_prefix_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), 'https://fermatslibrary.com/s/');
-        $this->specify_settings_field('fermats_library_email', 'Email for Fermats Library', array( $this, 'render_fermats_library_email_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings', array(), array($this, 'validate_email'), '');
-        $this->specify_settings_field('mathjax_url', 'MathJax url', array( $this, 'render_mathjax_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js');
-        $this->specify_settings_field('social_media_thumbnail_url', 'Url of default thumbnail for social media', array( $this, 'render_social_media_thumbnail_url_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), '');
-        $this->specify_settings_field('facebook_app_id', 'Facebook app_id', array( $this, 'render_facebook_app_id_setting' ), $this->plugin_name . '-settings:other_service_settings', 'other_service_settings', array(), array($this, 'trim_settings_field'), '');
-
-        $this->specify_settings_section('other_plugins_settings', 'Other plugins', array( $this, 'render_other_plugins_settings' ), $this->plugin_name . '-settings:other_plugins_settings');
-        $this->specify_settings_field('relevanssi_mime_types_to_exclude', 'Relevanssi mime types to exclude', array( $this, 'render_relevanssi_mime_types_to_exclude_setting' ), $this->plugin_name . '-settings:other_plugins_settings', 'other_plugins_settings', array(), array($this, 'trim_settings_field'), '#(application/.*(tar|gz|gzip)|text/.*tex)#u');
-        $this->specify_settings_field('relevanssi_index_pdfs_asynchronously', 'Index PDFs asynchronously', array( $this, 'render_relevanssi_index_pdfs_asynchronously_setting' ), $this->plugin_name . '-settings:other_plugins_settings', 'other_plugins_settings', array(), array($this, 'checked_or_unchecked'), 'checked');
+        $this->specify_settings_section('other_plugins_settings', 'Other plugins', array( $this, 'render_other_plugins_settings' ), 'other_plugins_settings');
+        $this->specify_settings_field('relevanssi_mime_types_to_exclude', 'Relevanssi mime types to exclude', array( $this, 'render_relevanssi_mime_types_to_exclude_setting' ), 'other_plugins_settings', 'other_plugins_settings', array(), array($this, 'trim_settings_field'), '#(application/.*(tar|gz|gzip)|text/.*tex)#u');
+        $this->specify_settings_field('relevanssi_index_pdfs_asynchronously', 'Index PDFs asynchronously', array( $this, 'render_relevanssi_index_pdfs_asynchronously_setting' ), 'other_plugins_settings', 'other_plugins_settings', array(), array($this, 'checked_or_unchecked'), 'checked');
 
     }
 
@@ -789,136 +776,6 @@ class O3PO_Settings extends O3PO_Singleton {
 
     }
 
-        /**
-         * Render the executive board of the email settings
-         *
-         * @since    0.2.2
-         * @access   public
-         */
-    public function render_executive_board() {
-
-        $this->render_setting('executive_board');
-        echo('<p>(Names of the executive board of your journal. Set this if you want to use the [executive_board] shortcode in the email templates below.)</p>');
-
-    }
-
-        /**
-         * Render the editor in chief of the email settings
-         *
-         * @since    0.2.2
-         * @access   public
-         */
-    public function render_editor_in_chief() {
-
-        $this->render_setting('editor_in_chief');
-        echo('<p>(Name of the editor in chief. Set this if you want to use the [editor_in_chief] shortcode in the email templates below.)</p>');
-
-    }
-
-
-        /**
-         * Render the email template for the self notification subject
-         *
-         * @since    0.2.2
-         * @access   public
-         */
-    public function render_self_notification_subject_template_settings() {
-
-        $this->render_setting('self_notification_subject_template');
-        echo O3PO_EmailTemplates::render_short_codes('self_notification_subject');
-
-    }
-
-        /**
-         * Render the email template for the self notification body
-         *
-         * @since    0.2.2
-         * @access   public
-         */
-    public function render_self_notification_body_template_settings() {
-
-        $this->render_multi_line_setting('self_notification_body_template');
-        echo O3PO_EmailTemplates::render_short_codes('self_notification_body');
-
-    }
-
-        /**
-         * Render the email template for the author notification subject
-         *
-         * @since    0.2.2
-         * @access   public
-         */
-    public function render_author_notification_subject_template_settings() {
-
-        $this->render_setting('author_notification_subject_template');
-        echo O3PO_EmailTemplates::render_short_codes('author_notification_subject');
-
-    }
-
-        /**
-         * Render the email template for the author notification body
-         *
-         * @since    0.2.2
-         * @access   public
-         */
-    public function render_author_notification_body_template_settings() {
-
-        $this->render_multi_line_setting('author_notification_body_template');
-        echo O3PO_EmailTemplates::render_short_codes('author_notification_body');
-
-    }
-
-        /**
-         * Render the email template for the author notification secondary subject
-         *
-         * @since    0.2.2
-         * @access   public
-         */
-    public function render_author_notification_secondary_subject_template_settings() {
-
-        $this->render_multi_line_setting('author_notification_secondary_subject_template');
-        echo O3PO_EmailTemplates::render_short_codes('author_notification_subject');
-
-    }
-
-        /**
-         * Render the email template for the author notification secondary body
-         *
-         * @since    0.2.2
-         * @access   public
-         */
-    public function render_author_notification_secondary_body_template_settings() {
-
-        $this->render_multi_line_setting('author_notification_secondary_body_template');
-        echo O3PO_EmailTemplates::render_short_codes('author_notification_body');
-
-    }
-
-        /**
-         * Render the email template for the fermats library notification subject
-         *
-         * @since    0.2.2
-         * @access   public
-         */
-    public function render_fermats_library_subject_template_settings() {
-
-        $this->render_setting('fermats_library_notification_subject_template');
-        echo O3PO_EmailTemplates::render_short_codes('fermats_library_notification_subject');
-
-    }
-
-        /**
-         * Render the email template for the fermats library notification body
-         *
-         * @since    0.2.2
-         * @access   public
-         */
-    public function render_fermats_library_body_template_settings() {
-
-        $this->render_multi_line_setting('fermats_library_notification_body_template');
-        echo O3PO_EmailTemplates::render_short_codes('fermats_library_notification_body');
-
-    }
 
         /**
          * Render the setting for the licence name.
@@ -2026,6 +1883,21 @@ class O3PO_Settings extends O3PO_Singleton {
     }
 
         /**
+         * Get the title of a plugin option by id.
+         *
+         * @since    0.3.1+
+         * @acceess  prublic
+         * @param    int    $id     Id of the option.
+         */
+    public function get_plugin_option_title( $id ) {
+
+        if(isset($this->settings_fields[$id]) and isset($this->settings_fields[$id]['title']))
+            return $this->settings_fields[$id]['title'];
+
+        throw new Exception('Plugin option '. $id . ' has no title.');
+    }
+
+        /**
          * Get the plugin_name.
          *
          * @since 0.3.0
@@ -2066,7 +1938,7 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function specify_settings_section( $id, $title, $callback, $page ) {
 
-        $this->settings_sections[$id] = array('title' => $title, 'callback' => $callback, 'page' => $page);
+        $this->settings_sections[$id] = array('title' => $title, 'callback' => $callback, 'page' => $this->plugin_name . '-settings:' . $page);
 
     }
 
@@ -2107,7 +1979,7 @@ class O3PO_Settings extends O3PO_Singleton {
         if(!isset($this->settings_sections[$section]))
             throw new Exception('Cannot add settings field ' . $id . ' to non-existing section ' . $section . '.');
 
-        $this->settings_fields[$id] = array('title' => $title, 'callback' => $callback, 'page' => $page, 'section' => $section, 'args' => $args, 'validation_callable' => $validation_callable, 'default' => $default);
+        $this->settings_fields[$id] = array('title' => $title, 'callback' => $callback, 'page' => $this->plugin_name . '-settings:' . $page, 'section' => $section, 'args' => $args, 'validation_callable' => $validation_callable, 'default' => $default);
 
     }
 

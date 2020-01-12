@@ -137,6 +137,7 @@ class O3PO {
 
 	}
 
+    Update this list:
         /**
          * Load the required dependencies for this plugin.
          *
@@ -213,8 +214,7 @@ class O3PO {
 
         $this->loader = new O3PO_Loader();
 
-        $settings = O3PO_Settings::instance();
-        $settings->configure($this->plugin_name, $this->get_plugin_pretty_name(), $this->version, 'O3PO_PublicationType::get_active_publication_type_names');
+        $settings = O3PO_Settings::instance($this->plugin_name, $this->get_plugin_pretty_name(), $this->version, 'O3PO_PublicationType::get_active_publication_type_names'); # configure settings singleton during first initialization
 
         $this->environment = new O3PO_Environment($settings->get_plugin_option("production_site_url"));
 
@@ -272,8 +272,6 @@ class O3PO {
 
         $this->loader->add_action( 'load-post.php', Null, 'O3PO_PublicationType::init_metabox' );
         $this->loader->add_action( 'load-post-new.php', Null, 'O3PO_PublicationType::init_metabox' );
-
-        $this->loader->add_action( 'admin_init', Null, 'O3PO_PublicationType::register_settings' );
 
         if(!empty($settings->get_plugin_option('relevanssi_mime_types_to_exclude')))
             $this->loader->add_filter( 'relevanssi_do_not_index', null, 'O3PO_Relevanssi::exclude_mime_types_by_regexp', 10, 2 );

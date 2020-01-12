@@ -26,7 +26,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-setti
  * @subpackage O3PO/includes
  * @author     Christian Gogolin <o3po@quantum-journal.org>
  */
-class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
+class O3PO_SecondaryPublicationType extends O3PO_PublicationType use O3PO_EmailTemplates {
 
         /**
          * Name of the publication type on which this publication type

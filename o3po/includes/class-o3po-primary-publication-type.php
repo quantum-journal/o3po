@@ -30,7 +30,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-relev
  * @subpackage O3PO/includes
  * @author     Christian Gogolin <o3po@quantum-journal.org>
  */
-class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
+class O3PO_PrimaryPublicationType extends O3PO_PublicationType use O3PO_EmailTemplates {
 
         /**
          * Construct this publication type.
