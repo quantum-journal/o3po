@@ -845,9 +845,9 @@ class O3PO_Latex_Dictionary_Provider
          * The following is a (more or less complete) mapping of LaTeX encodigs into
          * utf-8 characters whenever such a character is available. This list must
          * only contain latex macros that contain a \ as for preformance reasons
-         * replacing is stoped once all \ have been eliminated. Also there is a
-         * negative look ahead added in the function below to prevent cases such as
-         * \\v{a} to be replaced.
+         * replacing is stopped once all \ have been eliminated. Also there is a
+         * negative look must be added when using this dictionary to prevent
+         * replacements in cases such as \\v{a}.
          *
          * @since    0.1.0
          * @access   public
@@ -867,8 +867,9 @@ class O3PO_Latex_Dictionary_Provider
                 '\\\\textemdash(?![a-zA-Z])' => '—',
                 '\\\\textendash(?![a-zA-Z])' => '–',
                 '\\\\&' => '&',
+                '\\\\negthinspace' => '',
+                '\\\\!' => '',
                 '\\\\,' => ' ',
-                '\\\\!' => ' ',
                 '\\\\>' => ' ',
                 '\\\\;' => ' ',
                 '\\\\:' => ' ',
@@ -1083,8 +1084,8 @@ class O3PO_Latex_Dictionary_Provider
         '~' => ' ',
         '{' => '',
         '}' => '',
-        '---' => '-',
-        '--' => '-',
+        '---' => '—',
+        '--' => '–',
         '\\%' => '%',
         '\\#' => '#',
         '\\_' => '_',
@@ -1528,8 +1529,18 @@ class O3PO_Latex_Dictionary_Provider
                     '\\\\(newline|hfill|break)(?![a-zA-Z])\h*'  => "\n",
                     '\\\\(hspace|vspace)\s*{[^}]*?}\h*' => " ",
                     '\\\\(smallskip|medskip|bigskip)(?![a-zA-Z])\h*' => " ",
+                    '\\\\negthinspace' => '',
+                    '\\\\!' => '',
+                    '\\\\,' => ' ',
+                    '\\\\>' => ' ',
+                    '\\\\;' => ' ',
+                    '\\\\:' => ' ',
+                    '\\\\enspace' => ' ',
+                    '\\\\quad' => ' ',
+                    '\\\\qquad' => ' ',
+                    '~' => ' ',
                       ) as $target => $replacement )
-            $text = preg_replace('#' . $target . '#u', $replacement, $text);
+            $text = preg_replace('#'.'(?<!\\\\)'.$target.'#u', $replacement, $text);
 
         if($single_line)
             $text = str_replace("\n", ' ', $text);
