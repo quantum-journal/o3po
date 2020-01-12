@@ -1514,8 +1514,6 @@ class O3PO_Settings extends O3PO_Form {
         else
             echo "<p>Relevanssi premium installed</p>";
 
-        echo("<p>TODO: Verify that indexing actually works!</p>");
-
         $this->render_setting('relevanssi_mime_types_to_exclude');
         echo '<p>(Relevanssi Premium has the ability to index the content of attachments and thereby, e.g., enabled full text search in PDFs attached to publications. It however, by default, will index all attachment types and this is usually not desirable for the arXiv source files in .tex or .tar.gz format. Through this setting, mime types can be excluded from indexing by providing a php regular expression. All attachment posts whose mime type matches that regular expression are excluded from indexing via the <a href="https://www.relevanssi.com/knowledge-base/controlling-attachment-types-index/">relevanssi_do_not_index</a> filter. If left empty all post attachments are indexed if that feature is enable in Relevanssi Premium.)</p>';
 

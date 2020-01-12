@@ -27,9 +27,10 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
          *
          * Does not attempt to deal with commands that cannot be reasonably represented in utf8, such as \small, \newblock, \emph, ...
          *
-         * Leaves mathematical formulas enclosed in $...$ intact so that they can be
-         * displayed nicely using MathJax. This function turns various math modes
-         * into standard linline mode $a+b$.
+         * Leaves mathematical formulas enclosed in $...$ (and other math
+         * mode delimiters such as $$...$$,...) intact so that they can be
+         * displayed nicely using MathJax. This function turns various the
+         * math modes into linline mode $a+b$.
          *
          * @since    0.1.0
          * @access   public
@@ -68,13 +69,19 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
         /**
          * Preg split LaTeX code at math mode delimters.
          *
+         * If $text is well formed, Odd parts of the resulting array
+         * are outside math mode and even parts are inside math mode.
+         * If $fags is not specified or set to 0 the delimiters are stripped.
+         *
          * @since    0.1.0
          * @access   public
-         * @param    string    $text    Text to be split at LaTeX math mode delimiters such as $$ \[\] \(\).
+         * @param    string    $text    Text to be split at LaTeX math mode delimiters such as $...$ \[...\] \(...\).
+         * @param int $limit If specified, then only substrings up to limit are returned with the rest of the string being placed in the last substring. A limit of -1 or 0 means "no limit" and, as is standard across PHP, you can use NULL to skip to the flags parameter.
+         * @param int $flags Flags can be any combination of valid preg_split flags. Defaults to 0.
          */
-    static public function preg_split_at_latex_math_mode_delimters( $text ) {
+    static public function preg_split_at_latex_math_mode_delimters( $text, $limit = -1, $flags = 0 ) {
 
-        return preg_split('#(?<!\\\\)(?:\$\$|\$|\\\\\[|\\\\\]|\\\\\(|\\\\\)|\\\\(?:begin|end)\s*{(?:equation|align|eqarray|gather|displaymath)\**})#u', $text);
+        return preg_split('#(?<!\\\\)([\$]{1,2}|\\\\\[|\\\\\]|\\\\\(|\\\\\)|\\\\(?:begin|end)\s*{(?:equation|align|eqarray|gather|displaymath)\**})#u', $text, $limit, $flags);
     }
 
 
@@ -229,13 +236,19 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 preg_match('#\\\\verb{doi}\s*?\\\\verb ([^\s]*)\s*\\\\endverb#u', $entry, $doi);
                 if(!empty($doi[1]))
                     $citations[$n]['doi'] = $doi[1];
-
                 if(empty($citations[$n]['doi']))
                 {
-                    preg_match('#\\\\verb{url}\s*?\\\\verb ([^\s]*)\s*\\\\endverb#u', $entry, $url);
-                    if(!empty($url[1]))
-                        $citations[$n]['url'] = $url[1];
+                    preg_match('#(?:http|https)://(?:doi\.org|dx\.doi\.org)/([^}\s]*)#u', $entry, $doi);
+                    if(!empty($doi[1]))
+                        $citations[$n]['doi'] = static::un_escape_url($doi[1]);
                 }
+
+                preg_match('#\\\\verb{url}\s*?\\\\verb ([^\s]*)\s*\\\\endverb#u', $entry, $url);
+                if(!empty($url[1]))
+                    $citations[$n]['url'] = $url[1];
+
+                if(!empty($citations[$n]['url']) && ( (!empty($citations[$n]['doi']) &&  mb_strpos($citations[$n]['url'], $citations[$n]['doi']) !== false || mb_strpos($citations[$n]['url'], 'doi.org/') !== false) || (!empty($citations[$n]['eprint']) && mb_strpos($citations[$n]['url'], $citations[$n]['eprint']) !== false )))
+                    unset($citations[$n]['url']);
 
                 preg_match('#\\\\verb{eprint}\s*?\\\\verb ([^\s]*)\s*\\\\endverb#u', $entry, $eprint);
                 if(!empty($eprint[1]))
@@ -832,9 +845,9 @@ class O3PO_Latex_Dictionary_Provider
          * The following is a (more or less complete) mapping of LaTeX encodigs into
          * utf-8 characters whenever such a character is available. This list must
          * only contain latex macros that contain a \ as for preformance reasons
-         * replacing is stoped once all \ have been eliminated. Also there is a
-         * negative look ahead added in the function below to prevent cases such as
-         * \\v{a} to be replaced.
+         * replacing is stopped once all \ have been eliminated. Also there is a
+         * negative look must be added when using this dictionary to prevent
+         * replacements in cases such as \\v{a}.
          *
          * @since    0.1.0
          * @access   public
@@ -842,6 +855,7 @@ class O3PO_Latex_Dictionary_Provider
     static public function get_latex_special_chars_dictionary() {
         if(self::$latex_special_chars_dictionary===null)
             self::$latex_special_chars_dictionary = array(
+                # We are not treating \kern <len> , \hskip <len>, \hspace{<len>}, \hphantom{<stuff>}
                     /* '\\\\\\\\' => "\n", better ignore these as, depending on context, they should be replaced by a newline, a whitespace, or by nothing */
                     /* '\\\\linebreak(?![a-zA-Z])' => "\n", */
                 '\\\\ifmmode.*?\\\\else[ {}\n\r]*(.*?)\\\\fi[ {}]*' => '$1',
@@ -853,6 +867,15 @@ class O3PO_Latex_Dictionary_Provider
                 '\\\\textemdash(?![a-zA-Z])' => '—',
                 '\\\\textendash(?![a-zA-Z])' => '–',
                 '\\\\&' => '&',
+                '\\\\negthinspace' => '',
+                '\\\\!' => '',
+                '\\\\,' => ' ',
+                '\\\\>' => ' ',
+                '\\\\;' => ' ',
+                '\\\\:' => ' ',
+                '\\\\enspace' => ' ',
+                '\\\\quad' => ' ',
+                '\\\\qquad' => ' ',
                 '\\\\ss(\s*\{\s*\}|\s+|(?![a-zA-Z]))' => 'ß',
                 '\\\\L(\s*\{\s*\}|\s+|(?![a-zA-Z]))' => 'Ł',
                 '\\\\l(\s*\{\s*\}|\s+|(?![a-zA-Z]))' => 'ł',
@@ -1039,6 +1062,8 @@ class O3PO_Latex_Dictionary_Provider
                 '\\\\etalchar{?\+}?' => '⁺',
                 '\\\\textquoteright' => '’',
                 '\\\\textquoteleft' => '‘',
+                '\\\\textquotedblleft' => '"',
+                '\\\\textquotedblright' => '"',
                                                     );
         return self::$latex_special_chars_dictionary;
     }
@@ -1059,8 +1084,8 @@ class O3PO_Latex_Dictionary_Provider
         '~' => ' ',
         '{' => '',
         '}' => '',
-        '---' => '-',
-        '--' => '-',
+        '---' => '—',
+        '--' => '–',
         '\\%' => '%',
         '\\#' => '#',
         '\\_' => '_',
@@ -1504,8 +1529,18 @@ class O3PO_Latex_Dictionary_Provider
                     '\\\\(newline|hfill|break)(?![a-zA-Z])\h*'  => "\n",
                     '\\\\(hspace|vspace)\s*{[^}]*?}\h*' => " ",
                     '\\\\(smallskip|medskip|bigskip)(?![a-zA-Z])\h*' => " ",
+                    '\\\\negthinspace' => '',
+                    '\\\\!' => '',
+                    '\\\\,' => ' ',
+                    '\\\\>' => ' ',
+                    '\\\\;' => ' ',
+                    '\\\\:' => ' ',
+                    '\\\\enspace' => ' ',
+                    '\\\\quad' => ' ',
+                    '\\\\qquad' => ' ',
+                    '~' => ' ',
                       ) as $target => $replacement )
-            $text = preg_replace('#' . $target . '#u', $replacement, $text);
+            $text = preg_replace('#'.'(?<!\\\\)'.$target.'#u', $replacement, $text);
 
         if($single_line)
             $text = str_replace("\n", ' ', $text);

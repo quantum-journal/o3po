@@ -851,6 +851,7 @@ abstract class O3PO_PublicationType {
                 $title = get_post_meta( $post_id, $post_type . '_title', true );
                 $authors = static::get_formated_authors($post_id);
         		$post_url = get_permalink( $post_id );
+                $doi_url = $this->get_journal_property('doi_url_prefix') . static::get_doi($post_id);
                 $journal = get_post_meta( $post_id, $post_type . '_journal', true );
                 $lead_ins = array(
                     "Published in " . $journal,
@@ -875,9 +876,9 @@ abstract class O3PO_PublicationType {
                     $subject .= $lead_ins[array_rand($lead_ins)];
                     $subject .= ': ' . $title . " by " . $authors;
                 }
-                if(mb_strlen($subject)+1+mb_strlen($post_url) > 280)
-                    $subject = mb_substr($subject, 0, 280-(1+mb_strlen($post_url)-3)) . '...';
-                $subject .= ' ' . $post_url;
+                if(mb_strlen($subject)+1+mb_strlen($doi_url) > 280)
+                    $subject = mb_substr($subject, 0, 280-(1+mb_strlen($doi_url)-3)) . '...';
+                $subject .= ' ' . $doi_url;
                 $media = array(
                     'photo' => $image_url,
                     'link' => $post_url,
@@ -964,7 +965,7 @@ abstract class O3PO_PublicationType {
          *
          * @since    0.1.0
          * @access   public
-         * @param    arry    $request    The request to which this post type is maybe to be added.
+         * @param    array    $request    The request to which this post type is maybe to be added.
          */
     public final function add_custom_post_types_to_rss_feed( $request ) {
 
@@ -995,22 +996,6 @@ abstract class O3PO_PublicationType {
             return $display_name;
         }
     }
-        /* Should we make this non static and then modify this post type? */
-        /*     /\* We return a fake author name for publication type posts */
-        /*      * on the rss feed.*\/ */
-        /* public static function the_author_feed( $display_name ) { */
-        /*     global $post; */
-        /*     $post_id = $post->ID; */
-        /*     $post_type = get_post_type($post_id); */
-
-        /*     if ( is_feed() && in_array( $post_type, static::get_active_publication_type_names() ) ) { */
-        /*         return esc_html(static::get_formated_authors($post_id)); */
-        /*     } */
-        /*     else */
-        /*     { */
-        /*         return $display_name; */
-        /*     } */
-        /* } */
 
         /**
          * Add Dublin Core and Highwire Press meta tags.
@@ -2409,15 +2394,28 @@ abstract class O3PO_PublicationType {
         {
             $crossref_bibentries_last_fetch_attempt_timestamp = time();
             update_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries_last_fetch_attempt_timestamp', $crossref_bibentries_last_fetch_attempt_timestamp);
-
-            $new_crossref_bibentries = O3PO_Crossref::get_cited_by_bibentries($crossref_url, $login_id, $login_passwd, $doi);
-            if(!empty($new_crossref_bibentries) or !is_wp_error($new_crossref_bibentries) or empty($crossref_bibentries) or is_wp_error($crossref_bibentries))
+            $crossref_fetch_result = O3PO_Crossref::get_cited_by_bibentries($crossref_url, $login_id, $login_passwd, $doi);
+            if(is_wp_error($crossref_fetch_result))
             {
-                $crossref_bibentries = $new_crossref_bibentries;
+                update_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries_last_fetch_attempt_error', $crossref_fetch_result);
+            }
+            else
+            {
+                $crossref_bibentries = $crossref_fetch_result;
                 update_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries', $crossref_bibentries );
                 $crossref_bibentries_timestamp = time();
                 update_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries_timestamp', $crossref_bibentries_timestamp);
+                update_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries_last_fetch_attempt_error', null);
             }
+        }
+        $crossref_bibentries_last_fetch_attempt_error = get_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries_last_fetch_attempt_error', true );
+        if(empty($crossref_bibentries))
+            $crossref_bibentries = array();
+        if(is_wp_error($crossref_bibentries)) #for backward compatibility
+        {
+            $crossref_bibentries = array();
+            if(empty($crossref_bibentries_last_fetch_attempt_error))
+                $crossref_bibentries_last_fetch_attempt_error = $crossref_bibentries;
         }
 
         $ads_bibentries = get_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries', true );
@@ -2427,40 +2425,51 @@ abstract class O3PO_PublicationType {
         {
             $ads_bibentries_last_fetch_attempt_timestamp = time();
             update_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries_last_fetch_attempt_timestamp', $ads_bibentries_last_fetch_attempt_timestamp);
-
-            $new_ads_bibentries = O3PO_Ads::get_cited_by_bibentries($ads_api_search_url, $ads_api_token, $eprint);
-
-            if(!empty($new_ads_bibentries) or !is_wp_error($new_ads_bibentries) or empty($ads_bibentries) or is_wp_error($ads_bibentries))
+            $ads_fetch_result = O3PO_Ads::get_cited_by_bibentries($ads_api_search_url, $ads_api_token, $eprint);
+            if(is_wp_error($ads_fetch_result))
             {
-                $ads_bibentries = $new_ads_bibentries;
+                update_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries_last_fetch_attempt_error', $ads_fetch_result);
+            }
+            else
+            {
+                $ads_bibentries = $ads_fetch_result;
                 update_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries', $ads_bibentries );
                 $ads_bibentries_timestamp = time();
                 update_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries_timestamp', $ads_bibentries_timestamp);
+                update_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries_last_fetch_attempt_error', null);
             }
+        }
+        if(empty($ads_bibentries))
+            $ads_bibentries = array();
+        $ads_bibentries_last_fetch_attempt_error = get_post_meta( $post_id, $post_type . '_ads_cited_by_bibentries_last_fetch_attempt_error', true );
+        if(is_wp_error($ads_bibentries)) #for backward compatibility
+        {
+            $ads_bibentries = array();
+            if(empty($ads_bibentries_last_fetch_attempt_error))
+                $ads_bibentries_last_fetch_attempt_error = $ads_bibentries;
         }
 
         $cited_by_html = '';
 
         $errors = array();
-        $error_explanations = array();
-        if(is_wp_error($crossref_bibentries))
+        $explanations = array();
+        if(is_wp_error($crossref_bibentries_last_fetch_attempt_error))
         {
-            $errors[] = $crossref_bibentries;
-            $error_explanations[] = 'Could not fetch <a href="https://www.crossref.org/services/cited-by/">Crossref cited-by data</a> (last attempt ' . date("Y-m-d H:i:s", $crossref_bibentries_last_fetch_attempt_timestamp) . '): ' . esc_html($crossref_bibentries->get_error_message());
-            $crossref_bibentries = array();
+            $errors[] = $crossref_bibentries_last_fetch_attempt_error;
+            $explanations[] = 'Could not fetch <a href="https://www.crossref.org/services/cited-by/">Crossref cited-by data</a> during last attempt ' . date("Y-m-d H:i:s", $crossref_bibentries_last_fetch_attempt_timestamp) . ': ' . esc_html($crossref_bibentries_last_fetch_attempt_error->get_error_message());
         }
         elseif(empty($crossref_bibentries))
-            $error_explanations[] = 'On <a href="https://www.crossref.org/services/cited-by/">Crossref\'s cited-by service</a> no data on citing works was found (last attempt ' . date("Y-m-d H:i:s", $crossref_bibentries_last_fetch_attempt_timestamp) . ').';
+            $explanations[] = 'On <a href="https://www.crossref.org/services/cited-by/">Crossref\'s cited-by service</a> no data on citing works was found (last attempt ' . date("Y-m-d H:i:s", $crossref_bibentries_last_fetch_attempt_timestamp) . ').';
 
 
-        if (is_wp_error($ads_bibentries))
+        if(is_wp_error($ads_bibentries_last_fetch_attempt_error))
         {
-            $errors[] = $ads_bibentries;
-            $error_explanations[] = 'Could not fetch <a href="https://ui.adsabs.harvard.edu/">ADS cited-by data</a> (last attempt ' . date("Y-m-d H:i:s", $ads_bibentries_last_fetch_attempt_timestamp) . '): ' . esc_html($ads_bibentries->get_error_message());
-            $ads_bibentries = array();
+            $errors[] = $ads_bibentries_last_fetch_attempt_error;
+            $explanations[] = 'Could not fetch <a href="https://ui.adsabs.harvard.edu/">ADS cited-by data</a> during last attempt ' . date("Y-m-d H:i:s", $ads_bibentries_last_fetch_attempt_timestamp) . ': ' . esc_html($ads_bibentries_last_fetch_attempt_error->get_error_message());
         }
         elseif(empty($ads_bibentries))
-            $error_explanations[] = 'On <a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a> no data on citing works was found (last attempt ' . date("Y-m-d H:i:s", $ads_bibentries_last_fetch_attempt_timestamp) . ').';
+            $explanations[] = 'On <a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a> no data on citing works was found (last attempt ' . date("Y-m-d H:i:s", $ads_bibentries_last_fetch_attempt_timestamp) . ').';
+
 
         if(!empty($crossref_bibentries) and !empty($ads_bibentries))
         {
@@ -2481,12 +2490,12 @@ abstract class O3PO_PublicationType {
         $timestamps = array();
         if(!empty($crossref_bibentries))
         {
-            $sources[] = '<a href="https://www.crossref.org/services/cited-by/">Crossref\'s cited-by service</a> (last updated ' . date("Y-m-d H:i:s", $crossref_bibentries_timestamp) . ')';
+            $sources[] = '<a href="https://www.crossref.org/services/cited-by/">Crossref\'s cited-by service</a> (last updated successfully ' . date("Y-m-d H:i:s", $crossref_bibentries_timestamp) . ')';
             $timestamps[] = $crossref_bibentries_timestamp;
         }
         if(!empty($ads_bibentries))
         {
-            $sources[] = '<a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a>  (last updated ' . date("Y-m-d H:i:s", $ads_bibentries_timestamp) . ')';
+            $sources[] = '<a href="https://ui.adsabs.harvard.edu/">SAO/NASA ADS</a>  (last updated successfully ' . date("Y-m-d H:i:s", $ads_bibentries_timestamp) . ')';
             $timestamps[] = $ads_bibentries_timestamp;
         }
 
@@ -2502,8 +2511,8 @@ abstract class O3PO_PublicationType {
         if(!empty($sources))
             $cited_by_html .= '<p>The above citations are from ' . implode($sources, ' and ') . '. The list may be incomplete as not all publishers provide suitable and complete citation data.</p>';
 
-        if(!empty($error_explanations))
-            $cited_by_html .= '<p>' . implode($error_explanations, ' ') . '</p>';
+        if(!empty($explanations))
+            $cited_by_html .= '<p>' . implode($explanations, ' ') . '</p>';
 
         return array(
             'html' => $cited_by_html,
@@ -3154,6 +3163,96 @@ abstract class O3PO_PublicationType {
         return $out;
     }
 
+
+        /**
+         * Get the text basis for the text part of the excerpt
+         *
+         * To be overwritten in any sub-class.
+         *
+         * @since 0.3.1
+         * @access public
+         * @param int $post_id The ID of the post.
+         * @return The basis for the text of the excerpt.
+         */
+    abstract public function get_basis_for_excerpt( $post_id );
+
+
+        /**
+         * Get the excerpt of a this publication type.
+         *
+         * As we modify the content in get_the_content() we
+         * construct the excerpt from scratch,
+         *
+         * To be added to the 'get_the_excerpt' filter.
+         *
+         * @since 0.1.0
+         * @param string    $content    Content to be filtered.
+         */
+    public function get_the_excerpt( $content ) {
+
+        global $post;
+
+        $post_id = $post->ID;
+        $post_type = get_post_type($post_id);
+
+        if ( $post_type === $this->get_publication_type_name() ) {
+            $content = '';
+            $content .= '<p class="authors-in-excerpt">' . static::get_formated_authors( $post_id ) . ',</p>' . "\n";
+            $content .= '<p class="citation-in-excerpt"><a href="' . $this->get_journal_property('doi_url_prefix') . static::get_doi($post_id) . '">' . static::get_formated_citation($post_id) . '</a></p>' . "\n";
+            $content .= '<p><a href="' . get_permalink($post_id) . '" class="abstract-in-excerpt">';
+            $basis_for_excerpt = $this->get_basis_for_excerpt($post_id);
+            $bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
+            $trimmer_abstract = $this->html_latex_excerpt(do_shortcode(O3PO_Latex::expand_cite_to_html($basis_for_excerpt, $bbl)), 190, '&#8230;');
+            $content .= esc_html($trimmer_abstract);
+            $content .= '</a></p>';
+        }
+
+        return $content;
+    }
+
+        /**
+         * Get the src of the feature image.
+         *
+         * Safely extracts not more than the first $count characters from a string
+         * containing html and LaTeX code (including mathematical formulas).
+         *
+         * @since  0.3.1
+         * @access public
+         * @param string $str String to get the excerpt from.
+         * @param int $count Maximum number of characters to take.
+         * @param string $more (Optional) What to append if $str needs to be trimmed. Defaults to empty string. Default value: null
+         * @return string The excerpt.
+         */
+    public static function html_latex_excerpt( $str, $count, $more=null ) {
+
+        if(empty($str))
+            return '';
+
+        $str = wp_strip_all_tags($str, true);
+        $parts = O3PO_Latex::preg_split_at_latex_math_mode_delimters($str);
+        $parts_with_delimiters = O3PO_Latex::preg_split_at_latex_math_mode_delimters($str, -1, PREG_SPLIT_DELIM_CAPTURE);
+
+        $num_parts_to_take_entirely = 0;
+        while(mb_strlen(implode(array_slice($parts, 0, $num_parts_to_take_entirely+1), '')) <= $count and $num_parts_to_take_entirely < count($parts))
+            $num_parts_to_take_entirely += 1;
+
+        $num_parts_with_delimiters = 2*$num_parts_to_take_entirely;
+        if($num_parts_to_take_entirely % 2 === 1) $num_parts_with_delimiters -= 1;
+        $count_from_parts_taken_entirely = mb_strlen(implode(array_slice($parts, 0, $num_parts_to_take_entirely), ''));
+        $excerpt = implode(array_slice($parts_with_delimiters, 0, $num_parts_with_delimiters), '');
+
+
+        if($count_from_parts_taken_entirely < $count && $num_parts_to_take_entirely % 2 === 0 && !empty($parts_with_delimiters[$num_parts_with_delimiters]))
+        {
+            $excerpt .= mb_substr($parts_with_delimiters[$num_parts_with_delimiters], 0, $count-$count_from_parts_taken_entirely);
+            $excerpt = preg_replace('/&[^;\s]{0,6}$/u', '', $excerpt);
+        }
+
+        if($str !== $excerpt)
+            $excerpt = rtrim($excerpt) . $more;
+
+        return $excerpt;
+    }
 
 
         /**
