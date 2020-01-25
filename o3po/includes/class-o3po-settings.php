@@ -25,6 +25,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-singl
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-utility.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-email-templates.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-buffer.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-journal.php';
 
 
 /**
@@ -118,7 +119,7 @@ class O3PO_Settings extends O3PO_Singleton {
             if($plugin_name!==null and $plugin_pretty_name!==null and $version!==null and $active_post_type_names_callback!==null)
                 $settings->configure($plugin_name, $plugin_pretty_name, $version, $active_post_type_names_callback);
             else
-                throw new Exception("Settings object must be configured on first initialization. Not configuration given.");
+                throw new Exception("Settings object must be configured on first initialization. No configuration given.");
         else
             if($plugin_name!==null or $plugin_pretty_name!==null or $version!==null or $active_post_type_names_callback!==null)
                 throw new Exception("Settings object must be configured on first initialization. Already configured.");
@@ -146,8 +147,10 @@ class O3PO_Settings extends O3PO_Singleton {
 
         $this->specify_settings();
         O3PO_Journal::specify_settings($this);
+        O3PO_EmailTemplates::specify_settings($this);
 
         $this->configured = true;
+
 	}
 
         /**
@@ -232,12 +235,12 @@ class O3PO_Settings extends O3PO_Singleton {
 
         register_setting( $this->plugin_name . '-settings', $this->plugin_name . '-settings', array( $this, 'validate_settings' ) );
 
-        foreach($this->settings_sections as $id => $specification)
-            add_settings_section($id, $specification['title'], $specification['callback'], $specification['page']);
+        foreach($this->settings_sections as $section => $specification)
+            add_settings_section($section, $specification['title'], $specification['callback'], $specification['page']);
 
-        foreach($this->settings_fields as $id => $specification)
+        foreach($this->settings_fields as $field => $specification)
             if(isset($specification['title'])) # fake fields do not have titles
-                add_settings_field($id, $specification['title'], $specification['callback'], $specification['page'], $specification['section'], $specification['args']);
+                add_settings_field($field, $specification['title'], $specification['callback'], $specification['page'], $specification['section'], $specification['args']);
     }
 
 
@@ -272,11 +275,11 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->specify_settings_field('journal_subtitle', 'Journal subtitle', array( $this, 'render_journal_subtitle_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
         $this->specify_settings_field('journal_description', 'Journal description', array( $this, 'render_journal_description_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
         $this->specify_settings_field('journal_level_doi_suffix', 'Journal level DOI suffix', array( $this, 'render_journal_level_doi_suffix_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'validate_doi_suffix'), '');
-        $this->specify_settings_field('eissn', 'eISSN', array( $this, 'render_eissn_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'validate_issn'), '');
+        $this->specify_settings_field('eissn', 'eISSN', array( $this, 'render_eissn_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'validate_issn_or_empty'), '');
         $this->specify_settings_field('publisher', 'Publisher', array( $this, 'render_publisher_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
         $this->specify_settings_field('secondary_journal_title', 'Secondary journal title', array( $this, 'render_secondary_journal_title_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'trim_settings_field'), '');
         $this->specify_settings_field('secondary_journal_level_doi_suffix', 'Secondary journal level DOI suffix', array( $this, 'render_secondary_journal_level_doi_suffix_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'validate_doi_suffix'), '');
-        $this->specify_settings_field('secondary_journal_eissn', 'Secondary journal eISSN', array( $this, 'render_secondary_journal_eissn_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'validate_issn'), '');
+        $this->specify_settings_field('secondary_journal_eissn', 'Secondary journal eISSN', array( $this, 'render_secondary_journal_eissn_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'validate_issn_or_empty'), '');
         $this->specify_settings_field('developer_email', 'Email of developer', array( $this, 'render_developer_email_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'validate_email'), '');
         $this->specify_settings_field('publisher_email', 'Email of publisher', array( $this, 'render_publisher_email_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'validate_email'), '');
         $this->specify_settings_field('first_volume_year', 'Year of first volume', array( $this, 'render_first_volume_year_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'validate_first_volume_year'), '2017');
@@ -322,7 +325,7 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->specify_settings_section('buffer_settings', 'Buffer.com', array( $this, 'render_buffer_settings' ), 'buffer_settings');
         $this->specify_settings_field('buffer_api_url', 'Url of the buffer.com api', array( $this, 'render_buffer_api_url_setting' ), 'buffer_settings', 'buffer_settings', array(), array($this, 'validate_url'), 'https://api.bufferapp.com/1');
         $this->specify_settings_field('buffer_access_token', 'Access token from buffer.com', array( $this, 'render_buffer_access_token_setting' ), 'buffer_settings', 'buffer_settings', array(), array($this, 'trim_settings_field'), '');
-        $this->specify_settings_field('buffer_profile_ids', 'Profile IDs on buffer.com', array( $this, 'render_buffer_profile_ids_setting' ), 'buffer_settings', 'buffer_settings', array(), array($this, 'validate_array_as_comma_separated_list'), '');
+        $this->specify_settings_field('buffer_profile_ids', 'Profile IDs on buffer.com', array( $this, 'render_buffer_profile_ids_setting' ), 'buffer_settings', 'buffer_settings', array(), array($this, 'validate_array_as_comma_separated_list'), array());
 
         $this->specify_settings_section('other_service_settings', 'Other services', array( $this, 'render_other_service_settings' ), 'other_service_settings');
         $this->specify_settings_field('doi_url_prefix', 'Url prefix for DOI resolution', array( $this, 'render_doi_url_prefix_setting' ), 'other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), 'https://doi.org/');
@@ -351,18 +354,6 @@ class O3PO_Settings extends O3PO_Singleton {
     public function render_plugin_settings() {
 
         echo '<p>Configure the general behavior of ' . $this->plugin_name . '.</p>';
-
-    }
-
-        /**
-         * Render the head of the plugin settings page.
-         *
-         * @since    0.2.2
-         * @access   public
-         */
-    public function render_email_settings() {
-
-        echo '<p>Configure the templates used for sending emails.</p>';
 
     }
 
@@ -1459,7 +1450,7 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   private
          * @var      array    $all_settings_fields_map    Aarray of all option names to the respective functions used when cleaning user input for these options.
          */
-    private static $all_settings_fields_map = Null;
+    #private static $all_settings_fields_map = Null;
 
         /**
          * Get array of all option names to the respective functions used when cleaning user input for these options.
@@ -1467,10 +1458,10 @@ class O3PO_Settings extends O3PO_Singleton {
          * @since    0.1.0
          * @access   public
          */
-    public function get_all_settings_fields_map() {
+    /* public function get_all_settings_fields_map() { */
 
-        if(empty(self::$all_settings_fields_map))
-            self::$all_settings_fields_map = array(
+    /*     if(empty(self::$all_settings_fields_map)) */
+    /*         self::$all_settings_fields_map = array( */
 
                 #'production_site_url' => 'validate_url',
                 #'journal_title' => 'trim_settings_field',
@@ -1558,10 +1549,10 @@ class O3PO_Settings extends O3PO_Singleton {
                 /* 'primary_publication_type_name_plural' => null, */
                 /* 'secondary_publication_type_name' => null, */
                 /* 'secondary_publication_type_name_plural' => null, */
-                                                   );
+                                                   /* ); */
 
-        return self::$all_settings_fields_map;
-    }
+    /*     return self::$all_settings_fields_map; */
+    /* } */
 
         /**
          * Clean user input to the doi_prefix setting
@@ -1625,6 +1616,22 @@ class O3PO_Settings extends O3PO_Singleton {
          * @param    string   $field    The field this was input to.
          * @param    string   $input    User input.
          */
+    public function validate_issn_or_empty( $field, $input ) {
+        if(empty(trim($input)))
+            return '';
+        else
+            return $this->validate_issn($field, $input);
+    }
+
+
+        /**
+         * Clean user input to issn type settings
+         *
+         * @since    0.3.0
+         * @access   private
+         * @param    string   $field    The field this was input to.
+         * @param    string   $input    User input.
+         */
     public function validate_issn( $field, $input ) {
 
         $trimmed_input = trim($input);
@@ -1632,7 +1639,7 @@ class O3PO_Settings extends O3PO_Singleton {
         if(O3PO_Utility::valid_issn($trimmed_input))
             return $trimmed_input;
 
-        add_settings_error( $field, 'invalid-issn', "The ISSN '" . $input ."' given in '" . $this->settings_fields[$field]['title'] . "' is invalid. Field rest.", 'error');
+        add_settings_error( $field, 'invalid-issn', "The ISSN '" . $input ."' given in '" . $this->settings_fields[$field]['title'] . "' is invalid. Field reset.", 'error');
         return $this->get_plugin_option_default($field);
     }
 
@@ -1838,7 +1845,7 @@ class O3PO_Settings extends O3PO_Singleton {
     public function validate_settings( $input ) {
 
         $newinput = array();
-        foreach($this->settings_fields[$id] as $field => $specification)
+        foreach($this->settings_fields as $field => $specification)
         {
 
             if(isset($input[$field]) and isset($specification['validation_callable']))
@@ -1860,11 +1867,14 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function get_plugin_option( $id ) {
 
+        if(!array_key_exists($id, $this->settings_fields))
+            throw new Exception('The non existing plugin option ' . $id . ' was requested. Known settings fields are: ' . json_encode($this->settings_fields));
+
         $options = get_option($this->plugin_name . '-settings', array());
         if(array_key_exists($id, $options))
             return $options[$id];
         else
-            return get_plugin_option_default($id);
+            return $this->get_plugin_option_default($id);
     }
 
         /**
@@ -1879,8 +1889,26 @@ class O3PO_Settings extends O3PO_Singleton {
         if(isset($this->settings_fields[$id]) and isset($this->settings_fields[$id]['default']))
             return $this->settings_fields[$id]['default'];
 
-        throw new Exception('Plugin option '. $id . ' has no default value.');
+        throw new Exception('Plugin option '. $id . ' is not known or has no default value.');
     }
+
+
+       /**
+         * Get the default value of all plugin options.
+         *
+         * @since    0.3.0+
+         * @acceess  prublic
+         */
+    public function get_option_defaults() {
+
+        $return = array();
+        foreach($this->settings_fields as $id => $specification)
+            if(isset($specification['title'])) # fake fields do not have titles
+                $return[$id] = $specification['default'];
+
+        return $return;
+    }
+
 
         /**
          * Get the title of a plugin option by id.

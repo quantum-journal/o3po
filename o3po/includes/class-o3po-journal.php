@@ -11,6 +11,7 @@
  */
 
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-shortcode-template.php';
 
 /**
  * The functionality related to individual journals.*
@@ -37,9 +38,9 @@ class O3PO_Journal {
          *
          * @since    0.3.0+
          * @access   private
-         * @var      O3PO_ShortcodeTemplate    The shortcode template used to construct DOIs.
+         * @var      O3PO_ShortcodeTemplate  $doi_suffix_template  The shortcode template used to construct DOIs.
          */
-    private $doi_template;
+    private static $doi_suffix_template;
 
         /**
          * Initialize the journal.
@@ -50,43 +51,12 @@ class O3PO_Journal {
          */
 	public function __construct( $journal_config ) {
 
-        specify_settings();
-
 		$this->journal_config = $journal_config;
 
             //check whether at least all properties specified in get_journal_config_properties have been provided
         foreach($this->get_journal_config_properties() as $journal_config_property)
             $this->get_journal_property($journal_config_property);
-
-        $this->doi_template = $this->construct_doi_suffix_shortcode_template($this->get_journal_property('doi_suffix_template'));
     }
-
-
-    private construct_doi_suffix_shortcode_template( $doi_suffix_template )
-    {
-        return new O3PO_ShortcodeTemplate(
-            $doi_suffix_template,
-            array(
-                '[journal_level_doi_suffix]' => array(
-                    'description' => 'The journal level DOI suffix',
-                    'example' => $doi_suffix,
-                                                      ),
-                '[date]' => array(
-                    'description' => 'The <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO_8601</a> formated publication date',
-                    'example' => '2019-12-31',
-                                  ),
-                '[volume]' => array(
-                    'description' => 'The volume in which the article appears',
-                    'example' => '3',
-                                    ),
-                '[page]' => array(
-                    'description' => 'An article number that counts up starting at 1',
-                    'example' => '1',
-                                  ),
-                  );
-                                          );
-	}
-
 
         /**
          * Required journal config properties
@@ -656,15 +626,35 @@ for (i = 0; i < elemets_to_condense.length; i++) {
         /**
          * Specifies class specific settings sections and fields.
          *
+         * To be called during during O3PO_Settings::configure().
+         *
          * @since    0.3.1+
          * @access   public
          */
-    public static function specify_settings() {
+    public static function specify_settings( $settings ) {
 
-        $settings = O3PO_Settings::instance();
+        $settings->specify_settings_field('doi_suffix_template', 'DOI suffix template', array('O3PO_Journal', 'render_doi_suffix_template_setting'), 'journal_settings', 'journal_settings', array(), array('O3PO_Journal', 'validate_doi_suffix_template'), '[journal_level_doi_suffix]-[date]-[page]');
 
-        $settings->specify_settings_field('journal_doi_template', 'DOI suffix template', 'O3PO_Journal::render_doi_suffix_template_setting', 'journal_settings', 'journal_settings', array(), 'O3PO_Journal::validate_doi_suffix_template', '[journal_level_doi_suffix]-[date]-[page]');
-
+        static::$doi_suffix_template = new O3PO_ShortcodeTemplate(
+            $settings->get_plugin_option('doi_suffix_template'),
+            array(
+                '[journal_level_doi_suffix]' => array(
+                    'description' => 'The journal level DOI suffix',
+                    'example' => 'abc',
+                                                      ),
+                '[date]' => array(
+                    'description' => 'The <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO_8601</a> formated publication date',
+                    'example' => '2019-12-31',
+                                  ),
+                '[volume]' => array(
+                    'description' => 'The volume in which the article appears',
+                    'example' => '3',
+                                    ),
+                '[page]' => array(
+                    'description' => 'An article number that counts up starting at 1',
+                    'example' => '1',
+                                  ),
+                  ));
     }
 
 
@@ -679,13 +669,9 @@ for (i = 0; i < elemets_to_condense.length; i++) {
         $settings = O3PO_Settings::instance();
         $settings->render_setting('doi_suffix_template');
 
-        echo('<p>The DOI suffix template is used to specify the DOI suffix. The following shortcodes are available: <ul>');
-        $shotcodes = $this->doi_template->get_shortcodes();
-        foreach($shortcodes as $shortcode => $specification)
-        {
-            echo('<li>' . $shortcode . ': ' . $specification['description'] . '(example: ' . $specification['example'] . ')</li>');
-        }
-        echo('</ul>See the <a href="https://support.crossref.org/hc/en-us/articles/214569903-Journal-level-DOIs">Crossref website</a> for more background.</p>');
+        echo('<p>The DOI suffix template is used to specify the DOI suffix.</p>');
+        echo(static::$doi_suffix_template->render_short_codes());
+        echo('<p>See the <a href="https://support.crossref.org/hc/en-us/articles/214569903-Journal-level-DOIs">Crossref website</a> for more background.</p>');
     }
 
 
@@ -701,10 +687,10 @@ for (i = 0; i < elemets_to_condense.length; i++) {
 
         $settings = O3PO_Settings::instance();
         $input_trimmed = trim($input);
-        $example_panded = $this->construct_doi_suffix_shortcode_template($input)->example_expanded();
-        $in_url = esc_url_raw(strip_tags(stripslashes($expanded_input)));
+        $example_expanded = static::$doi_suffix_template->example_expand();
+        $in_url = esc_url_raw(strip_tags(stripslashes($example_expanded)));
 
-        if($input !== $input_trimmed or $in_url !== $example_panded)
+        if($input !== $input_trimmed or $in_url !== $example_expanded)
         {
             add_settings_error( $field, 'url-validated', "The template '" . $input . "' given in in '" . $settings->get_plugin_option_title($field) . "' was malformed or contained special or illegal characters. Field reset.", 'error');
             return $settings->get_plugin_option_default($field);
@@ -737,11 +723,11 @@ for (i = 0; i < elemets_to_condense.length; i++) {
     public function construct_doi_suffix( $date_published, $volume, $pages ) {
 
         $doi_suffix = $this->get_journal_property('journal_level_doi_suffix');
-        return $this->doi_template->expanded(array(
-                                                 '[journal_level_doi_suffix]' => $doi_suffix,
-                                                 '[date]' => $date_published,
-                                                 '[volume]' => str($volume),
-                                                 '[page]' => str($page),
-                                                   ), true);
+        return static::$doi_suffix_template->expand(array(
+                                                       '[journal_level_doi_suffix]' => $doi_suffix,
+                                                       '[date]' => $date_published,
+                                                       '[volume]' => str($volume),
+                                                       '[page]' => str($page),
+                                                         ), true);
     }
 }
