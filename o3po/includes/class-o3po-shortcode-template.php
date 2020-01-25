@@ -41,7 +41,7 @@ class O3PO_ShortcodeTemplate {
          * @access private
          * @avr string The string specifying the template.
          */
-    private static $template;
+    private $template;
 
 
         /**
@@ -79,6 +79,22 @@ class O3PO_ShortcodeTemplate {
     }
 
         /**
+         * Get all the descriptions
+         *
+         * @since 0.3.0+
+         * @access public
+         * @return array Associative array of shortcode descriptions.
+         */
+    public function get_shortcode_descriptions() {
+
+        $descriptions = array();
+        foreach($this->shortcodes as $shortcode => $specification)
+            $descriptions[$shortcode] = $specification['description'];
+
+        return $descriptions;
+    }
+
+        /**
          * Return the expanded version of the template
          *
          * @since 0.3.0+
@@ -92,10 +108,10 @@ class O3PO_ShortcodeTemplate {
          *                                            template contains
          *                                            shortcodes for which no
          *                                            value was provided
-         *                                            (optional).
+         *                                            (default true).
          * @return string The expanded template.
          */
-    public function expanded( $replacements, $error_if_not_all_specified=false ) {
+    public function expand( $replacements, $error_if_not_all_specified=true ) {
 
         if(!is_array($replacements))
             throw new Exception('Argument $replacements must be an array.');
@@ -110,7 +126,7 @@ class O3PO_ShortcodeTemplate {
         {
             $result = $this->template;
             foreach($this->shortcodes as $shortcode => $specification)
-                if($error_if_not_all_specified and !array_key_exists($shortcode, $replacements) and strpos($this->template, $shortcode) !== false))
+                if($error_if_not_all_specified and !array_key_exists($shortcode, $replacements) and strpos($this->template, $shortcode) !== false)
                     throw new Exception('No value was provided for the shortcodee ' . $shortcode . ' but it appears in the template.');
 
                 $result = str_replace($shortcode, $replacements[$shortcode], $result);
@@ -128,16 +144,31 @@ class O3PO_ShortcodeTemplate {
          * @access public
          * @return string The expanded template based on the examples.
          */
-    public function example_expanded() {
+    public function example_expand() {
 
         $result = $this->template;
         foreach($this->shortcodes as $shortcode => $specification)
-            $result = str_replace($shortcode, $specification['example']], $result);
+            $result = str_replace($shortcode, $specification['example'], $result);
 
         return $result;
     }
 
 
+        /**
+         *
+         *
+         */
+    public function render_short_codes() {
+
+        $result = '<p>You may use the following shortcodes:</p>';
+        $result .= '<ul>';
+        foreach($this->get_shortcode_descriptions() as $short_code => $description) {
+            $result .= '<li>' . esc_html($short_code) . ': ' . esc_html($description) . '</li>';
+        }
+        $result .= '</ul>';
+
+        return $result;
+    }
 
 
 }
