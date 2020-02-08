@@ -179,7 +179,6 @@ class O3PO_SettingsTest extends O3PO_TestCase
     }
 
 
-
     public function validate_issn_provider() {
         return [
             ['0378-5955', '0378-5955', true],

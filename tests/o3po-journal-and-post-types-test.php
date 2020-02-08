@@ -400,7 +400,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
     }
 
     public function parse_publication_source_provider() {
-        $settings = O3PO_Settings::instance();
+
+        $settings = O3PO_SettingsTest::get_settings();
 
         return [
             [dirname(__FILE__) . '/resources/arxiv/1711.04662v3.tar.gz', "application/gzip", array(
@@ -871,7 +872,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
     public function save_metabox_provider() {
         #init settings here instead of depending on test_initialize_settings because O3PO_Settings is a singleton
         $this->test_initialize_settings();
-        $settings = O3PO_Settings::instance();
+        $settings = O3PO_SettingsTest::get_settings();
 
         return [
             [1,
@@ -2003,6 +2004,27 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
     public function test_html_latex_excerpt( $text, $len, $expected, $primary_publication_type ) {
         $this->assertSame($expected, $primary_publication_type->html_latex_excerpt($text, $len));
 
+    }
+
+
+
+    public function validate_doi_suffix_template_provider() {
+
+        $settings = O3PO_SettingsTest::get_settings();
+
+        return [
+            ['a-[year]-[page]-foo', 'a-[year]-[page]-foo'],
+            ['template-without-page', $settings->get_plugin_option_default('doi_suffix_template')],
+            ['asdf ', $settings->get_plugin_option_default('doi_suffix_template')],
+                ];
+    }
+
+        /**
+         * @dataProvider validate_doi_suffix_template_provider
+         */
+    public function test_validate_doi_suffix_template( $doi_suffix_template, $expected ) {
+
+        $this->assertSame(O3PO_Journal::validate_doi_suffix_template('doi_suffix_template', $doi_suffix_template), $expected);
     }
 
 

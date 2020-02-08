@@ -163,10 +163,14 @@ class O3PO_EmailTemplatesTest extends PHPUnit_Framework_TestCase
      $this->assertEquals($expectedDom->saveHTML(), $actualDom->saveHTML());
    }
 
-   private static function getTemplate($template_name){
-       $settings = O3PO_Settings::instance();
-       $settings->configure('o3po', 'O-3PO', '1.2.3', 'O3PO_PublicationType::get_active_publication_type_names');
-       return $settings->get_plugin_option($template_name);
+
+   public function test_get_template() {
+
+       $this->expectException(InvalidArgumentException::class);
+       O3PO_EmailTemplates::get_template('some-template-that-doesn-not-exist');
+
    }
+
+
 }
 ?>

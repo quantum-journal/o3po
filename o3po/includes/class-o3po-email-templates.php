@@ -186,7 +186,7 @@ class O3PO_EmailTemplates {
                           ));
                 break;
             default:
-                throw new Exception('Template ' . $template_name . ' is not known.');
+                throw new InvalidArgumentException('Template ' . $template_name . ' is not known.');
         }
         static::$templates[$template_name] = $template;
 
