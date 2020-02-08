@@ -2,7 +2,7 @@
 
 require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-latex.php';
 
-class O3PO_LatexTest extends PHPUnit_Framework_TestCase
+class O3PO_LatexTest extends O3PO_TestCase
 {
 
 

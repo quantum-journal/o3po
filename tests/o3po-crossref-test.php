@@ -2,7 +2,7 @@
 
 require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-crossref.php';
 
-class O3PO_CrossrefTest extends PHPUnit_Framework_TestCase
+class O3PO_CrossrefTest extends O3PO_TestCase
 {
 
     public function get_cited_by_xml_body_provider() {

@@ -51,16 +51,17 @@ class O3PO_ShortcodeTemplate {
          *
          * @since 0.3.1+
          * @access public
-         * @param array $meta_data The meta-data to store in this bibentry
+         * @param string $template The template containing a subset of the shortcodes.
+         * @param array $shortcodes Array whose keys are the shortcodes inclosed in [...] and whose values are associative arrays containing a 'description' and an 'example' value for the shortcode.
          */
     public function __construct( $template, $shortcodes ) {
 
         foreach($shortcodes as $shortcode => $specification)
         {
             if(!is_string($shortcode) or mb_substr($shortcode, 0, 1) !== '[' or mb_substr($shortcode, mb_strlen($shortcode)-1, 1) !== ']')
-                throw new Exception('shortcode ' . str($shortcode) . ' is malformed');
+                throw new InvalidArgumentException('shortcode ' . strval($shortcode) . ' is malformed');
             if(!is_array($specification) or !isset($specification['description']) or !isset($specification['example']))
-                throw new Exception('specification of shortcode ' . $shortcode . ' is malformed');
+                throw new InvalidArgumentException('specification of shortcode ' . $shortcode . ' is malformed');
         }
 
         $this->template = $template;
@@ -116,12 +117,12 @@ class O3PO_ShortcodeTemplate {
     public function expand( $replacements, $error_if_not_all_appearing_specified=true ) {
 
         if(!is_array($replacements))
-            throw new Exception('Argument $replacements must be an array.');
+            throw new InvalidArgumentException('Argument $replacements must be an array.');
 
         if(!O3PO_Utility::is_assoc($replacements))
         {
             if(count($replacements) !== count($this->shortcodes))
-                throw new Exception('Argument $replacements must be an associative array or have the same number of entries as there are shortcodes,');
+                throw new InvalidArgumentException('Argument $replacements must be an associative array or have the same number of entries as there are shortcodes,');
             $result = str_replace(array_keys($this->shortcodes), $replacements, $this->template);
         }
         else
@@ -130,7 +131,7 @@ class O3PO_ShortcodeTemplate {
             foreach($this->shortcodes as $shortcode => $specification)
             {
                 if($error_if_not_all_appearing_specified and !array_key_exists($shortcode, $replacements) and strpos($this->template, $shortcode) !== false)
-                    throw new Exception('No value was provided for the shortcode ' . $shortcode . ' but it appears in the template.');
+                    throw new InvalidArgumentException('No value was provided for the shortcode ' . $shortcode . ' but it appears in the template.');
 
                 $result = str_replace($shortcode, $replacements[$shortcode], $result);
             }
@@ -158,8 +159,10 @@ class O3PO_ShortcodeTemplate {
 
 
         /**
+         * Render a list of shortcodes as html to help users.
          *
-         *
+         * @sinde 0.3.1+
+         * @access public
          */
     public function render_short_codes() {
 

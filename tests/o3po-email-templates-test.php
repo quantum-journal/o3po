@@ -3,7 +3,7 @@
 require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-email-templates.php';
 require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-settings.php';
 
-class O3PO_EmailTemplatesTest extends PHPUnit_Framework_TestCase
+class O3PO_EmailTemplatesTest extends O3PO_TestCase
 {
   public function test_self_notification_subject(){
 

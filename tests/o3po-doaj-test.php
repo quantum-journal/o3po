@@ -2,7 +2,7 @@
 
 require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-doaj.php';
 
-class O3PO_DoajTest extends PHPUnit_Framework_TestCase
+class O3PO_DoajTest extends O3PO_TestCase
 {
 
     public function remote_post_meta_data_to_doaj_provider() {

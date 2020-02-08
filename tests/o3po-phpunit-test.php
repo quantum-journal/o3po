@@ -1,6 +1,6 @@
 <?php
 
-class PHPUnitTest extends PHPUnit_Framework_TestCase
+class PHPUnitTest extends O3PO_TestCase
 {
     public function date_provider() {
         return array([date("Y-m-d")]);
