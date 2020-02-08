@@ -459,7 +459,7 @@ public function validate_array_as_comma_separated_list_provider() {
         } catch (Exception $e) {
 
             if(method_exists($this, 'assertStringContainsString'))
-                $this->assertStringContainsString('The non existing plugin option i-do-not-exist was requested.', $e->getMessage());
+                $this->assertStringContainsString('The non existing plugin settings field i-do-not-exist was requested.', $e->getMessage());
             else
                 $this->assertContains('The non existing plugin settings field i-do-not-exist was requested.', $e->getMessage());
         }
