@@ -106,19 +106,17 @@ class O3PO_ShortcodeTemplate {
          *                            same length as $shortcodes or have a subset
          *                            of shortcodes as array keys and their
          *                            replacements as values.
-         * @param boolean $error_if_not_all_specified Throw an exception if
+         * @param boolean $error_if_not_all_appearing_specified Throw an exception if
          *                                            template contains
          *                                            shortcodes for which no
          *                                            value was provided
          *                                            (default true).
          * @return string The expanded template.
          */
-    public function expand( $replacements, $error_if_not_all_specified=true ) {
+    public function expand( $replacements, $error_if_not_all_appearing_specified=true ) {
 
         if(!is_array($replacements))
             throw new Exception('Argument $replacements must be an array.');
-
-
 
         if(!O3PO_Utility::is_assoc($replacements))
         {
@@ -130,11 +128,12 @@ class O3PO_ShortcodeTemplate {
         {
             $result = $this->template;
             foreach($this->shortcodes as $shortcode => $specification)
-                if($error_if_not_all_specified and !array_key_exists($shortcode, $replacements) and strpos($this->template, $shortcode) !== false)
-                    throw new Exception('No value was provided for the shortcodee ' . $shortcode . ' but it appears in the template.');
+            {
+                if($error_if_not_all_appearing_specified and !array_key_exists($shortcode, $replacements) and strpos($this->template, $shortcode) !== false)
+                    throw new Exception('No value was provided for the shortcode ' . $shortcode . ' but it appears in the template.');
 
                 $result = str_replace($shortcode, $replacements[$shortcode], $result);
-
+            }
         }
 
         return $result;
