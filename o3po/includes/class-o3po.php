@@ -137,7 +137,6 @@ class O3PO {
 
 	}
 
-    Update this list:
         /**
          * Load the required dependencies for this plugin.
          *
@@ -425,7 +424,7 @@ class O3PO {
 
         $journal_config_properties = O3PO_Journal::get_journal_config_properties();
         $journal_config = array();
-        foreach(array_intersect(array_keys($settings->get_all_settings_fields_map()), $journal_config_properties) as $journal_config_property){
+        foreach(array_intersect(array_keys($settings->get_option_defaults(true)), $journal_config_properties) as $journal_config_property){
             $journal_config[$journal_config_property] = $settings->get_plugin_option($journal_config_property);
         }
         return $journal_config;
