@@ -98,7 +98,7 @@ class O3PO_SettingsTest extends O3PO_TestCase
                 if(method_exists($this, 'assertStringContainsString'))
                     $this->assertStringContainsString($id, $combined_output, 'There was a default set for the option ' . $id . ' but it was not found in the settings page html.');
                 else
-                    $this->assertContains($id, $combined_output, 'There was a default set for the option ' . $id . ' but it was not found in the settings page html.');
+                    $this->assertStringContainsString($id, $combined_output, 'There was a default set for the option ' . $id . ' but it was not found in the settings page html.');
             }
             else
             {
@@ -458,7 +458,7 @@ public function validate_array_as_comma_separated_list_provider() {
             $settings->get_plugin_option('i-do-not-exist');
             $this->assertFalse(true, 'Command above should throw exception.');
         } catch (Exception $e) {
-            $this->assertContains('The non existing plugin option i-do-not-exist was requested.', $e->getMessage());
+            $this->assertStringContainsString('The non existing plugin option i-do-not-exist was requested.', $e->getMessage());
         }
     }
 
