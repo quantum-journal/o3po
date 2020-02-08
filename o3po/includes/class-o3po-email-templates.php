@@ -34,10 +34,12 @@ class O3PO_EmailTemplates {
         if(isset(static::$templates[$template_name]))
             return static::$templates[$template_name];
 
+        $settings = O3PO_Settings::instance();
+
         switch($template_name) {
             case 'self_notification_subject':
                 $template = new O3PO_ShortcodeTemplate(
-                    'self_notification_subject_template',
+                    $settings->get_plugin_option($template_name . '_template'),
                     array("[journal]" => array(
                               'description' => "The journal name",
                               'example' => 'Some Journal',
@@ -51,7 +53,7 @@ class O3PO_EmailTemplates {
                 break;
             case 'self_notification_body':
                 $template = new O3PO_ShortcodeTemplate(
-                    'self_notification_body_template',
+                    $settings->get_plugin_option($template_name . '_template'),
                     array(
                         "[journal]" => array(
                             'description' => "The journal name",
@@ -77,8 +79,9 @@ class O3PO_EmailTemplates {
                           ));
                 break;
             case 'author_notification_subject':
+            case 'author_notification_secondary_subject':
                 $template = new O3PO_ShortcodeTemplate(
-                    'author_notification_subject_template',
+                    $settings->get_plugin_option($template_name . '_template'),
                     array(
                         "[journal]" => array(
                             'description' => "The journal name",
@@ -89,8 +92,9 @@ class O3PO_EmailTemplates {
                           ));
                 break;
             case 'author_notification_body':
+            case 'author_notification_secondary_body':
                 $template = new O3PO_ShortcodeTemplate(
-                    'author_notification_body_template',
+                    $settings->get_plugin_option($template_name . '_template'),
                     array("[journal]" => array(
                               'description' => "The journal name",
                               'example' => 'Some Journal'),
@@ -128,7 +132,7 @@ class O3PO_EmailTemplates {
                 break;
             case 'fermats_library_notification_subject':
                 $template = new O3PO_ShortcodeTemplate(
-                    'fermats_library_notification_subject_template',
+                    $settings->get_plugin_option($template_name . '_template'),
                     array("[journal]" => array(
                               'description' => "The journal name",
                               'example' => 'Some Journal'),
@@ -139,7 +143,7 @@ class O3PO_EmailTemplates {
                 break;
             case 'fermats_library_notification_body':
                 $template = new O3PO_ShortcodeTemplate(
-                    'fermats_library_notification_body_template',
+                    $settings->get_plugin_option($template_name . '_template'),
                     array(
                         "[journal]" => array(
                             'description' => "The journal name",
@@ -167,6 +171,8 @@ class O3PO_EmailTemplates {
                             'example' => 'https://fermatslibrary.com/s/q-2017-06-01-152'),
                           ));
                 break;
+            default:
+                throw new Exception('Template ' . $template_name . ' is not known.');
         }
         static::$templates[$template_name] = $template;
 
@@ -180,7 +186,7 @@ class O3PO_EmailTemplates {
          */
     public static function expand( $template_name, $replacements, $error_if_not_all_specified=true ) {
 
-        return static::get_template($template_name)->expand($error_if_not_all_specified);
+        return static::get_template($template_name)->expand($replacements, $error_if_not_all_specified);
     }
 
 
