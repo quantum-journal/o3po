@@ -13,9 +13,6 @@ require_once(dirname( __FILE__ ) . '/o3po-settings-test.php');
 class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
 {
 
-        /**
-         * @doesNotPerformAssertions
-         */
     public function test_initialize_settings() {
 
         $settings = O3PO_SettingsTest::get_settings();
