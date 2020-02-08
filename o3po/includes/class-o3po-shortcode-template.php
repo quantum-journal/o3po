@@ -10,6 +10,8 @@
  * @subpackage O3PO/includes
  */
 
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-utility.php';
+
 /**
  * A class to represent shortcode templates.
  *
@@ -116,7 +118,9 @@ class O3PO_ShortcodeTemplate {
         if(!is_array($replacements))
             throw new Exception('Argument $replacements must be an array.');
 
-        if(!is_assoc($replacements))
+
+
+        if(!O3PO_Utility::is_assoc($replacements))
         {
             if(count($replacements) !== count($this->shortcodes))
                 throw new Exception('Argument $replacements must be an associative array or have the same number of entries as there are shortcodes,');
