@@ -823,6 +823,10 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_secondary_publication_type
          */
     public function test_secondary_save_meta_data( $post_id, $POST_args, $expections, $secondary_publication_type ) {
+
+        #$settings is not used but save_meta_data() needs the settings to be initialized
+        $this->test_initialize_settings();
+
         $post_type = get_post_type($post_id);
 
         foreach($POST_args as $key => $value)
