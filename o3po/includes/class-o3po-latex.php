@@ -137,7 +137,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 $line_result = preg_match($pattern, $line, $line_matches, $flags, $offset);
 
                 if($line_result === false)
-                    return false;
+                    return false; // @codeCoverageIgnore
                 elseif($line_result === 1)
                     $result += 1;
                 if(!empty($line_matches))

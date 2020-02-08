@@ -351,6 +351,39 @@ ab' , 'äb'],
         $this->assertSame($expected, O3PO_Latex::strpos_outside_math_mode($input[0], $input[1]));
     }
 
+    public function utf8_to_latex_provider() {
+        return [
+            ['foo', 'foo'],
+            ['ô', '{\\^{o}}'],
+            ['é', '{\\\'{e}}'],
+                ];
+    }
+
+        /**
+         * @dataProvider utf8_to_latex_provider
+         */
+    public function test_utf8_to_latex( $input, $expected ) {
+        $this->assertSame($expected, O3PO_Latex::utf8_to_latex($input, $expected));
+    }
+
+
+
+    public function utf8_to_bibtex_provider() {
+        return [
+            ['foo', 'foo'],
+            ['ô', '{\\^{o}}'],
+            ['é', '{\\\'{e}}'],
+            ['and some $$y$$ equation é', 'and some {$y$} equation {\\\'{e}}'],
+                ];
+    }
+
+        /**
+         * @dataProvider utf8_to_bibtex_provider
+         */
+    public function test_utf8_to_bibtex( $input, $expected ) {
+        $this->assertSame($expected, O3PO_Latex::utf8_to_bibtex($input, $expected));
+    }
+
 
     public function preg_match_outside_math_mode_provider() {
         return [
