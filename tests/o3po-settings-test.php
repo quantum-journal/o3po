@@ -10,6 +10,13 @@ class O3PO_SettingsTest extends O3PO_TestCase
         return array("fake_publication_type_name_1", "fake_publication_type_name_2");
     }
 
+    public static function get_settings()
+    {
+
+        $settings_test = new O3PO_SettingsTest();
+        return $settings_test->test_initialize_settings();
+    }
+
     public function test_initialize_settings()
     {
         $file_data = get_file_data(dirname( __FILE__ ) . '/../o3po/o3po.php', array(

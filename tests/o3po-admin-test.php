@@ -1,6 +1,7 @@
 <?php
 
 require_once(dirname( __FILE__ ) . '/../o3po/admin/class-o3po-admin.php');
+require_once(dirname( __FILE__ ) . '/o3po-settings-test.php');
 
 class O3PO_AdminTest extends O3PO_TestCase
 {
@@ -68,8 +69,7 @@ class O3PO_AdminTest extends O3PO_TestCase
          */
     public function test_enable_mathjax( $admin ) {
 
-        $settings = O3PO_Settings::instance();
-        $settings->configure('o3po', '0.3.0', 'O-3PO', 'O3PO_PublicationType::get_active_publication_type_names');
+        $settings = O3PO_SettingsTest::get_settings();
 
         ob_start();
         $admin->enable_mathjax();

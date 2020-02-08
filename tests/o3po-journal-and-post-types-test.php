@@ -8,23 +8,17 @@ require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-primary-publica
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-secondary-publication-type.php');
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-latex.php');
 require_once(dirname( __FILE__ ) . '/../o3po/admin/class-o3po-admin.php');
-
+require_once(dirname( __FILE__ ) . '/o3po-settings-test.php');
 
 class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
 {
 
-    public function test_initialize_settings()
-    {
-        $file_data = get_file_data(dirname( __FILE__ ) . '/../o3po/o3po.php', array(
-                                       'Version' => 'Version',
-                                       'Plugin Name' => 'Plugin Name',
-                                       'Text Domain' => 'Text Domain'
-                                                   ));
+        /**
+         * @doesNotPerformAssertions
+         */
+    public function test_initialize_settings() {
 
-        $settings = O3PO_Settings::instance();
-        $settings->configure($file_data['Text Domain'], $file_data['Plugin Name'], $file_data['Version'], 'O3PO_PublicationType::get_active_publication_type_names');
-
-        $this->assertInstanceOf(O3PO_Settings::class, $settings);
+        $settings = O3PO_SettingsTest::get_settings();
 
         return $settings;
     }
