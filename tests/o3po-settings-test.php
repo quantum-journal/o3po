@@ -5,8 +5,6 @@ require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-settings.php');
 class O3PO_SettingsTest extends O3PO_TestCase
 {
 
-    private static $settings_initialized = false;
-
     public function fake_get_active_publication_type_names() {
 
         return array("fake_publication_type_name_1", "fake_publication_type_name_2");
@@ -20,23 +18,22 @@ class O3PO_SettingsTest extends O3PO_TestCase
                                        'Text Domain' => 'Text Domain'
                                                    ));
 
-        if(!static::$settings_initialized) {
+        if(!O3PO_Settings::configured()) {
             try
             {
                 O3PO_Settings::instance();
                 $this->assertTrue(false, 'An exception should have been thrown on first initialization without parameters');
             } catch (Exception $e) {
-                $this->assertEquals($e, new Exception("Settings object must be configured on first initialization. No configuration given."));
+                $this->assertEquals($e->getMessage(), "Settings object must be configured on first initialization. No configuration given.");
             }
             $settings = O3PO_Settings::instance($file_data['Text Domain'], $file_data['Plugin Name'], $file_data['Version'], array( $this, 'fake_get_active_publication_type_names'));
-            static::$settings_initialized = true;
 
             try
             {
-                $settings = O3PO_Settings::instance('bodus', 'input', 'to', 'initialization');
+                $settings = O3PO_Settings::instance('bogus', 'input', 'to', 'initialization');
                 $this->assertTrue(false, 'An exception should have been thrown when initializing again with different parameters');
             } catch (Exception $e) {
-                $this->assertEquals($e, new Exception("Settings object must be configured on first initialization. No configuration given."));
+                $this->assertEquals($e->getMessage(), "Settings object must be configured on first initialization. Already configured.");
             }
 
         }
@@ -213,8 +210,7 @@ class O3PO_SettingsTest extends O3PO_TestCase
 
     public function validate_first_volume_year_provider() {
 
-        $this->test_initialize_settings();
-        $settings = O3PO_Settings::instance();
+        $settings = $this->test_initialize_settings();
 
         return [
             ['2017', '2017'],

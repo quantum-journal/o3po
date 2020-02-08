@@ -75,7 +75,7 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   protected
          * @var      string    $version    Whether this singleton had already been configured.
          */
-	protected $configured = false;
+	protected static $configured = false;
 
         /**
          * The callback from which to get the active post type names.
@@ -114,8 +114,9 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public static function instance($plugin_name=null, $plugin_pretty_name=null, $version=null, $active_post_type_names_callback=null)
     {
+
         $settings = parent::instance();
-        if(!$settings->configured())
+        if(!static::configured())
             if($plugin_name!==null and $plugin_pretty_name!==null and $version!==null and $active_post_type_names_callback!==null)
                 $settings->configure($plugin_name, $plugin_pretty_name, $version, $active_post_type_names_callback);
             else
@@ -149,17 +150,16 @@ class O3PO_Settings extends O3PO_Singleton {
         O3PO_Journal::specify_settings($this);
         O3PO_EmailTemplates::specify_settings($this);
 
-        $this->configured = true;
-
+        static::$configured = true;
 	}
 
         /**
          *
          *
          */
-    public function configured() {
+    public static function configured() {
 
-        return $this->configured;
+        return static::$configured;
     }
 
 
