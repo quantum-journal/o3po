@@ -11,7 +11,7 @@
  * group name used in settings_fields() and register_setting() to
  * depend on the plugin slug.
  * Therefore we implement O3PO_Settings as a singleton. It doesn't seem
- * to be such a evil thing to do given that the options are anyway
+ * to be such a evil thing to do given that the settings are anyway
  * global.
  *
  * @link       https://quantum-journal.org/o3po/
@@ -31,8 +31,8 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-journ
 /**
  * Manage the settings of the plugin.
  *
- * Provide methods to set and get plugin options and to create
- * the respetive admin page and menu entry. *
+ * Provide methods to set and get plugin settings fields and to create
+ * the respective admin page and menu entry. *
  *
  * @since      0.1.0
  * @package    O3PO
@@ -1365,9 +1365,9 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_setting( $id ) {
 
-        $option = $this->get_plugin_option($id);
+        $value = $this->get_plugin_option($id);
 
-        echo '<input class="regular-text ltr o3po-setting o3po-setting-text" type="text" id="' . $this->plugin_name . '-settings-' . $id . '" name="' . $this->plugin_name . '-settings[' . $id . ']" value="' . esc_attr($option) . '" />';
+        echo '<input class="regular-text ltr o3po-setting o3po-setting-text" type="text" id="' . $this->plugin_name . '-settings-' . $id . '" name="' . $this->plugin_name . '-settings[' . $id . ']" value="' . esc_attr($value) . '" />';
 
     }
 
@@ -1380,9 +1380,9 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_multi_line_setting( $id ) {
 
-        $option = $this->get_plugin_option($id);
+        $value = $this->get_plugin_option($id);
 
-        echo '<textarea class="regular-text ltr o3po-setting o3po-setting-text-multi-line" id="' . $this->plugin_name . '-settings-' . $id . '" name="' . $this->plugin_name . '-settings[' . $id . ']" rows="' . (mb_substr_count( $option, "\n" )+1) . '">' . esc_html($option) . '</textarea>';
+        echo '<textarea class="regular-text ltr o3po-setting o3po-setting-text-multi-line" id="' . $this->plugin_name . '-settings-' . $id . '" name="' . $this->plugin_name . '-settings[' . $id . ']" rows="' . (mb_substr_count( $value, "\n" )+1) . '">' . esc_html($value) . '</textarea>';
 
     }
 
@@ -1395,9 +1395,9 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_password_setting( $id ) {
 
-        $option = $this->get_plugin_option($id);
+        $value = $this->get_plugin_option($id);
 
-        echo '<input class="regular-text ltr o3po-setting o3po-setting-password" type="password" id="' . $this->plugin_name . '-settings-' . $id . '" name="' . $this->plugin_name . '-settings[' . $id . ']" value="' . esc_attr($option) . '" />';
+        echo '<input class="regular-text ltr o3po-setting o3po-setting-password" type="password" id="' . $this->plugin_name . '-settings-' . $id . '" name="' . $this->plugin_name . '-settings[' . $id . ']" value="' . esc_attr($value) . '" />';
         echo '<input type="checkbox" onclick="(function myFunction() {
     var x = document.getElementById(\'' . $this->plugin_name . '-settings-' . $id . '\');
     if (x.type === \'password\') {
@@ -1418,10 +1418,10 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_checkbox_setting( $id, $label='') {
 
-        $option = $this->get_plugin_option($id);
+        $value = $this->get_plugin_option($id);
 
         echo '<input type="hidden" name="' . $this->plugin_name . '-settings[' . $id . ']" value="unchecked">'; //To have a 0 in POST when the checkbox is unticked
-        echo '<input class="o3po-setting o3po-setting-checkbox" type="checkbox" id="' . $this->plugin_name . '-settings-' . $id . '" name="' . $this->plugin_name . '-settings[' . $id . ']" value="checked"' . checked( 'checked', $option, false ) . '/>';
+        echo '<input class="o3po-setting o3po-setting-checkbox" type="checkbox" id="' . $this->plugin_name . '-settings-' . $id . '" name="' . $this->plugin_name . '-settings[' . $id . ']" value="checked"' . checked( 'checked', $value, false ) . '/>';
         echo '<label for="' . $this->plugin_name . '-settings-' . $id . '">' . $label . '</label>';
 
     }
@@ -1437,11 +1437,11 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function render_array_as_comma_separated_list_setting( $id ) {
 
-        $option = $this->get_plugin_option($id);
-        if(!is_array($option))
-            $option = array();
+        $value = $this->get_plugin_option($id);
+        if(!is_array($value))
+            $value = array();
 
-        echo '<input class="regular-text ltr o3po-setting o3po-setting-text" type="text" id="' . $this->plugin_name . '-settings-' . $id . '" name="' . $this->plugin_name . '-settings[' . $id . ']" value="' . esc_attr(implode($option, ',')) . '" />';
+        echo '<input class="regular-text ltr o3po-setting o3po-setting-text" type="text" id="' . $this->plugin_name . '-settings-' . $id . '" name="' . $this->plugin_name . '-settings[' . $id . ']" value="' . esc_attr(implode($value, ',')) . '" />';
 
     }
 
@@ -1509,6 +1509,7 @@ class O3PO_Settings extends O3PO_Singleton {
          * @return string Valid issn or empty string.
          */
     public function validate_issn_or_empty( $field, $input ) {
+
         if(empty(trim($input)))
             return '';
         else
@@ -1751,29 +1752,29 @@ class O3PO_Settings extends O3PO_Singleton {
 
 
         /**
-         * Get the value of a plugin option by id.
+         * Get the value of a plugin settings field by id.
          *
          * @since    0.1.0
          * @acceess  prublic
-         * @param    int    $id     Id of the option.
+         * @param    int    $id     Id of the field.
          */
     public function get_plugin_option( $id ) {
 
         if(!array_key_exists($id, $this->settings_fields))
-            throw new Exception('The non existing plugin option ' . $id . ' was requested. Known settings fields are: ' . json_encode($this->settings_fields));
+            throw new Exception('The non existing plugin settings field ' . $id . ' was requested. Known settings fields are: ' . json_encode($this->settings_fields));
 
-        $options = get_option($this->plugin_name . '-settings', array());
-        if(array_key_exists($id, $options))
-            return $options[$id];
+        $fields = get_option($this->plugin_name . '-settings', array());
+        if(array_key_exists($id, $fields))
+            return $fields[$id];
         else
             return $this->get_plugin_option_default($id);
     }
 
         /**
-         * Get the default value of a plugin option by id.
+         * Get the default value of a settings field by id.
          *
-         * @since    0.3.0+
-         * @acceess  prublic
+         * @since    0.3.1+
+         * @acceess  public
          * @param    int    $id     Id of the option.
          */
     public function get_plugin_option_default( $id ) {
@@ -1781,15 +1782,17 @@ class O3PO_Settings extends O3PO_Singleton {
         if(isset($this->settings_fields[$id]) and isset($this->settings_fields[$id]['default']))
             return $this->settings_fields[$id]['default'];
 
-        throw new Exception('Plugin option '. $id . ' is not known or has no default value.');
+        throw new Exception('Plugin settings field '. $id . ' is not known or has no default value.');
     }
 
 
        /**
-         * Get the default value of all plugin options.
+         * Get the default value of all plugin settings fields.
          *
-         * @since    0.3.0+
+         *
+         * @since    0.3.1+
          * @acceess  public
+         * @param boolean $include_fake_fields Whether to also include fake fields in the list.
          */
     public function get_option_defaults( $include_fake_fields=false ) {
 
@@ -1803,18 +1806,18 @@ class O3PO_Settings extends O3PO_Singleton {
 
 
         /**
-         * Get the title of a plugin option by id.
+         * Get the title of a plugin settings field by id.
          *
          * @since    0.3.1+
          * @acceess  prublic
-         * @param    int    $id     Id of the option.
+         * @param    int    $id     Id of the field.
          */
     public function get_plugin_option_title( $id ) {
 
         if(isset($this->settings_fields[$id]) and isset($this->settings_fields[$id]['title']))
             return $this->settings_fields[$id]['title'];
 
-        throw new Exception('Plugin option '. $id . ' has no title.');
+        throw new Exception('Plugin settings field '. $id . ' has no title.');
     }
 
         /**
@@ -1847,7 +1850,7 @@ class O3PO_Settings extends O3PO_Singleton {
          * They are then added with Wordpress' add_settings_section() in
          * register_settings().
          *
-         * @since  0.3.0+
+         * @since  0.3.1+
          * @access private
          * @param string   $id       Slug-name to identify the section. Used in the 'id' attribute of tags.
          * @param string   $title    Formatted title of the section. Shown as the heading for the section.
@@ -1869,7 +1872,7 @@ class O3PO_Settings extends O3PO_Singleton {
          * They are then added with Wordpress' add_settings_field() in
          * register_settings().
          *
-         * @since  0.3.0+
+         * @since  0.3.1+
          * @access private
          * @param string   $id       Slug-name to identify the section. Used in the 'id' attribute of tags.
          * @param string   $title    Formatted title of the section. Shown as the heading for the section.
@@ -1909,12 +1912,12 @@ class O3PO_Settings extends O3PO_Singleton {
          * Fake fields cannot be modified, but have default values that
          * can be used to avoid hard coding values in other classes.
          *
-         * @since  0.3.0
+         * @since  0.3.1+
          * @access private
          * @param string   $id       Slug-name to identify the section. Used in the 'id' attribute of tags.
          * @param string   $default  Default value for the settings field.
          */
-    public function specify_fake_settings_field($id, $default ) {
+    public function specify_fake_settings_field( $id, $default ) {
 
         $this->settings_fields[$id] = array('default' => $default);
 

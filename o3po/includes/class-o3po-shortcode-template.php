@@ -4,7 +4,7 @@
  * A class to represent shortcode templates.
  *
  * @link       https://quantum-journal.org/o3po/
- * @since      0.3.0+
+ * @since      0.3.1+
  *
  * @package    O3PO
  * @subpackage O3PO/includes
@@ -24,7 +24,7 @@ class O3PO_ShortcodeTemplate {
         /**
          * Array holding the shortcodes of this template
          *
-         * @since 0.3.0+
+         * @since 0.3.1+
          * @access private
          * @var array The array keys are the shortcodes, the values are arrays
          *            with two fields: 'description' holding the description
@@ -39,7 +39,7 @@ class O3PO_ShortcodeTemplate {
         /**
          * The template
          *
-         * @since 0.3.0+
+         * @since 0.3.1+
          * @access private
          * @avr string The string specifying the template.
          */
@@ -49,7 +49,7 @@ class O3PO_ShortcodeTemplate {
         /**
          * Construct a shortcode template.
          *
-         * @since 0.3.0+
+         * @since 0.3.1+
          * @access public
          * @param array $meta_data The meta-data to store in this bibentry
          */
@@ -71,7 +71,7 @@ class O3PO_ShortcodeTemplate {
         /**
          * Get all the shortcodes
          *
-         * @since 0.3.0+
+         * @since 0.3.1+
          * @access public
          * @return array The array of all shortcodes.
          */
@@ -83,7 +83,7 @@ class O3PO_ShortcodeTemplate {
         /**
          * Get all the descriptions
          *
-         * @since 0.3.0+
+         * @since 0.3.1+
          * @access public
          * @return array Associative array of shortcode descriptions.
          */
@@ -99,7 +99,7 @@ class O3PO_ShortcodeTemplate {
         /**
          * Return the expanded version of the template
          *
-         * @since 0.3.0+
+         * @since 0.3.1+
          * @access public
          * @param array $replacements Array of strings with which to replace the
          *                            shortcodes. Must be either an array of the
@@ -143,7 +143,7 @@ class O3PO_ShortcodeTemplate {
         /**
          * Return the template with short codes replaced by their example values
          *
-         * @since 0.3.0+
+         * @since 0.3.1+
          * @access public
          * @return string The expanded template based on the examples.
          */
