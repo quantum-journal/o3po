@@ -184,9 +184,9 @@ class O3PO_EmailTemplates {
          *
          *
          */
-    public static function expand( $template_name, $replacements, $error_if_not_all_specified=true ) {
+    public static function expand( $template_name, $replacements, $error_if_not_all_appearing_specified=true ) {
 
-        return static::get_template($template_name)->expand($replacements, $error_if_not_all_specified);
+        return static::get_template($template_name)->expand($replacements, $error_if_not_all_appearing_specified);
     }
 
 
