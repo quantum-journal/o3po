@@ -1897,13 +1897,13 @@ class O3PO_Settings extends O3PO_Singleton {
          * Get the default value of all plugin options.
          *
          * @since    0.3.0+
-         * @acceess  prublic
+         * @acceess  public
          */
-    public function get_option_defaults() {
+    public function get_option_defaults( $include_fake_fields=false ) {
 
         $return = array();
         foreach($this->settings_fields as $id => $specification)
-            if(isset($specification['title'])) # fake fields do not have titles
+            if($include_fake_fields or isset($specification['title'])) # fake fields do not have titles
                 $return[$id] = $specification['default'];
 
         return $return;
