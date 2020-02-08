@@ -154,8 +154,11 @@ class O3PO_Settings extends O3PO_Singleton {
 	}
 
         /**
+         * Check whether this settings singleton has already been configured or not.
          *
-         *
+         * @since 0.3.1+
+         * @access public
+         * @return boolean Whether this settings singleton has already been configured or not.
          */
     public static function configured() {
 
@@ -247,8 +250,8 @@ class O3PO_Settings extends O3PO_Singleton {
         /**
          * Specifies plugin wide settings sections and fields.
          *
-         *
-         *
+         * @since 0.3.1+
+         * @access private
          */
     private function specify_settings() {
 
@@ -1442,118 +1445,6 @@ class O3PO_Settings extends O3PO_Singleton {
 
     }
 
-
-        /**
-         * An array of all option names to the respective functions used when cleaning user input for these options.
-         *
-         * @since    0.1.0
-         * @access   private
-         * @var      array    $all_settings_fields_map    Aarray of all option names to the respective functions used when cleaning user input for these options.
-         */
-    #private static $all_settings_fields_map = Null;
-
-        /**
-         * Get array of all option names to the respective functions used when cleaning user input for these options.
-         *
-         * @since    0.1.0
-         * @access   public
-         */
-    /* public function get_all_settings_fields_map() { */
-
-    /*     if(empty(self::$all_settings_fields_map)) */
-    /*         self::$all_settings_fields_map = array( */
-
-                #'production_site_url' => 'validate_url',
-                #'journal_title' => 'trim_settings_field',
-                #'journal_subtitle' => 'trim_settings_field',
-                #'journal_description' => 'trim_settings_field',
-                #'journal_level_doi_suffix' => 'validate_doi_suffix',
-                #'doi_suffix_template' => 'validate_doi_suffix_template',
-                #'eissn' => 'validate_issn',
-                #'publisher' => 'trim_settings_field',
-                #'secondary_journal_title' => 'trim_settings_field',
-                #'secondary_journal_level_doi_suffix' => 'validate_doi_suffix',
-                #'secondary_journal_eissn' => 'validate_issn',
-                #'developer_email' => 'trim_settings_field',
-                #'publisher_email' => 'trim_settings_field',
-                #'publisher_country' => 'trim_settings_field',
-                #'license_name' => 'trim_settings_field',
-                #'license_type' => 'trim_settings_field',
-                #'license_version' => 'trim_settings_field',
-                #'license_url' => 'validate_url',
-                #'license_explanation' => 'trim_settings_field',
-                /* 'crossref_id' => 'trim_settings_field', */
-                /* 'crossref_pw' => 'trim_settings_field', */
-                /* 'crossref_get_forward_links_url' => 'validate_url', */
-                /* 'crossref_deposite_url' => 'validate_url', */
-                #'crossref_test_deposite_url' => 'validate_url',
-                #'crossref_email' => 'trim_settings_field',
-                #'crossref_archive_locations' => 'trim_settings_field',
-                #'ads_api_search_url' => 'validate_url',
-                #'ads_api_token' => 'trim_settings_field',
-                #'clockss_ftp_url' => 'trim_settings_field', #cannot use validate_url here because it prepends https:// or ftp:// and we want to save the raw url
-                #'clockss_username' => 'trim_settings_field',
-                #'clockss_password' => 'trim_settings_field',
-                #'arxiv_url_abs_prefix' => 'validate_url',
-                #'arxiv_url_pdf_prefix' => 'validate_url',
-                #'arxiv_url_source_prefix' => 'validate_url',
-                #'arxiv_url_trackback_prefix' => 'validate_url',
-                /* 'arxiv_doi_feed_identifier' => 'trim_settings_field', */
-                /* 'arxiv_paper_doi_feed_endpoint' => 'trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed', */
-                /* 'arxiv_paper_doi_feed_days' => 'validate_positive_integer', */
-                #'doi_url_prefix' => 'validate_url',
-
-                #'scholastica_manuscripts_url' => 'validate_url',
-                #'scirate_url_abs_prefix' => 'validate_url',
-                #'arxiv_vanity_url_prefix' => 'validate_url',
-                #'orcid_url_prefix' => 'validate_url',
-                #'fermats_library_url_prefix' => 'validate_url',
-                #'fermats_library_email' => 'trim_settings_field',
-                #'mathjax_url' => 'validate_url',
-                #'social_media_thumbnail_url' => 'trim_settings_field',
-                /* 'buffer_api_url' => 'validate_url', */
-                /* 'buffer_access_token' => 'trim_settings_field', */
-                /* 'buffer_profile_ids' => 'validate_array_as_comma_separated_list', */
-                #'facebook_app_id' => 'trim_settings_field',
-                /* 'doaj_api_url' => 'trim_settings_field', */
-                /* 'doaj_api_key' => 'trim_settings_field', */
-                /* 'doaj_language_code' => 'validate_two_letter_country_code', */
-                #'custom_search_page' => 'checked_or_unchecked',
-                #'extended_search_and_navigation' => 'checked_or_unchecked',
-                #'search_form_on_search_page' => 'checked_or_unchecked',
-                #'page_template_for_publication_posts' => 'checked_or_unchecked',
-                #'page_template_abstract_header' => 'trim_settings_field',
-                #'trackbacks_from_secondary_directly_into_database' => 'checked_or_unchecked',
-                #'maintenance_mode' => 'checked_or_unchecked',
-                #'volumes_endpoint' => 'trim_settings_field',
-                #'doi_prefix' => 'validate_doi_prefix',
-                #'first_volume_year' => 'validate_first_volume_year',
-                #'executive_board' => 'trim_settings_field',
-                #'editor_in_chief' => 'trim_settings_field',
-                #'self_notification_subject_template' => 'trim_settings_field',
-                #'self_notification_body_template' => 'leave_unchaged',
-                /* 'author_notification_subject_template' => 'trim_settings_field', */
-                /* 'author_notification_body_template' => 'leave_unchaged', */
-                /* 'author_notification_secondary_subject_template' => 'trim_settings_field', */
-                /* 'author_notification_secondary_body_template' => 'leave_unchaged', */
-                /* 'fermats_library_notification_subject_template' => 'trim_settings_field', */
-                /* 'fermats_library_notification_body_template' => 'leave_unchaged', */
-                #'relevanssi_mime_types_to_exclude' => 'trim_settings_field',
-                #'relevanssi_index_pdfs_asynchronously' => 'checked_or_unchecked',
-                #'cited_by_refresh_seconds' => 'validate_positive_integer',
-
-                    /* The following settings cannot be customized by the user.
-                     * validation method null ensures that these settings are never
-                     * updated when user settings are saved and validated. */
-                /* 'primary_publication_type_name' => null, */
-                /* 'primary_publication_type_name_plural' => null, */
-                /* 'secondary_publication_type_name' => null, */
-                /* 'secondary_publication_type_name_plural' => null, */
-                                                   /* ); */
-
-    /*     return self::$all_settings_fields_map; */
-    /* } */
-
         /**
          * Clean user input to the doi_prefix setting
          *
@@ -1611,10 +1502,11 @@ class O3PO_Settings extends O3PO_Singleton {
         /**
          * Clean user input to issn type settings
          *
-         * @since    0.3.0
+         * @since    0.3.1+
          * @access   private
          * @param    string   $field    The field this was input to.
          * @param    string   $input    User input.
+         * @return string Valid issn or empty string.
          */
     public function validate_issn_or_empty( $field, $input ) {
         if(empty(trim($input)))

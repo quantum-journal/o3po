@@ -37,6 +37,7 @@ if(!class_exists('PHPUnit_Framework_TestCase')){
 
 class O3PO_TestCase extends PHPUnit_Framework_TestCase
 {
+
     public function assertValidHTMLFragment( $html ) {
 
         $dom = new DOMDocument;

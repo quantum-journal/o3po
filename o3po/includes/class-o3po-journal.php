@@ -36,7 +36,7 @@ class O3PO_Journal {
         /**
          * The shortcode template used to construct DOIs.
          *
-         * @since    0.3.0+
+         * @since    0.3.1+
          * @access   private
          * @var      O3PO_ShortcodeTemplate  $doi_suffix_template  The shortcode template used to construct DOIs.
          */
@@ -56,6 +56,7 @@ class O3PO_Journal {
             //check whether at least all properties specified in get_journal_config_properties have been provided
         foreach($this->get_journal_config_properties() as $journal_config_property)
             $this->get_journal_property($journal_config_property);
+
     }
 
         /**
@@ -630,6 +631,7 @@ for (i = 0; i < elemets_to_condense.length; i++) {
          *
          * @since    0.3.1+
          * @access   public
+         * @param O3PO_Settings $settings Settings object.
          */
     public static function specify_settings( $settings ) {
 
@@ -676,12 +678,13 @@ for (i = 0; i < elemets_to_condense.length; i++) {
 
 
         /**
-         * Clean user input to the doi_suffix_template setting
+         * Clean user input to the doi_suffix_template setting.
          *
-         * @since    0.3.0+
+         * @since    0.3.1+
          * @access   private
          * @param    string   $field    The field this was input to.
          * @param    string   $input    User input.
+         * @return   string   Validated doi suffix.
          */
     public static function validate_doi_suffix_template( $field, $input ) {
 
