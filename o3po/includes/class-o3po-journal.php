@@ -726,8 +726,8 @@ for (i = 0; i < elemets_to_condense.length; i++) {
         return static::$doi_suffix_template->expand(array(
                                                        '[journal_level_doi_suffix]' => $doi_suffix,
                                                        '[date]' => $date_published,
-                                                       '[volume]' => str($volume),
-                                                       '[page]' => str($page),
+                                                       '[volume]' => strval($volume),
+                                                       '[page]' => strval($pages),
                                                          ), true);
     }
 }
