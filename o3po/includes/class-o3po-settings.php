@@ -1431,7 +1431,7 @@ class O3PO_Settings extends O3PO_Singleton {
          * @param string $setting Slug title of the setting to which this error applies.
          * @param string $code Slug-name to identify the error. Used as part of 'id' attribute in HTML output.
          * @param string $message The formatted message text to display to the user (will be shown inside styled <div> and <p> tags).
-         * @pram $type Message type, controls HTML class. Possible values include 'error', 'success', 'warning', 'info'. Default value: 'error'
+         * @param string $type Message type, controls HTML class. Possible values include 'error', 'success', 'warning', 'info'. Default value: 'error'
          */
     protected function add_error( $setting, $code, $message, $type='error' ) {
 

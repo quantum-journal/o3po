@@ -333,5 +333,16 @@ class O3PO_Utility
         return $median;
     }
 
+        /**
+         * Test whether an array is associative or enumerated.
+         *
+         * @param array $a Array to test.
+         * @return Whether the array is associative or not.
+         */
+    public static function is_assoc( $a ) {
+
+        if (array() === $a) return false;
+        return array_keys($a) !== range(0, count($a) - 1);
+    }
 }
 

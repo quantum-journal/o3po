@@ -118,7 +118,7 @@ trait O3PO_Form {
          * @param string $setting Slug title of the setting to which this error applies.
          * @param string $code Slug-name to identify the error. Used as part of 'id' attribute in HTML output.
          * @param string $message The formatted message text to display to the user (will be shown inside styled <div> and <p> tags).
-         * @pram $type Message type, controls HTML class. Possible values include 'error', 'success', 'warning', 'info'. Default value: 'error'
+         * @param $type Message type, controls HTML class. Possible values include 'error', 'success', 'warning', 'info'. Default value: 'error'
          */
     abstract protected function add_error( $setting, $code, $message, $type='error' );
 
@@ -287,7 +287,7 @@ trait O3PO_Form {
          * @since    0.3.1+
          * @access   private
          * @param    string   $id    The field this was input to.
-         * @param    string   $doi_prefix    User input.
+         * @param    string   $input User input.
          */
     public function validate_doi_prefix( $id, $input ) {
 
@@ -305,7 +305,7 @@ trait O3PO_Form {
          * @since    0.3.1+
          * @access   private
          * @param    string   $id    The field this was input to.
-         * @param    string   $doi_suffix    User input.
+         * @param    string   $input User input.
          */
     public function validate_doi_suffix( $id, $input ) {
 
@@ -323,7 +323,7 @@ trait O3PO_Form {
          * @since    0.3.1
          * @access   private
          * @param    string   $id    The field this was input to.
-         * @param    string   $first_volume_year    User input.
+         * @param    string   $input User input.
          */
     public function validate_four_digit_year( $id, $input ) {
 

@@ -83,8 +83,8 @@ class O3PO_Environment {
          * @since    0.1.0
          * @access   public
          * @param    string     $dir        Directory.
-         * @param    string     $filename   Base Filename.
-         * @param    string     $ext        Desired extension.
+         * @param    string     $filename   Base Filename including the extension.
+         * @param    string     $ext        Desired extension, e.g., '.txt', '.pdf', or '.tar.gz'.
          * */
     public function unique_filename_callback( $dir, $filename, $ext ) {
 
@@ -135,7 +135,7 @@ class O3PO_Environment {
          * @param string $filename                  The name of the file (may differ from $file due to
          *                                          $file being in a tmp directory).
          * @param array  $mimes                     Key is the file extension with value as the mime type.
-         * @return
+         * @return array Values for the extension, MIME, and filename.
          */
     public function disable_real_mime_check_for_selected_extensions( $data, $file, $filename, $mimes ) {
         $wp_filetype = wp_check_filetype($filename, $mimes);
