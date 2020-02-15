@@ -38,6 +38,21 @@ if(!class_exists('PHPUnit_Framework_TestCase')){
 class O3PO_TestCase extends PHPUnit_Framework_TestCase
 {
 
+    public function assertStringContains( $needle, $haystack ) {
+        if(method_exists($this, 'assertStringContainsString'))
+            $this->assertStringContainsString($needle, $haystack);
+        else
+            $this->assertContains($needle, $haystack);
+    }
+
+    public function assertStringNotContains( $needle, $haystack ) {
+        if(method_exists($this, 'assertStringContainsString'))
+            $this->assertStringNotContainsString($needle, $haystack);
+        else
+            $this->assertNotContains($needle, $haystack);
+    }
+
+
     public function assertValidHTMLFragment( $html ) {
 
         $dom = new DOMDocument;

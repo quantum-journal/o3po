@@ -95,17 +95,11 @@ class O3PO_SettingsTest extends O3PO_TestCase
             {
                 $callable = $specification['validation_callable'];
 
-                if(method_exists($this, 'assertStringContainsString'))
-                    $this->assertStringContainsString($id, $combined_output, 'There was a default set for the option ' . $id . ' but it was not found in the settings page html.');
-                else
-                    $this->assertContains($id, $combined_output, 'There was a default set for the option ' . $id . ' but it was not found in the settings page html.');
+                $this->assertStringContains($id, $combined_output, 'There was a default set for the option ' . $id . ' but it was not found in the settings page html.');
             }
             else
             {
-                if(method_exists($this, 'assertStringNotContainsString'))
-                    $this->assertStringNotContainsString($id, $combined_output, 'Option ' . $id . ' was found in the settings page html, but we thought it should not be configurable?.');
-                else
-                    $this->assertNotContains($id, $combined_output, 'Option ' . $id . ' was found in the settings page html, but we thought it should not be configurable?.');
+                $this->assertStringNotContains($id, $combined_output, 'Option ' . $id . ' was found in the settings page html, but we thought it should not be configurable?.');
             }
 
             #test the special cases of 'tab' not being set and a transient being present that will trigger a flush rewrite rules
@@ -458,10 +452,7 @@ public function validate_array_as_comma_separated_list_provider() {
             $this->assertFalse(true, 'Command above should throw exception.');
         } catch (Exception $e) {
 
-            if(method_exists($this, 'assertStringContainsString'))
-                $this->assertStringContainsString('The non existing plugin settings field i-do-not-exist was requested.', $e->getMessage());
-            else
-                $this->assertContains('The non existing settings field i-do-not-exist was requested.', $e->getMessage());
+            $this->assertStringContains('The non existing settings field i-do-not-exist was requested.', $e->getMessage());
         }
     }
 
