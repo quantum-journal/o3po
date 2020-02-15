@@ -578,7 +578,14 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
     static public function extract_latex_macros( $latex_source ) {
 
         $latex_source_without_comments = preg_replace('#(?<!\\\\)%.*#u', '', $latex_source);
-        preg_match_all('#\\\\(newcommand|providecommand|def)(?:\{| *)(\\\\[@a-zA-Z]+)(?:\}| *)(\[[0-9]\]|)(\[[^]]*\]|)(?=\{((?:[^{}]++|\{(?5)\})*)\})#u', $latex_source_without_comments, $latex_macro_definitions, PREG_SET_ORDER);//matches \newcommand and friends and takes into account balanced parenthesis (Note the use of (?5) here!) to test changes go here https://regex101.com/r/g7LCUO/1
+
+        preg_match_all('#\\\\(newcommand|providecommand|renewcommand|renewcommand\*)(?:\{| *)(\\\\[@a-zA-Z]+|\\\\[^@a-zA-Z])\s*(?:\}| *)\s*(\[[0-9]\]|)\s*(\[[^]]*\]|)\s*(?=\{((?:[^{}]++|\{(?5)\})*)\})#u', $latex_source_without_comments, $latex_macro_definitions1, PREG_SET_ORDER);//matches \newcommand and friends and takes into account balanced parenthesis (Note the use of (?5) here!) to test changes go here https://regex101.com/r/g7LCUO/1
+
+        preg_match_all('#\\\\(def)(?:\{| *)(\\\\[@a-zA-Z]+|\\\\[^@a-zA-Z])\s*(?:\}| *)((?:\#[0-9])*)()(?=\{((?:[^{}]++|\{(?5)\})*)\})#u', $latex_source_without_comments, $latex_macro_definitions2, PREG_SET_ORDER);//matches \newcommand and friends and takes into account balanced parenthesis (Note the use of (?5) here!) to test changes go here https://regex101.com/r/g7LCUO/1
+        foreach($latex_macro_definitions2 as $key => $def_macro)
+            $latex_macro_definitions2[$key][3] = '[' . substr_count($def_macro[3], '#') . ']'; //determine the number of arguments of \def macro definitions
+
+        $latex_macro_definitions = array_merge($latex_macro_definitions1, $latex_macro_definitions2);
 
         return $latex_macro_definitions;
     }
@@ -666,7 +673,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
             else
                 $default_argument = $default_argument[1];
 
-            $macroname = '\\\\' . mb_substr($macro_definition[2],1);//mb_substr picks out the name of the macro without the leading \;
+            $macroname = '\\\\' . preg_quote(mb_substr($macro_definition[2], 1));//mb_substr picks out the name of the macro without the leading \;
             $pattern = $macroname;
             $replacement = $macro_definition[5];
             if($num_arguments == 0)
