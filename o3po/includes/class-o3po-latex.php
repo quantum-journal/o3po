@@ -390,7 +390,9 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
             else
                 $style = 'author-year';
 
-            $bbl = preg_replace('#\\\\(newcommand|providecommand|def|renewcommand|renewcommand\*)(?:\{| +|)(\\\\[@a-zA-Z]+)(?:\}| +|)(\[[0-9]\]|)(\[[^]]*\]|)(?=\{((?:[^{}]++|\{(?5)\})*)\})#u', '', $bbl); //remove all \newcommand and similar (Note the use of (?5) here!) to test changes go here https://regex101.com/r/g7LCUO/1
+            $bbl = preg_replace('#\\\\(newcommand|providecommand|renewcommand|renewcommand\*)(?:\{| *)(\\\\[@a-zA-Z]+|\\\\[^ @a-zA-Z])\s*(?:\}| *)\s*(\[[0-9]\]|)\s*(\[[^]]*\]|)\s*(?=\{((?:[^{}]++|\{(?5)\})*)\})#u', '', $bbl); //remove all \newcommand and similar (Note the use of (?5) here!) to test changes go here https://regex101.com/r/g7LCUO/1
+            $bbl = preg_replace('#\\\\(def)(?:\{| *)(\\\\[@a-zA-Z]+|\\\\[^ @a-zA-Z])\s*(?:\}| *)((?:\#[0-9])*)()(?=\{((?:[^{}]++|\{(?5)\})*)\})#u', '', $bbl); //remove all \def and similar (Note the use of (?5) here!) to test changes go here https://regex101.com/r/g7LCUO/1
+
             $entries = preg_split('/\\\\bibitem\s*(?=[[{])/u', $bbl, -1, PREG_SPLIT_NO_EMPTY);
 
             $citations = array();
@@ -691,9 +693,9 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
 
                     $replacement = str_replace( '#' . $i , '\\'.$i ,  $replacement );
                 }
-            $pattern = '\\\\(?:newcommand|providecommand|def)[\s{]*' . $macroname . '(*SKIP)(*FAIL)|' . $pattern; //prevent expanion in the definition of the macro
+            $pattern = '\\\\(?:newcommand|providecommand|renewcommand|renewcommand|def)[\s{]*' . $macroname . '(*SKIP)(*FAIL)|' . $pattern; //prevent expanion in the definition of the macro
             $pattern = '#' . $pattern . '#u';
-            $replacement = str_replace('\$', '\\\\\$', $replacement);// espace $ in replacement as it has a special meaning
+            $replacement = str_replace('\$', '\\\\\$', $replacement);// escape $ in replacement as it has a special meaning
             if(preg_match('#\\\\[a-zA-Z]+$#', $replacement)===1) #If replacement ends with an all letter latex macro add a space to allow correct expansion of that macro in following expansion rounds
                 $replacement .= " ";
 
