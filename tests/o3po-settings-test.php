@@ -63,7 +63,7 @@ class O3PO_SettingsTest extends O3PO_TestCase
         $settings->register_settings();
 
         $class = new ReflectionClass('O3PO_Settings');
-        $property = $class->getProperty('settings_sections');
+        $property = $class->getProperty('sections');
         $property->setAccessible(true);
 
         $combined_output = '';
@@ -80,7 +80,7 @@ class O3PO_SettingsTest extends O3PO_TestCase
         }
 
         $class = new ReflectionClass('O3PO_Settings');
-        $property = $class->getProperty('settings_fields');
+        $property = $class->getProperty('fields');
         $property->setAccessible(true);
 
         foreach($property->getValue($settings) as $id => $specification)
@@ -124,7 +124,7 @@ class O3PO_SettingsTest extends O3PO_TestCase
         preg_match_all('#id="' . $settings->get_plugin_name() . '-settings-(.*?)"#', $combined_output, $matches);
         foreach($matches[1] as $id)
         {
-            $this->assertContains($id, array_keys($settings->get_option_defaults()), 'Option ' . $id . ' was found in the settings page html but not in the all_settings_fields_map. Only settings with an entry in that map are actually saved, when the settings are saved.');
+            $this->assertContains($id, array_keys($settings->get_field_defaults()), 'Option ' . $id . ' was found in the settings page html but not in the all_settings_fields_map. Only settings with an entry in that map are actually saved, when the settings are saved.');
         }
     }
 
@@ -132,10 +132,10 @@ class O3PO_SettingsTest extends O3PO_TestCase
         /**
          * @depends test_initialize_settings
          */
-    public function test_render_array_as_comma_separated_list_setting( $settings ) {
+    public function test_render_array_as_comma_separated_list_field( $settings ) {
 
         ob_start();
-        $settings->render_array_as_comma_separated_list_setting('maintenance_mode');#call this on a non-list setting to make sure it executes on non-initialized settings
+        $settings->render_array_as_comma_separated_list_field('maintenance_mode');#call this on a non-list setting to make sure it executes on non-initialized settings
         $output = ob_get_contents();
         ob_end_clean();
         $this->assertValidHTMLFragment($output);
@@ -214,7 +214,7 @@ class O3PO_SettingsTest extends O3PO_TestCase
 
 
 
-    public function validate_first_volume_year_provider() {
+    public function validate_four_digit_year_provider() {
 
         $settings = $this->test_initialize_settings();
 
@@ -224,18 +224,18 @@ class O3PO_SettingsTest extends O3PO_TestCase
             ['  1962 ', '1962'],
             ['  1963', '1963'],
             ['1965 ', '1965'],
-            ['@', $settings->get_plugin_option_default('first_volume_year')],
-            ['asdf', $settings->get_plugin_option_default('first_volume_year')]
+            ['@', $settings->get_field_default('first_volume_year')],
+            ['asdf', $settings->get_field_default('first_volume_year')]
                 ];
     }
 
         /**
-         * @dataProvider validate_first_volume_year_provider
+         * @dataProvider validate_four_digit_year_provider
          * @depends test_initialize_settings
          */
-    public function test_validate_first_volume_year( $first_volume_year, $expected, $setting ) {
+    public function test_validate_four_digit__year( $first_volume_year, $expected, $setting ) {
 
-        $this->assertSame($setting->validate_first_volume_year('first_volume_year', $first_volume_year), $expected);
+        $this->assertSame($setting->validate_four_digit_year('first_volume_year', $first_volume_year), $expected);
     }
 
 
@@ -249,8 +249,8 @@ class O3PO_SettingsTest extends O3PO_TestCase
             ['https://codex.wordpress.org/Function_Reference/get_post_thumbnail_id', 'https://codex.wordpress.org/Function_Reference/get_post_thumbnail_id'],
             ['ftp://fo.bar', 'ftp://fo.bar'], #in the fake wordpress environment of the test system esc_url and esc_url_raw currently have no effect, so this validation doesn't really work during unit tests
             ['  https://foo.de  ', 'https://foo.de'],
-            ['foo.de', $settings->get_plugin_option_default('license_url')],
-            ['/path/', $settings->get_plugin_option_default('license_url')],
+            ['foo.de', $settings->get_field_default('license_url')],
+            ['/path/', $settings->get_field_default('license_url')],
                 ];
     }
 
@@ -317,12 +317,12 @@ public function validate_array_as_comma_separated_list_provider() {
 
         return [
             ['1234567890', '1234567890'],
-            ['-2', $settings->get_plugin_option_default('arxiv_paper_doi_feed_days')],
-            ['0', $settings->get_plugin_option_default('arxiv_paper_doi_feed_days')],
-            ['000', $settings->get_plugin_option_default('arxiv_paper_doi_feed_days')],
-            ['0.2', $settings->get_plugin_option_default('arxiv_paper_doi_feed_days')],
-            ['-0.3', $settings->get_plugin_option_default('arxiv_paper_doi_feed_days')],
-            ['a', $settings->get_plugin_option_default('arxiv_paper_doi_feed_days')],
+            ['-2', $settings->get_field_default('arxiv_paper_doi_feed_days')],
+            ['0', $settings->get_field_default('arxiv_paper_doi_feed_days')],
+            ['000', $settings->get_field_default('arxiv_paper_doi_feed_days')],
+            ['0.2', $settings->get_field_default('arxiv_paper_doi_feed_days')],
+            ['-0.3', $settings->get_field_default('arxiv_paper_doi_feed_days')],
+            ['a', $settings->get_field_default('arxiv_paper_doi_feed_days')],
                 ];
     }
 
@@ -344,7 +344,7 @@ public function validate_array_as_comma_separated_list_provider() {
         return [
             ['checked', 'checked'],
             ['unchecked', 'unchecked'],
-            ['foo', $settings->get_plugin_option_default('custom_search_page')],
+            ['foo', $settings->get_field_default('custom_search_page')],
                 ];
     }
 
@@ -383,7 +383,7 @@ public function validate_array_as_comma_separated_list_provider() {
 
         $this->test_initialize_settings();
         $settings = O3PO_Settings::instance();
-        $previous_value = $settings->get_plugin_option('arxiv_paper_doi_feed_endpoint');
+        $previous_value = $settings->get_field_value('arxiv_paper_doi_feed_endpoint');
 
         return [
             ['abc', 'abc'],
@@ -430,7 +430,7 @@ public function validate_array_as_comma_separated_list_provider() {
 
         return [
             [array(), array('journal_title' => 'fake_journal_title')], #check that defaults survive even if input is empty
-            [$settings->get_option_defaults(), $settings->get_option_defaults()], #check that all default options validate
+            [$settings->get_field_defaults(), $settings->get_field_defaults()], #check that all default options validate
             [array('journal_title' => 'new title'), array('journal_title' => 'new title')], #check that settings actually change
 
                 ];
@@ -440,9 +440,9 @@ public function validate_array_as_comma_separated_list_provider() {
          * @dataProvider validate_settings_provider
          * @depends test_initialize_settings
          */
-    public function test_validate_settings( $input, $expected, $settings ) {
+    public function test_validate_input( $input, $expected, $settings ) {
 
-        $output = $settings->validate_settings($input);
+        $output = $settings->validate_input($input);
 
         foreach($expected as $key => $val)
             $this->assertSame($output[$key], $val);
@@ -452,16 +452,16 @@ public function validate_array_as_comma_separated_list_provider() {
         /**
          * @depends test_initialize_settings
          */
-    public function test_get_plugin_option_that_does_not_exis( $settings ) {
+    public function test_get_field_value_that_does_not_exis( $settings ) {
         try{
-            $settings->get_plugin_option('i-do-not-exist');
+            $settings->get_field_value('i-do-not-exist');
             $this->assertFalse(true, 'Command above should throw exception.');
         } catch (Exception $e) {
 
             if(method_exists($this, 'assertStringContainsString'))
                 $this->assertStringContainsString('The non existing plugin settings field i-do-not-exist was requested.', $e->getMessage());
             else
-                $this->assertContains('The non existing plugin settings field i-do-not-exist was requested.', $e->getMessage());
+                $this->assertContains('The non existing settings field i-do-not-exist was requested.', $e->getMessage());
         }
     }
 

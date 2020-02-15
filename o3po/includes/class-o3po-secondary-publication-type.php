@@ -349,8 +349,8 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 
         $post_type = get_post_type($post_id);
 
-        $executive_board = $settings->get_plugin_option('executive_board');
-        $editor_in_chief = $settings->get_plugin_option('editor_in_chief');
+        $executive_board = $settings->get_field_value('executive_board');
+        $editor_in_chief = $settings->get_field_value('editor_in_chief');
 
         $corresponding_author_has_been_notifed_date = get_post_meta( $post_id, $post_type . '_corresponding_author_has_been_notifed_date', true );
         $corresponding_author_email = get_post_meta( $post_id, $post_type . '_corresponding_author_email', true );
@@ -410,7 +410,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                     $validation_result .= 'INFO: Trackback to the arXiv for ' . $eprint_without_version . ' sent.' . "\n";
                 }
 
-                if($settings->get_plugin_option('trackbacks_from_secondary_directly_into_database') !== 'checked')
+                if($settings->get_field_value('trackbacks_from_secondary_directly_into_database') !== 'checked')
                 {
                         //Send Trackback to ourselves via trackback()
                     $response = trackback( get_site_url() . $suspected_post_url, $title, $trackback_excerpt, $post_id );
@@ -874,7 +874,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 
             $content = '';
             $content .= '<header class="entry-header">';
-            if($settings->get_plugin_option('page_template_for_publication_posts')==='checked')
+            if($settings->get_field_value('page_template_for_publication_posts')==='checked')
                 $content .= '<h1 class="entry-title title citation_title"><a href="#">' . esc_html ( get_the_title( $post_id ) ) . '</a></h1>';
 
             if ( has_post_thumbnail( ) ) {

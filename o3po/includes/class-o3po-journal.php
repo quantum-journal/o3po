@@ -635,10 +635,10 @@ for (i = 0; i < elemets_to_condense.length; i++) {
          */
     public static function specify_settings( $settings ) {
 
-        $settings->specify_settings_field('doi_suffix_template', 'DOI suffix template', array('O3PO_Journal', 'render_doi_suffix_template_setting'), 'journal_settings', 'journal_settings', array(), array('O3PO_Journal', 'validate_doi_suffix_template'), '[journal_level_doi_suffix]-[date]-[page]');
+        $settings->specify_field('doi_suffix_template', 'DOI suffix template', array('O3PO_Journal', 'render_doi_suffix_template_setting'), 'journal_settings', 'journal_settings', array(), array('O3PO_Journal', 'validate_doi_suffix_template'), '[journal_level_doi_suffix]-[date]-[page]');
 
         static::$doi_suffix_template = new O3PO_ShortcodeTemplate(
-            $settings->get_plugin_option('doi_suffix_template'),
+            $settings->get_field_value('doi_suffix_template'),
             array(
                 '[journal_level_doi_suffix]' => array(
                     'description' => 'The journal level DOI suffix',
@@ -669,7 +669,7 @@ for (i = 0; i < elemets_to_condense.length; i++) {
     public static function render_doi_suffix_template_setting() {
 
         $settings = O3PO_Settings::instance();
-        $settings->render_setting('doi_suffix_template');
+        $settings->render_single_line_field('doi_suffix_template');
 
         echo('<p>The DOI suffix template is used to specify the DOI suffix.</p>');
         echo(static::$doi_suffix_template->render_short_codes());
@@ -695,14 +695,14 @@ for (i = 0; i < elemets_to_condense.length; i++) {
 
         if($input !== $input_trimmed or $in_url !== $example_expanded)
         {
-            add_settings_error( $field, 'url-validated', "The template '" . $input . "' given in in '" . $settings->get_plugin_option_title($field) . "' was malformed or contained special or illegal characters. Field reset.", 'error');
-            return $settings->get_plugin_option_default($field);
+            add_settings_error( $field, 'url-validated', "The template '" . $input . "' given in in '" . $settings->get_field_title($field) . "' was malformed or contained special or illegal characters. Field reset.", 'error');
+            return $settings->get_field_default($field);
         }
 
         if(mb_strpos($input, '[page]') === false)
         {
-            add_settings_error( $field, 'url-validated', "The template '" . $input . "' given in in '" . $settings->get_plugin_option_title($field) . "' did not contain the [page] shortcode, which is needed to ensure uniqueness of the DOIs. Field reset.", 'error');
-            return $settings->get_plugin_option_default($field);;
+            add_settings_error( $field, 'url-validated', "The template '" . $input . "' given in in '" . $settings->get_field_title($field) . "' did not contain the [page] shortcode, which is needed to ensure uniqueness of the DOIs. Field reset.", 'error');
+            return $settings->get_field_default($field);;
         }
 
         return $input;

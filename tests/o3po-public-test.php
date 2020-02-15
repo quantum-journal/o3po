@@ -139,7 +139,7 @@ class O3PO_PublicTest extends O3PO_TestCase
         $settings = O3PO_SettingsTest::get_settings();
 
         return [
-            [new WP_Query(null, array('post_type' => $settings->get_plugin_option('secondary_publication_type_name')))],
+            [new WP_Query(null, array('post_type' => $settings->get_field_value('secondary_publication_type_name')))],
             [new WP_Query(null, array('category' => O3PO_SecondaryPublicationType::get_associated_categories()[0]))],
         ];
     }

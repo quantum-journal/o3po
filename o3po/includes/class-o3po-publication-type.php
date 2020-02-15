@@ -358,7 +358,7 @@ abstract class O3PO_PublicationType {
     public static final function render_maintenance_mode_warning( $post ) {
 
         $settings = O3PO_Settings::instance();
-        if($settings->get_plugin_option('maintenance_mode')!=='unchecked')
+        if($settings->get_field_value('maintenance_mode')!=='unchecked')
             echo '<script>alert("' . esc_html($settings->get_plugin_pretty_name()) . ' has been put in maintenance mode. Modification of publication-meta data is inhibited. Maintenance mode can be disabled in the plugin settings. Please contact your site administrator(s).");</script>' . "\n";
 
     }
@@ -414,7 +414,7 @@ abstract class O3PO_PublicationType {
 
             // Do nothing if in maintenance mode
         $settings = O3PO_Settings::instance();
-        if($settings->get_plugin_option('maintenance_mode')!=='unchecked')
+        if($settings->get_field_value('maintenance_mode')!=='unchecked')
             return;
 
             //Save the entered meta data
@@ -2386,7 +2386,7 @@ abstract class O3PO_PublicationType {
         $eprint = get_post_meta( $post_id, $post_type . '_eprint', true );
 
         $settings = O3PO_Settings::instance();
-        $cited_by_refresh_seconds = $settings->get_plugin_option('cited_by_refresh_seconds');
+        $cited_by_refresh_seconds = $settings->get_field_value('cited_by_refresh_seconds');
 
         $crossref_bibentries = get_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries', true );
         $crossref_bibentries_timestamp = get_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries_timestamp', true );
@@ -3274,7 +3274,7 @@ abstract class O3PO_PublicationType {
         }
 
         $settings = O3PO_Settings::instance();
-        $default_image_url = $settings->get_plugin_option('social_media_thumbnail_url');
+        $default_image_url = $settings->get_field_value('social_media_thumbnail_url');
         return $default_image_url;
     }
 

@@ -49,7 +49,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          */
     public function test_setup_environment( $settings ) {
 
-        $environment = new O3PO_Environment($settings->get_plugin_option("production_site_url"));
+        $environment = new O3PO_Environment($settings->get_field_value("production_site_url"));
         $this->assertInstanceOf(O3PO_Environment::class, $environment);
 
         return $environment;
@@ -253,8 +253,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
             {
                 foreach( array(
                          '#popular science#',
-                         '#' . $settings->get_plugin_option('license_url')  . '#',
-                         '#' . $settings->get_plugin_option('publisher')  . '#',
+                         '#' . $settings->get_field_value('license_url')  . '#',
+                         '#' . $settings->get_field_value('publisher')  . '#',
                            )
                          as $regexp)
                     $this->assertRegexp($regexp, $content);
@@ -294,8 +294,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
             if($post_type == $primary_publication_type->get_publication_type_name())
             {
                 foreach( array(
-                         '#' . $settings->get_plugin_option('license_url')  . '#',
-                         '#' . $settings->get_plugin_option('publisher')  . '#',
+                         '#' . $settings->get_field_value('license_url')  . '#',
+                         '#' . $settings->get_field_value('publisher')  . '#',
                            )
                          as $regexp)
                     $this->assertRegexp($regexp, $content);
@@ -932,7 +932,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
                  '_date_published' => current_time("Y-m-d"),
                  '_volume' => '2',
                  '_corresponding_author_email' => 'foo@bar.com',
-                 '_journal' => $settings->get_plugin_option('journal_title'),
+                 '_journal' => $settings->get_field_value('journal_title'),
                  '_buffer_email' => 'checked',
                    ),
              array(
@@ -966,7 +966,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
                  '_author_urls' => ['',''],
                  '_number_affiliations' => 2,
                  '_affiliations' => ['Foo University', 'Bar Institut'],
-                 '_journal' => $settings->get_plugin_option('journal_title'),
+                 '_journal' => $settings->get_field_value('journal_title'),
                  '_number_authors' => 4,
                  '_fetch_metadata_from_arxiv' => 'checked',
                  '_nonce' => 'fake_nonce',
@@ -992,7 +992,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
                  '_date_published' => current_time("Y-m-d"),
                  '_volume' => '2',
                  '_corresponding_author_email' => 'foo@bar.com',
-                 '_journal' => $settings->get_plugin_option('journal_title'),
+                 '_journal' => $settings->get_field_value('journal_title'),
                  '_buffer_email' => 'checked',
                    ),
              array(
@@ -1344,7 +1344,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
             if($post_type == $primary_publication_type->get_publication_type_name())
             {
                 foreach( array(
-                             '#' . $settings->get_plugin_option('doi_url_prefix')  . '#',
+                             '#' . $settings->get_field_value('doi_url_prefix')  . '#',
                            )
                          as $regexp)
                     $this->assertRegexp($regexp, $content);
@@ -1384,7 +1384,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
             if($post_type == $primary_publication_type->get_publication_type_name())
             {
                 foreach( array(
-                             '#' . $settings->get_plugin_option('doi_url_prefix')  . '#',
+                             '#' . $settings->get_field_value('doi_url_prefix')  . '#',
                            )
                          as $regexp)
                     $this->assertRegexp($regexp, $content);
@@ -1425,7 +1425,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
             if($post_type == $secondary_publication_type->get_publication_type_name())
             {
                 foreach( array(
-                             '#' . $settings->get_plugin_option('doi_url_prefix')  . '#',
+                             '#' . $settings->get_field_value('doi_url_prefix')  . '#',
                            )
                          as $regexp)
                     $this->assertRegexp($regexp, $content);
@@ -1634,7 +1634,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
 
         $paper = 'paper'; # 'paper' should ideally be $primary_publication_type->get_publication_type_name()
         $settings = $this->test_initialize_settings();
-        $endpoint_suffix = $settings->get_plugin_option('arxiv_paper_doi_feed_endpoint');
+        $endpoint_suffix = $settings->get_field_value('arxiv_paper_doi_feed_endpoint');
 
 
         return [
@@ -1965,8 +1965,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         $this->assertSame(wp_get_attachment_image_src(get_post_thumbnail_id(1), "Full")[0], $secondary_publication_type->get_social_media_thumbnail_src(1));
 
         # a post without feature image
-        $this->assertSame($settings->get_plugin_option('social_media_thumbnail_url'), $primary_publication_type->get_social_media_thumbnail_src(5));
-        $this->assertSame($settings->get_plugin_option('social_media_thumbnail_url'), $secondary_publication_type->get_social_media_thumbnail_src(5));
+        $this->assertSame($settings->get_field_value('social_media_thumbnail_url'), $primary_publication_type->get_social_media_thumbnail_src(5));
+        $this->assertSame($settings->get_field_value('social_media_thumbnail_url'), $secondary_publication_type->get_social_media_thumbnail_src(5));
 
     }
 
@@ -2014,8 +2014,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
 
         return [
             ['a-[year]-[page]-foo', 'a-[year]-[page]-foo'],
-            ['template-without-page', $settings->get_plugin_option_default('doi_suffix_template')],
-            ['asdf ', $settings->get_plugin_option_default('doi_suffix_template')],
+            ['template-without-page', $settings->get_field_default('doi_suffix_template')],
+            ['asdf ', $settings->get_field_default('doi_suffix_template')],
                 ];
     }
 
