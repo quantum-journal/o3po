@@ -266,10 +266,10 @@ class O3PO_Admin {
             $html .= '<h3>Cited-by citation statistics</h3>';
 
             $settings = O3PO_Settings::instance();
-            $doi_prefix = $settings->get_plugin_option('doi_prefix');
-            $doi_url_prefix = $settings->get_plugin_option('doi_url_prefix');
-            $cited_by_refresh_seconds = $settings->get_plugin_option('cited_by_refresh_seconds');
-            #$first_volume_year = $settings->get_plugin_option('first_volume_year');
+            $doi_prefix = $settings->get_field_value('doi_prefix');
+            $doi_url_prefix = $settings->get_field_value('doi_url_prefix');
+            $cited_by_refresh_seconds = $settings->get_field_value('cited_by_refresh_seconds');
+            #$first_volume_year = $settings->get_field_value('first_volume_year');
             #$start_date = $first_volume_year . '-01-01';
 
             $fetch_if_outdated = false;
@@ -383,7 +383,7 @@ class O3PO_Admin {
                     extensions: ["toMathML.js"]
                     });
         </script>
-        <script type="text/javascript" async src="<?php echo $settings->get_plugin_option('mathjax_url') ?>?config=TeX-AMS_CHTML"></script>
+        <script type="text/javascript" async src="<?php echo $settings->get_field_value('mathjax_url') ?>?config=TeX-AMS_CHTML"></script>
         <script type="text/javascript">
         function toMathML(jax,callback) {
             var mml;

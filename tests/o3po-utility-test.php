@@ -2,7 +2,7 @@
 
 require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-utility.php';
 
-class O3PO_UtilityTest extends PHPUnit_Framework_TestCase
+class O3PO_UtilityTest extends O3PO_TestCase
 {
         /**
          * @dataProvider orcid_provider

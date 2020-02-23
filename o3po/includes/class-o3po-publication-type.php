@@ -24,6 +24,8 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-doaj.
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-latex.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-utility.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-shortcode-template.php';
+
 
 /**
  * Base class for types of publications.
@@ -168,6 +170,8 @@ abstract class O3PO_PublicationType {
                 throw new Exception('Cannot create a publication type with an already taken publication name.');
 
         array_push(self::$active_publication_types, $this);
+
+        $doi_suffix = $this->get_journal_property('journal_level_doi_suffix');
 
     }
 
@@ -354,7 +358,7 @@ abstract class O3PO_PublicationType {
     public static final function render_maintenance_mode_warning( $post ) {
 
         $settings = O3PO_Settings::instance();
-        if($settings->get_plugin_option('maintenance_mode')!=='unchecked')
+        if($settings->get_field_value('maintenance_mode')!=='unchecked')
             echo '<script>alert("' . esc_html($settings->get_plugin_pretty_name()) . ' has been put in maintenance mode. Modification of publication-meta data is inhibited. Maintenance mode can be disabled in the plugin settings. Please contact your site administrator(s).");</script>' . "\n";
 
     }
@@ -410,7 +414,7 @@ abstract class O3PO_PublicationType {
 
             // Do nothing if in maintenance mode
         $settings = O3PO_Settings::instance();
-        if($settings->get_plugin_option('maintenance_mode')!=='unchecked')
+        if($settings->get_field_value('maintenance_mode')!=='unchecked')
             return;
 
             //Save the entered meta data
@@ -505,11 +509,8 @@ abstract class O3PO_PublicationType {
         $new_pages = isset( $_POST[ $post_type . '_pages' ] ) ? sanitize_text_field( $_POST[ $post_type . '_pages' ] ) : '';
         $new_doi_prefix = $this->get_journal_property('doi_prefix');
         $old_doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
-        $new_doi_suffix = O3PO_Utility::format_doi_suffix( $this->get_journal_property('doi_suffix_template'),
-                                                  $this->get_journal_property('journal_level_doi_suffix'),
-                                                  $new_date_published,
-                                                  $new_volume,
-                                                  $new_pages );
+
+        $new_doi_suffix = $this->journal->construct_doi_suffix($new_date_published, $new_volume, $new_pages);
         if ($old_doi_suffix === $new_doi_suffix)
            update_post_meta( $post_id, $post_type . '_doi_suffix_was_changed_on_last_save', "false" );
         else {
@@ -2385,7 +2386,7 @@ abstract class O3PO_PublicationType {
         $eprint = get_post_meta( $post_id, $post_type . '_eprint', true );
 
         $settings = O3PO_Settings::instance();
-        $cited_by_refresh_seconds = $settings->get_plugin_option('cited_by_refresh_seconds');
+        $cited_by_refresh_seconds = $settings->get_field_value('cited_by_refresh_seconds');
 
         $crossref_bibentries = get_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries', true );
         $crossref_bibentries_timestamp = get_post_meta( $post_id, $post_type . '_crossref_cited_by_bibentries_timestamp', true );
@@ -3273,9 +3274,8 @@ abstract class O3PO_PublicationType {
         }
 
         $settings = O3PO_Settings::instance();
-        $default_image_url = $settings->get_plugin_option('social_media_thumbnail_url');
+        $default_image_url = $settings->get_field_value('social_media_thumbnail_url');
         return $default_image_url;
     }
-
 
 }

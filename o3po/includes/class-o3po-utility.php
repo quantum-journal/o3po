@@ -153,16 +153,6 @@ class O3PO_Utility
         return $string;
     }
 
-   
-    /**
-     * Format the doi suffix by filling the template.
-     */ 
-    public static function format_doi_suffix( $doi_suffix_template, $doi_suffix, $date_published, $volume, $pages ){
-        return str_replace( array( '[journal_level_doi_suffix]', '[date]', '[page]', '[volume]' ),
-                            array( $doi_suffix, $date_published, $pages, $volume ),
-                            $doi_suffix_template );
-    }
-
         /**
          * Make slashes breakable in text for html.
          *
@@ -343,4 +333,15 @@ class O3PO_Utility
         return $median;
     }
 
+        /**
+         * Test whether an array is associative or enumerated.
+         *
+         * @param array $a Array to test.
+         * @return Whether the array is associative or not.
+         */
+    public static function is_assoc( $a ) {
+
+        if (array() === $a) return false;
+        return array_keys($a) !== range(0, count($a) - 1);
+    }
 }

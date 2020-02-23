@@ -137,7 +137,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 $line_result = preg_match($pattern, $line, $line_matches, $flags, $offset);
 
                 if($line_result === false)
-                    return false;
+                    return false; // @codeCoverageIgnore
                 elseif($line_result === 1)
                     $result += 1;
                 if(!empty($line_matches))
@@ -281,9 +281,9 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 if(!empty($citations[$n]['author'])) {
                     $num_authors = count($citations[$n]['author']);
                     foreach( $citations[$n]['author'] as $i => $author) {
-                        if(!empty($author['giveni']))
-                            $text .= $author['giveni'];
-                        if(!empty($author['giveni']) && !empty($author['family']))
+                        if(!empty($author['given']))
+                            $text .= $author['given'];
+                        if(!empty($author['given']) && !empty($author['family']))
                             $text .= " ";
                         if(!empty($author['family']))
                             $text .= $author['family'];

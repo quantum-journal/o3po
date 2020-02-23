@@ -114,11 +114,11 @@ class O3PO_Public {
     public function add_open_graph_meta_tags_for_social_media() {
         $settings = O3PO_Settings::instance();
 
-        $image_url = $settings->get_plugin_option('social_media_thumbnail_url');
-        $title = $settings->get_plugin_option('journal_title');
+        $image_url = $settings->get_field_value('social_media_thumbnail_url');
+        $title = $settings->get_field_value('journal_title');
         $url = get_site_url();
-        $description = $settings->get_plugin_option('journal_description');
-        $facebook_app_id = $settings->get_plugin_option('facebook_app_id');
+        $description = $settings->get_field_value('journal_description');
+        $facebook_app_id = $settings->get_field_value('facebook_app_id');
         if(is_single())
         {
 
@@ -139,7 +139,7 @@ class O3PO_Public {
                 $description = $specific_description;
         }
 
-        $journal_title = $settings->get_plugin_option('journal_title');
+        $journal_title = $settings->get_field_value('journal_title');
 
         echo '<meta property="og:type" content="article" />' . "\n";
         echo '<meta property="og:url" content="' . esc_attr($url) . '" />' . "\n";
@@ -170,7 +170,7 @@ class O3PO_Public {
               tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']], processEscapes: true}
             });
         </script>
-        <script type="text/javascript" async src="<?php echo $settings->get_plugin_option('mathjax_url') ?>?config=TeX-AMS_CHTML"></script>
+        <script type="text/javascript" async src="<?php echo $settings->get_field_value('mathjax_url') ?>?config=TeX-AMS_CHTML"></script>
 <?php
 
     }
@@ -221,13 +221,13 @@ class O3PO_Public {
                 /* $secondary_journal_post_count = 0; */
                 /* foreach(O3PO_PublicationType::$active_post_type_classes as $class)  */
                 /* { */
-                /*     if($class::get_journal_title() === $settings->get_plugin_option('journal_title')) */
+                /*     if($class::get_journal_title() === $settings->get_field_value('journal_title')) */
                 /*         $primary_journal_post_count += $class::get_count_of_volume(null); */
-                /*     elseif($class::get_journal_title() === $settings->get_plugin_option('secondary_journal_title')) */
+                /*     elseif($class::get_journal_title() === $settings->get_field_value('secondary_journal_title')) */
                 /*         $secondary_journal_post_count += $class::get_count_of_volume(null); */
                 /* } */
-            $primary_journal_post_count = O3PO_Journal::get_count_of_volume(null, $settings->get_plugin_option('primary_publication_type_name'));
-            $secondary_journal_post_count = O3PO_Journal::get_count_of_volume(null, $settings->get_plugin_option('secondary_publication_type_name'));
+            $primary_journal_post_count = O3PO_Journal::get_count_of_volume(null, $settings->get_field_value('primary_publication_type_name'));
+            $secondary_journal_post_count = O3PO_Journal::get_count_of_volume(null, $settings->get_field_value('secondary_publication_type_name'));
 
             echo '<div class="search-results">';
             echo '<div class="hentry">';
@@ -239,7 +239,7 @@ var search_field = document.getElementsByClassName("search-field");
         search_field[i].placeholder=\'Doi, title, author, arXiv id, ...\';
     }
 </script>';
-            echo $settings->get_plugin_option('journal_title') . ' has published <a href="/' . $settings->get_plugin_option('primary_publication_type_name_plural') . '/">' . $primary_journal_post_count . ' ' . ucfirst($primary_journal_post_count > 1 ? $settings->get_plugin_option('primary_publication_type_name_plural') : $settings->get_plugin_option('primary_publication_type_name')) . '</a> in <a href="/' . $settings->get_plugin_option('volumes_endpoint') . '">' . (getdate()["year"] - ($settings->get_plugin_option('first_volume_year')-1)) . ' Volumes</a>, as well as <a href="/'. $settings->get_plugin_option('secondary_publication_type_name_plural') . '/">' . $secondary_journal_post_count . ' ' . ucfirst($secondary_journal_post_count > 1 ? $settings->get_plugin_option('secondary_publication_type_name_plural') : $settings->get_plugin_option('secondary_publication_type_name') ) . '</a> in ' . $settings->get_plugin_option('secondary_journal_title') . '.';
+            echo $settings->get_field_value('journal_title') . ' has published <a href="/' . $settings->get_field_value('primary_publication_type_name_plural') . '/">' . $primary_journal_post_count . ' ' . ucfirst($primary_journal_post_count > 1 ? $settings->get_field_value('primary_publication_type_name_plural') : $settings->get_field_value('primary_publication_type_name')) . '</a> in <a href="/' . $settings->get_field_value('volumes_endpoint') . '">' . (getdate()["year"] - ($settings->get_field_value('first_volume_year')-1)) . ' Volumes</a>, as well as <a href="/'. $settings->get_field_value('secondary_publication_type_name_plural') . '/">' . $secondary_journal_post_count . ' ' . ucfirst($secondary_journal_post_count > 1 ? $settings->get_field_value('secondary_publication_type_name_plural') : $settings->get_field_value('secondary_publication_type_name') ) . '</a> in ' . $settings->get_field_value('secondary_journal_title') . '.';
             echo '</div>';
             echo '</div>';
         }
@@ -282,7 +282,7 @@ var search_field = document.getElementsByClassName("search-field");
 
         $show_help_on_this_page = false;
 
-        if(is_post_type_archive($settings->get_plugin_option('secondary_publication_type_name')))
+        if(is_post_type_archive($settings->get_field_value('secondary_publication_type_name')))
             $show_help_on_this_page = true;
         else
             foreach(O3PO_SecondaryPublicationType::get_associated_categories() as $category)
@@ -304,7 +304,7 @@ var search_field = document.getElementsByClassName("search-field");
             }
 
             $categories_string = O3PO_Utility::oxford_comma_implode($categorylinks);
-            echo '<p>' . $settings->get_plugin_option('secondary_journal_title') . ' publishes ' . $categories_string . ' on research papers and other issues of relevance for <a href="/">' . $settings->get_plugin_option('journal_title') . '</a>.</p>';
+            echo '<p>' . $settings->get_field_value('secondary_journal_title') . ' publishes ' . $categories_string . ' on research papers and other issues of relevance for <a href="/">' . $settings->get_field_value('journal_title') . '</a>.</p>';
         }
     }
 

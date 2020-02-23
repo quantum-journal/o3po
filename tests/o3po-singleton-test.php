@@ -2,7 +2,7 @@
 
 require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-singleton.php';
 
-class O3PO_SingletonTest extends PHPUnit_Framework_TestCase
+class O3PO_SingletonTest extends O3PO_TestCase
 {
         /**
          * @runInSeparateProcess

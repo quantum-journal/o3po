@@ -2,7 +2,7 @@
 
 require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-latex.php';
 
-class O3PO_LatexTest extends PHPUnit_Framework_TestCase
+class O3PO_LatexTest extends O3PO_TestCase
 {
 
 
@@ -349,6 +349,39 @@ ab' , 'äb'],
          */
     public function test_strpos_outside_math_mode( $input, $expected ) {
         $this->assertSame($expected, O3PO_Latex::strpos_outside_math_mode($input[0], $input[1]));
+    }
+
+    public function utf8_to_latex_provider() {
+        return [
+            ['foo', 'foo'],
+            ['ô', '{\\^{o}}'],
+            ['é', '{\\\'{e}}'],
+                ];
+    }
+
+        /**
+         * @dataProvider utf8_to_latex_provider
+         */
+    public function test_utf8_to_latex( $input, $expected ) {
+        $this->assertSame($expected, O3PO_Latex::utf8_to_latex($input, $expected));
+    }
+
+
+
+    public function utf8_to_bibtex_provider() {
+        return [
+            ['foo', 'foo'],
+            ['ô', '{\\^{o}}'],
+            ['é', '{\\\'{e}}'],
+            ['and some $$y$$ equation é', 'and some {$y$} equation {\\\'{e}}'],
+                ];
+    }
+
+        /**
+         * @dataProvider utf8_to_bibtex_provider
+         */
+    public function test_utf8_to_bibtex( $input, $expected ) {
+        $this->assertSame($expected, O3PO_Latex::utf8_to_bibtex($input, $expected));
     }
 
 
