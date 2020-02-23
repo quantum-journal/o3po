@@ -390,7 +390,9 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
             else
                 $style = 'author-year';
 
-            $bbl = preg_replace('#\\\\(newcommand|providecommand|def)(?:\{| +|)(\\\\[@a-zA-Z]+)(?:\}| +|)(\[[0-9]\]|)(\[[^]]*\]|)(?=\{((?:[^{}]++|\{(?5)\})*)\})#u', '', $bbl); //remove all \newcommand and similar (Note the use of (?5) here!) to test changes go here https://regex101.com/r/g7LCUO/1
+            $bbl = preg_replace('#\\\\(newcommand|providecommand|renewcommand|renewcommand\*)(?:\{| *)(\\\\[@a-zA-Z]+|\\\\[^ @a-zA-Z])\s*(?:\}| *)\s*(\[[0-9]\]|)\s*(\[[^]]*\]|)\s*(?=\{((?:[^{}]++|\{(?5)\})*)\})#u', '', $bbl); //remove all \newcommand and similar (Note the use of (?5) here!) to test changes go here https://regex101.com/r/g7LCUO/1
+            $bbl = preg_replace('#\\\\(def)(?:\{| *)(\\\\[@a-zA-Z]+|\\\\[^ @a-zA-Z])\s*(?:\}| *)((?:\#[0-9])*)()(?=\{((?:[^{}]++|\{(?5)\})*)\})#u', '', $bbl); //remove all \def and similar (Note the use of (?5) here!) to test changes go here https://regex101.com/r/g7LCUO/1
+
             $entries = preg_split('/\\\\bibitem\s*(?=[[{])/u', $bbl, -1, PREG_SPLIT_NO_EMPTY);
 
             $citations = array();
@@ -578,7 +580,14 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
     static public function extract_latex_macros( $latex_source ) {
 
         $latex_source_without_comments = preg_replace('#(?<!\\\\)%.*#u', '', $latex_source);
-        preg_match_all('#\\\\(newcommand|providecommand|def)(?:\{| *)(\\\\[@a-zA-Z]+)(?:\}| *)(\[[0-9]\]|)(\[[^]]*\]|)(?=\{((?:[^{}]++|\{(?5)\})*)\})#u', $latex_source_without_comments, $latex_macro_definitions, PREG_SET_ORDER);//matches \newcommand and friends and takes into account balanced parenthesis (Note the use of (?5) here!) to test changes go here https://regex101.com/r/g7LCUO/1
+
+        preg_match_all('#\\\\(newcommand|providecommand|renewcommand|renewcommand\*)(?:\{| *)(\\\\[@a-zA-Z]+|\\\\[^ @a-zA-Z])\s*(?:\}| *)\s*(\[[0-9]\]|)\s*(\[[^]]*\]|)\s*(?=\{((?:[^{}]++|\{(?5)\})*)\})#u', $latex_source_without_comments, $latex_macro_definitions1, PREG_SET_ORDER);//matches \newcommand and friends and takes into account balanced parenthesis (Note the use of (?5) here!) to test changes go here https://regex101.com/r/g7LCUO/1
+
+        preg_match_all('#\\\\(def)(?:\{| *)(\\\\[@a-zA-Z]+|\\\\[^ @a-zA-Z])\s*(?:\}| *)((?:\#[0-9])*)()(?=\{((?:[^{}]++|\{(?5)\})*)\})#u', $latex_source_without_comments, $latex_macro_definitions2, PREG_SET_ORDER);//matches \def and friends and takes into account balanced parenthesis (Note the use of (?5) here!) to test changes go here https://regex101.com/r/g7LCUO/1
+        foreach($latex_macro_definitions2 as $key => $def_macro)
+            $latex_macro_definitions2[$key][3] = '[' . substr_count($def_macro[3], '#') . ']'; //determine the number of arguments of \def macro definitions
+
+        $latex_macro_definitions = array_merge($latex_macro_definitions1, $latex_macro_definitions2);
 
         return $latex_macro_definitions;
     }
@@ -666,7 +675,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
             else
                 $default_argument = $default_argument[1];
 
-            $macroname = '\\\\' . mb_substr($macro_definition[2],1);//mb_substr picks out the name of the macro without the leading \;
+            $macroname = '\\\\' . preg_quote(mb_substr($macro_definition[2], 1));//mb_substr picks out the name of the macro without the leading \;
             $pattern = $macroname;
             $replacement = $macro_definition[5];
             if($num_arguments == 0)
@@ -684,9 +693,9 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
 
                     $replacement = str_replace( '#' . $i , '\\'.$i ,  $replacement );
                 }
-            $pattern = '\\\\(?:newcommand|providecommand|def)[\s{]*' . $macroname . '(*SKIP)(*FAIL)|' . $pattern; //prevent expanion in the definition of the macro
+            $pattern = '\\\\(?:newcommand|providecommand|renewcommand|renewcommand|def)[\s{]*' . $macroname . '(*SKIP)(*FAIL)|' . $pattern; //prevent expanion in the definition of the macro
             $pattern = '#' . $pattern . '#u';
-            $replacement = str_replace('\$', '\\\\\$', $replacement);// espace $ in replacement as it has a special meaning
+            $replacement = str_replace('\$', '\\\\\$', $replacement);// escape $ in replacement as it has a special meaning
             if(preg_match('#\\\\[a-zA-Z]+$#', $replacement)===1) #If replacement ends with an all letter latex macro add a space to allow correct expansion of that macro in following expansion rounds
                 $replacement .= " ";
 
@@ -704,6 +713,9 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
             }
 
             $new_text = preg_replace('#\\\\csname\s*(.*)\\\\endcsname#u', '\\\\$1', $new_text);
+
+                //This would be the right place to hande \if \else \fi
+                //preg_match('#\\\\if(?=\{((?:[^{}]++|\{(?1)\})*)\}|.)(?=\{((?:[^{}]++|\{(?1)\})*)\}|.)(.*)\\\\else(.*)\\\\fi#u');
 
             if($new_text === $text)
                 break;

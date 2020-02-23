@@ -138,13 +138,26 @@ class O3PO_LatexTest extends PHPUnit_Framework_TestCase
 
     }
 
+
         /**
          * @depends test_get_latex_file
          */
     public function test_extract_latex_macros_latex( $latex ) {
 
-        $macros = O3PO_Latex::extract_latex_macros($latex);;
-        $this->assertEquals(count($macros), 68);
+        $macros = O3PO_Latex::extract_latex_macros($latex);
+
+        $some_expected_macros = [
+            ["\\newcommand{\\refsub}[2]","newcommand","\\refsub","[2]","","\\hyperref[#1]{\\ref*{#1}#2}"],
+            ["\\newcommand{\\stoc\n    }[1]","newcommand","\\stoc","[1]","","\\if\\lName1\\skp{ }{Proceedings of the #1 {ACM} Symposium on the Theory of Computing ({STOC})}{ }\\else{STOC}\\fi"],
+            ["\\newcommand{\\inputTikZ}[1]","newcommand","\\inputTikZ","[1]","","\n  \\beginpgfgraphicnamed{tikz/#1-external}\n  \\input{tikz/#1.tikz}\n  \\endpgfgraphicnamed\n"],
+            ["\\def\\?#1","def","\\?","[1]","","\\if.#1{}\\else#1\\fi"],
+            ["\\def\\_#1#2","def","\\_","[2]","","#2foo#1"]
+                            ];
+
+        foreach($some_expected_macros as $macro)
+            $this->assertContains($macro, $macros);
+
+        $this->assertEquals(83, count($macros));
 
         return $macros;
     }
