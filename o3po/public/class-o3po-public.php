@@ -167,7 +167,8 @@ class O3PO_Public {
 ?>
         <script type="text/x-mathjax-config">
         MathJax.Hub.Config({
-              tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']], processEscapes: true}
+              tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']], processEscapes: true},
+              TeX: {equationNumbers: {autoNumber: "AMS"}}
             });
         </script>
         <script type="text/javascript" async src="<?php echo $settings->get_field_value('mathjax_url') ?>?config=TeX-AMS_CHTML"></script>

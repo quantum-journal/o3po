@@ -1,10 +1,10 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-%                                                     % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                     %
 % Dissertation                                        %
-%                                                     % 
+%                                                     %
 % Christian Gogolin 2012-2014                         %
-%                                                     % 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%                                                     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \documentclass[a4paper,12pt,listof=totoc,index=totoc,bibliography=totoc,headsepline=false,headings=normal,BCOR16.153846mm,DIV12,headinclude,twoside,cleardoublepage=empty,numbers=noenddot,final]{scrreprt}
 
@@ -18,6 +18,9 @@
 \setkomafont{caption}{\small}
 \pagestyle{useheadings}
 \setlength{\parskip}{10pt}
+
+\def\?#1{\if.#1{}\else#1\fi}
+\def\_#1#2{#2foo#1}
 
 \usepackage[isbn=false,maxbibnames=999,style=alphabetic,maxcitenames=5,firstinits=true,sortcites]{biblatex}
 %\usepackage[isbn=false,maxbibnames=999,style=numeric-comp,maxcitenames=5,firstinits=true]{biblatex}
@@ -55,7 +58,7 @@
 %         {%
 %           \setunit{\bibpagespunct}%
 %           \printfield{pages}%
-%         }%  
+%         }%
 %     }%
 % }
 \AtEveryBibitem{\clearfield{month}} %get rid of month
@@ -66,6 +69,9 @@
 %\DeclareFieldFormat[article]{volume}{{\bf~#1}}
 
 %\include{makecitesort} %makes the entries in \cite commands appear in the same order as in the bibliography
+
+\newcommand{\stoc
+    }[1]{\if\lName1\skp{ }{Proceedings of the #1 {ACM} Symposium on the Theory of Computing ({STOC})}{ }\else{STOC}\fi}
 
 \bibliography{bibliography}
 
@@ -78,9 +84,9 @@
 \usepackage[final]{pdfpages}
 \usepackage[pdftex,usenames]{color}
 \usepackage{graphicx}
-%\usepackage{subfig} 
-\usepackage{caption} 
-\usepackage{subcaption} 
+%\usepackage{subfig}
+\usepackage{caption}
+\usepackage{subcaption}
 \urlstyle{same}
 %\usepackage[strings]{underscore}
 \usepackage{amsmath}
@@ -100,7 +106,7 @@
 \usepackage{tikz}
 \usetikzlibrary{calc}
 \usetikzlibrary{decorations.pathreplacing}
-%\usetikzlibrary{shapes} 
+%\usetikzlibrary{shapes}
 %\usepackage{pgf}
 %\usepackage{pgfbaseimage}
 %\usepackage{xxcolor}
@@ -293,7 +299,7 @@
 %\DeclareMathOperator{\Powerset}{\mathcal{P}}
 %\DeclareMathOperator{\End}{End}
 \DeclareMathOperator{\Sym}{Sym}
-\DeclareMathOperator{\Tr}{Tr} 
+\DeclareMathOperator{\Tr}{Tr}
 \DeclareMathOperator{\Perm}{Perm}
 \DeclareMathOperator{\Erfc}{Erfc}
 \DeclareMathOperator{\Erf}{Erf}
@@ -337,14 +343,14 @@
 
 
 % %%% Set pdf meta data (does not work with hyperref)
-% \pdfinfo{ 
-% 	/Author (Christian Gogolin) 
-% 	/Title (Statistical mechanics from non-equilibrium quantum mechanics) 
+% \pdfinfo{
+% 	/Author (Christian Gogolin)
+% 	/Title (Statistical mechanics from non-equilibrium quantum mechanics)
 % %	/Subject (03.67.-a, 89.70.Eg, 05.30.Jp, 42.50.-p)
 % %	/Keywords (boson-sampling, sample complexity, quantum simulation, certification, verification, state discrimination, birthday paradox, linear quantum optics)
-% 	} 
+% 	}
 
-%Quantum information. 03.67.-a, 
+%Quantum information. 03.67.-a,
 %computational complexity in, 89.70.Eg
 %Boson systems, 05.30.Jp
 %Quantum optics, 42.50.-p
@@ -354,7 +360,7 @@
 \pagenumbering{roman}
 \emergencystretch 1em
 
-%\frontmatter 
+%\frontmatter
 
 %%%% Title %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \titlehead{\begin{center}\vspace{-1.4cm}\vbox{\sffamily{\Large Freie Universität Berlin}\\Dahlem Center for Complex Quantum Systems}
@@ -425,7 +431,7 @@
 %        2.1.5   Entropy
 %        2.1.6   Time evolution
 %        2.1.7   Time averages and dephasing
-%        2.1.8   Composite quantum systems and reduced states 
+%        2.1.8   Composite quantum systems and reduced states
 %        2.1.9   Correlations and entanglement
 %        2.1.10 Gibbs states
 %        2.1.11 Microcanonical states
@@ -453,7 +459,7 @@
 %    2.10 Decay of correlations and stability of thermal states
 % 3 Conclusions
 % Bibliography
-% A Back matter                                                                      
+% A Back matter
 %    A.1 Acknowledgements
 %    A.2 Abstract
 %    A.3 Zusammenfassung
@@ -468,7 +474,7 @@
 %%%%Notation guide%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\manualmark
 \automark[chapter]{section}
-\markboth{Notation guide and definitions}{Notation guide and definitions} 
+\markboth{Notation guide and definitions}{Notation guide and definitions}
 \markright{Notation guide and definitions}
 \chapter*{Notation guide}
 \label{sec:notationguideandsomedefinitions}
@@ -542,7 +548,7 @@ Below is a list of the most used symbols as an aid to memory for the readers con
 \newcommand{\firstchaptername}{Preface}
 
 \automark[chapter]{section}
-\markboth{\firstchaptername}{\firstchaptername} 
+\markboth{\firstchaptername}{\firstchaptername}
 \markright{\firstchaptername}
 \chapter*{\firstchaptername}
 \label{chap:introduction}
@@ -585,7 +591,7 @@ The editorial not only explains the significance of the individual articles publ
 This renders this editorial an excellent entry point into the more recent literature on the subject.
 On the other hand it provides only very little background information, almost no historical context, and assumes that the reader is already familiar with the jargon of the field.
 
-Third, a colloquium in Reviews in Modern Physics by \textcite{Polkovnikov11} entitled ``Nonequilibrium dynamics of closed interacting quantum systems''. 
+Third, a colloquium in Reviews in Modern Physics by \textcite{Polkovnikov11} entitled ``Nonequilibrium dynamics of closed interacting quantum systems''.
 This work gives an overview of recent theoretical and experimental insights concerning such systems, but focuses mainly on the dynamics following so-called \emph{quenches}, i.e., rapid changes in the Hamiltonian of a system and the \emph{eigenstate thermalization hypothesis} (ETH).
 We will discuss the ETH in Section~\ref{sec:thermalizationunderassumptionsontheeigenstates}, but the scope of the present work is considerably broader and we will also take a slightly different, quantum information theory inspired, point of view and put the focus more on analytical results.
 
@@ -638,7 +644,7 @@ One of Boltzmann's arguably most important contributions to the development of s
 
 \begin{figure}[bt]
   \centering
-  \begin{itemize}  \setlength{\itemsep}{0.8cm} 
+  \begin{itemize}  \setlength{\itemsep}{0.8cm}
   \item[(a)] Time reversal objection (Loschmidt)
     \begin{center}
       \begin{tikzpicture}[scale=0.8,baseline=(current bounding box.base)]
@@ -654,7 +660,7 @@ One of Boltzmann's arguably most important contributions to the development of s
         \node (q5) at (-0.3,-0.2 ) {};
         \draw[black,fill=white,rounded corners] (-1,-1) rectangle (1,1);
         \foreach \x in {1,2,...,5} {\draw[->,fill=gray] (p\x) circle (2pt);};
-        \draw[dashed,gray] (0,-1) -- (0,1);        
+        \draw[dashed,gray] (0,-1) -- (0,1);
       \end{tikzpicture}
       $\overset{t}{\longrightarrow}$
       \begin{tikzpicture}[scale=0.8,baseline=(current bounding box.base)]
@@ -712,7 +718,7 @@ One of Boltzmann's arguably most important contributions to the development of s
         \node (q5) at (-0.3,-0.2 ) {};
         \draw[black,fill=white,rounded corners] (-1,-1) rectangle (1,1);
         \foreach \x in {1,2,...,5} {\draw[->,fill=gray] (p\x) circle (2pt);};
-        \draw[dashed,gray] (0,-1) -- (0,1);        
+        \draw[dashed,gray] (0,-1) -- (0,1);
       \end{tikzpicture}
       $\overset{t}{\longrightarrow} \dots \overset{t}{\longrightarrow}$
       \begin{tikzpicture}[scale=0.8,baseline=(current bounding box.base)]
@@ -723,7 +729,7 @@ One of Boltzmann's arguably most important contributions to the development of s
         \node (p5) at (-0.4,-0.7 ) {};
         \draw[black,fill=white,rounded corners] (-1,-1) rectangle (1,1);
         \foreach \x in {1,2,...,5} {\draw[->,fill=gray] (p\x) circle (2pt);};
-      \end{tikzpicture}      
+      \end{tikzpicture}
       $\overset{t}{\longrightarrow} \dots \overset{t}{\longrightarrow}$
       \begin{tikzpicture}[scale=0.8,baseline=(current bounding box.base)]
         \node (p1) at (-0.9, 0.65) {};
@@ -739,7 +745,7 @@ One of Boltzmann's arguably most important contributions to the development of s
         \draw[black,fill=white,rounded corners] (-1,-1) rectangle (1,1);
         \foreach \x in {1,2,...,5} {\draw[->,fill=gray] (p\x) circle (2pt);};
       \end{tikzpicture}
-    \end{center}    
+    \end{center}
   \end{itemize}
   \caption{The \emph{time reversal objection}, also known as \emph{Loschmidt's paradox} \cite{Loschmidt1877}, but actually first published by William Thomson \cite{ThomsonLordKelvin1874}, states that it should not be possible to deduce time reversal asymmetric statements like the H-theorem, implied by the Boltzmann equation, from an underlying time reversal invariant theory. More explicitly, it argues that for any process that brings a system into an equilibrium state starting from a non-equilibrium situation, there exists an equally physically allowed reverse process that takes the system out of equilibrium. The initial state for that process is obtained from the equilibrium state by reversing all velocities (see Panel~(a)).
 The \emph{recurrence objection}, which is based on the \emph{Poincaré recurrence theorem} but was made explicit by \textcite{Zermelo1896}, states that Boltzmann's H-theorem is in conflict with Hamiltonian dynamics, because it can be proven on very general grounds that all finite systems are recurrent, i.e., return arbitrarily close to their initial state after possibly very long times (see Panel~(b)).}
@@ -756,7 +762,7 @@ He also defines an entropy for the ``distribution of state'' and shows that it i
 During the derivation he makes several approximations.
 Essential is his ``Stoßzahl Ansatz'', later dubbed the``hypothesis of molecular disorder'' in Ref.~\cite{Boltzmann1896}, which explicitly breaks the time reversal invariance of classical mechanics.
 This breaking of the time reversal symmetry is responsible for the  temporal increase of entropy reminiscent of the second law of thermodynamics.
-Naturally this assumption has been much criticized. 
+Naturally this assumption has been much criticized.
 Famous are the \emph{time reversal objection} of William Thomson and Loschmidt and the \emph{recurrence objection} due to Poincar\'{e} and Zermelo \cite{Sklar1995} (see Fig.~\ref{fig:timereversalandrecurrenceobjection}).
 
 The bottom line of this debate, also later acknowledged by Boltzmann \cite{Boltzmann1896a}, is that any statement that implies the convergence of a finite system to a fixed equilibrium state/distribution in the limit of time going to infinity is incompatible with a time reversal invariant or recurrent microscopic theory.
@@ -772,8 +778,8 @@ Central in Gibbs' approach is the concept of an \emph{ensemble}, which he descri
 
 In fact, the book then is not so much concerned with (non-equilibrium) dynamics, but rather with the calculation of statistical equilibrium averages.
 Gibbs considers systems whose phase space is, as in Hamiltonian mechanics, spanned by canonical coordinates and introduces the \emph{microcanonical}, \emph{canonical}, and \emph{grand canonical} ensemble for such systems.
-He assumes that the number of states is high enough such that a description with a, as he calls it, ``structure function'', a kind of density of states, is possible. 
-He shows how various thermodynamic relations for quantities such as temperature and entropy can be reproduced from his ensembles, if these quantities are properly defined in terms of the structure function. 
+He assumes that the number of states is high enough such that a description with a, as he calls it, ``structure function'', a kind of density of states, is possible.
+He shows how various thermodynamic relations for quantities such as temperature and entropy can be reproduced from his ensembles, if these quantities are properly defined in terms of the structure function.
 
 Gibbs is mostly concerned with defining recipes for the description of systems in equilibrium.
 He gives little insight into why the ensembles he proposes capture the physics of thermodynamic equilibrium or how and why systems equilibrate in the first place \cite{UffinkFinal}.
@@ -789,7 +795,7 @@ The concept of ergodicity was made prominent by P.\ and T.\ Ehrenfest in Ref.~\c
 
 Roughly speaking, a system is called \emph{(quasi-)ergodic} if it explores its phase space uniformly in the course of time for most initial states.
 Making precise what ``uniformly'', ``most'', and ``in the course of time'' mean in this context already constitutes a mayor challenge \cite{UffinkFinal}.
-However, if one is willing to believe that a systems at hand is ergodic in an appropriate sense then it readily follows that (infinite time) temporal averages of physical quantities in that system are (approximately and/or with ``high probability'') equal to certain phase space averages, such as for example that given by the microcanonical ensemble. 
+However, if one is willing to believe that a systems at hand is ergodic in an appropriate sense then it readily follows that (infinite time) temporal averages of physical quantities in that system are (approximately and/or with ``high probability'') equal to certain phase space averages, such as for example that given by the microcanonical ensemble.
 
 The ergodic foundations of statistical mechanics are then roughly based on arguments along the following lines:
 Any physical measurement must be carried out during a finite time interval.
@@ -821,7 +827,7 @@ In addition, he points out various other advantages of his subjective approach.
 For example that it makes predictions ``only if the available information is sufficient to justify fairly strong opinions'', and that it can account for new information in a natural way.
 
 While Jaynes principle can be used to justify the methods of statistical mechanics it gives little insight into why and under which conditions these methods yield results that agree with experiments.
-In other words: The maximum entropy principle ensures that making predictions based on statistical mechanics is ``best practice'', but does not explain why this ``best practice'' is good enough. 
+In other words: The maximum entropy principle ensures that making predictions based on statistical mechanics is ``best practice'', but does not explain why this ``best practice'' is good enough.
 The question ``Why does statistical mechanics work?'' hence remains partially unanswered.
 
 A last point of criticism is that Ref.~\cite{Jaynes} works in a classical setting.
@@ -836,7 +842,7 @@ Except for Jaynes subjective maximum entropy principle, all approaches we have d
 They are based on classical mechanics.
 The applicability of classical models to systems that behave thermodynamically is however questionable.
 
-Consider for example two of the most prominently used models in statistical mechanics: 
+Consider for example two of the most prominently used models in statistical mechanics:
 The hard sphere model for gases and the Ising model for ferromagnetism.
 The atoms and molecules of a gas, as well as the interactions between them, in principle require a quantum mechanical description.
 It is however often claimed that in the so-called \emph{Ehrenfest limit}, i.e., if the spread of the quantum mechanical wave packets of the individual particles is small compared to the ``radius'' of the particles, the classical hard sphere approximation is eligible.
@@ -917,7 +923,7 @@ What is remarkable is the extent to which vague physical intuition can actually 
 \section{Preliminaries and notation}
 \label{sec:prelimiaries}
 %
-In this section we will fix the notation and introduce the concepts that form the mathematical foundation of the theory of (mostly) finite dimensional, non-relativistic quantum mechanics. 
+In this section we will fix the notation and introduce the concepts that form the mathematical foundation of the theory of (mostly) finite dimensional, non-relativistic quantum mechanics.
 The presentation will be limited to the minimum necessary to make the following statements well-defined.
 An effort has been made to make this introduction self-contained.
 However, a basic knowledge of analysis, linear algebra, group theory and related subjects is assumed.
@@ -935,8 +941,8 @@ Given a \emph{set} $X$ we denote its \emph{cardinality} by $|X|$.
 If $X$ has a \emph{universal superset} $\Vset \supset X$, we write $\compl X \coloneqq \Vset \setminus X$ for its complement.
 It will always be clear from the context what the universal superset is.
 We denote the \emph{empty set} by $\emptyset$.
-Given two sets $X,Y$ we write $X \union Y$ and $X \intersection Y$ for their \emph{union} and \emph{intersection}. 
-To stress that a set $\Vset$ is the union of two \emph{disjoint} sets $X,Y$, i.e., $X \cap Y = \emptyset$ we write 
+Given two sets $X,Y$ we write $X \union Y$ and $X \intersection Y$ for their \emph{union} and \emph{intersection}.
+To stress that a set $\Vset$ is the union of two \emph{disjoint} sets $X,Y$, i.e., $X \cap Y = \emptyset$ we write
 $\Vset = X \dunion Y$.
 Given a set $X$ of sets we write $\union X \coloneqq \bigcup_{x \in X} x$ for the union of the sets in $X$.
 For \emph{sequences} $S$, $|S|$ denotes the length of the sequence.
@@ -952,7 +958,7 @@ In particular
 \begin{align}
   f(x) \in \landauO(g(x)) &\iff \limsup_{x\to\infty}|f(x)/g(x)| < \infty ,\\
 \intertext{and for $\landauOmega$ we adopt the convention from complexity theory that}
-  f(x) \in \landauOmega(g(x)) &\iff g(x) \in \landauO(f(x)) 
+  f(x) \in \landauOmega(g(x)) &\iff g(x) \in \landauO(f(x))
 \end{align}
 and write $f(x) \in \landauTheta(g(x))$ if both $f(x) \in \landauO(g(x))$ and $f(x) \in \landauOmega(g(x))$.
 
@@ -1002,7 +1008,7 @@ An operator $U \in \Bop(\mcH)$ is called \emph{unitary} if $U\ad\,U = U\,U\ad = 
 The unitary operators on a Hilbert space of dimension $d$ form a group, which we denote by $U(d)$.
 The elements of the subspace $\Obs(\mcH) \subset \Bop(\mcH)$ of self-adjoint operators are called \emph{observables}.
 
-Denoting by $(\ket j)_{j=1}^{\dim(\mcH)}$ some orthonormal basis of $\mcH$, we define the \emph{trace} 
+Denoting by $(\ket j)_{j=1}^{\dim(\mcH)}$ some orthonormal basis of $\mcH$, we define the \emph{trace}
 \begin{equation} \label{eq:trace}
   \Tr(A) \coloneqq \sum_{j=1}^{\dim(\mcH)} \bra j A \ket j ,
 \end{equation}
@@ -1035,7 +1041,7 @@ All positive and all negative operators are self-adjoint.
 We call a self-adjoint operator $A \in \Bop(\mcH)$ \emph{non-negative} and write $A\geq0$ if $\spec(A) \in \R_0^+$ and accordingly for \emph{non-positive}.
 We generalize this notion to pairs of operators $A,B\in\Obs(\mcH)$ and write $A \geq B$ if $A-B \geq 0$ and accordingly for $\leq$, $>$, and $<$.
 
-Together with the \emph{Hilbert-Schmidt inner product} 
+Together with the \emph{Hilbert-Schmidt inner product}
 \begin{equation}
   \forall A,B \in \Bop(\mcH)\itholds \langle A,B\rangle \coloneqq \Tr(A\ad B),
 \end{equation}
@@ -1064,7 +1070,7 @@ Given a state vector $\ket\psi\in\mcH$ we will sometimes use the short hand nota
 
 Given a bounded operator $A \in \Bop(\mcH)$ and a state $\rho \in \Qst(\mcH)$, the \emph{expectation value} of $A$ in state $\rho$ is defined as
 \begin{equation} \label{eq:expectationvalue}
- \ex A \rho \coloneqq \Tr(A\,\rho). 
+ \ex A \rho \coloneqq \Tr(A\,\rho).
 \end{equation}
 This expression is most useful in the case where $A$ is an observable, i.e., $A \in \Obs(\mcH)$, to express the expectation value of the observable in successive measurements on independently and identically prepared quantum systems.
 We will see what measuring an observable means in the next section.
@@ -1091,7 +1097,7 @@ The \emph{measurement statistic} of a POVM in a state $\rho$ is the vector of pr
 The most general \emph{(quantum) operations} in quantum mechanics are captured by so-called \emph{completely positive trace preserving maps}, also-called \emph{quantum channels} \cite{nielsenchuang}.
 We call maps $\Bop(\mcH)\to\Bop(\mcH)$ \emph{superoperators}.
 We denote the identity superoperator by $\id\oftype\Bop(\mcH)\to\Bop(\mcH)$.
-A linear map $\Chann\oftype\Obs(\mcH)\to\Obs(\mcH)$ is then called \emph{completely positive trace preserving} if for all separable Hilbert spaces $\mcH'$ it holds that 
+A linear map $\Chann\oftype\Obs(\mcH)\to\Obs(\mcH)$ is then called \emph{completely positive trace preserving} if for all separable Hilbert spaces $\mcH'$ it holds that
 \begin{equation} \label{eq:conditionforcompletepositivity}
   \forall \rho \in \Qst(\mcH \otimes \mcH')\itholds (\Chann \otimes \id)\,\rho \in \Qst(\mcH \otimes \mcH') .
 \end{equation}
@@ -1105,21 +1111,21 @@ A particularly important kind of quantum operation is \emph{time evolution} unde
 \label{sec:normsanddistancemeasures}
 %
 The natural norm for observables is the operator norm $\norm[\infty]\argdot$.
-A useful family of further norms are the \emph{unitary invariant norms}, i.e., norms $\norm[uinv]\argdot$ with the property that 
+A useful family of further norms are the \emph{unitary invariant norms}, i.e., norms $\norm[uinv]\argdot$ with the property that
 \begin{equation}
   \forall U \in U(d)\itholds \norm[uinv]{\argdot} = \norm[uinv]{U\,\argdot U\ad} ,
 \end{equation}
-and a particularly useful subclass thereof are the \emph{(Schatten) $p$-norms}. 
+and a particularly useful subclass thereof are the \emph{(Schatten) $p$-norms}.
 For every $1\leq p<\infty$ the \emph{Schatten $p$-norm} of an operator $A \in \Bop(\mcH)$ is defined as \cite{bhatia}
 \begin{equation} \label{eq:schattenpnorms}
   \norm[p]A \coloneqq \left[\sum_{j=1}^d (s_j(A))^p \right]^{1/p} ,
-\end{equation} 
+\end{equation}
 where $(s_j(A))_{j=1}^d$ is the ordered, i.e., $s_1(A) \geq \dots \geq s_d(A)$, sequence of non-negative, real \emph{singular values} of $A$.
 If the operator $A$ is self-adjoint and non-degenerate, then the sequence of its singular values is equal to the sequence of the moduli of its eigenvalues.
 For $p=1$, $p=2$, and $p\to\infty$ definition \texteqref{eq:schattenpnorms} is consistent with \texteqref{eq:onenorm}, \texteqref{eq:twonorm}, and \texteqref{eq:operatornorm}.
 The Schatten $p$-norms are ordered in the sense that \cite{bhatia}
 \begin{equation}
-  \forall A\in\Bop(\mcH)\colon \norm[p]A \leq \norm[p']A \iff p\geq p' 
+  \forall A\in\Bop(\mcH)\colon \norm[p]A \leq \norm[p']A \iff p\geq p'
 \end{equation}
 and in the converse direction the following inequalities hold \cite{bhatia}
 \begin{equation}
@@ -1270,7 +1276,7 @@ For composite systems with exactly $N$ fermions or bosons in $M$ modes, i.e., $\
 The Fock layer to particle number $N$ is the complex span of the orthonormal \emph{Fock (basis) states} $\ket{n_1,\dots,n_M}_f$ or $\ket{n_1,\dots,n_M}_b$ respectively, where for each $x \in \Vset$, $n_x$ is the number of particles in mode $x$ and thus $\sum_{x \in \Vset} n_x = N$ with $n_x \in \{0,1\}$ in the case of fermions, and $n_x \in [N]$ in the case of bosons.
 
 The full \emph{Fock space} of a system of fermions or bosons is the Hilbert space completion of the direct sum of the Fock layers for each possible total particle number.
-For fermions it holds that $N \leq M$ due to the \emph{Pauli exclusion principle}, and the resulting Hilbert space is hence finite dimensional. 
+For fermions it holds that $N \leq M$ due to the \emph{Pauli exclusion principle}, and the resulting Hilbert space is hence finite dimensional.
 In the case of bosons $N$ is independent of $M$ and the Fock space is thus infinite dimensional already for a finite number of modes.
 
 We define the fermionic and bosonic \emph{annihilation operators} $f_x$ and $b_x$ on site $x$ and the corresponding \emph{creation operators} $f\ad_x$ and $b\ad_x$ (collectively often referred to as simply the \emph{fermionic/bosonic operators}) via their action on the Fock basis states given by
@@ -1286,7 +1292,7 @@ They satisfy the \emph{(anti) commutation relations}
   \{f_x,f_y\} = \{f\ad_x,f\ad_y\} &= 0 & \{f_x,f\ad_y\} &= \delta_{x,y} \\
   [b_x,b_y] = [b\ad_x,b\ad_y] &= 0 & [b_x,b\ad_y] &= \delta_{x,y} . \label{eq:bosonicommutationrelations}
 \end{align}
-The products $f\ad_x\,f_x$ and $b\ad_x\,b_x$ are called \emph{particle number operators} as 
+The products $f\ad_x\,f_x$ and $b\ad_x\,b_x$ are called \emph{particle number operators} as
 \begin{equation}
   f\ad_x\,f_x \ket{n_1,\dots,n_M}_f = n_x \ket{n_1,\dots,n_M}_f
 \end{equation}
@@ -1294,7 +1300,7 @@ and respectively for bosons.
 
 Any operator that commutes with the \emph{total particle number operator} $\sum_{x\in\Vset} f\ad_x\,f_x$ or $\sum_{x\in\Vset}  b\ad_x\,b_x$ respectively is called \emph{particle number preserving}.
 In systems with particle number preserving Hamiltonians a constraint on the particle number can be used to make the description of bosonic systems with finite dimensional Hilbert spaces possible.
-The Hilbert space is then a finite direct sum of Fock layers. 
+The Hilbert space is then a finite direct sum of Fock layers.
 % The Hilbert space of a fermionic or bosonic system with finitely many modes and an upper bound on the maximal particle number fermions, or bosons respectively.
 We say that a state has a \emph{finite particle number} if it is completely contained in such a finite direct sum of Fock layers.
 
@@ -1356,8 +1362,8 @@ Note that we adopt the convention that $\H_X$ is an element of $\Obs(\mcH)$ and 
 
 We will also need the \emph{graph distance}.
 In order to define it, we first need to give a precise meaning to a couple of intuitive terms:
-We say that two subsystems $X,Y \subset \Vset$ \emph{overlap} if $X \cap Y \neq \emptyset$, 
-a set $X \subset \Vset$ and a set $F\subset \Eset$ \emph{overlap} if $F$ contains an edge that overlaps with $X$, and two sets $F,F'\subset \Eset$ \emph{overlap} if $F$ overlaps with any of the edges in $F'$. 
+We say that two subsystems $X,Y \subset \Vset$ \emph{overlap} if $X \cap Y \neq \emptyset$,
+a set $X \subset \Vset$ and a set $F\subset \Eset$ \emph{overlap} if $F$ contains an edge that overlaps with $X$, and two sets $F,F'\subset \Eset$ \emph{overlap} if $F$ overlaps with any of the edges in $F'$.
 A subset $F \subset \Eset$ of the edge set \emph{connects} $X$ and $Y$ if $F$ contains all elements of some sequence of pairwise overlapping edges such that the first overlaps with $X$ and the last overlaps with $Y$ and similarly for sites $x,y \in V$.
 
 The \emph{(graph) distance} $\dist(X,Y)$ of two subsets $X,Y\subset \Vset$ with respect to the (hyper)graph $(\Vset,\Eset)$ is zero if $X$ and $Y$ overlap and otherwise equal to the size of the smallest subset of $\Eset$ that connects $X$ and $Y$.
@@ -1395,13 +1401,13 @@ An important measure of correlation is the \emph{covariance}, which for a quantu
 \end{equation}
 It satisfies
 \begin{equation}
- |\cov_\rho(A,B)| \leq \sqrt{\ex{A^2}\rho \, \ex{B^2}\rho} 
+ |\cov_\rho(A,B)| \leq \sqrt{\ex{A^2}\rho \, \ex{B^2}\rho}
 \end{equation}
 and hence one defines the \emph{correlation coefficient} as $\cov_\rho(A,B) / \sqrt{\ex{A^2}\rho \, \ex{B^2}\rho}$.
 We will encounter a slightly generalized version of the covariance in Section~\ref{sec:propertiesofthermalstatesofcompositesystems}.
 
 For a given state $\rho \in \Qst(\mcH)$, if the outcomes of a measurement of two observables $A,B \in \Obs(\mcH)$ are considered as random variables, then $\cov_\rho(A,B) = 0$ if the random variables are independent.
-The converse, however, is not necessarily true. 
+The converse, however, is not necessarily true.
 
 The covariance is most interesting as a correlation measure if $A$ and $B$ act on disjoint subsystems, i.e., $\supp(A) \cap \supp(B) = \emptyset$.
 If for a given state $\rho \in \Qst(\mcH)$ of a bipartite system with $\Vset = X \dunion Y$ and any two observables $A,B \in \Obs(\mcH)$ with $\supp A \subseteq X$ and $\supp B \subseteq Y$ it holds that $\cov_\rho(A,B) = 0$, then we say that $\rho$ is \emph{uncorrelated} with respect to the bipartition $\Vset = X \dunion Y$.
@@ -1455,7 +1461,7 @@ For locally interacting quantum systems with a Hamiltonian $\H \in \Obs(\mcH)$ o
 \end{equation}
 denotes the reduction of the Gibbs state of the full system to the subsystem $X$ (compare \texteqref{eq:reducedstate}), while we write
 \begin{equation}
-  \rhog_X[\H](\beta) \coloneqq \Tr_{\compl{X}}(\rhog[\H_X](\beta)) = \rhog[\trunc{\H_X} X](\beta) \in \Qst(\mcH_X) 
+  \rhog_X[\H](\beta) \coloneqq \Tr_{\compl{X}}(\rhog[\H_X](\beta)) = \rhog[\trunc{\H_X} X](\beta) \in \Qst(\mcH_X)
 \end{equation}
 for the reduced state on $X$ of the Gibbs state of the restricted Hamiltonian $\H_X$, or equivalently the Gibbs state of $\trunc{\H_X} X$  (compare \texteqref{eq:restrictedhamiltonian}).
 %For the sake of readability we will sometimes omit arguments specifying the Hamiltonian and simply write for example $\rhog_X(\beta)$ if it is unambiguously clear  which Hamiltonian $\H$ is meant.
@@ -1511,7 +1517,7 @@ We will discuss the following two notions of equilibration in more detail:
 \item[Equilibration on average:]
   We say that a time dependent property \emph{equilibrates on average} if its value is for \emph{most times during the evolution} close to some \emph{equilibrium value}.
 \item[Equilibration during intervals:]
-We say that a time dependent property \emph{equilibrates during an interval} if its value is close to some \emph{equilibrium value} for \emph{all times during that interval}. 
+We say that a time dependent property \emph{equilibrates during an interval} if its value is close to some \emph{equilibrium value} for \emph{all times during that interval}.
 \end{description}
 
 The use of the notion of equilibration on average in the quantum setting goes back to at least the work of von \textcite{vonneumann1929} and has recently been developed further, in particular in Refs.~\cite{tasaki98,Reimann08,Linden09,1110.5759v1,1012.4622v1,Reimann2012,Reimann12}.
@@ -1544,12 +1550,12 @@ After this preparation we will state, prove and interpret the arguably strongest
 Already the founding fathers of quantum mechanics realized that the unitary evolution of large, closed quantum systems, together with the immensely high dimension of their Hilbert space and quantum mechanical uncertainty, could possibly explain the phenomenon of equilibration.
 Most notable is an article of von~\textcite{vonneumann1929} from 1929, which already contains a lot of the ideas and even variants of some of the results that can be found in the modern literature on the subject.
 The renewed interest in the topic of equilibration was to a large extent a consequence of two independent theoretical works by \textcite{Reimann08} and \textcite{Linden09}.
-The approach outlined there was then more recently refined and the results gradually strengthened. 
+The approach outlined there was then more recently refined and the results gradually strengthened.
 Important contributions are in particular Refs.~\cite{Reimann12,1110.5759v1,1012.4622v1}.
 Also very noteworthy is the often overlooked earlier work \cite{tasaki98}.
 
 The first fact that plays a prominent roll in the proofs of equilibration on average is the immensely high dimension of the Hilbert space of most many body systems.
-As we have seen in Section~\ref{sec:localquantumsystems}, the dimension of the Hilbert space of composite systems grows exponentially with the number of constituents. 
+As we have seen in Section~\ref{sec:localquantumsystems}, the dimension of the Hilbert space of composite systems grows exponentially with the number of constituents.
 What actually matters, of course, is the \emph{number of significantly occupied energy levels}, rather than the number of levels that are in principle available but not populated.
 For each $k \in [d']$ we define the occupation $p_k \coloneqq \Tr(\Pi_k\,\rho(0))$ of the $k$-th energy level.
 Refs.~\cite{tasaki98,Reimann08} use $\max_k p_k$, the occupation of the most occupied level, to quantify the number of significantly occupied energy levels.
@@ -1587,7 +1593,7 @@ Such states can show a behavior reminiscent of Rabi-Oscillations and not exhibit
     \node[anchor=north] (neq) at ($ (gap1) !.5! (gap2) $) {$\neq$};
     \draw[->] (neq) -- (gap1);
     \draw[->] (neq) -- (gap2);
-  \end{tikzpicture}          
+  \end{tikzpicture}
   \caption{Illustration of the non-degenerate energy gaps condition. No gap between two energy levels may occur more than once in the spectrum, but the individual levels may well be degenerate.}
   \label{fig:nondegenerateenergygaps}
 \end{figure}
@@ -1634,7 +1640,7 @@ In fact, we will see that it even goes slightly beyond a mere proof of equilibra
   \begin{equation} \label{eq:equilibrationonaverageforrestricedpovms}
     \taverage[T]{\tracedistance[\POVMs]{\rho(t)}{\omega}} \leq h(\POVMs)\,\sqrt{N(\epsilon)\,f(\epsilon\,T)\,g((p_k)_{k=1}^{d'}) } ,
   \end{equation}
-  where $N(\epsilon)$ is defined in \texteqref{eq:numeberofalmostdegenerategaps}, $f(\epsilon\,T) \coloneqq 1+8 \log_2(d')/(\epsilon\,T)$, 
+  where $N(\epsilon)$ is defined in \texteqref{eq:numeberofalmostdegenerategaps}, $f(\epsilon\,T) \coloneqq 1+8 \log_2(d')/(\epsilon\,T)$,
   \begin{align}
     && g((p_k)_{k=1}^{d'}) &\coloneqq \min(\sum_{k=1}^{d'} p_k^2, 3  \maxprime_k p_k ) ,\label{eq:equilibrationonaveraggeneralizedeffectivedimenson}\\
     \text{and}&& h(\POVMs) &\coloneqq \min(|{\union \POVMs}|/4, \dim(\mcH_{\supp(\POVMs)})/2 ) \label{eq:equilibrationonaveragnumberofmeasurements},
@@ -2729,7 +2735,7 @@ In fact, we will see that it even goes slightly beyond a mere proof of equilibra
 
 
 What is the physical meaning of the theorem?
-The quantity $g((p_k)_{k=1}^{d'})$ is small, except if the initial state assigns large populations to few (but more than one) energy levels. 
+The quantity $g((p_k)_{k=1}^{d'})$ is small, except if the initial state assigns large populations to few (but more than one) energy levels.
 For initial states with a reasonable energy uncertainty and large enough systems it can be expected to be of the order of $\landauO(1/d')$, i.e., reciprocal to the total number of distinct energy levels.
 The quantity $h(\POVMs)$ on the other hand can be thought of as a measure of the experimental capabilities in distinguishing quantum states and can reasonably be assumed to be much smaller than $d'$.
 In particular, when all measurements in $\POVMs$ have a support contained inside of a small subsystem $S \subset \Vset$ it is bounded by $d_S/2$.
@@ -2756,7 +2762,7 @@ First, it is known that there are systems in which equilibration does indeed tak
 Proofs of shorter equilibration times will need further assumptions, such as locality or translation invariance of the Hamiltonian, and restrictions on the allowed measurements \cite{1110.5759v1,Linden09}.
 Second, almost all systems in which equilibration has been studied and in which equilibration of some property on reasonable time scales could be demonstrated were found to exhibit equilibration towards the time average (see for example \cite{Gemmer09,Campos10,Fagotti2012,Rigol11,1110.4690v1,Rigol07,Rigol2006}), so in these cases the upper bound on the equilibration time implied by Theorem~\ref{thm:equilibrationonaverage} is not tight, but the theorem still captures the relevant physics.
 Transient equilibration to metastable states that precedes equilibration to the time average seems to require special structure in the Hamiltonian.
-That the physics of such special systems is not captured by a result as general as Theorem~\ref{thm:equilibrationonaverage} is not too surprising. 
+That the physics of such special systems is not captured by a result as general as Theorem~\ref{thm:equilibrationonaverage} is not too surprising.
 
 An interesting variant of the subsystem equilibration setting is investigated in Ref.~\cite{MasterThesisHutter}, in which the subsystem $S$ can initially be correlated (either classically or even quantum mechanically) with a reference system $R$.
 The ``knowledge'' about the initial state of $S$ stored in the reference $R$ can in principle help to distinguish the state $\rho^S(t)$ from $\omega^S$.
@@ -2817,7 +2823,7 @@ The time $t_{\mathrm{rec}}$ is a lower bound on the recurrence time and is sligh
 
 \subsubsection*{Discussion}
 %
-According to Ref.~\cite{cramer10_1} a similar theorem can also be proved for systems on other lattices evolving under more general quadratic Hamiltonians of the form given in \eqref{eq:quadratichamiltonian}, but even such more general results would suffer from the following limitation: 
+According to Ref.~\cite{cramer10_1} a similar theorem can also be proved for systems on other lattices evolving under more general quadratic Hamiltonians of the form given in \eqref{eq:quadratichamiltonian}, but even such more general results would suffer from the following limitation:
 Quadratic Hamiltonians of the form given in \texteqref{eq:quadratichamiltonian}, whose $A$ matrix is banded, i.e., has non-zero entries only for pairs of sites that are geometrically close to each other, have \emph{local conserved quantities}, i.e., observables that commute with $\H$ but have support only on a small number of sites independent of the system size.
 The time averaged state has the same expectation values for all these local observables as the initial state so that equilibration of subsystems to a state that is close in trace distance to a thermal/Gibbs state of the truncated Hamiltonian is impossible for most initial states \cite{Lanford1972,cramer10_1}.
 
@@ -2850,9 +2856,9 @@ The elementary excitations of Hamiltonians of this form behave very similarly to
 
 In order to prove statements similar to Theorem~\ref{thm:equilbrationduringintervals} for more general systems, a better understanding of the transport that is responsible for the mechanism behind Theorem~\ref{thm:equilbrationduringintervals} seems necessary.
 We will now define a notion of transport that appears to be sufficient for equilibration during intervals.
-It turns out to be more convenient to formulate it in the \emph{Heisenberg picture}, i.e., to consider observables as time dependent and conversely quantum states as static (see also Section~\ref{sec:timeevolution}). 
+It turns out to be more convenient to formulate it in the \emph{Heisenberg picture}, i.e., to consider observables as time dependent and conversely quantum states as static (see also Section~\ref{sec:timeevolution}).
 \begin{definition}[Spreading transport] \label{def:mixingtransport}
-  An infinite sequence of composite quantum systems indexed by their system size $|\Vset|$ with respective Hilbert spaces $\mcH(|\Vset|)$, evolving under Hamiltonians $\H(|\Vset|) \in \Obs(\mcH(|\Vset|))$ exhibits \emph{spreading transport} if there exists a $D \in \landauO(1)$ and a time $t_2 \in \landauOmega(|\Vset|^{1/D})$ such that up to $t_2$ the support of every initially observable $A\oftype \R \to  \Obs(\mcH(|\Vset|))$ which was initially local, i.e., $|\supp(A(0))| \in \landauO(1)$ grows with time in the sense that for every sufficiently small $0<\epsilon \in \landauO(1)$ and every $\tilde{A}\oftype \R \to \Obs(\mcH(|\Vset|))$ and all $0 \leq t_1 \leq t_2$ it holds that 
+  An infinite sequence of composite quantum systems indexed by their system size $|\Vset|$ with respective Hilbert spaces $\mcH(|\Vset|)$, evolving under Hamiltonians $\H(|\Vset|) \in \Obs(\mcH(|\Vset|))$ exhibits \emph{spreading transport} if there exists a $D \in \landauO(1)$ and a time $t_2 \in \landauOmega(|\Vset|^{1/D})$ such that up to $t_2$ the support of every initially observable $A\oftype \R \to  \Obs(\mcH(|\Vset|))$ which was initially local, i.e., $|\supp(A(0))| \in \landauO(1)$ grows with time in the sense that for every sufficiently small $0<\epsilon \in \landauO(1)$ and every $\tilde{A}\oftype \R \to \Obs(\mcH(|\Vset|))$ and all $0 \leq t_1 \leq t_2$ it holds that
   \begin{equation}
     \left( \forall t \in [t_1,t_2]\itholds \norm[\infty]{\tilde{A}(t) - A(t)} \leq \epsilon \right) \implies \inf_{t \in [t_1,t_2]} |\supp(\tilde{A}(t))| \in \landauOmega(t_1) .
   \end{equation}
@@ -2880,7 +2886,7 @@ Based on the above considerations I make the following conjecture:
 
 \subsubsection*{Discussion}
 %
-Spreading transport excludes the existence of local conserved quantities and hence, in particular, requires that the system is not localized due to, for example, spacial disorder. 
+Spreading transport excludes the existence of local conserved quantities and hence, in particular, requires that the system is not localized due to, for example, spacial disorder.
 A proof of the above conjecture would therefore fit nicely into the folklore knowledge that disorder prevents systems from reaching thermodynamic equilibrium, and the often invoked picture of quasi particles propagating through a system, thereby leading to equilibration \cite{Calabrese2007}.
 
 Whether the above conjecture can be turned into a theorem and whether Definition~\ref{def:mixingtransport} is the right notion of transport is the subject of further research.
@@ -2893,7 +2899,7 @@ In this section we briefly cover two other notions of equilibration for closed q
 
 The first alternative notion of equilibration we want to discuss was proposed in Ref.~\cite{0907.0108v1}.
 This work is closely related to an article of von~\textcite{vonneumann1929}, which investigates why large quantum systems can be well described within the framework of statistical mechanics.
-To that end it is postulated that on large systems only a set of so-called \emph{macroscopic observables} is accessible. 
+To that end it is postulated that on large systems only a set of so-called \emph{macroscopic observables} is accessible.
 The macroscopic observables are required to commute, thus they divide the Hilbert space in subspaces, so-called \emph{phase cells}, each containing states that belong to the same sequence of eigenvalues for all the macroscopic observables (see also the more detailed discussion of Ref.~\cite{vonneumann1929} in Section~\ref{sec:typicality}).
 If one of the phase cells is particularly large, Ref.~\cite{0907.0108v1} associates it with \emph{thermal equilibrium} and says that a system is in \emph{thermal equilibrium} if and only if its state is almost entirely contained in that cell.
 Variants of the results from Ref.~\cite{vonneumann1929} can then be used to prove equilibration in this sense.
@@ -2924,7 +2930,7 @@ Moreover, it has a peculiar property that implies the following \emph{quantum me
 \end{theorem}
 \begin{proof}
   That the equilibrium value of the expectation value of $A$ is given by $\Tr(A\,\omega)$ follows directly from the definition of equilibration on average.
-  The time averaged state $\omega$ is equal to the dephased initial state 
+  The time averaged state $\omega$ is equal to the dephased initial state
   \begin{equation}
     \$_H(\rho(0)) = \sum_{k=1}^{d'} \Pi_k\,\rho(0)\,\Pi_k .
   \end{equation}
@@ -2945,15 +2951,15 @@ Moreover, it has a peculiar property that implies the following \emph{quantum me
       \foreach \i/\ri/\phii/\omegai in {1/0.137264/-159.008/1,2/0.0919508/93.4659/1,3/0.204039/-110.476/1,4/0.14146/28.212/2,5/0.116946/145.35/4,6/0.128177/59.1885/4,7/0.113461/-153.794/5,8/0.0667032/-167.439/6}
       \foreach \j/\rj/\phij/\omegaj in {1/0.137264/-159.008/1,2/0.0919508/93.4659/1,3/0.204039/-110.476/1,4/0.14146/28.212/2,5/0.116946/145.35/4,6/0.128177/59.1885/4,7/0.113461/-153.794/5,8/0.0667032/-167.439/6}
       {
-        \draw[very thin,-latex] (\i,-\j) -- +(\phii-\phij:\ri*\rj*12); 
-        % \draw<4>[thick,-latex] (\i,-\j) -- +({\phii-\phij+(\omegai-\omegaj)*60}:\ri*\rj*12); 
+        \draw[very thin,-latex] (\i,-\j) -- +(\phii-\phij:\ri*\rj*12);
+        % \draw<4>[thick,-latex] (\i,-\j) -- +({\phii-\phij+(\omegai-\omegaj)*60}:\ri*\rj*12);
         \ifnum \omegai=\omegaj
         % \draw<5->[thick,-latex] (\i,-\j) -- +(\phii-\phij:\ri*\rj*12);
         \fi
         % \draw<4>[thick] (\phii-\phij:\ri*\rj*12)+(\i,-\j) arc (\phii-\phij:{\phii-\phij+(\omegai-\omegaj)*60}:\ri*\rj*12)+(\i,-\j);
         \node[minimum size=1cm] at (\i,-\j) (n\i\j) {};
       }
-      
+
       \draw[thick] (n11.north west) to[bend right=6] node[midway,anchor=base east] {\Large $\rho(0)=$} (n18.south west);
       \draw[thick] (n88.south east) to [bend right=6] (n81.north east);
       \fill[opacity=0.2,niceblue] (n11.north west) rectangle (n33.south east);
@@ -2971,8 +2977,8 @@ Moreover, it has a peculiar property that implies the following \emph{quantum me
       \foreach \i/\ri/\phii/\omegai in {1/0.137264/-159.008/1,2/0.0919508/93.4659/1,3/0.204039/-110.476/1,4/0.14146/28.212/2,5/0.116946/145.35/4,6/0.128177/59.1885/4,7/0.113461/-153.794/5,8/0.0667032/-167.439/6}
       \foreach \j/\rj/\phij/\omegaj in {1/0.137264/-159.008/1,2/0.0919508/93.4659/1,3/0.204039/-110.476/1,4/0.14146/28.212/2,5/0.116946/145.35/4,6/0.128177/59.1885/4,7/0.113461/-153.794/5,8/0.0667032/-167.439/6}
       {
-        % \draw[very thin,-latex] (\i,-\j) -- +(\phii-\phij:\ri*\rj*12); 
-        \draw[very thin,-latex] (\i,-\j) -- +({\phii-\phij+(\omegai-\omegaj)*60}:\ri*\rj*12); 
+        % \draw[very thin,-latex] (\i,-\j) -- +(\phii-\phij:\ri*\rj*12);
+        \draw[very thin,-latex] (\i,-\j) -- +({\phii-\phij+(\omegai-\omegaj)*60}:\ri*\rj*12);
         \ifnum \omegai=\omegaj
         \draw[very thin,-latex] (\i,-\j) -- +(\phii-\phij:\ri*\rj*12);
         \fi
@@ -2996,15 +3002,15 @@ Moreover, it has a peculiar property that implies the following \emph{quantum me
       \foreach \i/\ri/\phii/\omegai in {1/0.137264/-159.008/1,2/0.0919508/93.4659/1,3/0.204039/-110.476/1,4/0.14146/28.212/2,5/0.116946/145.35/4,6/0.128177/59.1885/4,7/0.113461/-153.794/5,8/0.0667032/-167.439/6}
       \foreach \j/\rj/\phij/\omegaj in {1/0.137264/-159.008/1,2/0.0919508/93.4659/1,3/0.204039/-110.476/1,4/0.14146/28.212/2,5/0.116946/145.35/4,6/0.128177/59.1885/4,7/0.113461/-153.794/5,8/0.0667032/-167.439/6}
       {
-        % \draw[very thin,-latex] (\i,-\j) -- +(\phii-\phij:\ri*\rj*12); 
-        % \draw[very thin,-latex] (\i,-\j) -- +({\phii-\phij+(\omegai-\omegaj)*60}:\ri*\rj*12); 
+        % \draw[very thin,-latex] (\i,-\j) -- +(\phii-\phij:\ri*\rj*12);
+        % \draw[very thin,-latex] (\i,-\j) -- +({\phii-\phij+(\omegai-\omegaj)*60}:\ri*\rj*12);
         \ifnum \omegai=\omegaj
         \draw[very thin,-latex] (\i,-\j) -- +(\phii-\phij:\ri*\rj*12);
         \fi
         % \draw[very thin] (\phii-\phij:\ri*\rj*12)+(\i,-\j) arc (\phii-\phij:{\phii-\phij+(\omegai-\omegaj)*60}:\ri*\rj*12)+(\i,-\j);
         \node[minimum size=1cm] at (\i,-\j) (n\i\j) {};
       }
-      
+
       \draw[thick] (n11.north west) to[bend right=6] node[midway,anchor=base east] {\Large $\taverage{\rho}=$
       } (n18.south west);
       \draw[thick] (n88.south east) to [bend right=6] (n81.north east);
@@ -3047,12 +3053,12 @@ We will come back to this when we discuss thermalization in Section~\ref{sec:the
 \label{sec:decoherence}
 %
 The main aim of the \emph{decoherence program} is to explain the emergence of classical behavior in quantum systems as a consequence of a \emph{loss of coherence}, which is also called \emph{dephasing}, or just \emph{decoherence}.
-A prime example of this is \emph{einselection}, which we will describe below. 
+A prime example of this is \emph{einselection}, which we will describe below.
 It is the subject of an ongoing scientific debate to which extent decoherence provides a satisfactory explanation of the emergence of classicality and whether and to which extent it can solve the measurement problem \cite{Schlosshauer2005,0112095v3,0908.4069v1}.
 It is beyond the scope of this thesis to provide a comprehensive review of decoherence theory.
 More detailed information can for example be found in the reviews Ref.~\cite{RevModPhys.75.715,Schlosshauer2005}.
 
-Decoherence theory is similar in spirit to the approach taken in this work in that it tries to justify a macroscopic theory based on purely microscopic, quantum mechanical considerations, thereby leading to a reconciliation of the two theories. 
+Decoherence theory is similar in spirit to the approach taken in this work in that it tries to justify a macroscopic theory based on purely microscopic, quantum mechanical considerations, thereby leading to a reconciliation of the two theories.
 In fact, the connection exists not only on this meta level, but there also is a far more direct connection.
 The results on equilibration of Ref.~\cite{Linden10} were used in Ref.~\cite{PhysRevE.81.05-1} to obtain a very general proof of decoherence under weak interactions.
 In order to properly understand the meaning of this result we will first review some concepts from decoherence theory and then reproduce and discuss a bound on the speed of fluctuations around equilibrium from Ref.~\cite{Linden10}.
@@ -3085,7 +3091,7 @@ As a measure of the \emph{speed} at time $t$ of the state $\rho^S(t) = \Tr_{\com
 \begin{equation}
   v_S(t) \coloneqq \lim_{\Delta t \to 0} \frac{\tracedistance{\rho^S(t)}{\rho^S(t+\Delta t)}}{\Delta t} = \norm[1]{\frac{\del \rho^S}{\del t}(t)} ,
 \end{equation}
-where 
+where
 \begin{equation}
   \frac{\del \rho^S}{\del t}(t) = \i\, \Tr_{\compl{S}}([\rho^S(t),\H]) .
 \end{equation}
@@ -3160,7 +3166,7 @@ This average state can, for example, turn out to be the state corresponding to a
 
 The use of such \emph{typicality arguments} has a long history.
 First considerations along these lines already appear in a work by \textcite{Schroedinger1927} from 1927.
-After an introduction into (first order) perturbation theory and a discussion of resonance phenomena in quantum mechanics with a focus on energy exchange in weakly interacting systems he goes on discussing what he calls a ``statistical hypothesis''\footnote{German original \cite{Schroedinger1927}: \foreignlanguage{ngerman}{``Statistische Hypothese''}}. 
+After an introduction into (first order) perturbation theory and a discussion of resonance phenomena in quantum mechanics with a focus on energy exchange in weakly interacting systems he goes on discussing what he calls a ``statistical hypothesis''\footnote{German original \cite{Schroedinger1927}: \foreignlanguage{ngerman}{``Statistische Hypothese''}}.
 He aims at describing the long time behavior of weakly interacting systems hoping to find thermodynamic behavior.
 More specifically, he considers two systems that each have a pair of energy levels with the same gap.
 The coupling between them that mixes the levels is assumed to be weak.
@@ -3252,8 +3258,8 @@ Remember the definition of the microcanonical state $\rhomc[\H](R)$ from Section
   We now prove \texteqref{eq:measureconcentrationforpovms} for $h(\POVMs)$ equal to the second argument of the $\min$ in \texteqref{eq:definitionofhinthemeasureconcentrationtheorem}.
   Let $S \coloneqq \bigcup_{M \in \union \POVMs} \supp(M)$ and remember that then for all $\rho,\sigma \in \Qst(\mcH)$
   \begin{equation}
-    \tracedistance[\POVMs]\rho\sigma \leq \tracedistance{\rho^S}{\sigma^S} . 
-  \end{equation}  
+    \tracedistance[\POVMs]\rho\sigma \leq \tracedistance{\rho^S}{\sigma^S} .
+  \end{equation}
   Then Eq.~(75) in Section~VI.C of Ref.~\cite{Popescu05} yields the result.
   To finish the proof, note that \texteqref{eq:distinguishabilityunderrestrictedsetsofpovms} implies that for any $\rho,\sigma \in \Qst(\mcH)$
   \begin{align} \label{eq:distinguishabilityupperboundforproofofmeasureconcentrationtheorem}
@@ -3293,7 +3299,7 @@ Instead of the uniform measure on a subspace corresponding to some energy interv
 Under certain conditions on the spectrum of $\H$ it can be shown that the mean energy ensemble exhibits measure concentration \cite{1003.4982}.
 In addition to that, it is possible to identify the typical reduced state of states drawn from the mean energy ensemble \cite{1003.4982}, and it can be shown that under certain conditions states from the mean energy ensemble typically have a high effective dimension \cite{Gogolin10-masterthesis}.
 
-Ref.~\cite{Reimann07} considers an ensemble of quantum state vectors of the form given in \texteqref{eq:normalizedstateintermsofcoefficients}, in which the expansion coefficients $c_j = \braket{j}{\psi}$ have fixed modulus but random phases. 
+Ref.~\cite{Reimann07} considers an ensemble of quantum state vectors of the form given in \texteqref{eq:normalizedstateintermsofcoefficients}, in which the expansion coefficients $c_j = \braket{j}{\psi}$ have fixed modulus but random phases.
 Concentration results, similar in spirit to Theorem~\ref{thm:measureconcentrationforquantumstatevectors}, can be shown for this ensemble that yield typicality whenever sufficiently many energy levels are populated.
 
 Ref.~\cite{Bartsch09} extends the notion of typicality to the dynamics of systems.
@@ -3355,7 +3361,7 @@ is a \emph{Haar random Hamiltonian}.
 Of course, $G$ and $\H_G(U)$ share the same spectrum and eigenvalue multiplicities for any unitary $U$, but the energy eigenstates / spectral projectors of $\H_G(U)$ are Haar random.
 Fixing $G$ is thus equivalent to fixing the eigenvalues and degeneracies of the ensemble $\H_G(U),\ U \sim \muhaar[U(d)]$ of Haar random Hamiltonians.
 
-A quantity that will play an important role in the theorems to come is 
+A quantity that will play an important role in the theorems to come is
 \begin{equation} \label{eq:deffouriertransformedcpectrum}
   f_G(t) \coloneqq \frac{1}{d}\,\sum_{k=1}^d \e^{- \i\,\tilde{E_k}\,t} ,
 \end{equation}
@@ -3399,7 +3405,7 @@ For the random circuit ensemble of random Hamiltonians the following statement h
 As can be seen from \texteqref{eq:equilibrationundercircuitrandomhamiltonsbound}, a slightly super linear circuit complexity, i.e., $C = C(N) \notin \landauO(N)$, is sufficient to make the additional term in \texteqref{eq:equilibrationundercircuitrandomhamiltonsbound} (compared to \texteqref{eq:equilibrationunderrandomhamiltonsbound}) go to zero for large $N$.
 
 If this is the case, and in addition $N$ is large enough, the bath is much larger than the subsystem, i.e., $d_B \gg d_S$, and $G$ has only few degeneracies, i.e., $g_G \ll d$, then the right hand side of both \texteqref{eq:equilibrationunderrandomhamiltonsbound} and \eqref{eq:equilibrationundercircuitrandomhamiltonsbound} is approximately equal to $|f_G(t)|^2\,\sqrt{d_S}/(2\,\epsilon)$.
-Hence, the bounds are non-trivial for reasonably small $\epsilon$ for all $t$ for which $\sqrt{d_s}\,|f(t)|^2 \ll 1$. 
+Hence, the bounds are non-trivial for reasonably small $\epsilon$ for all $t$ for which $\sqrt{d_s}\,|f(t)|^2 \ll 1$.
 For which times $t$ this is the case of course crucially depends on the spectrum that was fixed by fixing $G$.
 
 The spectrum of the Ising model with transverse field, for example, leads to an approximately Gaussian decay of $|f(t)|^2$, implying an estimated equilibration time of the order of $\landauO(N^{-1/2})$ \cite{1108.0374}.
@@ -3415,11 +3421,11 @@ Despite them being very important contributions, I think it is fair to say that 
 
 First, the derived equilibration time scale appears to be rather unphysical.
 Subsystems of larger systems should take longer to equilibrate, simply because excitations in locally interacting spin systems travel with a finite speed (see \cite{Kliesch2013} and the references therein).
-One would expect that for locally interacting systems of $N$ spins on a $D$ dimensional regular lattice with nearest neighbor or short range interactions, subsystem equilibration should happen on a time scale of the order of $\landauTheta(N^{1/D})$, where $N^{1/D}$ is the \emph{linear size of the system}. 
+One would expect that for locally interacting systems of $N$ spins on a $D$ dimensional regular lattice with nearest neighbor or short range interactions, subsystem equilibration should happen on a time scale of the order of $\landauTheta(N^{1/D})$, where $N^{1/D}$ is the \emph{linear size of the system}.
 A subsystem equilibration time of the order of $\landauO(|N|^{-1/2})$, which becomes shorter with increasing system size, is clearly unphysical.
 
 Second, irrespective of the above point, it is unfortunate that Theorems~\ref{thm:equilibrationunderrandomhamiltonians} and \ref{thm:equilibrationundercircuitrandomhamiltonians} do not say anything about concrete Hamiltonians, but are statements about typical Hamiltonians from an ensemble.
-Even more worrying is the fact that one can show that for Haar random Hamiltonians the subsystem equilibrium state is the maximally mixed state \cite[Corollary 1]{1112.5295v1} and a similar statement can be shown for the random circuit ensemble of random Hamiltonians. 
+Even more worrying is the fact that one can show that for Haar random Hamiltonians the subsystem equilibrium state is the maximally mixed state \cite[Corollary 1]{1112.5295v1} and a similar statement can be shown for the random circuit ensemble of random Hamiltonians.
 Systems to which the above results apply can thus never exhibit subsystem equilibration to an interesting, e.g., finite temperature, state.
 
 The reason for both of these problems is that neither the model of Haar random Hamiltonians nor that of Hamiltonians whose diagonalizing unitary is given by a random circuit with high circuit complexity are good models for realistic, locally interacting quantum systems.
@@ -3462,7 +3468,7 @@ Whenever the term \emph{bath} is used in the following it refers to this model o
 In particular we do not mean quantum systems that are already initially in a thermal state or other models of heat baths.
 It is crucial to note that approaches that explain thermalization in quantum systems by investigating the behavior of systems coupled to such \emph{thermal baths} cannot solve the fundamental problem of thermalization, as they leave open the question how the thermal bath became thermal in the first place.
 
-\vspace{2em}%hack!!! 
+\vspace{2em}%hack!!!
 \subsection{What is thermalization?}
 \label{sec:whatisthermalization}
 %
@@ -3518,7 +3524,7 @@ It gives a set of conditions that are sufficient for thermalization.
 An obvious question to ask is:
 What are reasonable sets $\Qst_0$ of initial states?
 Particularly important is the \emph{energy distribution} of the initial states, i.e., the sequence $(p_k)_{k=1}^{d'}$ of the energy level populations $p_k \coloneqq \Tr(\Pi_k\,\rho(0))$, as it is conserved under time evolution.
-Taking the classical derivation of the canonical ensemble from the microcanonical one as a guideline, thermalization can only be expected to happen for initial states whose energy distribution is not too wide, i.e., the energies of the significantly populated levels must be in an interval small compared to $\norm[\infty]\H$. 
+Taking the classical derivation of the canonical ensemble from the microcanonical one as a guideline, thermalization can only be expected to happen for initial states whose energy distribution is not too wide, i.e., the energies of the significantly populated levels must be in an interval small compared to $\norm[\infty]\H$.
 We will see in Sections~\ref{sec:thermalizationunderassumptionsontheeigenstates} and \ref{sec:thermalizationunderassumptionsontheinitialstate} that such a condition will play an important role in proofs of thermalization.
 
 In the above definition of thermalization on average we deliberately left open the question of what ``sufficiently small'' means.
@@ -3571,7 +3577,7 @@ A much more rigorous formulation of the idea behind eigenstate thermalization ca
 This article considers bipartite systems with $\Vset = S \dunion B$, whose non-interacting part $\H_0 = \H_S + \H_B$ of the Hamiltonian $\H = \H_0 + \H_I$ is non-degenerate.
 The interaction Hamiltonian $\H_I$ is assumed to couple only neighboring energy levels, i.e., it is of the form
 \begin{equation}
-  \forall k\in[d]\itholds \bra{E^0_k} \H_I \ket{E^0_{k'}} = \lambda/2\,\delta_{|k-k'|,1} 
+  \forall k\in[d]\itholds \bra{E^0_k} \H_I \ket{E^0_{k'}} = \lambda/2\,\delta_{|k-k'|,1}
 \end{equation}
 for some $\lambda\in\R$ such that $\levelspaceing^{\max}_B \ll \lambda \ll \levelspaceing^{\min}_S$ with $\levelspaceing^{\max}_B$ the maximal spacing between the energy eigenvalues of $\H_B$ and $\levelspaceing^{\min}_S$ the minimal level spacing of $\H_S$.
 It is first argued heuristically and then proved, under some additional technical assumptions, that such Hamiltonians indeed exhibit eigenstate thermalization in the sense that for most $k$ and all observables $A_S$ with $\supp(A_S) \subseteq S$ it holds that $\bra{E_k} A_S \ket{E_k} \approx \Tr(A_S\, g[H_S](\beta(E_k)))$ (see Eq.~(5) and (6) in Ref.~\cite{Tasaki97}).
@@ -3585,8 +3591,8 @@ Ref.~\cite{Rigol08} studies a system of hard core bosons on a lattice.
 It is demonstrated that the observed thermalization can be explained by the fact that certain physically relevant observables have expectation values in most energy eigenstates that indeed resemble those in a microcanonical state.
 
 The validity of numerous variants of the ETH has been studied extensively, amongst others in Refs.~\cite{Santos10,Sirker2013,1102.0528v1,Biroli09,Singh,Ikeda11,Rigol08,Rigol11,1103.0787v1,Neuenhahn10,1108.0928v1,1111.6119,Mazets10,Polkovnikov11,Cassidy11,1104.3232v1,1004.2232v1,1201.0578v1,PhysRevLett.10-6,Polkovnikov11,Rigol09,1112.3424v1.pd,Cazalilla10,PhysRevB.82.17,Cazalilla11,Gritsev10,Iucci2009,Wilming2011,1108.0928v1,Steinigeweg2013,Beugeling2013,Ikeda2013a}.
-The various \emph{eigenstate thermalization hypotheses} differ in whether they conjecture closeness to a microcanonical or a canonical average and concerning the type of observables they supposedly apply to. 
-\emph{Few body} and \emph{local} observables are the two most frequently encountered choices. 
+The various \emph{eigenstate thermalization hypotheses} differ in whether they conjecture closeness to a microcanonical or a canonical average and concerning the type of observables they supposedly apply to.
+\emph{Few body} and \emph{local} observables are the two most frequently encountered choices.
 
 The bottom line of this large amount of (mostly numerical) investigations is as follows:
 The energy eigenstates in the bulk of the spectrum, i.e., those to energies that are neither too low nor too high, of sufficiently large and sufficiently complicated composite quantum systems seem to generically fulfill some variant of the ETH for certain physically meaningful local or few body observables.
@@ -3621,7 +3627,7 @@ In the language used here a slightly simplified version of this statement can be
   \end{equation}
 \end{theorem}
 Essentially the theorem tells us that if $S$ is sufficiently far from the boundary of $B$, then for each energy eigenstate $\ket{E}$ of $\H$ there exists a state in $\Qst(\mcH_B)$ that is both approximately diagonal in the eigenbasis of $\trunc {\H_B} B$ and locally on $S$ hard to distinguish from $\ketbra{E}{E}$.
-If one could improve the result to the effect that it would show local indistinguishability not only from an approximately diagonal state but from a thermal state then it would constitute a proof of an ETH like statement. 
+If one could improve the result to the effect that it would show local indistinguishability not only from an approximately diagonal state but from a thermal state then it would constitute a proof of an ETH like statement.
 However, such a generalization can almost surely hold only under additional assumptions \cite{Mueller2013}.
 
 The ETH, as defined in Definition~\ref{def:eth}, is sufficient for thermalization in the following sense:
@@ -3645,16 +3651,16 @@ While there is evidence that in many models this is indeed the case, we will see
 \subsubsection*{Discussion}
 %
 We have seen that the ETH as defined in Definition~\ref{def:eth} is by construction essentially sufficient and, in a certain sense, necessary for thermalization.
-Is the problem of thermalization settled? 
+Is the problem of thermalization settled?
 In my opinion, no.
 
-First, a critical person could argue that the question ``When does a system thermalize?'' and the question ``When does a system fulfill the ETH?'' are essentially equally little understood \cite{Singh}. 
+First, a critical person could argue that the question ``When does a system thermalize?'' and the question ``When does a system fulfill the ETH?'' are essentially equally little understood \cite{Singh}.
 I feel that, despite the great amount of new insights in the behavior of many body systems that was gained by investigating the validity of the ETH, such a person would have a point.
 Saying that a system thermalizes if (and only if) it fulfills the ETH or is non-integrable (in some sense) is, at least at present, more a rephrasing of the problem rather than a solution.
 
 Second, the ETH is necessary for thermalization only if one is willing to call a system thermalizing only if it thermalizes for a given set of POVMs for \emph{all} initial states with a sufficiently narrow energy distribution for which it also apparently equilibrates.
 Hence, there is the possibility to show thermalization in systems that do not fulfill the ETH, if one is willing to restrict the class of allowed initial states.
-As we will see in the following this can indeed be done. 
+As we will see in the following this can indeed be done.
 
 
 \subsection{Thermalization under assumptions on the initial state}
@@ -3681,7 +3687,7 @@ It is thus of interest to approach the problem of thermalization in a way that i
 As we will see in the following, restricting the class of initial states makes it possible to rigorously prove thermalization without any reference to the ETH for both spin and fermionic systems.
 The overall structure of the argument is depicted in Fig.~\ref{fig:structureofthermalizationargument}.
 The result that we will derive and discuss in this section can be combined with either the typicality theorems from Section~\ref{sec:typicality} or the dynamical equilibration theorems from Section~\ref{sec:equilibration}.
-The former yields a kinematic thermalization statement (Observation~\ref{obs:thermalizationonofrandomstaates}) that holds for most Haar random states from a certain subspace. 
+The former yields a kinematic thermalization statement (Observation~\ref{obs:thermalizationonofrandomstaates}) that holds for most Haar random states from a certain subspace.
 The latter yields a dynamic thermalization result (Observation~\ref{obs:thermalizationonaverage}) that proves thermalization on average in the sense of Definition~\ref{def:thermlaizationonaverage} for all initial states from a certain class of states.
 It is hence closer to the thermalization statement obtained under the ETH (Observation~\ref{obs:ethissufficientforthermalization}), which we discussed in the last section.
 
@@ -3751,7 +3757,7 @@ The Hamiltonians $\trunc {H_S} S$, $\trunc {H_B} B$, and $\H_0$ are allowed to h
 Remember that, on the other hand, by definition, the elements of the sequences $(E^0_k)_{k=1}^{d'_0}$ and $(E^S_l)_{l=1}^{d'}$ are distinct.
 
 We first look at the case of spin systems.
-In such systems each of the spectral projectors $\Pi^0_k$ of $\H_0$ is of the form 
+In such systems each of the spectral projectors $\Pi^0_k$ of $\H_0$ is of the form
 \begin{equation}
   \Pi^0_k = \sum_{l,m\suchthat \tilde E^S_l+\tilde E^B_m=E^0_k} \ketbra{\tilde E^S_l}{\tilde E^S_l} \otimes \ketbra{\tilde E^B_m}{\tilde E^B_m} . \label{eq:energyprojectorsofnoninteractinghamiltonianinspinsystems}
 \end{equation}
@@ -3765,7 +3771,7 @@ The microcanonical state $\rhomc[\H_0]([E,E+\Delta])$ to an energy interval $[E,
   &= \sum_{l=1}^{d_S'} \Pi^S_l \, |\{m\oftype E^S_l+\tilde E^B_m \in [E,E+\Delta] \}| \\
   &= \sum_{l=1}^{d_S'} \Pi^S_l \, \#_\Delta[\trunc{\H_B}B](E-E^S_l) ,
 \end{align}
-where 
+where
 \begin{equation}
   \#_\Delta[\trunc{\H_B}B](E) \coloneqq |\{m\oftype \tilde E^B_m \in [E,E+\Delta] \}| = \rank\rhomc[\trunc{\H_B}B]([E,E+\Delta])
 \end{equation}
@@ -3788,7 +3794,7 @@ It is again straight forward to verify that for any even operator $A \in \Bop(\m
 \begin{align}
   &\Tr\big(A\,\ketbra{\tilde E^S_l + \tilde E^B_m}{\tilde E^S_l + \tilde E^B_m}\big) \\
   = &\Tr\big(A\, p^{\H_S}_l((f_s,f\ad_s))\,p^{\H_B}_m((f_b,f\ad_b))\,\ketbra{0}{0}_S\,\ketbra{0}{0}_B\,p^{\H_B}_m((f_b,f\ad_b))\ad\,p^{\H_S}_l((f_s,f_s))\ad \big) \nonumber \\
-  = &\Tr\big(A\, p^{\H_S}_l((f_s,f\ad_s))\,\ketbra{0}{0}_S\,p^{\H_S}_l((f_s,f\ad_s))\ad\,p^{\H_B}_m((f_b,f\ad_b))\,\ketbra{0}{0}_B\,p^{\H_B}_m((f_b,f\ad_b))\ad \big) \nonumber \\ 
+  = &\Tr\big(A\, p^{\H_S}_l((f_s,f\ad_s))\,\ketbra{0}{0}_S\,p^{\H_S}_l((f_s,f\ad_s))\ad\,p^{\H_B}_m((f_b,f\ad_b))\,\ketbra{0}{0}_B\,p^{\H_B}_m((f_b,f\ad_b))\ad \big) \nonumber \\
   = &\Tr\big(A\,\ketbra{\tilde E^S_l}{\tilde E^S_l} \big) .
 \end{align}
 The last step can be shown by explicitly writing out the trace in the Fock basis and inserting an identity between the operators that are supported on $S$ and those supported on $B$.
@@ -3802,7 +3808,7 @@ Finally, realizing that
 \begin{equation}
   \begin{split}
     \rhomc[\H_0]&([E,E+\Delta])\\
-    &= \sum_{k\suchthat E^0_k \in [E,E+\Delta]}\ \sum_{l,m\suchthat \tilde E^S_l+\tilde E^B_m=E^0_k} \Tr_B(\ketbra{\tilde E^S_l + \tilde E^B_m}{\tilde E^S_l + \tilde E^B_m}) 
+    &= \sum_{k\suchthat E^0_k \in [E,E+\Delta]}\ \sum_{l,m\suchthat \tilde E^S_l+\tilde E^B_m=E^0_k} \Tr_B(\ketbra{\tilde E^S_l + \tilde E^B_m}{\tilde E^S_l + \tilde E^B_m})
   \end{split}
 \end{equation}
 yields an expression equivalent to \texteqref{eq:firstequalityinthecountingargumentforspins} and the proof then proceeds analogously.
@@ -3870,14 +3876,14 @@ The rather technical theorem stated above has immediate consequences for the sta
   \begin{equation} \label{eq:stabilityofmicrocanonicalstates}
     \tracedistance{\rhomc[\H]([E,E+\Delta])}{\rhomc[\H']([E,E+\Delta])} \leq \frac{\norm[\infty]{\H-\H'}}{\epsilon} + \frac{\Delta\Omega+\Omega_\epsilon}{2\,\Omega_{\max}} ,
   \end{equation}
-  where $\Omega_{\min/\max} \coloneqq \min / \max (\rank \rhomc[\H]([E,E+\Delta]),\rank \rhomc[\H']([E,E+\Delta]))$, $\Omega \coloneqq \Omega_{\max} - \Omega_{\min}$, and 
+  where $\Omega_{\min/\max} \coloneqq \min / \max (\rank \rhomc[\H]([E,E+\Delta]),\rank \rhomc[\H']([E,E+\Delta]))$, $\Omega \coloneqq \Omega_{\max} - \Omega_{\min}$, and
   \begin{align}
     \Omega_\epsilon \coloneqq &\rank \rhomc[\H]([E,E+\epsilon]\union[E+\Delta-\epsilon,E+\Delta]) \\
     + &\rank \rhomc[\H']([E,E+\epsilon]\union[E+\Delta-\epsilon,E+\Delta]) .
   \end{align}
 \end{corollary}
 \begin{proof}
-  By the triangle inequality 
+  By the triangle inequality
   \begin{equation}
     \tracedistance{\rhomc[\H](I)}{\rhomc[\H'](I)} \leq \frac{\norm[1]{P-P'}+\Delta\Omega}{2\,\Omega_{\max}}
   \end{equation}
@@ -3902,7 +3908,7 @@ First, notice that the two terms in the right hand side of \texteqref{eq:stabili
 For the interesting case $\H = \H_0 + \H_I$ and $\H' = \H_0$ this implies that it is necessary that $\norm[\infty]{\H_I} \ll \epsilon$, so that the fist term can become small.
 For the second term we restrict our attention to $\Omega_\epsilon/(2\,\Omega_{\max})$ as $\Delta\Omega$ can reasonably be assumed to be smaller than $\Omega_\epsilon$.
 
-If to good approximation 
+If to good approximation
 \begin{equation} \label{eq:approxexponentialdensityofstates}
   \#_\Delta[\H_0](E) \approx \#_\Delta[\H](E) \propto \e^{-\beta\,E} ,
 \end{equation}
@@ -3972,7 +3978,7 @@ The class of rectangular states is not a very large class of states, but general
 %         \fi \fi \fi \fi
 %         \node[minimum size=1cm] at (\i,-\j) (n\i\j) {};
 %       }
-      
+
 %       \draw[thick] (n11.north west) to[bend right=6] node[midway,anchor=base east] {\Large $\rho=$
 %       } (n18.south west);
 %       \draw[thick] (n88.south east) to [bend right=6] (n81.north east);
@@ -4003,7 +4009,7 @@ Nevertheless, all these states have a tendency to thermalize dynamically:
     \norm[\infty]{\H_I} \ll 1/\beta \ll \Delta ,
   \end{equation}
   and the interval $R$ is sufficiently far from the edges of the spectrum, then the time evolution is such that the subsystem $S$ thermalizes on average, in the sense of Definition~\ref{def:thermlaizationonaverage}, for any initial state $\rho(0) \in \Qst(\mcH)$ that is rectangular with respect to $R$ in the sense that
-  \begin{equation} 
+  \begin{equation}
     \taverage[T]{\tracedistance{\rho^S(t)}{\rhog[\trunc{\H_S}S](\beta)}} \leq \sqrt{N(\epsilon)\,d_S^2\,g((p_k)_{k=1}^{d'}) }/2 + \delta(\H_B) + \landauO\left(\sqrt{\beta\,\norm[\infty]{H_I}}\right) ,
   \end{equation}
   where $\delta(\H_B)$ decreases fast with the size of the bath, and, as in Theorem~\ref{thm:equilibrationonaverage},
@@ -4034,7 +4040,7 @@ This is a significant improvement over the condition that would be necessary to 
 While the gaps of $\H_0$ become exponentially small with the system size $\beta$ can be expected to be an intensive quantity, i.e., to be independent of the system size.
 
 In the case of a 1D system with short range interactions and if $S$ is a set of consecutive sites $\norm[\infty]{H_I}$ is also intensive.
-In this case, \texteqref{eq:weakcouplingcondition} is a physically natural condition to call the coupling \emph{weak}. 
+In this case, \texteqref{eq:weakcouplingcondition} is a physically natural condition to call the coupling \emph{weak}.
 In the analogous situation in higher dimensional lattices, for example a system with nearest neighbor interactions on a 2D square lattice and $S$ the sites inside a ball around the origin, $\norm[\infty]{H_I}$ however scales with the surface of the region $S$, making the above bounds useless already for medium sized $|S|$.
 Thus, the above results are not entirely satisfactory.
 
@@ -4097,7 +4103,7 @@ They guarantee that the absence of thermalization is not a matter of time scales
 Importantly, this also makes the results interesting for numerical tests of thermalization (see Section~\ref{sec:anumericalinvestigationoftheviolationofinitialstateindependence} for an example).
 
 The kind of absence of thermalization effect we will prove is well illustrated by Fig.~\ref{fig:absenceofthermalizationnumerics2a}.
-We will discuss this plot in more detail below. 
+We will discuss this plot in more detail below.
 For the moment it suffices to know that it shows the evolution of the expectation value of a local observable after a system has been started in two initial states that are identical on the bath but differ on a small subsystem so that the observable initially has expectation value $+1$ (upper line) or $-1$ (lower line) respectively.
 As the plot shows, the expectation value first approaches and then fluctuates around an equilibrium value in both cases, but the two equilibrium values are well distinguishable.
 
@@ -4112,7 +4118,7 @@ A central role in the proofs is played by the entanglement in the spectral proje
 For fermionic composite systems no unique and universally accepted definition of entanglement exists \cite{Banuls2007}.
 Hence, we restrict ourselves to spin systems for the rest of this section.
 
-As will become apparent shortly, it is a \emph{lack of entanglement in the eigenbasis} of the Hamiltonian that leads to the violation of subsystem initial state independence effect described here. 
+As will become apparent shortly, it is a \emph{lack of entanglement in the eigenbasis} of the Hamiltonian that leads to the violation of subsystem initial state independence effect described here.
 The central quantity in the following argument is the \emph{effective entanglement in the eigenbasis}.
 Given a bipartite spin system with $\Vset = S \dunion B$, Hilbert space $\mcH$, and Hamiltonian $\H \in \Obs(\mcH)$ with spectral decomposition $\H = \sum_{k=1}^{d'} E_k\,\Pi_k$ we define for any pure state $\psi = \ketbra\psi\psi \in \Qst$ the \emph{effective entanglement in the eigenbasis} as
 \begin{equation}
@@ -4137,7 +4143,7 @@ The effective entanglement in the eigenbasis is interesting because it quantifie
   Consider a bipartite spin system with $\Vset = S \dunion B$, Hilbert space $\mcH$ and Hamiltonian $\H \in \Obs(\mcH)$.
   For $j \in \{1,2\}$ let $\psi_j(0) = \psi^S_j(0) \otimes \psi^B_j(0) \in \Qst(\mcH)$ be two initial product states and set $\omega^{S(j)} \coloneqq \Tr_B(\$_\H(\psi_j(0)))$ then
   \begin{equation}
-    \tracedistance{\omega^{S(1)}}{\omega^{S(2)}} \geq \tracedistance{\psi^S_1(0)}{\psi^S_2(0)} - R_{S|B}(\psi_1(0)) - R_{S|B}(\psi_2(0)) .      
+    \tracedistance{\omega^{S(1)}}{\omega^{S(2)}} \geq \tracedistance{\psi^S_1(0)}{\psi^S_2(0)} - R_{S|B}(\psi_1(0)) - R_{S|B}(\psi_2(0)) .
   \end{equation}
 \end{theorem}
 Remember that if the state of the subsystem $S$ equilibrates on average during the evolution under $\H$ for the two initial states, then the dephased states $\omega^{S(j)} = \Tr_B(\$_\H(\psi_{j}(0)))$ are the respective equilibrium states.
@@ -4154,7 +4160,7 @@ The following theorem yields a constructive proof of the existence of many initi
   \begin{equation} \label{eq:averageeffectiveentanglementintheeigenbasisbound}
     \expectation_{\ket{\psi^B}\sim\muhaar[\mcH_R]}\left( R_{S|B}( \ketbra{j}{j} \otimes \ketbra{\psi^B}{\psi^B} ) \right) \leq 2\,d_S\,\delta ,
   \end{equation}
-  where $\delta \coloneqq \max_{k\in[d]} \delta_k$ with 
+  where $\delta \coloneqq \max_{k\in[d]} \delta_k$ with
   \begin{equation} \label{eq:geometricentanglementdelta}
      \delta_k \coloneqq \min_{j\in [d_S]} \tracedistance{\Tr_B \ketbra{E_k}{E_K}}{\ketbra{j}{j}} ,
   \end{equation}
@@ -4185,7 +4191,7 @@ If the subsystem $S$ of interest is itself a composite system, then for any inte
 Thus, Theorems~\ref{thm:entanglementintheeigenbasis} and \ref{thm:absenceofthermalizaton} can be applied to $S^i$ instead of $S$ and this then still gives a lower bound on $\tracedistance{\Tr_B[\$_\H(\psi_1(0))]}{\Tr_B[\$_\H(\psi_2(0))]}$, but in terms of $d_{S^i}$ instead of $d_S$.
 
 Earlier it was claimed that Theorem~\ref{thm:entanglementintheeigenbasis} bounds $R_{S|B}$ by a quantity that is related to the geometric measure of entanglement.
-The quantity that was meant is $\delta = \max_{k\in[d]} \delta_k$. 
+The quantity that was meant is $\delta = \max_{k\in[d]} \delta_k$.
 But \texteqref{eq:geometricentanglementdelta} does not quite look like the standard definition of the geometric measure of entanglement $\geometricentanglement_{S|B}$ (see \texteqref{eq:geometricmeasureofentanglementdefinition}).
 However, it holds that \cite[Chapter 9.2]{nielsenchuang}
 \begin{align}
@@ -4213,7 +4219,7 @@ More recently, initial state independence was studied in Ref.~\cite{Hutter11,Mas
 By using the \emph{decoupling method} \cite{Dupuis2010,1109.4348v1,Szehr2012} and the formalism of so-called \emph{smooth min and max entropies} \cite{Koenig08,Ciganovic2013}.
 The authors show that it can be decided from just looking at one particular initial state whether a system satisfies initial state independence for most initial states.
 Moreover, they give sufficient and necessary entropic conditions for initial state independence of most initial states.
-The authors consider both subsystem initial state independence and bath initial state independence, i.e., the independence of the equilibrium state of the subsystem from the initial state of the bath. 
+The authors consider both subsystem initial state independence and bath initial state independence, i.e., the independence of the equilibrium state of the subsystem from the initial state of the bath.
 The results concerning the absence of subsystem initial state independence of Ref.~\cite{Hutter11}, when compared to those of Ref.~\cite{PhysRevLett.10-6} discussed above, have the advantage that they apply to specific points in time instead of time averaged states and that the subsystem does not need to be small.
 On the other hand they only hold for most/typical initial states.
 
@@ -4226,7 +4232,7 @@ We will investigate a concrete, locally interacting system with strong interacti
 Still, we will provide strong numerical evidence that it fails to thermalize due to a lack of entanglement in its eigenbasis.
 This section is partially based on material that was previously published in Ref.~\cite{PhysRevLett.10-6}.
 
-Consider the spin-$1/2$ XYZ chain with $N$ sites, vertex set $\Vset = [N]$, and Hilbert space $\mcH = (\C^2)^{\otimes N}$ with random coupling and on-site field, whose Hamiltonian is given by $\H \coloneqq \H_0 + \H_1$ with 
+Consider the spin-$1/2$ XYZ chain with $N$ sites, vertex set $\Vset = [N]$, and Hilbert space $\mcH = (\C^2)^{\otimes N}$ with random coupling and on-site field, whose Hamiltonian is given by $\H \coloneqq \H_0 + \H_1$ with
 \begin{align}
   \H_0 &\coloneqq \sum_{x\in\Vset} h_x\,\sigma^Z_x \\
   \H_1 &\coloneqq \sum_{x \in \Vset} \vec{b}_x \argdot \vec{\sigma}^{\mathrm{NN}}_x ,
@@ -4256,7 +4262,7 @@ If, instead of averaging over the $\ket{E^0_k}$, the optimal pair of state vecto
   \caption{(reproduced from \cite{PhysRevLett.10-6})
     For each of the product eigenvectors $\ket{E^0_k}$ of $\H_0$ the equilibration properties under the dynamics of $\H$ with $\sigma_0 = 1$ and $\sigma_1 = 0.4$ of the subsystem $S=\{1\}$ for the initial state $\ket{E^0_k}$ are compared with those of $\sigma^X_1 \ket{E^0_k}$, i.e., the same state but with the first spin flipped.
     Panels (a) and (b) display averages over energy eigenstates:
-    (a)~Average $\delta_k$ for the energy eigenstates of $\H_0$ and average distance of the reduced dephased states $\mathbb{E}(\tracedistance{\omega^{S(1)}}{\omega^{S(2)}})$. 
+    (a)~Average $\delta_k$ for the energy eigenstates of $\H_0$ and average distance of the reduced dephased states $\mathbb{E}(\tracedistance{\omega^{S(1)}}{\omega^{S(2)}})$.
     (b)~Average effective dimension and equilibration coefficient.
     Panels (c) and (d) show quantities optimized over energy eigenstates:
     (c)~Maximum distinguishability $\max_k \Delta(\ket{E_k^{(0)}})$ where $\Delta(\ket{E_k^{(0)}}) = \tracedistance{\omega^{S(1)}}{\omega^{S(2)}} - \eqcoef(\psi^{(1)}_0) - \eqcoef(\psi^{(2)}_0)$ ($\Delta>0$ ensures distinguishability for most times. See the inset for an illustration of the meaning of the quantities.
@@ -4303,8 +4309,8 @@ Due to the lack of entanglement in the eigenbasis the squared moduli of the over
 In addition the expectation values of $\sigma^Z_1$ in eigenstates with neighboring energies fluctuate significantly.
 One could say that the system does not fulfill the eigenstate thermalization hypothesis (see Section~\ref{sec:thermalizationunderassumptionsontheeigenstates}), as is expected for systems with \emph{quenched disorder} \cite{PhysRevB.82.17}.
 
-As can be seen in Fig.~\ref{fig:absenceofthermalizationnumerics2a}, the expectation value of $\sigma^Z_1$ does equilibrate under the dynamics of $\H$ when the system is started in $\ket{E^0_j}$ or $\sigma^X_1\,\ket{E^0_j}$, but it remains close to its initial state for most times during the simulated evolution. 
-Memory of the initial condition prevents thermalization. 
+As can be seen in Fig.~\ref{fig:absenceofthermalizationnumerics2a}, the expectation value of $\sigma^Z_1$ does equilibrate under the dynamics of $\H$ when the system is started in $\ket{E^0_j}$ or $\sigma^X_1\,\ket{E^0_j}$, but it remains close to its initial state for most times during the simulated evolution.
+Memory of the initial condition prevents thermalization.
 
 In addition to the numerical study of the absence of thermalization that was published in \cite{PhysRevLett.10-6} that we discussed above, there exist several other articles, including Refs.~\cite{1011.0781v1,Cazalilla11,Biroli09,Znidaric09}, that numerically and analytically study related effects.
 Ref.~\cite{Biroli09} finds that the existence of few energy eigenstates that violate the \emph{eigenstate thermalization hypothesis} (see also Section~\ref{sec:thermalizationunderassumptionsontheeigenstates} and in particular Definition~\ref{def:eth}) can lead to absence of thermalization.
@@ -4390,7 +4396,7 @@ If a Liouville integrable system is perturbed, i.e., the Hamiltonian function sl
 For small perturbations the Kolmogorov-Arnold-Moser (KAM) theorem ensures, under a so-called \emph{non-resonance condition}, that most tori are only deformed and the time evolution on them is then still quasi periodic \cite{Moradi2001,Tabor1989,Poeschel03}.
 
 In summary we have:
-Integrability in classical systems implies \emph{systematic solvability} and thereby yields a \emph{qualitative classification} of classical systems. 
+Integrability in classical systems implies \emph{systematic solvability} and thereby yields a \emph{qualitative classification} of classical systems.
 Liouville integrable systems are not \emph{ergodic} (see Section~\ref{sec:canonicalapproaches}) in the sense that their phase space trajectory does not explore the whole phase space, but is confined to a portion of it.
 Whether or not this implies that integrable systems cannot thermalize depends on the definition of thermalization, but the motion of the system is quasi periodic and hence no convergence of the state of the system in the limit $t\to\infty$ is possible.
 Non-integrability in classical systems is \emph{not} sufficient for ergodicity or chaos and hence also not sufficient for notions of mixing or thermalization based on these concepts.
@@ -4416,7 +4422,7 @@ The overlaps $\braket{\tilde E_k}{\psi}$ can also be calculated systematically, 
 
 The analogy to the situation of Liouville integrable systems is striking:
 The dimension $d$ plays the role of the number $n$ of degrees of freedom of the system in the classical case.
-The linear functionals $|\bra{\tilde E_k} \,\argdot\, | \oftype \mcH \to \R$, induced by the eigenvectors of $\H$, are analogous to the first integrals of motion in Liouville's theorem on integrable systems, and the time independent moduli of the overlaps $|\braket{\tilde E_k}{\psi}| = |\braket{\tilde E_k}{\psi(t)}|$ play the role of the values fixed for these constants of motion. 
+The linear functionals $|\bra{\tilde E_k} \,\argdot\, | \oftype \mcH \to \R$, induced by the eigenvectors of $\H$, are analogous to the first integrals of motion in Liouville's theorem on integrable systems, and the time independent moduli of the overlaps $|\braket{\tilde E_k}{\psi}| = |\braket{\tilde E_k}{\psi(t)}|$ play the role of the values fixed for these constants of motion.
 Finally, the functions $\tilde \varphi_k$ in the right hand side of \texteqref{eq:timeevolutioninexpliciteform} satisfy differential equations analogous to those of the action angle variables, namely $\dot{\tilde{\varphi}}_k = \tilde E_k$, and the time evolution indeed happens on a $d$-torus.
 As in the classical case, the specific torus to which the evolution is confined depends on the values fixed for the conserved quantities.
 
@@ -4430,7 +4436,7 @@ Of course, simply classifying all (finite dimensional) quantum systems as integr
 After all, as we have seen in the previous sections, under certain conditions closed quantum systems can exhibit behavior that is reminiscent of the behavior of non-integrable classical systems, such as equilibration and thermalization.
 Moreover, if one believes that quantum mechanics is indeed a fundamental theory, then it must also be able to somehow produce the non-integrable, and sometimes even ergodic or chaotic, behavior observable on the classical level.
 It is thus tempting to define quantum versions of the notion of chaos, ergodicity and integrability via a classical limit.
-As we will see shortly this is only one of the many approaches that have been pursued in the literature. 
+As we will see shortly this is only one of the many approaches that have been pursued in the literature.
 
 Before going on, it is reasonable to give a set of conditions that a good notion of \mbox{(non-)}integrability for quantum systems should satisfy.
 Inspired by the work of \textcite{1012.3587v1}, we demand that a definition of quantum integrability should:
@@ -4441,7 +4447,7 @@ Inspired by the work of \textcite{1012.3587v1}, we demand that a definition of q
 \item \label{item:reasonablenotionofquantumintegrabilitycondition3} be decidable for concrete models.
 \end{enumerate}
 
-Unfortunately none of the existing frequently used notions of quantum integrability seems to fulfill all these criteria. 
+Unfortunately none of the existing frequently used notions of quantum integrability seems to fulfill all these criteria.
 The following is a (probably incomplete) list of the different definitions of quantum integrability that have been introduced, together with some (purely exemplary) references in which the corresponding definition appears or is used (see also Refs.~\cite{1012.3587v1,PhysRevLett.10-6,sutherland04,Weigert1992}).
 A system is \emph{quantum integrable}:
 \begin{enumerate}[leftmargin=*]
@@ -4528,7 +4534,7 @@ We have previously touched upon the issue of quantifying correlations in Section
 Here we measure correlations by a generalization of the covariance that we introduced in \texteqref{eq:covariance}.
 We define for any $\tau \in [0,1]$, any two operators $A,B \in \Bop(\mcH)$, and any quantum state $\rho \in \Qst(\mcH)$ the \emph{generalized covariance}
 \begin{equation} \label{eq:generalizedcovariance}
- \cov_\rho^\tau(A,B) 
+ \cov_\rho^\tau(A,B)
  \coloneqq \Tr(\rho^\tau A\, \rho^{1-\tau} B) - \Tr(\rho\, A) \Tr(\rho \, B) \, .
 \end{equation}
 The choice $\tau = 1$ gives the usual covariance introduced in Section~\ref{sec:correlationsandmomemts}.
@@ -4540,7 +4546,7 @@ The reason for our more general definition is that the \emph{generalized covaria
   \begin{equation}\label{eq:truncation_error_in_terms_of_cov}
     \begin{split}
       &\Tr\bigl(A\,\rhog[\H(0)](\beta)\bigr)-\Tr\bigl(A\,\rhog[\H(1)](\beta)\bigr) \\
-      = &\beta\,\int_0^1  \int_0^1 \cov_{\rhog[\H(s)](\beta)}^\tau(A, \sum_{X \in I} \H_X)\,\dd\tau\,\dd s .        
+      = &\beta\,\int_0^1  \int_0^1 \cov_{\rhog[\H(s)](\beta)}^\tau(A, \sum_{X \in I} \H_X)\,\dd\tau\,\dd s .
     \end{split}
   \end{equation}
 \end{theorem}
@@ -4564,11 +4570,11 @@ If $I$ in Theorem~\ref{thm:truncationformula} is chosen to be $S_\partial$, then
 If $\supp(A) \subset S$, then the truncation formula tells us that the expectation value of $A$ in $\rhog[\H](\beta)$ is similar to that of $\trunc A S$ in $\rhog_S[\H](\beta) = \rhog[\trunc{\H_S} S](\beta)$ if and only if the right hand side of \texteqref{eq:truncation_error_in_terms_of_cov} is small.
 
 In other words:
-\begin{observation}[Locality of temperature \cite{Kliesch2013a}] 
-  Temperature can be defined locally on a given length scale if and only if the averaged generalized covariance is small compared to $1/\beta$ on that length scale. 
+\begin{observation}[Locality of temperature \cite{Kliesch2013a}]
+  Temperature can be defined locally on a given length scale if and only if the averaged generalized covariance is small compared to $1/\beta$ on that length scale.
 \end{observation}
 
-We now give conditions under which this can be guaranteed. 
+We now give conditions under which this can be guaranteed.
 More precisely, we will formulate a theorem that ensures an exponential decay of the generalized covariance $\cov^\tau_{\rhog(\beta)}(A,B)$ with the \emph{graph distance} $\dist(A,B)$ (remember the definitions from Section~\ref{sec:localquantumsystems}) between the supports of the two operators $A,B \in \Bop(\mcH)$ above a universal critical temperature.
 Together with the truncation formula this will allows us to prove the local stability result promised earlier.
 
@@ -4594,15 +4600,15 @@ We can now state the clustering of correlations result:
   Consider a locally interacting system of spins or fermions with Hilbert space $\mcH$ and Hamiltonian $\H \in \Obs(\mcH)$ with \emph{local interaction strength} $J \coloneqq \max_{X\in\Eset} \norm[\infty]{\H_X}$ and interaction (hyper)graph $\mcG = (\Vset,\Eset)$ with growth constant $\animalc$.
   Define the \emph{critical temperature}
   \begin{equation}\label{eq:crit_beta_def}
-    \beta^\ast \coloneqq \ln((1+\sqrt{1+4/\animalc})/2)/(2\,J) 
+    \beta^\ast \coloneqq \ln((1+\sqrt{1+4/\animalc})/2)/(2\,J)
   \end{equation}
   and the \emph{thermal correlation length}
   \begin{equation} \label{eq:correlation_length_def}
     \xi(\beta) \coloneqq \left|1/\ln\left(\animalc\, \e^{2\,|\beta|\,J}(\e^{2\,|\beta|\,J}-1)\right)\right|  \, .
   \end{equation}
-  Then, for every $|\beta|<\beta^\ast$, parameter $\tau \in [0,1]$, and every two operators $A,B \in \Bop(\mcH)$ with 
+  Then, for every $|\beta|<\beta^\ast$, parameter $\tau \in [0,1]$, and every two operators $A,B \in \Bop(\mcH)$ with
   $\dist(A, B) \geq \xi(\beta)\, \left|\ln\left(\ln(3)\, (1-\e^{-1/\xi(\beta)})/\min(|A_\partial |,|B_\partial |)\right)\right|$ ,
-  \begin{equation} \label{eq:clustering} 
+  \begin{equation} \label{eq:clustering}
     |\cov^\tau_{\rhog(\beta)} (A, B)| \leq \frac{4\,a \norm{A}_\infty\, \norm{B}_\infty}{\ln(3)\, (1-\e^{-1/\xi(\beta)})}\,\e^{-\dist(A,B)/\xi(\beta)} .
   \end{equation}
 \end{theorem}
@@ -4616,7 +4622,7 @@ More precisely, it shows that changing the Hamiltonian of a locally interacting 
 \begin{theorem}[Universal locality at high temperatures {\cite[Theorem~4 and 17]{Kliesch2013a}}]\label{thm:intensivity}
   Let $\H$ be a Hamiltonian satisfying the conditions of Theorem~\ref{thm:clustering},
   let $\beta^\ast$ and $\xi(\beta)$ be defined as in \texteqref{eq:crit_beta_def} and \texteqref{eq:correlation_length_def},
-  let $|\beta|< \beta^\ast$, and let $S^i \subset S \subseteq V$ be subsystems with 
+  let $|\beta|< \beta^\ast$, and let $S^i \subset S \subseteq V$ be subsystems with
   $\dist(S^i, S_\partial) \geq \xi(\beta)\, \left|\ln\left(\ln(3)\, (1-\e^{-1/\xi(\beta)})/|S^i_\partial|\right)\right|$.
   Then
   \begin{equation}\label{eq:stabilityofthermalstatesbound}
@@ -4636,7 +4642,7 @@ Theorem~\ref{thm:intensivity} is an instance of a result whose proof heavily rel
 
 It is interesting to plug in the numbers of a specific model to see how physical the derived critical temperature is.
 As a concrete example consider the ferromagnetic two dimensional isotropic Ising Model without external field.
-The critical temperature of Theorem~\ref{thm:clustering} and \ref{thm:intensivity} is 
+The critical temperature of Theorem~\ref{thm:clustering} and \ref{thm:intensivity} is
 $1/(\beta^\ast\,J) = 2/\ln((1+\sqrt{1+1/\e})/2) \approx 24.58$, whereas the \emph{Curie temperature}, i.e., the temperature at which the phase transition between the paramagnetic and the ferromagnetic phase happens is known to be
 $1/(\beta_c\,J) = 2/\ln(1+\sqrt{2}) \approx 2.27$ \cite{Bhattacharjee1995}.
 
@@ -4683,7 +4689,7 @@ It is the hope that the review provided in this exposition will help to stimulat
 
 \cleardoublepage
 
-\appendix 
+\appendix
 
 %%%%Back matter%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Back matter}
@@ -4717,7 +4723,7 @@ I would like to thank Andreas Winter, who introduced me to the field of quantum 
 I would like to thank my supervisor Jens Eisert who has been restlessly supporting me in countless ways.
 I am grateful for him creating a near perfect research environment, for getting me involved in so many wonderful projects, for his enthusiasm, encouragement, advice, and trust.
 
-I would like to thank the current and former members of the QMIO group, in particular Martin Kliesch, Arnau Riera, Markus Müller, Leandro Aolita, Earl Campbell, Michael Kastoryano, Mathis Friesdorf, Henrik Wilming, and Albert Werner, for sharing their ideas in hours of discussions, their advice, wisdom, and support. 
+I would like to thank the current and former members of the QMIO group, in particular Martin Kliesch, Arnau Riera, Markus Müller, Leandro Aolita, Earl Campbell, Michael Kastoryano, Mathis Friesdorf, Henrik Wilming, and Albert Werner, for sharing their ideas in hours of discussions, their advice, wisdom, and support.
 It is you, who have made the last three and a half years the wonderful, enjoyable, and productive time I can now look back to.
 
 Last but not least, I would like to thank my wonderful partner Manuela for her support and interest in my life and work, for being the open-hearted, outspoken, and inspiring person she is.
@@ -4755,7 +4761,7 @@ Alle Resultate werden in einer vereinheitlichten Notation präsentiert und viele
 \section{Eigenständigkeitserklärung}
 %
 Hiermit bestätige ich, dass ich die vorliegende Arbeit selbstständig und nur mit Hilfe der angegebenen Hilfsmittel angefertigt habe.
-Alle Stellen der Arbeit, die wörtlich oder sinngemäß aus Veröffentlichungen oder aus anderweitigen fremden Quellen entnommen wurden, sind als solche kenntlich gemacht. 
+Alle Stellen der Arbeit, die wörtlich oder sinngemäß aus Veröffentlichungen oder aus anderweitigen fremden Quellen entnommen wurden, sind als solche kenntlich gemacht.
 Ich habe die Arbeit noch nicht in einem früheren Promotionsverfahren eingereicht.
 
 %{\begin{flushright} \vspace{9mm}Vorgelegt am \rule{35mm}{0.2pt} von \rule{60mm}{0.2pt}\\{\footnotesize Christian Gogolin} \end{flushright}}
@@ -4913,8 +4919,7 @@ Diese Doktorarbeit basiert teilweise auf den folgenden Artikeln des Autors:
 
 \end{document}
 
-%%% Local Variables: 
+%%% Local Variables:
 %%% mode: latex
 %%% TeX-master: t
-%%% End: 
-
+%%% End:
