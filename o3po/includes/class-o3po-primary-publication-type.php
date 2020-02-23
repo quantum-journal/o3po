@@ -133,7 +133,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 		if ( ( isset($_POST[$post_type . '_fetch_metadata_from_arxiv'] ) or $old_eprint !== $new_eprint ) and !empty($new_eprint) and preg_match("/^(quant-ph\/[0-9]{6,}|[0-9]{4}\.[0-9]{4,})v[0-9]*$/u", $new_eprint) === 1 ) {
 
             $settings = O3PO_Settings::instance();
-            $arxiv_abs_page_url = $settings->get_plugin_option('arxiv_url_abs_prefix');
+            $arxiv_abs_page_url = $settings->get_field_value('arxiv_url_abs_prefix');
             $fetch_meta_data_from_abstract_page_result = O3PO_Arxiv::fetch_meta_data_from_abstract_page($arxiv_abs_page_url, $new_eprint);
             if(!empty($fetch_meta_data_from_abstract_page_result['arxiv_fetch_results']))
                 $arxiv_fetch_results .= $fetch_meta_data_from_abstract_page_result['arxiv_fetch_results'];
@@ -221,7 +221,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             // Download PDF form the arXiv
         if( !empty( $doi_suffix ) and !empty( $eprint ) and (isset($_POST[$post_type . '_download_arxiv_pdf']) or empty($arxiv_pdf_attach_ids) or $eprint_was_changed_on_last_save === "true" or $doi_suffix_was_changed_on_last_save === "true" ) )
         {
-            $arxiv_url_pdf_prefix = $settings->get_plugin_option('arxiv_url_pdf_prefix');
+            $arxiv_url_pdf_prefix = $settings->get_field_value('arxiv_url_pdf_prefix');
             $pdf_download_result= O3PO_Arxiv::download_pdf($this->environment, $arxiv_url_pdf_prefix, $eprint, $doi_suffix, $post_id);
         }
         if ( !empty( $pdf_download_result['error'] ) ) {
@@ -235,7 +235,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             // Download SOURCE form the arXiv (This can yield either a .tex or a .tar.gz file!)
         if( !empty( $doi_suffix ) and !empty( $eprint ) and (isset($_POST[$post_type . '_download_arxiv_source']) or empty($arxiv_source_attach_ids) or $eprint_was_changed_on_last_save === "true" or $doi_suffix_was_changed_on_last_save === 'true') )
         {
-            $arxiv_url_source_prefix = $settings->get_plugin_option('arxiv_url_source_prefix');
+            $arxiv_url_source_prefix = $settings->get_field_value('arxiv_url_source_prefix');
             $source_download_result = O3PO_Arxiv::download_source($this->environment, $arxiv_url_source_prefix, $eprint, $doi_suffix, $post_id );
         }
         if ( !empty( $source_download_result['error'] ) ) {
@@ -414,29 +414,29 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $journal = get_post_meta( $post_id, $post_type . '_journal', true );
         $post_url = get_permalink( $post_id );
 
-        $executive_board = $settings->get_plugin_option('executive_board');
-        $editor_in_chief = $settings->get_plugin_option('editor_in_chief');
+        $executive_board = $settings->get_field_value('executive_board');
+        $editor_in_chief = $settings->get_field_value('editor_in_chief');
 
             // Send Emails about the submission to us
         $to = ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') );
         $headers = array( 'From: ' . $this->get_journal_property('publisher_email'));
 
-        $subject  = ($this->environment->is_test_environment() ? 'TEST ' : '').
-                    O3PO_EmailTemplates::self_notification_subject(
-                              $settings->get_plugin_option('self_notification_subject_template'),
-                              $journal,
-                              $this->get_publication_type_name())['result'];
+        $subject  = ($this->environment->is_test_environment() ? 'TEST ' : '') .
+            O3PO_EmailTemplates::expand('self_notification_subject',
+                                        array('[journal]' => $journal,
+                                              '[publication_type_name]' => $this->get_publication_type_name()
+                                              ));
 
         $message  = ($this->environment->is_test_environment() ? 'TEST ' : '') .
-            O3PO_EmailTemplates::self_notification_body(
-                $settings->get_plugin_option('self_notification_body_template'),
-                $journal,
-                $this->get_publication_type_name(),
-                $title,
-                static::get_formated_authors($post_id),
-                $post_url,
-                $this->get_journal_property('doi_url_prefix'),
-                $doi)['result'];
+            O3PO_EmailTemplates::expand('self_notification_body',
+                                        array('[journal]' => $journal,
+                                              '[publication_type_name]' => $this->get_publication_type_name(),
+                                              '[title]' => $title,
+                                              '[authors]' => static::get_formated_authors($post_id),
+                                              '[url]' => $post_url,
+                                              '[doi_url_prefix]' => $this->get_journal_property('doi_url_prefix'),
+                                              '[doi]' => $doi,
+                                              ));
 
         $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
@@ -460,27 +460,26 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 
             $to = ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $corresponding_author_email);
             $headers = array( 'Cc: ' . ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') ), 'From: ' . $this->get_journal_property('publisher_email'));
-            $subject  = ($this->environment->is_test_environment() ? 'TEST ' : '').
-                         O3PO_EmailTemplates::author_notification_subject(
-                              $settings->get_plugin_option('author_notification_subject_template'),
-                            $journal,
-                            $this->get_publication_type_name())['result'];
+            $subject  = ($this->environment->is_test_environment() ? 'TEST ' : '') .
+                O3PO_EmailTemplates::expand('author_notification_subject',
+                                            array('[journal]' => $journal,
+                                                  '[publication_type_name]' => $this->get_publication_type_name()
+                                                  ));
 
             $message  = ($this->environment->is_test_environment() ? 'TEST ' : '') .
-                O3PO_EmailTemplates::author_notification_body(
-                    $settings->get_plugin_option('author_notification_body_template'),
-                    $journal,
-                    $executive_board,
-                    $editor_in_chief,
-                    $this->get_journal_property('publisher_email'),
-                    $this->get_publication_type_name(),
-                    $title,
-                    static::get_formated_authors($post_id),
-                    $post_url,
-                    $this->get_journal_property('doi_url_prefix'),
-                    $doi,
-                    static::get_formated_citation($post_id)
-                                                              )['result'];
+                O3PO_EmailTemplates::expand('author_notification_body',
+                                            array('[journal]' => $journal,
+                                                  '[executive_board]' => $executive_board,
+                                                  '[editor_in_chief]' => $editor_in_chief,
+                                                  '[publisher_email]' => $this->get_journal_property('publisher_email'),
+                                                  '[publication_type_name]' => $this->get_publication_type_name(),
+                                                  '[title]' => $title,
+                                                  '[authors]' => static::get_formated_authors($post_id),
+                                                  '[post_url]' => $post_url,
+                                                  '[doi_url_prefix]' => $this->get_journal_property('doi_url_prefix'),
+                                                  '[doi]' => $doi,
+                                                  '[journal_reference]' => static::get_formated_citation($post_id)
+                                                  ));
 
             $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
@@ -502,20 +501,21 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             $to = ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('fermats_library_email'));
             $headers = array( 'Cc: ' . ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') ), 'From: ' . $this->get_journal_property('publisher_email'));
             $subject  = ($this->environment->is_test_environment() ? 'TEST ' : '') .
-                  O3PO_EmailTemplates::fermats_library_notification_subject(
-                      $settings->get_plugin_option('fermats_library_notification_subject_template'),
-                      $journal,
-                      $this->get_publication_type_name())['result'];
+                O3PO_EmailTemplates::expand('fermats_library_notification_subject',
+                                            array('[journal]' => $journal,
+                                                  '[publication_type_name]' => $this->get_publication_type_name()
+                                                  ));
             $message  = ($this->environment->is_test_environment() ? 'TEST ' : '') .
-                  O3PO_EmailTemplates::fermats_library_notification_body(
-                      $settings->get_plugin_option('fermats_library_notification_body_template'),
-                      $journal,
-                      $this->get_publication_type_name(),
-                      $title, static::get_formated_authors($post_id),
-                      $post_url,
-                      $this->get_journal_property('doi_url_prefix'),
-                      $doi,
-                      $fermats_library_permalink)['result'];
+                O3PO_EmailTemplates::expand('fermats_library_notification_body',
+                                            array('[journal]' => $journal,
+                                                  '[publication_type_name]' => $this->get_publication_type_name(),
+                                                  '[title]' => $title,
+                                                  '[authors]' => static::get_formated_authors($post_id),
+                                                  '[post_url]' => $post_url,
+                                                  '[doi_url_prefix]' => $this->get_journal_property('doi_url_prefix'),
+                                                  '[doi]' => $doi,
+                                                  '[fermats_library_permalink]' => $fermats_library_permalink
+                                                  ));
 
             $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
@@ -1059,7 +1059,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             /* We do this because now we can then submit the pdf for
              * indexing to relevanssi. */
         $settings = O3PO_Settings::instance();
-        $relevanssi_index_pdfs_asynchronously = $settings->get_plugin_option('relevanssi_index_pdfs_asynchronously');
+        $relevanssi_index_pdfs_asynchronously = $settings->get_field_value('relevanssi_index_pdfs_asynchronously');
         if($relevanssi_index_pdfs_asynchronously === 'checked')
         {
             ignore_user_abort(true);
@@ -1181,7 +1181,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
     public static function add_axiv_paper_doi_feed_endpoint() {
 
         $settings = O3PO_Settings::instance();
-        $endpoint_suffix = $settings->get_plugin_option('arxiv_paper_doi_feed_endpoint');
+        $endpoint_suffix = $settings->get_field_value('arxiv_paper_doi_feed_endpoint');
 
         add_rewrite_endpoint( $endpoint_suffix, EP_ROOT );
 
@@ -1200,8 +1200,8 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
     public function handle_arxiv_paper_doi_feed_endpoint_request( $wp_query, $do_not_exit=false ) {
 
         $settings = O3PO_Settings::instance();
-        $endpoint_suffix = $settings->get_plugin_option('arxiv_paper_doi_feed_endpoint');
-        $endpoint_days = $settings->get_plugin_option('arxiv_paper_doi_feed_days');
+        $endpoint_suffix = $settings->get_field_value('arxiv_paper_doi_feed_endpoint');
+        $endpoint_days = $settings->get_field_value('arxiv_paper_doi_feed_days');
 
 
         if ( !isset( $wp_query->query_vars[ $endpoint_suffix ] ) )
@@ -1527,7 +1527,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             $content = '';
 
             $content .= '<header class="entry-header">';
-            if($settings->get_plugin_option('page_template_for_publication_posts')==='checked')
+            if($settings->get_field_value('page_template_for_publication_posts')==='checked')
                 $content .= '<h1 class="entry-title title citation_title"><a href="#">' . esc_html ( get_the_title( $post_id ) ) . '</a></h1>';
             $content .= '<p class="authors citation_author">';
             $content .= $this->get_formated_authors_html( $post_id );
@@ -1537,19 +1537,19 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             $content .= '</p>';
             $content .= '<table class="meta-data-table">';
             $content .= '<tr><td>Published:</td><td>' . esc_html($this->get_formated_date_published( $post_id )) .  ', ' . $this->get_formated_volume_html($post_id) . ', page ' . esc_html(get_post_meta( $post_id, $post_type . '_pages', true )) . '</td></tr>';
-            $content .= '<tr><td>Eprint:</td><td><a href="' . esc_attr($settings->get_plugin_option('arxiv_url_abs_prefix') . get_post_meta( $post_id, $post_type . '_eprint', true ) ) . '">arXiv:' . esc_html(get_post_meta( $post_id, $post_type . '_eprint', true )) . '</a></td></tr>';
+            $content .= '<tr><td>Eprint:</td><td><a href="' . esc_attr($settings->get_field_value('arxiv_url_abs_prefix') . get_post_meta( $post_id, $post_type . '_eprint', true ) ) . '">arXiv:' . esc_html(get_post_meta( $post_id, $post_type . '_eprint', true )) . '</a></td></tr>';
             $doi = get_post_meta( $post_id, $post_type . '_doi_prefix', true ) . '/' .  get_post_meta( $post_id, $post_type . '_doi_suffix', true );
-            $content .= '<tr><td>Doi:</td><td><a href="' . esc_attr($settings->get_plugin_option('doi_url_prefix') . $doi) . '">' . esc_html($settings->get_plugin_option('doi_url_prefix') . $doi ) . '</a></td></tr>';
+            $content .= '<tr><td>Doi:</td><td><a href="' . esc_attr($settings->get_field_value('doi_url_prefix') . $doi) . '">' . esc_html($settings->get_field_value('doi_url_prefix') . $doi ) . '</a></td></tr>';
             $content .= '<tr><td>Citation:</td><td>' . esc_html($this->get_formated_citation($post_id)) . '</td></tr>';
             $content .= '</table>';
 
             $content .= '<div class="publication-action-buttons">';
             $content .= '<a href="' . esc_url($this->get_pdf_pretty_permalink($post_id)) . '" ><button id="fulltext" class="btn-theme-primary pirate-forms-submit-button" type="button">Get full text pdf</button></a>';
-            if(!empty($settings->get_plugin_option('arxiv_vanity_url_prefix')))
+            if(!empty($settings->get_field_value('arxiv_vanity_url_prefix')))
             {
                 $eprint = get_post_meta( $post_id, $post_type . '_eprint', true );
                 $eprint_without_version = preg_replace('#v[0-9]+$#u', '', $eprint);
-                $arxiv_vanity_url = $settings->get_plugin_option('arxiv_vanity_url_prefix') . $eprint_without_version;
+                $arxiv_vanity_url = $settings->get_field_value('arxiv_vanity_url_prefix') . $eprint_without_version;
                 $content .= '<a href="' . esc_url($arxiv_vanity_url) . '" ><button id="arxiv-vanity" class="btn-theme-primary pirate-forms-submit-button" type="button">Read on arXiv Vanity</button></a>';
             }
             if($this->show_fermats_library_permalink($post_id))
@@ -1559,16 +1559,16 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             }
             $content .= '</div>';
 
-            if(!empty($settings->get_plugin_option('scirate_url_abs_prefix')))
+            if(!empty($settings->get_field_value('scirate_url_abs_prefix')))
             {
-                $scirate_url = $settings->get_plugin_option('scirate_url_abs_prefix') . get_post_meta( $post_id, $post_type . '_eprint', true );
+                $scirate_url = $settings->get_field_value('scirate_url_abs_prefix') . get_post_meta( $post_id, $post_type . '_eprint', true );
                 $content .= '<p>Find this '. $post_type . ' interesting or want to discuss? <a href="' . esc_attr($scirate_url) . '">Scite or leave a comment on SciRate</a>.<p>';
             }
 
             $content .= '</header>';
             $content .= '<div class="entry-content">';
 
-            $abstract_header = $settings->get_plugin_option('page_template_abstract_header');
+            $abstract_header = $settings->get_field_value('page_template_abstract_header');
             if(!empty($abstract_header)) {
                 $content .= '<h3 class="abstract-header" >' . esc_html($abstract_header) . '</h3>';
             }

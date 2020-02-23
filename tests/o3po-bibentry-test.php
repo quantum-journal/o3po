@@ -2,7 +2,7 @@
 
 require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-bibentry.php';
 
-class O3PO_BibentryTest extends PHPUnit_Framework_TestCase
+class O3PO_BibentryTest extends O3PO_TestCase
 {
 
     public function match_provider() {

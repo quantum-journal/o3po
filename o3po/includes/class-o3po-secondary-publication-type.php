@@ -349,8 +349,8 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 
         $post_type = get_post_type($post_id);
 
-        $executive_board = $settings->get_plugin_option('executive_board');
-        $editor_in_chief = $settings->get_plugin_option('editor_in_chief');
+        $executive_board = $settings->get_field_value('executive_board');
+        $editor_in_chief = $settings->get_field_value('editor_in_chief');
 
         $corresponding_author_has_been_notifed_date = get_post_meta( $post_id, $post_type . '_corresponding_author_has_been_notifed_date', true );
         $corresponding_author_email = get_post_meta( $post_id, $post_type . '_corresponding_author_email', true );
@@ -365,20 +365,22 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         $to = $this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email');
         $headers = array( 'From: ' . $this->get_journal_property('publisher_email'));
         $subject  = $this->environment->is_test_environment() ? 'TEST ' : ''.
-                    O3PO_EmailTemplates::self_notification_subject(
-                      $settings->get_plugin_option('self_notification_subject_template'),
-                    $journal, mb_strtolower($sub_type))['result'];
+            O3PO_EmailTemplates::expand('self_notification_subject',
+                                        array(
+                                            '[journal]' => $journal,
+                                            '[publication_type_name]' => mb_strtolower($sub_type),
+                                              ));
         $message  = $this->environment->is_test_environment() ? 'TEST ' : '' .
-                    O3PO_EmailTemplates::self_notification_body(
-                        $settings->get_plugin_option('self_notification_body_template'),
-                        $journal,
-                        $this->get_publication_type_name(),
-                        $title,
-                        static::get_formated_authors($post_id),
-                        $post_url,
-                        $this->get_journal_property('doi_url_prefix'),
-                        $doi)['result'];
-
+            O3PO_EmailTemplates::expand('self_notification_body',
+                                        array(
+                                            '[journal]' => $journal,
+                                            '[publication_type_name]' => $this->get_publication_type_name(),
+                                            '[title]' => $title,
+                                            '[authors]' => static::get_formated_authors($post_id),
+                                            '[url]' => $post_url,
+                                            '[doi_url_prefix]' => $this->get_journal_property('doi_url_prefix'),
+                                            '[doi]' => $doi,
+                                              ));
         $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
         if(!$successfully_sent)
@@ -408,7 +410,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
                     $validation_result .= 'INFO: Trackback to the arXiv for ' . $eprint_without_version . ' sent.' . "\n";
                 }
 
-                if($settings->get_plugin_option('trackbacks_from_secondary_directly_into_database') !== 'checked')
+                if($settings->get_field_value('trackbacks_from_secondary_directly_into_database') !== 'checked')
                 {
                         //Send Trackback to ourselves via trackback()
                     $response = trackback( get_site_url() . $suspected_post_url, $title, $trackback_excerpt, $post_id );
@@ -455,26 +457,26 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
             $headers = array( 'Cc: ' . ($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('publisher_email') ), 'From: ' . $this->get_journal_property('publisher_email'));
 
             $subject  = $this->environment->is_test_environment() ? 'TEST ' : ''.
-                  O3PO_EmailTemplates::author_notification_subject(
-                      $settings->get_plugin_option('author_notification_secondary_subject_template'),
-                      $journal,
-                      $sub_type)['result'];
+                O3PO_EmailTemplates::expand('author_notification_secondary_subject',
+                                            array(
+                                                "[journal]" => $journal,
+                                                "[publication_type_name]" => $sub_type,
+                                                  ));
             $message  = $this->environment->is_test_environment() ? 'TEST ' : '' .
-                        O3PO_EmailTemplates::author_notification_body(
-                            $settings->get_plugin_option('author_notification_secondary_body_template'),
-                            $journal,
-                            $executive_board,
-                            $editor_in_chief,
-                            $this->get_journal_property('publisher_email'),
-                            $this->get_publication_type_name(),
-                            $title,
-                            static::get_formated_authors($post_id),
-                            $post_url,
-                            $this->get_journal_property('doi_url_prefix'),
-                            $doi,
-                            static::get_formated_citation($post_id)
-                                                                      )['result'];
-
+                O3PO_EmailTemplates::expand('author_notification_secondary_body',
+                                            array(
+                                                "[journal]" => $journal,
+                                                "[executive_board]" => $executive_board,
+                                                "[editor_in_chief]" => $editor_in_chief,
+                                                "[publisher_email]" => $this->get_journal_property('publisher_email'),
+                                                "[publication_type_name]" => $this->get_publication_type_name(),
+                                                "[title]" => $title,
+                                                "[authors]" => static::get_formated_authors($post_id),
+                                                "[post_url]" => $post_url,
+                                                "[doi_url_prefix]" => $this->get_journal_property('doi_url_prefix'),
+                                                "[doi]" => $doi,
+                                                "[journal_reference]" => static::get_formated_citation($post_id),
+                                                  ));
             $successfully_sent = wp_mail( $to, $subject, $message, $headers);
 
             if($successfully_sent) {
@@ -872,7 +874,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 
             $content = '';
             $content .= '<header class="entry-header">';
-            if($settings->get_plugin_option('page_template_for_publication_posts')==='checked')
+            if($settings->get_field_value('page_template_for_publication_posts')==='checked')
                 $content .= '<h1 class="entry-title title citation_title"><a href="#">' . esc_html ( get_the_title( $post_id ) ) . '</a></h1>';
 
             if ( has_post_thumbnail( ) ) {

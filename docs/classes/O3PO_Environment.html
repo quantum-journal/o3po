@@ -106,12 +106,12 @@
                         <ul class="dropdown-menu">
                             <li>
                                 <a href="../reports/errors.html">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">0</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">3</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="../reports/markers.html">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">0</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">0</span>
                                 </a>
                             </li>
                             <li>
@@ -136,15 +136,16 @@
                                 <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-217867341"></a>
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-1791685496"></a>
                                 <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
             </div>
-            <div id="namespace-217867341" class="accordion-body collapse in">
+            <div id="namespace-1791685496" class="accordion-body collapse in">
                 <div class="accordion-inner">
 
                     
                     <ul>
-                                                                                                    <li class="class"><a href="../classes/O3PO.html">O3PO</a></li>
+                                                                            <li class="trait"><a href="../classes/O3PO_Form.html">O3PO_Form</a></li>
+                                                                            <li class="class"><a href="../classes/O3PO.html">O3PO</a></li>
                                                     <li class="class"><a href="../classes/O3PO_Activator.html">O3PO_Activator</a></li>
                                                     <li class="class"><a href="../classes/O3PO_Admin.html">O3PO_Admin</a></li>
                                                     <li class="class"><a href="../classes/O3PO_Ads.html">O3PO_Ads</a></li>
@@ -167,9 +168,12 @@
                                                     <li class="class"><a href="../classes/O3PO_PrimaryPublicationType.html">O3PO_PrimaryPublicationType</a></li>
                                                     <li class="class"><a href="../classes/O3PO_Public.html">O3PO_Public</a></li>
                                                     <li class="class"><a href="../classes/O3PO_PublicationType.html">O3PO_PublicationType</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Ready2PublishForm.html">O3PO_Ready2PublishForm</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Ready2PublishStorage.html">O3PO_Ready2PublishStorage</a></li>
                                                     <li class="class"><a href="../classes/O3PO_Relevanssi.html">O3PO_Relevanssi</a></li>
                                                     <li class="class"><a href="../classes/O3PO_SecondaryPublicationType.html">O3PO_SecondaryPublicationType</a></li>
                                                     <li class="class"><a href="../classes/O3PO_Settings.html">O3PO_Settings</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_ShortcodeTemplate.html">O3PO_ShortcodeTemplate</a></li>
                                                     <li class="class"><a href="../classes/O3PO_Singleton.html">O3PO_Singleton</a></li>
                                                     <li class="class"><a href="../classes/O3PO_Utility.html">O3PO_Utility</a></li>
                                             </ul>
@@ -460,12 +464,12 @@ but it treats .tar.gz as a single extension.</p>
                                                     <tr>
                                 <td>string</td>
                                 <td>$filename </td>
-                                <td><p>Base Filename.</p></td>
+                                <td><p>Base Filename including the extension.</p></td>
                             </tr>
                                                     <tr>
                                 <td>string</td>
                                 <td>$ext </td>
-                                <td><p>Desired extension.</p></td>
+                                <td><p>Desired extension, e.g., '.txt', '.pdf', or '.tar.gz'.</p></td>
                             </tr>
                                             </table>
                 
@@ -538,7 +542,7 @@ but it treats .tar.gz as a single extension.</p>
             <article class="method">
                 <h3 class="public ">disable_real_mime_check_for_selected_extensions()</h3>
                 <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
-                <pre class="signature" style="margin-right: 54px;">disable_real_mime_check_for_selected_extensions(array  <span class="argument">$data</span>, string  <span class="argument">$file</span>, string  <span class="argument">$filename</span>, array  <span class="argument">$mimes</span>) : </pre>
+                <pre class="signature" style="margin-right: 54px;">disable_real_mime_check_for_selected_extensions(array  <span class="argument">$data</span>, string  <span class="argument">$file</span>, string  <span class="argument">$filename</span>, array  <span class="argument">$mimes</span>) : array</pre>
                 <p><em>Works around a bug in WP that disallows upload of files to the media library even if they are marked as allowed via the &#039;upload_mimes&#039; filter.</em></p>
                 <p>To be added to the 'wp_check_filetype_and_ext' filter.</p>
 
@@ -570,7 +574,8 @@ $file being in a tmp directory).</p></td>
                 
                 
                                     <h4>Returns</h4>
-                    
+                    array
+                                            &mdash; <p>Values for the extension, MIME, and filename.</p>
                                     				
                             </article>
         </div>
@@ -844,7 +849,7 @@ has turned out to work in all cases I have tested.</em></p>
                 <section class="span10 offset1">
                     <hr />
                     Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
-                    on September 19th, 2019 at 09:31.
+                    on February 15th, 2020 at 07:05.
                 </section>
             </section>
         </section>

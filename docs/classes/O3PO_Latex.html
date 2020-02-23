@@ -106,12 +106,12 @@
                         <ul class="dropdown-menu">
                             <li>
                                 <a href="../reports/errors.html">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">0</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">3</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="../reports/markers.html">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">0</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">0</span>
                                 </a>
                             </li>
                             <li>
@@ -136,15 +136,16 @@
                                 <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-2056305889"></a>
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-1127268022"></a>
                                 <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
             </div>
-            <div id="namespace-2056305889" class="accordion-body collapse in">
+            <div id="namespace-1127268022" class="accordion-body collapse in">
                 <div class="accordion-inner">
 
                     
                     <ul>
-                                                                                                    <li class="class"><a href="../classes/O3PO.html">O3PO</a></li>
+                                                                            <li class="trait"><a href="../classes/O3PO_Form.html">O3PO_Form</a></li>
+                                                                            <li class="class"><a href="../classes/O3PO.html">O3PO</a></li>
                                                     <li class="class"><a href="../classes/O3PO_Activator.html">O3PO_Activator</a></li>
                                                     <li class="class"><a href="../classes/O3PO_Admin.html">O3PO_Admin</a></li>
                                                     <li class="class"><a href="../classes/O3PO_Ads.html">O3PO_Ads</a></li>
@@ -167,9 +168,12 @@
                                                     <li class="class"><a href="../classes/O3PO_PrimaryPublicationType.html">O3PO_PrimaryPublicationType</a></li>
                                                     <li class="class"><a href="../classes/O3PO_Public.html">O3PO_Public</a></li>
                                                     <li class="class"><a href="../classes/O3PO_PublicationType.html">O3PO_PublicationType</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Ready2PublishForm.html">O3PO_Ready2PublishForm</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Ready2PublishStorage.html">O3PO_Ready2PublishStorage</a></li>
                                                     <li class="class"><a href="../classes/O3PO_Relevanssi.html">O3PO_Relevanssi</a></li>
                                                     <li class="class"><a href="../classes/O3PO_SecondaryPublicationType.html">O3PO_SecondaryPublicationType</a></li>
                                                     <li class="class"><a href="../classes/O3PO_Settings.html">O3PO_Settings</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_ShortcodeTemplate.html">O3PO_ShortcodeTemplate</a></li>
                                                     <li class="class"><a href="../classes/O3PO_Singleton.html">O3PO_Singleton</a></li>
                                                     <li class="class"><a href="../classes/O3PO_Utility.html">O3PO_Utility</a></li>
                                             </ul>
@@ -907,9 +911,10 @@ correspnding entry in the bibliograhy.</p>
                 <pre class="signature" style="margin-right: 54px;">latex_to_utf8_outside_math_mode(string  <span class="argument">$latex_text</span>, boolean  <span class="argument">$clean = true</span>) : string</pre>
                 <p><em>Convert LaTeX code to utf8, leaving along everything within math mode.</em></p>
                 <p>Does not attempt to deal with commands that cannot be reasonably represented in utf8, such as \small, \newblock, \emph, ...</p>
-<p>Leaves mathematical formulas enclosed in $...$ intact so that they can be
-displayed nicely using MathJax. This function turns various math modes
-into standard linline mode $a+b$.</p>
+<p>Leaves mathematical formulas enclosed in $...$ (and other math
+mode delimiters such as $$...$$,...) intact so that they can be
+displayed nicely using MathJax. This function turns various the
+math modes into linline mode $a+b$.</p>
 
                                     <h4>Parameters</h4>
                     <table class="table table-condensed table-hover">
@@ -957,16 +962,28 @@ into standard linline mode $a+b$.</p>
             <article class="method">
                 <h3 class="public ">preg_split_at_latex_math_mode_delimters()</h3>
                 <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
-                <pre class="signature" style="margin-right: 54px;">preg_split_at_latex_math_mode_delimters(string  <span class="argument">$text</span>) </pre>
+                <pre class="signature" style="margin-right: 54px;">preg_split_at_latex_math_mode_delimters(string  <span class="argument">$text</span>, integer  <span class="argument">$limit = -1</span>, integer  <span class="argument">$flags</span>) </pre>
                 <p><em>Preg split LaTeX code at math mode delimters.</em></p>
-                
+                <p>If $text is well formed, Odd parts of the resulting array
+are outside math mode and even parts are inside math mode.
+If $fags is not specified or set to 0 the delimiters are stripped.</p>
 
                                     <h4>Parameters</h4>
                     <table class="table table-condensed table-hover">
                                                     <tr>
                                 <td>string</td>
                                 <td>$text </td>
-                                <td><p>Text to be split at LaTeX math mode delimiters such as $$ [] ().</p></td>
+                                <td><p>Text to be split at LaTeX math mode delimiters such as $...$ [...] (...).</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>integer</td>
+                                <td>$limit </td>
+                                <td><p>If specified, then only substrings up to limit are returned with the rest of the string being placed in the last substring. A limit of -1 or 0 means &quot;no limit&quot; and, as is standard across PHP, you can use NULL to skip to the flags parameter.</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>integer</td>
+                                <td>$flags </td>
+                                <td><p>Flags can be any combination of valid preg_split flags. Defaults to 0.</p></td>
                             </tr>
                                             </table>
                 
@@ -1718,7 +1735,7 @@ from a text such as a title.</em></p>
                 <section class="span10 offset1">
                     <hr />
                     Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
-                    on September 19th, 2019 at 09:31.
+                    on February 15th, 2020 at 07:05.
                 </section>
             </section>
         </section>
