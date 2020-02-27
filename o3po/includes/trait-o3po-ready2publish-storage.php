@@ -21,10 +21,12 @@
 trait O3PO_Ready2PublishStorage {
 
         /**
+         * Slug of this storage.
          *
+         * @since 0.3.1+
+         * @access protected
+         * @var string $slug Slug of the storage.
          */
-    static $slug = 'ready2publish';
-
-
+    protected $slug;
 
 }

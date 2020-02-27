@@ -94,6 +94,15 @@ class O3PO {
 	protected $journal_secondary;
 
         /**
+         * The ready to publish form.
+         *
+         * @since    0.3.1+
+         * @access   protected
+         * @var      O3PO_Ready2Publish_Form    $ready2publish_form    The ready to publish form.
+         */
+	protected $ready2publish_form;
+
+        /**
          * The primary publication type.
          *
          * @since    0.1.0
@@ -197,6 +206,11 @@ class O3PO {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-journal.php';
 
             /**
+             * The class representing ready to publish forms.
+             */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-o3po-ready2publish-form.php';
+
+            /**
              * The class providing the primary publication type.
              */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-primary-publication-type.php';
@@ -220,6 +234,9 @@ class O3PO {
             //create the journals
         $this->journal = static::setup_primary_journal($settings);
         $this->journal_secondary = static::setup_secondary_journal($settings);
+
+            //create the ready to publish form
+        $this->ready2publish_form = new O3PO_Ready2PublishForm($this->plugin_name, $settings->get_field_value("ready2publish_slug"));
 
             //create the publication types for each journal
         $this->primary_publication_type = new O3PO_PrimaryPublicationType($this->journal, $this->environment);
@@ -315,6 +332,8 @@ class O3PO {
             $this->loader->add_filter('loop_start', $this->journal, 'add_notice_to_search_results_at_loop_start');
         }
 
+        $this->loader->add_action('init', $this->ready2publish_form, 'init');
+        $this->loader->add_action('do_parse_request', $this->ready2publish_form, 'do_parse_request', PHP_INT_MAX, 2 );
 
         #$this->loader->add_action('get_template_part_template-parts/content', $this->journal, 'foo', 99, 2);
 
