@@ -44,15 +44,6 @@ class O3PO_Settings extends O3PO_Singleton {
     use O3PO_Form;
 
         /**
-         * The unique identifier of this plugin.
-         *
-         * @since    0.1.0
-         * @access   private
-         * @var      string    $plugin_name    The string used to uniquely identify this plugin.
-         */
-	private $plugin_name;
-
-        /**
          * The human readable name of this plugin.
          *
          * @since    0.1.0
@@ -138,6 +129,7 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->specify_sections_and_fields();
         O3PO_Journal::specify_settings($this);
         O3PO_EmailTemplates::specify_settings($this);
+        O3PO_Ready2PublishForm::specify_settings($this);
 
         static::$configured = true;
 	}
@@ -266,6 +258,7 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->specify_fake_field('secondary_publication_type_name', 'view');
         $this->specify_fake_field('secondary_publication_type_name_plural', 'views');
         $this->specify_fake_field('volumes_endpoint', 'volumes');
+        $this->specify_fake_field('ready2publish_slug', 'ready2publish');
 
         $this->specify_section('plugin_settings', 'Plugin', array( $this, 'render_plugin_settings' ), 'plugin_settings');
         $this->specify_field('production_site_url', 'Production site url', array( $this, 'render_production_site_url_setting' ), 'plugin_settings', 'plugin_settings', array(), array($this, 'validate_url'), '');

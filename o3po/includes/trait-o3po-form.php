@@ -21,6 +21,15 @@
 trait O3PO_Form {
 
         /**
+         * The unique identifier of this plugin.
+         *
+         * @since    0.1.0
+         * @access   private
+         * @var      string    $plugin_name    The string used to uniquely identify this plugin.
+         */
+	private $plugin_name;
+
+        /**
          * Slug of this form.
          *
          * Used for css classes when rendering the sections and fields.
@@ -33,7 +42,16 @@ trait O3PO_Form {
     protected $slug;
 
         /**
-         * Array of the IDs of all sections of the form.
+         * Array of all pages of the form.
+         *
+         * @since    0.3.1+
+         * @access   protected
+         * @var      array     $sections   Dictionary of all pages and their properties.
+         */
+	protected $pages = array();
+
+        /**
+         * Array of all sections of the form.
          *
          * @since    0.3.1+
          * @access   protected
@@ -42,13 +60,31 @@ trait O3PO_Form {
 	protected $sections = array();
 
         /**
-         * Array of the IDs of all field of the form.
+         * Array of all field of the form.
          *
          * @since    0.3.1+
          * @access   protected
          * @var      array     $fields    Dictionary of all fields and their properties.
          */
 	protected $fields = array();
+
+        /**
+         * Specify a section of the form.
+         *
+         * Keeps a record of all sections in $this->sections.
+         *
+         * @since  0.3.1+
+         * @access private
+         * @param string   $id       Slug-name to identify the section. Used in the 'id' attribute of tags.
+         * @param string   $title    Formatted title of the section. Shown as the heading for the section.
+         * @param callable $callback Function that echos out any content at the top of the section (between heading and fields).
+         * @param string   $page     The slug-name of the page on which to show the section.
+         */
+    public function specify_page( $id, $render_navigation_callable ) {
+
+        $this->pages[$id] = array('render_navigation_callable' => $render_navigation_callable);
+
+    }
 
         /**
          * Specify a section of the form.
@@ -76,11 +112,12 @@ trait O3PO_Form {
          *
          * @since  0.3.1+
          * @access private
-         * @param string   $id       Slug-name to identify the section. Used in the 'id' attribute of tags.
-         * @param string   $title    Formatted title of the section. Shown as the heading for the section.
-         * @param callable $callback Function that echos out any content at the top of the section (between heading and fields).
-         * @param string   $page     The slug-name of the page on which to show the section. Built-in pages include
-         * @param string   $section  The slug-name of the section of the page
+         * @param string   $id       Slug-name to identify the field. Used in the 'id' attribute of tags.
+         * @param string   $title    Formatted title of the field. Shown as the heading for the field.
+         * @param callable $callback Function that echos out any content at the top of the field (between heading and fields).
+         * @param string   $page     The slug-name of the page on which to show the field.
+         * @param string   $section     The slug-name of the section in which to show the field.
+         * @param string   $field  The slug-name of the field of the page
          *                           in which to show the box.
          * @param array    $args {
          *     Extra arguments used when outputting the field. May be an empty array().
@@ -132,7 +169,7 @@ trait O3PO_Form {
     public function render_single_line_field( $id ) {
         $value = $this->get_field_value($id);
 
-        echo '<input class="regular-text ltr o3po-' . $this->slug . ' o3po-' . $this->slug . '-text" type="text" id="' . $this->plugin_name . '-' . $this->slug . 's-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="' . esc_attr($value) . '" />';
+        echo '<input class="regular-text ltr ' . $this->plugin_name . '-' . $this->slug . ' ' . $this->plugin_name . '-' . $this->slug . '-text" type="text" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="' . esc_attr($value) . '" />';
 
     }
 
@@ -336,7 +373,26 @@ trait O3PO_Form {
     }
 
 
-            /**
+        /**
+         * Clean user input to eprint fields
+         *
+         * @since    0.3.1+
+         * @access   private
+         * @param    string   $id    The field this was input to.
+         * @param    string   $input    User input.
+         * @return string Valid issn or empty string.
+         */
+    public function validate_eprint( $id, $input ) {
+
+        $eprint = trim($input);
+        if(preg_match('/^([-a-z]+/|)[0-9]{4}\.[0-9]{4-5}v[0-9]+$/u', $eprint))
+            return $eprint;
+
+        $this->add_error( $id, 'malformed-eprint', "The arXiv identifier '" . $input ."' given in '" . $this->fields[$id]['title'] . "' is not valid.", 'error');
+        return $this->get_field_default($id);
+    }
+
+        /**
          * Clean user input to issn fields
          *
          * @since    0.3.1+
@@ -422,7 +478,7 @@ trait O3PO_Form {
     }
 
 
-            /**
+        /**
          * Validate input to comma separated list fields.
          *
          * Break a comma separated list into an array of fields.
@@ -469,7 +525,7 @@ trait O3PO_Form {
     }
 
 
-            /**
+        /**
          * Validate positive integer fields
          *
          * @since    0.3.0
@@ -532,4 +588,14 @@ trait O3PO_Form {
 
         return $input;
     }
+
+        /**
+         * Get the value of a field by id.
+         *
+         * @since    0.3.1+
+         * @acceess  prublic
+         * @param    int    $id     Id of the field.
+         */
+    abstract public function get_field_value( $id );
+
 }
