@@ -26,6 +26,9 @@ abstract class O3PO_PublicForm {
     use O3PO_Form;
     use O3PO_Ready2PublishStorage;
 
+    private $errors = array();
+
+    private $field_values = array();
 
     public function __construct( $plugin_name, $slug ) {
 
@@ -51,7 +54,17 @@ abstract class O3PO_PublicForm {
 
     public function get_content() {
 
+        $this->read_and_validate_field_values();
+
         ob_start();
+        if(count($this->errors) > 0)
+        {
+            foreach($this->errors as $error_num => $error)
+            {
+                echo('<div id="' . esc_attr($error['code']) . '" class="' . esc_attr($error['type']) . '">' . esc_html(esc_attr($error['message'])) . '</div>');
+            }
+        }
+
         echo '<form method="post">';
         $previous_page_id = false;
         reset($this->pages);
@@ -172,9 +185,12 @@ abstract class O3PO_PublicForm {
         $GLOBALS['post']          = $post;
     }
 
-    protected function add_error( $setting, $code, $message, $type='error' )
-    {
-
+    protected function add_error( $setting, $code, $message, $type='error' ) {
+        $this->errors[] = array('setting' => $setting,
+                                'code' => $code,
+                                'message' => $message,
+                                'type' => $type
+                                );
     }
 
         /**
@@ -185,11 +201,19 @@ abstract class O3PO_PublicForm {
          * @param    int    $id     Id of the field.
          */
     public function get_field_value( $id ) {
-        echo json_encode($_POST);
 
-        if(isset($_POST[$this->plugin_name . '-' . $this->slug][$id]))
-            return call_user_func($this->fields[$id]['validation_callable'], $id, $_POST[$this->plugin_name . '-' . $this->slug][$id]);
-        else
-            $this->get_field_default($id);
+        return $this->field_values[$id];
+    }
+
+    public function read_and_validate_field_values() {
+
+        $this->field_values = array();
+        foreach($this->fields as $id => $field_options)
+        {
+            if(isset($_POST[$this->plugin_name . '-' . $this->slug][$id]))
+                $this->field_values[$id] = call_user_func($this->fields[$id]['validation_callable'], $id, $_POST[$this->plugin_name . '-' . $this->slug][$id]);
+            else
+                $this->field_values[$id] = $this->get_field_default($id);
+        }
     }
 }

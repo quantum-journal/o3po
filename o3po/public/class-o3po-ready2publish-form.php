@@ -47,18 +47,24 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         $this->specify_section('basic_manuscript_data', 'Which manuscript do you want to submit?', array( $this, 'render_basic_manuscript_data_section' ), 'basic_manuscript_data');
         $this->specify_field('eprint', 'ArXiv identifyer', array( $this, 'render_eprint_field' ), 'basic_manuscript_data', 'basic_manuscript_data', array(), array($this, 'validate_eprint'), '0000.0000v2');
 
+        $this->specify_page('payment', array( $this, 'render_basic_manuscript_data_navigation' ));
+
     }
 
     public function render_basic_manuscript_data_navigation( $previous_page_id, $next_page_id ) {
-        echo '<input type="submit" value="Submit" />';
+        if($previous_page_id)
+            echo '<input type="submit" value="Back" />';
+        if($next_page_id)
+            echo '<input type="submit" value="Next" />';
+        else
+            echo '<input type="submit" value="Submit" />';
     }
 
     public function render_basic_manuscript_data_section() {
-        echo '<h2>Enter the basic manuscript data</h2>';
+        echo '<h3>Enter the basic manuscript data</h3>';
     }
 
     public function render_eprint_field() {
-        $this->render_single_line_field('eprint');
-        echo '<p>The arXiv number of your manuscript</p>';
+        $this->render_single_line_field('eprint', '1501.12345v2', 'The arXiv number of your manuscript');
     }
 }

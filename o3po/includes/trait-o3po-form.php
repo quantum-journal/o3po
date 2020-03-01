@@ -166,11 +166,14 @@ trait O3PO_Form {
          * @access   public
          * @param    string    $id   Id of the field.
          */
-    public function render_single_line_field( $id ) {
+    public function render_single_line_field( $id , $placeholder=Null, $label=Null) {
         $value = $this->get_field_value($id);
 
-        echo '<input class="regular-text ltr ' . $this->plugin_name . '-' . $this->slug . ' ' . $this->plugin_name . '-' . $this->slug . '-text" type="text" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="' . esc_attr($value) . '" />';
+        echo '<input class="regular-text ltr ' . $this->plugin_name . '-' . $this->slug . ' ' . $this->plugin_name . '-' . $this->slug . '-text" type="text" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="' . esc_attr($value) . '"' . ($placeholder ? ' placeholder="' . $placeholder . '"' : '' ) . ' />';
+        if($label)
+            echo('<label for="' . $this->plugin_name . '-' . $this->slug . '-' . $id .'">' . $label . '</label></br>');
 
+        Overhaul escaping! Add label and placeholder to other field types!
     }
 
         /**
@@ -385,7 +388,7 @@ trait O3PO_Form {
     public function validate_eprint( $id, $input ) {
 
         $eprint = trim($input);
-        if(preg_match('/^([-a-z]+/|)[0-9]{4}\.[0-9]{4-5}v[0-9]+$/u', $eprint))
+        if(preg_match('#^([-.a-zA-Z]+/[0-9]{7}|[0-9]{4}.[0-9]{4,5})v[0-9]+$#u', $eprint))
             return $eprint;
 
         $this->add_error( $id, 'malformed-eprint', "The arXiv identifier '" . $input ."' given in '" . $this->fields[$id]['title'] . "' is not valid.", 'error');
