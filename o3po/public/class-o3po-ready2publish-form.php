@@ -28,7 +28,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
     public function __construct( $plugin_name, $slug ) {
 
-        parent::__construct($plugin_name, $slug);
+        parent::__construct($plugin_name, $slug, 'Submit your manuscript for publication');
         $this->specify_pages_sections_and_fields();
 
     }
@@ -42,29 +42,22 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
          */
     protected function specify_pages_sections_and_fields() {
 
-        $this->specify_page('basic_manuscript_data', array( $this, 'render_basic_manuscript_data_navigation' ));
+        $this->specify_page('basic_manuscript_data', 'Enter the basic manuscript data');
+        $this->specify_section('basic_manuscript_data', 'Which manuscript do you want to submit?', null, 'basic_manuscript_data');
+        $this->specify_field('eprint', 'ArXiv identifier', array( $this, 'render_eprint_field' ), 'basic_manuscript_data', 'basic_manuscript_data', array(), array($this, 'validate_eprint'), '');
 
-        $this->specify_section('basic_manuscript_data', 'Which manuscript do you want to submit?', array( $this, 'render_basic_manuscript_data_section' ), 'basic_manuscript_data');
-        $this->specify_field('eprint', 'ArXiv identifyer', array( $this, 'render_eprint_field' ), 'basic_manuscript_data', 'basic_manuscript_data', array(), array($this, 'validate_eprint'), '0000.0000v2');
+        $this->specify_field('acceptance_code', 'Acceptance code', array( $this, 'render_acceptance_code' ), 'basic_manuscript_data', 'basic_manuscript_data', array(), array($this, 'trim'), '');
 
-        $this->specify_page('payment', array( $this, 'render_basic_manuscript_data_navigation' ));
+        $this->specify_page('payment', 'Payment');
 
-    }
-
-    public function render_basic_manuscript_data_navigation( $previous_page_id, $next_page_id ) {
-        if($previous_page_id)
-            echo '<input type="submit" value="Back" />';
-        if($next_page_id)
-            echo '<input type="submit" value="Next" />';
-        else
-            echo '<input type="submit" value="Submit" />';
-    }
-
-    public function render_basic_manuscript_data_section() {
-        echo '<h3>Enter the basic manuscript data</h3>';
     }
 
     public function render_eprint_field() {
-        $this->render_single_line_field('eprint', '1501.12345v2', 'The arXiv number of your manuscript');
+        $this->render_single_line_field('eprint', 'e.g. 1234.56789v2');
     }
+
+    public function render_acceptance_code() {
+        $this->render_single_line_field('acceptance_code');
+    }
+
 }

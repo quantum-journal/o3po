@@ -30,10 +30,13 @@ abstract class O3PO_PublicForm {
 
     private $field_values = array();
 
-    public function __construct( $plugin_name, $slug ) {
+    private $title;
+
+    public function __construct( $plugin_name, $slug, $title ) {
 
         $this->plugin_name = $plugin_name;
         $this->slug = $slug;
+        $this->title = $title;
         $this->specify_pages_sections_and_fields();
 
     }
@@ -52,39 +55,74 @@ abstract class O3PO_PublicForm {
     abstract protected function specify_pages_sections_and_fields();
 
 
-    public function get_content() {
+    public function handle_form_data_and_produce_content() {
 
-        $this->read_and_validate_field_values();
+        $coming_from_page = false;
+        $page_to_display = false;
+        if(isset($_POST['coming_from_page']) and isset($this->pages[$_POST['coming_from_page']]))
+            $coming_from_page = $_POST['coming_from_page'];
 
         ob_start();
         if(count($this->errors) > 0)
         {
             foreach($this->errors as $error_num => $error)
             {
-                echo('<div id="' . esc_attr($error['code']) . '" class="' . esc_attr($error['type']) . '">' . esc_html(esc_attr($error['message'])) . '</div>');
+                echo('<div id="' . esc_attr($error['code']) . '" class="alert ' . ($error['type'] === 'error' ? 'alert-danger' : 'alert-warning') . '">' . esc_html(esc_attr($error['message'])) . '</div>');
+            }
+            $page_to_display = $coming_from_page;
+        }
+        else
+        {
+            if(isset($_POST['navigation']) and $coming_from_page !== false)
+            {
+                if($_POST['navigation'] === 'Submit')
+                {
+                    return 'Thank you! Your request has been submitted.';
+                }
+
+                reset($this->pages);
+                while(key($this->pages) !== $coming_from_page and key($this->pages) !== null)
+                    next($this->pages);
+                if($_POST['navigation'] === 'Next')
+                    next($this->pages);
+                elseif($_POST['navigation'] === 'Back')
+                    prev($this->pages);
+                else
+                    throw new Exception('<div>Error, don\'t know which page to display.</div>');
+                $page_to_display = key($this->pages);
             }
         }
+        if($page_to_display === false)
+            $page_to_display = array_key_first($this->pages);
 
         echo '<form method="post">';
         $previous_page_id = false;
         reset($this->pages);
-        while ($page_options = current($this->pages) )
+        while($page_options = current($this->pages))
         {
             $page_id = key($this->pages);
             $next_page_id = next($this->pages);
+
+            echo '<div style="display:' . ($page_id === $page_to_display ? 'initial' : 'none' ) . '">';
+            echo '<h2>' . esc_html($page_options['title']) . '</h2>';
             foreach($this->sections as $section_id => $section_options)
             {
                 if($section_options['page'] !== $this->plugin_name . '-' . $this->slug . ':' . $page_id)
                     continue;
-                call_user_func($section_options['callback']);
+                echo '<h3>' . esc_html($section_options['title']) . '</h3>';
+                if(is_callable($section_options['callback']))
+                    call_user_func($section_options['callback']);
                 foreach($this->fields as $field_id => $field_options)
                 {
                     if($section_options['page'] !== $this->plugin_name . '-' . $this->slug . ':' . $page_id or $field_options['section'] !== $section_id)
                         continue;
+                    echo '<h4>' . esc_html($field_options['title']) . '</h4>';
                     call_user_func($field_options['callback']);
                 }
             }
-            call_user_func($page_options['render_navigation_callable'], $previous_page_id, $next_page_id);
+            echo '</div>';
+            if($page_id === $page_to_display)
+                $this->render_navigation($previous_page_id, $page_id, $next_page_id);
             $previous_page_id = $page_id;
         }
         echo '</form>';
@@ -93,6 +131,22 @@ abstract class O3PO_PublicForm {
 
         return $content;
     }
+
+
+    public function render_navigation( $previous_page_id, $page_id, $next_page_id ) {
+        echo('<div display="none">');
+        echo('<input type="hidden" name="coming_from_page" value="' . $page_id . '">');
+        echo('</div>');
+        echo('<div>');
+        if($previous_page_id)
+            echo '<input type="submit" name="navigation" value="Back" />';
+        if($next_page_id)
+            echo '<input type="submit" name="navigation" value="Next" />';
+        else
+            echo '<input type="submit" name="navigation" value="Submit" />';
+        echo '</div>';
+    }
+
 
        /**
          * Adds a rewrite endpoint for the form.
@@ -117,8 +171,10 @@ abstract class O3PO_PublicForm {
         if($path !== $this->slug)
             return $bool;
 
+        $this->read_and_validate_field_values();
+
         do_action( 'parse_request', $wp );
-        $this->setup_query($this->make_post('title', $this->get_content()));
+        $this->setup_query($this->make_post($this->title, $this->handle_form_data_and_produce_content()));
         do_action( 'wp', $wp );
 
         do_action( 'template_redirect' );
@@ -137,7 +193,7 @@ abstract class O3PO_PublicForm {
     }
 
 
-    function make_post( $title, $content ) {
+    private function make_post( $title, $content ) {
         $post = new WP_Post((object) array(
             'ID'             => 0,
             'post_title'     => $title,

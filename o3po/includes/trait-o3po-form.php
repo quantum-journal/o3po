@@ -75,14 +75,16 @@ trait O3PO_Form {
          *
          * @since  0.3.1+
          * @access private
-         * @param string   $id       Slug-name to identify the section. Used in the 'id' attribute of tags.
+         * @param string   $id       Slug-name to identify the page.
          * @param string   $title    Formatted title of the section. Shown as the heading for the section.
-         * @param callable $callback Function that echos out any content at the top of the section (between heading and fields).
-         * @param string   $page     The slug-name of the page on which to show the section.
+         * @param callable $callback Function that echos out the any content at the top of the page (before the first section).
          */
-    public function specify_page( $id, $render_navigation_callable ) {
+    public function specify_page( $id, $title, $callback=null ) {
 
-        $this->pages[$id] = array('render_navigation_callable' => $render_navigation_callable);
+        $this->pages[$id] = array(
+            'title' => $title,
+            'callback' => $callback,
+                                  );
 
     }
 
@@ -166,14 +168,11 @@ trait O3PO_Form {
          * @access   public
          * @param    string    $id   Id of the field.
          */
-    public function render_single_line_field( $id , $placeholder=Null, $label=Null) {
+    public function render_single_line_field( $id , $placeholder=null ) {
+
         $value = $this->get_field_value($id);
+        echo '<input class="regular-text ltr ' . $this->plugin_name . '-' . $this->slug . ' ' . $this->plugin_name . '-' . $this->slug . '-text" type="text" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="' . esc_attr($value) . '"' . ($placeholder ? ' placeholder="' . esc_attr($placeholder) . '"' : '' ) . ' />';
 
-        echo '<input class="regular-text ltr ' . $this->plugin_name . '-' . $this->slug . ' ' . $this->plugin_name . '-' . $this->slug . '-text" type="text" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="' . esc_attr($value) . '"' . ($placeholder ? ' placeholder="' . $placeholder . '"' : '' ) . ' />';
-        if($label)
-            echo('<label for="' . $this->plugin_name . '-' . $this->slug . '-' . $id .'">' . $label . '</label></br>');
-
-        Overhaul escaping! Add label and placeholder to other field types!
     }
 
         /**
@@ -184,8 +183,8 @@ trait O3PO_Form {
          * @param    string    $id   Id of the field.
          */
     public function render_multi_line_field( $id ) {
-        $value = $this->get_field_value($id);
 
+        $value = $this->get_field_value($id);
         echo '<textarea class="regular-text ltr o3po-' . $this->slug . ' o3po-' . $this->slug . '-text-multi-line" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" rows="' . (mb_substr_count( $value, "\n" )+1) . '">' . esc_html($value) . '</textarea>';
 
     }
@@ -239,13 +238,13 @@ trait O3PO_Form {
          * @access   public
          * @param    string    $id   Id of the field.
          */
-    public function render_array_as_comma_separated_list_field( $id ) {
+    public function render_array_as_comma_separated_list_field( $id, $placeholder=null ) {
 
         $value = $this->get_field_value($id);
         if(!is_array($value))
             $value = array();
 
-        echo '<input class="regular-text ltr o3po-' . $this->slug . ' o3po-' . $this->slug . '-text" type="text" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="' . esc_attr(implode($value, ',')) . '" />';
+        echo '<input class="regular-text ltr o3po-' . $this->slug . ' o3po-' . $this->slug . '-text" type="text" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="' . esc_attr(implode($value, ',')) . '"' . ($placeholder ? ' placeholder="' . esc_attr($placeholder) . '"' : '' ) . ' />';
 
     }
 
@@ -565,7 +564,7 @@ trait O3PO_Form {
     }
 
 
-            /**
+        /**
          * Trim user input to field
          *
          * @since    0.3.0
@@ -573,7 +572,7 @@ trait O3PO_Form {
          * @param    string   $id    The field this was input to.
          * @param    string   $input    User input.
          */
-    public function trim_settings_field( $id, $input ) {
+    public function trim( $id, $input ) {
 
         return trim($input);
     }
