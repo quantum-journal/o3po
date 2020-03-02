@@ -32,6 +32,11 @@ abstract class O3PO_PublicForm {
 
     private $title;
 
+    private $coming_from_page = false;
+    private $page_to_display = false;
+    private $navigation = false;
+    private $upload_results = array();
+
     public function __construct( $plugin_name, $slug, $title ) {
 
         $this->plugin_name = $plugin_name;
@@ -57,11 +62,6 @@ abstract class O3PO_PublicForm {
 
     public function handle_form_data_and_produce_content() {
 
-        $coming_from_page = false;
-        $page_to_display = false;
-        if(isset($_POST['coming_from_page']) and isset($this->pages[$_POST['coming_from_page']]))
-            $coming_from_page = $_POST['coming_from_page'];
-
         ob_start();
         if(count($this->errors) > 0)
         {
@@ -69,31 +69,19 @@ abstract class O3PO_PublicForm {
             {
                 echo('<div id="' . esc_attr($error['code']) . '" class="alert ' . ($error['type'] === 'error' ? 'alert-danger' : 'alert-warning') . '">' . esc_html(esc_attr($error['message'])) . '</div>');
             }
-            $page_to_display = $coming_from_page;
         }
         else
         {
-            if(isset($_POST['navigation']) and $coming_from_page !== false)
-            {
-                if($_POST['navigation'] === 'Submit')
-                {
-                    return 'Thank you! Your request has been submitted.';
-                }
-
-                reset($this->pages);
-                while(key($this->pages) !== $coming_from_page and key($this->pages) !== null)
-                    next($this->pages);
-                if($_POST['navigation'] === 'Next')
-                    next($this->pages);
-                elseif($_POST['navigation'] === 'Back')
-                    prev($this->pages);
-                else
-                    throw new Exception('<div>Error, don\'t know which page to display.</div>');
-                $page_to_display = key($this->pages);
-            }
+            if($this->navigation === 'Submit' and $this->coming_from_page !== false)
+                return 'Thank you! Your request has been submitted.';
         }
-        if($page_to_display === false)
-            $page_to_display = array_key_first($this->pages);
+
+        # Store upload results in
+        echo($this->get_field_value('featured_image_upload'));
+        foreach($this->upload_results as $id => $result)
+        {
+            echo '<input type="hidden" name="' . $id . '" value="' . . '">';
+        }
 
         echo '<form method="post" enctype="multipart/form-data">';
         $previous_page_id = false;
@@ -103,7 +91,7 @@ abstract class O3PO_PublicForm {
             $page_id = key($this->pages);
             $next_page_id = next($this->pages);
 
-            echo '<div style="display:' . ($page_id === $page_to_display ? 'initial' : 'none' ) . '">';
+            echo '<div style="display:' . ($page_id === $this->page_to_display ? 'initial' : 'none' ) . '">';
             echo '<h2>' . esc_html($page_options['title']) . '</h2>';
             foreach($this->sections as $section_id => $section_options)
             {
@@ -121,7 +109,7 @@ abstract class O3PO_PublicForm {
                 }
             }
             echo '</div>';
-            if($page_id === $page_to_display)
+            if($page_id === $this->page_to_display)
                 $this->render_navigation($previous_page_id, $page_id, $next_page_id);
             $previous_page_id = $page_id;
         }
@@ -263,36 +251,8 @@ abstract class O3PO_PublicForm {
 
     public function read_and_validate_field_values() {
 
-        /* $coming_from_page = false; */
-        /* $page_to_display = false; */
-        /* if(isset($_POST['coming_from_page']) and isset($this->pages[$_POST['coming_from_page']])) */
-        /*     $coming_from_page = $_POST['coming_from_page']; */
-
-        /* if(count($this->errors) > 0) */
-        /*     $page_to_display = $coming_from_page; */
-        /* else */
-        /* { */
-        /*     if(isset($_POST['navigation']) and $coming_from_page !== false) */
-        /*     { */
-        /*         if($_POST['navigation'] === 'Submit') */
-        /*         { */
-        /*             return 'Thank you! Your request has been submitted.'; */
-        /*         } */
-
-        /*         reset($this->pages); */
-        /*         while(key($this->pages) !== $coming_from_page and key($this->pages) !== null) */
-        /*             next($this->pages); */
-        /*         if($_POST['navigation'] === 'Next') */
-        /*             next($this->pages); */
-        /*         elseif($_POST['navigation'] === 'Back') */
-        /*             prev($this->pages); */
-        /*         else */
-        /*             throw new Exception('<div>Error, don\'t know which page to display.</div>'); */
-        /*         $page_to_display = key($this->pages); */
-        /*     } */
-        /* } */
-        /* if($page_to_display === false) */
-        /*     $page_to_display = array_key_first($this->pages);} */
+        if(isset($_POST['coming_from_page']) and isset($this->pages[$_POST['coming_from_page']]))
+            $this->coming_from_page = $_POST['coming_from_page'];
 
         $this->field_values = array();
         foreach($this->fields as $id => $field_options)
@@ -306,9 +266,39 @@ abstract class O3PO_PublicForm {
 
                 $this->field_values[$id] = call_user_func($this->fields[$id]['validation_callable'], $id, $sanitized_value);
             }
+            elseif(isset($_FILES[$id]))
+            {
+                $result = wp_handle_upload($_FILES[$id], array('test_form' => FALSE));
+                $this->upload_results[$id] = $result; Unsure how to best store the results of past uploads so that they can be carried over to other pages via POST in handle_...()?
+            }
             else
                 $this->field_values[$id] = $this->get_field_default($id);
         }
+
+        if(isset($_POST['navigation']) and in_array($_POST['navigation'], ['Next', 'Back', 'Submit' ]))
+            $this->navigation = $_POST['navigation'];
+        else
+            $this->navigation = false;
+        #throw new Exception('Error, invalid value ' . $_POST['navigation'] . ' in $_POST[\'navigation\'].');
+
+        if(count($this->errors) > 0)
+            $this->page_to_display = $this->coming_from_page;
+        else
+        {
+            if(isset($this->navigation) and $this->coming_from_page !== false)
+            {
+                reset($this->pages);
+                while(key($this->pages) !== $this->coming_from_page and key($this->pages) !== null)
+                    next($this->pages);
+                if($this->navigation === 'Next')
+                    next($this->pages);
+                elseif($this->navigation === 'Back')
+                    prev($this->pages);
+                $this->page_to_display = key($this->pages);
+            }
+        }
+        if($this->page_to_display === false)
+            $this->page_to_display = array_key_first($this->pages);
     }
 
     public function sanitize_user_input( $input ) {

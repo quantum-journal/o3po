@@ -258,9 +258,10 @@ trait O3PO_Form {
 
     public function render_image_upload_field( $id, $label='' ) {
 
-        echo('<input type="file" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']">');
+        echo('<input type="file" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $id . '">');# here we is only the id as the name
         if(!empty($label))
             echo '<label for="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '">' . esc_html($label) . '</label>';
+
     }
 
         /**
