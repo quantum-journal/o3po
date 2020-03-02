@@ -91,10 +91,10 @@ class O3PO_SettingsTest extends O3PO_TestCase
                                'primary_publication_type_name_plural',
                                'secondary_publication_type_name',
                                'secondary_publication_type_name_plural',
-                               'volumes_endpoint',)))
+                               'volumes_endpoint',
+                               'ready2publish_slug',
+                               )))
             {
-                $callable = $specification['validation_callable'];
-
                 $this->assertStringContains($id, $combined_output, 'There was a default set for the option ' . $id . ' but it was not found in the settings page html.');
             }
             else
@@ -369,7 +369,7 @@ public function validate_array_as_comma_separated_list_provider() {
          */
     public function test_trim_settings_field( $trim_settings_field, $expected, $setting ) {
 
-        $this->assertSame($setting->trim_settings_field('trim_settings_field', $trim_settings_field), $expected);
+        $this->assertSame($setting->trim('trim', $trim_settings_field), $expected);
     }
 
 
@@ -395,7 +395,7 @@ public function validate_array_as_comma_separated_list_provider() {
          */
     public function test_trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed( $trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed, $expected, $setting ) {
 
-        $this->assertSame($setting->trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed('arxiv_paper_doi_feed_endpoint', $trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed), $expected);
+        $this->assertSame($setting->trim_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed('arxiv_paper_doi_feed_endpoint', $trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed), $expected);
     }
 
 
@@ -404,7 +404,7 @@ public function validate_array_as_comma_separated_list_provider() {
          */
     public function test_trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed_on_empty_setting( $settings ) {
 
-        $this->assertSame($settings->trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed('arxiv_paper_doi_feed_endpoint', ''), 'arxiv_paper_doi_feed');
+        $this->assertSame($settings->trim_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed('arxiv_paper_doi_feed_endpoint', ''), 'arxiv_paper_doi_feed');
     }
 
 

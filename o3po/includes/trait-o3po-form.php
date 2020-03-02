@@ -136,13 +136,20 @@ trait O3PO_Form {
          *                                      call $this->add_error() to indicate problems.
          * @param string   $default  Default value for the field.
          */
-    public function specify_field($id, $title, $callback, $page, $section, $args, $validation_callable, $default ) {
+    public function specify_field($id, $title, $callback, $page, $section, $args, $validation_callable, $default, $max_length=false ) {
 
         if(!isset($this->sections[$section]))
             throw new Exception('Cannot add field ' . $id . ' to non-existing section ' . $section . '.');
 
-        $this->fields[$id] = array('title' => $title, 'callback' => $callback, 'page' => $this->plugin_name . '-' . $this->slug . ':' . $page, 'section' => $section, 'args' => $args, 'validation_callable' => $validation_callable, 'default' => $default);
-
+        $this->fields[$id] = array(
+            'title' => $title,
+            'callback' => $callback,
+            'page' => $this->plugin_name . '-' . $this->slug . ':' . $page,
+            'section' => $section,
+            'args' => $args,
+            'validation_callable' => $validation_callable,
+            'default' => $default,
+            'max_length' => $max_length);
     }
 
 
@@ -225,7 +232,8 @@ trait O3PO_Form {
 
         echo '<input type="hidden" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="unchecked">'; //To have a 0 in POST when the checkbox is unticked
         echo '<input class="o3po-' . $this->slug . ' o3po-' . $this->slug . '-checkbox" type="checkbox" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="checked"' . checked( 'checked', $value, false ) . '/>';
-        echo '<label for="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '">' . $label . '</label>';
+        if(!empty($label))
+            echo '<label for="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '">' . esc_html($label) . '</label>';
 
     }
 
@@ -246,6 +254,13 @@ trait O3PO_Form {
 
         echo '<input class="regular-text ltr o3po-' . $this->slug . ' o3po-' . $this->slug . '-text" type="text" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="' . esc_attr(implode($value, ',')) . '"' . ($placeholder ? ' placeholder="' . esc_attr($placeholder) . '"' : '' ) . ' />';
 
+    }
+
+    public function render_image_upload_field( $id, $label='' ) {
+
+        echo('<input type="file" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']">');
+        if(!empty($label))
+            echo '<label for="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '">' . esc_html($label) . '</label>';
     }
 
         /**
@@ -311,7 +326,10 @@ trait O3PO_Form {
          */
     public function specify_fake_field( $id, $default ) {
 
-        $this->fields[$id] = array('default' => $default);
+        $this->fields[$id] = array(
+            'default' => $default,
+            'max_length' => false,
+                                   );
 
     }
 
@@ -559,7 +577,17 @@ trait O3PO_Form {
         if($input === "checked" or $input === "unchecked")
             return $input;
 
-        $this->add_error( $id, 'not-checked-or-unchecked', "The field '" . $this->fields[$id]['title'] . "' must be either checked or unchecked. Field reset.", 'error');
+        $this->add_error( $id, 'not-checked-or-unchecked', "The box '" . $this->fields[$id]['title'] . "' must be either checked or unchecked. Box reset.", 'error');
+        return $this->get_field_default($id);
+    }
+
+
+    public function checked( $id, $input ) {
+
+        if($input === "checked")
+            return $input;
+
+        $this->add_error( $id, 'not-checked', "The box '" . $this->fields[$id]['title'] . "' must be checked.", 'error');
         return $this->get_field_default($id);
     }
 

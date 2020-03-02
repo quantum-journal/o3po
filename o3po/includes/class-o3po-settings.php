@@ -26,7 +26,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-email
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-buffer.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-journal.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/trait-o3po-form.php';
-
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-o3po-ready2publish-form.php';
 
 /**
  * Manage the settings of the plugin.
@@ -160,7 +160,10 @@ class O3PO_Settings extends O3PO_Singleton {
 
         $fields = get_option($this->plugin_name . '-' . $this->slug, array());
         if(array_key_exists($id, $fields))
-            return $fields[$id];
+            if($this->fields[$id]['max_length'] === false)
+                return $fields[$id];
+            else
+                return substr($fields[$id], 0, $this->fields[$id]['max_length']);
         else
             return $this->get_field_default($id);
     }
@@ -335,8 +338,9 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->specify_field('arxiv_vanity_url_prefix', 'Url prefix for arXiv Vanity pages', array( $this, 'render_arxiv_vanity_url_prefix_setting' ), 'other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), 'https://www.arxiv-vanity.com/papers/');
         $this->specify_field('scholastica_manuscripts_url', 'Url of Scholastica manuscripts page', array( $this, 'render_scholastica_manuscripts_url_setting' ), 'other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), '');
         $this->specify_field('orcid_url_prefix', 'Orcid url prefix', array( $this, 'render_orcid_url_prefix_setting' ), 'other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), 'https://orcid.org/');
-        $this->specify_field('fermats_library_url_prefix', 'Url prefix for Fermats Library', array( $this, 'render_fermats_library_url_prefix_setting' ), 'other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), 'https://fermatslibrary.com/s/');
-        $this->specify_field('fermats_library_email', 'Email for Fermats Library', array( $this, 'render_fermats_library_email_setting' ), 'other_service_settings', 'other_service_settings', array(), array($this, 'validate_email'), '');
+        $this->specify_field('fermats_library_about_url', 'Url of Fermat\' Library about page', array( $this, 'render_fermats_library_about_url_setting' ), 'other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), 'https://fermatslibrary.com/about/');
+        $this->specify_field('fermats_library_url_prefix', 'Url prefix for Fermat\'s Library', array( $this, 'render_fermats_library_url_prefix_setting' ), 'other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), 'https://fermatslibrary.com/s/');
+        $this->specify_field('fermats_library_email', 'Email for Fermat\'s Library', array( $this, 'render_fermats_library_email_setting' ), 'other_service_settings', 'other_service_settings', array(), array($this, 'validate_email'), '');
         $this->specify_field('mathjax_url', 'MathJax url', array( $this, 'render_mathjax_url_setting' ), 'other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js');
         $this->specify_field('social_media_thumbnail_url', 'Url of default thumbnail for social media', array( $this, 'render_social_media_thumbnail_url_setting' ), 'other_service_settings', 'other_service_settings', array(), array($this, 'validate_url'), '');
         $this->specify_field('facebook_app_id', 'Facebook app_id', array( $this, 'render_facebook_app_id_setting' ), 'other_service_settings', 'other_service_settings', array(), array($this, 'trim'), '');
@@ -1196,6 +1200,15 @@ class O3PO_Settings extends O3PO_Singleton {
         echo '<p>(The url prefix under which papers are published on Fermat\'s library.)</p>';
 
     }
+
+
+    public function render_fermats_library_about_url_setting() {
+
+        $this->render_single_line_field('fermats_library_about_url');
+        echo '<p>(The url of Fermat\'s library about page.)</p>';
+
+    }
+
 
         /**
          * Render the setting for the email of Fermt's library.

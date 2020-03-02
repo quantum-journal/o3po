@@ -95,7 +95,7 @@ abstract class O3PO_PublicForm {
         if($page_to_display === false)
             $page_to_display = array_key_first($this->pages);
 
-        echo '<form method="post">';
+        echo '<form method="post" enctype="multipart/form-data">';
         $previous_page_id = false;
         reset($this->pages);
         while($page_options = current($this->pages))
@@ -263,13 +263,57 @@ abstract class O3PO_PublicForm {
 
     public function read_and_validate_field_values() {
 
+        /* $coming_from_page = false; */
+        /* $page_to_display = false; */
+        /* if(isset($_POST['coming_from_page']) and isset($this->pages[$_POST['coming_from_page']])) */
+        /*     $coming_from_page = $_POST['coming_from_page']; */
+
+        /* if(count($this->errors) > 0) */
+        /*     $page_to_display = $coming_from_page; */
+        /* else */
+        /* { */
+        /*     if(isset($_POST['navigation']) and $coming_from_page !== false) */
+        /*     { */
+        /*         if($_POST['navigation'] === 'Submit') */
+        /*         { */
+        /*             return 'Thank you! Your request has been submitted.'; */
+        /*         } */
+
+        /*         reset($this->pages); */
+        /*         while(key($this->pages) !== $coming_from_page and key($this->pages) !== null) */
+        /*             next($this->pages); */
+        /*         if($_POST['navigation'] === 'Next') */
+        /*             next($this->pages); */
+        /*         elseif($_POST['navigation'] === 'Back') */
+        /*             prev($this->pages); */
+        /*         else */
+        /*             throw new Exception('<div>Error, don\'t know which page to display.</div>'); */
+        /*         $page_to_display = key($this->pages); */
+        /*     } */
+        /* } */
+        /* if($page_to_display === false) */
+        /*     $page_to_display = array_key_first($this->pages);} */
+
         $this->field_values = array();
         foreach($this->fields as $id => $field_options)
         {
             if(isset($_POST[$this->plugin_name . '-' . $this->slug][$id]))
-                $this->field_values[$id] = call_user_func($this->fields[$id]['validation_callable'], $id, $_POST[$this->plugin_name . '-' . $this->slug][$id]);
+            {
+                $sanitized_value = $this->sanitize_user_input($_POST[$this->plugin_name . '-' . $this->slug][$id]);
+
+                if($field_options['max_length'] !== false)
+                    $sanitized_value = substr($sanitized_value, 0, $field_options['max_length']);
+
+                $this->field_values[$id] = call_user_func($this->fields[$id]['validation_callable'], $id, $sanitized_value);
+            }
             else
                 $this->field_values[$id] = $this->get_field_default($id);
         }
     }
+
+    public function sanitize_user_input( $input ) {
+
+        return strip_tags($input);
+    }
+
 }

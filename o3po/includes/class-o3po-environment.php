@@ -173,15 +173,13 @@ class O3PO_Environment {
          * @param    string    $mime_type         Expected mime type of the download.
          * @param    int       $parent_post_id    Id of post to which to link the download.
          * */
-    public function download_to_media_library( $url, $filename, $extension, $mime_type, $parent_post_id ) {
+    public function download_to_media_library( $url, $filename, $extension, $mime_type, $parent_post_id, $timeout_seconds = 20 ) {
 
         $extension = ltrim($extension, '.');
 
             // Gives us access to the download_url() and wp_handle_sideload() functions
         require_once( ABSPATH . 'wp-admin/includes/file.php' );
         require_once( ABSPATH . 'wp-admin/includes/image.php' );
-
-        $timeout_seconds = 20;
 
             // Download file to temp dir
         $temp_file = download_url( $url, $timeout_seconds );
