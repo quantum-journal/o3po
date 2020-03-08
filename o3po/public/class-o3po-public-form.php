@@ -35,7 +35,7 @@ abstract class O3PO_PublicForm {
     private $coming_from_page = false;
     private $page_to_display = false;
     private $navigation = false;
-    private $upload_results = array();
+    #private $upload_results = array();
 
     public function __construct( $plugin_name, $slug, $title ) {
 
@@ -62,6 +62,9 @@ abstract class O3PO_PublicForm {
 
     public function handle_form_data_and_produce_content() {
 
+        if($this->session_id != false)
+            return 'Invalid session id. Access denied.';
+
         ob_start();
         if(count($this->errors) > 0)
         {
@@ -76,14 +79,10 @@ abstract class O3PO_PublicForm {
                 return 'Thank you! Your request has been submitted.';
         }
 
-        # Store upload results in
-        echo($this->get_field_value('featured_image_upload'));
-        foreach($this->upload_results as $id => $result)
-        {
-            echo '<input type="hidden" name="' . $id . '" value="' . . '">';
-        }
-
         echo '<form method="post" enctype="multipart/form-data">';
+
+        echo '<input type="hidden" name="' . $this->plugin_name . '-' . $this->slug . '[' . 'session_id' . ']" value="' . $this->session_id . '">';
+
         $previous_page_id = false;
         reset($this->pages);
         while($page_options = current($this->pages))
@@ -252,9 +251,25 @@ abstract class O3PO_PublicForm {
     public function read_and_validate_field_values() {
 
         if(isset($_POST['coming_from_page']) and isset($this->pages[$_POST['coming_from_page']]))
+        {
             $this->coming_from_page = $_POST['coming_from_page'];
+            $this->session_id = $this->validate_session_id($_POST['session_id']);
+            if($this->session_id == false)
+                return;
+        }
+        else
+            $this->session_id = $this->generate_session_id();
+
+        if(isset($_POST['navigation']) and in_array($_POST['navigation'], ['Next', 'Back', 'Submit', 'Upload' ]))
+            $this->navigation = $_POST['navigation'];
+        else
+            $this->navigation = false;
 
         $this->field_values = array();
+
+        echo("read_and_validate_field_values");
+        echo("_FILES=" . json_encode($_FILES));
+
         foreach($this->fields as $id => $field_options)
         {
             if(isset($_POST[$this->plugin_name . '-' . $this->slug][$id]))
@@ -266,20 +281,30 @@ abstract class O3PO_PublicForm {
 
                 $this->field_values[$id] = call_user_func($this->fields[$id]['validation_callable'], $id, $sanitized_value);
             }
-            elseif(isset($_FILES[$id]))
-            {
-                $result = wp_handle_upload($_FILES[$id], array('test_form' => FALSE));
-                $this->upload_results[$id] = $result; Unsure how to best store the results of past uploads so that they can be carried over to other pages via POST in handle_...()?
-            }
             else
                 $this->field_values[$id] = $this->get_field_default($id);
         }
 
-        if(isset($_POST['navigation']) and in_array($_POST['navigation'], ['Next', 'Back', 'Submit' ]))
-            $this->navigation = $_POST['navigation'];
-        else
-            $this->navigation = false;
-        #throw new Exception('Error, invalid value ' . $_POST['navigation'] . ' in $_POST[\'navigation\'].');
+        if($this->navigation === 'Upload')
+        {
+            if(isset($_FILES[$this->plugin_name . '-' . $this->slug]))
+            {
+                $files_of_this_form = $_FILES[$this->plugin_name . '-' . $this->slug];
+                foreach($this->fields as $id => $field_options)
+                {
+                    if(isset($files_of_this_form['error'][$id]))
+                    {
+                        if($files_of_this_form['error'][$id] == 0)
+                        {
+                            $result = wp_handle_upload($_FILES[$id], array('test_form' => FALSE));
+
+                            echo("result=" . json_encode($result));
+                            save result via $this->session_id!
+                        }
+                    }
+                }
+            }
+        }
 
         if(count($this->errors) > 0)
             $this->page_to_display = $this->coming_from_page;
@@ -304,6 +329,76 @@ abstract class O3PO_PublicForm {
     public function sanitize_user_input( $input ) {
 
         return strip_tags($input);
+    }
+
+
+    public generate_session_id() {
+
+        $id = XXX
+        $fields = get_option($this->plugin_name . '-' . $this->slug, array());
+        if(empty($fields['session_ids']))
+            $fields['session_ids'] = array();
+
+        put_session_id( $id )
+        $fields['session_ids'][$id] = array(
+            'time' => ...
+                                            );
+
+        return $id;
+    }
+
+
+        /**
+         * @return mixed Session id or False if invalid.
+         */
+    public validate_session_id( $id ) {
+
+        $session_ids = $this->get_session_ids();
+        if(isset($session_ids[$id]))
+            return $id;
+        else
+            return false;
+    }
+
+
+    private function put_session_id( $id ) {
+        ... update_option( string $option, mixed $value, string|bool $autoload = null )
+    }
+
+    private function get_session_ids() {
+        $fields = get_option($this->plugin_name . '-' . $this->slug, array());
+        if(isset($fields['session_ids']))
+            return $fields['session_ids'];
+        else
+            return array();
+
+    }
+
+
+        /**
+         *
+         *
+         * @param    string   $label Label of the field. May contain html and is not escaped!
+         */
+    public function render_image_upload_field( $id, $label='', $esc_label=true ) {
+
+        $value = $this->get_field_value($id);
+        if(empty($value))
+        {
+            echo('<input type="hidden" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="">');
+            echo('<input type="file" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']">');
+            if(!empty($label))
+                echo '<label for="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '">' . ($esc_label ? esc_html($label) : $label) . '</label>';
+
+            echo '<input type="submit" name="navigation" value="Upload" />';
+        }
+        else
+        {
+
+            echo('<input type="hidden" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="' . esc_attr($value) . '">');
+            echo('<p>Image already uploaded as ' . esc_html($value) . '</p>');
+        }
+
     }
 
 }

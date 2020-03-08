@@ -394,7 +394,7 @@ class O3PO_EmailTemplates {
         $settings->specify_field('editor_in_chief' , 'The name of the editor in chief' , array('O3PO_EmailTemplates', 'render_editor_in_chief_setting') , 'email_settings', 'email_settings', array(), array($settings, 'trim'), '');
 
         $settings->specify_field('self_notification_subject_template', 'Self notification subject template', array('O3PO_EmailTemplates', 'render_self_notification_subject_template_settings'),'email_settings', 'email_settings', array(), array($settings, 'trim'), "A [publication_type_name] has been published/updated by [journal]");
-        $settings->specify_field('self_notification_body_template', 'Self notification body template', array('O3PO_EmailTemplates', 'render_self_notification_body_template_settings'), 'email_settings', 'email_settings', array(), array($settings, 'leave_unchaged'),
+        $settings->specify_field('self_notification_body_template', 'Self notification body template', array('O3PO_EmailTemplates', 'render_self_notification_body_template_settings'), 'email_settings', 'email_settings', array(), array($settings, 'leave_unchanged'),
                                           "[journal] has published/updated the following [publication_type_name]\n".
                                           "Title:   [title] \n".
                                           "Authors: [authors] \n".
@@ -402,7 +402,7 @@ class O3PO_EmailTemplates {
                                           "DOI:     [doi_url_prefix][doi]\n"
                                           );
         $settings->specify_field('author_notification_subject_template', 'Author notification subject template', array('O3PO_EmailTemplates', 'render_author_notification_subject_template_settings'), 'email_settings', 'email_settings', array(), array($settings, 'trim'), "[journal] has published your [publication_type_name]");
-        $settings->specify_field('author_notification_body_template' , 'Author notification body template' , array('O3PO_EmailTemplates', 'render_author_notification_body_template_settings') , 'email_settings', 'email_settings', array(), array($settings, 'leave_unchaged'),
+        $settings->specify_field('author_notification_body_template' , 'Author notification body template' , array('O3PO_EmailTemplates', 'render_author_notification_body_template_settings') , 'email_settings', 'email_settings', array(), array($settings, 'leave_unchanged'),
                                           "Dear [authors],\n\n".
                                           "Congratulations! Your [publication_type_name] '[title]' has been published by [journal] and is now available under:\n\n".
                                           "[post_url]\n\n".
@@ -418,7 +418,7 @@ class O3PO_EmailTemplates {
                                           "Executive Board\n"
                                           );
         $settings->specify_field('author_notification_secondary_subject_template' , 'Author notification subject template for the secondary journal' , array('O3PO_EmailTemplates', 'render_author_notification_secondary_subject_template_settings') , 'email_settings', 'email_settings', array(), array($settings, 'trim'), "[journal] has published your [publication_type_name]");
-        $settings->specify_field('author_notification_secondary_body_template' , 'Author notification body template for the secondary journal' , array('O3PO_EmailTemplates', 'render_author_notification_secondary_body_template_settings') , 'email_settings', 'email_settings', array(), array($settings, 'leave_unchaged'),
+        $settings->specify_field('author_notification_secondary_body_template' , 'Author notification body template for the secondary journal' , array('O3PO_EmailTemplates', 'render_author_notification_secondary_body_template_settings') , 'email_settings', 'email_settings', array(), array($settings, 'leave_unchanged'),
                                           "Dear [authors],\n\n".
                                           "Congratulations! Your [publication_type_name] '[title]' has been published by [journal] and is now available under:\n\n".
                                           "[post_url]\n\n".
@@ -434,7 +434,7 @@ class O3PO_EmailTemplates {
                                           "Executive Board\n"
                                           );
         $settings->specify_field('fermats_library_notification_subject_template' , 'Fermats library subject template' , array('O3PO_EmailTemplates', 'render_fermats_library_notification_subject_template_settings') , 'email_settings', 'email_settings', array(), array($settings, 'trim'), "[journal] has a new [publication_type_name] for Fermat's library");
-        $settings->specify_field('fermats_library_notification_body_template' , 'Fermats library body template' , array('O3PO_EmailTemplates', 'render_fermats_library_notification_body_template_settings') , 'email_settings', 'email_settings', array(), array($settings, 'leave_unchaged'),
+        $settings->specify_field('fermats_library_notification_body_template' , 'Fermats library body template' , array('O3PO_EmailTemplates', 'render_fermats_library_notification_body_template_settings') , 'email_settings', 'email_settings', array(), array($settings, 'leave_unchanged'),
                                           "Dear team at Fermat's library,\n\n".
                                           "[journal] has published the following [publication_type_name]:\n\n".
                                           "Title:     [title]\n".

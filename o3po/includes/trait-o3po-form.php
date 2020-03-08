@@ -225,15 +225,16 @@ trait O3PO_Form {
          * @access   public
          * @param    string   $id    Id of the field.
          * @param    string   $label Label of the field.
+         * @param    boolean  $esc_label Whether to escape the content of $label, disable in case you want $label to contains htmls
          */
-    public function render_checkbox_field( $id, $label='') {
+    public function render_checkbox_field( $id, $label='', $esc_label=true) {
 
         $value = $this->get_field_value($id);
 
         echo '<input type="hidden" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="unchecked">'; //To have a 0 in POST when the checkbox is unticked
         echo '<input class="o3po-' . $this->slug . ' o3po-' . $this->slug . '-checkbox" type="checkbox" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="checked"' . checked( 'checked', $value, false ) . '/>';
         if(!empty($label))
-            echo '<label for="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '">' . esc_html($label) . '</label>';
+            echo '<label for="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '">' . ($esc_label ? esc_html($label) : $label) . '</label>';
 
     }
 
@@ -253,14 +254,6 @@ trait O3PO_Form {
             $value = array();
 
         echo '<input class="regular-text ltr o3po-' . $this->slug . ' o3po-' . $this->slug . '-text" type="text" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="' . esc_attr(implode($value, ',')) . '"' . ($placeholder ? ' placeholder="' . esc_attr($placeholder) . '"' : '' ) . ' />';
-
-    }
-
-    public function render_image_upload_field( $id, $label='' ) {
-
-        echo('<input type="file" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $id . '">');# here we is only the id as the name
-        if(!empty($label))
-            echo '<label for="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '">' . esc_html($label) . '</label>';
 
     }
 
@@ -615,7 +608,7 @@ trait O3PO_Form {
          * @param    string   $id    The field this was input to.
          * @param    string   $input    User input.
          */
-    public function leave_unchaged( $id, $input ) {
+    public function leave_unchanged( $id, $input ) {
 
         return $input;
     }

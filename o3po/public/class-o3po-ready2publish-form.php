@@ -85,7 +85,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
     public function render_fermats_library() {
 
         $settings = O3PO_Settings::instance();
-        $this->render_checkbox_field('fermats_library', 'I want this paper to appear on <a href="'. esc_attr($settings->get_field_value('fermats_library_about_url')) . ' target="_blank">Fermat\'s library</a>.');
+        $this->render_checkbox_field('fermats_library', 'I want this paper to appear on <a href="'. esc_attr($settings->get_field_value('fermats_library_about_url')) . ' target="_blank">Fermat\'s library</a>.', false);
     }
 
     public function render_featured_image_upload() {
