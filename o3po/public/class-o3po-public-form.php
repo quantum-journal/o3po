@@ -62,7 +62,7 @@ abstract class O3PO_PublicForm {
 
     public function handle_form_data_and_produce_content() {
 
-        if($this->session_id != false)
+        if($this->session_id == false)
             return 'Invalid session id. Access denied.';
 
         ob_start();
@@ -81,7 +81,7 @@ abstract class O3PO_PublicForm {
 
         echo '<form method="post" enctype="multipart/form-data">';
 
-        echo '<input type="hidden" name="' . $this->plugin_name . '-' . $this->slug . '[' . 'session_id' . ']" value="' . $this->session_id . '">';
+        echo '<input type="hidden" name="session_id" value="' . $this->session_id . '">';
 
         $previous_page_id = false;
         reset($this->pages);
@@ -253,12 +253,16 @@ abstract class O3PO_PublicForm {
         if(isset($_POST['coming_from_page']) and isset($this->pages[$_POST['coming_from_page']]))
         {
             $this->coming_from_page = $_POST['coming_from_page'];
-            $this->session_id = $this->validate_session_id($_POST['session_id']);
-            if($this->session_id == false)
-                return;
+            if(!empty($_POST['session_id']))
+                $this->session_id = $this->validate_session_id($_POST['session_id']);
+            else
+                $this->session_id = false;
         }
         else
             $this->session_id = $this->generate_session_id();
+
+        if($this->session_id == false)
+            return;
 
         if(isset($_POST['navigation']) and in_array($_POST['navigation'], ['Next', 'Back', 'Submit', 'Upload' ]))
             $this->navigation = $_POST['navigation'];
@@ -267,8 +271,8 @@ abstract class O3PO_PublicForm {
 
         $this->field_values = array();
 
-        echo("read_and_validate_field_values");
-        echo("_FILES=" . json_encode($_FILES));
+        /* echo("read_and_validate_field_values"); */
+        /* echo("_FILES=" . json_encode($_FILES)); */
 
         foreach($this->fields as $id => $field_options)
         {
@@ -299,7 +303,7 @@ abstract class O3PO_PublicForm {
                             $result = wp_handle_upload($_FILES[$id], array('test_form' => FALSE));
 
                             echo("result=" . json_encode($result));
-                            save result via $this->session_id!
+                            $this->put_session_data('wp_handle_upload_result', $result);
                         }
                     }
                 }
@@ -332,17 +336,19 @@ abstract class O3PO_PublicForm {
     }
 
 
-    public generate_session_id() {
+    public function generate_session_id() {
 
-        $id = XXX
-        $fields = get_option($this->plugin_name . '-' . $this->slug, array());
-        if(empty($fields['session_ids']))
-            $fields['session_ids'] = array();
+        $id = bin2hex(random_bytes(32));
 
-        put_session_id( $id )
-        $fields['session_ids'][$id] = array(
-            'time' => ...
-                                            );
+        $class_options = $this->get_class_option();
+        if(empty($class_options['session_data']))
+            $class_options['session_data'] = array();
+
+        $class_options['session_data'][$id] = array(
+            'time' => time(),
+            'data' => array(),
+                                                   );
+        $this->update_class_option($class_options);
 
         return $id;
     }
@@ -351,29 +357,58 @@ abstract class O3PO_PublicForm {
         /**
          * @return mixed Session id or False if invalid.
          */
-    public validate_session_id( $id ) {
+    public function validate_session_id( $id ) {
 
         $session_ids = $this->get_session_ids();
-        if(isset($session_ids[$id]))
+        if(in_array($id, $session_ids))
             return $id;
         else
             return false;
     }
 
 
-    private function put_session_id( $id ) {
-        ... update_option( string $option, mixed $value, string|bool $autoload = null )
-    }
+    private function get_session_ids( $dicard_older_than=24*60*60 ) {
 
-    private function get_session_ids() {
-        $fields = get_option($this->plugin_name . '-' . $this->slug, array());
-        if(isset($fields['session_ids']))
-            return $fields['session_ids'];
+        $class_options = $this->get_class_option();
+
+        if($dicard_older_than > 0 and !empty($class_options['session_data']))
+        {
+            foreach($class_options['session_data'] as $session_id => $data)
+            {
+                if(abs(time() - $data['time']) > $dicard_older_than)
+                    unset($class_options['session_data'][$session_id]);
+            }
+            $this->update_class_option($class_options);
+        }
+
+        if(isset($class_options['session_data']))
+            return array_keys($class_options['session_data']);
         else
             return array();
-
     }
 
+    private function get_class_option() {
+        return get_option($this->plugin_name . '-' . $this->slug, array());
+    }
+
+    private function update_class_option( $class_options ) {
+        update_option($this->plugin_name . '-' . $this->slug, $class_options);
+    }
+
+
+    private function put_session_data( $field, $value)
+    {
+
+        $class_options = $this->get_class_option();
+
+        if(!$this->session_id or !isset($class_options['session_data'][$this->session_id]['data']) or !is_array($class_options['session_data'][$this->session_id]['data']))
+            return false;
+
+        $class_options['session_data'][$this->session_id]['data'][$field] = $value;
+
+        $this->update_class_option($class_options);
+
+    }
 
         /**
          *

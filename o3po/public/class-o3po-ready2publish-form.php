@@ -90,7 +90,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
     public function render_featured_image_upload() {
 
-        $this->render_image_upload_field('featured_image_upload', 'Image must be ...');
+        $this->render_image_upload_field('featured_image_upload', 'Image must have a white background and have an aspect ratio of 2:1.');
 
     }
 
