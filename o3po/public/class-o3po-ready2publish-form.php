@@ -123,12 +123,6 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
          */
     public function validate_featured_image_upload( $id, $file_of_this_id ) {
 
-        /* if($file_of_this_id['error'] !== UPLOAD_ERR_OK) */
-        /* { */
-        /*     $this->add_error( $id, 'featured-image-upload-error', "The file did not upload correctly", 'error'); */
-        /*     return false; */
-        /* } */
-
         $temp_file = $file_of_this_id['tmp_name'];
         $size = $file_of_this_id['size'];
         $mime_type = $file_of_this_id['type'];
@@ -136,32 +130,30 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         $filesize = filesize($temp_file);
         $upload_max_filesize = O3PO_Environment::max_file_upload_bytes();
         if($filesize > $upload_max_filesize)
-        {
-            $this->add_error( $id, 'featured-image-file-too-large', "The image file must be smaller than " . $upload_max_filesize . "B.", 'error');
-            return false;
-        }
+            return array('error' => "The image file must be smaller than " . $upload_max_filesize . "B.");
 
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $actual_mime_type = finfo_file($finfo, $temp_file);
         finfo_close($finfo);
         if($mime_type != $actual_mime_type or !in_array($actual_mime_type, array('image/png', 'image/jpeg')))
-        {
-            $this->add_error( $id, 'featured-image-invalid-mime-type', "The image must be a png or jpeg file.", 'error');
-            return false;
-        }
+            return array('error' => "The image must be a png or jpeg file.");
 
         $size = getimagesize($temp_file);
         $width = $size[0];
         $height = $size[1];
         if($width !== 2*$height )
+            return array('error' => "The image must must have an aspect ratio of 2:1. The current image size is " . $width . "x" . $height . ".");
+
+        require_once( ABSPATH . 'wp-admin/includes/file.php' );
+
+        $result = wp_handle_upload($file_of_this_id, array('test_form' => FALSE));
+        if(!isset($result['error']))
         {
-            $this->add_error( $id, 'featured-image-wrong-aspect-ratio', "The image must must have an aspect ratio of 2:1. The current image size is " . $width . "x" . $height . ".", 'error');
-            return false;
+            $result['user_name'] = $file_of_this_id['name'];
+            $result['size'] = $file_of_this_id['size'];
         }
 
-        #require_once( ABSPATH . 'wp-admin/includes/image.php' );
-
-        return true;
+        return $result;
     }
 
 

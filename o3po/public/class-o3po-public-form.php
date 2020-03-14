@@ -298,19 +298,7 @@ abstract class O3PO_PublicForm {
                     switch($file_of_this_id['error']) {
                         case UPLOAD_ERR_OK:
                             $this->put_session_data('_FILES_' . $id, $file_of_this_id);
-                            require_once( ABSPATH . 'wp-admin/includes/file.php' );
-                            $valid = call_user_func($this->fields[$id]['validation_callable'], $id, $file_of_this_id);
-                            if($valid === true)
-                            {
-                                $result = wp_handle_upload($file_of_this_id, array('test_form' => FALSE));
-                                if(!isset($result['error']))
-                                {
-                                    $result['user_name'] = $file_of_this_id['name'];
-                                    $result['size'] = $file_of_this_id['size'];
-                                }
-                            }
-                            else
-                                $result['error'] = "The image did not pass the validation test.";
+                            $result = call_user_func($this->fields[$id]['validation_callable'], $id, $file_of_this_id);
                             break;
                         case UPLOAD_ERR_INI_SIZE:
                         case UPLOAD_ERR_FORM_SIZE:
@@ -337,7 +325,7 @@ abstract class O3PO_PublicForm {
                             break;
                     }
                     if(!empty($result['error']))
-                        $this->add_error($id, 'upload_error', $result['error'], 'error');
+                        $this->add_error($id, 'upload-error', $result['error'], 'error');
 
                     $this->put_session_data('file_upload_result_' . $id, $result);
                 }
