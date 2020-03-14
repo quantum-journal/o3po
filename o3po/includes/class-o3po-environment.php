@@ -349,5 +349,24 @@ class O3PO_Environment {
             return '';
     }
 
+    public static function max_file_upload_bytes() {
 
+        $val = ini_get('upload_max_filesize');
+        $last = strtolower($val[strlen($val)-1]);
+        $val  = substr($val, 0, -1);
+        switch($last) {
+            case 'g':
+                $val *= 1024;
+            case 'm':
+                $val *= 1024;
+            case 'k':
+                $val *= 1024;
+        }
+        $upload_max_filesize = $val;
+
+        if(!empty($_POST['MAX_FILE_SIZE']) and is_numeric($_POST['MAX_FILE_SIZE']))
+            $upload_max_filesize = min($upload_max_filesize, intval($_POST['MAX_FILE_SIZE']));
+
+        return $upload_max_filesize;
+    }
 }

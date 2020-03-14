@@ -12,6 +12,7 @@
 
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-o3po-public-form.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-environment.php';
 
 /**
  * Class for the ready to publish form.
@@ -56,7 +57,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
         $this->specify_section('dissemination_material', 'Dissemination material', null, 'dissemination');
         $this->specify_field('popular_summary', 'Popular summary', array( $this, 'render_popular_summary' ), 'dissemination', 'dissemination_material', array(), array($this, 'trim'), '');
-        $this->specify_field('featured_image_upload', 'Featured image', array( $this, 'render_featured_image_upload' ), 'dissemination', 'dissemination_material', array(), array($this, 'leave_unchanged'), '');
+        $this->specify_field('featured_image_upload', 'Featured image', array( $this, 'render_featured_image_upload' ), 'dissemination', 'dissemination_material', array(), array($this, 'validate_featured_image_upload'), '');
         $this->specify_field('featured_image_caption', 'Featured image caption', array( $this, 'render_featured_image_caption' ), 'dissemination', 'dissemination_material', array(), array($this, 'trim'), '');
 
         $this->specify_section('dissemination_fermats_library', 'Fermat\'s library', null, 'dissemination');
@@ -101,8 +102,9 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
     public function render_featured_image_upload() {
 
         $id = 'featured_image_upload';
+        $upload_max_filesize = O3PO_Environment::max_file_upload_bytes();
 
-        $this->render_image_upload_field($id, 'Image must have a white background and have an aspect ratio of 2:1.');
+        $this->render_image_upload_field($id, 'Image must be in jpg or png format, have a white background, and an aspect ratio of 2:1. The maximum file size is ' . ($upload_max_filesize > 1024 ? (round($upload_max_filesize/1024, 2)) . 'M' : $upload_max_filesize) . 'B.');
 
     }
 
@@ -113,6 +115,56 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         $this->render_checkbox_field('waiver', 'I require a waiver.');
     }
 
+
+        /**
+         *
+         * @param array $file_of_this_id Array with fields such as those
+         * of a single element of $_FILE
+         */
+    public function validate_featured_image_upload( $id, $file_of_this_id ) {
+
+        /* if($file_of_this_id['error'] !== UPLOAD_ERR_OK) */
+        /* { */
+        /*     $this->add_error( $id, 'featured-image-upload-error', "The file did not upload correctly", 'error'); */
+        /*     return false; */
+        /* } */
+
+        $temp_file = $file_of_this_id['tmp_name'];
+        $size = $file_of_this_id['size'];
+        $mime_type = $file_of_this_id['type'];
+
+        $filesize = filesize($temp_file);
+        $upload_max_filesize = O3PO_Environment::max_file_upload_bytes();
+        if($filesize > $upload_max_filesize)
+        {
+            $this->add_error( $id, 'featured-image-file-too-large', "The image file must be smaller than " . $upload_max_filesize . "B.", 'error');
+            return false;
+        }
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $actual_mime_type = finfo_file($finfo, $temp_file);
+        finfo_close($finfo);
+        if($mime_type != $actual_mime_type or !in_array($actual_mime_type, array('image/png', 'image/jpeg')))
+        {
+            $this->add_error( $id, 'featured-image-invalid-mime-type', "The image must be a png or jpeg file.", 'error');
+            return false;
+        }
+
+        $size = getimagesize($temp_file);
+        $width = $size[0];
+        $height = $size[1];
+        if($width !== 2*$height )
+        {
+            $this->add_error( $id, 'featured-image-wrong-aspect-ratio', "The image must must have an aspect ratio of 2:1. The current image size is " . $width . "x" . $height . ".", 'error');
+            return false;
+        }
+
+        #require_once( ABSPATH . 'wp-admin/includes/image.php' );
+
+        return true;
+    }
+
+
     public function validate_acceptance_code( $id, $input ) {
 
         $settings = O3PO_Settings::instance();
@@ -121,7 +173,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         if(in_array($input, $acceptance_codes))
             return $input;
 
-        $this->add_error( $id, 'malformed-eprint', "The acceptance code '" . $input ."' given in '" . $this->fields[$id]['title'] . "' is not valid.", 'error');
+        $this->add_error( $id, 'invalid-acceptance-codes', "The acceptance code '" . $input ."' given in '" . $this->fields[$id]['title'] . "' is not valid.", 'error');
         return $this->get_field_default($id);
     }
 

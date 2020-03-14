@@ -11,6 +11,7 @@
  */
 
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-latex.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-environment.php';
 
 /**
  * Encapsulates the interface with the external service arXiv.

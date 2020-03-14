@@ -12,6 +12,7 @@
 
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/trait-o3po-form.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/trait-o3po-ready2publish-storage.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-environment.php';
 
 /**
  * Class for the ready to publish form.
@@ -298,21 +299,22 @@ abstract class O3PO_PublicForm {
                         case UPLOAD_ERR_OK:
                             $this->put_session_data('_FILES_' . $id, $file_of_this_id);
                             require_once( ABSPATH . 'wp-admin/includes/file.php' );
-                            #require_once( ABSPATH . 'wp-admin/includes/image.php' );
-                            $result = wp_handle_upload($file_of_this_id, array('test_form' => FALSE));
-                            if(!isset($result['error']))
+                            $valid = call_user_func($this->fields[$id]['validation_callable'], $id, $file_of_this_id);
+                            if($valid === true)
                             {
-                                $result['user_name'] = $file_of_this_id['name'];
-                                $result['size'] = $file_of_this_id['size'];
-                                #$result = call_user_func($this->fields[$id]['validation_callable'], $id, $result);
+                                $result = wp_handle_upload($file_of_this_id, array('test_form' => FALSE));
+                                if(!isset($result['error']))
+                                {
+                                    $result['user_name'] = $file_of_this_id['name'];
+                                    $result['size'] = $file_of_this_id['size'];
+                                }
                             }
-
+                            else
+                                $result['error'] = "The image did not pass the validation test.";
                             break;
                         case UPLOAD_ERR_INI_SIZE:
                         case UPLOAD_ERR_FORM_SIZE:
-                            $upload_max_filesize = ini_get('upload_max_filesize');
-                            if(!empty($_POST['MAX_FILE_SIZE']))
-                                $upload_max_filesize = min($upload_max_filesize, int($_POST['MAX_FILE_SIZE']));
+                            $upload_max_filesize = O3PO_Environment::max_file_upload_bytes();
                             $result = array('error' => "The file was larger than the maximum file size of " . $upload_max_filesize . " Bytes.");
                             break;
                         case UPLOAD_ERR_PARTIAL:
@@ -472,7 +474,7 @@ abstract class O3PO_PublicForm {
             echo('<p>Image file ' . esc_html($file_upload_result['user_name']) . ' was uploaded and saved successfully. Want to upload a different file?</p>');
         }
 
-        echo('<input type="hidden" name="MAX_FILE_SIZE" value="30000" />');
+        echo('<input type="hidden" name="MAX_FILE_SIZE" value="30720" />');
         # $_FILES looks funny if an array is used as name of the upload
         echo('<input type="file" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '">');
         if(!empty($label))
