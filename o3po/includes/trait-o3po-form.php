@@ -189,10 +189,10 @@ trait O3PO_Form {
          * @access   public
          * @param    string    $id   Id of the field.
          */
-    public function render_multi_line_field( $id ) {
+    public function render_multi_line_field( $id, $rows=false, $style = false ) {
 
         $value = $this->get_field_value($id);
-        echo '<textarea class="regular-text ltr o3po-' . $this->slug . ' o3po-' . $this->slug . '-text-multi-line" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" rows="' . (mb_substr_count( $value, "\n" )+1) . '">' . esc_html($value) . '</textarea>';
+        echo '<textarea class="regular-text ltr o3po-' . $this->slug . ' o3po-' . $this->slug . '-text-multi-line" ' . ($style ? 'style="' . esc_attr($style). '" ': '') . ($rows ? 'rows="' . esc_attr($rows). '" ': '') . 'id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" rows="' . (mb_substr_count( $value, "\n" )+1) . '">' . esc_html($value) . '</textarea>';
 
     }
 

@@ -11,6 +11,7 @@
  */
 
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-o3po-public-form.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
 
 /**
  * Class for the ready to publish form.
@@ -23,6 +24,8 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-o3po-public-
 class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
     public static function specify_settings( $settings ) {
+        $settings->specify_section('ready2publish_settings', 'Ready2Publish Form', array('O3PO_Ready2PublishForm', 'render_ready2publish_settings'), 'ready2publish_settings');
+        $settings->specify_field('acceptance_codes', 'Acceptance codes currently valid', array('O3PO_Ready2PublishForm', 'render_acceptance_codes_setting' ), 'ready2publish_settings', 'ready2publish_settings', array(), array('O3PO_Ready2PublishForm', 'validate_array_as_comma_separated_list'), array('AAA'));
 
     }
 
@@ -47,13 +50,14 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         $this->specify_section('basic_manuscript_data', 'Which manuscript do you want to submit?', null, 'basic_manuscript_data');
         $this->specify_field('eprint', 'ArXiv identifier', array( $this, 'render_eprint_field' ), 'basic_manuscript_data', 'basic_manuscript_data', array(), array($this, 'validate_eprint'), '');
         $this->specify_field('agree_to_publish', 'Consent to publish', array( $this, 'render_agree_to_publish' ), 'basic_manuscript_data', 'basic_manuscript_data', array(), array($this, 'checked'), 'unchecked');
-        $this->specify_field('acceptance_code', 'Acceptance code', array( $this, 'render_acceptance_code' ), 'basic_manuscript_data', 'basic_manuscript_data', array(), array($this, 'trim'), '');
+        $this->specify_field('acceptance_code', 'Acceptance code', array( $this, 'render_acceptance_code' ), 'basic_manuscript_data', 'basic_manuscript_data', array(), array($this, 'validate_acceptance_code'), '');
 
         $this->specify_page('dissemination', 'Dissemination options');
 
         $this->specify_section('dissemination_material', 'Dissemination material', null, 'dissemination');
         $this->specify_field('popular_summary', 'Popular summary', array( $this, 'render_popular_summary' ), 'dissemination', 'dissemination_material', array(), array($this, 'trim'), '');
         $this->specify_field('featured_image_upload', 'Featured image', array( $this, 'render_featured_image_upload' ), 'dissemination', 'dissemination_material', array(), array($this, 'leave_unchanged'), '');
+        $this->specify_field('featured_image_caption', 'Featured image caption', array( $this, 'render_featured_image_caption' ), 'dissemination', 'dissemination_material', array(), array($this, 'trim'), '');
 
         $this->specify_section('dissemination_fermats_library', 'Fermat\'s library', null, 'dissemination');
         $this->specify_field('fermats_library', 'Opt-in to Fermat\'s library', array( $this, 'render_fermats_library' ), 'dissemination', 'dissemination_fermats_library', array(), array($this, 'checked_or_unchecked'), 'unchecked');
@@ -76,16 +80,22 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
     public function render_acceptance_code() {
         $this->render_single_line_field('acceptance_code');
+        echo('Please enter the acceptance code sent to you in the notification of acceptance.');
     }
 
     public function render_popular_summary() {
-        $this->render_multi_line_field('popular_summary');
+        $this->render_multi_line_field('popular_summary', 12, 'width:100%');
     }
+
+    public function render_featured_image_caption() {
+        $this->render_multi_line_field('featured_image_caption', 6, 'width:100%');
+    }
+
 
     public function render_fermats_library() {
 
         $settings = O3PO_Settings::instance();
-        $this->render_checkbox_field('fermats_library', 'I want this paper to appear on <a href="'. esc_attr($settings->get_field_value('fermats_library_about_url')) . ' target="_blank">Fermat\'s library</a>.', false);
+        $this->render_checkbox_field('fermats_library', 'The authors want this paper to appear on <a href="'. esc_attr($settings->get_field_value('fermats_library_about_url')) . ' target="_blank">Fermat\'s library</a>.', false);
     }
 
     public function render_featured_image_upload() {
@@ -101,6 +111,18 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
         $settings = O3PO_Settings::instance();
         $this->render_checkbox_field('waiver', 'I require a waiver.');
+    }
+
+    public function validate_acceptance_code( $id, $input ) {
+
+        $settings = O3PO_Settings::instance();
+        $acceptance_codes = $settings->get_field_value('acceptance_codes');
+
+        if(in_array($input, $acceptance_codes))
+            return $input;
+
+        $this->add_error( $id, 'malformed-eprint', "The acceptance code '" . $input ."' given in '" . $this->fields[$id]['title'] . "' is not valid.", 'error');
+        return $this->get_field_default($id);
     }
 
 }

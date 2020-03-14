@@ -128,9 +128,9 @@ abstract class O3PO_PublicForm {
         if($previous_page_id)
             echo '<input type="submit" name="navigation" value="Back" />';
         if($next_page_id)
-            echo '<input type="submit" name="navigation" value="Next" />';
+            echo '<input type="submit" name="navigation" style="float:right;" value="Next" />';
         else
-            echo '<input type="submit" name="navigation" value="Submit" />';
+            echo '<input type="submit" name="navigation" style="float:right;" value="Submit" />';
         echo '</div>';
     }
 
@@ -287,7 +287,6 @@ abstract class O3PO_PublicForm {
         }
         if($this->navigation === 'Upload')
         {
-            echo("_FILES=" . json_encode($_FILES));
             # Note: All files not handled will be automatically deleted by PHP
             foreach($this->fields as $id => $field_options)
             {
@@ -295,14 +294,19 @@ abstract class O3PO_PublicForm {
                 {
                     $file_of_this_id = $_FILES[$this->plugin_name . '-' . $this->slug . '-' . $id];
 
-                    switch ($file_of_this_id['error']) {
+                    switch($file_of_this_id['error']) {
                         case UPLOAD_ERR_OK:
                             $this->put_session_data('_FILES_' . $id, $file_of_this_id);
                             require_once( ABSPATH . 'wp-admin/includes/file.php' );
+                            #require_once( ABSPATH . 'wp-admin/includes/image.php' );
                             $result = wp_handle_upload($file_of_this_id, array('test_form' => FALSE));
-                            # Put the file name into field_values
-                            if(isset($file_of_this_id['name']))
-                                $this->field_values[$id] = $file_of_this_id['name'];
+                            if(!isset($result['error']))
+                            {
+                                $result['user_name'] = $file_of_this_id['name'];
+                                $result['size'] = $file_of_this_id['size'];
+                                #$result = call_user_func($this->fields[$id]['validation_callable'], $id, $result);
+                            }
+
                             break;
                         case UPLOAD_ERR_INI_SIZE:
                         case UPLOAD_ERR_FORM_SIZE:
@@ -330,6 +334,9 @@ abstract class O3PO_PublicForm {
                             $result = array('error' => "An unknown upload error occurred");
                             break;
                     }
+                    if(!empty($result['error']))
+                        $this->add_error($id, 'upload_error', $result['error'], 'error');
+
                     $this->put_session_data('file_upload_result_' . $id, $result);
                 }
             }
@@ -451,32 +458,27 @@ abstract class O3PO_PublicForm {
          * @param    string   $label Label of the field. May contain html and is not escaped!
          */
     public function render_image_upload_field( $id, $label='', $esc_label=true ) {
+        $file_upload_result = $this->get_session_data('file_upload_result_' . $id);
+        #$_file = $this->get_session_data('_FILES_' . $id);
+        #echo('file_upload_result_' . $id . '=' . json_encode($file_upload_result));
+        #echo('_FILES_' . $id . '=' . json_encode($_file));
 
-        $value = $this->get_field_value($id);
-        $result = $this->get_session_data('file_upload_result_' . $id);
-        $_file = $this->get_session_data('_FILES_' . $id);
-        echo('file_upload_result_' . $id . '=' . json_encode($result));
-        echo('_FILES_' . $id . '=' . json_encode($_file));
+        /* if(!empty($file_upload_result['error'])) */
+        /*     echo '<p>An error occurred during the upload: ' . $file_upload_result['error'] . '</p>'; */
 
-        if(!empty($result['error']))
-            echo '<p>An error occurred during the upload: ' . $result['error'] . '</p>';
-        if(empty($value))
+        if(!empty($file_upload_result['file']))
         {
-            # $_FILES looks funny if an array is used as name of the upload
-            echo('<input type="hidden" name="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" value="">');
-            echo('<input type="hidden" name="MAX_FILE_SIZE" value="30000" />');
-            echo('<input type="file" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '">');
-            if(!empty($label))
-                echo '<label for="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '">' . ($esc_label ? esc_html($label) : $label) . '</label>';
-
-            echo '<input type="submit" name="navigation" value="Upload" />';
+            echo('<img style="display:block;max-width:100%;max-height:10em;width: auto;height: auto;" src="' . esc_attr($file_upload_result['url']) . '" >');
+            echo('<p>Image file ' . esc_html($file_upload_result['user_name']) . ' was uploaded and saved successfully. Want to upload a different file?</p>');
         }
-        else
-        {
 
-            echo('<input type="hidden" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="' . esc_attr($value) . '">');
-            echo('<p>Image file ' . esc_html($value) . ' uploaded successfully.</p>');
-        }
+        echo('<input type="hidden" name="MAX_FILE_SIZE" value="30000" />');
+        # $_FILES looks funny if an array is used as name of the upload
+        echo('<input type="file" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '">');
+        if(!empty($label))
+            echo '<label for="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '">' . ($esc_label ? esc_html($label) : $label) . '</label>';
+
+        echo '<input type="submit" name="navigation" value="Upload" />';
     }
 
 }
