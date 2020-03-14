@@ -63,7 +63,7 @@ abstract class O3PO_PublicForm {
     public function handle_form_data_and_produce_content() {
 
         if($this->session_id == false)
-            return 'Invalid session id. Access denied.';
+            return 'Invalid session id or session expired. Access denied.';
 
         ob_start();
         if(count($this->errors) > 0)
@@ -271,9 +271,6 @@ abstract class O3PO_PublicForm {
 
         $this->field_values = array();
 
-        /* echo("read_and_validate_field_values"); */
-        /* echo("_FILES=" . json_encode($_FILES)); */
-
         foreach($this->fields as $id => $field_options)
         {
             if(isset($_POST[$this->plugin_name . '-' . $this->slug][$id]))
@@ -288,24 +285,52 @@ abstract class O3PO_PublicForm {
             else
                 $this->field_values[$id] = $this->get_field_default($id);
         }
-
         if($this->navigation === 'Upload')
         {
-            if(isset($_FILES[$this->plugin_name . '-' . $this->slug]))
+            echo("_FILES=" . json_encode($_FILES));
+            # Note: All files not handled will be automatically deleted by PHP
+            foreach($this->fields as $id => $field_options)
             {
-                $files_of_this_form = $_FILES[$this->plugin_name . '-' . $this->slug];
-                foreach($this->fields as $id => $field_options)
+                if(isset($_FILES[$this->plugin_name . '-' . $this->slug . '-' . $id]))
                 {
-                    if(isset($files_of_this_form['error'][$id]))
-                    {
-                        if($files_of_this_form['error'][$id] == 0)
-                        {
-                            $result = wp_handle_upload($_FILES[$id], array('test_form' => FALSE));
+                    $file_of_this_id = $_FILES[$this->plugin_name . '-' . $this->slug . '-' . $id];
 
-                            echo("result=" . json_encode($result));
-                            $this->put_session_data('wp_handle_upload_result', $result);
-                        }
+                    switch ($file_of_this_id['error']) {
+                        case UPLOAD_ERR_OK:
+                            $this->put_session_data('_FILES_' . $id, $file_of_this_id);
+                            require_once( ABSPATH . 'wp-admin/includes/file.php' );
+                            $result = wp_handle_upload($file_of_this_id, array('test_form' => FALSE));
+                            # Put the file name into field_values
+                            if(isset($file_of_this_id['name']))
+                                $this->field_values[$id] = $file_of_this_id['name'];
+                            break;
+                        case UPLOAD_ERR_INI_SIZE:
+                        case UPLOAD_ERR_FORM_SIZE:
+                            $upload_max_filesize = ini_get('upload_max_filesize');
+                            if(!empty($_POST['MAX_FILE_SIZE']))
+                                $upload_max_filesize = min($upload_max_filesize, int($_POST['MAX_FILE_SIZE']));
+                            $result = array('error' => "The file was larger than the maximum file size of " . $upload_max_filesize . " Bytes.");
+                            break;
+                        case UPLOAD_ERR_PARTIAL:
+                            $result = array('error' => "The file was only partially uploaded");
+                            break;
+                        case UPLOAD_ERR_NO_FILE:
+                            $result = array('error' => "No file was uploaded");
+                            break;
+                        case UPLOAD_ERR_NO_TMP_DIR:
+                            $result = array('error' => "The server is missing a temporary upload folder");
+                            break;
+                        case UPLOAD_ERR_CANT_WRITE:
+                            $result = array('error' => "The server failed to write the file to disk");
+                            break;
+                        case UPLOAD_ERR_EXTENSION:
+                            $result = array('error' => "The upload was stopped by a PHP extension");
+                            break;
+                        default:
+                            $result = array('error' => "An unknown upload error occurred");
+                            break;
                     }
+                    $this->put_session_data('file_upload_result_' . $id, $result);
                 }
             }
         }
@@ -410,6 +435,16 @@ abstract class O3PO_PublicForm {
 
     }
 
+    protected function get_session_data( $field ) {
+
+     $class_options = $this->get_class_option();
+     if(isset($class_options['session_data'][$this->session_id]['data'][$field]))
+         return $class_options['session_data'][$this->session_id]['data'][$field];
+     else
+         return Null;
+    }
+
+
         /**
          *
          *
@@ -418,10 +453,19 @@ abstract class O3PO_PublicForm {
     public function render_image_upload_field( $id, $label='', $esc_label=true ) {
 
         $value = $this->get_field_value($id);
+        $result = $this->get_session_data('file_upload_result_' . $id);
+        $_file = $this->get_session_data('_FILES_' . $id);
+        echo('file_upload_result_' . $id . '=' . json_encode($result));
+        echo('_FILES_' . $id . '=' . json_encode($_file));
+
+        if(!empty($result['error']))
+            echo '<p>An error occurred during the upload: ' . $result['error'] . '</p>';
         if(empty($value))
         {
-            echo('<input type="hidden" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="">');
-            echo('<input type="file" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']">');
+            # $_FILES looks funny if an array is used as name of the upload
+            echo('<input type="hidden" name="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" value="">');
+            echo('<input type="hidden" name="MAX_FILE_SIZE" value="30000" />');
+            echo('<input type="file" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '">');
             if(!empty($label))
                 echo '<label for="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '">' . ($esc_label ? esc_html($label) : $label) . '</label>';
 
@@ -431,9 +475,8 @@ abstract class O3PO_PublicForm {
         {
 
             echo('<input type="hidden" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="' . esc_attr($value) . '">');
-            echo('<p>Image already uploaded as ' . esc_html($value) . '</p>');
+            echo('<p>Image file ' . esc_html($value) . ' uploaded successfully.</p>');
         }
-
     }
 
 }
