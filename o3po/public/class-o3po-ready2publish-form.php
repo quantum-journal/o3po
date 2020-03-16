@@ -46,12 +46,19 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
          */
     protected function specify_pages_sections_and_fields() {
 
-        $this->specify_page('basic_manuscript_data', 'Enter the basic manuscript data');
+        $this->specify_page('basic_manuscript_data', 'Your accepted manuscript is ready for publication?');
 
-        $this->specify_section('basic_manuscript_data', 'Which manuscript do you want to submit?', null, 'basic_manuscript_data');
-        $this->specify_field('eprint', 'ArXiv identifier', array( $this, 'render_eprint_field' ), 'basic_manuscript_data', 'basic_manuscript_data', array(), array($this, 'validate_eprint'), '');
+        $this->specify_section('basic_manuscript_data', 'Please enter the basic manuscript information', null, 'basic_manuscript_data');
+        $this->specify_field('eprint', 'ArXiv identifier', array( $this, 'render_eprint_field' ), 'basic_manuscript_data', 'basic_manuscript_data', array(), array($this, 'validate_eprint_fetch_meta_data_check_license_and_store_in_session'), '');
         $this->specify_field('agree_to_publish', 'Consent to publish', array( $this, 'render_agree_to_publish' ), 'basic_manuscript_data', 'basic_manuscript_data', array(), array($this, 'checked'), 'unchecked');
         $this->specify_field('acceptance_code', 'Acceptance code', array( $this, 'render_acceptance_code' ), 'basic_manuscript_data', 'basic_manuscript_data', array(), array($this, 'validate_acceptance_code'), '');
+
+        $this->specify_page('meta_data', 'Manuscript meta-data');
+        $this->specify_section('manuscript_data', 'Manuscript data', null, 'meta_data');
+        $this->specify_field('title', 'Title', array( $this, 'render_title' ), 'meta_data', 'manuscript_data', array(), array($this, 'trim'), '');
+        $this->specify_field('abstract', 'Abstract', array( $this, 'render_abstrac' ), 'meta_data', 'manuscript_data', array(), array($this, 'trim'), '');
+
+        $this->specify_section('author_data', 'Author data', null, 'meta_data');
 
         $this->specify_page('dissemination', 'Dissemination options');
 
@@ -68,6 +75,8 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         $this->specify_section('payment', 'Choose your payment options', null, 'payment');
         $this->specify_field('waiver', 'Waiver', array( $this, 'render_waiver' ), 'payment', 'payment', array(), array($this, 'checked_or_unchecked'), 'unchecked');
 
+        $this->specify_page('summary', 'Summary');
+
     }
 
     public function render_eprint_field() {
@@ -80,7 +89,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
     }
 
     public function render_acceptance_code() {
-        $this->render_single_line_field('acceptance_code');
+        $this->render_single_line_field('acceptance_code', null, 'off');
         echo('Please enter the acceptance code sent to you in the notification of acceptance.');
     }
 
@@ -96,7 +105,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
     public function render_fermats_library() {
 
         $settings = O3PO_Settings::instance();
-        $this->render_checkbox_field('fermats_library', 'The authors want this paper to appear on <a href="'. esc_attr($settings->get_field_value('fermats_library_about_url')) . ' target="_blank">Fermat\'s library</a>.', false);
+        $this->render_checkbox_field('fermats_library', 'All authors want this paper to appear on <a href="'. esc_attr($settings->get_field_value('fermats_library_about_url')) . ' target="_blank">Fermat\'s library</a>.', false);
     }
 
     public function render_featured_image_upload() {
@@ -159,14 +168,87 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
     public function validate_acceptance_code( $id, $input ) {
 
+        $input = trim($input);
         $settings = O3PO_Settings::instance();
         $acceptance_codes = $settings->get_field_value('acceptance_codes');
+
+        if(empty(trim($input)))
+        {
+            $this->add_error( $id, 'empty-acceptance-code', "An acceptance code must be provided in '" . $this->fields[$id]['title'] . "'.", 'error');
+            return $this->get_field_default($id);
+        }
 
         if(in_array($input, $acceptance_codes))
             return $input;
 
-        $this->add_error( $id, 'invalid-acceptance-codes', "The acceptance code '" . $input ."' given in '" . $this->fields[$id]['title'] . "' is not valid.", 'error');
+        $this->add_error( $id, 'invalid-acceptance-code', "The acceptance code '" . $input ."' given in '" . $this->fields[$id]['title'] . "' is not valid.", 'error');
         return $this->get_field_default($id);
+    }
+
+    public function validate_eprint_fetch_meta_data_check_license_and_store_in_session($id, $input) {
+
+        if(empty(trim($input)))
+        {
+            $this->add_error( $id, 'eprint-empty', "The arXiv identifier asked for in '" . $this->fields[$id]['title'] . "' may not be empty.", 'error');
+            return $this->get_field_default($id);
+        }
+
+        $eprint = $this->validate_eprint($id, $input);
+        if(trim($input) !== $eprint) # validate_eprint() was not happy and has already added an error for us
+            return $eprint;
+
+        $meta_data = $this->get_session_data('arxiv_meta_data_' . $eprint);
+        if(!empty($meta_data['title']))
+            return $this->get_field_default($id);
+
+        $settings = O3PO_Settings::instance();
+        $arxiv_url_abs_prefix = $settings->get_field_value('arxiv_url_abs_prefix');
+        $meta_data = O3PO_Arxiv::fetch_meta_data_from_abstract_page( $arxiv_url_abs_prefix, $eprint);
+
+        if(!empty($meta_data['arxiv_fetch_results']) and (strpos($meta_data['arxiv_fetch_results'], 'ERROR') or strpos($meta_data['arxiv_fetch_results'], 'WARNING')))
+        {
+            $this->add_error($id, 'arxiv-fetch-error', $meta_data['arxiv_fetch_results'] . "Are you sure the arXiv identifier is correct and the preprint already available?", 'error');
+            return $this->get_field_default($id);
+        }
+        else
+        {
+            $arxiv_license = $meta_data['arxiv_license'];
+            if(!O3PO_Arxiv::is_cc_by_license_url($arxiv_license))
+            {
+                $this->add_error($id, 'upload-error', "It seems like your " . $eprint . " is not published under one of the three creative commons license (CC BY 4.0, CC BY-SA 4.0, or CC BY-NC-SA 4.0) on the arXiv. Please update the arXiv version of your manuscript and chose the CC BY 4.0 license.", 'error');
+                return $this->get_field_default($id);
+            }
+
+            $this->put_session_data('arxiv_meta_data_' . $eprint, $meta_data);
+            # The way the validation of options works, we can still set fields that appear later in the form here. We just have to do the same sanitation and validation as if the input were coming form the user:
+            foreach( ['title', 'abstract'] as $id)
+                $_POST[$this->plugin_name . '-' . $this->slug][$id] = call_user_func($this->fields[$id]['validation_callable'], $id, $this->sanitize_user_input($meta_data[$id]));
+
+            #$_POST[$this->plugin_name . '-' . $this->slug]['title'] = $meta_data['title'];
+            #$_POST[$this->plugin_name . '-' . $this->slug]['abstract'] = $meta_data['abstract'];
+
+                /* $title = $meta_data['title']; */
+                /* $abstract = $meta_data['abstract']; */
+                /* $number_authors = $meta_data['number_authors']; */
+                /* $author_given_names = $meta_data['author_given_names']; */
+                /* $author_surnames = $meta_data['author_surnames']; */
+            return $eprint;
+        }
+    }
+
+
+    public function render_title() {
+
+        /* $eprint = $this->get_field_value('eprint'); */
+        /* $meta_data = $this->get_session_data('arxiv_meta_data_' . $eprint); */
+        $this->render_single_line_field('title', '', 'on', 'width:100%;');
+    }
+
+    public function render_abstrac() {
+
+        /* $eprint = $this->get_field_value('eprint'); */
+        /* $meta_data = $this->get_session_data('arxiv_meta_data_' . $eprint); */
+        $this->render_multi_line_field('abstract', 12, 'width:100%;');
     }
 
 }

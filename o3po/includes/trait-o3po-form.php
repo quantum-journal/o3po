@@ -27,7 +27,7 @@ trait O3PO_Form {
          * @access   private
          * @var      string    $plugin_name    The string used to uniquely identify this plugin.
          */
-	private $plugin_name;
+	protected $plugin_name;
 
         /**
          * Slug of this form.
@@ -175,10 +175,10 @@ trait O3PO_Form {
          * @access   public
          * @param    string    $id   Id of the field.
          */
-    public function render_single_line_field( $id , $placeholder=null ) {
+    public function render_single_line_field( $id , $placeholder=null, $autocomplete='on', $style=false ) {
 
         $value = $this->get_field_value($id);
-        echo '<input class="regular-text ltr ' . $this->plugin_name . '-' . $this->slug . ' ' . $this->plugin_name . '-' . $this->slug . '-text" type="text" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="' . esc_attr($value) . '"' . ($placeholder ? ' placeholder="' . esc_attr($placeholder) . '"' : '' ) . ' />';
+        echo '<input class="regular-text ltr ' . $this->plugin_name . '-' . $this->slug . ' ' . $this->plugin_name . '-' . $this->slug . '-text" type="text" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="' . esc_attr($value) . '"' . ($placeholder ? ' placeholder="' . esc_attr($placeholder) . '"' : '' ) . ($style ? ' style="' . esc_attr($style). '" ': '') . ($autocomplete === 'off' ? ' autocomplete=off': '') .' />';
 
     }
 
@@ -189,7 +189,7 @@ trait O3PO_Form {
          * @access   public
          * @param    string    $id   Id of the field.
          */
-    public function render_multi_line_field( $id, $rows=false, $style = false ) {
+    public function render_multi_line_field( $id, $rows=false, $style=false ) {
 
         $value = $this->get_field_value($id);
         echo '<textarea class="regular-text ltr o3po-' . $this->slug . ' o3po-' . $this->slug . '-text-multi-line" ' . ($style ? 'style="' . esc_attr($style). '" ': '') . ($rows ? 'rows="' . esc_attr($rows). '" ': '') . 'id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" rows="' . (mb_substr_count( $value, "\n" )+1) . '">' . esc_html($value) . '</textarea>';

@@ -54,6 +54,7 @@ class O3PO_Arxiv {
                 $author_given_names = array();
                 $author_surnames = array();
                 $title = '';
+                $arxiv_license = '';
                 $arxiv_author_links = $x_path->query("/html/body//div[@class='authors']/a");
                 if(isset($arxiv_author_links[0]))
                 {
@@ -90,10 +91,12 @@ class O3PO_Arxiv {
 
                 $arxiv_license_urls = $x_path->query("/html/body//div[contains(@class, 'abs-license')]/a/@href");
                 if(isset($arxiv_license_urls[0]))
-                    foreach ($arxiv_license_urls as $x => $arxiv_license_url) {
-                        if( preg_match('#creativecommons.org/licenses/(by-nc-sa|by-sa|by)/4.0/#u', $arxiv_license_url->nodeValue) !== 1)
-                            $arxiv_fetch_results .= "ERROR: It seems like " . $arxiv_abs_page_url . " is not published under one of the three creative commons license (CC BY 4.0, CC BY-SA 4.0, or CC BY-NC-SA 4.0). Please inform the authors that this is mandatory and remind them that we will publish under CC BY 4.0 and that, by our terms and conditions, they grant us the right to do so.\n";
-                    }
+                {
+                    $arxiv_license_url = $arxiv_license_urls[0];
+                    $arxiv_license = $arxiv_license_url->nodeValue;
+                    if(static::is_cc_by_license_url($arxiv_license))
+                        $arxiv_fetch_results .= "ERROR: It seems like " . $arxiv_abs_page_url . " is not published under one of the three creative commons license (CC BY 4.0, CC BY-SA 4.0, or CC BY-NC-SA 4.0). Please inform the authors that this is mandatory and remind them that we will publish under CC BY 4.0 and that, by our terms and conditions, they grant us the right to do so.\n";
+                }
                 else
                     $arxiv_fetch_results .= "ERROR: No license informatin found on " . $arxiv_abs_page_url . ".\n";
 
@@ -107,6 +110,7 @@ class O3PO_Arxiv {
                     'author_given_names' => $author_given_names,
                     'author_surnames' => $author_surnames,
                     'title' => $title,
+                    'arxiv_license' => $arxiv_license,
                              );
             }
             else
@@ -204,4 +208,12 @@ class O3PO_Arxiv {
             return new WP_Error('exception', $e->getMessage());
         }
     }
+
+    public static function is_cc_by_license_url( $url ) {
+
+        return preg_match('#creativecommons.org/licenses/(by-nc-sa|by-sa|by)/4.0/#u', $url) !== 1;
+    }
+
+
+
 }

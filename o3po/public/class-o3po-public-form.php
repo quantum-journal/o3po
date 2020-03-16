@@ -36,7 +36,6 @@ abstract class O3PO_PublicForm {
     private $coming_from_page = false;
     private $page_to_display = false;
     private $navigation = false;
-    #private $upload_results = array();
 
     public function __construct( $plugin_name, $slug, $title ) {
 
@@ -64,14 +63,14 @@ abstract class O3PO_PublicForm {
     public function handle_form_data_and_produce_content() {
 
         if($this->session_id == false)
-            return 'Invalid session id or session expired. Access denied.';
+            return 'Invalid session id or session expired. Access denied. We are sorry, but you will have to <a href="/' . $slug . '">start from scratch</a>.';
 
         ob_start();
         if(count($this->errors) > 0)
         {
             foreach($this->errors as $error_num => $error)
             {
-                echo('<div id="' . esc_attr($error['code']) . '" class="alert ' . ($error['type'] === 'error' ? 'alert-danger' : 'alert-warning') . '">' . esc_html(esc_attr($error['message'])) . '</div>');
+                echo('<div id="' . esc_attr($error['code']) . '" class="alert ' . ($error['type'] === 'error' ? 'alert-danger' : 'alert-warning') . '">' . esc_html($error['message']) . '</div>');
             }
         }
         else
@@ -418,7 +417,7 @@ abstract class O3PO_PublicForm {
     }
 
 
-    private function put_session_data( $field, $value)
+    protected function put_session_data( $field, $value)
     {
 
         $class_options = $this->get_class_option();
@@ -449,17 +448,12 @@ abstract class O3PO_PublicForm {
          */
     public function render_image_upload_field( $id, $label='', $esc_label=true ) {
         $file_upload_result = $this->get_session_data('file_upload_result_' . $id);
-        #$_file = $this->get_session_data('_FILES_' . $id);
-        #echo('file_upload_result_' . $id . '=' . json_encode($file_upload_result));
-        #echo('_FILES_' . $id . '=' . json_encode($_file));
-
-        /* if(!empty($file_upload_result['error'])) */
-        /*     echo '<p>An error occurred during the upload: ' . $file_upload_result['error'] . '</p>'; */
 
         if(!empty($file_upload_result['file']))
         {
+            echo('<p>Image file ' . esc_html($file_upload_result['user_name']) . ' was uploaded and saved successfully:</p>');
             echo('<img style="display:block;max-width:100%;max-height:10em;width: auto;height: auto;" src="' . esc_attr($file_upload_result['url']) . '" >');
-            echo('<p>Image file ' . esc_html($file_upload_result['user_name']) . ' was uploaded and saved successfully. Want to upload a different file?</p>');
+            echo('<p>Changed your mind? You can chose to upload a different file below.</p>');
         }
 
         echo('<input type="hidden" name="MAX_FILE_SIZE" value="30720" />');
