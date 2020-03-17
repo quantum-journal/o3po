@@ -194,12 +194,12 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         }
 
         $eprint = $this->validate_eprint($id, $input);
-        if(trim($input) !== $eprint) # validate_eprint() was not happy and has already added an error for us
+        if(trim($input) !== $eprint) # validate_eprint() was not happy and has already added an error for us, we simply return the result
             return $eprint;
 
         $meta_data = $this->get_session_data('arxiv_meta_data_' . $eprint);
         if(!empty($meta_data['title']))
-            return $this->get_field_default($id);
+            return $eprint;
 
         $settings = O3PO_Settings::instance();
         $arxiv_url_abs_prefix = $settings->get_field_value('arxiv_url_abs_prefix');
@@ -232,6 +232,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
                 /* $number_authors = $meta_data['number_authors']; */
                 /* $author_given_names = $meta_data['author_given_names']; */
                 /* $author_surnames = $meta_data['author_surnames']; */
+
             return $eprint;
         }
     }
