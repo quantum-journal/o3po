@@ -211,7 +211,7 @@ class O3PO_Arxiv {
 
     public static function is_cc_by_license_url( $url ) {
 
-        return preg_match('#creativecommons.org/licenses/(by-nc-sa|by-sa|by)/4.0/#u', $url) !== 1;
+        return preg_match('#creativecommons.org/licenses/(by-nc-sa|by-sa|by)/4.0/#u', $url) === 1;
     }
 
 
