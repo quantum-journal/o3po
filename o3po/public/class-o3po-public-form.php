@@ -388,6 +388,22 @@ abstract class O3PO_PublicForm {
     }
 
 
+    private function discard_session( $session_id ) {
+
+        $class_options = $this->get_class_option();
+
+        $sideloaded_files = $this->get_session_data('sideloaded_files', array());
+        foreach($sideloaded_files as $sideloaded_file)
+        {
+            if(file_exists($sideloaded_file))
+                unlink($sideloaded_file);
+        }
+
+        unset($class_options['session_data'][$session_id]);
+        $this->update_class_option($class_options);
+    }
+
+
     private function get_session_ids( $dicard_older_than=24*60*60 ) {
 
         $class_options = $this->get_class_option();
@@ -397,9 +413,9 @@ abstract class O3PO_PublicForm {
             foreach($class_options['session_data'] as $session_id => $data)
             {
                 if(abs(time() - $data['time']) > $dicard_older_than)
-                    unset($class_options['session_data'][$session_id]);
+                    $this->discard_session($session_id);
             }
-            $this->update_class_option($class_options);
+            $class_options = $this->get_class_option();#reload after discarding
         }
 
         if(isset($class_options['session_data']))
@@ -417,7 +433,7 @@ abstract class O3PO_PublicForm {
     }
 
 
-    protected function put_session_data( $field, $value)
+    protected function put_session_data( $field, $value )
     {
 
         $class_options = $this->get_class_option();
@@ -431,15 +447,23 @@ abstract class O3PO_PublicForm {
 
     }
 
-    protected function get_session_data( $field ) {
+    protected function get_session_data( $field, $default=Null ) {
 
      $class_options = $this->get_class_option();
      if(isset($class_options['session_data'][$this->session_id]['data'][$field]))
          return $class_options['session_data'][$this->session_id]['data'][$field];
      else
-         return Null;
+         return $default;
     }
 
+
+    protected function append_session_data( $field, $value ) {
+
+        $session_data = $this->get_session_data($field, array());
+        $session_data[] = $value;
+        $this->put_session_data($field, $session_data);
+
+    }
 
         /**
          *

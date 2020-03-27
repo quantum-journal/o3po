@@ -92,10 +92,11 @@ class O3PO_Arxiv {
                 $arxiv_license_urls = $x_path->query("/html/body//div[contains(@class, 'abs-license')]/a/@href");
                 if(isset($arxiv_license_urls[0]))
                 {
-                    $arxiv_license_url = $arxiv_license_urls[0];
-                    $arxiv_license = $arxiv_license_url->nodeValue;
-                    if(static::is_cc_by_license_url($arxiv_license))
-                        $arxiv_fetch_results .= "ERROR: It seems like " . $arxiv_abs_page_url . " is not published under one of the three creative commons license (CC BY 4.0, CC BY-SA 4.0, or CC BY-NC-SA 4.0). Please inform the authors that this is mandatory and remind them that we will publish under CC BY 4.0 and that, by our terms and conditions, they grant us the right to do so.\n";
+                    foreach ($arxiv_license_urls as $x => $arxiv_license_url) {
+                        $arxiv_license = $arxiv_license_url->nodeValue;
+                        if(!static::is_cc_by_license_url($arxiv_license))
+                            $arxiv_fetch_results .= "ERROR: It seems like " . $arxiv_abs_page_url . " is not published under one of the three creative commons license (CC BY 4.0, CC BY-SA 4.0, or CC BY-NC-SA 4.0). Please inform the authors that this is mandatory and remind them that we will publish under CC BY 4.0 and that, by our terms and conditions, they grant us the right to do so.\n";
+                    }
                 }
                 else
                     $arxiv_fetch_results .= "ERROR: No license informatin found on " . $arxiv_abs_page_url . ".\n";

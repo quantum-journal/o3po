@@ -26,7 +26,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
     public static function specify_settings( $settings ) {
         $settings->specify_section('ready2publish_settings', 'Ready2Publish Form', array('O3PO_Ready2PublishForm', 'render_ready2publish_settings'), 'ready2publish_settings');
-        $settings->specify_field('acceptance_codes', 'Acceptance codes currently valid', array('O3PO_Ready2PublishForm', 'render_acceptance_codes_setting' ), 'ready2publish_settings', 'ready2publish_settings', array(), array('O3PO_Ready2PublishForm', 'validate_array_as_comma_separated_list'), array('AAA'));
+        $settings->specify_field('acceptance_codes', 'Acceptance codes currently valid', array('O3PO_Ready2PublishForm', 'render_acceptance_codes_setting' ), 'ready2publish_settings', 'ready2publish_settings', array(), array($settings, 'validate_array_as_comma_separated_list'), array('AAA'));
 
     }
 
@@ -139,7 +139,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         $filesize = filesize($temp_file);
         $upload_max_filesize = O3PO_Environment::max_file_upload_bytes();
         if($filesize > $upload_max_filesize)
-            return array('error' => "The image file must be smaller than " . $upload_max_filesize . "B.");
+            return array('error' => "The image file must be at most " . $upload_max_filesize . "B large.");
 
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $actual_mime_type = finfo_file($finfo, $temp_file);
@@ -155,7 +155,27 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
         require_once( ABSPATH . 'wp-admin/includes/file.php' );
 
-        $result = wp_handle_upload($file_of_this_id, array('test_form' => FALSE));
+        #$result = wp_handle_upload($file_of_this_id, array('test_form' => FALSE));
+        $result = wp_handle_sideload($file_of_this_id, array('test_form' => FALSE));
+        if (empty($results['error']) and !empty($results['file']))
+        {
+            $filepath  = $results['file'];
+            $this->append_session_data('sideloaded_files', $filepath);
+            $filename = 'featured_image';
+            $parent_post_id = 0;
+
+            $attachment = array(
+                'guid'           => $filename,
+                'post_mime_type' => $actual_mime_type,
+                'post_title'     => $filename,
+                'post_content'   => '',
+                'post_status'    => 'inherit'
+                                );
+            $attach_id = wp_insert_attachment($attachment, $filepath, $parent_post_id);
+            $attach_data = wp_generate_attachment_metadata( $attach_id, $filename );
+            wp_update_attachment_metadata( $attach_id, $attach_data );
+        }
+
         if(!isset($result['error']))
         {
             $result['user_name'] = $file_of_this_id['name'];
@@ -252,4 +272,17 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         $this->render_multi_line_field('abstract', 12, 'width:100%;');
     }
 
+
+    public static function render_ready2publish_settings() {
+
+                echo '<p>Configure the form for submission of accepted manuscripts ready for publication.</p>';
+
+    }
+
+    public static function render_acceptance_codes_setting() {
+
+        $settings = O3PO_Settings::instance();
+        $settings->render_array_as_comma_separated_list_field('acceptance_codes');
+        echo '<p>(Comma separated list of currently valid acceptance codes the user can enter to make it past the first page of the form.)</p>';
+    }
 }

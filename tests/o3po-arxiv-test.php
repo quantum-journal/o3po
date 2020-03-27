@@ -21,6 +21,7 @@ class O3PO_ArxivTest extends O3PO_TestCase
                         0 => 'McKague'
                                                ),
                     'title' => 'Self-testing in parallel with CHSH',
+                    'arxiv_license' => 'http://creativecommons.org/licenses/by-sa/4.0/'
                                     ),
                   ),
             array(
@@ -43,6 +44,7 @@ class O3PO_ArxivTest extends O3PO_TestCase
                                             3 => 'Hinrichsen',
                                                                    ),
                                         'title' => 'Dynamic wetting with two competing adsorbates',
+                                        'arxiv_license' => 'http://arxiv.org/licenses/nonexclusive-distrib/1.0/'
                                     )),
             array(
                 'eprint' => '0809.2542v5',
@@ -57,6 +59,7 @@ ERROR: No license informatin found on https://arxiv.org/abs/0809.2542v5.
                     'author_given_names' => array(),
                     'author_surnames' => array(),
                     'title' => '',
+                    'arxiv_license' => ''
                                     ),
                   ),
             array(
