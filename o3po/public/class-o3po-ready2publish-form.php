@@ -56,9 +56,9 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         $this->specify_page('meta_data', 'Manuscript meta-data');
         $this->specify_section('manuscript_data', 'Manuscript data', null, 'meta_data');
         $this->specify_field('title', 'Title', array( $this, 'render_title' ), 'meta_data', 'manuscript_data', array(), array($this, 'trim'), '');
-        $this->specify_field('abstract', 'Abstract', array( $this, 'render_abstrac' ), 'meta_data', 'manuscript_data', array(), array($this, 'trim'), '');
+        $this->specify_field('abstract', 'Abstract', array( $this, 'render_abstract' ), 'meta_data', 'manuscript_data', array(), array($this, 'trim'), '');
 
-        $this->specify_section('author_data', 'Author data', null, 'meta_data');
+        $this->specify_section('author_data', 'Author data', array($this, 'render_author_data'), 'meta_data');
 
         $this->specify_page('dissemination', 'Dissemination options');
 
@@ -157,26 +157,10 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
         #$result = wp_handle_upload($file_of_this_id, array('test_form' => FALSE));
         $result = wp_handle_sideload($file_of_this_id, array('test_form' => FALSE));
-        if (empty($results['error']) and !empty($results['file']))
-        {
-            $filepath  = $results['file'];
-            $this->append_session_data('sideloaded_files', $filepath);
-            $filename = 'featured_image';
-            $parent_post_id = 0;
 
-            $attachment = array(
-                'guid'           => $filename,
-                'post_mime_type' => $actual_mime_type,
-                'post_title'     => $filename,
-                'post_content'   => '',
-                'post_status'    => 'inherit'
-                                );
-            $attach_id = wp_insert_attachment($attachment, $filepath, $parent_post_id);
-            $attach_data = wp_generate_attachment_metadata( $attach_id, $filename );
-            wp_update_attachment_metadata( $attach_id, $attach_data );
-        }
-
-        if(!isset($result['error']))
+        if(empty($result['error']) and !empty($result['file']))
+            $this->append_session_data('sideloaded_files', $result['file']);
+        else
         {
             $result['user_name'] = $file_of_this_id['name'];
             $result['size'] = $file_of_this_id['size'];
@@ -219,7 +203,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
         $meta_data = $this->get_session_data('arxiv_meta_data_' . $eprint);
         if(!empty($meta_data['title']))
-            return $eprint;
+            return $eprint; #meta-data has already been fetched
 
         $settings = O3PO_Settings::instance();
         $arxiv_url_abs_prefix = $settings->get_field_value('arxiv_url_abs_prefix');
@@ -241,17 +225,11 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
             $this->put_session_data('arxiv_meta_data_' . $eprint, $meta_data);
             # The way the validation of options works, we can still set fields that appear later in the form here. We just have to do the same sanitation and validation as if the input were coming form the user:
-            foreach( ['title', 'abstract'] as $id)
+            foreach( ['title', 'abstract', 'number_authors', 'author_given_names', 'author_surnames'] as $id)
                 $_POST[$this->plugin_name . '-' . $this->slug][$id] = call_user_func($this->fields[$id]['validation_callable'], $id, $this->sanitize_user_input($meta_data[$id]));
+            Put array fields correctly into POST and make get_field_value() retreive them correctly!
 
-            #$_POST[$this->plugin_name . '-' . $this->slug]['title'] = $meta_data['title'];
-            #$_POST[$this->plugin_name . '-' . $this->slug]['abstract'] = $meta_data['abstract'];
-
-                /* $title = $meta_data['title']; */
-                /* $abstract = $meta_data['abstract']; */
-                /* $number_authors = $meta_data['number_authors']; */
-                /* $author_given_names = $meta_data['author_given_names']; */
-                /* $author_surnames = $meta_data['author_surnames']; */
+                Also: Fix the escaping problem with the abstract!
 
             return $eprint;
         }
@@ -260,18 +238,29 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
     public function render_title() {
 
-        /* $eprint = $this->get_field_value('eprint'); */
-        /* $meta_data = $this->get_session_data('arxiv_meta_data_' . $eprint); */
         $this->render_single_line_field('title', '', 'on', 'width:100%;');
     }
 
-    public function render_abstrac() {
+    public function render_abstract() {
 
-        /* $eprint = $this->get_field_value('eprint'); */
-        /* $meta_data = $this->get_session_data('arxiv_meta_data_' . $eprint); */
         $this->render_multi_line_field('abstract', 12, 'width:100%;');
+
     }
 
+
+    public function render_author_data() {
+
+        $number_authors = $this->get_field_value('number_authors');
+        $author_given_names = $this->get_field_value('author_given_names');
+        $author_surnames = $this->get_field_value('author_surnames');
+
+        echo '<input type="hidden" name="number_authors" value="' . esc_attr($number_authors) . '">';
+        for ($x = 0; $x < $number_authors; $x++) {
+            $this->render_single_line_field('author_given_names[]', '', 'on', 'width:50%;');
+            $this->render_single_line_field('author_surnames[]', '', 'on', 'width:50%;');
+        }
+
+    }
 
     public static function render_ready2publish_settings() {
 

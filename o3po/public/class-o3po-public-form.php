@@ -76,7 +76,9 @@ abstract class O3PO_PublicForm {
         else
         {
             if($this->navigation === 'Submit' and $this->coming_from_page !== false)
+            {
                 return 'Thank you! Your request has been submitted.';
+            }
         }
 
         echo '<form method="post" enctype="multipart/form-data">';
@@ -330,6 +332,10 @@ abstract class O3PO_PublicForm {
                 }
             }
         }
+        elseif($this->navigation === 'Submit')
+        {
+            $this->add_sideloaded_files_to_media_library();
+        }
 
         if(count($this->errors) > 0)
             $this->page_to_display = $this->coming_from_page;
@@ -391,14 +397,7 @@ abstract class O3PO_PublicForm {
     private function discard_session( $session_id ) {
 
         $class_options = $this->get_class_option();
-
-        $sideloaded_files = $this->get_session_data('sideloaded_files', array());
-        foreach($sideloaded_files as $sideloaded_file)
-        {
-            if(file_exists($sideloaded_file))
-                unlink($sideloaded_file);
-        }
-
+        $this->delete_sideloaded_files($session_id);
         unset($class_options['session_data'][$session_id]);
         $this->update_class_option($class_options);
     }
@@ -433,27 +432,32 @@ abstract class O3PO_PublicForm {
     }
 
 
-    protected function put_session_data( $field, $value )
+    protected function put_session_data( $field, $value, $session_id=Null )
     {
+        if($session_id === Null)
+            $session_id = $this->session_id;
 
         $class_options = $this->get_class_option();
 
-        if(!$this->session_id or !isset($class_options['session_data'][$this->session_id]['data']) or !is_array($class_options['session_data'][$this->session_id]['data']))
+        if(!$this->session_id or !isset($class_options['session_data'][$session_id]['data']) or !is_array($class_options['session_data'][$session_id]['data']))
             return false;
 
-        $class_options['session_data'][$this->session_id]['data'][$field] = $value;
+        $class_options['session_data'][$session_id]['data'][$field] = $value;
 
         $this->update_class_option($class_options);
 
     }
 
-    protected function get_session_data( $field, $default=Null ) {
+    protected function get_session_data( $field, $default=Null, $session_id=Null ) {
 
-     $class_options = $this->get_class_option();
-     if(isset($class_options['session_data'][$this->session_id]['data'][$field]))
-         return $class_options['session_data'][$this->session_id]['data'][$field];
-     else
-         return $default;
+        if($session_id === Null)
+            $session_id = $this->session_id;
+
+            $class_options = $this->get_class_option();
+        if(isset($class_options['session_data'][$session_id]['data'][$field]))
+            return $class_options['session_data'][$session_id]['data'][$field];
+        else
+            return $default;
     }
 
 
@@ -489,4 +493,46 @@ abstract class O3PO_PublicForm {
         echo '<input type="submit" name="navigation" value="Upload" />';
     }
 
+
+    protected function add_sideloaded_files_to_media_library() {
+
+        $sideloaded_files = $this->get_session_data('sideloaded_files');
+        foreach($sideloaded_files as $key => $sideloaded_file)
+        {
+            $parent_post_id = 0;
+            $filename = basename($sideloaded_file);
+            $attachment = array(
+                'guid'           => $filename,
+                'post_mime_type' => $actual_mime_type,
+                'post_title'     => $filename,
+                'post_content'   => '',
+                'post_status'    => 'inherit'
+                                );
+            $attach_id = wp_insert_attachment($attachment, $sideloaded_file, $parent_post_id);
+            if($attach_id === 0)
+                $attach_id = new WP_Error("sideload-error", "wp_insert_attachment() returned 0");
+            if(is_wp_error($attach_id))
+                return $attach_id;
+            $attach_data = wp_generate_attachment_metadata( $attach_id, $filename );
+            $update_attachment_result = wp_update_attachment_metadata( $attach_id, $attach_data );
+            if($update_attachment_result === False)
+                return new WP_Error("sideload-error", "Unable to update attachment meta-data.");
+
+            unset($sideloaded_files[$key]);
+        }
+        $this->put_session_data('sideloaded_files', $sideloaded_files);
+
+    }
+
+
+    private function delete_sideloaded_files( $session_id )
+    {
+        $sideloaded_files = $this->get_session_data('sideloaded_files', array(), $session_id);
+        foreach($sideloaded_files as $sideloaded_file)
+        {
+            if(file_exists($sideloaded_file))
+                unlink($sideloaded_file);
+        }
+
+    }
 }
