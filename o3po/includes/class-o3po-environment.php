@@ -236,12 +236,12 @@ class O3PO_Environment {
                                );
 
                 // Move the temporary file into the uploads directory
-            $results = wp_handle_sideload( $file, $overrides );
+            $result = wp_handle_sideload( $file, $overrides );
 
-            if ( !empty( $results['error'] ) ) {
-                return array( 'error' => "Failed to put file " . $file['name'] . " of mime type " . $file['type'] . " into uploads directory because Wordpress said: " . $results['error'] );
+            if ( !empty( $result['error'] ) ) {
+                return array( 'error' => "Failed to put file " . $file['name'] . " of mime type " . $file['type'] . " into uploads directory because Wordpress said: " . $result['error'] );
             } else {
-                $filepath  = $results['file']; // Full path to the file
+                $filepath = $result['file']; // Full path to the file
 
                     // Prepare an array of post data for the attachment.
                 $attachment = array(
@@ -254,14 +254,21 @@ class O3PO_Environment {
 
                     // Insert the attachment.
                 $attach_id = wp_insert_attachment( $attachment, $filepath, $parent_post_id );
+                if($attach_id === 0)
+                    $attach_id = new WP_Error("sideload-error", "wp_insert_attachment() returned 0");
+                if(is_wp_error($attach_id))
+                    return array( 'error' => $attach_id->get_error_message());
 
                     // Generate the metadata for the attachment, and update the database record.
                 $attach_data = wp_generate_attachment_metadata( $attach_id, $filename );
-                wp_update_attachment_metadata( $attach_id, $attach_data );
+                $update_attachment_result = wp_update_attachment_metadata( $attach_id, $attach_data );
+                if($update_attachment_result === False)
+                    return array("error" => "Unable to update attachment meta-data.");
 
-                $results['mime_type'] = $mime_type;
-                $results['attach_id'] = $attach_id;
-                return $results;
+
+                $result['mime_type'] = $mime_type;
+                $result['attach_id'] = $attach_id;
+                return $result;
             }
         }
         else
