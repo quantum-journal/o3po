@@ -85,7 +85,7 @@ class O3PO_Arxiv {
 
                 $abstract = '';
                 if (!empty($arxiv_abstract_text))
-                    $abstract = addslashes( O3PO_Latex::latex_to_utf8_outside_math_mode($arxiv_abstract_text) );
+                    $abstract =O3PO_Latex::latex_to_utf8_outside_math_mode($arxiv_abstract_text);
                 else
                     $arxiv_fetch_results .= "WARNING: Failed to fetch abstract from " . $arxiv_abs_page_url . ".\n";
 
