@@ -72,7 +72,7 @@ class O3PO_Arxiv {
                 if(!empty($arxiv_titles->item(0)->nodeValue))
                     $arxiv_title_text = preg_replace("/[\r\n\s]+/u", " ", trim( $arxiv_titles->item(0)->nodeValue ) );
                 if(!empty($arxiv_title_text) ) {
-                    $title = addslashes( O3PO_Latex::latex_to_utf8_outside_math_mode($arxiv_title_text) );
+                    $title = O3PO_Latex::latex_to_utf8_outside_math_mode($arxiv_title_text);
                 }
                 else
                     $arxiv_fetch_results .= "WARNING: Failed to fetch title from " . $arxiv_abs_page_url . ".\n";

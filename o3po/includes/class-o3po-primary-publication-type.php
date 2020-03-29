@@ -140,7 +140,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             if(!empty($fetch_meta_data_from_abstract_page_result['abstract']))
                 $new_abstract = addslashes($fetch_meta_data_from_abstract_page_result['abstract']);
             if(!empty($fetch_meta_data_from_abstract_page_result['title']))
-                update_post_meta( $post_id, $post_type . '_title', $fetch_meta_data_from_abstract_page_result['title'] );
+                update_post_meta( $post_id, $post_type . '_title', addslashes($fetch_meta_data_from_abstract_page_result['title']));
             if(!empty($fetch_meta_data_from_abstract_page_result['number_authors']))
                 update_post_meta( $post_id, $post_type . '_number_authors', $fetch_meta_data_from_abstract_page_result['number_authors'] );
             if(!empty($fetch_meta_data_from_abstract_page_result['author_given_names']))
