@@ -577,7 +577,10 @@ abstract class O3PO_PublicForm {
     public function validate_array_of_at_most_1000_names( $id, $input ) {
 
         if(!is_array($input))
+        {
             $this->add_error( $id, 'not-array', "The input to field " . $id . " must be an array but was of type " . gettype($input) . ".", 'error');
+            return array();
+        }
 
         $input = array_slice($input, 0, 1000);
         $result = array();
@@ -589,6 +592,28 @@ abstract class O3PO_PublicForm {
                 $this_name = $name;
             $this_name = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/u', '', $this_name); #strip some nasty non-printable characters
             $result[$key] = $this_name;
+        }
+
+        return $result;
+    }
+
+
+
+        public function validate_array_of_at_most_1000_name_styles( $id, $input ) {
+
+        if(!is_array($input))
+        {
+            $this->add_error( $id, 'not-array', "The input to field " . $id . " must be an array but was of type " . gettype($input) . ".", 'error');
+            return array();
+        }
+
+        $input = array_slice($input, 0, 1000);
+        $result = array();
+        foreach($input as $key => $name)
+        {
+            if($name !== 'western' and $name !== 'eastern')
+                $name = 'western';
+            $result[$key] = $name;
         }
 
         return $result;

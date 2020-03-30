@@ -60,8 +60,11 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
         $this->specify_section('author_data', 'Author data', array($this, 'render_author_data'), 'meta_data'); # We render everything here as part of the section and set the render callable of the fields to Null
         #$this->specify_field('number_authors', Null, Null, 'meta_data', 'author_data', array(), array($this, 'validate_positive_integer_under_1000'), 1);
-        $this->specify_field('author_given_names', Null, Null, 'meta_data', 'author_data', array(), array($this, 'validate_array_of_at_most_1000_names'), array());
-        $this->specify_field('author_surnames', Null, Null, 'meta_data', 'author_data', array(), array($this, 'validate_array_of_at_most_1000_names'), array());
+        $this->specify_field('author_first_names', Null, Null, 'meta_data', 'author_data', array(), array($this, 'validate_array_of_at_most_1000_names'), array());
+        $this->specify_field('author_second_names', Null, Null, 'meta_data', 'author_data', array(), array($this, 'validate_array_of_at_most_1000_names'), array());
+        $this->specify_field('author_name_styles', Null, Null, 'meta_data', 'author_data', array(), array($this, 'validate_array_of_at_most_1000_name_styles'), array());
+
+
 
 
         $this->specify_page('dissemination', 'Dissemination options');
@@ -228,8 +231,13 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
             $this->put_session_data('arxiv_meta_data_' . $eprint, $meta_data);
 
             # The way the validation of options works, we can still set fields that appear later in the form here. We just have to do the same sanitation and validation as if the input were coming form the user:
-            foreach(['title', 'abstract', 'author_given_names', 'author_surnames'] as $id) #'number_authors'
-                $_POST[$this->plugin_name . '-' . $this->slug][$id] = call_user_func($this->fields[$id]['validation_callable'], $id, $this->sanitize_user_input($meta_data[$id]));
+            foreach(['title' => 'title', 'abstract' => 'abstract', 'author_given_names' => 'author_first_names', 'author_surnames' => 'author_second_names'] as $source => $id) #'number_authors'
+                $_POST[$this->plugin_name . '-' . $this->slug][$id] = call_user_func($this->fields[$id]['validation_callable'], $id, $this->sanitize_user_input($meta_data[$source]));
+
+            $_POST[$this->plugin_name . '-' . $this->slug]['author_name_styles'] = array();
+            foreach($_POST[$this->plugin_name . '-' . $this->slug]['author_first_names'] as $foo)
+                $_POST[$this->plugin_name . '-' . $this->slug]['author_name_styles'][] = 'western';
+
             return $eprint;
         }
     }
@@ -250,16 +258,23 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
     public function render_author_data() {
 
         #$number_authors = $this->get_field_value('number_authors');
-        $author_given_names = $this->get_field_value('author_given_names');
-        $author_surnames = $this->get_field_value('author_surnames');
+        $author_first_names = $this->get_field_value('author_first_names');
+        $author_second_names = $this->get_field_value('author_second_names');
 
         #echo '<input type="hidden" name="number_authors" value="' . esc_attr($number_authors) . '">';
         echo '<p>Please help us identify the...</p>';
-        foreach($author_surnames as $x => $surname)
+        foreach($author_second_names as $x => $surname)
         {
             echo '<div class="' . $this->plugin_name . '-' . $this->slug . ' ' . $this->plugin_name . '-' . $this->slug . '-author">';
-            $this->render_single_line_field('author_given_names[' . $x . ']', '', 'on', 'width:20em;max-width:100%;', 'First name(s)');
-            $this->render_single_line_field('author_surnames[' . $x . ']', '', 'on', 'width:20em;max-width:100%;', 'Last name(s)');
+            $this->render_single_line_field('author_first_names[' . $x . ']', '', 'on', 'width:20em;max-width:100%;', 'First name(s)');
+            $this->render_single_line_field('author_second_names[' . $x . ']', '', 'on', 'width:20em;max-width:100%;', 'Last name(s)');
+            $this->render_select_field('author_name_styles[' . $x . ']', [
+                                      array('value' => 'western',
+                                            'description' => 'First name(s) are given name(s)'),
+                                      array('value' => 'eastern',
+                                            'description' => 'Last name(s) are given name(s)'),
+                                                        ]);
+
             echo '<span>Del</span>';
             echo '</div>';
         }

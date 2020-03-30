@@ -245,6 +245,23 @@ trait O3PO_Form {
 
     }
 
+
+    public function render_select_field( $id, $options) {
+
+        $value = $this->get_field_value($id);
+
+        if(preg_match('#(.*)\[(.*)\]#u', $id, $matches) === 1)
+            $name_end = '[' . $matches[1] . '][' . $matches[2] . ']';
+        else
+            $name_end = '[' . $id . ']';
+
+        echo '<select id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . $name_end . '">';
+        foreach($options as $option)
+            echo '<option value="' . $option['value'] . '"' . ($value == $option['value'] ? 'selected': '' ) . '>' . $option['description'] . '</option>';
+        echo '</select>';
+    }
+
+
         /**
          * Render an array as comma separated list type field.
          *
