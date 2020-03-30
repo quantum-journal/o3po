@@ -110,3 +110,11 @@ div.publication-action-buttons button {
     margin-right: 1em;
     margin-bottom: 1rem;
 }
+
+input.o3po-ready2publish-text {
+    margin-right:1em;
+}
+
+div.o3po-ready2publish-author {
+    margin-bottom: 1rem;
+}

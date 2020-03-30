@@ -175,10 +175,17 @@ trait O3PO_Form {
          * @access   public
          * @param    string    $id   Id of the field.
          */
-    public function render_single_line_field( $id , $placeholder=null, $autocomplete='on', $style=false ) {
+    public function render_single_line_field( $id , $placeholder=null, $autocomplete='on', $style=false, $label=false, $esc_label=true) {
 
         $value = $this->get_field_value($id);
-        echo '<input class="regular-text ltr ' . $this->plugin_name . '-' . $this->slug . ' ' . $this->plugin_name . '-' . $this->slug . '-text" type="text" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="' . esc_attr($value) . '"' . ($placeholder ? ' placeholder="' . esc_attr($placeholder) . '"' : '' ) . ($style ? ' style="' . esc_attr($style). '" ': '') . ($autocomplete === 'off' ? ' autocomplete=off': '') .' />';
+
+        if(preg_match('#(.*)\[(.*)\]#u', $id, $matches) === 1)
+            $name_end = '[' . $matches[1] . '][' . $matches[2] . ']';
+        else
+            $name_end = '[' . $id . ']';
+        echo '<input class="regular-text ltr ' . $this->plugin_name . '-' . $this->slug . ' ' . $this->plugin_name . '-' . $this->slug . '-text" type="text" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . $name_end . '" value="' . esc_attr($value) . '"' . ($placeholder ? ' placeholder="' . esc_attr($placeholder) . '"' : '' ) . ($style ? ' style="' . esc_attr($style). '" ': '') . ($autocomplete === 'off' ? ' autocomplete=off': '') .' />';
+        if(!empty($label))
+            echo '<label for="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '">' . ($esc_label ? esc_html($label) : $label) . '</label>';
 
     }
 
@@ -192,7 +199,7 @@ trait O3PO_Form {
     public function render_multi_line_field( $id, $rows=false, $style=false ) {
 
         $value = $this->get_field_value($id);
-        echo '<textarea class="regular-text ltr o3po-' . $this->slug . ' o3po-' . $this->slug . '-text-multi-line" ' . ($style ? 'style="' . esc_attr($style). '" ': '') . ($rows ? 'rows="' . esc_attr($rows). '" ': '') . 'id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" rows="' . (mb_substr_count( $value, "\n" )+1) . '">' . esc_html($value) . '</textarea>';
+        echo '<textarea class="regular-text ltr o3po-' . $this->slug . ' o3po-' . $this->slug . '-text-multi-line" ' . ($style ? 'style="' . esc_attr($style). '" ': '') . ($rows ? 'rows="' . esc_attr($rows). '" ': '') . 'id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" rows="' . (mb_substr_count( $value, "\n" )+1) . '">' . esc_textarea($value) . '</textarea>';
 
     }
 
@@ -558,7 +565,25 @@ trait O3PO_Form {
     }
 
 
-            /**
+    /*     /\** */
+    /*      * Validate positive integer fields <1000 */
+    /*      * */
+    /*      * @since    0.3.1+ */
+    /*      * @access   private */
+    /*      * @param    string   $id    The field this was input to. */
+    /*      * @param    string   $input    User input. */
+    /*      *\/ */
+    /* public function validate_positive_integer_under_1000( $id, $input ) { */
+
+    /*     $result = validate_positive_integer($id, $input); */
+    /*     if($result < 1000) */
+    /*         return $result; */
+
+    /*     $this->add_error( $id, 'not-a-positive-integer', "The maximum for the field '" . $input . "' is 1000. Field reset.", 'error'); */
+    /*     return 1000; */
+    /* } */
+
+        /**
          * Restrict input to checked or unchecked fields
          *
          * @since    0.3.0

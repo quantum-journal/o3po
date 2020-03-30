@@ -105,8 +105,10 @@ abstract class O3PO_PublicForm {
                 {
                     if($section_options['page'] !== $this->plugin_name . '-' . $this->slug . ':' . $page_id or $field_options['section'] !== $section_id)
                         continue;
-                    echo '<h4>' . esc_html($field_options['title']) . '</h4>';
-                    call_user_func($field_options['callback']);
+                    if(!empty($field_options['title']))
+                        echo '<h4>' . esc_html($field_options['title']) . '</h4>';
+                    if(is_callable($field_options['callback']))
+                        call_user_func($field_options['callback']);
                 }
             }
             echo '</div>';
@@ -247,7 +249,14 @@ abstract class O3PO_PublicForm {
          */
     public function get_field_value( $id ) {
 
-        return $this->field_values[$id];
+        if(preg_match('#(.*)\[(.*)\]#u', $id, $matches) === 1)
+        {
+            $array = $matches[1];
+            $key = $matches[2];
+            return $this->field_values[$array][$key];
+        }
+        else
+            return $this->field_values[$id];
     }
 
     public function read_and_validate_field_values() {
@@ -277,12 +286,26 @@ abstract class O3PO_PublicForm {
         {
             if(isset($_POST[$this->plugin_name . '-' . $this->slug][$id]))
             {
+                /* if(is_array($_POST[$this->plugin_name . '-' . $this->slug][$id])) */
+                /* { */
+                /*     $this->field_values[$id] = array(); */
+                /*     foreach($_POST[$this->plugin_name . '-' . $this->slug][$id] as $key => $value) */
+                /*     { */
+                /*         $sanitized_value = $this->sanitize_user_input($value); */
+
+                /*         if($field_options['max_length'] !== false) */
+                /*             $sanitized_value = substr($sanitized_value, 0, $field_options['max_length']); */
+                /*         $this->field_values[$id][$key] = call_user_func($this->fields[$id]['validation_callable'], $id, $sanitized_value); */
+                /*     } */
+                /* } */
+                /* else */
+                /* { */
                 $sanitized_value = $this->sanitize_user_input($_POST[$this->plugin_name . '-' . $this->slug][$id]);
 
                 if($field_options['max_length'] !== false)
                     $sanitized_value = substr($sanitized_value, 0, $field_options['max_length']);
-
                 $this->field_values[$id] = call_user_func($this->fields[$id]['validation_callable'], $id, $sanitized_value);
+                /* } */
             }
             else
                 $this->field_values[$id] = $this->get_field_default($id);
@@ -359,7 +382,15 @@ abstract class O3PO_PublicForm {
 
     public function sanitize_user_input( $input ) {
 
-        return strip_tags($input);
+        if(is_array($input))
+        {
+            $result = array();
+            foreach($input as $key => $elem)
+                $result[$key] = $this->sanitize_user_input($elem);
+            return $result;
+        }
+        else
+            return stripslashes(strip_tags($input));
     }
 
 
@@ -535,4 +566,26 @@ abstract class O3PO_PublicForm {
         }
 
     }
+
+
+    public function validate_array_of_at_most_1000_names( $id, $input ) {
+
+        if(!is_array($input))
+            $this->add_error( $id, 'not-array', "The input to field " . $id . " must be an array but was of type " . gettype($input) . ".", 'error');
+
+        $input = array_slice($input, 0, 1000);
+        $result = array();
+        foreach($input as $key => $name)
+        {
+            if($this->fields[$id]['max_length'] !== false)
+                $this_name = substr($name, 0, $this->fields[$id]['max_length']);
+            else
+                $this_name = $name;
+            $this_name = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/u', '', $this_name); #strip some nasty non-printable characters
+            $result[$key] = $this_name;
+        }
+
+        return $result;
+    }
+
 }
