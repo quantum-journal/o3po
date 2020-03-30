@@ -159,15 +159,13 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
         require_once( ABSPATH . 'wp-admin/includes/file.php' );
 
-        #$result = wp_handle_upload($file_of_this_id, array('test_form' => FALSE));
         $result = wp_handle_sideload($file_of_this_id, array('test_form' => FALSE));
 
         if(empty($result['error']) and !empty($result['file']))
-            $this->append_session_data('sideloaded_files', $result['file']);
-        else
         {
             $result['user_name'] = $file_of_this_id['name'];
             $result['size'] = $file_of_this_id['size'];
+            $this->append_session_data('sideloaded_files', $result['file']);
         }
 
         return $result;

@@ -527,11 +527,17 @@ abstract class O3PO_PublicForm {
 
     protected function add_sideloaded_files_to_media_library() {
 
+        include_once( ABSPATH . 'wp-admin/includes/image.php' );
+
         $sideloaded_files = $this->get_session_data('sideloaded_files');
         foreach($sideloaded_files as $key => $sideloaded_file)
         {
             $parent_post_id = 0;
             $filename = basename($sideloaded_file);
+
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $actual_mime_type = finfo_file($finfo, $sideloaded_file);
+
             $attachment = array(
                 'guid'           => $filename,
                 'post_mime_type' => $actual_mime_type,
