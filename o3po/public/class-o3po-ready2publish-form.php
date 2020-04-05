@@ -207,8 +207,8 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
             return $eprint;
 
         $meta_data = $this->get_session_data('arxiv_meta_data_' . $eprint);
-        if(!empty($meta_data['title']) and !empty($_POST[$this->plugin_name . '-' . $this->slug]['title']))
-            return $eprint; #meta-data has already been fetched and e.g., the title filled
+        if(!empty($meta_data['title']))
+            return $eprint; #meta-data has already been fetched, so we don't fetch again
 
         $settings = O3PO_Settings::instance();
         $arxiv_url_abs_prefix = $settings->get_field_value('arxiv_url_abs_prefix');
@@ -263,6 +263,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
         #echo '<input type="hidden" name="number_authors" value="' . esc_attr($number_authors) . '">';
         echo '<p>Please help us identify the...</p>';
+        echo '<div id="' . $this->plugin_name . '-' . $this->slug . '-author-list">';
         foreach($author_second_names as $x => $surname)
         {
             echo '<div class="' . $this->plugin_name . '-' . $this->slug . ' ' . $this->plugin_name . '-' . $this->slug . '-author">';
@@ -274,11 +275,54 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
                                       array('value' => 'eastern',
                                             'description' => 'Last name(s) are given name(s)'),
                                                         ]);
-
-            echo '<span>Del</span>';
             echo '</div>';
         }
-        echo '<p>Add author...</p>';
+        echo '</div>';
+        echo'<script>
+        function addAuthor() {
+            var item = document.getElementById("' . $this->plugin_name . '-' . $this->slug . '-author-list").lastElementChild;
+            var clone = item.cloneNode(true);
+            var authorNumber = parseInt(RegExp("\\\\[([0-9]*)\\\\]$").exec(clone.getElementsByTagName("input")[0].name)[1]) + 1;
+            var inputs = clone.getElementsByTagName("input");
+            for (i = 0; i < inputs.length; i++) {
+              inputs[i].value = "";
+
+              inputs[i].name = inputs[i].name.replace(RegExp("\[[0-9]*\]$"), "["+authorNumber+"]");
+              inputs[i].id = inputs[i].id.replace(RegExp("\[[0-9]*\]$"), "["+authorNumber+"]");
+            }
+            var labels = clone.getElementsByTagName("label")
+            for (i = 0; i < labels.length; i++) {
+              labels[i].setAttribute("for", labels[i].getAttribute("for").replace(RegExp("\[[0-9]*\]$"), "["+authorNumber+"]"));
+            }
+            var selects = clone.getElementsByTagName("select")
+            for (i = 0; i < selects.length; i++) {
+              selects[i].name = selects[i].name.replace(RegExp("\[[0-9]*\]$"), "["+authorNumber+"]");
+              selects[i].id = selects[i].id.replace(RegExp("\[[0-9]*\]$"), "["+authorNumber+"]");
+              selects[i].selectedIndex = 0;
+            }
+
+//            clone.getElementsByTagName("input")[0].value = "";
+//            clone.getElementsByTagName("input")[1].value = "";
+//
+//            clone.getElementsByTagName("input")[0].name = clone.getElementsByTagName("input")[0].name.replace(RegExp("\[[0-9]*\]$"), "[]");
+//            clone.getElementsByTagName("input")[0].id = clone.getElementsByTagName("input")[0].id.replace(RegExp("\[[0-9]*\]$"), "[]");
+
+//            clone.getElementsByTagName("input")[1].name = clone.getElementsByTagName("input")[0].name.replace(RegExp("\[[0-9]*\]$"), "[]");
+//            clone.getElementsByTagName("input")[1].id = clone.getElementsByTagName("input")[0].id.replace(RegExp("\[[0-9]*\]$"), "[]");
+
+//            clone.getElementsByTagName("select")[0].selectedIndex = 0;
+//            clone.getElementsByTagName("select")[0].name = clone.getElementsByTagName("input")[0].name.replace(RegExp("\[[0-9]*\]$"), "[]");
+//            clone.getElementsByTagName("select")[0].id = clone.getElementsByTagName("input")[0].id.replace(RegExp("\[[0-9]*\]$"), "[]");
+
+            document.getElementById("' . $this->plugin_name . '-' . $this->slug . '-author-list").appendChild(clone);
+        }
+        function removeAuthor() {
+            var select = document.getElementById("' . $this->plugin_name . '-' . $this->slug . '-author-list");
+            select.removeChild(select.lastElementChild);
+        }
+        </script>';
+        echo '<button type="button" onclick="addAuthor()">Add author</button>';
+        echo '<button type="button" onclick="removeAuthor()">Remove author</button>';
 
     }
 
