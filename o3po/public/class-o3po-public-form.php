@@ -196,15 +196,17 @@ abstract class O3PO_PublicForm {
 
         echo '<input type="hidden" name="session_id" value="' . $this->session_id . '">';
 
+        $num = 0;
         $previous_page_id = false;
         reset($this->pages);
         while($page_options = current($this->pages))
         {
+            $num += 1;
             $page_id = key($this->pages);
             $next_page_id = next($this->pages);
 
             echo '<div style="display:' . ($page_id === $this->page_to_display ? 'initial' : 'none' ) . '">';
-            echo '<h2>' . esc_html($page_options['title']) . '</h2>';
+            echo '<h2>' . esc_html($page_options['title']) . ' (step ' . $num . ' of ' . count($this->pages) . ')</h2>';
             foreach($this->sections as $section_id => $section_options)
             {
                 if($section_options['page'] !== $this->plugin_name . '-' . $this->slug . ':' . $page_id)
@@ -622,9 +624,9 @@ abstract class O3PO_PublicForm {
         return $result;
     }
 
-    public function one_of_paypal_invoice_transfer( $id, $input ) {
+    public function one_of_paypal_invoice_transfer_waiver( $id, $input ) {
 
-        if($input === "paypal" or $input === "invoice" or $input === "transfer")
+        if(in_array($input, ["paypal", "invoice", "transfer", "waiver"]))
             return $input;
 
         $this->add_error( $id, 'neither-of-paypal-invoice-transfer', "The selection '" . $this->fields[$id]['title'] . "' must be either paypal, invoice, or transfer. Selection reset.", 'error');

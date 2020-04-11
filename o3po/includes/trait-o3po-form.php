@@ -212,7 +212,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
 }
 </script>';
             echo '<div id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '_preview_lable">Live preview:</div>';
-            echo '<p id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '_preview">' . esc_html($value) . '</p>';
+            echo '<p id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '_preview">' . (!empty($value) ? esc_html($value) : 'Nothing to show') . '</p>';
         }
     }
 

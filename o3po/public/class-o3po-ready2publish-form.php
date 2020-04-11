@@ -80,13 +80,13 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         $this->specify_page('payment', 'Payment');
 
         $this->specify_section('payment_method', 'Choose your payment method', null, 'payment');
-        $this->specify_field('payment_method', Null, array($this, 'render_payment_method'), 'payment', 'payment_method', array(), array($this, 'one_of_paypal_invoice_transfer'), array());
+        $this->specify_field('payment_method', Null, array($this, 'render_payment_method'), 'payment', 'payment_method', array(), array($this, 'one_of_paypal_invoice_transfer_waiver'), array());
 
         $this->specify_section('payment_paypal', 'Pay with PayPal', null, 'payment');
 
 
         $this->specify_section('payment_invoice', 'Request invoice', null, 'payment');
-        $this->specify_field('waiver', 'Waiver', array( $this, 'render_waiver' ), 'payment', 'payment_invoice', array(), array($this, 'checked_or_unchecked'), 'unchecked');
+        #$this->specify_field('waiver', 'Waiver', array( $this, 'render_waiver' ), 'payment', 'payment_invoice', array(), array($this, 'checked_or_unchecked'), 'unchecked');
         $this->specify_field('invoice_recipient', 'Recipient', array( $this, 'render_invoice_recipient' ), 'payment', 'payment_invoice', array(), array($this, 'trim'), '');
         $this->specify_field('invoice_address', 'Address', array( $this, 'render_invoice_address' ), 'payment', 'payment_invoice', array(), array($this, 'trim'), '');
         $this->specify_field('invoice_vat_number', 'VAT number (if applicable)', array( $this, 'render_invoice_vat_number' ), 'payment', 'payment_invoice', array(), array($this, 'trim'), '');
@@ -101,7 +101,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
     }
 
     public function render_eprint_field() {
-        $this->render_single_line_field('eprint', 'e.g. 1234.56789v2');
+        $this->render_single_line_field('eprint', 'e.g., 1234.56789v2', 'on', '', 'The arXiv identifyer of your manuscript including the specific version you want to have published.');
     }
 
 
@@ -140,11 +140,11 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
     }
 
 
-    public function render_waiver() {
+    /* public function render_waiver() { */
 
-        $settings = O3PO_Settings::instance();
-        $this->render_checkbox_field('waiver', 'I require a waiver.');
-    }
+    /*     $settings = O3PO_Settings::instance(); */
+    /*     $this->render_checkbox_field('waiver', 'I require a waiver.'); */
+    /* } */
 
 
         /**
@@ -354,9 +354,9 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         echo '<p>(Comma separated list of currently valid acceptance codes the user can enter to make it past the first page of the form.)</p>';
     }
 
-    public function corresponding_author_email() {
+    public function render_corresponding_author_email() {
 
-        $this->render_single_line_field('corresponding_author_email');
+        $this->render_single_line_field('corresponding_author_email', 'mail@provider.com', 'on', 'width:25em;max-width:100%;');
     }
 
     public function submitted_message() {
@@ -366,7 +366,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
     public function render_basic_manuscript_data_section() {
 
-        echo 'Data in this form ... if you encounter any problems, ....';
+        echo 'Data entered into this form remains valid for 24hours after the last interaction unless you close your browser window. If you encounter any problems please <a href="mailto:info@quantum-journal.org">contact us know</a>.';
     }
 
     public function render_manuscript_data_section() {
@@ -409,6 +409,8 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
                                              'description' => 'Pay with PayPal'),
                                        array('value' => 'transfer',
                                              'description' => 'Pay by bank transfer'),
+                                       array('value' => 'waiver',
+                                             'description' => 'I require a waiver'),
                                                         ]);
 
     }
