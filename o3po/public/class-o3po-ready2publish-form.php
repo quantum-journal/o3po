@@ -48,28 +48,25 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
         $this->specify_page('basic_manuscript_data', 'Your accepted manuscript is ready for publication?');
 
-        $this->specify_section('basic_manuscript_data', 'Please enter the basic manuscript information', null, 'basic_manuscript_data');
+        $this->specify_section('basic_manuscript_data', 'Please enter the basic manuscript information', array($this, 'render_basic_manuscript_data_section'), 'basic_manuscript_data');
         $this->specify_field('eprint', 'ArXiv identifier', array( $this, 'render_eprint_field' ), 'basic_manuscript_data', 'basic_manuscript_data', array(), array($this, 'validate_eprint_fetch_meta_data_check_license_and_store_in_session'), '');
         $this->specify_field('agree_to_publish', 'Consent to publish', array( $this, 'render_agree_to_publish' ), 'basic_manuscript_data', 'basic_manuscript_data', array(), array($this, 'checked'), 'unchecked');
         $this->specify_field('acceptance_code', 'Acceptance code', array( $this, 'render_acceptance_code' ), 'basic_manuscript_data', 'basic_manuscript_data', array(), array($this, 'validate_acceptance_code'), '');
 
         $this->specify_page('meta_data', 'Manuscript meta-data');
-        $this->specify_section('manuscript_data', 'Manuscript data', null, 'meta_data');
+        $this->specify_section('manuscript_data', 'Manuscript data', array($this, 'render_manuscript_data_section'), 'meta_data');
         $this->specify_field('title', 'Title', array( $this, 'render_title' ), 'meta_data', 'manuscript_data', array(), array($this, 'trim'), '');
         $this->specify_field('abstract', 'Abstract', array( $this, 'render_abstract' ), 'meta_data', 'manuscript_data', array(), array($this, 'trim'), '');
 
         $this->specify_section('author_data', 'Author data', array($this, 'render_author_data'), 'meta_data'); # We render everything here as part of the section and set the render callable of the fields to Null
-        #$this->specify_field('number_authors', Null, Null, 'meta_data', 'author_data', array(), array($this, 'validate_positive_integer_under_1000'), 1);
         $this->specify_field('author_first_names', Null, Null, 'meta_data', 'author_data', array(), array($this, 'validate_array_of_at_most_1000_names'), array());
         $this->specify_field('author_second_names', Null, Null, 'meta_data', 'author_data', array(), array($this, 'validate_array_of_at_most_1000_names'), array());
         $this->specify_field('author_name_styles', Null, Null, 'meta_data', 'author_data', array(), array($this, 'validate_array_of_at_most_1000_name_styles'), array());
 
-
-
-
         $this->specify_page('dissemination', 'Dissemination options');
 
-        $this->specify_section('dissemination_material', 'Dissemination material', null, 'dissemination');
+        $this->specify_section('dissemination_material', 'Dissemination material', array($this, 'render_dissemination_material_section'), 'dissemination');
+
         $this->specify_field('popular_summary', 'Popular summary', array( $this, 'render_popular_summary' ), 'dissemination', 'dissemination_material', array(), array($this, 'trim'), '');
         $this->specify_field('featured_image_upload', 'Featured image', array( $this, 'render_featured_image_upload' ), 'dissemination', 'dissemination_material', array(), array($this, 'validate_featured_image_upload'), '');
         $this->specify_field('featured_image_caption', 'Featured image caption', array( $this, 'render_featured_image_caption' ), 'dissemination', 'dissemination_material', array(), array($this, 'trim'), '');
@@ -96,8 +93,9 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
     }
 
     public function render_acceptance_code() {
-        $this->render_single_line_field('acceptance_code', null, 'off');
-        echo('Please enter the acceptance code sent to you in the notification of acceptance.');
+        echo '<div style="float:left;">';
+        $this->render_single_line_field('acceptance_code', null, 'off', '', 'Please enter the acceptance code sent to you in the notification of acceptance.', true, 'display:block;');
+        echo '</div>';
     }
 
     public function render_popular_summary() {
@@ -230,7 +228,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         }
 
         # The way the validation of options works, we can still set fields that appear later in the form here. We just have to do the same sanitation and validation as if the input were coming form the user.
-        foreach(['title' => 'title', 'abstract' => 'abstract', 'author_given_names' => 'author_first_names', 'author_surnames' => 'author_second_names'] as $source => $id) #'number_authors'
+        foreach(['title' => 'title', 'abstract' => 'abstract', 'author_given_names' => 'author_first_names', 'author_surnames' => 'author_second_names'] as $source => $id)
             if(empty($_POST[$this->plugin_name . '-' . $this->slug][$id]))
                 $_POST[$this->plugin_name . '-' . $this->slug][$id] = call_user_func($this->fields[$id]['validation_callable'], $id, $this->sanitize_user_input($meta_data[$source]));
 
@@ -252,26 +250,24 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
     public function render_abstract() {
 
-        $this->render_multi_line_field('abstract', 12, 'width:100%;');
+        $this->render_multi_line_field('abstract', 12, 'width:100%;', true);
 
     }
 
 
     public function render_author_data() {
 
-        #$number_authors = $this->get_field_value('number_authors');
         $author_first_names = $this->get_field_value('author_first_names');
         $author_second_names = $this->get_field_value('author_second_names');
 
-        #echo '<input type="hidden" name="number_authors" value="' . esc_attr($number_authors) . '">';
-        echo '<p>Please help us identify the...</p>';
+        echo '<p>Please help us identify which part(s) of the authors\' names belong to the first and which to their second name(s) as well as which part is their given name (e.g., in Chinese names the given name is usually after the family name, whereas in western cultures the given name comes first). This format does not do justice to <a href="https://www.w3.org/International/questions/qa-personal-names">all common name styles around the world</a>, but names in this format are needed for the registration of DOIs with Crossref.</p>';
         echo '<div id="' . $this->plugin_name . '-' . $this->slug . '-author-list">';
         foreach($author_second_names as $x => $surname)
         {
             echo '<div class="' . $this->plugin_name . '-' . $this->slug . ' ' . $this->plugin_name . '-' . $this->slug . '-author">';
 
             echo '<div style="float:left;">';
-            $this->render_single_line_field('author_first_names[' . $x . ']', '', 'on', 'width:20em;max-width:100%;', 'First name(s)', true, 'display:block;');
+            $this->render_single_line_field('author_first_names[' . $x . ']', '', 'on', 'width:20em;max-width:100%;', 'First and middle name(s)', true, 'display:block;');
             echo '</div>';
             echo '<div style="float:left;">';
             $this->render_single_line_field('author_second_names[' . $x . ']', '', 'on', 'width:20em;max-width:100%;', 'Last name(s)', true, 'display:block;');
@@ -282,6 +278,10 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
                                             'description' => 'First name(s) are given name(s)'),
                                       array('value' => 'eastern',
                                             'description' => 'Last name(s) are given name(s)'),
+                                      /* array('value' => 'islensk', */
+                                      /*       'description' => 'Last name(s) are given name(s)'), */
+                                      /* array('value' => 'given-only', */
+                                      /*       'description' => 'Only given name(s)'), */
                                                         ]);
             echo '</div>';
         }
@@ -333,5 +333,25 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         $settings = O3PO_Settings::instance();
         $settings->render_array_as_comma_separated_list_field('acceptance_codes');
         echo '<p>(Comma separated list of currently valid acceptance codes the user can enter to make it past the first page of the form.)</p>';
+    }
+
+    public function submitted_message() {
+        return 'Thank you for providing ';
+    }
+
+
+    public function render_basic_manuscript_data_section() {
+
+        echo 'Data in this form ... if you encounter any problems, ....';
+    }
+
+    public function render_manuscript_data_section() {
+
+        echo '<p>The following information was fetched from the arXiv for your convenience. Please check and correct carefully. You may use standard LaTeX formulas in both title and abstract.</p>';
+    }
+
+    public function render_dissemination_material_section() {
+
+        echo '<p>Please provide optional dissemination material.</p>';
     }
 }

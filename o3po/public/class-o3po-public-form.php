@@ -59,6 +59,131 @@ abstract class O3PO_PublicForm {
          */
     abstract protected function specify_pages_sections_and_fields();
 
+    public function read_and_validate_field_values() {
+
+        if(isset($_POST['coming_from_page']) and isset($this->pages[$_POST['coming_from_page']]))
+        {
+            $this->coming_from_page = $_POST['coming_from_page'];
+            if(!empty($_POST['session_id']))
+            {
+                $this->session_id = $this->validate_session_id($_POST['session_id']);
+                if($this->session_id !== false)
+                    $this->renew_session_id($this->session_id);
+            }
+            else
+                $this->session_id = false;
+        }
+        else
+            $this->session_id = $this->generate_session_id();
+
+        if($this->session_id == false)
+            return;
+
+        if(isset($_POST['navigation']) and in_array($_POST['navigation'], ['Next', 'Back', 'Submit', 'Upload' ]))
+            $this->navigation = $_POST['navigation'];
+        else
+            $this->navigation = false;
+
+        $this->field_values = array();
+
+        foreach($this->fields as $id => $field_options)
+        {
+            if(isset($_POST[$this->plugin_name . '-' . $this->slug][$id]))
+            {
+                /* if(is_array($_POST[$this->plugin_name . '-' . $this->slug][$id])) */
+                /* { */
+                /*     $this->field_values[$id] = array(); */
+                /*     foreach($_POST[$this->plugin_name . '-' . $this->slug][$id] as $key => $value) */
+                /*     { */
+                /*         $sanitized_value = $this->sanitize_user_input($value); */
+
+                /*         if($field_options['max_length'] !== false) */
+                /*             $sanitized_value = substr($sanitized_value, 0, $field_options['max_length']); */
+                /*         $this->field_values[$id][$key] = call_user_func($this->fields[$id]['validation_callable'], $id, $sanitized_value); */
+                /*     } */
+                /* } */
+                /* else */
+                /* { */
+                $sanitized_value = $this->sanitize_user_input($_POST[$this->plugin_name . '-' . $this->slug][$id]);
+
+                if($field_options['max_length'] !== false)
+                    $sanitized_value = substr($sanitized_value, 0, $field_options['max_length']);
+                $this->field_values[$id] = call_user_func($this->fields[$id]['validation_callable'], $id, $sanitized_value);
+                /* } */
+            }
+            else
+                $this->field_values[$id] = $this->get_field_default($id);
+        }
+        if($this->navigation === 'Upload')
+        {
+            # Note: All files not handled will be automatically deleted by PHP
+            foreach($this->fields as $id => $field_options)
+            {
+                if(isset($_FILES[$this->plugin_name . '-' . $this->slug . '-' . $id]))
+                {
+                    $file_of_this_id = $_FILES[$this->plugin_name . '-' . $this->slug . '-' . $id];
+
+                    switch($file_of_this_id['error']) {
+                        case UPLOAD_ERR_OK:
+                            $this->put_session_data('_FILES_' . $id, $file_of_this_id);
+                            $result = call_user_func($this->fields[$id]['validation_callable'], $id, $file_of_this_id);
+                            break;
+                        case UPLOAD_ERR_INI_SIZE:
+                        case UPLOAD_ERR_FORM_SIZE:
+                            $upload_max_filesize = O3PO_Environment::max_file_upload_bytes();
+                            $result = array('error' => "The file was larger than the maximum file size of " . $upload_max_filesize . " Bytes.");
+                            break;
+                        case UPLOAD_ERR_PARTIAL:
+                            $result = array('error' => "The file was only partially uploaded");
+                            break;
+                        case UPLOAD_ERR_NO_FILE:
+                            $result = array('error' => "No file was uploaded");
+                            break;
+                        case UPLOAD_ERR_NO_TMP_DIR:
+                            $result = array('error' => "The server is missing a temporary upload folder");
+                            break;
+                        case UPLOAD_ERR_CANT_WRITE:
+                            $result = array('error' => "The server failed to write the file to disk");
+                            break;
+                        case UPLOAD_ERR_EXTENSION:
+                            $result = array('error' => "The upload was stopped by a PHP extension");
+                            break;
+                        default:
+                            $result = array('error' => "An unknown upload error occurred");
+                            break;
+                    }
+                    if(!empty($result['error']))
+                        $this->add_error($id, 'upload-error', $result['error'], 'error');
+
+                    $this->put_session_data('file_upload_result_' . $id, $result);
+                }
+            }
+        }
+        elseif($this->navigation === 'Submit')
+        {
+            $this->add_sideloaded_files_to_media_library();
+        }
+
+        if(count($this->errors) > 0)
+            $this->page_to_display = $this->coming_from_page;
+        else
+        {
+            if(isset($this->navigation) and $this->coming_from_page !== false)
+            {
+                reset($this->pages);
+                while(key($this->pages) !== $this->coming_from_page and key($this->pages) !== null)
+                    next($this->pages);
+                if($this->navigation === 'Next')
+                    next($this->pages);
+                elseif($this->navigation === 'Back')
+                    prev($this->pages);
+                $this->page_to_display = key($this->pages);
+            }
+        }
+        if($this->page_to_display === false)
+            $this->page_to_display = array_key_first($this->pages);
+    }
+
 
     public function handle_form_data_and_produce_content() {
 
@@ -77,7 +202,7 @@ abstract class O3PO_PublicForm {
         {
             if($this->navigation === 'Submit' and $this->coming_from_page !== false)
             {
-                return 'Thank you! Your request has been submitted.';
+                return $this->submitted_message();
             }
         }
 
@@ -123,6 +248,11 @@ abstract class O3PO_PublicForm {
         return $content;
     }
 
+
+    public function submitted_message() {
+
+        return 'Thank you! Your request has been submitted.';
+    }
 
     public function render_navigation( $previous_page_id, $page_id, $next_page_id ) {
         echo('<div display="none">');
@@ -259,127 +389,6 @@ abstract class O3PO_PublicForm {
             return $this->field_values[$id];
     }
 
-    public function read_and_validate_field_values() {
-
-        if(isset($_POST['coming_from_page']) and isset($this->pages[$_POST['coming_from_page']]))
-        {
-            $this->coming_from_page = $_POST['coming_from_page'];
-            if(!empty($_POST['session_id']))
-                $this->session_id = $this->validate_session_id($_POST['session_id']);
-            else
-                $this->session_id = false;
-        }
-        else
-            $this->session_id = $this->generate_session_id();
-
-        if($this->session_id == false)
-            return;
-
-        if(isset($_POST['navigation']) and in_array($_POST['navigation'], ['Next', 'Back', 'Submit', 'Upload' ]))
-            $this->navigation = $_POST['navigation'];
-        else
-            $this->navigation = false;
-
-        $this->field_values = array();
-
-        foreach($this->fields as $id => $field_options)
-        {
-            if(isset($_POST[$this->plugin_name . '-' . $this->slug][$id]))
-            {
-                /* if(is_array($_POST[$this->plugin_name . '-' . $this->slug][$id])) */
-                /* { */
-                /*     $this->field_values[$id] = array(); */
-                /*     foreach($_POST[$this->plugin_name . '-' . $this->slug][$id] as $key => $value) */
-                /*     { */
-                /*         $sanitized_value = $this->sanitize_user_input($value); */
-
-                /*         if($field_options['max_length'] !== false) */
-                /*             $sanitized_value = substr($sanitized_value, 0, $field_options['max_length']); */
-                /*         $this->field_values[$id][$key] = call_user_func($this->fields[$id]['validation_callable'], $id, $sanitized_value); */
-                /*     } */
-                /* } */
-                /* else */
-                /* { */
-                $sanitized_value = $this->sanitize_user_input($_POST[$this->plugin_name . '-' . $this->slug][$id]);
-
-                if($field_options['max_length'] !== false)
-                    $sanitized_value = substr($sanitized_value, 0, $field_options['max_length']);
-                $this->field_values[$id] = call_user_func($this->fields[$id]['validation_callable'], $id, $sanitized_value);
-                /* } */
-            }
-            else
-                $this->field_values[$id] = $this->get_field_default($id);
-        }
-        if($this->navigation === 'Upload')
-        {
-            # Note: All files not handled will be automatically deleted by PHP
-            foreach($this->fields as $id => $field_options)
-            {
-                if(isset($_FILES[$this->plugin_name . '-' . $this->slug . '-' . $id]))
-                {
-                    $file_of_this_id = $_FILES[$this->plugin_name . '-' . $this->slug . '-' . $id];
-
-                    switch($file_of_this_id['error']) {
-                        case UPLOAD_ERR_OK:
-                            $this->put_session_data('_FILES_' . $id, $file_of_this_id);
-                            $result = call_user_func($this->fields[$id]['validation_callable'], $id, $file_of_this_id);
-                            break;
-                        case UPLOAD_ERR_INI_SIZE:
-                        case UPLOAD_ERR_FORM_SIZE:
-                            $upload_max_filesize = O3PO_Environment::max_file_upload_bytes();
-                            $result = array('error' => "The file was larger than the maximum file size of " . $upload_max_filesize . " Bytes.");
-                            break;
-                        case UPLOAD_ERR_PARTIAL:
-                            $result = array('error' => "The file was only partially uploaded");
-                            break;
-                        case UPLOAD_ERR_NO_FILE:
-                            $result = array('error' => "No file was uploaded");
-                            break;
-                        case UPLOAD_ERR_NO_TMP_DIR:
-                            $result = array('error' => "The server is missing a temporary upload folder");
-                            break;
-                        case UPLOAD_ERR_CANT_WRITE:
-                            $result = array('error' => "The server failed to write the file to disk");
-                            break;
-                        case UPLOAD_ERR_EXTENSION:
-                            $result = array('error' => "The upload was stopped by a PHP extension");
-                            break;
-                        default:
-                            $result = array('error' => "An unknown upload error occurred");
-                            break;
-                    }
-                    if(!empty($result['error']))
-                        $this->add_error($id, 'upload-error', $result['error'], 'error');
-
-                    $this->put_session_data('file_upload_result_' . $id, $result);
-                }
-            }
-        }
-        elseif($this->navigation === 'Submit')
-        {
-            $this->add_sideloaded_files_to_media_library();
-        }
-
-        if(count($this->errors) > 0)
-            $this->page_to_display = $this->coming_from_page;
-        else
-        {
-            if(isset($this->navigation) and $this->coming_from_page !== false)
-            {
-                reset($this->pages);
-                while(key($this->pages) !== $this->coming_from_page and key($this->pages) !== null)
-                    next($this->pages);
-                if($this->navigation === 'Next')
-                    next($this->pages);
-                elseif($this->navigation === 'Back')
-                    prev($this->pages);
-                $this->page_to_display = key($this->pages);
-            }
-        }
-        if($this->page_to_display === false)
-            $this->page_to_display = array_key_first($this->pages);
-    }
-
     public function sanitize_user_input( $input ) {
 
         if(is_array($input))
@@ -430,6 +439,14 @@ abstract class O3PO_PublicForm {
         $class_options = $this->get_class_option();
         $this->delete_sideloaded_files($session_id);
         unset($class_options['session_data'][$session_id]);
+        $this->update_class_option($class_options);
+    }
+
+    private function renew_session_id( $session_id ) {
+
+        $class_options = $this->get_class_option();
+        $this->delete_sideloaded_files($session_id);
+        $class_options['session_data'][$session_id]['time'] = time();
         $this->update_class_option($class_options);
     }
 
