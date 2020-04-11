@@ -602,7 +602,7 @@ abstract class O3PO_PublicForm {
 
 
 
-        public function validate_array_of_at_most_1000_name_styles( $id, $input ) {
+    public function validate_array_of_at_most_1000_name_styles( $id, $input ) {
 
         if(!is_array($input))
         {
@@ -621,5 +621,16 @@ abstract class O3PO_PublicForm {
 
         return $result;
     }
+
+    public function one_of_paypal_invoice_transfer( $id, $input ) {
+
+        if($input === "paypal" or $input === "invoice" or $input === "transfer")
+            return $input;
+
+        $this->add_error( $id, 'neither-of-paypal-invoice-transfer', "The selection '" . $this->fields[$id]['title'] . "' must be either paypal, invoice, or transfer. Selection reset.", 'error');
+        return $this->get_field_default($id);
+    }
+
+
 
 }

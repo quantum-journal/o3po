@@ -79,8 +79,22 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
         $this->specify_page('payment', 'Payment');
 
-        $this->specify_section('payment', 'Choose your payment options', null, 'payment');
-        $this->specify_field('waiver', 'Waiver', array( $this, 'render_waiver' ), 'payment', 'payment', array(), array($this, 'checked_or_unchecked'), 'unchecked');
+        $this->specify_section('payment_method', 'Choose your payment method', null, 'payment');
+        $this->specify_field('payment_method', Null, array($this, 'render_payment_method'), 'payment', 'payment_method', array(), array($this, 'one_of_paypal_invoice_transfer'), array());
+
+        $this->specify_section('payment_paypal', 'Pay with PayPal', null, 'payment');
+
+
+        $this->specify_section('payment_invoice', 'Request invoice', null, 'payment');
+        $this->specify_field('waiver', 'Waiver', array( $this, 'render_waiver' ), 'payment', 'payment_invoice', array(), array($this, 'checked_or_unchecked'), 'unchecked');
+        $this->specify_field('invoice_recipient', 'Recipient', array( $this, 'render_invoice_recipient' ), 'payment', 'payment_invoice', array(), array($this, 'trim'), '');
+        $this->specify_field('invoice_address', 'Address', array( $this, 'render_invoice_address' ), 'payment', 'payment_invoice', array(), array($this, 'trim'), '');
+        $this->specify_field('invoice_vat_number', 'VAT number (if applicable)', array( $this, 'render_invoice_vat_number' ), 'payment', 'payment_invoice', array(), array($this, 'trim'), '');
+        $this->specify_field('invoice_comments', 'Comments, e.g., in case you want to split the bill', array( $this, 'render_invoice_comments' ), 'payment', 'payment_invoice', array(), array($this, 'trim'), '');
+
+
+        $this->specify_section('payment_transfer', 'Pay by bank transfer', null, 'payment');
+
 
         $this->specify_page('summary', 'Summary');
 
@@ -364,4 +378,39 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
         echo '<p>Please provide optional dissemination material. Also here you may use LaTeX formulas in the popular summary and the feature image caption.</p>';
     }
+
+
+    public function render_invoice_recipient() {
+
+        $this->render_single_line_field('invoice_recipient', 'Person/Institution the invoice needs to be addressed to', 'on', 'width:100%;');
+
+    }
+
+    public function render_invoice_address() {
+
+        $this->render_multi_line_field('invoice_address', 6, 'width:100%;');
+
+    }
+
+    public function render_invoice_vat_number() {
+        $this->render_single_line_field('invoice_recipient', 'e.g., ATU99999999');
+    }
+
+    public function render_invoice_comments() {
+        $this->render_multi_line_field('invoice_comments', 6, 'width:100%;');
+    }
+
+
+    public function render_payment_method() {
+        $this->render_select_field('payment_method', [
+                                       array('value' => 'invoice',
+                                             'description' => 'Request invoice'),
+                                       array('value' => 'paypal',
+                                             'description' => 'Pay with PayPal'),
+                                       array('value' => 'transfer',
+                                             'description' => 'Pay by bank transfer'),
+                                                        ]);
+
+    }
+
 }
