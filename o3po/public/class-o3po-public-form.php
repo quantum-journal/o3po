@@ -63,10 +63,10 @@ abstract class O3PO_PublicForm {
 
         if(isset($_POST['coming_from_page']) and isset($this->pages[$_POST['coming_from_page']]))
         {
-            $this->coming_from_page = $_POST['coming_from_page'];
+            $this->coming_from_page = wp_unslash($_POST['coming_from_page']);
             if(!empty($_POST['session_id']))
             {
-                $this->session_id = $this->validate_session_id($_POST['session_id']);
+                $this->session_id = $this->validate_session_id(wp_unslash($_POST['session_id']));
                 if($this->session_id !== false)
                     $this->renew_session_id($this->session_id);
             }
@@ -79,8 +79,8 @@ abstract class O3PO_PublicForm {
         if($this->session_id == false)
             return;
 
-        if(isset($_POST['navigation']) and in_array($_POST['navigation'], ['Next', 'Back', 'Submit', 'Upload' ]))
-            $this->navigation = $_POST['navigation'];
+        if(isset($_POST['navigation']) and in_array(wp_unslash($_POST['navigation']), ['Next', 'Back', 'Submit', 'Upload' ]))
+            $this->navigation = wp_unslash($_POST['navigation']);
         else
             $this->navigation = false;
 
@@ -90,21 +90,7 @@ abstract class O3PO_PublicForm {
         {
             if(isset($_POST[$this->plugin_name . '-' . $this->slug][$id]))
             {
-                /* if(is_array($_POST[$this->plugin_name . '-' . $this->slug][$id])) */
-                /* { */
-                /*     $this->field_values[$id] = array(); */
-                /*     foreach($_POST[$this->plugin_name . '-' . $this->slug][$id] as $key => $value) */
-                /*     { */
-                /*         $sanitized_value = $this->sanitize_user_input($value); */
-
-                /*         if($field_options['max_length'] !== false) */
-                /*             $sanitized_value = substr($sanitized_value, 0, $field_options['max_length']); */
-                /*         $this->field_values[$id][$key] = call_user_func($this->fields[$id]['validation_callable'], $id, $sanitized_value); */
-                /*     } */
-                /* } */
-                /* else */
-                /* { */
-                $sanitized_value = $this->sanitize_user_input($_POST[$this->plugin_name . '-' . $this->slug][$id]);
+                $sanitized_value = $this->sanitize_user_input(wp_unslash($_POST[$this->plugin_name . '-' . $this->slug][$id]));
 
                 if($field_options['max_length'] !== false)
                     $sanitized_value = substr($sanitized_value, 0, $field_options['max_length']);
@@ -399,7 +385,7 @@ abstract class O3PO_PublicForm {
             return $result;
         }
         else
-            return stripslashes(strip_tags($input));
+            return strip_tags($input);
     }
 
 

@@ -228,15 +228,16 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         }
 
         # The way the validation of options works, we can still set fields that appear later in the form here. We just have to do the same sanitation and validation as if the input were coming form the user.
+        # Also we need to add slashes in the same way wordpress does: https://stackoverflow.com/questions/2496455/why-are-post-variables-getting-escaped-in-php
         foreach(['title' => 'title', 'abstract' => 'abstract', 'author_given_names' => 'author_first_names', 'author_surnames' => 'author_second_names'] as $source => $id)
             if(empty($_POST[$this->plugin_name . '-' . $this->slug][$id]))
-                $_POST[$this->plugin_name . '-' . $this->slug][$id] = call_user_func($this->fields[$id]['validation_callable'], $id, $this->sanitize_user_input($meta_data[$source]));
+                $_POST[$this->plugin_name . '-' . $this->slug][$id] = wp_slash(call_user_func($this->fields[$id]['validation_callable'], $id, $this->sanitize_user_input($meta_data[$source])));
 
         if(empty($_POST[$this->plugin_name . '-' . $this->slug]['author_name_styles']))
         {
             $_POST[$this->plugin_name . '-' . $this->slug]['author_name_styles'] = array();
             foreach($_POST[$this->plugin_name . '-' . $this->slug]['author_first_names'] as $foo)
-                $_POST[$this->plugin_name . '-' . $this->slug]['author_name_styles'][] = 'western';
+                $_POST[$this->plugin_name . '-' . $this->slug]['author_name_styles'][] = wp_slash('western');
         }
 
         return $eprint;
