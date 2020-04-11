@@ -52,6 +52,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         $this->specify_field('eprint', 'ArXiv identifier', array( $this, 'render_eprint_field' ), 'basic_manuscript_data', 'basic_manuscript_data', array(), array($this, 'validate_eprint_fetch_meta_data_check_license_and_store_in_session'), '');
         $this->specify_field('agree_to_publish', 'Consent to publish', array( $this, 'render_agree_to_publish' ), 'basic_manuscript_data', 'basic_manuscript_data', array(), array($this, 'checked'), 'unchecked');
         $this->specify_field('acceptance_code', 'Acceptance code', array( $this, 'render_acceptance_code' ), 'basic_manuscript_data', 'basic_manuscript_data', array(), array($this, 'validate_acceptance_code'), '');
+        $this->specify_field('corresponding_author_email', 'Email', array( $this, 'render_corresponding_author_email' ), 'basic_manuscript_data', 'basic_manuscript_data', array(), array($this, 'validate_email'), '');
 
         $this->specify_page('meta_data', 'Manuscript meta-data');
         $this->specify_section('manuscript_data', 'Manuscript data', array($this, 'render_manuscript_data_section'), 'meta_data');
@@ -73,6 +74,8 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
         $this->specify_section('dissemination_fermats_library', 'Fermat\'s library', null, 'dissemination');
         $this->specify_field('fermats_library', 'Opt-in to Fermat\'s library', array( $this, 'render_fermats_library' ), 'dissemination', 'dissemination_fermats_library', array(), array($this, 'checked_or_unchecked'), 'unchecked');
+
+        $this->specify_section('dissemination_video', 'Video recordings', null, 'dissemination');
 
         $this->specify_page('payment', 'Payment');
 
@@ -99,11 +102,11 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
     }
 
     public function render_popular_summary() {
-        $this->render_multi_line_field('popular_summary', 12, 'width:100%');
+        $this->render_multi_line_field('popular_summary', 12, 'width:100%', true);
     }
 
     public function render_featured_image_caption() {
-        $this->render_multi_line_field('featured_image_caption', 6, 'width:100%');
+        $this->render_multi_line_field('featured_image_caption', 6, 'width:100%', true);
     }
 
 
@@ -246,7 +249,8 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
     public function render_title() {
 
-        $this->render_single_line_field('title', '', 'on', 'width:100%;');
+        #$this->render_single_line_field('title', '', 'on', 'width:100%;');
+        $this->render_multi_line_field('title', 1, 'width:100%;', true);
     }
 
     public function render_abstract() {
@@ -325,7 +329,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
     public static function render_ready2publish_settings() {
 
-                echo '<p>Configure the form for submission of accepted manuscripts ready for publication.</p>';
+        echo '<p>Configure the form for submission of accepted manuscripts ready for publication.</p>';
 
     }
 
@@ -334,6 +338,11 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         $settings = O3PO_Settings::instance();
         $settings->render_array_as_comma_separated_list_field('acceptance_codes');
         echo '<p>(Comma separated list of currently valid acceptance codes the user can enter to make it past the first page of the form.)</p>';
+    }
+
+    public function corresponding_author_email() {
+
+        $this->render_single_line_field('corresponding_author_email');
     }
 
     public function submitted_message() {
@@ -348,11 +357,11 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
     public function render_manuscript_data_section() {
 
-        echo '<p>The following information was fetched from the arXiv for your convenience. Please check and correct carefully. You may use standard LaTeX formulas in both title and abstract.</p>';
+        echo '<p>The following information was fetched from the arXiv for your convenience. Please check and correct carefully. You may use standard LaTeX formulas in both title and abstract, but please remove all manual LaTeX formating commands such as \bf and do not abuse math mode to emphasize parts of your text.</p>';
     }
 
     public function render_dissemination_material_section() {
 
-        echo '<p>Please provide optional dissemination material.</p>';
+        echo '<p>Please provide optional dissemination material. Also here you may use LaTeX formulas in the popular summary and the feature image caption.</p>';
     }
 }

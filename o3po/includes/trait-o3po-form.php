@@ -202,20 +202,17 @@ trait O3PO_Form {
         echo '<textarea class="regular-text ltr o3po-' . $this->slug . ' o3po-' . $this->slug . '-text-multi-line" ' . ($style ? 'style="' . esc_attr($style). '" ': '') . ($preview ? ' oninput=UpdatePreview(this.id)': '') . ($rows ? ' rows="' . esc_attr($rows). '" ': ' ') . 'id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" rows="' . (mb_substr_count( $value, "\n" )+1) . '">' . esc_textarea($value) . '</textarea>';
         if($preview === true)
         {
-            echo'
-<script>
+            echo'<script>
 function UpdatePreview(id) {
 var source = document.getElementById(id);
-//var target = source.nextSibling;
 var target = document.getElementById(id + "_preview");
+//var label = document.getElementById(id + "_preview_lable");
 target.textContent = source.value;
+MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
 }
-</script>
-<p id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '_preview">
-
-</p>
-';
-
+</script>';
+            echo '<div id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '_preview_lable">Live preview:</div>';
+            echo '<p id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '_preview">' . esc_html($value) . '</p>';
         }
     }
 
