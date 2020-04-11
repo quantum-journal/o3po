@@ -207,20 +207,18 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
             return $eprint;
 
         $meta_data = $this->get_session_data('arxiv_meta_data_' . $eprint);
-        if(!empty($meta_data['title']))
-            return $eprint; #meta-data has already been fetched, so we don't fetch again
-
-        $settings = O3PO_Settings::instance();
-        $arxiv_url_abs_prefix = $settings->get_field_value('arxiv_url_abs_prefix');
-        $meta_data = O3PO_Arxiv::fetch_meta_data_from_abstract_page( $arxiv_url_abs_prefix, $eprint);
-
-        if(!empty($meta_data['arxiv_fetch_results']) and (strpos($meta_data['arxiv_fetch_results'], 'ERROR') or strpos($meta_data['arxiv_fetch_results'], 'WARNING')))
+        if(empty($meta_data['title'])) #return $eprint; #meta-data has already been fetched, so we don't fetch again
         {
-            $this->add_error($id, 'arxiv-fetch-error', $meta_data['arxiv_fetch_results'] . "Are you sure the arXiv identifier is correct and the preprint already available?", 'error');
-            return $this->get_field_default($id);
-        }
-        else
-        {
+            $settings = O3PO_Settings::instance();
+            $arxiv_url_abs_prefix = $settings->get_field_value('arxiv_url_abs_prefix');
+            $meta_data = O3PO_Arxiv::fetch_meta_data_from_abstract_page( $arxiv_url_abs_prefix, $eprint);
+
+            if(!empty($meta_data['arxiv_fetch_results']) and (strpos($meta_data['arxiv_fetch_results'], 'ERROR') or strpos($meta_data['arxiv_fetch_results'], 'WARNING')))
+            {
+                $this->add_error($id, 'arxiv-fetch-error', $meta_data['arxiv_fetch_results'] . "Are you sure the arXiv identifier is correct and the preprint already available?", 'error');
+                return $this->get_field_default($id);
+            }
+
             $arxiv_license = $meta_data['arxiv_license'];
             if(!O3PO_Arxiv::is_cc_by_license_url($arxiv_license))
             {
@@ -229,17 +227,21 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
             }
 
             $this->put_session_data('arxiv_meta_data_' . $eprint, $meta_data);
+        }
 
-            # The way the validation of options works, we can still set fields that appear later in the form here. We just have to do the same sanitation and validation as if the input were coming form the user:
-            foreach(['title' => 'title', 'abstract' => 'abstract', 'author_given_names' => 'author_first_names', 'author_surnames' => 'author_second_names'] as $source => $id) #'number_authors'
+        # The way the validation of options works, we can still set fields that appear later in the form here. We just have to do the same sanitation and validation as if the input were coming form the user.
+        foreach(['title' => 'title', 'abstract' => 'abstract', 'author_given_names' => 'author_first_names', 'author_surnames' => 'author_second_names'] as $source => $id) #'number_authors'
+            if(empty($_POST[$this->plugin_name . '-' . $this->slug][$id]))
                 $_POST[$this->plugin_name . '-' . $this->slug][$id] = call_user_func($this->fields[$id]['validation_callable'], $id, $this->sanitize_user_input($meta_data[$source]));
 
+        if(empty($_POST[$this->plugin_name . '-' . $this->slug]['author_name_styles']))
+        {
             $_POST[$this->plugin_name . '-' . $this->slug]['author_name_styles'] = array();
             foreach($_POST[$this->plugin_name . '-' . $this->slug]['author_first_names'] as $foo)
                 $_POST[$this->plugin_name . '-' . $this->slug]['author_name_styles'][] = 'western';
-
-            return $eprint;
         }
+
+        return $eprint;
     }
 
 
@@ -267,8 +269,14 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         foreach($author_second_names as $x => $surname)
         {
             echo '<div class="' . $this->plugin_name . '-' . $this->slug . ' ' . $this->plugin_name . '-' . $this->slug . '-author">';
-            $this->render_single_line_field('author_first_names[' . $x . ']', '', 'on', 'width:20em;max-width:100%;', 'First name(s)');
-            $this->render_single_line_field('author_second_names[' . $x . ']', '', 'on', 'width:20em;max-width:100%;', 'Last name(s)');
+
+            echo '<div style="float:left;">';
+            $this->render_single_line_field('author_first_names[' . $x . ']', '', 'on', 'width:20em;max-width:100%;', 'First name(s)', true, 'display:block;');
+            echo '</div>';
+            echo '<div style="float:left;">';
+            $this->render_single_line_field('author_second_names[' . $x . ']', '', 'on', 'width:20em;max-width:100%;', 'Last name(s)', true, 'display:block;');
+            echo '</div>';
+
             $this->render_select_field('author_name_styles[' . $x . ']', [
                                       array('value' => 'western',
                                             'description' => 'First name(s) are given name(s)'),
@@ -300,25 +308,13 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
               selects[i].id = selects[i].id.replace(RegExp("\[[0-9]*\]$"), "["+authorNumber+"]");
               selects[i].selectedIndex = 0;
             }
-
-//            clone.getElementsByTagName("input")[0].value = "";
-//            clone.getElementsByTagName("input")[1].value = "";
-//
-//            clone.getElementsByTagName("input")[0].name = clone.getElementsByTagName("input")[0].name.replace(RegExp("\[[0-9]*\]$"), "[]");
-//            clone.getElementsByTagName("input")[0].id = clone.getElementsByTagName("input")[0].id.replace(RegExp("\[[0-9]*\]$"), "[]");
-
-//            clone.getElementsByTagName("input")[1].name = clone.getElementsByTagName("input")[0].name.replace(RegExp("\[[0-9]*\]$"), "[]");
-//            clone.getElementsByTagName("input")[1].id = clone.getElementsByTagName("input")[0].id.replace(RegExp("\[[0-9]*\]$"), "[]");
-
-//            clone.getElementsByTagName("select")[0].selectedIndex = 0;
-//            clone.getElementsByTagName("select")[0].name = clone.getElementsByTagName("input")[0].name.replace(RegExp("\[[0-9]*\]$"), "[]");
-//            clone.getElementsByTagName("select")[0].id = clone.getElementsByTagName("input")[0].id.replace(RegExp("\[[0-9]*\]$"), "[]");
-
             document.getElementById("' . $this->plugin_name . '-' . $this->slug . '-author-list").appendChild(clone);
         }
         function removeAuthor() {
             var select = document.getElementById("' . $this->plugin_name . '-' . $this->slug . '-author-list");
-            select.removeChild(select.lastElementChild);
+            if(select.childElementCount > 1) {
+                select.removeChild(select.lastElementChild);
+            }
         }
         </script>';
         echo '<button type="button" onclick="addAuthor()">Add author</button>';

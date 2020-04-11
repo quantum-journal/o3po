@@ -175,7 +175,7 @@ trait O3PO_Form {
          * @access   public
          * @param    string    $id   Id of the field.
          */
-    public function render_single_line_field( $id , $placeholder=null, $autocomplete='on', $style=false, $label=false, $esc_label=true) {
+    public function render_single_line_field( $id , $placeholder=null, $autocomplete='on', $style=false, $label=false, $esc_label=true, $label_style=false) {
 
         $value = $this->get_field_value($id);
 
@@ -185,7 +185,7 @@ trait O3PO_Form {
             $name_end = '[' . $id . ']';
         echo '<input class="regular-text ltr ' . $this->plugin_name . '-' . $this->slug . ' ' . $this->plugin_name . '-' . $this->slug . '-text" type="text" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . $name_end . '" value="' . esc_attr($value) . '"' . ($placeholder ? ' placeholder="' . esc_attr($placeholder) . '"' : '' ) . ($style ? ' style="' . esc_attr($style). '" ': '') . ($autocomplete === 'off' ? ' autocomplete=off': '') .' />';
         if(!empty($label))
-            echo '<label for="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '">' . ($esc_label ? esc_html($label) : $label) . '</label>';
+            echo '<label for="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '"' . ($label_style ? ' style="' . esc_attr($label_style). '" ': '') . '>' . ($esc_label ? esc_html($label) : $label) . '</label>';
 
     }
 

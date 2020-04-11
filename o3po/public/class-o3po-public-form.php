@@ -63,7 +63,7 @@ abstract class O3PO_PublicForm {
     public function handle_form_data_and_produce_content() {
 
         if($this->session_id == false)
-            return 'Invalid session id or session expired. Access denied. We are sorry, but you will have to <a href="/' . $slug . '">start from scratch</a>.';
+            return 'Invalid session id or session expired. Access denied. We are sorry, but you will have to <a href="/' . $this->slug . '">start from scratch</a>.';
 
         ob_start();
         if(count($this->errors) > 0)
