@@ -637,11 +637,15 @@ abstract class O3PO_PublicForm {
         foreach($this->sections as $section_id => $section_options)
         {
             echo '<h3 id="' . esc_attr($section_id) . '">' . esc_html($section_options['title']) . '</h3>';
-            foreach($this->fields as $id => $field_options) {
-                if($field_options['section'] !== $section_id)
-                    continue;
-                if(!empty($field_options['title']))
-                {
+            if($section_options['summary_callback'] !== null)
+            {
+               call_user_func($section_options['summary_callback']);
+            }
+            else
+            {
+                foreach($this->fields as $id => $field_options) {
+                    if($field_options['section'] !== $section_id)
+                        continue;
                     echo '<h4>' . esc_html($field_options['title']) . '</h4>';
                     $value = $this->field_values[$id];
                     if(is_array($value))

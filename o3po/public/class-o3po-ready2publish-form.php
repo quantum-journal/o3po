@@ -59,7 +59,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         $this->specify_field('title', 'Title', array( $this, 'render_title' ), 'meta_data', 'manuscript_data', array(), array($this, 'trim'), '');
         $this->specify_field('abstract', 'Abstract', array( $this, 'render_abstract' ), 'meta_data', 'manuscript_data', array(), array($this, 'trim'), '');
 
-        $this->specify_section('author_data', 'Author data', array($this, 'render_author_data'), 'meta_data'); # We render everything here as part of the section and set the render callable of the fields to Null
+        $this->specify_section('author_data', 'Authors', array($this, 'render_author_data'), 'meta_data', array($this, 'render_author_data_summary')); # We render everything here as part of the section and set the render callable of the fields to Null
         $this->specify_field('author_first_names', Null, Null, 'meta_data', 'author_data', array(), array($this, 'validate_array_of_at_most_1000_names'), array());
         $this->specify_field('author_second_names', Null, Null, 'meta_data', 'author_data', array(), array($this, 'validate_array_of_at_most_1000_names'), array());
         $this->specify_field('author_name_styles', Null, Null, 'meta_data', 'author_data', array(), array($this, 'validate_array_of_at_most_1000_name_styles'), array());
@@ -88,7 +88,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         $this->specify_field('invoice_recipient', 'Recipient', array( $this, 'render_invoice_recipient' ), 'payment', 'payment_invoice', array(), array($this, 'trim'), '');
         $this->specify_field('invoice_address', 'Address', array( $this, 'render_invoice_address' ), 'payment', 'payment_invoice', array(), array($this, 'trim'), '');
         $this->specify_field('invoice_vat_number', 'VAT number (if applicable)', array( $this, 'render_invoice_vat_number' ), 'payment', 'payment_invoice', array(), array($this, 'trim'), '');
-        $this->specify_field('invoice_comments', 'Comments, e.g., in case you want to split the bill', array( $this, 'render_invoice_comments' ), 'payment', 'payment_invoice', array(), array($this, 'trim'), '');
+        $this->specify_field('comments', 'Comments', array( $this, 'render_comments' ), 'payment', 'payment_invoice', array(), array($this, 'trim'), '');
 
         #$this->specify_section('payment_transfer', 'Pay by bank transfer', null, 'payment');
 
@@ -277,7 +277,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
         echo '<p>Please help us identify which part(s) of the authors\' names belong to the first and which to their second name(s) as well as which part is their given name (e.g., in Chinese names the given name comes after the family name, whereas in western cultures the given name is the first name). We are aware that this format does not do justice to <a href="https://www.w3.org/International/questions/qa-personal-names">all common name styles around the world</a>, but names in this format are needed for the registration of DOIs with Crossref.</p>';
         echo '<div id="' . $this->plugin_name . '-' . $this->slug . '-author-list">';
-        foreach($author_second_names as $x => $surname)
+        foreach($author_first_names as $x => $foo)
         {
             echo '<div class="' . $this->plugin_name . '-' . $this->slug . ' ' . $this->plugin_name . '-' . $this->slug . '-author">';
 
@@ -395,8 +395,8 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         $this->render_single_line_field('invoice_recipient', 'e.g., ATU99999999');
     }
 
-    public function render_invoice_comments() {
-        $this->render_multi_line_field('invoice_comments', 6, 'width:100%;');
+    public function render_comments() {
+        $this->render_multi_line_field('comments', 6, 'width:100%;', 'E.g., in case you want to split the bill or you have other relevant information that did not fit into this form.');
     }
 
     public function render_dissemination_multimedia() {
@@ -437,16 +437,29 @@ break;
 }
 var nextSibling = paymentInvoice;
 while(nextSibling) {
-  if(select.value != "invoice") {
-    nextSibling.style.display = "none";
-  }
-  else {
-    nextSibling.style.display = "block";
+  if(nextSibling.id.indexOf("comments") > -1) {
+    if(select.value != "invoice") {
+      nextSibling.style.display = "none";
+    }
+    else {
+      nextSibling.style.display = "block";
+    }
   }
   nextSibling = nextSibling.nextElementSibling
 }
 }
 </script>';
+
+    }
+
+
+    public function render_author_data_summary() {
+
+        $author_first_names = $this->get_field_value('author_first_names');
+        $author_second_names = $this->get_field_value('author_second_names');
+
+        foreach($author_first_names as $x => $foo)
+            echo '<p>' . esc_html($author_first_names[$x]) . ' ' . esc_html($author_second_names[$x]) . '</p>';
 
     }
 }

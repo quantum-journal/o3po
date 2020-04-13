@@ -100,9 +100,9 @@ trait O3PO_Form {
          * @param callable $callback Function that echos out any content at the top of the section (between heading and fields).
          * @param string   $page     The slug-name of the page on which to show the section.
          */
-    public function specify_section( $id, $title, $callback, $page ) {
+    public function specify_section( $id, $title, $callback, $page, $summary_callback=null ) {
 
-        $this->sections[$id] = array('title' => $title, 'callback' => $callback, 'page' => $this->plugin_name . '-' . $this->slug . ':' . $page);
+        $this->sections[$id] = array('title' => $title, 'callback' => $callback, 'page' => $this->plugin_name . '-' . $this->slug . ':' . $page, 'summary_callback' => $summary_callback);
 
     }
 
