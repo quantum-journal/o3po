@@ -95,7 +95,6 @@ abstract class O3PO_PublicForm {
                 if($field_options['max_length'] !== false)
                     $sanitized_value = substr($sanitized_value, 0, $field_options['max_length']);
                 $this->field_values[$id] = call_user_func($this->fields[$id]['validation_callable'], $id, $sanitized_value);
-                /* } */
             }
             else
                 $this->field_values[$id] = $this->get_field_default($id);
@@ -211,7 +210,7 @@ abstract class O3PO_PublicForm {
             {
                 if($section_options['page'] !== $this->plugin_name . '-' . $this->slug . ':' . $page_id)
                     continue;
-                echo '<h3>' . esc_html($section_options['title']) . '</h3>';
+                echo '<h3 id="' . esc_attr($section_id) . '">' . esc_html($section_options['title']) . '</h3>';
                 if(is_callable($section_options['callback']))
                     call_user_func($section_options['callback']);
                 foreach($this->fields as $field_id => $field_options)
@@ -219,7 +218,7 @@ abstract class O3PO_PublicForm {
                     if($section_options['page'] !== $this->plugin_name . '-' . $this->slug . ':' . $page_id or $field_options['section'] !== $section_id)
                         continue;
                     if(!empty($field_options['title']))
-                        echo '<h4>' . esc_html($field_options['title']) . '</h4>';
+                        echo '<h4 id=' . esc_attr($field_id) . '>' . esc_html($field_options['title']) . '</h4>';
                     if(is_callable($field_options['callback']))
                         call_user_func($field_options['callback']);
                 }
@@ -633,6 +632,30 @@ abstract class O3PO_PublicForm {
         return $this->get_field_default($id);
     }
 
-
+    public function render_summary() {
+        echo "<p>Please verify that the following information is correct before submitting.</p>";
+        foreach($this->sections as $section_id => $section_options)
+        {
+            echo '<h3 id="' . esc_attr($section_id) . '">' . esc_html($section_options['title']) . '</h3>';
+            foreach($this->fields as $id => $field_options) {
+                if($field_options['section'] !== $section_id)
+                    continue;
+                if(!empty($field_options['title']))
+                {
+                    echo '<h4>' . esc_html($field_options['title']) . '</h4>';
+                    $value = $this->field_values[$id];
+                    if(is_array($value))
+                    {
+                        foreach($value as $val)
+                            echo '<p>' . (!empty($val) ? esc_html($val) : 'Not provided') . '</p>';
+                    }
+                    else
+                    {
+                        echo '<p>' . (!empty($value) ? esc_html($value) : 'Not provided') . '</p>';
+                    }
+                }
+            }
+        }
+    }
 
 }

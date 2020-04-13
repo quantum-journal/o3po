@@ -196,10 +196,10 @@ trait O3PO_Form {
          * @access   public
          * @param    string    $id   Id of the field.
          */
-    public function render_multi_line_field( $id, $rows=false, $style=false, $preview=false ) {
+    public function render_multi_line_field( $id, $rows=false, $style=false, $preview=false, $placeholder=false ) {
 
         $value = $this->get_field_value($id);
-        echo '<textarea class="regular-text ltr o3po-' . $this->slug . ' o3po-' . $this->slug . '-text-multi-line" ' . ($style ? 'style="' . esc_attr($style). '" ': '') . ($preview ? ' oninput=UpdatePreview(this.id)': '') . ($rows ? ' rows="' . esc_attr($rows). '" ': ' ') . 'id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" rows="' . (mb_substr_count( $value, "\n" )+1) . '">' . esc_textarea($value) . '</textarea>';
+        echo '<textarea class="regular-text ltr o3po-' . $this->slug . ' o3po-' . $this->slug . '-text-multi-line" ' . ($style ? 'style="' . esc_attr($style). '" ': '') . ($preview ? ' oninput=UpdatePreview(this.id)': '') . ($rows ? ' rows="' . esc_attr($rows). '" ': ' ') . 'id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" rows="' . (mb_substr_count( $value, "\n" )+1) . '"' . ($placeholder !== false ? ' placeholder="' . esc_attr($placeholder) . '"' : '') . '>' . esc_textarea($value) . '</textarea>';
         if($preview === true)
         {
             echo'<script>
@@ -211,8 +211,8 @@ target.textContent = source.value;
 MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
 }
 </script>';
-            echo '<div id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '_preview_lable">Live preview:</div>';
-            echo '<p id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '_preview">' . (!empty($value) ? esc_html($value) : 'Nothing to show') . '</p>';
+            echo '<span id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '_preview_lable" stype="">LaTeX preview:</span><br/>';
+            echo '<span id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '_preview">' . (!empty($value) ? esc_html($value) : 'Nothing to show') . '</span>';
         }
     }
 
@@ -259,7 +259,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
     }
 
 
-    public function render_select_field( $id, $options) {
+    public function render_select_field( $id, $options, $onchange=false) {
 
         $value = $this->get_field_value($id);
 
@@ -268,7 +268,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         else
             $name_end = '[' . $id . ']';
 
-        echo '<select id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . $name_end . '">';
+        echo '<select id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . $name_end . '"' . ($onchange !== false ? ' onchange="' . $onchange . '"' : '') . '>';
         foreach($options as $option)
             echo '<option value="' . $option['value'] . '"' . ($value == $option['value'] ? 'selected': '' ) . '>' . $option['description'] . '</option>';
         echo '</select>';

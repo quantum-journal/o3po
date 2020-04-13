@@ -48,14 +48,14 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
         $this->specify_page('basic_manuscript_data', 'Your accepted manuscript is ready for publication?');
 
-        $this->specify_section('basic_manuscript_data', 'Please enter the basic manuscript information', array($this, 'render_basic_manuscript_data_section'), 'basic_manuscript_data');
+        $this->specify_section('basic_manuscript_data', 'Basic submission information', array($this, 'render_basic_manuscript_data_section'), 'basic_manuscript_data');
         $this->specify_field('eprint', 'ArXiv identifier', array( $this, 'render_eprint_field' ), 'basic_manuscript_data', 'basic_manuscript_data', array(), array($this, 'validate_eprint_fetch_meta_data_check_license_and_store_in_session'), '');
         $this->specify_field('agree_to_publish', 'Consent to publish', array( $this, 'render_agree_to_publish' ), 'basic_manuscript_data', 'basic_manuscript_data', array(), array($this, 'checked'), 'unchecked');
         $this->specify_field('acceptance_code', 'Acceptance code', array( $this, 'render_acceptance_code' ), 'basic_manuscript_data', 'basic_manuscript_data', array(), array($this, 'validate_acceptance_code'), '');
         $this->specify_field('corresponding_author_email', 'Email', array( $this, 'render_corresponding_author_email' ), 'basic_manuscript_data', 'basic_manuscript_data', array(), array($this, 'validate_email'), '');
 
         $this->specify_page('meta_data', 'Manuscript meta-data');
-        $this->specify_section('manuscript_data', 'Manuscript data', array($this, 'render_manuscript_data_section'), 'meta_data');
+        $this->specify_section('manuscript_data', 'Meta-data', array($this, 'render_manuscript_data_section'), 'meta_data');
         $this->specify_field('title', 'Title', array( $this, 'render_title' ), 'meta_data', 'manuscript_data', array(), array($this, 'trim'), '');
         $this->specify_field('abstract', 'Abstract', array( $this, 'render_abstract' ), 'meta_data', 'manuscript_data', array(), array($this, 'trim'), '');
 
@@ -71,33 +71,29 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         $this->specify_field('popular_summary', 'Popular summary', array( $this, 'render_popular_summary' ), 'dissemination', 'dissemination_material', array(), array($this, 'trim'), '');
         $this->specify_field('featured_image_upload', 'Featured image', array( $this, 'render_featured_image_upload' ), 'dissemination', 'dissemination_material', array(), array($this, 'validate_featured_image_upload'), '');
         $this->specify_field('featured_image_caption', 'Featured image caption', array( $this, 'render_featured_image_caption' ), 'dissemination', 'dissemination_material', array(), array($this, 'trim'), '');
+        $this->specify_field('dissemination_multimedia', 'Multi media', array( $this, 'render_dissemination_multimedia' ), 'dissemination', 'dissemination_material', array(), array($this, 'trim'), '');
 
         $this->specify_section('dissemination_fermats_library', 'Fermat\'s library', null, 'dissemination');
         $this->specify_field('fermats_library', 'Opt-in to Fermat\'s library', array( $this, 'render_fermats_library' ), 'dissemination', 'dissemination_fermats_library', array(), array($this, 'checked_or_unchecked'), 'unchecked');
 
-        $this->specify_section('dissemination_video', 'Video recordings', null, 'dissemination');
-
         $this->specify_page('payment', 'Payment');
 
-        $this->specify_section('payment_method', 'Choose your payment method', null, 'payment');
+        $this->specify_section('payment_method', 'Payment method', null, 'payment');
         $this->specify_field('payment_method', Null, array($this, 'render_payment_method'), 'payment', 'payment_method', array(), array($this, 'one_of_paypal_invoice_transfer_waiver'), array());
 
-        $this->specify_section('payment_paypal', 'Pay with PayPal', null, 'payment');
+        #$this->specify_section('payment_paypal', 'Pay with PayPal', null, 'payment');
 
 
-        $this->specify_section('payment_invoice', 'Request invoice', null, 'payment');
-        #$this->specify_field('waiver', 'Waiver', array( $this, 'render_waiver' ), 'payment', 'payment_invoice', array(), array($this, 'checked_or_unchecked'), 'unchecked');
+        $this->specify_section('payment_invoice', 'Invoicing information', null, 'payment');
         $this->specify_field('invoice_recipient', 'Recipient', array( $this, 'render_invoice_recipient' ), 'payment', 'payment_invoice', array(), array($this, 'trim'), '');
         $this->specify_field('invoice_address', 'Address', array( $this, 'render_invoice_address' ), 'payment', 'payment_invoice', array(), array($this, 'trim'), '');
         $this->specify_field('invoice_vat_number', 'VAT number (if applicable)', array( $this, 'render_invoice_vat_number' ), 'payment', 'payment_invoice', array(), array($this, 'trim'), '');
         $this->specify_field('invoice_comments', 'Comments, e.g., in case you want to split the bill', array( $this, 'render_invoice_comments' ), 'payment', 'payment_invoice', array(), array($this, 'trim'), '');
 
-
-        $this->specify_section('payment_transfer', 'Pay by bank transfer', null, 'payment');
-
+        #$this->specify_section('payment_transfer', 'Pay by bank transfer', null, 'payment');
 
         $this->specify_page('summary', 'Summary');
-
+        $this->specify_section('summary', '', array($this, 'render_summary'), 'summary');
     }
 
     public function render_eprint_field() {
@@ -279,7 +275,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         $author_first_names = $this->get_field_value('author_first_names');
         $author_second_names = $this->get_field_value('author_second_names');
 
-        echo '<p>Please help us identify which part(s) of the authors\' names belong to the first and which to their second name(s) as well as which part is their given name (e.g., in Chinese names the given name is usually after the family name, whereas in western cultures the given name comes first). This format does not do justice to <a href="https://www.w3.org/International/questions/qa-personal-names">all common name styles around the world</a>, but names in this format are needed for the registration of DOIs with Crossref.</p>';
+        echo '<p>Please help us identify which part(s) of the authors\' names belong to the first and which to their second name(s) as well as which part is their given name (e.g., in Chinese names the given name comes after the family name, whereas in western cultures the given name is the first name). We are aware that this format does not do justice to <a href="https://www.w3.org/International/questions/qa-personal-names">all common name styles around the world</a>, but names in this format are needed for the registration of DOIs with Crossref.</p>';
         echo '<div id="' . $this->plugin_name . '-' . $this->slug . '-author-list">';
         foreach($author_second_names as $x => $surname)
         {
@@ -356,7 +352,9 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
     public function render_corresponding_author_email() {
 
-        $this->render_single_line_field('corresponding_author_email', 'mail@provider.com', 'on', 'width:25em;max-width:100%;');
+        echo '<div style="float:left;">';
+        $this->render_single_line_field('corresponding_author_email', 'mail@provider.com', 'on', 'width:25em;max-width:100%;', 'Please enter the email you wish to use for correspondence.', true, 'display:block;');
+        echo '</div>';
     }
 
     public function submitted_message() {
@@ -366,7 +364,8 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
     public function render_basic_manuscript_data_section() {
 
-        echo 'Data entered into this form remains valid for 24hours after the last interaction unless you close your browser window. If you encounter any problems please <a href="mailto:info@quantum-journal.org">contact us know</a>.';
+        $settings = O3PO_Settings::instance();
+        echo 'Data entered into this form remains valid for 24hours after the last interaction unless you close your browser window. If you have questions or encounter any problems please <a href="mailto:' . esc_attr($settings->get_field_value('publisher_email')) . '">contact us</a>.';
     }
 
     public function render_manuscript_data_section() {
@@ -400,19 +399,54 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         $this->render_multi_line_field('invoice_comments', 6, 'width:100%;');
     }
 
+    public function render_dissemination_multimedia() {
+        $this->render_multi_line_field('dissemination_multimedia', 6, 'width:100%;', false, 'You may provide links to recordings of conference talks, animations, short videos, or interactive content illustrating the content of your work. if appropriate and technically feasible these will be embedded on the page of your manuscript.');
+    }
 
     public function render_payment_method() {
         $this->render_select_field('payment_method', [
                                        array('value' => 'invoice',
                                              'description' => 'Request invoice'),
                                        array('value' => 'paypal',
-                                             'description' => 'Pay with PayPal'),
+                                             'description' => 'Pay by PayPal now'),
                                        array('value' => 'transfer',
-                                             'description' => 'Pay by bank transfer'),
+                                             'description' => 'Pay by bank transfer now'),
                                        array('value' => 'waiver',
                                              'description' => 'I require a waiver'),
-                                                        ]);
+                                                      ], 'onPaymentMethodChange()');
+        echo '<p id="payment_method_explanation"></p>';
+                echo '<script>
+window.addEventListener("load", onPaymentMethodChange);
+function onPaymentMethodChange() {
+var select = document.getElementById("o3po-ready2publish-payment_method");
+var paymentInvoice = document.getElementById("payment_invoice");
+var explanationP = document.getElementById("payment_method_explanation");
+switch(select.value) {
+case "invoice":
+explanationP.innerHTML = "Please provide the following information so that we can write an invoice. The invoice can then be payed later via bank transfer or PayPal by, e.g., the administration of your institution. Instructions will be sent to you by email together with the invoice."
+break;
+case "waiver":
+explanationP.innerHTML = "We offer a progressive waiver policy so that authors who cannot cover their open-access fees are not excluded from publishing. Your article processing charge can be waived. Please only chose this option if you cannot support the journal."
+break;
+case "paypal":
+explanationP.innerHTML = "After submitting this form you will receive an email with instructions on how to pay your article processing charge via PayPal.";
+break;
+case "transfer":
+explanationP.innerHTML = "After submitting this form you will receive an email with instructions on how to pay your article processing charge via bank transfer.";
+break;
+}
+var nextSibling = paymentInvoice;
+while(nextSibling) {
+  if(select.value != "invoice") {
+    nextSibling.style.display = "none";
+  }
+  else {
+    nextSibling.style.display = "block";
+  }
+  nextSibling = nextSibling.nextElementSibling
+}
+}
+</script>';
 
     }
-
 }
