@@ -432,7 +432,6 @@ abstract class O3PO_PublicForm {
     private function renew_session_id( $session_id ) {
 
         $class_options = $this->get_class_option();
-        $this->delete_sideloaded_files($session_id);
         $class_options['session_data'][$session_id]['time'] = time();
         $this->update_class_option($class_options);
     }
@@ -655,7 +654,11 @@ abstract class O3PO_PublicForm {
                     }
                     else
                     {
-                        echo '<p>' . (!empty($value) ? esc_html($value) : 'Not provided') . '</p>';
+                        $result = $this->get_session_data('file_upload_result_' . $id);
+                        if(empty($result['error']) and !empty($result['user_name']))
+                            echo '<p>' . esc_html($result['user_name']) . '</p>';
+                        else
+                            echo '<p>' . (!empty($value) ? esc_html($value) : 'Not provided') . '</p>';
                     }
                 }
             }
