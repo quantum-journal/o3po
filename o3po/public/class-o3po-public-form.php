@@ -11,7 +11,6 @@
  */
 
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/trait-o3po-form.php';
-require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/trait-o3po-ready2publish-storage.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-environment.php';
 
 /**
@@ -25,7 +24,6 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-envir
 abstract class O3PO_PublicForm {
 
     use O3PO_Form;
-    use O3PO_Ready2PublishStorage;
 
     private $errors = array();
 
@@ -146,6 +144,7 @@ abstract class O3PO_PublicForm {
         }
         elseif($this->navigation === 'Submit')
         {
+            $this->on_submit();
             $this->add_sideloaded_files_to_media_library();
         }
 
@@ -666,5 +665,8 @@ abstract class O3PO_PublicForm {
             }
         }
     }
+
+
+    abstract public function on_submit();
 
 }

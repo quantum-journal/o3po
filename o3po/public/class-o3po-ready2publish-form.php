@@ -11,6 +11,7 @@
  */
 
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-o3po-public-form.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/trait-o3po-ready2publish-storage.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-environment.php';
 
@@ -23,6 +24,8 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-envir
  * @author     Christian Gogolin <o3po@quantum-journal.org>
  */
 class O3PO_Ready2PublishForm extends O3PO_PublicForm {
+
+    use O3PO_Ready2PublishStorage;
 
     public static function specify_settings( $settings ) {
         $settings->specify_section('ready2publish_settings', 'Ready2Publish Form', array('O3PO_Ready2PublishForm', 'render_ready2publish_settings'), 'ready2publish_settings');
@@ -356,6 +359,12 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         $this->render_single_line_field('corresponding_author_email', 'mail@provider.com', 'on', 'width:25em;max-width:100%;', 'Please enter the email you wish to use for correspondence.', true, 'display:block;');
         echo '</div>';
     }
+
+
+    public function on_submit() {
+
+    }
+
 
     public function submitted_message() {
         return 'Thank you! Your manuscript will be processed by our team.';

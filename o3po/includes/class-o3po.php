@@ -211,6 +211,11 @@ class O3PO {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-o3po-ready2publish-form.php';
 
             /**
+             * The class representing ready to publish dashboard.
+             */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-o3po-ready2publish-dashboard.php';
+
+            /**
              * The class providing the primary publication type.
              */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-primary-publication-type.php';
@@ -237,6 +242,9 @@ class O3PO {
 
             //create the ready to publish form
         $this->ready2publish_form = new O3PO_Ready2PublishForm($this->plugin_name, $settings->get_field_value("ready2publish_slug"));
+
+            //create the ready to publish dashboard
+        $this->ready2publish_dashboard = new O3PO_Ready2PublishDashboard($this->plugin_name, $this->get_plugin_pretty_name(), $settings->get_field_value("ready2publish_slug"), "Ready2Publish");
 
             //create the publication types for each journal
         $this->primary_publication_type = new O3PO_PrimaryPublicationType($this->journal, $this->environment);
@@ -334,6 +342,10 @@ class O3PO {
 
         $this->loader->add_action('init', $this->ready2publish_form, 'init');
         $this->loader->add_action('do_parse_request', $this->ready2publish_form, 'do_parse_request', PHP_INT_MAX, 2 );
+
+        $this->loader->add_action('wp_dashboard_setup', $this->ready2publish_dashboard, 'setup');
+
+
 
         #$this->loader->add_action('get_template_part_template-parts/content', $this->journal, 'foo', 99, 2);
 
