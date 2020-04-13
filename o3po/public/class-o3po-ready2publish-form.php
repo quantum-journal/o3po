@@ -358,7 +358,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
     }
 
     public function submitted_message() {
-        return 'Thank you for providing ';
+        return 'Thank you! Your manuscript will be processed by our team.';
     }
 
 
@@ -396,7 +396,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
     }
 
     public function render_comments() {
-        $this->render_multi_line_field('comments', 6, 'width:100%;', 'E.g., in case you want to split the bill or you have other relevant information that did not fit into this form.');
+        $this->render_multi_line_field('comments', 6, 'width:100%;', false, 'E.g., in case you want to split the bill or you have other relevant information that did not fit into this form.');
     }
 
     public function render_dissemination_multimedia() {
@@ -437,14 +437,15 @@ break;
 }
 var nextSibling = paymentInvoice;
 while(nextSibling) {
-  if(nextSibling.id.indexOf("comments") > -1) {
+  if(nextSibling.id.indexOf("comments") != -1) {
+    break;
+  }
     if(select.value != "invoice") {
       nextSibling.style.display = "none";
     }
     else {
       nextSibling.style.display = "block";
     }
-  }
   nextSibling = nextSibling.nextElementSibling
 }
 }

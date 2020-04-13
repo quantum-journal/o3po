@@ -187,7 +187,9 @@ abstract class O3PO_PublicForm {
         {
             if($this->navigation === 'Submit' and $this->coming_from_page !== false)
             {
-                return $this->submitted_message();
+                $ret = '<script>window.history.replaceState(null, "", "/' . $this->slug . '")</script>';
+                $ret .= $this->submitted_message();
+                return $ret;
             }
         }
 
@@ -532,7 +534,7 @@ abstract class O3PO_PublicForm {
 
         include_once( ABSPATH . 'wp-admin/includes/image.php' );
 
-        $sideloaded_files = $this->get_session_data('sideloaded_files');
+        $sideloaded_files = $this->get_session_data('sideloaded_files', array());
         foreach($sideloaded_files as $key => $sideloaded_file)
         {
             $parent_post_id = 0;
