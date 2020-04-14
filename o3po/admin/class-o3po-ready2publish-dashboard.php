@@ -57,7 +57,9 @@ class O3PO_Ready2PublishDashboard {
             echo '<p>' . esc_html($manuscript_info['eprint']) . '</p>';
             echo '<p class="row-actionsX">';
             echo '<span class="reply"><a href="mailto:' . esc_attr($manuscript_info['corresponding_author_email']) . '">' . esc_html($manuscript_info['corresponding_author_email']) . '</a></span>';
-            echo '<span class="approve"><a href="/' XXX . '?id=' . $id . '">Publish</a></span>';
+            echo '<span class="approve"><a href="/' . $this->slug . '?action=' . 'publish' . '&id=' . urlencode($id) . '">Publish</a></span>';
+            echo '<span class="approve"><a href="/' . $this->slug . '?action=' . 'invoice' . '&id=' . urlencode($id) . '">Invoice</a></span>';
+
             echo '</p>';
             echo '</div></li>';
         }
@@ -65,22 +67,55 @@ class O3PO_Ready2PublishDashboard {
 
     }
 
-    public function insert_post() {
+    public function insert_post( $id ) {
+        $manuscript_info = $this->get_manuscript($id);
 
+        $post_type = $manuscript_info['post_type'];
         $postarr = [
-            XXX
-        ];
-        return wp_insert_post($postarr, true);
-    }
-
-    public function insert_and_display_post() {
-        $post = $this->insert_post();
-        if(is_wp_error($post))
-            XXX
+            'post_type' => $post_type,
+                    ];
+        $post_id = wp_insert_post($postarr, true);
+        if(is_wp_error($post_id))
+            return $post_id;
         else
-            header('Location: /post.php?post=' . $post . '&action=edit');
+        {
+            update_post_meta($post_id, $post_type . '_eprint', $manuscript_info['eprint']);
+        }
+
+        return $post_id;
     }
 
+    public function insert_and_display_post( $id ) {
+        $post_id = $this->insert_post($id);
+        if(is_wp_error($post_id))
+            echo "ERROR: " . $post_id->get_error_message();
+        else
+            header('Location: /post.php?post=' . $post_id . '&action=edit');
+    }
+
+
+
+    public function do_parse_request( $bool, $wp, $extra_query_vars ) {
+
+        $home_path = parse_url(home_url(), PHP_URL_PATH);
+        $path = trim(preg_replace("#^/?{$home_path}/#", '/', esc_url(add_query_arg(array()))), '/' );
+
+        if($path !== $this->slug)
+            return $bool;
+
+        $action = get_query_var( 'action', null );
+        switch($action)
+        {
+            case 'publish':
+                $id = get_query_var( 'id', null );
+                if($id !== null)
+                    $this->insert_and_display_post($id);
+                break;
+            default:
+                echo "unsupported action " . $action;
+        }
+        exit();
+    }
 
 
 }

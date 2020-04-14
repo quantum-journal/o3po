@@ -244,7 +244,7 @@ class O3PO {
         $this->ready2publish_form = new O3PO_Ready2PublishForm($this->plugin_name, $settings->get_field_value("ready2publish_slug"));
 
             //create the ready to publish dashboard
-        $this->ready2publish_dashboard = new O3PO_Ready2PublishDashboard($this->plugin_name, $this->get_plugin_pretty_name(), $settings->get_field_value("ready2publish_slug"), "Ready2Publish");
+        $this->ready2publish_dashboard = new O3PO_Ready2PublishDashboard($this->plugin_name, $this->get_plugin_pretty_name(), $settings->get_field_value("ready2publish_slug") . '-dashboard', "Ready2Publish");
 
             //create the publication types for each journal
         $this->primary_publication_type = new O3PO_PrimaryPublicationType($this->journal, $this->environment);
@@ -344,6 +344,7 @@ class O3PO {
         $this->loader->add_action('do_parse_request', $this->ready2publish_form, 'do_parse_request', PHP_INT_MAX, 2 );
 
         $this->loader->add_action('wp_dashboard_setup', $this->ready2publish_dashboard, 'setup');
+        $this->loader->add_action('do_parse_request', $this->ready2publish_dashboard, 'do_parse_request', PHP_INT_MAX, 2 );
 
 
 

@@ -97,7 +97,7 @@ abstract class O3PO_PublicForm {
             else
                 $this->field_values[$id] = $this->get_field_default($id);
         }
-        if($this->navigation === 'Upload')
+        if($this->navigation === 'Upload' and count($this->errors) === 0)
         {
             # Note: All files not handled will be automatically deleted by PHP
             foreach($this->fields as $id => $field_options)
@@ -387,7 +387,7 @@ abstract class O3PO_PublicForm {
             return $result;
         }
         else
-            return strip_tags($input);
+            return strip_tags($input); Also handle control chars, maybe use https://www.php.net/manual/en/filter.filters.sanitize.php?
     }
 
 

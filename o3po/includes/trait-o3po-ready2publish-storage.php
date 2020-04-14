@@ -41,24 +41,25 @@ trait O3PO_Ready2PublishStorage {
 
     public static function get_all_manuscripts() {
         return ['12345' => [
-            'eprint' => '1234.56789v4',
-            'title' => 'On Foo Bar',
-            'corresponding_author_email' => "foo@bar.com",
-            'abstract' => "Some boring abstract",
-            'author_first_names' => ['Christian', 'Marcus'],
-            'author_second_names' => ['Gogolin', 'Huber'],
-            'author_name_styles' => ['western', 'eastern'],
-            'popular_summary' => '',
-            'featured_image' => '',
-            'featured_image_caption' => '',
-            'multimedia_comment' => '',
-            'fermats_library' => '',
-            'payment_method' => '',
-            'invoice_recipient' => '',
-            'invoice_address' => '',
-            'invoice_vat_number' => '',
-            'author_comments' => '',
-                 ]];
+                'post_type' => 'paper',
+                'eprint' => '1234.56789v4',
+                'title' => 'On Foo Bar',
+                'corresponding_author_email' => "foo@bar.com",
+                'abstract' => "Some boring abstract",
+                'author_first_names' => ['Christian', 'Marcus'],
+                'author_second_names' => ['Gogolin', 'Huber'],
+                'author_name_styles' => ['western', 'eastern'],
+                'popular_summary' => '',
+                'featured_image' => '',
+                'featured_image_caption' => '',
+                'multimedia_comment' => '',
+                'fermats_library' => '',
+                'payment_method' => '',
+                'invoice_recipient' => '',
+                'invoice_address' => '',
+                'invoice_vat_number' => '',
+                'author_comments' => '',
+                            ]];
     }
 
     public static function get_all_unpublished_manuscripts() {

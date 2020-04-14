@@ -84,13 +84,13 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         $this->specify_section('payment_method', 'Payment method', null, 'payment');
         $this->specify_field('payment_method', Null, array($this, 'render_payment_method'), 'payment', 'payment_method', array(), array($this, 'one_of_paypal_invoice_transfer_waiver'), array());
 
-        #$this->specify_section('payment_paypal', 'Pay with PayPal', null, 'payment');
-
 
         $this->specify_section('payment_invoice', 'Invoicing information', null, 'payment');
         $this->specify_field('invoice_recipient', 'Recipient', array( $this, 'render_invoice_recipient' ), 'payment', 'payment_invoice', array(), array($this, 'trim'), '');
         $this->specify_field('invoice_address', 'Address', array( $this, 'render_invoice_address' ), 'payment', 'payment_invoice', array(), array($this, 'trim'), '');
         $this->specify_field('invoice_vat_number', 'VAT number (if applicable)', array( $this, 'render_invoice_vat_number' ), 'payment', 'payment_invoice', array(), array($this, 'trim'), '');
+        Add field to specify payment amount
+
         $this->specify_field('comments', 'Comments', array( $this, 'render_comments' ), 'payment', 'payment_invoice', array(), array($this, 'trim'), '');
 
         #$this->specify_section('payment_transfer', 'Pay by bank transfer', null, 'payment');
