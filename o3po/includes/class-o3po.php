@@ -344,7 +344,7 @@ class O3PO {
         $this->loader->add_action('do_parse_request', $this->ready2publish_form, 'do_parse_request', PHP_INT_MAX, 2 );
 
         $this->loader->add_action('wp_dashboard_setup', $this->ready2publish_dashboard, 'setup');
-        $this->loader->add_action('do_parse_request', $this->ready2publish_dashboard, 'do_parse_request', PHP_INT_MAX, 2 );
+        $this->loader->add_action('do_parse_request', $this->ready2publish_dashboard, 'do_parse_request', PHP_INT_MAX, 3 );
 
 
 
