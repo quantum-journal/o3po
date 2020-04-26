@@ -55,7 +55,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         $this->specify_field('eprint', 'ArXiv identifier', array( $this, 'render_eprint_field' ), 'basic_manuscript_data', 'basic_manuscript_data', array(), array($this, 'validate_eprint_fetch_meta_data_check_license_and_store_in_session'), '');
         $this->specify_field('agree_to_publish', 'Consent to publish', array( $this, 'render_agree_to_publish' ), 'basic_manuscript_data', 'basic_manuscript_data', array(), array($this, 'checked'), 'unchecked');
         $this->specify_field('acceptance_code', 'Acceptance code', array( $this, 'render_acceptance_code' ), 'basic_manuscript_data', 'basic_manuscript_data', array(), array($this, 'validate_acceptance_code'), '');
-        $this->specify_field('corresponding_author_email', 'Email', array( $this, 'render_corresponding_author_email' ), 'basic_manuscript_data', 'basic_manuscript_data', array(), array($this, 'validate_email'), '');
+        $this->specify_field('corresponding_author_email', 'Corresponding author email', array( $this, 'render_corresponding_author_email' ), 'basic_manuscript_data', 'basic_manuscript_data', array(), array($this, 'validate_email'), '');
 
         $this->specify_page('meta_data', 'Manuscript meta-data');
         $this->specify_section('manuscript_data', 'Meta-data', array($this, 'render_manuscript_data_section'), 'meta_data');
@@ -69,7 +69,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
         $this->specify_page('dissemination', 'Dissemination options');
 
-        $this->specify_section('dissemination_material', 'Dissemination material', array($this, 'render_dissemination_material_section'), 'dissemination');
+        $this->specify_section('dissemination_material', 'Optional material', array($this, 'render_dissemination_material_section'), 'dissemination');
 
         $this->specify_field('popular_summary', 'Popular summary', array( $this, 'render_popular_summary' ), 'dissemination', 'dissemination_material', array(), array($this, 'trim'), '');
         $this->specify_field('featured_image_upload', 'Featured image', array( $this, 'render_featured_image_upload' ), 'dissemination', 'dissemination_material', array(), array($this, 'validate_featured_image_upload'), '');
@@ -86,10 +86,10 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
 
         $this->specify_section('payment_invoice', 'Invoicing information', null, 'payment');
+        $this->specify_field('payment_amount', Null, array($this, 'render_payment_amount'), 'payment', 'payment_invoice', array(), array($this, 'validate_positive_integer'), array());
         $this->specify_field('invoice_recipient', 'Recipient', array( $this, 'render_invoice_recipient' ), 'payment', 'payment_invoice', array(), array($this, 'trim'), '');
         $this->specify_field('invoice_address', 'Address', array( $this, 'render_invoice_address' ), 'payment', 'payment_invoice', array(), array($this, 'trim'), '');
         $this->specify_field('invoice_vat_number', 'VAT number (if applicable)', array( $this, 'render_invoice_vat_number' ), 'payment', 'payment_invoice', array(), array($this, 'trim'), '');
-        Add field to specify payment amount
 
         $this->specify_field('comments', 'Comments', array( $this, 'render_comments' ), 'payment', 'payment_invoice', array(), array($this, 'trim'), '');
 
@@ -110,12 +110,12 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
     public function render_acceptance_code() {
         echo '<div style="float:left;">';
-        $this->render_single_line_field('acceptance_code', null, 'off', '', 'Please enter the acceptance code sent to you in the notification of acceptance.', true, 'display:block;');
+        $this->render_single_line_field('acceptance_code', null, 'off', '', 'Please enter the acceptance code sent to you in the email from Scholastica notifyng you of the acceptance of your manuscript.', true, 'display:block;');
         echo '</div>';
     }
 
     public function render_popular_summary() {
-        $this->render_multi_line_field('popular_summary', 12, 'width:100%', true);
+        $this->render_multi_line_field('popular_summary', 12, 'width:100%', true, '');
     }
 
     public function render_featured_image_caption() {
@@ -126,7 +126,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
     public function render_fermats_library() {
 
         $settings = O3PO_Settings::instance();
-        $this->render_checkbox_field('fermats_library', 'All authors want this paper to appear on <a href="'. esc_attr($settings->get_field_value('fermats_library_about_url')) . ' target="_blank">Fermat\'s library</a>.', false);
+        $this->render_checkbox_field('fermats_library', 'All authors want this paper to appear on <a href="'. esc_attr($settings->get_field_value('fermats_library_about_url')) . ' target="_blank">Fermat\'s library</a>. Fermat\'s library is a platform on which readers can leave comments in publish research articles.', false);
     }
 
     public function render_featured_image_upload() {
@@ -134,8 +134,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         $id = 'featured_image_upload';
         $upload_max_filesize = O3PO_Environment::max_file_upload_bytes();
 
-        $this->render_image_upload_field($id, 'Image must be in jpg or png format, have a white background, and an aspect ratio of 2:1. The maximum file size is ' . ($upload_max_filesize > 1024 ? (round($upload_max_filesize/1024, 2)) . 'M' : $upload_max_filesize) . 'B.');
-
+        $this->render_image_upload_field($id, 'Image must be in jpg or png format, have a white background, and an aspect ratio of 2:1. The maximum file size is ' . ($upload_max_filesize > 1024 ? (round($upload_max_filesize/1024, 2)) . 'M' : $upload_max_filesize) . 'B. The featured image appears on the Quantum homepage, e.g., <a href="/papers/">in the list of published papers</a>, and on social media. A good image helps draw attention to your article.');
     }
 
 
@@ -278,7 +277,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         $author_first_names = $this->get_field_value('author_first_names');
         $author_second_names = $this->get_field_value('author_second_names');
 
-        echo '<p>Please help us identify which part(s) of the authors\' names belong to the first and which to their second name(s) as well as which part is their given name (e.g., in Chinese names the given name comes after the family name, whereas in western cultures the given name is the first name). We are aware that this format does not do justice to <a href="https://www.w3.org/International/questions/qa-personal-names">all common name styles around the world</a>, but names in this format are needed for the registration of DOIs with Crossref.</p>';
+        echo '<p>Please help us identify which part(s) of the authors\' names belong to the first and which to their second name(s) as well as which part is their given name (e.g., in Chinese names the given name comes after the family name, whereas in Spain the given name is the first name and family names are the second names). We are aware that this format does not do justice to <a href="https://www.w3.org/International/questions/qa-personal-names">all common name styles around the world</a>, but names in this format are needed for the registration of DOIs with Crossref.</p>';
         echo '<div id="' . $this->plugin_name . '-' . $this->slug . '-author-list">';
         foreach($author_first_names as $x => $foo)
         {
@@ -340,6 +339,17 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
     }
 
+    public function render_payment_amount() {
+        $this->render_select_field('author_name_styles[' . $x . ']', [
+                                       array('value' => '450',
+                                             'description' => '450€ Default fee for manuscripts submitted from 01.05.2020 on'),
+                                       array('value' => '200',
+                                             'description' => '200€ Default fee for manuscripts submitted before 01.05.2020'),
+                                       array('value' => '100',
+                                             'description' => '100€ Discount fee'),
+                                                                      ]);
+    }
+
     public static function render_ready2publish_settings() {
 
         echo '<p>Configure the form for submission of accepted manuscripts ready for publication.</p>';
@@ -356,7 +366,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
     public function render_corresponding_author_email() {
 
         echo '<div style="float:left;">';
-        $this->render_single_line_field('corresponding_author_email', 'mail@provider.com', 'on', 'width:25em;max-width:100%;', 'Please enter the email you wish to use for correspondence.', true, 'display:block;');
+        $this->render_single_line_field('corresponding_author_email', 'mail@provider.com', 'on', 'width:25em;max-width:100%;', 'Please enter the email you wish to use for correspondence. We will use it to send you a notification email once the paper is online and store it so we can get in touch with our authors should the need arise. We will will not send you newsletters or any other kind of recurring automated emails to this address and it will not be published.', true, 'display:block;');
         echo '</div>';
     }
 
@@ -374,7 +384,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
     public function render_basic_manuscript_data_section() {
 
         $settings = O3PO_Settings::instance();
-        echo 'Data entered into this form remains valid for 24hours after the last interaction unless you close your browser window. If you have questions or encounter any problems please <a href="mailto:' . esc_attr($settings->get_field_value('publisher_email')) . '">contact us</a>.';
+        echo 'Data entered into this form remains valid for 24 hours after the last interaction unless you close your browser window. If you have questions or encounter any problems please <a href="mailto:' . esc_attr($settings->get_field_value('publisher_email')) . '">contact us</a>.';
     }
 
     public function render_manuscript_data_section() {
@@ -384,7 +394,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
     public function render_dissemination_material_section() {
 
-        echo '<p>Please provide optional dissemination material. Also here you may use LaTeX formulas in the popular summary and the feature image caption.</p>';
+        echo '<p>Now you can add a popular summary and multimedia to your article. These steps are optional, but they can help you reach a larger audience. Also here you may use LaTeX formulas in the popular summary and the feature image caption.</p>';
     }
 
 
@@ -413,6 +423,8 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
     }
 
     public function render_payment_method() {
+        echo '<p>Quantum is a non-profit journal, supported by voluntary publication fees - for a full explanation and break-down of running costs see <a href="https://quantum-journal.org/update-on-quantums-publication-fees/">this blog post</a>. If you are able to afford the publication fee (for example through your funding agency), we thank you for your support.</p>';
+
         $this->render_select_field('payment_method', [
                                        array('value' => 'invoice',
                                              'description' => 'Request invoice'),
@@ -435,7 +447,7 @@ case "invoice":
 explanationP.innerHTML = "Please provide the following information so that we can write an invoice. The invoice can then be payed later via bank transfer or PayPal by, e.g., the administration of your institution. Instructions will be sent to you by email together with the invoice."
 break;
 case "waiver":
-explanationP.innerHTML = "We offer a progressive waiver policy so that authors who cannot cover their open-access fees are not excluded from publishing. Your article processing charge can be waived. Please only chose this option if you cannot support the journal."
+explanationP.innerHTML = "We offer a progressive waiver policy so that authors who cannot cover their open-access fees are not excluded from publishing. Your article processing charge can be waived."
 break;
 case "paypal":
 explanationP.innerHTML = "After submitting this form you will receive an email with instructions on how to pay your article processing charge via PayPal.";
