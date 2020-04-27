@@ -86,7 +86,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
 
         $this->specify_section('payment_invoice', 'Invoicing information', null, 'payment');
-        $this->specify_field('payment_amount', Null, array($this, 'render_payment_amount'), 'payment', 'payment_invoice', array(), array($this, 'validate_positive_integer'), array());
+        $this->specify_field('payment_amount', 'Amount', array($this, 'render_payment_amount'), 'payment', 'payment_invoice', array(), array($this, 'validate_positive_integer'), array());
         $this->specify_field('invoice_recipient', 'Recipient', array( $this, 'render_invoice_recipient' ), 'payment', 'payment_invoice', array(), array($this, 'trim_strip_tags'), '');
         $this->specify_field('invoice_address', 'Address', array( $this, 'render_invoice_address' ), 'payment', 'payment_invoice', array(), array($this, 'trim_strip_tags'), '');
         $this->specify_field('invoice_vat_number', 'VAT number (if applicable)', array( $this, 'render_invoice_vat_number' ), 'payment', 'payment_invoice', array(), array($this, 'trim_strip_tags'), '');
@@ -340,7 +340,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
     }
 
     public function render_payment_amount() {
-        $this->render_select_field('author_name_styles[' . $x . ']', [
+        $this->render_select_field('payment_amount', [
                                        array('value' => '450',
                                              'description' => '450€ Default fee for manuscripts submitted from 01.05.2020 on'),
                                        array('value' => '200',

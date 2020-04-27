@@ -388,8 +388,8 @@ abstract class O3PO_PublicForm {
         }
         else
         {
-            $sring = iconv("UTF-8","UTF-8//IGNORE", $input);
-            $sring = preg_replace('/[[:^print:]]/u', '', $string);
+            $string = iconv("UTF-8","UTF-8//IGNORE", $input);
+            $string = preg_replace('/[[:^print:]]/u', '', $string);
             return $string;
         }
     }
