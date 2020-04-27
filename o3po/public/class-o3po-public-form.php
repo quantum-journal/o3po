@@ -387,7 +387,11 @@ abstract class O3PO_PublicForm {
             return $result;
         }
         else
-            return strip_tags($input); Also handle control chars, maybe use https://www.php.net/manual/en/filter.filters.sanitize.php?
+        {
+            $sring = iconv("UTF-8","UTF-8//IGNORE", $input);
+            $sring = preg_replace('/[[:^print:]]/u', '', $string);
+            return $string;
+        }
     }
 
 
@@ -594,7 +598,7 @@ abstract class O3PO_PublicForm {
                 $this_name = substr($name, 0, $this->fields[$id]['max_length']);
             else
                 $this_name = $name;
-            $this_name = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/u', '', $this_name); #strip some nasty non-printable characters
+            $this_name = strip_tags($this_name);
             $result[$key] = $this_name;
         }
 

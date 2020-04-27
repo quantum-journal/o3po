@@ -654,6 +654,22 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         return trim($input);
     }
 
+        /**
+         * Trim user input to field
+         *
+         * @since    0.3.0
+         * @access   private
+         * @param    string   $id    The field this was input to.
+         * @param    string   $input    User input.
+         */
+    public function trim_strip_tags( $id, $input ) {
+
+        $input = trim($input);
+        $trimmed_striped_input = strip_tags($input);
+        if($trimmed_striped_input !== $input)
+            $this->add_error( $id, 'tags-stripped', "The field '" . $this->fields[$id]['title'] . "' cannot contain html tags. Tags were removed.", 'error');
+        return $trimmed_striped_input;
+    }
 
         /**
          * Leave user input to field unchanged.

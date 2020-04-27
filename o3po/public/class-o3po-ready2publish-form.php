@@ -59,8 +59,8 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
         $this->specify_page('meta_data', 'Manuscript meta-data');
         $this->specify_section('manuscript_data', 'Meta-data', array($this, 'render_manuscript_data_section'), 'meta_data');
-        $this->specify_field('title', 'Title', array( $this, 'render_title' ), 'meta_data', 'manuscript_data', array(), array($this, 'trim'), '');
-        $this->specify_field('abstract', 'Abstract', array( $this, 'render_abstract' ), 'meta_data', 'manuscript_data', array(), array($this, 'trim'), '');
+        $this->specify_field('title', 'Title', array( $this, 'render_title' ), 'meta_data', 'manuscript_data', array(), array($this, 'trim_strip_tags'), '');
+        $this->specify_field('abstract', 'Abstract', array( $this, 'render_abstract' ), 'meta_data', 'manuscript_data', array(), array($this, 'trim_strip_tags'), '');
 
         $this->specify_section('author_data', 'Authors', array($this, 'render_author_data'), 'meta_data', array($this, 'render_author_data_summary')); # We render everything here as part of the section and set the render callable of the fields to Null
         $this->specify_field('author_first_names', Null, Null, 'meta_data', 'author_data', array(), array($this, 'validate_array_of_at_most_1000_names'), array());
@@ -71,10 +71,10 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
         $this->specify_section('dissemination_material', 'Optional material', array($this, 'render_dissemination_material_section'), 'dissemination');
 
-        $this->specify_field('popular_summary', 'Popular summary', array( $this, 'render_popular_summary' ), 'dissemination', 'dissemination_material', array(), array($this, 'trim'), '');
+        $this->specify_field('popular_summary', 'Popular summary', array( $this, 'render_popular_summary' ), 'dissemination', 'dissemination_material', array(), array($this, 'trim_strip_tags'), '');
         $this->specify_field('featured_image_upload', 'Featured image', array( $this, 'render_featured_image_upload' ), 'dissemination', 'dissemination_material', array(), array($this, 'validate_featured_image_upload'), '');
-        $this->specify_field('featured_image_caption', 'Featured image caption', array( $this, 'render_featured_image_caption' ), 'dissemination', 'dissemination_material', array(), array($this, 'trim'), '');
-        $this->specify_field('dissemination_multimedia', 'Multi media', array( $this, 'render_dissemination_multimedia' ), 'dissemination', 'dissemination_material', array(), array($this, 'trim'), '');
+        $this->specify_field('featured_image_caption', 'Featured image caption', array( $this, 'render_featured_image_caption' ), 'dissemination', 'dissemination_material', array(), array($this, 'trim_strip_tags'), '');
+        $this->specify_field('dissemination_multimedia', 'Multi media', array( $this, 'render_dissemination_multimedia' ), 'dissemination', 'dissemination_material', array(), array($this, 'trim_strip_tags'), '');
 
         $this->specify_section('dissemination_fermats_library', 'Fermat\'s library', null, 'dissemination');
         $this->specify_field('fermats_library', 'Opt-in to Fermat\'s library', array( $this, 'render_fermats_library' ), 'dissemination', 'dissemination_fermats_library', array(), array($this, 'checked_or_unchecked'), 'unchecked');
@@ -87,11 +87,11 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
         $this->specify_section('payment_invoice', 'Invoicing information', null, 'payment');
         $this->specify_field('payment_amount', Null, array($this, 'render_payment_amount'), 'payment', 'payment_invoice', array(), array($this, 'validate_positive_integer'), array());
-        $this->specify_field('invoice_recipient', 'Recipient', array( $this, 'render_invoice_recipient' ), 'payment', 'payment_invoice', array(), array($this, 'trim'), '');
-        $this->specify_field('invoice_address', 'Address', array( $this, 'render_invoice_address' ), 'payment', 'payment_invoice', array(), array($this, 'trim'), '');
-        $this->specify_field('invoice_vat_number', 'VAT number (if applicable)', array( $this, 'render_invoice_vat_number' ), 'payment', 'payment_invoice', array(), array($this, 'trim'), '');
+        $this->specify_field('invoice_recipient', 'Recipient', array( $this, 'render_invoice_recipient' ), 'payment', 'payment_invoice', array(), array($this, 'trim_strip_tags'), '');
+        $this->specify_field('invoice_address', 'Address', array( $this, 'render_invoice_address' ), 'payment', 'payment_invoice', array(), array($this, 'trim_strip_tags'), '');
+        $this->specify_field('invoice_vat_number', 'VAT number (if applicable)', array( $this, 'render_invoice_vat_number' ), 'payment', 'payment_invoice', array(), array($this, 'trim_strip_tags'), '');
 
-        $this->specify_field('comments', 'Comments', array( $this, 'render_comments' ), 'payment', 'payment_invoice', array(), array($this, 'trim'), '');
+        $this->specify_field('comments', 'Comments', array( $this, 'render_comments' ), 'payment', 'payment_invoice', array(), array($this, 'trim_strip_tags'), '');
 
         #$this->specify_section('payment_transfer', 'Pay by bank transfer', null, 'payment');
 
@@ -394,7 +394,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
     public function render_dissemination_material_section() {
 
-        echo '<p>Now you can add a popular summary and multimedia to your article. These steps are optional, but they can help you reach a larger audience. Also here you may use LaTeX formulas in the popular summary and the feature image caption.</p>';
+        echo '<p>Now you can add a popular summary and other supporting material to your article. These steps are optional, but they can help you reach a larger audience. Also here you may use LaTeX formulas in the popular summary and the feature image caption.</p>';
     }
 
 
