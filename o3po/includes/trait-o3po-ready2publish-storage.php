@@ -20,15 +20,6 @@
  */
 trait O3PO_Ready2PublishStorage {
 
-        /**
-         * Slug of this storage.
-         *
-         * @since 0.3.1+
-         * @access protected
-         * @var string $slug Slug of the storage.
-         */
-    protected $slug;
-
     public static function store_manuscript($manuscript_info) {
 
     }
