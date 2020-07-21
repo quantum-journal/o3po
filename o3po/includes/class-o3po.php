@@ -103,6 +103,15 @@ class O3PO {
 	protected $ready2publish_form;
 
         /**
+         * The ready to publish dashboard.
+         *
+         * @since    0.3.1+
+         * @access   protected
+         * @var      O3PO_Ready2Publish_Dashboard    $ready2publish_dashboard    The ready to publish dashboard.
+         */
+    protected $ready2publish_dashboard;
+
+        /**
          * The primary publication type.
          *
          * @since    0.1.0
