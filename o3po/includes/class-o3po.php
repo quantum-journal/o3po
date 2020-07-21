@@ -241,7 +241,7 @@ class O3PO {
         $this->journal_secondary = static::setup_secondary_journal($settings);
 
             //create the ready to publish form
-        $this->ready2publish_form = new O3PO_Ready2PublishForm($this->plugin_name, $settings->get_field_value("ready2publish_slug"));
+        $this->ready2publish_form = new O3PO_Ready2PublishForm($this->plugin_name, $settings->get_field_value("ready2publish_slug"), $this->environment);
 
             //create the ready to publish dashboard
         $this->ready2publish_dashboard = new O3PO_Ready2PublishDashboard($this->plugin_name, $this->get_plugin_pretty_name(), $settings->get_field_value("ready2publish_slug") . '-dashboard', "Ready2Publish");

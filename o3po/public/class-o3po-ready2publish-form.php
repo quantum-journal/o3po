@@ -33,10 +33,13 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
     }
 
-    public function __construct( $plugin_name, $slug ) {
+    private $environment;
+
+    public function __construct( $plugin_name, $slug, $environment ) {
 
         parent::__construct($plugin_name, $slug, 'Submit your manuscript for publication');
         $this->specify_pages_sections_and_fields();
+        $this->environment = $environment;
 
     }
 
@@ -134,7 +137,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         $id = 'featured_image_upload';
         $upload_max_filesize = O3PO_Environment::max_file_upload_bytes();
 
-        $this->render_image_upload_field($id, 'Image must be in jpg or png format, have a white background, and an aspect ratio of 2:1. The maximum file size is ' . ($upload_max_filesize > 1024 ? (round($upload_max_filesize/1024, 2)) . 'M' : $upload_max_filesize) . 'B. The featured image appears on the Quantum homepage, e.g., <a href="/papers/">in the list of published papers</a>, and on social media. A good image helps draw attention to your article.');
+        $this->render_image_upload_field($id, 'Image must be in jpg or png format, have a white background, and an aspect ratio of 2:1. The maximum file size is ' . ($upload_max_filesize > 1024 ? (round($upload_max_filesize/1024, 2)) . 'M' : $upload_max_filesize) . 'B. The featured image appears on the Quantum homepage, e.g., <a href="/papers/">in the list of published papers</a>, and on social media. A good image helps draw attention to your article.', false);
     }
 
 
@@ -342,11 +345,13 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
     public function render_payment_amount() {
         $this->render_select_field('payment_amount', [
                                        array('value' => '450',
-                                             'description' => '450€ Default fee for manuscripts submitted from 01.05.2020 on'),
+                                             'description' => '450€ Regular publication fee (for manuscripts submitted from 01.05.2020 on)'),
+                                       array('value' => '2250',
+                                             'description' => '225€ Half regular publication fee (for flitting the fee)'),
                                        array('value' => '200',
-                                             'description' => '200€ Default fee for manuscripts submitted before 01.05.2020'),
+                                             'description' => '200€ Old publication fee (for manuscripts submitted before May 1st 2020)'),
                                        array('value' => '100',
-                                             'description' => '100€ Discount fee'),
+                                             'description' => '100€ Discount publication fee'),
                                                                       ]);
     }
 
@@ -373,11 +378,77 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
     public function on_submit() {
 
+            // This is just a temporary solution.
+            // In the long run the papers in the queue will be displayed
+            // on the admin page and publishing can be directly initiated
+            // from there.
+        $settings = O3PO_Settings::instance();
+        $to = ($this->environment->is_test_environment() ? $settings->get_field_value('developer_email') : "publish@quantum-journal.org" );
+        $to = "publish@quantum-journal.org";
+        $headers = array( 'From: ' . $settings->get_field_value('publisher_email'), 'Content-Type: text/html; charset=UTF-8');
+        $subject  = "TEST " . $this->get_field_value('title');
+
+        $message = "The following manuscript was submitted for publication:" . "\n";
+        foreach($this->sections as $section_id => $section_options)
+        {
+            $message .= "\n" . '<h3 id="' . esc_attr($section_id) . '">' . esc_html($section_options['title']) . ':</h3>';
+            if($section_options['summary_callback'] !== null)
+            {
+                $message .= call_user_func($section_options['summary_callback']);
+            }
+            else
+            {
+                foreach($this->fields as $id => $field_options) {
+                    if($field_options['section'] !== $section_id)
+                        continue;
+                    $message .= "\n" . '<h4>' . esc_html($field_options['title']) . '</h4>';
+                    $value = $this->get_field_value($id);
+                    if(is_array($value))
+                    {
+                        foreach($value as $val)
+                            $message .= '<p>' . (!empty($val) ? esc_html($val) : 'Not provided') . '</p>' . "\n";
+                    }
+                    else
+                    {
+                        $result = $this->get_session_data('file_upload_result_' . $id);
+                        if(empty($result['error']) and !empty($result['user_name']))
+                            $message .= '<p>' . esc_html($result['user_name']) . '</p>';
+                        else
+                            $message .= '<p>' . (!empty($value) ? esc_html($value) : 'Not provided') . '</p>';
+                    }
+                }
+            }
+        }
+        $file_upload_result = $this->get_session_data('file_upload_result_' . 'featured_image_upload');
+        $attachment = array($file_upload_result['file']);
+
+        $successfully_sent = wp_mail( $to, $subject, $message, $headers, $attachment);
+            // send it also to the corresponding author
+        if($successfully_sent)
+        {
+            $to = $this->get_field_value('corresponding_author_email');
+            $successfully_sent = wp_mail($to, $subject, $message, $headers, $attachment);
+        }
+
+        return $successfully_sent;
     }
 
 
-    public function submitted_message() {
-        return 'Thank you! Your manuscript will be processed by our team.';
+    public function submitted_message( $submitted_successfully ) {
+        if($submitted_successfully)
+        {
+            $message = '<p>Thank you for preparing your manuscript for publication! The information you provided was safely recorded.</p>';
+            $message .= '<p>If you requested an invoice, there is nothing else you need to do at the moment. Our team will issue the invoice and get back to you in the coming days.</p>';
+            $message .= '<p>If you chose to pay now with any of the listed payment options, please proceed to the payment page.</p>';
+            $message .= '<form action="/payment/"><input type="submit" value="proceed to payment" style="float:right;" /></form>';
+
+            return $message;
+        }
+        else
+        {
+            $settings = O3PO_Settings::instance();
+            return 'Apologies, an error occurred while submitting your manuscript for publication. Please get in touch with our team via <a href="mailto:' . $settings->get_field_value('publisher_email') . '">' . $settings->get_field_value('publisher_email') . '</a>.';
+        }
     }
 
 
@@ -427,11 +498,13 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
         $this->render_select_field('payment_method', [
                                        array('value' => 'invoice',
-                                             'description' => 'Request invoice'),
-                                       array('value' => 'paypal',
-                                             'description' => 'Pay by PayPal now'),
+                                             'description' => 'Request invoice and pay later'),
                                        array('value' => 'transfer',
                                              'description' => 'Pay by bank transfer now'),
+                                       array('value' => 'card',
+                                             'description' => 'Pay by credit Card now'),
+                                       array('value' => 'paypal',
+                                             'description' => 'Pay by PayPal now'),
                                        array('value' => 'waiver',
                                              'description' => 'I require a waiver'),
                                                       ], 'onPaymentMethodChange()');
@@ -444,16 +517,19 @@ var paymentInvoice = document.getElementById("payment_invoice");
 var explanationP = document.getElementById("payment_method_explanation");
 switch(select.value) {
 case "invoice":
-explanationP.innerHTML = "Please provide the following information so that we can write an invoice. The invoice can then be payed later via bank transfer or PayPal by, e.g., the administration of your institution. Instructions will be sent to you by email together with the invoice."
+explanationP.innerHTML = "Please provide the following information so that we can issue an invoice. The invoice can then be payed later via bank transfer, credit card, or PayPal by, e.g., the administration of your institution. Instructions will be sent to you by email together with the invoice."
 break;
 case "waiver":
 explanationP.innerHTML = "We offer a progressive waiver policy so that authors who cannot cover their open-access fees are not excluded from publishing. Your article processing charge can be waived."
 break;
 case "paypal":
-explanationP.innerHTML = "After submitting this form you will receive an email with instructions on how to pay your article processing charge via PayPal.";
+explanationP.innerHTML = "After submitting this form you will be directed to the payment page to carry out the payment.";
+break;
+case "card":
+explanationP.innerHTML = "After submitting this form you will be directed to the payment page to carry out the payment.";
 break;
 case "transfer":
-explanationP.innerHTML = "After submitting this form you will receive an email with instructions on how to pay your article processing charge via bank transfer.";
+explanationP.innerHTML = "After submitting this form you will be directed to the payment page to carry out the payment.";
 break;
 }
 var nextSibling = paymentInvoice;
@@ -480,8 +556,10 @@ while(nextSibling) {
         $author_first_names = $this->get_field_value('author_first_names');
         $author_second_names = $this->get_field_value('author_second_names');
 
+        $out = '';
         foreach($author_first_names as $x => $foo)
-            echo '<p>' . esc_html($author_first_names[$x]) . ' ' . esc_html($author_second_names[$x]) . '</p>';
+            $out .= '<p>' . esc_html($author_first_names[$x]) . ' ' . esc_html($author_second_names[$x]) . '</p>';
 
+        return $out;
     }
 }

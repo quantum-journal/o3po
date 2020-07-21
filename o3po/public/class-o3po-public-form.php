@@ -34,6 +34,7 @@ abstract class O3PO_PublicForm {
     private $coming_from_page = false;
     private $page_to_display = false;
     private $navigation = false;
+    private $submitted_successfully = false;
 
     public function __construct( $plugin_name, $slug, $title ) {
 
@@ -144,7 +145,7 @@ abstract class O3PO_PublicForm {
         }
         elseif($this->navigation === 'Submit')
         {
-            $this->on_submit();
+            $this->submitted_successfully = $this->on_submit();
             $this->add_sideloaded_files_to_media_library();
         }
 
@@ -187,7 +188,7 @@ abstract class O3PO_PublicForm {
             if($this->navigation === 'Submit' and $this->coming_from_page !== false)
             {
                 $ret = '<script>window.history.replaceState(null, "", "/' . $this->slug . '")</script>';
-                $ret .= $this->submitted_message();
+                $ret .= $this->submitted_message($this->submitted_successfully);
                 return $ret;
             }
         }
@@ -237,7 +238,7 @@ abstract class O3PO_PublicForm {
     }
 
 
-    public function submitted_message() {
+    public function submitted_message( $submitted_successfully ) {
 
         return 'Thank you! Your request has been submitted.';
     }
@@ -514,7 +515,7 @@ abstract class O3PO_PublicForm {
          * @param    string   $label Label of the field. May contain html and is not escaped!
          */
     public function render_image_upload_field( $id, $label='', $esc_label=true ) {
-        $file_upload_result = $this->get_session_data('file_upload_result_' . $id);
+        $file_upload_result = $this->get_session_data('file_upload_result_' . 'featured_image_upload');
 
         if(!empty($file_upload_result['file']))
         {
@@ -643,7 +644,7 @@ abstract class O3PO_PublicForm {
             echo '<h3 id="' . esc_attr($section_id) . '">' . esc_html($section_options['title']) . '</h3>';
             if($section_options['summary_callback'] !== null)
             {
-               call_user_func($section_options['summary_callback']);
+                echo call_user_func($section_options['summary_callback']);
             }
             else
             {
