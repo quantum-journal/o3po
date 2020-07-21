@@ -384,7 +384,6 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
             // from there.
         $settings = O3PO_Settings::instance();
         $to = ($this->environment->is_test_environment() ? $settings->get_field_value('developer_email') : "publish@quantum-journal.org" );
-        $to = "publish@quantum-journal.org";
         $headers = array( 'From: ' . $settings->get_field_value('publisher_email'), 'Content-Type: text/html; charset=UTF-8');
         $subject  = "TEST " . $this->get_field_value('title');
 
