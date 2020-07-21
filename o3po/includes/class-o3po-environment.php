@@ -262,8 +262,8 @@ class O3PO_Environment {
                     // Generate the metadata for the attachment, and update the database record.
                 $attach_data = wp_generate_attachment_metadata( $attach_id, $filename );
                 $update_attachment_result = wp_update_attachment_metadata( $attach_id, $attach_data );
-                if($update_attachment_result === False)
-                    return array("error" => "Unable to update attachment meta-data.");
+                #if($update_attachment_result === False)
+                #    return array("error" => "Unable to update attachment meta-data." . json_encode($attach_data) . json_encode($attach_id) . json_encode($filename) . json_encode($attachment) );
 
 
                 $result['mime_type'] = $mime_type;
