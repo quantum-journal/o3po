@@ -104,6 +104,11 @@ form.search-form input.search-submit {
     {
         display: none !important;
     }
+
+    html
+    {
+	color: black !important
+    }
 }
 div.publication-action-buttons button {
     display: inline-block;
