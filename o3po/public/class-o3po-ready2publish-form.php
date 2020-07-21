@@ -306,7 +306,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
             echo '</div>';
         }
         echo '</div>';
-        echo'<script>
+        echo '<script>
         function addAuthor() {
             var item = document.getElementById("' . $this->plugin_name . '-' . $this->slug . '-author-list").lastElementChild;
             var clone = item.cloneNode(true);
