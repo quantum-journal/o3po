@@ -268,7 +268,27 @@ var search_field = document.getElementsByClassName("search-field");
 
     }
 
+        /**
+         * Clean \newline and \protect from search queries to fix the title
+         * click feature for authors using those in their title
+         *
+         * To be added to the 'parse_query' action.
+         *
+         * @since      0.3.1+
+         * @access     public
+         * @param      WP_Query    $query_object      Query that lead to the current search.
+         */
+    public function clean_newline_and_protect_from_search_string( $query_object ) {
+        if( $query_object->is_search() ) {
+            $raw_search = $query_object->query['s'];
+            $raw_search = str_replace('\\newline', '', $raw_search);
+            $raw_search = str_replace('\\protect', '', $raw_search);
 
+            if($raw_search) {
+                $query_object->set('s', $raw_search);
+            }
+        }
+    }
 
         /**
          * Add a help text for listing pages showing posts from the secondary journal just before the loop starts.
