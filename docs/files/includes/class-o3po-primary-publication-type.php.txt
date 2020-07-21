@@ -138,9 +138,9 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             if(!empty($fetch_meta_data_from_abstract_page_result['arxiv_fetch_results']))
                 $arxiv_fetch_results .= $fetch_meta_data_from_abstract_page_result['arxiv_fetch_results'];
             if(!empty($fetch_meta_data_from_abstract_page_result['abstract']))
-                $new_abstract = $fetch_meta_data_from_abstract_page_result['abstract'];
+                $new_abstract = addslashes($fetch_meta_data_from_abstract_page_result['abstract']);
             if(!empty($fetch_meta_data_from_abstract_page_result['title']))
-                update_post_meta( $post_id, $post_type . '_title', $fetch_meta_data_from_abstract_page_result['title'] );
+                update_post_meta( $post_id, $post_type . '_title', addslashes($fetch_meta_data_from_abstract_page_result['title']));
             if(!empty($fetch_meta_data_from_abstract_page_result['number_authors']))
                 update_post_meta( $post_id, $post_type . '_number_authors', $fetch_meta_data_from_abstract_page_result['number_authors'] );
             if(!empty($fetch_meta_data_from_abstract_page_result['author_given_names']))
@@ -154,7 +154,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             $arxiv_fetch_results .= "WARNING: No meta-data was fetched from the arXiv this time, but there were errors or warnings during the last fetch. Please make sure to resolve all of them manually or trigger a new fetch attempt by ticking the corresponding box below.\n";
 
         update_post_meta( $post_id, $post_type . '_arxiv_fetch_results', $arxiv_fetch_results );
-		update_post_meta( $post_id, $post_type . '_abstract', $new_abstract );
+		update_post_meta( $post_id, $post_type . '_abstract', $new_abstract);
 		update_post_meta( $post_id, $post_type . '_abstract_mathml', $new_abstract_mathml );
 		update_post_meta( $post_id, $post_type . '_eprint', $new_eprint );
 		update_post_meta( $post_id, $post_type . '_fermats_library', $new_fermats_library );
