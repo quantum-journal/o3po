@@ -2501,14 +2501,39 @@ abstract class O3PO_PublicationType {
             $timestamps[] = $ads_bibentries_timestamp;
         }
 
+        $date_published = get_post_meta( $post_id, $post_type . '_date_published', true );
+        $year_published = intval(mb_substr($date_published, 0, 4));
         $citation_number = 0;
+        $citing_dois_published_in_year = array();
+        $citing_dois_in_two_years_preceeding = array();
         foreach($all_bibentries as $bibentry)
         {
             $citation_number += 1;
             $cited_by_html .= '<p class="break">' . '[' . esc_html($citation_number) . '] ';
             $cited_by_html .= $bibentry->get_formated_html($doi_url_prefix, $arxiv_url_abs_prefix);
             $cited_by_html .= '</p>' . "\n";
+
+            $year = $bibentry->get('year');
+            $bibentry_doi = $bibentry->get('doi');
+            if(!empty($year) and !empty($bibentry_doi))
+            {
+                $year = intval($year);
+                if(!isset($journal_citations_per_year[$year]))
+                    $citing_dois_published_in_year[$year] = array();
+                $citing_dois_published_in_year[$year][] = $bibentry_doi;
+            }
+            foreach([1, 2] as $offset)
+            {
+                if(!isset($citing_dois_in_two_years_preceeding[$year_published+$offset]))
+                    $citing_dois_in_two_years_preceeding[$year_published+$offset] = array();
+                if($year_published+$offset === $year)
+                    $citing_dois_in_two_years_preceeding[$year_published+$offset][] = $bibentry_doi;
+            }
         }
+        ksort($citing_dois_published_in_year);
+        ksort($citing_dois_in_two_years_preceeding);
+
+
 
         if(!empty($sources))
             $cited_by_html .= '<p>The above citations are from ' . implode($sources, ' and ') . '. The list may be incomplete as not all publishers provide suitable and complete citation data.</p>';
@@ -2525,6 +2550,8 @@ abstract class O3PO_PublicationType {
             'errors' => $errors,
             'sources' => $sources,
             'timestamps' => $timestamps,
+            'citing_dois_published_in_year' => $citing_dois_published_in_year,
+            'citing_dois_in_two_years_preceeding' => $citing_dois_in_two_years_preceeding,
                      );
     }
 
@@ -3132,6 +3159,9 @@ abstract class O3PO_PublicationType {
         $citations_this_type = array();
         $my_query = new WP_Query( $query );
 
+        $all_citing_dois_published_in_year = array();
+        $all_citing_dois_in_two_years_preceeding = array();
+        $all_papers_published_in_two_years_preceeding = array();
         if ( $my_query->have_posts() ) {
             $num = 0;
             while ( $my_query->have_posts() ) {
@@ -3139,7 +3169,32 @@ abstract class O3PO_PublicationType {
                 $my_query->the_post();
 
                 $post_id = get_the_ID();
+                $date_published = get_post_meta( $post_id, $post_type . '_date_published', true );
+                $year_published = intval(mb_substr($date_published, 0, 4));
+                foreach([1, 2] as $offset)
+                {
+                    if(!isset($all_papers_published_in_two_years_preceeding[($year_published+$offset)]))
+                        $all_papers_published_in_two_years_preceeding[($year_published+$offset)] = 0;
+                    $all_papers_published_in_two_years_preceeding[($year_published+$offset)] += 1;
+                }
                 $cited_by_data = $this->get_cited_by_data($post_id, $fetch_if_outdated);
+
+                $citing_dois_published_in_year = $cited_by_data['citing_dois_published_in_year'];
+                foreach($citing_dois_published_in_year as $year => $citing_dois){
+                    if(!isset($all_citing_dois_published_in_year[$year]))
+                        $all_citing_dois_published_in_year[$year] = array();
+                    $all_citing_dois_published_in_year[$year] = array_unique(array_merge($all_citing_dois_published_in_year[$year], $citing_dois));
+                }
+                ksort($all_citing_dois_published_in_year);
+
+                $citing_dois_in_two_years_preceeding = $cited_by_data['citing_dois_in_two_years_preceeding'];
+                foreach($citing_dois_in_two_years_preceeding as $year => $citing_dois){
+                    if(!isset($all_citing_dois_in_two_years_preceeding[$year]))
+                        $all_citing_dois_in_two_years_preceeding[$year] = array();
+                    $all_citing_dois_in_two_years_preceeding[$year] = array_unique(array_merge($all_citing_dois_in_two_years_preceeding[$year], $citing_dois));
+                }
+                ksort($all_citing_dois_in_two_years_preceeding);
+
                 if(!empty($cited_by_data['errors']))
                     $errors = array_merge($errors, $cited_by_data['errors']);
 
@@ -3155,6 +3210,9 @@ abstract class O3PO_PublicationType {
         $out = array(
             'citation_count' => $citations_this_type,
             'errors' => $errors,
+            'all_citing_dois_published_in_year' => $all_citing_dois_published_in_year,
+            'all_citing_dois_in_two_years_preceeding' => $all_citing_dois_in_two_years_preceeding,
+            'all_papers_published_in_two_years_preceeding' => $all_papers_published_in_two_years_preceeding,
                      );
         if(!empty($timestamps))
         {

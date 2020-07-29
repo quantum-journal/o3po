@@ -269,8 +269,7 @@ class O3PO_Admin {
             $doi_prefix = $settings->get_field_value('doi_prefix');
             $doi_url_prefix = $settings->get_field_value('doi_url_prefix');
             $cited_by_refresh_seconds = $settings->get_field_value('cited_by_refresh_seconds');
-            #$first_volume_year = $settings->get_field_value('first_volume_year');
-            #$start_date = $first_volume_year . '-01-01';
+            $first_volume_year = $settings->get_field_value('first_volume_year');
 
             $fetch_if_outdated = false;
             if(isset($_POST['refresh']) and $_POST['refresh'] === 'checked')
@@ -315,7 +314,7 @@ class O3PO_Admin {
                     if($num <= 0)
                         break;
                 }
-                $html .= '</table>' ;
+                $html .= '</table>';
 
                 $delta_x = 1;
                 while($max_citations/$delta_x > 25)
@@ -330,7 +329,41 @@ class O3PO_Admin {
 <tr><td style="text-align: right;">Total number of citations:</td><td style="text-align: left;">' . array_sum($citations_this_type) . '</td></tr>
 <tr><td style="text-align: right;">Mean number of citations:</td><td style="text-align: left;">' . O3PO_Utility::array_mean($citations_this_type) . '</td></tr>
 <tr><td style="text-align: right;">Median number of citations:</td><td style="text-align: left;">' . O3PO_Utility::array_median($citations_this_type) . '</td></tr></table>';
+
+                $all_citing_dois_published_in_year = $citations_data['all_citing_dois_published_in_year'];
+                $html .= '<table><tr><td>Year</td><td>Citations with DOI</td><td>Citations to ' . O3PO_PublicationType::get_active_publication_types($post_type)->get_publication_type_name_plural() .' from two preceding years</td><td>' . ucfirst(O3PO_PublicationType::get_active_publication_types($post_type)->get_publication_type_name_plural()) .' in preceding two years</td><td>Journal Impact Factor</td></tr>';
+                foreach($all_citing_dois_published_in_year as $year => $all_citing_dois)
+                {
+                    $html .= '<tr>';
+                    $html .= '<td>' . $year . '</td>';
+                    $html .= '<td style="text-align: right;">' . count($all_citing_dois) . '</td>';
+                    $all_citations_with_doi_in_two_years_preceeding = 0;
+                    if(isset($citations_data['all_citing_dois_in_two_years_preceeding'][$year]))
+                        $all_citations_with_doi_in_two_years_preceeding = count($citations_data['all_citing_dois_in_two_years_preceeding'][$year]);
+
+                    $html .= '<td style="text-align: right;">' . $all_citations_with_doi_in_two_years_preceeding . '</td>';
+
+                    $papers_published_in_two_years_preceeding = 0;
+                    if(isset($citations_data['all_papers_published_in_two_years_preceeding'][$year]))
+                        $papers_published_in_two_years_preceeding = $citations_data['all_papers_published_in_two_years_preceeding'][$year];
+                    $html .= '<td style="text-align: right;">' . $papers_published_in_two_years_preceeding . '</td>';
+                    $html .= '<td style="text-align: right;">' . ($papers_published_in_two_years_preceeding > 0 ? $all_citations_with_doi_in_two_years_preceeding/$papers_published_in_two_years_preceeding : 'n/a') . '</td>';
+                    $html .= '</tr>';
+                }
+                $html .= '</table>';
+                $html .= '<p>Note that the Journal impact factor can only be finally calculated up to the year preceding the current year (though the value might still change when more citable items are added to the source data bases).</p>';
+                $year_to_display = intval(date("Y"))-1;
+                if(!empty($citations_data['all_citing_dois_in_two_years_preceeding'][$year_to_display]))
+                {
+                $html .= '<h5>Citations in ' . $year_to_display . ' to articles published in ' . ($year_to_display-2) . ' and ' . ($year_to_display-1) . '</h5>';
+                sort($citations_data['all_citing_dois_in_two_years_preceeding'][$year_to_display]);
+                foreach($citations_data['all_citing_dois_in_two_years_preceeding'][$year_to_display] as $doi)
+                    $html .= '<div><a href="' . esc_attr($doi_url_prefix . $doi) . '">' . esc_html($doi) . '</a></div>';
+        }
+
             }
+
+
             wp_reset_postdata();
 
             $html .= '<h4>Why is the data not always up to date?</h4>';
