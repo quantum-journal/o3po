@@ -603,8 +603,8 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
          * @var      array    $additional_default_macros   Array of additional macros that we often want to expand even if they were not explicitely defined by the user.
          */
     static private $additional_default_macros = array(
-        array('', '\\newcommand', '\\\@firstoftwo', '[2]', '', '#1'),
-        array('', '\\newcommand', '\\\@secondoftwo', '[2]', '', '#2'),
+        array('', '\\newcommand', '\\@firstoftwo', '[2]', '', '#1'),
+        array('', '\\newcommand', '\\@secondoftwo', '[2]', '', '#2'),
                                                       );
         /**
          * Get special macros we sometimes want to ignore in expansion.
