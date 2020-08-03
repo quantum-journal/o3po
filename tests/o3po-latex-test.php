@@ -5,6 +5,17 @@ require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-latex.php';
 class O3PO_LatexTest extends O3PO_TestCase
 {
 
+    public function test_special_biblatex_bib() {
+        $path = dirname( __FILE__ ) . '/resources/arxiv/mitigation_paper_v2.bbl';
+        $content = file_get_contents($path);
+        $encoding = mb_detect_encoding($content, 'UTF-8, ISO-8859-1', true);
+        $filecontents = mb_convert_encoding($content, 'UTF-8', $encoding);
+        $bbl = $filecontents;
+        $parsed_bbl = O3PO_Latex::parse_single_bbl($bbl);
+        $this->assertEquals(count($parsed_bbl), 62);
+    }
+
+
     public function test_firstoftwo_secondoftwo() {
         $path = dirname( __FILE__ ) . '/resources/arxiv/mlcir010.bbl';
         $content = file_get_contents($path);

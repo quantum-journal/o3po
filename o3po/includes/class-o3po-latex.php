@@ -212,22 +212,24 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 $citations[$n]['ref'] = $n;
 
                 preg_match('#\\\\name\{[^}]*\}\{[^}]*\}\{\}(?=\{((?:[^{}]++|\{(?1)\})*)\})#u', $entry, $name);//matches balanced parenthesis (Note the use of (?1) here!) to test changes go here https://regex101.com/r/bVHadc/1
-                foreach(preg_split('/{{hash=/u', $name[1], -1, PREG_SPLIT_NO_EMPTY) as $i => $author_bbl) {
-                    if($i === 0) continue;
-                    preg_match('#family={(.*?)},#u', $author_bbl, $family );
-                    preg_match('#familyi={(.*?)},#u', $author_bbl, $familyi );
-                    preg_match('#given={(.*?)},#u', $author_bbl, $given );
-                    preg_match('#giveni={(.*?)},#u', $author_bbl, $giveni );
 
-                    if(!empty($family[1]))
-                        $citations[$n]['author'][$i]['family'] = $family[1];
-                    if(!empty($familyi[1]))
-                        $citations[$n]['author'][$i]['familyi'] = $familyi[1];
-                    if(!empty($given[1]))
-                        $citations[$n]['author'][$i]['given'] = $given[1];
-                    if(!empty($giveni[1]))
-                        $citations[$n]['author'][$i]['giveni'] = $giveni[1];
-                }
+                if(!empty($name[1]))
+                    foreach(preg_split('/{{hash=/u', $name[1], -1, PREG_SPLIT_NO_EMPTY) as $i => $author_bbl) {
+                        if($i === 0) continue;
+                        preg_match('#family={(.*?)},#u', $author_bbl, $family );
+                        preg_match('#familyi={(.*?)},#u', $author_bbl, $familyi );
+                        preg_match('#given={(.*?)},#u', $author_bbl, $given );
+                        preg_match('#giveni={(.*?)},#u', $author_bbl, $giveni );
+
+                        if(!empty($family[1]))
+                            $citations[$n]['author'][$i]['family'] = $family[1];
+                        if(!empty($familyi[1]))
+                            $citations[$n]['author'][$i]['familyi'] = $familyi[1];
+                        if(!empty($given[1]))
+                            $citations[$n]['author'][$i]['given'] = $given[1];
+                        if(!empty($giveni[1]))
+                            $citations[$n]['author'][$i]['giveni'] = $giveni[1];
+                    }
 
                 preg_match('#\\\\list{publisher}{[^}*]}(?=\{((?:[^{}]++|\{(?1)\})++)\})#u', $entry, $publisher);
                 if(!empty($publisher[1]))
@@ -246,6 +248,12 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 preg_match('#\\\\verb{url}\s*?\\\\verb ([^\s]*)\s*\\\\endverb#u', $entry, $url);
                 if(!empty($url[1]))
                     $citations[$n]['url'] = $url[1];
+                else
+                {
+                    preg_match('#\\\\url{([^\s]*)}#u', $entry, $url);
+                    if(!empty($url[1]))
+                        $citations[$n]['url'] = $url[1];
+                }
 
                 if(!empty($citations[$n]['url']) && ( (!empty($citations[$n]['doi']) &&  mb_strpos($citations[$n]['url'], $citations[$n]['doi']) !== false || mb_strpos($citations[$n]['url'], 'doi.org/') !== false) || (!empty($citations[$n]['eprint']) && mb_strpos($citations[$n]['url'], $citations[$n]['eprint']) !== false )))
                     unset($citations[$n]['url']);
@@ -271,7 +279,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                     'editor',
                                 );
                 foreach( $fields as $field) {
-                    preg_match('#\\\\field{' . $field .'}{*([^}]*)}*#u', $entry, $arg);
+                    preg_match('#\\\\field\{\s*' . $field .'\s*\}\s*(?=\{((?:[^{}]++|\{(?1)\})*)\})#u', $entry, $arg);//matches balanced parenthesis (Note the use of (?1) here!) to test changes go here https://regex101.com/r/bVHadc/1
                     if(!empty($arg[1]))
                         $citations[$n][$field] = $arg[1];
                 }
@@ -331,6 +339,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                         if(!empty($citations[$n]['howpublished'])) $text .= " " . $citations[$n]['howpublished'];
                         if(!empty($citations[$n]['chapter'])) $text .= " chapter " . $citations[$n]['chapter'];
 				        if(!empty($citations[$n]['year'])) $text .= " (" . $citations[$n]['year'] . ")";
+                        if(!empty($citations[$n]['note'])) $text .= " " . $citations[$n]['note'];
                         break;
                     case 'thesis':
                     case 'mastersthesis':
@@ -346,6 +355,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                         if(!empty($citations[$n]['organization'])) $text .= " " . $citations[$n]['organization'];
                         if(!empty($citations[$n]['location'])) $text .= " " . $citations[$n]['location'];
 				        if(!empty($citations[$n]['year'])) $text .= " (" . $citations[$n]['year'] . ")";
+                        if(!empty($citations[$n]['note'])) $text .= " " . $citations[$n]['note'];
                         break;
                     case 'misc':
                     case 'online':
@@ -356,10 +366,12 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
 				        if(!empty($citations[$n]['title'])) $text .= "``" . $citations[$n]['title'] . "''";
                         if(!empty($citations[$n]['howpublished'])) $text .= " " . $citations[$n]['howpublished'];
 				        if(!empty($citations[$n]['year'])) $text .= " (" . $citations[$n]['year'] . ")";
+                        if(!empty($citations[$n]['note'])) $text .= " " . $citations[$n]['note'];
                         break;
                     default:
                         if(!empty($citations[$n]['title'])) $text .= "``" . $citations[$n]['title'] . "''";
                         if(!empty($citations[$n]['year'])) $text .= " (" . $citations[$n]['year'] . ")";
+                        if(!empty($citations[$n]['note'])) $text .= " " . $citations[$n]['note'];
                         break;
                 }
                 foreach ($str_replacements as $target => $substitute)
@@ -370,6 +382,11 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 }
                 $text = self::normalize_whitespace_and_linebreak_characters($text, true, true);
                 $text = self::latex_to_utf8_outside_math_mode($text);
+                $str_replacements = array(
+                    '\\url' => '',
+                );
+                foreach ($str_replacements as $target => $substitute)
+                    $text = str_replace($target, $substitute, $text);
 
                 $text = preg_replace('#\s+#u', ' ', $text);
                 $text = trim($text, ". \t\n\r\0\x0B\s");
@@ -878,6 +895,7 @@ class O3PO_Latex_Dictionary_Provider
                 '\\\\bibnamedelim[abcdi](?![a-zA-Z])' => ' ',
                 '\\\\textemdash(?![a-zA-Z])' => '—',
                 '\\\\textendash(?![a-zA-Z])' => '–',
+                '\\\\bibrangedash(?![a-zA-Z])\s*' => '–',
                 '\\\\&' => '&',
                 '\\\\negthinspace' => '',
                 '\\\\!' => '',
