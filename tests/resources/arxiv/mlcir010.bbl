@@ -1,0 +1,847 @@
+%merlin.mbs apsrev4-1.bst 2010-07-25 4.21a (PWD, AO, DPC) hacked
+%Control: key (0)
+%Control: author (0) dotless jnrlst
+%Control: editor formatted (1) identically to author
+%Control: production of article title (0) allowed
+%Control: page (1) range
+%Control: year (0) verbatim
+%Control: production of eprint (0) enabled
+\begin{thebibliography}{70}%
+\makeatletter
+\providecommand \@ifxundefined [1]{%
+ \@ifx{#1\undefined}
+}%
+\providecommand \@ifnum [1]{%
+ \ifnum #1\expandafter \@firstoftwo
+ \else \expandafter \@secondoftwo
+ \fi
+}%
+\providecommand \@ifx [1]{%
+ \ifx #1\expandafter \@firstoftwo
+ \else \expandafter \@secondoftwo
+ \fi
+}%
+\providecommand \natexlab [1]{#1}%
+\providecommand \enquote  [1]{``#1''}%
+\providecommand \bibnamefont  [1]{#1}%
+\providecommand \bibfnamefont [1]{#1}%
+\providecommand \citenamefont [1]{#1}%
+\providecommand \href@noop [0]{\@secondoftwo}%
+\providecommand \href [0]{\begingroup \@sanitize@url \@href}%
+\providecommand \@href[1]{\@@startlink{#1}\@@href}%
+\providecommand \@@href[1]{\endgroup#1\@@endlink}%
+\providecommand \@sanitize@url [0]{\catcode `\\12\catcode `\$12\catcode
+  `\&12\catcode `\#12\catcode `\^12\catcode `\_12\catcode `\%12\relax}%
+\providecommand \@@startlink[1]{}%
+\providecommand \@@endlink[0]{}%
+\providecommand \url  [0]{\begingroup\@sanitize@url \@url }%
+\providecommand \@url [1]{\endgroup\@href {#1}{\urlprefix }}%
+\providecommand \urlprefix  [0]{URL }%
+\providecommand \Eprint [0]{\href }%
+\providecommand \doibase [0]{http://dx.doi.org/}%
+\providecommand \selectlanguage [0]{\@gobble}%
+\providecommand \bibinfo  [0]{\@secondoftwo}%
+\providecommand \bibfield  [0]{\@secondoftwo}%
+\providecommand \translation [1]{[#1]}%
+\providecommand \BibitemOpen [0]{}%
+\providecommand \bibitemStop [0]{}%
+\providecommand \bibitemNoStop [0]{.\EOS\space}%
+\providecommand \EOS [0]{\spacefactor3000\relax}%
+\providecommand \BibitemShut  [1]{\csname bibitem#1\endcsname}%
+%\newcommand{\@secondoftwo}[2]{#2}
+\let\auto@bib@innerbib\@empty
+%</preamble>
+\bibitem [{\citenamefont {Shor}(1995)}]{shor-error-correct}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {P.~W.}\ \bibnamefont
+  {Shor}},\ }\bibfield  {title} {\enquote {\bibinfo {title} {Scheme for
+  reducing decoherence in quantum computer memory},}\ }\href {\doibase
+  10.1103/PhysRevA.52.R2493} {\bibfield  {journal} {\bibinfo  {journal} {Phys.
+  Rev. A}\ }\textbf {\bibinfo {volume} {52}},\ \bibinfo {pages} {R2493}
+  (\bibinfo {year} {1995})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {{Almudever}}\ \emph {et~al.}(2017)\citenamefont
+  {{Almudever}}, \citenamefont {{Lao}}, \citenamefont {{Fu}}, \citenamefont
+  {{Khammassi}}, \citenamefont {{Ashraf}}, \citenamefont {{Iorga}},
+  \citenamefont {{Varsamopoulos}}, \citenamefont {{Eichler}}, \citenamefont
+  {{Wallraff}}, \citenamefont {{Geck}}, \citenamefont {{Kruth}}, \citenamefont
+  {{Knoch}}, \citenamefont {{Bluhm}},\ and\ \citenamefont
+  {{Bertels}}}]{Almudever-etal-2017}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {C.~G.}\ \bibnamefont
+  {{Almudever}}}, \bibinfo {author} {\bibfnamefont {L.}~\bibnamefont {{Lao}}},
+  \bibinfo {author} {\bibfnamefont {X.}~\bibnamefont {{Fu}}}, \bibinfo {author}
+  {\bibfnamefont {N.}~\bibnamefont {{Khammassi}}}, \bibinfo {author}
+  {\bibfnamefont {I.}~\bibnamefont {{Ashraf}}}, \bibinfo {author}
+  {\bibfnamefont {D.}~\bibnamefont {{Iorga}}}, \bibinfo {author} {\bibfnamefont
+  {S.}~\bibnamefont {{Varsamopoulos}}}, \bibinfo {author} {\bibfnamefont
+  {C.}~\bibnamefont {{Eichler}}}, \bibinfo {author} {\bibfnamefont
+  {A.}~\bibnamefont {{Wallraff}}}, \bibinfo {author} {\bibfnamefont
+  {L.}~\bibnamefont {{Geck}}}, \bibinfo {author} {\bibfnamefont
+  {A.}~\bibnamefont {{Kruth}}}, \bibinfo {author} {\bibfnamefont
+  {J.}~\bibnamefont {{Knoch}}}, \bibinfo {author} {\bibfnamefont
+  {H.}~\bibnamefont {{Bluhm}}}, \ and\ \bibinfo {author} {\bibfnamefont
+  {K.}~\bibnamefont {{Bertels}}},\ }\bibfield  {title} {\enquote {\bibinfo
+  {title} {The engineering challenges in quantum computing},}\ }in\ \href
+  {\doibase 10.23919/DATE.2017.7927104} {\emph {\bibinfo {booktitle} {Design,
+  Automation Test in Europe Conference Exhibition (DATE), 2017}}}\ (\bibinfo
+  {year} {2017})\ pp.\ \bibinfo {pages} {836--845}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Aliferis}\ \emph {et~al.}(2006)\citenamefont
+  {Aliferis}, \citenamefont {Gottesman},\ and\ \citenamefont
+  {Preskill}}]{Aliferis-Gottesman-Preskill-2006}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {P.}~\bibnamefont
+  {Aliferis}}, \bibinfo {author} {\bibfnamefont {D.}~\bibnamefont {Gottesman}},
+  \ and\ \bibinfo {author} {\bibfnamefont {J.}~\bibnamefont {Preskill}},\
+  }\bibfield  {title} {\enquote {\bibinfo {title} {Quantum accuracy threshold
+  for concatenated distance-3 codes},}\ }\href
+  {http://dl.acm.org/citation.cfm?id=2011665.2011666} {\bibfield  {journal}
+  {\bibinfo  {journal} {Quantum Inf. Comput.}\ }\textbf {\bibinfo {volume}
+  {6}},\ \bibinfo {pages} {97--165} (\bibinfo {year} {2006})},\ \Eprint
+  {http://arxiv.org/abs/quant-ph/0504218} {quant-ph/0504218} \BibitemShut
+  {NoStop}%
+\bibitem [{\citenamefont {Wang}\ \emph {et~al.}(2011)\citenamefont {Wang},
+  \citenamefont {Fowler},\ and\ \citenamefont
+  {Hollenberg}}]{Wang-Fowler-Hollenberg-2011}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {David~S.}\
+  \bibnamefont {Wang}}, \bibinfo {author} {\bibfnamefont {Austin~G.}\
+  \bibnamefont {Fowler}}, \ and\ \bibinfo {author} {\bibfnamefont {Lloyd
+  C.~L.}\ \bibnamefont {Hollenberg}},\ }\bibfield  {title} {\enquote {\bibinfo
+  {title} {Surface code quantum computing with error rates over {$1\%$}},}\
+  }\href {\doibase 10.1103/PhysRevA.83.020302} {\bibfield  {journal} {\bibinfo
+  {journal} {Phys. Rev. A}\ }\textbf {\bibinfo {volume} {83}},\ \bibinfo
+  {pages} {020302} (\bibinfo {year} {2011})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Chubb}\ and\ \citenamefont
+  {Flammia}(2018)}]{Chubb-Flammia-2018}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Christopher~T.}\
+  \bibnamefont {Chubb}}\ and\ \bibinfo {author} {\bibfnamefont {Steven~T.}\
+  \bibnamefont {Flammia}},\ }\href@noop {} {\enquote {\bibinfo {title}
+  {Statistical mechanical models for quantum codes with correlated noise},}\ }
+  (\bibinfo {year} {2018}),\ \bibinfo {note} {unpublished},\ \Eprint
+  {http://arxiv.org/abs/1809.10704} {1809.10704} \BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Dennis}\ \emph {et~al.}(2002)\citenamefont {Dennis},
+  \citenamefont {Kitaev}, \citenamefont {Landahl},\ and\ \citenamefont
+  {Preskill}}]{Dennis-Kitaev-Landahl-Preskill-2002}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {E.}~\bibnamefont
+  {Dennis}}, \bibinfo {author} {\bibfnamefont {A.}~\bibnamefont {Kitaev}},
+  \bibinfo {author} {\bibfnamefont {A.}~\bibnamefont {Landahl}}, \ and\
+  \bibinfo {author} {\bibfnamefont {J.}~\bibnamefont {Preskill}},\ }\bibfield
+  {title} {\enquote {\bibinfo {title} {Topological quantum memory},}\ }\href
+  {\doibase 10.1063/1.1499754} {\bibfield  {journal} {\bibinfo  {journal} {J.
+  Math. Phys.}\ }\textbf {\bibinfo {volume} {43}},\ \bibinfo {pages} {4452}
+  (\bibinfo {year} {2002})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Fowler}\ \emph
+  {et~al.}(2012{\natexlab{a}})\citenamefont {Fowler}, \citenamefont
+  {Whiteside},\ and\ \citenamefont {Hollenberg}}]{Fowler-2012}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Austin~G.}\
+  \bibnamefont {Fowler}}, \bibinfo {author} {\bibfnamefont {Adam~C.}\
+  \bibnamefont {Whiteside}}, \ and\ \bibinfo {author} {\bibfnamefont {Lloyd
+  C.~L.}\ \bibnamefont {Hollenberg}},\ }\bibfield  {title} {\enquote {\bibinfo
+  {title} {Towards practical classical processing for the surface code},}\
+  }\href {\doibase 10.1103/PhysRevLett.108.180501} {\bibfield  {journal}
+  {\bibinfo  {journal} {Phys. Rev. Lett.}\ }\textbf {\bibinfo {volume} {108}},\
+  \bibinfo {pages} {180501} (\bibinfo {year} {2012}{\natexlab{a}})}\BibitemShut
+  {NoStop}%
+\bibitem [{\citenamefont {Fowler}\ \emph
+  {et~al.}(2012{\natexlab{b}})\citenamefont {Fowler}, \citenamefont
+  {Mariantoni}, \citenamefont {Martinis},\ and\ \citenamefont
+  {Cleland}}]{Fowler-Mariantoni-Martinis-Cleland-2012}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {A.~G.}\ \bibnamefont
+  {Fowler}}, \bibinfo {author} {\bibfnamefont {M.}~\bibnamefont {Mariantoni}},
+  \bibinfo {author} {\bibfnamefont {J.~M.}\ \bibnamefont {Martinis}}, \ and\
+  \bibinfo {author} {\bibfnamefont {A.~N.}\ \bibnamefont {Cleland}},\
+  }\bibfield  {title} {\enquote {\bibinfo {title} {Surface codes: Towards
+  practical large-scale quantum computation},}\ }\href {\doibase
+  10.1103/PhysRevA.86.032324} {\bibfield  {journal} {\bibinfo  {journal} {Phys.
+  Rev. A}\ }\textbf {\bibinfo {volume} {86}},\ \bibinfo {pages} {032324}
+  (\bibinfo {year} {2012}{\natexlab{b}})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Fowler}\ \emph
+  {et~al.}(2012{\natexlab{c}})\citenamefont {Fowler}, \citenamefont
+  {Whiteside}, \citenamefont {Mc{I}nnes},\ and\ \citenamefont
+  {Rabbani}}]{Fowler-Whiteside-McInnes-Rabbani-2012}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Austin~G.}\
+  \bibnamefont {Fowler}}, \bibinfo {author} {\bibfnamefont {Adam~C.}\
+  \bibnamefont {Whiteside}}, \bibinfo {author} {\bibfnamefont {Angus~L.}\
+  \bibnamefont {Mc{I}nnes}}, \ and\ \bibinfo {author} {\bibfnamefont
+  {Alimohammad}\ \bibnamefont {Rabbani}},\ }\bibfield  {title} {\enquote
+  {\bibinfo {title} {Topological code autotune},}\ }\href {\doibase
+  10.1103/PhysRevX.2.041003} {\bibfield  {journal} {\bibinfo  {journal} {Phys.
+  Rev. X}\ }\textbf {\bibinfo {volume} {2}},\ \bibinfo {pages} {041003}
+  (\bibinfo {year} {2012}{\natexlab{c}})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Chamberland}\ \emph
+  {et~al.}(2020{\natexlab{a}})\citenamefont {Chamberland}, \citenamefont {Zhu},
+  \citenamefont {Yoder}, \citenamefont {Hertzberg},\ and\ \citenamefont
+  {Cross}}]{Chamberland-Zhu-Yoder-Hertzberg-Cross-2020}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Christopher}\
+  \bibnamefont {Chamberland}}, \bibinfo {author} {\bibfnamefont {Guanyu}\
+  \bibnamefont {Zhu}}, \bibinfo {author} {\bibfnamefont {Theodore~J.}\
+  \bibnamefont {Yoder}}, \bibinfo {author} {\bibfnamefont {Jared~B.}\
+  \bibnamefont {Hertzberg}}, \ and\ \bibinfo {author} {\bibfnamefont
+  {Andrew~W.}\ \bibnamefont {Cross}},\ }\bibfield  {title} {\enquote {\bibinfo
+  {title} {Topological and subsystem codes on low-degree graphs with flag
+  qubits},}\ }\href {\doibase 10.1103/PhysRevX.10.011022} {\bibfield  {journal}
+  {\bibinfo  {journal} {Phys. Rev. X}\ }\textbf {\bibinfo {volume} {10}},\
+  \bibinfo {pages} {011022} (\bibinfo {year} {2020}{\natexlab{a}})}\BibitemShut
+  {NoStop}%
+\bibitem [{\citenamefont {Chamberland}\ \emph
+  {et~al.}(2020{\natexlab{b}})\citenamefont {Chamberland}, \citenamefont
+  {Kubica}, \citenamefont {Yoder},\ and\ \citenamefont
+  {Zhu}}]{Chamberland-Kubica-Yoder-Zhu-2020}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Christopher}\
+  \bibnamefont {Chamberland}}, \bibinfo {author} {\bibfnamefont {Aleksander}\
+  \bibnamefont {Kubica}}, \bibinfo {author} {\bibfnamefont {Theodore~J}\
+  \bibnamefont {Yoder}}, \ and\ \bibinfo {author} {\bibfnamefont {Guanyu}\
+  \bibnamefont {Zhu}},\ }\bibfield  {title} {\enquote {\bibinfo {title}
+  {Triangular color codes on trivalent graphs with flag qubits},}\ }\href
+  {\doibase 10.1088/1367-2630/ab68fd} {\bibfield  {journal} {\bibinfo
+  {journal} {New Journal of Physics}\ }\textbf {\bibinfo {volume} {22}},\
+  \bibinfo {pages} {023019} (\bibinfo {year} {2020}{\natexlab{b}})}\BibitemShut
+  {NoStop}%
+\bibitem [{\citenamefont {Vuillot}\ \emph {et~al.}(2019)\citenamefont
+  {Vuillot}, \citenamefont {Lao}, \citenamefont {Criger}, \citenamefont
+  {Almud{\'{e}}ver}, \citenamefont {Bertels},\ and\ \citenamefont
+  {Terhal}}]{Vuillot-etal-Terhal-2019}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Christophe}\
+  \bibnamefont {Vuillot}}, \bibinfo {author} {\bibfnamefont {Lingling}\
+  \bibnamefont {Lao}}, \bibinfo {author} {\bibfnamefont {Ben}\ \bibnamefont
+  {Criger}}, \bibinfo {author} {\bibfnamefont {Carmen~Garc{\'{\i}}a}\
+  \bibnamefont {Almud{\'{e}}ver}}, \bibinfo {author} {\bibfnamefont {Koen}\
+  \bibnamefont {Bertels}}, \ and\ \bibinfo {author} {\bibfnamefont
+  {Barbara~M.}\ \bibnamefont {Terhal}},\ }\bibfield  {title} {\enquote
+  {\bibinfo {title} {Code deformation and lattice surgery are gauge fixing},}\
+  }\href {\doibase 10.1088/1367-2630/ab0199} {\bibfield  {journal} {\bibinfo
+  {journal} {New Journal of Physics}\ }\textbf {\bibinfo {volume} {21}},\
+  \bibinfo {pages} {033028} (\bibinfo {year} {2019})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Torlai}\ and\ \citenamefont
+  {Melko}(2017)}]{Torlai-Melko-2017}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Giacomo}\ \bibnamefont
+  {Torlai}}\ and\ \bibinfo {author} {\bibfnamefont {Roger~G.}\ \bibnamefont
+  {Melko}},\ }\bibfield  {title} {\enquote {\bibinfo {title} {Neural decoder
+  for topological codes},}\ }\href {\doibase 10.1103/PhysRevLett.119.030501}
+  {\bibfield  {journal} {\bibinfo  {journal} {Phys. Rev. Lett.}\ }\textbf
+  {\bibinfo {volume} {119}},\ \bibinfo {pages} {030501} (\bibinfo {year}
+  {2017})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Krastanov}\ and\ \citenamefont
+  {Jiang}(2017)}]{Krastanov-Jiang-2017}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {S.}~\bibnamefont
+  {Krastanov}}\ and\ \bibinfo {author} {\bibfnamefont {L.}~\bibnamefont
+  {Jiang}},\ }\bibfield  {title} {\enquote {\bibinfo {title} {Deep neural
+  network probabilistic decoder for stabilizer codes},}\ }\href {\doibase
+  10.1038/s41598-017-11266-1} {\bibfield  {journal} {\bibinfo  {journal}
+  {Scientific Reports}\ }\textbf {\bibinfo {volume} {7}},\ \bibinfo {pages}
+  {11003} (\bibinfo {year} {2017})},\ \Eprint {http://arxiv.org/abs/1705.09334}
+  {1705.09334} \BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Breuckmann}\ and\ \citenamefont
+  {Ni}(2018)}]{Breuckmann-Ni-2017}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {N.~P.}\ \bibnamefont
+  {Breuckmann}}\ and\ \bibinfo {author} {\bibfnamefont {X.}~\bibnamefont
+  {Ni}},\ }\bibfield  {title} {\enquote {\bibinfo {title} {Scalable {n}eural
+  {n}etwork {d}ecoders for {h}igher {d}imensional {q}uantum {c}odes},}\ }\href
+  {\doibase 10.22331/q-2018-05-24-68} {\bibfield  {journal} {\bibinfo
+  {journal} {{Quantum}}\ }\textbf {\bibinfo {volume} {2}},\ \bibinfo {pages}
+  {68} (\bibinfo {year} {2018})},\ \Eprint {http://arxiv.org/abs/1710.09489}
+  {1710.09489} \BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Jia}\ \emph {et~al.}(2019)\citenamefont {Jia},
+  \citenamefont {Zhang}, \citenamefont {Wu}, \citenamefont {Kong},
+  \citenamefont {Guo},\ and\ \citenamefont {Guo}}]{Jia-Zhang-etal-Guo-2019}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Zhih-Ahn}\
+  \bibnamefont {Jia}}, \bibinfo {author} {\bibfnamefont {Yuan-Hang}\
+  \bibnamefont {Zhang}}, \bibinfo {author} {\bibfnamefont {Yu-Chun}\
+  \bibnamefont {Wu}}, \bibinfo {author} {\bibfnamefont {Liang}\ \bibnamefont
+  {Kong}}, \bibinfo {author} {\bibfnamefont {Guang-Can}\ \bibnamefont {Guo}}, \
+  and\ \bibinfo {author} {\bibfnamefont {Guo-Ping}\ \bibnamefont {Guo}},\
+  }\bibfield  {title} {\enquote {\bibinfo {title} {Efficient machine-learning
+  representations of a surface code with boundaries, defects, domain walls, and
+  twists},}\ }\href {\doibase 10.1103/PhysRevA.99.012307} {\bibfield  {journal}
+  {\bibinfo  {journal} {Phys. Rev. A}\ }\textbf {\bibinfo {volume} {99}},\
+  \bibinfo {pages} {012307} (\bibinfo {year} {2019})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Baireuther}\ \emph {et~al.}(2018)\citenamefont
+  {Baireuther}, \citenamefont {O'Brien}, \citenamefont {Tarasinski},\ and\
+  \citenamefont {Beenakker}}]{Baireuther-etal-Beenakker-2018}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Paul}\ \bibnamefont
+  {Baireuther}}, \bibinfo {author} {\bibfnamefont {Thomas~E.}\ \bibnamefont
+  {O'Brien}}, \bibinfo {author} {\bibfnamefont {Brian}\ \bibnamefont
+  {Tarasinski}}, \ and\ \bibinfo {author} {\bibfnamefont {Carlo W.~J.}\
+  \bibnamefont {Beenakker}},\ }\bibfield  {title} {\enquote {\bibinfo {title}
+  {Machine-learning-assisted correction of correlated qubit errors in a
+  topological code},}\ }\href {\doibase 10.22331/q-2018-01-29-48} {\bibfield
+  {journal} {\bibinfo  {journal} {{Quantum}}\ }\textbf {\bibinfo {volume}
+  {2}},\ \bibinfo {pages} {48} (\bibinfo {year} {2018})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Chamberland}\ and\ \citenamefont
+  {Ronagh}(2018)}]{Chamberland-Ronagh-2019}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Christopher}\
+  \bibnamefont {Chamberland}}\ and\ \bibinfo {author} {\bibfnamefont {Pooya}\
+  \bibnamefont {Ronagh}},\ }\bibfield  {title} {\enquote {\bibinfo {title}
+  {Deep neural decoders for near term fault-tolerant experiments},}\ }\href
+  {\doibase 10.1088/2058-9565/aad1f7} {\bibfield  {journal} {\bibinfo
+  {journal} {Quantum Science and Technology}\ }\textbf {\bibinfo {volume}
+  {3}},\ \bibinfo {pages} {044002} (\bibinfo {year} {2018})}\BibitemShut
+  {NoStop}%
+\bibitem [{\citenamefont {Baireuther}\ \emph {et~al.}(2019)\citenamefont
+  {Baireuther}, \citenamefont {Caio}, \citenamefont {Criger}, \citenamefont
+  {Beenakker},\ and\ \citenamefont
+  {{O'B}rien}}]{Baireuther-etal-Beenakker-Obrien-2019}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {P.}~\bibnamefont
+  {Baireuther}}, \bibinfo {author} {\bibfnamefont {M.~D.}\ \bibnamefont
+  {Caio}}, \bibinfo {author} {\bibfnamefont {B.}~\bibnamefont {Criger}},
+  \bibinfo {author} {\bibfnamefont {C.~W.~J.}\ \bibnamefont {Beenakker}}, \
+  and\ \bibinfo {author} {\bibfnamefont {T.~E.}\ \bibnamefont {{O'B}rien}},\
+  }\bibfield  {title} {\enquote {\bibinfo {title} {Neural network decoder for
+  topological color codes with circuit level noise},}\ }\href {\doibase
+  10.1088/1367-2630/aaf29e} {\bibfield  {journal} {\bibinfo  {journal} {New
+  Journal of Physics}\ }\textbf {\bibinfo {volume} {21}},\ \bibinfo {pages}
+  {013003} (\bibinfo {year} {2019})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Maskara}\ \emph {et~al.}(2019)\citenamefont
+  {Maskara}, \citenamefont {Kubica},\ and\ \citenamefont
+  {Jochym-O'Connor}}]{Maskara-Kubica-JochymOConnor-2019}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Nishad}\ \bibnamefont
+  {Maskara}}, \bibinfo {author} {\bibfnamefont {Aleksander}\ \bibnamefont
+  {Kubica}}, \ and\ \bibinfo {author} {\bibfnamefont {Tomas}\ \bibnamefont
+  {Jochym-O'Connor}},\ }\bibfield  {title} {\enquote {\bibinfo {title}
+  {Advantages of versatile neural-network decoding for topological codes},}\
+  }\href {\doibase 10.1103/PhysRevA.99.052351} {\bibfield  {journal} {\bibinfo
+  {journal} {Phys. Rev. A}\ }\textbf {\bibinfo {volume} {99}},\ \bibinfo
+  {pages} {052351} (\bibinfo {year} {2019})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {{Bacon}}\ \emph {et~al.}(2015)\citenamefont
+  {{Bacon}}, \citenamefont {{Flammia}}, \citenamefont {{Harrow}},\ and\
+  \citenamefont {{Shi}}}]{Bacon-Flammia-Harrow-Shi-2015}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {D.}~\bibnamefont
+  {{Bacon}}}, \bibinfo {author} {\bibfnamefont {S.~T.}\ \bibnamefont
+  {{Flammia}}}, \bibinfo {author} {\bibfnamefont {A.~W.}\ \bibnamefont
+  {{Harrow}}}, \ and\ \bibinfo {author} {\bibfnamefont {J.}~\bibnamefont
+  {{Shi}}},\ }\bibfield  {title} {\enquote {\bibinfo {title} {Sparse quantum
+  codes from quantum circuits},}\ }in\ \href {\doibase 10.1145/2746539.2746608}
+  {\emph {\bibinfo {booktitle} {Proceedings of the Forty-Seventh Annual {ACM}
+  on Symposium on Theory of Computing}}},\ \bibinfo {series and number} {STOC
+  '15}\ (\bibinfo  {publisher} {ACM},\ \bibinfo {address} {New York, NY, USA},\
+  \bibinfo {year} {2015})\ pp.\ \bibinfo {pages} {327--334},\ \Eprint
+  {http://arxiv.org/abs/1411.3334} {1411.3334} \BibitemShut {NoStop}%
+\bibitem [{\citenamefont {{Bacon}}\ \emph {et~al.}(2017)\citenamefont
+  {{Bacon}}, \citenamefont {{Flammia}}, \citenamefont {{Harrow}},\ and\
+  \citenamefont {{Shi}}}]{Bacon-Flammia-Harrow-Shi-2017}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {D.}~\bibnamefont
+  {{Bacon}}}, \bibinfo {author} {\bibfnamefont {S.~T.}\ \bibnamefont
+  {{Flammia}}}, \bibinfo {author} {\bibfnamefont {A.~W.}\ \bibnamefont
+  {{Harrow}}}, \ and\ \bibinfo {author} {\bibfnamefont {J.}~\bibnamefont
+  {{Shi}}},\ }\bibfield  {title} {\enquote {\bibinfo {title} {Sparse quantum
+  codes from quantum circuits},}\ }\href {\doibase 10.1109/TIT.2017.2663199}
+  {\bibfield  {journal} {\bibinfo  {journal} {IEEE Transactions on Information
+  Theory}\ }\textbf {\bibinfo {volume} {63}},\ \bibinfo {pages} {2464--2479}
+  (\bibinfo {year} {2017})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Stre{\v{c}}ka}(2010)}]{Strecka-2010}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Jozef}\ \bibnamefont
+  {Stre{\v{c}}ka}},\ }\bibfield  {title} {\enquote {\bibinfo {title}
+  {Generalized algebraic transformations and exactly solvable classical-quantum
+  models},}\ }\href {\doibase https://doi.org/10.1016/j.physleta.2010.07.030}
+  {\bibfield  {journal} {\bibinfo  {journal} {Physics Letters A}\ }\textbf
+  {\bibinfo {volume} {374}},\ \bibinfo {pages} {3718 -- 3722} (\bibinfo {year}
+  {2010})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Chamberland}\ and\ \citenamefont
+  {Beverland}(2018)}]{Chamberland-Beverland-2017}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Christopher}\
+  \bibnamefont {Chamberland}}\ and\ \bibinfo {author} {\bibfnamefont
+  {Michael~E.}\ \bibnamefont {Beverland}},\ }\bibfield  {title} {\enquote
+  {\bibinfo {title} {Flag fault-tolerant error correction with arbitrary
+  distance codes},}\ }\href {\doibase 10.22331/q-2018-02-08-53} {\bibfield
+  {journal} {\bibinfo  {journal} {{Quantum}}\ }\textbf {\bibinfo {volume}
+  {2}},\ \bibinfo {pages} {53} (\bibinfo {year} {2018})},\ \Eprint
+  {http://arxiv.org/abs/1708.02246} {1708.02246} \BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Chamberland}\ and\ \citenamefont
+  {Cross}(2019)}]{Chamberland-Cross-2018}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {C.}~\bibnamefont
+  {Chamberland}}\ and\ \bibinfo {author} {\bibfnamefont {A.~W.}\ \bibnamefont
+  {Cross}},\ }\bibfield  {title} {\enquote {\bibinfo {title} {Fault-tolerant
+  magic state preparation with flag qubits},}\ }\href {\doibase
+  10.22331/q-2019-05-20-143} {\bibfield  {journal} {\bibinfo  {journal}
+  {{Quantum}}\ }\textbf {\bibinfo {volume} {3}},\ \bibinfo {pages} {143}
+  (\bibinfo {year} {2019})},\ \Eprint {http://arxiv.org/abs/1811.00566}
+  {1811.00566} \BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Chao}\ and\ \citenamefont
+  {Reichardt}(2018)}]{Chao-Reichardt-2018}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Rui}\ \bibnamefont
+  {Chao}}\ and\ \bibinfo {author} {\bibfnamefont {Ben~W.}\ \bibnamefont
+  {Reichardt}},\ }\bibfield  {title} {\enquote {\bibinfo {title} {Quantum error
+  correction with only two extra qubits},}\ }\href {\doibase
+  10.1103/PhysRevLett.121.050502} {\bibfield  {journal} {\bibinfo  {journal}
+  {Phys. Rev. Lett.}\ }\textbf {\bibinfo {volume} {121}},\ \bibinfo {pages}
+  {050502} (\bibinfo {year} {2018})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Bomb\'{\i}n}(2015)}]{Bombin-2015}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {H\'ector}\
+  \bibnamefont {Bomb\'{\i}n}},\ }\bibfield  {title} {\enquote {\bibinfo {title}
+  {Single-shot fault-tolerant quantum error correction},}\ }\href {\doibase
+  10.1103/PhysRevX.5.031043} {\bibfield  {journal} {\bibinfo  {journal} {Phys.
+  Rev. X}\ }\textbf {\bibinfo {volume} {5}},\ \bibinfo {pages} {031043}
+  (\bibinfo {year} {2015})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Brown}\ \emph {et~al.}(2016)\citenamefont {Brown},
+  \citenamefont {Nickerson},\ and\ \citenamefont
+  {Browne}}]{Brown-Nickerson-Browne-2016}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Benjamin~J.}\
+  \bibnamefont {Brown}}, \bibinfo {author} {\bibfnamefont {Naomi~H.}\
+  \bibnamefont {Nickerson}}, \ and\ \bibinfo {author} {\bibfnamefont {Dan~E.}\
+  \bibnamefont {Browne}},\ }\bibfield  {title} {\enquote {\bibinfo {title}
+  {Fault-tolerant error correction with the gauge color code},}\ }\href
+  {\doibase 10.1038/ncomms12302} {\bibfield  {journal} {\bibinfo  {journal}
+  {Nature Communications}\ }\textbf {\bibinfo {volume} {7}},\ \bibinfo {pages}
+  {12302} (\bibinfo {year} {2016})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Campbell}(2019)}]{Campbell-2018}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Earl~T.}\ \bibnamefont
+  {Campbell}},\ }\bibfield  {title} {\enquote {\bibinfo {title} {A theory of
+  single-shot error correction for adversarial noise},}\ }\href {\doibase
+  10.1088/2058-9565/aafc8f} {\bibfield  {journal} {\bibinfo  {journal} {Quantum
+  Science and Technology}\ }\textbf {\bibinfo {volume} {4}},\ \bibinfo {pages}
+  {025006} (\bibinfo {year} {2019})},\ \Eprint
+  {http://arxiv.org/abs/1805.09271} {1805.09271} \BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Dumer}\ \emph {et~al.}(2015)\citenamefont {Dumer},
+  \citenamefont {Kovalev},\ and\ \citenamefont
+  {Pryadko}}]{Dumer-Kovalev-Pryadko-bnd-2015}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {I.}~\bibnamefont
+  {Dumer}}, \bibinfo {author} {\bibfnamefont {A.~A.}\ \bibnamefont {Kovalev}},
+  \ and\ \bibinfo {author} {\bibfnamefont {L.~P.}\ \bibnamefont {Pryadko}},\
+  }\bibfield  {title} {\enquote {\bibinfo {title} {Thresholds for correcting
+  errors, erasures, and faulty syndrome measurements in degenerate quantum
+  codes},}\ }\href {\doibase 10.1103/PhysRevLett.115.050502} {\bibfield
+  {journal} {\bibinfo  {journal} {Phys. Rev. Lett.}\ }\textbf {\bibinfo
+  {volume} {115}},\ \bibinfo {pages} {050502} (\bibinfo {year} {2015})},\
+  \Eprint {http://arxiv.org/abs/1412.6172} {1412.6172} \BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Kovalev}\ \emph {et~al.}(2018)\citenamefont
+  {Kovalev}, \citenamefont {Prabhakar}, \citenamefont {Dumer},\ and\
+  \citenamefont {Pryadko}}]{Kovalev-Prabhakar-Dumer-Pryadko-2018}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {A.~A.}\ \bibnamefont
+  {Kovalev}}, \bibinfo {author} {\bibfnamefont {S.}~\bibnamefont {Prabhakar}},
+  \bibinfo {author} {\bibfnamefont {I.}~\bibnamefont {Dumer}}, \ and\ \bibinfo
+  {author} {\bibfnamefont {L.~P.}\ \bibnamefont {Pryadko}},\ }\bibfield
+  {title} {\enquote {\bibinfo {title} {Numerical and analytical bounds on
+  threshold error rates for hypergraph-product codes},}\ }\href {\doibase
+  10.1103/PhysRevA.97.062320} {\bibfield  {journal} {\bibinfo  {journal} {Phys.
+  Rev. A}\ }\textbf {\bibinfo {volume} {97}},\ \bibinfo {pages} {062320}
+  (\bibinfo {year} {2018})},\ \Eprint {http://arxiv.org/abs/1804.01950}
+  {1804.01950} \BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Poulin}(2005)}]{Poulin-subs-2005}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {David}\ \bibnamefont
+  {Poulin}},\ }\bibfield  {title} {\enquote {\bibinfo {title} {Stabilizer
+  formalism for operator quantum error correction},}\ }\href {\doibase
+  10.1103/PhysRevLett.95.230504} {\bibfield  {journal} {\bibinfo  {journal}
+  {Phys. Rev. Lett.}\ }\textbf {\bibinfo {volume} {95}},\ \bibinfo {pages}
+  {230504} (\bibinfo {year} {2005})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Bacon}(2006)}]{Bacon-subs-2006}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Dave}\ \bibnamefont
+  {Bacon}},\ }\bibfield  {title} {\enquote {\bibinfo {title} {Operator quantum
+  error-correcting subsystems for self-correcting quantum memories},}\ }\href
+  {\doibase 10.1103/PhysRevA.73.012340} {\bibfield  {journal} {\bibinfo
+  {journal} {Phys. Rev. A}\ }\textbf {\bibinfo {volume} {73}},\ \bibinfo
+  {pages} {012340} (\bibinfo {year} {2006})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Gottesman}(1997)}]{gottesman-thesis}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Daniel}\ \bibnamefont
+  {Gottesman}},\ }\emph {\bibinfo {title} {Stabilizer Codes and Quantum Error
+  Correction}},\ \href {http://arxiv.org/abs/quant-ph/9705052} {Ph.D. thesis},\
+  \bibinfo  {school} {Caltech} (\bibinfo {year} {1997})\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Calderbank}\ \emph {et~al.}(1998)\citenamefont
+  {Calderbank}, \citenamefont {Rains}, \citenamefont {Shor},\ and\
+  \citenamefont {Sloane}}]{Calderbank-1997}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {A.~R.}\ \bibnamefont
+  {Calderbank}}, \bibinfo {author} {\bibfnamefont {E.~M.}\ \bibnamefont
+  {Rains}}, \bibinfo {author} {\bibfnamefont {P.~M.}\ \bibnamefont {Shor}}, \
+  and\ \bibinfo {author} {\bibfnamefont {N.~J.~A.}\ \bibnamefont {Sloane}},\
+  }\bibfield  {title} {\enquote {\bibinfo {title} {Quantum error correction via
+  codes over {GF(4)}},}\ }\href {\doibase 10.1109/18.681315} {\bibfield
+  {journal} {\bibinfo  {journal} {IEEE Trans. Info. Theory}\ }\textbf {\bibinfo
+  {volume} {44}},\ \bibinfo {pages} {1369--1387} (\bibinfo {year}
+  {1998})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Dehaene}\ and\ \citenamefont
+  {De~Moor}(2003)}]{Dehaene-DeMoor-2003}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Jeroen}\ \bibnamefont
+  {Dehaene}}\ and\ \bibinfo {author} {\bibfnamefont {Bart}\ \bibnamefont
+  {De~Moor}},\ }\bibfield  {title} {\enquote {\bibinfo {title} {Clifford group,
+  stabilizer states, and linear and quadratic operations over {GF(2)}},}\
+  }\href {\doibase 10.1103/PhysRevA.68.042318} {\bibfield  {journal} {\bibinfo
+  {journal} {Phys. Rev. A}\ }\textbf {\bibinfo {volume} {68}},\ \bibinfo
+  {pages} {042318} (\bibinfo {year} {2003})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Aaronson}\ and\ \citenamefont
+  {Gottesman}(2004)}]{Aaronson-Gottesman-2004}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Scott}\ \bibnamefont
+  {Aaronson}}\ and\ \bibinfo {author} {\bibfnamefont {Daniel}\ \bibnamefont
+  {Gottesman}},\ }\bibfield  {title} {\enquote {\bibinfo {title} {Improved
+  simulation of stabilizer circuits},}\ }\href {\doibase
+  10.1103/PhysRevA.70.052328} {\bibfield  {journal} {\bibinfo  {journal} {Phys.
+  Rev. A}\ }\textbf {\bibinfo {volume} {70}},\ \bibinfo {pages} {052328}
+  (\bibinfo {year} {2004})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Dai}\ \emph {et~al.}(2013)\citenamefont {Dai},
+  \citenamefont {Ding},\ and\ \citenamefont {Wahba}}]{Dai-Ding-Wahba-2013}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Bin}\ \bibnamefont
+  {Dai}}, \bibinfo {author} {\bibfnamefont {Shilin}\ \bibnamefont {Ding}}, \
+  and\ \bibinfo {author} {\bibfnamefont {Grace}\ \bibnamefont {Wahba}},\
+  }\bibfield  {title} {\enquote {\bibinfo {title} {Multivariate {B}ernoulli
+  distribution},}\ }\href {\doibase 10.3150/12-BEJSP10} {\bibfield  {journal}
+  {\bibinfo  {journal} {Bernoulli}\ }\textbf {\bibinfo {volume} {19}},\
+  \bibinfo {pages} {1465--1483} (\bibinfo {year} {2013})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Wegner}(1971)}]{Wegner-1971}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {F.}~\bibnamefont
+  {Wegner}},\ }\bibfield  {title} {\enquote {\bibinfo {title} {Duality in
+  generalized {I}sing models and phase transitions without local order
+  parameters},}\ }\href {\doibase 10.1063/1.1665530} {\bibfield  {journal}
+  {\bibinfo  {journal} {J. Math. Phys.}\ }\textbf {\bibinfo {volume} {2259}},\
+  \bibinfo {pages} {12} (\bibinfo {year} {1971})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Landahl}\ \emph {et~al.}(2011)\citenamefont
+  {Landahl}, \citenamefont {Anderson},\ and\ \citenamefont
+  {Rice}}]{Landahl-2011}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {A.~J.}\ \bibnamefont
+  {Landahl}}, \bibinfo {author} {\bibfnamefont {J.~T.}\ \bibnamefont
+  {Anderson}}, \ and\ \bibinfo {author} {\bibfnamefont {P.~R.}\ \bibnamefont
+  {Rice}},\ }\href@noop {} {\enquote {\bibinfo {title} {Fault-tolerant quantum
+  computing with color codes},}\ } (\bibinfo {year} {2011}),\ \bibinfo {note}
+  {presented at QIP 2012, December 12 to December 16},\ \Eprint
+  {http://arxiv.org/abs/arXiv:1108.5738} {arXiv:1108.5738} \BibitemShut
+  {NoStop}%
+\bibitem [{\citenamefont {Kovalev}\ and\ \citenamefont
+  {Pryadko}(2015)}]{Kovalev-Pryadko-SG-2015}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {A.~A.}\ \bibnamefont
+  {Kovalev}}\ and\ \bibinfo {author} {\bibfnamefont {L.~P.}\ \bibnamefont
+  {Pryadko}},\ }\bibfield  {title} {\enquote {\bibinfo {title} {Spin glass
+  reflection of the decoding transition for quantum error-correcting codes},}\
+  }\href@noop {} {\bibfield  {journal} {\bibinfo  {journal} {Quantum Inf. {\&}
+  Comp.}\ }\textbf {\bibinfo {volume} {15}},\ \bibinfo {pages} {0825} (\bibinfo
+  {year} {2015})},\ \Eprint {http://arxiv.org/abs/arXiv:1311.7688}
+  {arXiv:1311.7688} \BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Onsager}(1944)}]{Onsager-exact-1944}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Lars}\ \bibnamefont
+  {Onsager}},\ }\bibfield  {title} {\enquote {\bibinfo {title} {Crystal
+  statistics. {I}. a two-dimensional model with an order-disorder
+  transition},}\ }\href {\doibase 10.1103/PhysRev.65.117} {\bibfield  {journal}
+  {\bibinfo  {journal} {Phys. Rev.}\ }\textbf {\bibinfo {volume} {65}},\
+  \bibinfo {pages} {117--149} (\bibinfo {year} {1944})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Naya}(1954)}]{Naya-1954}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Shigeo}\ \bibnamefont
+  {Naya}},\ }\bibfield  {title} {\enquote {\bibinfo {title} {On the spontaneous
+  magnetizations of honeycomb and {K}agom{\'e} {I}sing lattices},}\ }\href
+  {\doibase 10.1143/PTP.11.53} {\bibfield  {journal} {\bibinfo  {journal}
+  {Progress of Theoretical Physics}\ }\textbf {\bibinfo {volume} {11}},\
+  \bibinfo {pages} {53--62} (\bibinfo {year} {1954})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Fisher}(1959)}]{Fisher-1959}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Michael~E.}\
+  \bibnamefont {Fisher}},\ }\bibfield  {title} {\enquote {\bibinfo {title}
+  {Transformations of {I}sing models},}\ }\href {\doibase
+  10.1103/PhysRev.113.969} {\bibfield  {journal} {\bibinfo  {journal} {Phys.
+  Rev.}\ }\textbf {\bibinfo {volume} {113}},\ \bibinfo {pages} {969--981}
+  (\bibinfo {year} {1959})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Bravyi}\ \emph {et~al.}(2014)\citenamefont {Bravyi},
+  \citenamefont {Suchara},\ and\ \citenamefont
+  {Vargo}}]{Bravyi-Suchara-Vargo-2014}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Sergey}\ \bibnamefont
+  {Bravyi}}, \bibinfo {author} {\bibfnamefont {Martin}\ \bibnamefont
+  {Suchara}}, \ and\ \bibinfo {author} {\bibfnamefont {Alexander}\ \bibnamefont
+  {Vargo}},\ }\bibfield  {title} {\enquote {\bibinfo {title} {Efficient
+  algorithms for maximum likelihood decoding in the surface code},}\ }\href
+  {\doibase 10.1103/PhysRevA.90.032326} {\bibfield  {journal} {\bibinfo
+  {journal} {Phys. Rev. A}\ }\textbf {\bibinfo {volume} {90}},\ \bibinfo
+  {pages} {032326} (\bibinfo {year} {2014})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Hauru}\ \emph {et~al.}(2018)\citenamefont {Hauru},
+  \citenamefont {Delcamp},\ and\ \citenamefont
+  {Mizera}}]{Hauru-etal-tensor-2018}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Markus}\ \bibnamefont
+  {Hauru}}, \bibinfo {author} {\bibfnamefont {Clement}\ \bibnamefont
+  {Delcamp}}, \ and\ \bibinfo {author} {\bibfnamefont {Sebastian}\ \bibnamefont
+  {Mizera}},\ }\bibfield  {title} {\enquote {\bibinfo {title} {Renormalization
+  of tensor networks using graph-independent local truncations},}\ }\href
+  {\doibase 10.1103/PhysRevB.97.045111} {\bibfield  {journal} {\bibinfo
+  {journal} {Phys. Rev. B}\ }\textbf {\bibinfo {volume} {97}},\ \bibinfo
+  {pages} {045111} (\bibinfo {year} {2018})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {de~Koning}\ \emph {et~al.}(2000)\citenamefont
+  {de~Koning}, \citenamefont {Cai}, \citenamefont {Antonelli},\ and\
+  \citenamefont {Yip}}]{deKoning-etal-2000}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {M.}~\bibnamefont
+  {de~Koning}}, \bibinfo {author} {\bibfnamefont {Wei}\ \bibnamefont {Cai}},
+  \bibinfo {author} {\bibfnamefont {A.}~\bibnamefont {Antonelli}}, \ and\
+  \bibinfo {author} {\bibfnamefont {S.}~\bibnamefont {Yip}},\ }\bibfield
+  {title} {\enquote {\bibinfo {title} {Efficient free-energy calculations by
+  the simulation of nonequilibrium processes},}\ }\href {\doibase
+  10.1109/5992.841802} {\bibfield  {journal} {\bibinfo  {journal} {Computing in
+  Science Engineering}\ }\textbf {\bibinfo {volume} {2}},\ \bibinfo {pages}
+  {88--96} (\bibinfo {year} {2000})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Bennett}(1976)}]{Bennett-1976}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Charles~H.}\
+  \bibnamefont {Bennett}},\ }\bibfield  {title} {\enquote {\bibinfo {title}
+  {Efficient estimation of free energy differences from {M}onte {C}arlo
+  data},}\ }\href {\doibase 10.1016/0021-9991(76)90078-4} {\bibfield  {journal}
+  {\bibinfo  {journal} {Journal of Computational Physics}\ }\textbf {\bibinfo
+  {volume} {22}},\ \bibinfo {pages} {245–268} (\bibinfo {year}
+  {1976})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Preis}\ \emph {et~al.}(2009)\citenamefont {Preis},
+  \citenamefont {Virnau}, \citenamefont {Paul},\ and\ \citenamefont
+  {Schneider}}]{Preis-etal-2009}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Tobias}\ \bibnamefont
+  {Preis}}, \bibinfo {author} {\bibfnamefont {Peter}\ \bibnamefont {Virnau}},
+  \bibinfo {author} {\bibfnamefont {Wolfgang}\ \bibnamefont {Paul}}, \ and\
+  \bibinfo {author} {\bibfnamefont {Johannes~J.}\ \bibnamefont {Schneider}},\
+  }\bibfield  {title} {\enquote {\bibinfo {title} {\{GPU\} accelerated monte
+  carlo simulation of the 2d and 3d ising model},}\ }\href {\doibase
+  10.1016/j.jcp.2009.03.018} {\bibfield  {journal} {\bibinfo  {journal}
+  {Journal of Computational Physics}\ }\textbf {\bibinfo {volume} {228}},\
+  \bibinfo {pages} {4468 -- 4477} (\bibinfo {year} {2009})}\BibitemShut
+  {NoStop}%
+\bibitem [{\citenamefont {Gilman}\ \emph {et~al.}(2013)\citenamefont {Gilman},
+  \citenamefont {Leist},\ and\ \citenamefont {Hawick}}]{Gilman-etal-2016}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {A.}~\bibnamefont
+  {Gilman}}, \bibinfo {author} {\bibfnamefont {A.}~\bibnamefont {Leist}}, \
+  and\ \bibinfo {author} {\bibfnamefont {K.~A.}\ \bibnamefont {Hawick}},\
+  }\bibfield  {title} {\enquote {\bibinfo {title} {{3D} lattice {M}onte {C}arlo
+  simulations on {FPGA}s},}\ }in\ \href@noop {} {\emph {\bibinfo {booktitle}
+  {Proceedings of the International Conference on Computer Design (CDES)}}}\
+  (\bibinfo  {publisher} {The Steering Committee of The World Congress in
+  Computer Science, Computer Engineering and Applied Computing (WorldComp)},\
+  \bibinfo {year} {2013})\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Yang}\ \emph {et~al.}(2019)\citenamefont {Yang},
+  \citenamefont {Chen}, \citenamefont {Roumpos}, \citenamefont {Colby},\ and\
+  \citenamefont {Anderson}}]{Yang-etal-2019}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Kun}\ \bibnamefont
+  {Yang}}, \bibinfo {author} {\bibfnamefont {Yi-Fan}\ \bibnamefont {Chen}},
+  \bibinfo {author} {\bibfnamefont {Georgios}\ \bibnamefont {Roumpos}},
+  \bibinfo {author} {\bibfnamefont {Chris}\ \bibnamefont {Colby}}, \ and\
+  \bibinfo {author} {\bibfnamefont {John}\ \bibnamefont {Anderson}},\
+  }\href@noop {} {\enquote {\bibinfo {title} {High performance {M}onte {C}arlo
+  simulation of {I}sing model on {TPU} clusters},}\ } (\bibinfo {year}
+  {2019}),\ \bibinfo {note} {unpublished},\ \Eprint
+  {http://arxiv.org/abs/1903.11714} {1903.11714} \BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Poulin}\ and\ \citenamefont
+  {Chung}(2008)}]{Poulin-Chung-2008}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {D.}~\bibnamefont
+  {Poulin}}\ and\ \bibinfo {author} {\bibfnamefont {Y.}~\bibnamefont {Chung}},\
+  }\bibfield  {title} {\enquote {\bibinfo {title} {On the iterative decoding of
+  sparse quantum codes},}\ }\href@noop {} {\bibfield  {journal} {\bibinfo
+  {journal} {Quant. Info. and Comp.}\ }\textbf {\bibinfo {volume} {8}},\
+  \bibinfo {pages} {987} (\bibinfo {year} {2008})},\ \Eprint
+  {http://arxiv.org/abs/arXiv:0801.1241} {arXiv:0801.1241} \BibitemShut
+  {NoStop}%
+\bibitem [{\citenamefont {Liu}\ and\ \citenamefont
+  {Poulin}(2019)}]{Liu-Poulin-2019}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Ye-Hua}\ \bibnamefont
+  {Liu}}\ and\ \bibinfo {author} {\bibfnamefont {David}\ \bibnamefont
+  {Poulin}},\ }\bibfield  {title} {\enquote {\bibinfo {title} {Neural
+  belief-propagation decoders for quantum error-correcting codes},}\ }\href
+  {\doibase 10.1103/PhysRevLett.122.200501} {\bibfield  {journal} {\bibinfo
+  {journal} {Phys. Rev. Lett.}\ }\textbf {\bibinfo {volume} {122}},\ \bibinfo
+  {pages} {200501} (\bibinfo {year} {2019})},\ \Eprint
+  {http://arxiv.org/abs/1811.07835} {1811.07835} \BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Rigby}\ \emph {et~al.}(2019)\citenamefont {Rigby},
+  \citenamefont {Olivier},\ and\ \citenamefont
+  {Jarvis}}]{Rigby-Olivier-Jarvis-2019}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Alex}\ \bibnamefont
+  {Rigby}}, \bibinfo {author} {\bibfnamefont {J.~C.}\ \bibnamefont {Olivier}},
+  \ and\ \bibinfo {author} {\bibfnamefont {Peter}\ \bibnamefont {Jarvis}},\
+  }\bibfield  {title} {\enquote {\bibinfo {title} {Modified belief propagation
+  decoders for quantum low-density parity-check codes},}\ }\href {\doibase
+  10.1103/PhysRevA.100.012330} {\bibfield  {journal} {\bibinfo  {journal}
+  {Phys. Rev. A}\ }\textbf {\bibinfo {volume} {100}},\ \bibinfo {pages}
+  {012330} (\bibinfo {year} {2019})},\ \Eprint
+  {http://arxiv.org/abs/1903.07404} {1903.07404} \BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Kovalev}\ \emph {et~al.}(2011)\citenamefont
+  {Kovalev}, \citenamefont {Dumer},\ and\ \citenamefont
+  {Pryadko}}]{Kovalev-Dumer-Pryadko-2011}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {A.~A.}\ \bibnamefont
+  {Kovalev}}, \bibinfo {author} {\bibfnamefont {I.}~\bibnamefont {Dumer}}, \
+  and\ \bibinfo {author} {\bibfnamefont {L.~P.}\ \bibnamefont {Pryadko}},\
+  }\bibfield  {title} {\enquote {\bibinfo {title} {Design of additive quantum
+  codes via the code-word-stabilized framework},}\ }\href {\doibase
+  10.1103/PhysRevA.84.062319} {\bibfield  {journal} {\bibinfo  {journal} {Phys.
+  Rev. A}\ }\textbf {\bibinfo {volume} {84}},\ \bibinfo {pages} {062319}
+  (\bibinfo {year} {2011})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Iyer}\ and\ \citenamefont
+  {Poulin}(2015)}]{Iyer-Poulin-2013}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Pavithran}\
+  \bibnamefont {Iyer}}\ and\ \bibinfo {author} {\bibfnamefont {David}\
+  \bibnamefont {Poulin}},\ }\bibfield  {title} {\enquote {\bibinfo {title}
+  {Hardness of decoding quantum stabilizer codes},}\ }\href {\doibase
+  10.1109/TIT.2015.2422294} {\bibfield  {journal} {\bibinfo  {journal} {{IEEE}
+  Transactions on Information Theory}\ }\textbf {\bibinfo {volume} {61}},\
+  \bibinfo {pages} {5209--5223} (\bibinfo {year} {2015})},\ \Eprint
+  {http://arxiv.org/abs/arXiv:1310.3235} {arXiv:1310.3235} \BibitemShut
+  {NoStop}%
+\bibitem [{\citenamefont {Kruk}(1989)}]{Kruk-1989}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {E.~A.}\ \bibnamefont
+  {Kruk}},\ }\bibfield  {title} {\enquote {\bibinfo {title} {Decoding
+  complexity bound for linear block codes},}\ }\href
+  {http://mi.mathnet.ru/eng/ppi665} {\bibfield  {journal} {\bibinfo  {journal}
+  {Probl. Peredachi Inf.}\ }\textbf {\bibinfo {volume} {25}},\ \bibinfo {pages}
+  {103--107} (\bibinfo {year} {1989})},\ \bibinfo {note} {(In
+  Russian)}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Coffey}\ and\ \citenamefont
+  {Goodman}(1990)}]{Coffey-Goodman-1990}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {J.~T.}\ \bibnamefont
+  {Coffey}}\ and\ \bibinfo {author} {\bibfnamefont {R.~M.}\ \bibnamefont
+  {Goodman}},\ }\bibfield  {title} {\enquote {\bibinfo {title} {The complexity
+  of information set decoding},}\ }\href {\doibase 10.1109/18.57202} {\bibfield
+   {journal} {\bibinfo  {journal} {IEEE Trans. Info. Theory}\ }\textbf
+  {\bibinfo {volume} {36}},\ \bibinfo {pages} {1031 --1037} (\bibinfo {year}
+  {1990})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Viterbi}(1967)}]{Viterbi-1967}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Andrew~J.}\
+  \bibnamefont {Viterbi}},\ }\bibfield  {title} {\enquote {\bibinfo {title}
+  {Error bounds for convolutional codes and an asymptotically optimum decoding
+  algorithm},}\ }\href {\doibase 10.1109/TIT.1967.1054010} {\bibfield
+  {journal} {\bibinfo  {journal} {IEEE Transactions on Information Theory}\
+  }\textbf {\bibinfo {volume} {13}},\ \bibinfo {pages} {260--269} (\bibinfo
+  {year} {1967})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Gallager}(1963)}]{Gallager-book-1963}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {R.~G.}\ \bibnamefont
+  {Gallager}},\ }\href {\doibase doi=10.1.1.147.683} {\emph {\bibinfo {title}
+  {Low-Density Parity-Check Codes}}}\ (\bibinfo  {publisher} {M.I.T. Press},\
+  \bibinfo {address} {Cambridge, Mass.},\ \bibinfo {year} {1963})\BibitemShut
+  {NoStop}%
+\bibitem [{\citenamefont {Fossorier}(2001)}]{Fossorier-2001}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {M.~P.~C.}\
+  \bibnamefont {Fossorier}},\ }\bibfield  {title} {\enquote {\bibinfo {title}
+  {Iterative reliability-based decoding of low-density parity check codes},}\
+  }\href {\doibase 10.1109/49.924874} {\bibfield  {journal} {\bibinfo
+  {journal} {{IEEE} Journal on Selected Areas in Communications}\ }\textbf
+  {\bibinfo {volume} {19}},\ \bibinfo {pages} {908--917} (\bibinfo {year}
+  {2001})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Richardson}\ and\ \citenamefont
+  {Urbanke}(2001)}]{Richardson-Urbanke-2001}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Thomas~J.}\
+  \bibnamefont {Richardson}}\ and\ \bibinfo {author} {\bibfnamefont
+  {R{\"u}diger~L.}\ \bibnamefont {Urbanke}},\ }\bibfield  {title} {\enquote
+  {\bibinfo {title} {The capacity of low-density parity-check codes under
+  message-passing decoding},}\ }\href {\doibase 10.1109/18.910577} {\bibfield
+  {journal} {\bibinfo  {journal} {Information Theory, IEEE Transactions on}\
+  }\textbf {\bibinfo {volume} {47}},\ \bibinfo {pages} {599--618} (\bibinfo
+  {year} {2001})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Declerq}\ \emph {et~al.}(2014)\citenamefont
+  {Declerq}, \citenamefont {Fossorier},\ and\ \citenamefont
+  {Biglieri}}]{Declerq-Fossorier-Biglieri-2014}%
+  \BibitemOpen
+  \bibinfo {editor} {\bibfnamefont {David}\ \bibnamefont {Declerq}}, \bibinfo
+  {editor} {\bibfnamefont {Marc}\ \bibnamefont {Fossorier}}, \ and\ \bibinfo
+  {editor} {\bibfnamefont {Ezio}\ \bibnamefont {Biglieri}},\ eds.,\ \href
+  {\doibase 10.1016/C2011-0-07211-3} {\emph {\bibinfo {title} {Channel Coding.
+  Theory, Algorithms, and Applications}}}\ (\bibinfo  {publisher} {Academic
+  Press Library in Mobile and Wireless Communications},\ \bibinfo {address}
+  {San Francisco},\ \bibinfo {year} {2014})\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Zeng}\ and\ \citenamefont
+  {Pryadko}(2020)}]{Zeng-Pryadko-2020}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Weilei}\ \bibnamefont
+  {Zeng}}\ and\ \bibinfo {author} {\bibfnamefont {Leonid~P.}\ \bibnamefont
+  {Pryadko}},\ }\href@noop {} {\enquote {\bibinfo {title} {Iterative decoding
+  of row-reduced quantum {LDPC} codes},}\ } (\bibinfo {year} {2020}),\ \bibinfo
+  {note} {unpublished}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {MacWilliams}\ and\ \citenamefont
+  {Sloane}(1981)}]{MS-book}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {F.~J.}\ \bibnamefont
+  {MacWilliams}}\ and\ \bibinfo {author} {\bibfnamefont {N.~J.~A.}\
+  \bibnamefont {Sloane}},\ }\href@noop {} {\emph {\bibinfo {title} {The Theory
+  of Error-Correcting Codes}}}\ (\bibinfo  {publisher} {North-Holland},\
+  \bibinfo {address} {Amsterdam},\ \bibinfo {year} {1981})\BibitemShut
+  {NoStop}%
+\bibitem [{\citenamefont {Fawzi}\ \emph {et~al.}(2017)\citenamefont {Fawzi},
+  \citenamefont {Grospellier},\ and\ \citenamefont
+  {Leverrier}}]{Fawzi-Grospellier-Leverrier-2017}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Omar}\ \bibnamefont
+  {Fawzi}}, \bibinfo {author} {\bibfnamefont {Antoine}\ \bibnamefont
+  {Grospellier}}, \ and\ \bibinfo {author} {\bibfnamefont {Anthony}\
+  \bibnamefont {Leverrier}},\ }\href@noop {} {\enquote {\bibinfo {title}
+  {Efficient decoding of random errors for quantum expander codes},}\ }
+  (\bibinfo {year} {2017}),\ \bibinfo {note} {unpublished},\ \Eprint
+  {http://arxiv.org/abs/1711.08351} {1711.08351} \BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Fawzi}\ \emph {et~al.}(2018)\citenamefont {Fawzi},
+  \citenamefont {Grospellier},\ and\ \citenamefont {Leverrier}}]{FGL18}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Omar}\ \bibnamefont
+  {Fawzi}}, \bibinfo {author} {\bibfnamefont {Antoine}\ \bibnamefont
+  {Grospellier}}, \ and\ \bibinfo {author} {\bibfnamefont {Anthony}\
+  \bibnamefont {Leverrier}},\ }\bibfield  {title} {\enquote {\bibinfo {title}
+  {Constant overhead quantum fault-tolerance with quantum expander codes},}\
+  }in\ \href {\doibase 10.1109/FOCS.2018.00076} {\emph {\bibinfo {booktitle}
+  {59th {IEEE} Annual Symposium on Foundations of Computer Science, {FOCS}
+  2018, Paris, France, October 7-9, 2018}}}\ (\bibinfo {year} {2018})\ pp.\
+  \bibinfo {pages} {743--754}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Grospellier}\ and\ \citenamefont
+  {Krishna}(2018)}]{Grospellier-Krishna-2018}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {A.}~\bibnamefont
+  {Grospellier}}\ and\ \bibinfo {author} {\bibfnamefont {A.}~\bibnamefont
+  {Krishna}},\ }\href@noop {} {\enquote {\bibinfo {title} {Numerical study of
+  hypergraph product codes},}\ } (\bibinfo {year} {2018}),\ \bibinfo {note}
+  {unpublished},\ \Eprint {http://arxiv.org/abs/1810.03681} {1810.03681}
+  \BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Panteleev}\ and\ \citenamefont
+  {Kalachev}(2019)}]{Panteleev-Kalachev-2019}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Pavel}\ \bibnamefont
+  {Panteleev}}\ and\ \bibinfo {author} {\bibfnamefont {Gleb}\ \bibnamefont
+  {Kalachev}},\ }\href@noop {} {\enquote {\bibinfo {title} {Degenerate quantum
+  {LDPC} codes with good finite length performance},}\ } (\bibinfo {year}
+  {2019}),\ \bibinfo {note} {unpublished},\ \Eprint
+  {http://arxiv.org/abs/1904.02703} {1904.02703} \BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Grospellier}\ \emph {et~al.}(2020)\citenamefont
+  {Grospellier}, \citenamefont {Grou{\`e}s}, \citenamefont {Krishna},\ and\
+  \citenamefont {Leverrier}}]{Grospellier-Groues-Krishna-Leverrier-2020}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Antoine}\ \bibnamefont
+  {Grospellier}}, \bibinfo {author} {\bibfnamefont {Lucien}\ \bibnamefont
+  {Grou{\`e}s}}, \bibinfo {author} {\bibfnamefont {Anirudh}\ \bibnamefont
+  {Krishna}}, \ and\ \bibinfo {author} {\bibfnamefont {Anthony}\ \bibnamefont
+  {Leverrier}},\ }\href@noop {} {\enquote {\bibinfo {title} {Combining hard and
+  soft decoders for hypergraph product codes},}\ } (\bibinfo {year} {2020}),\
+  \bibinfo {note} {unpublished},\ \Eprint
+  {http://arxiv.org/abs/arXiv:2004.11199} {arXiv:2004.11199} \BibitemShut
+  {NoStop}%
+\end{thebibliography}%

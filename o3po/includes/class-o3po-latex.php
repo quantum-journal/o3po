@@ -885,6 +885,8 @@ class O3PO_Latex_Dictionary_Provider
                 '\\\\>' => ' ',
                 '\\\\;' => ' ',
                 '\\\\:' => ' ',
+                '\\\\{' => '{',
+                '\\\\}' => '}',
                 '\\\\enspace' => ' ',
                 '\\\\quad' => ' ',
                 '\\\\qquad' => ' ',
@@ -1094,8 +1096,6 @@ class O3PO_Latex_Dictionary_Provider
             //'>' => '\gt ', leave these alone outside of math mode so that they can
             //'<' => '\lt ', later be caught by esc_html() and finalyl printed by MathJax
         '~' => ' ',
-        '{' => '',
-        '}' => '',
         '---' => '—',
         '--' => '–',
         '\\%' => '%',
@@ -1104,6 +1104,8 @@ class O3PO_Latex_Dictionary_Provider
         '\\ ' => ' ',
         "\\\n" => "\n",
         "\\\r" => "\r",
+        '{' => '',
+        '}' => '',
                                                       );
 
         /**
