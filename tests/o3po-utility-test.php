@@ -126,9 +126,14 @@ class O3PO_UtilityTest extends O3PO_TestCase
 
     public function valid_email_provider() {
         return [
-            ['info@quantum-journal.org', true],
-            ['info@subdomain.quantum-journal.org', true],
+            ['info@foo-bar.org', true],
+            ['info@subdomain.foo-bar.org', true],
             ['a-öadaed@foo.com', true],
+            ['aregister@cgogolin.de', true],
+            ['aaregister@cgogolin.de', true],
+            ['aaaregister@cgogolin.de', true],
+            ['aaaaregister@cgogolin.de', true],
+            ['aaaaaregister@cgogolin.de', true],
             ['aaaaaaregister@cgogolin.de', true],
             /* ['a-öadaedfoo.com', false], */
             /* ['info@.org', false], */
