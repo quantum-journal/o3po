@@ -27,7 +27,7 @@ class O3PO_LatexTest extends O3PO_TestCase
         $author_latex_macro_definitions_without_specials = O3PO_Latex::remove_special_macros_to_ignore_in_bbl($author_latex_macro_definitions);
         $bbl = O3PO_Latex::expand_latex_macros($author_latex_macro_definitions_without_specials, $bbl);
 
-        $this->assertNotContains($bbl, 'P.~Aliferis, D.~Gottesman'); #checks that \@firstoftwo and \@secondoftwo was expanded
+        $this->assertStringNotContains($bbl, 'P.~Aliferis, D.~Gottesman'); #checks that \@firstoftwo and \@secondoftwo was expanded
     }
 
 

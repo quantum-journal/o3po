@@ -129,6 +129,7 @@ class O3PO_UtilityTest extends O3PO_TestCase
             ['info@quantum-journal.org', true],
             ['info@subdomain.quantum-journal.org', true],
             ['a-öadaed@foo.com', true],
+            ['aaaaaaregister@cgogolin.de', true],
             /* ['a-öadaedfoo.com', false], */
             /* ['info@.org', false], */
             /* ['info@.', false], */
