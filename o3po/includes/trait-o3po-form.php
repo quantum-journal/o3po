@@ -152,7 +152,6 @@ trait O3PO_Form {
             'max_length' => $max_length);
     }
 
-
         /**
          * Record errors during input verification.
          *
@@ -274,7 +273,6 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         echo '</select>';
     }
 
-
         /**
          * Render an array as comma separated list type field.
          *
@@ -308,7 +306,6 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
 
         throw new Exception('Field '. $id . ' is not known or has no default value.');
     }
-
 
         /**
          * Get the default value of all fields.
@@ -364,11 +361,6 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
 
     }
 
-
-
-
-
-
         /**
          * Clean user input to doi_prefix fields
          *
@@ -423,7 +415,6 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         return $this->get_field_default($id);
     }
 
-
         /**
          * Clean user input to eprint fields
          *
@@ -460,7 +451,6 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
             return $this->validate_issn($id, $input);
     }
 
-
        /**
          * Clean user input to issn fields
          *
@@ -480,7 +470,6 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         return $this->get_field_default($id);
     }
 
-
         /**
          * Clean user input to email fields
          *
@@ -498,7 +487,6 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         $this->add_error( $id, 'invalid-email', "The input '" . $input . "' to '" . $this->fields[$id]['title'] . "' was not a valid email address. Field reset.", 'error');
         return $this->get_field_default($id);
     }
-
 
         /**
          * Clean user input to url fields
@@ -528,7 +516,6 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         return $url;
     }
 
-
         /**
          * Validate input to comma separated list fields.
          *
@@ -555,7 +542,6 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
             return $this->get_field_default($id);
         }
     }
-
 
         /**
          * Validate two letter country code fields
@@ -594,25 +580,6 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         return $this->get_field_default($id);
     }
 
-
-    /*     /\** */
-    /*      * Validate positive integer fields <1000 */
-    /*      * */
-    /*      * @since    0.3.1+ */
-    /*      * @access   private */
-    /*      * @param    string   $id    The field this was input to. */
-    /*      * @param    string   $input    User input. */
-    /*      *\/ */
-    /* public function validate_positive_integer_under_1000( $id, $input ) { */
-
-    /*     $result = validate_positive_integer($id, $input); */
-    /*     if($result < 1000) */
-    /*         return $result; */
-
-    /*     $this->add_error( $id, 'not-a-positive-integer', "The maximum for the field '" . $input . "' is 1000. Field reset.", 'error'); */
-    /*     return 1000; */
-    /* } */
-
         /**
          * Restrict input to checked or unchecked fields
          *
@@ -630,16 +597,23 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         return $this->get_field_default($id);
     }
 
-
+        /**
+         * Ensure that a check box field is checked
+         *
+         * @sinde    0.3.1+
+         * @access   public
+         * @param    string   $id    The field this was input to.
+         * @param    string   $input    User input.
+         */
     public function checked( $id, $input ) {
 
         if($input === "checked")
             return $input;
 
         $this->add_error( $id, 'not-checked', "The box '" . $this->fields[$id]['title'] . "' must be checked.", 'error');
+
         return $this->get_field_default($id);
     }
-
 
         /**
          * Trim user input to field
@@ -668,6 +642,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         $trimmed_striped_input = strip_tags($input);
         if($trimmed_striped_input !== $input)
             $this->add_error( $id, 'tags-stripped', "The field '" . $this->fields[$id]['title'] . "' cannot contain html tags. Tags were removed.", 'error');
+
         return $trimmed_striped_input;
     }
 
