@@ -1470,6 +1470,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                     $thisabstract = O3PO_Latex::expand_latex_macros($new_author_latex_macro_definitions, $thisabstract);
                     $thisabstract = O3PO_Latex::latex_to_utf8_outside_math_mode($thisabstract, false);
                     $thisabstract = O3PO_Latex::normalize_whitespace_and_linebreak_characters($thisabstract, false, true);
+                    $thisabstract = O3PO_Latex::remove_font_changing_commands($thisabstract);
                     if(!empty($thisabstract))
                     {
                         if(!empty($abstract))

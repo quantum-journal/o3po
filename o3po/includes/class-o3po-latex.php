@@ -377,8 +377,8 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 foreach ($str_replacements as $target => $substitute)
                     $text = str_replace($target, $substitute, $text);
                 foreach ($preg_replacements as $target => $substitute) {
-                    $text = preg_replace('#'.$target.'#u', $substitute, $text);
                     if( mb_strpos($text, '\\') === false ) break;
+                    $text = preg_replace('#'.$target.'#u', $substitute, $text);
                 }
                 $text = self::normalize_whitespace_and_linebreak_characters($text, true, true);
                 $text = self::latex_to_utf8_outside_math_mode($text);
@@ -903,6 +903,7 @@ class O3PO_Latex_Dictionary_Provider
                 '\\\\>' => ' ',
                 '\\\\;' => ' ',
                 '\\\\:' => ' ',
+                '\\\\-' => '-',
                 '\\\\{' => '{',
                 '\\\\}' => '}',
                 '\\\\enspace' => ' ',
@@ -1587,6 +1588,32 @@ class O3PO_Latex_Dictionary_Provider
         return $text;
     }
 
+
+        /**
+         * Remove font changing commands.
+         *
+         * @since    0.3.1+
+         * @access   public
+         * @param    string   $text          LaTeX text to remove font commands from.
+         */
+    static public function remove_font_changing_commands( $text ) {
+        $preg_replacements = array(
+            '\\\\(bf|tt|sf|sl)(series|family)(?![a-zA-Z])' => '',
+            '\\\\text(em|it|bf|tt|rm|sl|sc)(?![a-zA-Z])' => '',
+            '\\\\emph(?![a-zA-Z])' => '',
+            '\\\\(em|it|tt|bf|sl)(|shape)(?![a-zA-Z])' => '',
+            '\\\\text(super|sub)script(?![a-zA-Z])' => '',
+            '\\\\spaceskip\s*=\s*[0-9.]*(em|pt)' => '',
+            '\\\\fontdimen[0-9]*' => '',
+            '\\\\font (plus|minus)(?![a-zA-Z])' => '',
+            '\\\\font(?![a-zA-Z])' => '',
+                                   );
+        foreach ($preg_replacements as $target => $substitute) {
+            if( mb_strpos($text, '\\') === false ) break;
+            $text = preg_replace('#'.$target.'#u', $substitute, $text);
+        }
+        return $text;
+    }
 
         /**
          * Extract all bibliographies from latex code.
