@@ -21,7 +21,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-short
  * @subpackage O3PO/includes
  * @author     Johannes Drever <drever@lrz.uni-muenchen.de>
  */
-class O3PO_EmailTemplates {
+class O3PO_EmailTemplates implements O3PO_SettingsSpecifyer {
 
 
         /**

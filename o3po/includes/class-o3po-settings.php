@@ -1446,3 +1446,18 @@ class O3PO_Settings extends O3PO_Singleton {
     }
 
 }
+
+
+/**
+ * Interface for classes specifying settings.
+ *
+ * @since      0.3.1+
+ * @package    O3PO
+ * @subpackage O3PO/includes
+ * @author     Christian Gogolin <o3po@quantum-journal.org>
+ */
+interface O3PO_SettingsSpecifyer  {
+
+    static function specify_settings( $settings );
+
+}

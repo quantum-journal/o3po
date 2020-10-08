@@ -21,7 +21,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-short
  * @subpackage O3PO/includes
  * @author     Christian Gogolin <o3po@quantum-journal.org>
  */
-class O3PO_Journal {
+class O3PO_Journal implements O3PO_SettingsSpecifyer {
 
 
         /**
