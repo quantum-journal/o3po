@@ -173,7 +173,7 @@ class O3PO_Environment {
          * @param    string    $mime_type         Expected mime type of the download.
          * @param    int       $parent_post_id    Id of post to which to link the download.
          * */
-    public function download_to_media_library( $url, $filename, $extension, $mime_type, $parent_post_id, $timeout_seconds = 20 ) {
+    public function download_to_media_library( $url, $filename, $extension, $mime_type, $parent_post_id, $timeout_seconds = 40 ) {
 
         $extension = ltrim($extension, '.');
 
