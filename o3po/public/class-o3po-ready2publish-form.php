@@ -23,7 +23,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-envir
  * @subpackage O3PO/includes
  * @author     Christian Gogolin <o3po@quantum-journal.org>
  */
-class O3PO_Ready2PublishForm extends O3PO_PublicForm {
+class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpecifyer {
 
     use O3PO_Ready2PublishStorage;
 
@@ -139,14 +139,6 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
         $this->render_image_upload_field($id, 'Image must be in jpg or png format, have a white background, and an aspect ratio of 2:1. The maximum file size is ' . ($upload_max_filesize > 1024 ? (round($upload_max_filesize/1024, 2)) . 'M' : $upload_max_filesize) . 'B. The featured image appears on the Quantum homepage, e.g., <a href="/papers/">in the list of published papers</a>, and on social media. A good image helps draw attention to your article.', false);
     }
-
-
-    /* public function render_waiver() { */
-
-    /*     $settings = O3PO_Settings::instance(); */
-    /*     $this->render_checkbox_field('waiver', 'I require a waiver.'); */
-    /* } */
-
 
         /**
          *
@@ -375,57 +367,95 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
         echo '</div>';
     }
 
-
     public function on_submit() {
 
-            // This is just a temporary solution.
-            // In the long run the papers in the queue will be displayed
-            // on the admin page and publishing can be directly initiated
-            // from there.
         $settings = O3PO_Settings::instance();
-        $to = ($this->environment->is_test_environment() ? $settings->get_field_value('developer_email') : "publish@quantum-journal.org" );
-        $headers = array( 'From: ' . $settings->get_field_value('publisher_email'), 'Content-Type: text/html; charset=UTF-8');
-        $subject  = "TEST " . $this->get_field_value('title');
 
-        $message = "The following manuscript was submitted for publication:" . "\n";
+        $summary = "";
         foreach($this->sections as $section_id => $section_options)
         {
-            $message .= "\n" . '<h3 id="' . esc_attr($section_id) . '">' . esc_html($section_options['title']) . ':</h3>';
+            $summary .= "\n" . '<h3 id="' . esc_attr($section_id) . '">' . esc_html($section_options['title']) . ':</h3>';
             if($section_options['summary_callback'] !== null)
             {
-                $message .= call_user_func($section_options['summary_callback']);
+                $summary .= call_user_func($section_options['summary_callback']);
             }
             else
             {
                 foreach($this->fields as $id => $field_options) {
                     if($field_options['section'] !== $section_id)
                         continue;
-                    $message .= "\n" . '<h4>' . esc_html($field_options['title']) . '</h4>';
+                    $summary .= "\n" . '<h4>' . esc_html($field_options['title']) . '</h4>';
                     $value = $this->get_field_value($id);
                     if(is_array($value))
                     {
                         foreach($value as $val)
-                            $message .= '<p>' . (!empty($val) ? esc_html($val) : 'Not provided') . '</p>' . "\n";
+                            $summary .= '<p>' . (!empty($val) ? esc_html($val) : 'Not provided') . '</p>' . "\n";
                     }
                     else
                     {
                         $result = $this->get_session_data('file_upload_result_' . $id);
                         if(empty($result['error']) and !empty($result['user_name']))
-                            $message .= '<p>' . esc_html($result['user_name']) . '</p>';
+                            $summary .= '<p>' . esc_html($result['user_name']) . '</p>';
                         else
-                            $message .= '<p>' . (!empty($value) ? esc_html($value) : 'Not provided') . '</p>';
+                            $summary .= '<p>' . (!empty($value) ? esc_html($value) : 'Not provided') . '</p>';
                     }
                 }
             }
         }
+
+        $headers = array( 'From: ' . "publish@quantum-journal.org", 'Content-Type: text/html; charset=UTF-8');
         $file_upload_result = $this->get_session_data('file_upload_result_' . 'featured_image_upload');
         $attachment = array($file_upload_result['file']);
 
+            // This is just a temporary solution.
+            // In the long run the papers in the queue will be displayed
+            // on the admin page and publishing can be directly initiated
+            // from there.
+        $to = ($this->environment->is_test_environment() ? $settings->get_field_value('developer_email') : "publish@quantum-journal.org" );
+        $subject  = "TEST - DO NOT PUBLISH: " . $this->get_field_value('title') . " was submitted for publication";
+        $message = "The following manuscript was submitted for publication:" . "\n\n" . $summary;
+
         $successfully_sent = wp_mail( $to, $subject, $message, $headers, $attachment);
-            // send it also to the corresponding author
+
+            //Send an email to order the invoice
+        if($successfully_sent)
+        {
+            if($this->get_field_value('payment_method')['value'] === 'invoice')
+            {
+                $to = 'invoice@quantum-journal.org';
+                $subject  = "Invoice request for " . $this->get_field_value('eprint');
+                $message = "An Invoice was requested for https://arxiv.org/abs/" . $this->get_field_value('eprint') . ":\n\n";
+                $message = $this->get_field_value('invoice_recipient') . "\n\n";
+                $message = $this->get_field_value('invoice_address') . "\n\n";
+                $message = "Vat-Nr: " . $this->get_field_value('invoice_vat_number') . "\n\n";
+                $message = "Amount: " . $this->get_field_value('payment_amount') . "\n\n";
+                $message = "Comments:\n" . $this->get_field_value('comments');
+                $successfully_sent = wp_mail($to, $subject, $message, $headers);
+            }
+        }
+
+            // Also send an email to the corresponding author
         if($successfully_sent)
         {
             $to = $this->get_field_value('corresponding_author_email');
+            $message = "Dear author,\n\nWe confirm having received your manuscript \"" . $this->get_field_value('title') . "\" for publication.\n\n";
+            if($this->get_field_value('payment_method')['value'] === 'waiver')
+            {
+                $message .= "Your publication fee has been waived as requested.\n";
+            }
+            elseif($this->get_field_value('payment_method')['value'] === 'invoice')
+            {
+                $message .= "Our team is preparing an invoice for you. Together with this invoice you will also receive instructions for how to pay the article processing charge.\n";
+            }
+            else
+            {
+                $message .= "If you haven't done so already, please visit <a href=\"https://quantum-journal.org/payment/\">https://quantum-journal.org/payment/</a> to support the operations of " . $settings->get_field_value('journal_title') . " by paying your article processing charge.\n";
+            }
+            $message .= "\n";
+            $message .= "Please find a summary of the information you provided below.\n\n";
+            $message .= "Thank you for choosing to publish in " . $settings->get_field_value('journal_title') . ".\n\nBest regards,\n\n" . $settings->get_field_value('executive_board') . "\n\n";
+            $message .= "Summary of the information provided:\n\n"$summary;
+
             $successfully_sent = wp_mail($to, $subject, $message, $headers, $attachment);
         }
 
@@ -436,8 +466,10 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
     public function submitted_message( $submitted_successfully ) {
         if($submitted_successfully)
         {
-            $message = '<p>Thank you for preparing your manuscript for publication! The information you provided was safely recorded.</p>';
-            $message .= '<p>If you requested an invoice, there is nothing else you need to do at the moment. Our team will issue the invoice and get back to you in the coming days.</p>';
+            $message = '<p>Thank you for preparing your manuscript for publication! The information you provided was safely received.</p>';
+            $message .= '<p>You will receive a confirmation email shortly.</p>';
+            $message .= '<p>If you requested a waiver, there is nothing else you need to do at the moment.</p>';
+            $message .= '<p>If you requested an invoice our team will issue the invoice and get back to you in the coming days.</p>';
             $message .= '<p>If you chose to pay now with any of the listed payment options, please proceed to the payment page.</p>';
             $message .= '<form action="/payment/"><input type="submit" value="proceed to payment" style="float:right;" /></form>';
 
@@ -497,13 +529,15 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm {
 
         $this->render_select_field('payment_method', [
                                        array('value' => 'invoice',
-                                             'description' => 'Request invoice and pay later'),
-                                       array('value' => 'transfer',
-                                             'description' => 'Pay by bank transfer now'),
-                                       array('value' => 'card',
-                                             'description' => 'Pay by credit Card now'),
-                                       array('value' => 'paypal',
-                                             'description' => 'Pay by PayPal now'),
+                                             'description' => 'Request invoice and payment information'),
+                                       array('value' => 'noinvoice',
+                                             'description' => 'Pay now without invoice'),
+                                       /* array('value' => 'transfer', */
+                                       /*       'description' => 'Pay by bank transfer now'), */
+                                       /* array('value' => 'card', */
+                                       /*       'description' => 'Pay by credit Card now'), */
+                                       /* array('value' => 'paypal', */
+                                       /*       'description' => 'Pay by PayPal now'), */
                                        array('value' => 'waiver',
                                              'description' => 'I require a waiver'),
                                                       ], 'onPaymentMethodChange()');
@@ -516,7 +550,10 @@ var paymentInvoice = document.getElementById("payment_invoice");
 var explanationP = document.getElementById("payment_method_explanation");
 switch(select.value) {
 case "invoice":
-explanationP.innerHTML = "Please provide the following information so that we can issue an invoice. The invoice can then be payed later via bank transfer, credit card, or PayPal by, e.g., the administration of your institution. Instructions will be sent to you by email together with the invoice."
+explanationP.innerHTML = "Please provide the following information so that we can issue an invoice. The invoice can then be payed later via bank transfer, credit card, or PayPal by, e.g., the administration of your institution. Instructions will be sent to you by email once out team has prepared the invoice."
+break;
+case "noinvoice":
+explanationP.innerHTML = "You will be directed to a page to carry out the payment after completing this form."
 break;
 case "waiver":
 explanationP.innerHTML = "We offer a progressive waiver policy so that authors who cannot cover their open-access fees are not excluded from publishing. Your article processing charge can be waived."

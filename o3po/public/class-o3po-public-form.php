@@ -45,11 +45,6 @@ abstract class O3PO_PublicForm {
 
     }
 
-
-    public static function specify_settings( $settings ) {
-
-    }
-
         /**
          * Specifies form sections and fields.
          *
@@ -58,6 +53,12 @@ abstract class O3PO_PublicForm {
          */
     abstract protected function specify_pages_sections_and_fields();
 
+        /**
+         * Read all form values from $_POST and process.
+         *
+         * @since 0.3.1+
+         * @access public
+         */
     public function read_and_validate_field_values() {
 
         if(isset($_POST['coming_from_page']) and isset($this->pages[$_POST['coming_from_page']]))
@@ -143,7 +144,7 @@ abstract class O3PO_PublicForm {
                 }
             }
         }
-        elseif($this->navigation === 'Submit')
+        elseif($this->navigation === 'Submit' and count($this->errors) === 0)
         {
             $this->submitted_successfully = $this->on_submit();
             $this->add_sideloaded_files_to_media_library();
@@ -534,6 +535,12 @@ abstract class O3PO_PublicForm {
     }
 
 
+        /**
+         * Add the files uploaded by the user to the media library.
+         *
+         * @since 0.3.1+
+         * @access protected
+         */
     protected function add_sideloaded_files_to_media_library() {
 
         include_once( ABSPATH . 'wp-admin/includes/image.php' );
