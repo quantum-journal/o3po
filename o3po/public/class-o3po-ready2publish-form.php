@@ -89,7 +89,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
 
 
         $this->specify_section('payment_invoice', 'Invoicing information', null, 'payment');
-        $this->specify_field('payment_amount', 'Amount', array($this, 'render_payment_amount'), 'payment', 'payment_invoice', array(), array($this, 'validate_positive_integer'), array());
+        $this->specify_field('payment_amount', 'Amount', array($this, 'render_payment_amount'), 'payment', 'payment_invoice', array(), array($this, 'validate_non_negative_euros'), "450€");
         $this->specify_field('invoice_recipient', 'Recipient', array( $this, 'render_invoice_recipient' ), 'payment', 'payment_invoice', array(), array($this, 'trim_strip_tags'), '');
         $this->specify_field('invoice_address', 'Address', array( $this, 'render_invoice_address' ), 'payment', 'payment_invoice', array(), array($this, 'trim_strip_tags'), '');
         $this->specify_field('invoice_vat_number', 'VAT number (if applicable)', array( $this, 'render_invoice_vat_number' ), 'payment', 'payment_invoice', array(), array($this, 'trim_strip_tags'), '');
@@ -336,13 +336,13 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
 
     public function render_payment_amount() {
         $this->render_select_field('payment_amount', [
-                                       array('value' => '450',
+                                       array('value' => '450€',
                                              'description' => '450€ Regular publication fee (for manuscripts submitted from 01.05.2020 on)'),
-                                       array('value' => '2250',
+                                       array('value' => '225€',
                                              'description' => '225€ Half regular publication fee (for flitting the fee)'),
-                                       array('value' => '200',
+                                       array('value' => '200€',
                                              'description' => '200€ Old publication fee (for manuscripts submitted before May 1st 2020)'),
-                                       array('value' => '100',
+                                       array('value' => '100€',
                                              'description' => '100€ Discount publication fee'),
                                                                       ]);
     }
@@ -424,12 +424,13 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
             {
                 $to = 'invoice@quantum-journal.org';
                 $subject  = "Invoice request for " . $this->get_field_value('eprint');
-                $message = "An Invoice was requested for https://arxiv.org/abs/" . $this->get_field_value('eprint') . ":\n\n";
-                $message = $this->get_field_value('invoice_recipient') . "\n\n";
-                $message = $this->get_field_value('invoice_address') . "\n\n";
-                $message = "Vat-Nr: " . $this->get_field_value('invoice_vat_number') . "\n\n";
-                $message = "Amount: " . $this->get_field_value('payment_amount') . "\n\n";
-                $message = "Comments:\n" . $this->get_field_value('comments');
+                $message = "";
+                $message .= "<p>An Invoice was requested for https://arxiv.org/abs/" . $this->get_field_value('eprint') . ":</p>";
+                $message .= "<p>" . $this->get_field_value('invoice_recipient') . "</p>";
+                $message .= "<p>" . $this->get_field_value('invoice_address') . "</p>";
+                $message .= "<p>Vat-Nr: " . $this->get_field_value('invoice_vat_number') . "</p>";
+                $message .= "<p>Amount: " . $this->get_field_value('payment_amount') . "</p>";
+                $message .= "<p>Comments:\n" . $this->get_field_value('comments') . "</p>";
                 $successfully_sent = wp_mail($to, $subject, $message, $headers);
             }
         }
@@ -438,28 +439,28 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         if($successfully_sent)
         {
             $to = $this->get_field_value('corresponding_author_email');
-            $message = "Dear author,\n\nWe confirm having received your manuscript \"" . $this->get_field_value('title') . "\" for publication.\n\n";
+            $message = "<p>Dear author,<br />\n<br />\nWe confirm having received your manuscript \"" . $this->get_field_value('title') . "\" for publication.</p>\n";
             if($this->get_field_value('payment_method') === 'waiver')
             {
-                $message .= "Your publication fee has been waived.\n";
+                $message .= "<p>Your publication fee has been waived.</p>\n";
             }
             else
             {
                 if($this->get_field_value('payment_method') === 'invoice')
                 {
-                    $message .= "Our team is preparing an invoice for you. Together with this invoice you will also receive instructions for how to pay the article processing charge.\n";
+                    $message .= "<p>Our team is preparing an invoice for you. Together with this invoice you will also receive instructions for how to pay the article processing charge.</p>\n";
                 }
                 else
                 {
-                    $message .= "If you haven't done so already, please visit <a href=\"https://quantum-journal.org/payment/\">https://quantum-journal.org/payment/</a> to support the operations of " . $settings->get_field_value('journal_title') . " by paying your article processing charge.\n";
+                    $message .= "<p>If you haven't done so already, please visit <a href=\"https://quantum-journal.org/payment/\">https://quantum-journal.org/payment/</a> to support the operations of " . $settings->get_field_value('journal_title') . " by paying your article processing charge.</p>\n";
                 }
                 $message .= "\n";
                 $message .= '<p>Please note that as a matter of courtesy we may publish your work before receiving the payment.</p>';
             }
             $message .= "\n";
-            $message .= "Please find a summary of the information you provided below.\n\n";
-            $message .= "Thank you for choosing to publish in " . $settings->get_field_value('journal_title') . ".\n\nBest regards,\n\n" . $settings->get_field_value('executive_board') . "\n\n";
-            $message .= "Summary of the information provided:\n\n" . $summary;
+            $message .= "<p>Please find a summary of the information you provided below.</p>\n\n";
+            $message .= "<p>Thank you for choosing to publish in " . $settings->get_field_value('journal_title') . " and congratulations on your work being pubished soon.<br />\n<br />\nBest regards,<br />\n<br />\n" . $settings->get_field_value('executive_board') . "<br />\n<br />\nExecutive Board of Quantum</p>\n\n";
+            $message .= "<p>Summary of the information provided:</p>\n\n" . $summary;
 
             $successfully_sent = wp_mail($to, $subject, $message, $headers, $attachment);
         }
@@ -523,7 +524,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
     }
 
     public function render_invoice_vat_number() {
-        $this->render_single_line_field('invoice_recipient', 'e.g., ATU99999999');
+        $this->render_single_line_field('invoice_vat_number', 'e.g., ATU99999999');
     }
 
     public function render_comments() {
