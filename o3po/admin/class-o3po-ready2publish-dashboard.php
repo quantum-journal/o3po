@@ -35,6 +35,19 @@ class O3PO_Ready2PublishDashboard {
 
     protected $title;
 
+    private $meta_fields = ['eprint',
+                            'title',
+                            'corresponding_author_email',
+                            'abstract',
+                            'author_given_names',
+                            'author_surnames',
+                            'author_name_styles',
+                            'popular_summary',
+                            'featured_image',
+                            'featured_image_caption',
+                            'multimedia_comment',
+                            'fermats_library'];
+
     public function __construct( $plugin_name, $plugin_pretty_name, $slug, $title ) {
 
         $this->plugin_name = $plugin_name;
@@ -49,22 +62,42 @@ class O3PO_Ready2PublishDashboard {
     }
 
     public function render() {
-        echo "<h3>Manuscripts ready for publication</h3>";
+        echo '<h3>Manuscripts submitted for publication</h3>';
         echo '<ul>';
-        foreach($this->get_all_unpublished_manuscripts() as $id => $manuscript_info)
+        foreach($this->get_manuscripts('unprocessed') as $id => $manuscript_info)
         {
-            echo '<li><div class="has-row-actionsX">';
-            echo '<p>' . esc_html($manuscript_info['eprint']) . '</p>';
-            echo '<p class="row-actionsX">';
-            echo '<span class="reply"><a href="mailto:' . esc_attr($manuscript_info['corresponding_author_email']) . '">' . esc_html($manuscript_info['corresponding_author_email']) . '</a></span>';
-            echo '<span class="approve"><a href="/' . $this->slug . '?action=' . 'publish' . '&id=' . urlencode($id) . '">Publish</a></span>';
-            echo '<span class="approve"><a href="/' . $this->slug . '?action=' . 'invoice' . '&id=' . urlencode($id) . '">Invoice</a></span>';
-
-            echo '</p>';
+            echo '<li><div class="manuscript-ready2publish">';
+            echo '<span>' . esc_html($manuscript_info['eprint']) . '</span>: ';
+            echo '<span>' . esc_html($manuscript_info['title']) . '</span>';
+            echo '<div style="margin-left:">';
+            echo '<span><a href="mailto:' . esc_attr($manuscript_info['corresponding_author_email']) . '">Email ' . esc_html($manuscript_info['corresponding_author_email']) . '</a></span>';
+            echo ' | ';
+            echo '<span class=""><a href="/' . $this->slug . '?action=' . 'publish' . '&id=' . urlencode($id) . '">Start publishing</a></span>';
+            /* echo ' | '; */
+            /* echo '<span class=""><a href="/' . $this->slug . '?action=' . 'ignore' . '&id=' . urlencode($id) . '">Ignore</a></span>'; */
+            echo '</div>';
             echo '</div></li>';
         }
         echo '</ul>';
-
+        echo '<h3>Partially published manuscripts</h3>';
+        echo '<ul>';
+        foreach($this->get_manuscripts('partial') as $id => $manuscript_info)
+        {
+            echo '<li><div class="manuscript-ready2publish">';
+            echo '<span>' . esc_html($manuscript_info['eprint']) . '</span>: ';
+            echo '<span>' . esc_html($manuscript_info['title']) . '</span>';
+            echo '<div style="margin-left:">';
+            echo '<span><a href="mailto:' . esc_attr($manuscript_info['corresponding_author_email']) . '">Email ' . esc_html($manuscript_info['corresponding_author_email']) . '</a></span>';
+            echo ' | ';
+            echo '<span class=""><a href="/' . $this->slug . '?action=' . 'continue' . '&id=' . urlencode($id) . '">Continue</a></span>';
+            /* echo ' | '; */
+            /* echo '<span class=""><a href="/' . $this->slug . '?action=' . 'ignore' . '&id=' . urlencode($id) . '">Ignore</a></span>'; */
+            echo '</div>';
+            echo '</div></li>';
+        }
+        echo '</ul>';
+        echo '<h3>Ignored submissions</h3>';
+        echo '<span>Coming soon...</span>';
     }
 
     public function insert_post( $id ) {
@@ -79,7 +112,10 @@ class O3PO_Ready2PublishDashboard {
             return $post_id;
         else
         {
-            update_post_meta($post_id, $post_type . '_eprint', $manuscript_info['eprint']);
+            foreach( $this->meta_fields as $field_id)
+                update_post_meta($post_id, $post_type . '_' . $field_id, $manuscript_info[$field_id]);
+            update_post_meta($post_id, $post_type . '_number_authors', count($manuscript_info['author_name_styles']));
+
         }
 
         return $post_id;
@@ -87,29 +123,51 @@ class O3PO_Ready2PublishDashboard {
 
     public function insert_and_display_post( $id ) {
         $post_id = $this->insert_post($id);
+        $this->display_post( $post_id );
+    }
+
+    public function display_post( $post_id ) {
         if(is_wp_error($post_id))
             echo "ERROR: " . $post_id->get_error_message();
         else
-            header('Location: /post.php?post=' . $post_id . '&action=edit');
+            header('Location: /wp-admin/post.php?post=' . $post_id . '&action=edit');
     }
 
+        /**
+         * Adds a rewrite endpoint for the form.
+         *
+         * To be added to the 'init' action.
+         *
+         * @since    0.1.0
+         * @access   public
+         * */
+    public function init() {
 
+        add_rewrite_endpoint($this->slug, EP_ROOT);
+            //flush_rewrite_rules( true );  //// <---------- ONLY COMMENT IN WHILE TESTING
+    }
 
     public function do_parse_request( $bool, $wp, $extra_query_vars ) {
 
         $home_path = parse_url(home_url(), PHP_URL_PATH);
-        $path = trim(preg_replace("#^/?{$home_path}/#", '/', esc_url(add_query_arg(array()))), '/' );
+        $path = trim(preg_replace("#\?.*#", '', preg_replace("#^/?{$home_path}/#", '/', esc_url(add_query_arg(array())))), '/' );
 
         if($path !== $this->slug)
             return $bool;
 
-        $action = get_query_var( 'action', null );
+        $action = isset($_GET["action"]) ? $_GET["action"] : null;
+        $id = isset($_GET["id"]) ? $_GET["id"] : null;
+
         switch($action)
         {
             case 'publish':
-                $id = get_query_var( 'id', null );
                 if($id !== null)
                     $this->insert_and_display_post($id);
+                break;
+            case 'continue':
+                if($id !== null)
+                    $post_id = $this->post_id_for_eprint($id);
+                    $this->display_post($post_id);
                 break;
             default:
                 echo "unsupported action " . $action;

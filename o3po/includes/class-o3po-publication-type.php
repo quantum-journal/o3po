@@ -616,7 +616,7 @@ abstract class O3PO_PublicationType {
             $validation_result .= "WARNING: The page number " . $pages . " of this " . $post_type . " is not exactly one larger than the so-far highest page number " . $highest_pages . " of all posts of type " . $post_type . ". This can be correct if you are modifying an already published post, or if there are posts scheduled for publication in the future. Please double check.\n";
         $pages_still_free_info = $this->journal->pages_still_free_info( $post_id, $pages, array($post_type) );
         if(!$pages_still_free_info['still_free'])
-            $validation_result .= "ERROR: The page number " . $pages . " is already taken by the " . $post_type . " " . $pages_still_free_info['title'] . ". This prevents assignment of a DOI as well as the downloading and parsing of the source files and pdf from the arXiv.\n";
+            $validation_result .= "ERROR: The page number " . $pages . " is already taken by the " . $post_type . " " . $pages_still_free_info['title'] . ". This may have prevented the assignment of a DOI as well as the downloading and parsing of the source files and pdf from the arXiv.\n";
 
         if ($doi_suffix_was_changed_on_last_save === "true")
             $validation_result .= "REVIEW: The doi suffix was set to ". $doi_suffix . ".\n";
