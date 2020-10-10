@@ -27,8 +27,10 @@ class O3PO_Arxiv {
         /**
          * Fetch meta-data from the abstract page of an eprint on the arXiv.
          *
-         * extracts the abstract, number_authors, author_given_names,
-         * author_surnames and title
+         * Extracts the abstract, number_authors, author_first_names,
+         * author_last_names and title. As there is no way to tell,
+         * whether the first name is the given or surname we cannot deduce the
+         * given names and surnames and instead return first and last names.
          *
          * @since  0.3.0
          * @access public
@@ -51,8 +53,8 @@ class O3PO_Arxiv {
                 $x_path = new DOMXPath($dom);
 
                 $number_authors = 0;
-                $author_given_names = array();
-                $author_surnames = array();
+                $author_first_names = array();
+                $author_last_names = array();
                 $title = '';
                 $arxiv_license = '';
                 $arxiv_author_links = $x_path->query("/html/body//div[@class='authors']/a");
@@ -60,8 +62,8 @@ class O3PO_Arxiv {
                 {
                     foreach($arxiv_author_links as $x => $arxiv_author_link) {
                         $arxiv_author_names = preg_split('/\s+(?=\S+$)/u', $arxiv_author_link->nodeValue, -1, PREG_SPLIT_NO_EMPTY);
-                        $author_given_names[$x] = empty($arxiv_author_names[0]) ? '' : $arxiv_author_names[0];
-                        $author_surnames[$x] = empty($arxiv_author_names[1]) ? '' : $arxiv_author_names[1];
+                        $author_first_names[$x] = empty($arxiv_author_names[0]) ? '' : $arxiv_author_names[0];
+                        $author_last_names[$x] = empty($arxiv_author_names[1]) ? '' : $arxiv_author_names[1];
                         $number_authors = $x+1;
                     }
                 }
@@ -108,8 +110,8 @@ class O3PO_Arxiv {
                     'arxiv_fetch_results' => $arxiv_fetch_results,
                     'abstract' => $abstract,
                     'number_authors' => $number_authors,
-                    'author_given_names' => $author_given_names,
-                    'author_surnames' => $author_surnames,
+                    'author_first_names' => $author_first_names,
+                    'author_last_names' => $author_last_names,
                     'title' => $title,
                     'arxiv_license' => $arxiv_license,
                              );

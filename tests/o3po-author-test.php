@@ -86,8 +86,10 @@ class O3PO_AuthorTest extends O3PO_TestCase
         $this->assertSame($author->get_surname(), $surname);
         $this->assertSame($author->get_surname(), $author->get('surname'));
         $this->assertSame($author->get_affiliations_csv(), is_array($affiliations) ? implode($affiliations, ',') : $affiliations);
-        $this->assertSame($author->get_name(), trim($given_name . ' ' . $surname));
-
+        if($author->get_name_style() !== 'eastern')
+            $this->assertSame($author->get_name(), trim($given_name . ' ' . $surname));
+        else
+            $this->assertSame($author->get_name(), trim($surname . ' ' . $given_name));
     }
 
 }

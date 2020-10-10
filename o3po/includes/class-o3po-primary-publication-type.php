@@ -143,12 +143,12 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                 update_post_meta( $post_id, $post_type . '_title', addslashes($fetch_meta_data_from_abstract_page_result['title']));
             if(!empty($fetch_meta_data_from_abstract_page_result['number_authors']))
                 update_post_meta( $post_id, $post_type . '_number_authors', $fetch_meta_data_from_abstract_page_result['number_authors'] );
-            if(!empty($fetch_meta_data_from_abstract_page_result['author_given_names']))
-                update_post_meta( $post_id, $post_type . '_author_given_names', $fetch_meta_data_from_abstract_page_result['author_given_names'] );
-            if(!empty($fetch_meta_data_from_abstract_page_result['author_surnames']))
-                update_post_meta( $post_id, $post_type . '_author_surnames', $fetch_meta_data_from_abstract_page_result['author_surnames'] );
+            if(!empty($fetch_meta_data_from_abstract_page_result['author_first_names']))
+                update_post_meta( $post_id, $post_type . '_author_given_names', $fetch_meta_data_from_abstract_page_result['author_first_names'] ); # we take the first name as the given name, which is not always correct
+            if(!empty($fetch_meta_data_from_abstract_page_result['author_last_names']))
+                update_post_meta( $post_id, $post_type . '_author_surnames', $fetch_meta_data_from_abstract_page_result['author_last_names'] ); # we take the last name as the surname, which is not always correct
             if(isset($fetch_meta_data_from_abstract_page_result['number_authors']) and $fetch_meta_data_from_abstract_page_result['number_authors'] >= 0)
-                update_post_meta( $post_id, $post_type . '_author_name_styles', array_fill(0, $fetch_meta_data_from_abstract_page_result['number_authors'], 'western') ); #we cannot guess the name style from the arXiv page but must set this to a legal value
+                update_post_meta( $post_id, $post_type . '_author_name_styles', array_fill(0, $fetch_meta_data_from_abstract_page_result['number_authors'], 'western') ); #we cannot guess the name style from the arXiv page but must set this to some legal value
 		}
         else if(strpos($old_arxiv_fetch_results, 'ERROR') !== false or strpos($old_arxiv_fetch_results, 'WARNING') !== false)
             $arxiv_fetch_results .= "WARNING: No meta-data was fetched from the arXiv this time, but there were errors or warnings during the last fetch. Please make sure to resolve all of them manually or trigger a new fetch attempt by ticking the corresponding box below.\n";

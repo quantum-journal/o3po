@@ -239,7 +239,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
 
         # The way the validation of options works, we can still set fields that appear later in the form here. We just have to do the same sanitation and validation as if the input were coming form the user.
         # Also we need to add slashes in the same way wordpress does: https://stackoverflow.com/questions/2496455/why-are-post-variables-getting-escaped-in-php
-        foreach(['title' => 'title', 'abstract' => 'abstract', 'author_given_names' => 'author_first_names', 'author_surnames' => 'author_second_names'] as $source => $id)
+        foreach(['title' => 'title', 'abstract' => 'abstract', 'author_first_names' => 'author_first_names', 'author_second_names' => 'author_second_names'] as $source => $id)
             if(empty($_POST[$this->plugin_name . '-' . $this->slug][$id]))
                 $_POST[$this->plugin_name . '-' . $this->slug][$id] = wp_slash(call_user_func($this->fields[$id]['validation_callable'], $id, $this->sanitize_user_input($meta_data[$source])));
 
@@ -454,7 +454,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
             $message .= "\n";
             $message .= "Please find a summary of the information you provided below.\n\n";
             $message .= "Thank you for choosing to publish in " . $settings->get_field_value('journal_title') . ".\n\nBest regards,\n\n" . $settings->get_field_value('executive_board') . "\n\n";
-            $message .= "Summary of the information provided:\n\n"$summary;
+            $message .= "Summary of the information provided:\n\n" . $summary;
 
             $successfully_sent = wp_mail($to, $subject, $message, $headers, $attachment);
         }

@@ -1027,6 +1027,7 @@ abstract class O3PO_PublicationType {
         $affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_affiliations');
         $author_given_names = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_given_names');
         $author_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
+        $author_name_styles = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_name_styles');
         $author_affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_affiliations');
         $journal = get_post_meta( $post_id, $post_type . '_journal', true );
         $volume = get_post_meta( $post_id, $post_type . '_volume', true );
@@ -1040,7 +1041,8 @@ abstract class O3PO_PublicationType {
         if(!empty($number_authors))
         {
             for ($x = 0; $x < $number_authors; $x++) {
-                if(!empty($author_surnames[$x])) echo '<meta name="citation_author" content="' . esc_attr($author_given_names[$x] . " " . $author_surnames[$x]) . '">'."\n";
+                $author = new O3PO_Author($author_given_names[$x], $author_surnames[$x], $author_name_styles[$x]);
+                if(!empty($author_surnames[$x])) echo '<meta name="citation_author" content="' . esc_attr($author->get_name()) . '">'."\n";
                 if ( !empty($author_affiliations) && !empty($author_affiliations[$x]) ) {
                     foreach(preg_split('/\s*,\s*/u', $author_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY) as $affiliation_num) {
                         if ( !empty($affiliations[$affiliation_num-1]) )
@@ -1676,8 +1678,9 @@ abstract class O3PO_PublicationType {
         $json_array["bibjson"]["month"] = mb_substr($date_published, 5, 2);
         $json_array["bibjson"]["day"] = mb_substr($date_published, 8, 2);
         for ($x = 0; $x < $number_authors; $x++) {
+            $author = new O3PO_Author($author_given_names[$x], $author_surnames[$x], $author_name_styles[$x]);
             $author_array = array(
-                "name" => $author_given_names[$x] . ' ' . $author_surnames[$x]
+                "name" => $author->get_name()
                     /* "affiliation" => "string", */
                     /* "email" => "string", */
                                   );
@@ -2724,13 +2727,16 @@ abstract class O3PO_PublicationType {
          * @param    int    $post_id     Id of the post.
          */
     public static function get_formated_authors( $post_id ) {
+
         $post_type = get_post_type($post_id);
         $number_authors = get_post_meta( $post_id, $post_type . '_number_authors', true );
         $author_given_names = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_given_names');
         $author_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
+        $author_name_styles = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_name_styles');
         $author_names = array();
         for ($x = 0; $x < $number_authors; $x++) {
-            $author_names[] = $author_given_names[$x] . " " . $author_surnames[$x];
+            $author = new O3PO_Author($author_given_names[$x], $author_surnames[$x], $author_name_styles[$x]);
+            $author_names[] = $author->get_name();
         }
 
         return O3PO_Utility::oxford_comma_implode($author_names);
@@ -2749,9 +2755,11 @@ abstract class O3PO_PublicationType {
         $number_authors = get_post_meta( $post_id, $post_type . '_number_authors', true );
         $author_given_names = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_given_names');
         $author_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
+        $author_name_styles = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_name_styles');
         $formated_authors = "";
         for ($x = 0; $x < $number_authors; $x++) {
-            $formated_authors .= $author_surnames[$x] . ', ' . $author_given_names[$x] ;
+            $author = new O3PO_Author($author_given_names[$x], $author_surnames[$x], $author_name_styles[$x]);
+            $formated_authors .= $author->get_name_bibtex();
             if( $x < $number_authors-1) $formated_authors .= " and ";
         }
 
@@ -2790,6 +2798,7 @@ abstract class O3PO_PublicationType {
         $number_authors = get_post_meta( $post_id, $post_type . '_number_authors', true );
         $author_given_names = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_given_names');
         $author_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
+        $author_name_styles = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_name_styles');
         $author_orcids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_orcids');
         $number_affiliations = get_post_meta( $post_id, $post_type . '_number_affiliations', true );
         $author_affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_affiliations');
@@ -2806,10 +2815,11 @@ abstract class O3PO_PublicationType {
 
         $formated_authors = "";
         for ($x = 0; $x < $number_authors; $x++) {
+            $author = new O3PO_Author($author_given_names[$x], $author_surnames[$x], $author_name_styles[$x]);
 	    	if ( !empty($author_orcids[$x]) )
-                $formated_authors .= '<a href="' . $this->get_journal_property('orcid_url_prefix') . $author_orcids[$x] . '">' . $author_given_names[$x] . " " . $author_surnames[$x] . '</a>';
+                $formated_authors .= '<a href="' . $this->get_journal_property('orcid_url_prefix') . $author_orcids[$x] . '">' . $author->get_name() . '</a>';
             else
-                $formated_authors .= $author_given_names[$x] . " " . $author_surnames[$x];
+                $formated_authors .= $author->get_name();
             if ( !$all_authors_have_same_affiliation and !empty($author_affiliations[$x]) )
 		    	$formated_authors .= '<sup>' . $author_affiliations[$x] . '</sup>';
             if( $x < $number_authors-1 and $number_authors > 2) $formated_authors .= ",";
