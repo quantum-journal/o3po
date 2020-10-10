@@ -635,15 +635,6 @@ abstract class O3PO_PublicForm {
         return $result;
     }
 
-    public function one_of_paypal_invoice_transfer_waiver( $id, $input ) {
-
-        if(in_array($input, ["paypal", "invoice", "transfer", "waiver"]))
-            return $input;
-
-        $this->add_error( $id, 'neither-of-paypal-invoice-transfer', "The selection '" . $this->fields[$id]['title'] . "' must be either paypal, invoice, or transfer. Selection reset.", 'error');
-        return $this->get_field_default($id);
-    }
-
     public function render_summary() {
         echo "<p>Please verify that the following information is correct before submitting.</p>";
         foreach($this->sections as $section_id => $section_options)

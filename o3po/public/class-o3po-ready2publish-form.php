@@ -67,7 +67,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
 
         $this->specify_section('author_data', 'Authors', array($this, 'render_author_data'), 'meta_data', array($this, 'render_author_data_summary')); # We render everything here as part of the section and set the render callable of the fields to Null
         $this->specify_field('author_first_names', Null, Null, 'meta_data', 'author_data', array(), array($this, 'validate_array_of_at_most_1000_names'), array());
-        $this->specify_field('author_second_names', Null, Null, 'meta_data', 'author_data', array(), array($this, 'validate_array_of_at_most_1000_names'), array());
+        $this->specify_field('author_last_names', Null, Null, 'meta_data', 'author_data', array(), array($this, 'validate_array_of_at_most_1000_names'), array());
         $this->specify_field('author_name_styles', Null, Null, 'meta_data', 'author_data', array(), array($this, 'validate_array_of_at_most_1000_name_styles'), array());
 
         $this->specify_page('dissemination', 'Dissemination options');
@@ -85,7 +85,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         $this->specify_page('payment', 'Payment');
 
         $this->specify_section('payment_method', 'Payment method', null, 'payment');
-        $this->specify_field('payment_method', Null, array($this, 'render_payment_method'), 'payment', 'payment_method', array(), array($this, 'one_of_paypal_invoice_transfer_waiver'), array());
+        $this->specify_field('payment_method', Null, array($this, 'render_payment_method'), 'payment', 'payment_method', array(), array($this, 'one_of_invoice_noinvoice_waiver'), array());
 
 
         $this->specify_section('payment_invoice', 'Invoicing information', null, 'payment');
@@ -239,7 +239,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
 
         # The way the validation of options works, we can still set fields that appear later in the form here. We just have to do the same sanitation and validation as if the input were coming form the user.
         # Also we need to add slashes in the same way wordpress does: https://stackoverflow.com/questions/2496455/why-are-post-variables-getting-escaped-in-php
-        foreach(['title' => 'title', 'abstract' => 'abstract', 'author_first_names' => 'author_first_names', 'author_second_names' => 'author_second_names'] as $source => $id)
+        foreach(['title' => 'title', 'abstract' => 'abstract', 'author_first_names' => 'author_first_names', 'author_last_names' => 'author_last_names'] as $source => $id)
             if(empty($_POST[$this->plugin_name . '-' . $this->slug][$id]))
                 $_POST[$this->plugin_name . '-' . $this->slug][$id] = wp_slash(call_user_func($this->fields[$id]['validation_callable'], $id, $this->sanitize_user_input($meta_data[$source])));
 
@@ -270,7 +270,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
     public function render_author_data() {
 
         $author_first_names = $this->get_field_value('author_first_names');
-        $author_second_names = $this->get_field_value('author_second_names');
+        $author_last_names = $this->get_field_value('author_last_names');
 
         echo '<p>Please help us identify which part(s) of the authors\' names belong to the first and which to their second name(s) as well as which part is their given name (e.g., in Chinese names the given name comes after the family name, whereas in Spain the given name is the first name and family names are the second names). We are aware that this format does not do justice to <a href="https://www.w3.org/International/questions/qa-personal-names">all common name styles around the world</a>, but names in this format are needed for the registration of DOIs with Crossref.</p>';
         echo '<div id="' . $this->plugin_name . '-' . $this->slug . '-author-list">';
@@ -282,7 +282,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
             $this->render_single_line_field('author_first_names[' . $x . ']', '', 'on', 'width:20em;max-width:100%;', 'First and middle name(s)', true, 'display:block;');
             echo '</div>';
             echo '<div style="float:left;">';
-            $this->render_single_line_field('author_second_names[' . $x . ']', '', 'on', 'width:20em;max-width:100%;', 'Last name(s)', true, 'display:block;');
+            $this->render_single_line_field('author_last_names[' . $x . ']', '', 'on', 'width:20em;max-width:100%;', 'Last name(s)', true, 'display:block;');
             echo '</div>';
 
             $this->render_select_field('author_name_styles[' . $x . ']', [
@@ -330,7 +330,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         }
         </script>';
         echo '<button type="button" onclick="addAuthor()">Add author</button>';
-        echo '<button type="button" onclick="removeAuthor()">Remove author</button>';
+        echo '<button type="button" onclick="removeAuthor()">Remove last author</button>';
 
     }
 
@@ -363,7 +363,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
     public function render_corresponding_author_email() {
 
         echo '<div style="float:left;">';
-        $this->render_single_line_field('corresponding_author_email', 'mail@provider.com', 'on', 'width:25em;max-width:100%;', 'Please enter the email you wish to use for correspondence. We will use it to send you a notification email once the paper is online and store it so we can get in touch with our authors should the need arise. We will will not send you newsletters or any other kind of recurring automated emails to this address and it will not be published.', true, 'display:block;');
+        $this->render_single_line_field('corresponding_author_email', 'mail@provider.com', 'on', 'width:25em;max-width:100%;', 'Please enter the email you wish to use for correspondence. We will use it, e.g., to send you a notification email once the paper is online and store it so we can get in touch with our authors should the need arise. We will will not send you newsletters or any other kind of recurring automated emails to this address and it will not be published.', true, 'display:block;');
         echo '</div>';
     }
 
@@ -420,7 +420,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
             //Send an email to order the invoice
         if($successfully_sent)
         {
-            if($this->get_field_value('payment_method')['value'] === 'invoice')
+            if($this->get_field_value('payment_method') === 'invoice')
             {
                 $to = 'invoice@quantum-journal.org';
                 $subject  = "Invoice request for " . $this->get_field_value('eprint');
@@ -439,17 +439,22 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         {
             $to = $this->get_field_value('corresponding_author_email');
             $message = "Dear author,\n\nWe confirm having received your manuscript \"" . $this->get_field_value('title') . "\" for publication.\n\n";
-            if($this->get_field_value('payment_method')['value'] === 'waiver')
+            if($this->get_field_value('payment_method') === 'waiver')
             {
-                $message .= "Your publication fee has been waived as requested.\n";
-            }
-            elseif($this->get_field_value('payment_method')['value'] === 'invoice')
-            {
-                $message .= "Our team is preparing an invoice for you. Together with this invoice you will also receive instructions for how to pay the article processing charge.\n";
+                $message .= "Your publication fee has been waived.\n";
             }
             else
             {
-                $message .= "If you haven't done so already, please visit <a href=\"https://quantum-journal.org/payment/\">https://quantum-journal.org/payment/</a> to support the operations of " . $settings->get_field_value('journal_title') . " by paying your article processing charge.\n";
+                if($this->get_field_value('payment_method') === 'invoice')
+                {
+                    $message .= "Our team is preparing an invoice for you. Together with this invoice you will also receive instructions for how to pay the article processing charge.\n";
+                }
+                else
+                {
+                    $message .= "If you haven't done so already, please visit <a href=\"https://quantum-journal.org/payment/\">https://quantum-journal.org/payment/</a> to support the operations of " . $settings->get_field_value('journal_title') . " by paying your article processing charge.\n";
+                }
+                $message .= "\n";
+                $message .= '<p>Please note that as a matter of courtesy we may publish your work before receiving the payment.</p>';
             }
             $message .= "\n";
             $message .= "Please find a summary of the information you provided below.\n\n";
@@ -466,12 +471,17 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
     public function submitted_message( $submitted_successfully ) {
         if($submitted_successfully)
         {
-            $message = '<p>Thank you for preparing your manuscript for publication! The information you provided was safely received.</p>';
+            $message = "";
+            if($this->get_field_value('payment_method') === 'noinvoice')
+                $message .= '<h2>Almost done</h2>';
+            else
+                $message .= '<h2>Manuscript submitted for publication</h2>';
+            $message .= '<p>Thank you for preparing your manuscript for publication! The information you provided was safely received.</p>';
             $message .= '<p>You will receive a confirmation email shortly.</p>';
-            $message .= '<p>If you requested a waiver, there is nothing else you need to do at the moment.</p>';
-            $message .= '<p>If you requested an invoice our team will issue the invoice and get back to you in the coming days.</p>';
-            $message .= '<p>If you chose to pay now with any of the listed payment options, please proceed to the payment page.</p>';
-            $message .= '<form action="/payment/"><input type="submit" value="proceed to payment" style="float:right;" /></form>';
+            if($this->get_field_value('payment_method') === 'invoice')
+                $message .= '<p>You requested an invoice. Our team will issue the invoice and get back to you in the coming days.</p>';
+            elseif($this->get_field_value('payment_method') === 'noinvoice')
+                $message .= '<p>Please proceed to the payment page.</p><form action="/payment/"><input type="submit" value="proceed to payment" style="float:right;" /></form>';
 
             return $message;
         }
@@ -550,7 +560,7 @@ var paymentInvoice = document.getElementById("payment_invoice");
 var explanationP = document.getElementById("payment_method_explanation");
 switch(select.value) {
 case "invoice":
-explanationP.innerHTML = "Please provide the following information so that we can issue an invoice. The invoice can then be payed later via bank transfer, credit card, or PayPal by, e.g., the administration of your institution. Instructions will be sent to you by email once out team has prepared the invoice."
+explanationP.innerHTML = "Please provide the following information so that we can issue an invoice. The invoice can then be payed later via bank transfer, credit card, or PayPal by, e.g., the administration of your institution. Instructions will be sent to you by email once our team has prepared the invoice."
 break;
 case "noinvoice":
 explanationP.innerHTML = "You will be directed to a page to carry out the payment after completing this form."
@@ -590,12 +600,24 @@ while(nextSibling) {
     public function render_author_data_summary() {
 
         $author_first_names = $this->get_field_value('author_first_names');
-        $author_second_names = $this->get_field_value('author_second_names');
+        $author_last_names = $this->get_field_value('author_last_names');
 
         $out = '';
         foreach($author_first_names as $x => $foo)
-            $out .= '<p>' . esc_html($author_first_names[$x]) . ' ' . esc_html($author_second_names[$x]) . '</p>';
+            $out .= '<p>' . esc_html($author_first_names[$x]) . ' ' . esc_html($author_last_names[$x]) . '</p>';
 
         return $out;
     }
+
+
+    public function one_of_invoice_noinvoice_waiver( $id, $input ) {
+
+        $allowed = ["invoice", "noinvoice", "waiver"];
+        if(in_array($input, $allowed))
+            return $input;
+
+        $this->add_error( $id, 'neither-of-paypal-invoice-transfer', "The selection '" . $this->fields[$id]['title'] . "' must be one of: " . implode($allowed) . ". Selection reset.", 'error');
+        return $this->get_field_default($id);
+    }
+
 }
