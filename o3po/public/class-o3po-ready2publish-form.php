@@ -439,6 +439,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         if($successfully_sent)
         {
             $to = $this->get_field_value('corresponding_author_email');
+            $subject  = "Manuscript " . $this->get_field_value('eprint') . " received for publication";
             $message = "<p>Dear author,<br />\n<br />\nWe confirm having received your manuscript \"" . $this->get_field_value('title') . "\" for publication.</p>\n";
             if($this->get_field_value('payment_method') === 'waiver')
             {
@@ -448,7 +449,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
             {
                 if($this->get_field_value('payment_method') === 'invoice')
                 {
-                    $message .= "<p>Our team is preparing an invoice for you. Together with this invoice you will also receive instructions for how to pay the article processing charge.</p>\n";
+                    $message .= "<p>Our team is preparing an invoice for you. Together with this invoice you will also receive instructions on how to pay the article processing charge.</p>\n";
                 }
                 else
                 {
@@ -460,7 +461,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
             $message .= "\n";
             $message .= "<p>Please find a summary of the information you provided below.</p>\n\n";
             $message .= "<p>Thank you for choosing to publish in " . $settings->get_field_value('journal_title') . " and congratulations on your work being pubished soon.<br />\n<br />\nBest regards,<br />\n<br />\n" . $settings->get_field_value('executive_board') . "<br />\n<br />\nExecutive Board of Quantum</p>\n\n";
-            $message .= "<p>Summary of the information provided:</p>\n\n" . $summary;
+            $message .= "<h1>Summary of the information provided:</h1>\n\n" . $summary;
 
             $successfully_sent = wp_mail($to, $subject, $message, $headers, $attachment);
         }
