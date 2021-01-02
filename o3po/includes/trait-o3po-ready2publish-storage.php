@@ -33,7 +33,7 @@ trait O3PO_Ready2PublishStorage {
     public static function get_all_manuscripts() {
         return ['12345' => [
                 'post_type' => 'paper',
-                'eprint' => '1912.00099v2',
+                'eprint' => '1234.00099v2',
                 'title' => 'On Foo Bar',
                 'corresponding_author_email' => "foo@bar.com",
                 'abstract' => "Some boring abstract",
@@ -53,7 +53,7 @@ trait O3PO_Ready2PublishStorage {
                             ],
                 '12346' => [
                 'post_type' => 'paper',
-                'eprint' => '1762.1349v2',
+                'eprint' => '1234.1349v2',
                 'title' => 'A longer title that usual papers have it',
                 'corresponding_author_email' => "baz@gmail.com",
                 'abstract' => "This abstract is much better",
@@ -76,6 +76,8 @@ trait O3PO_Ready2PublishStorage {
     public function post_id_for_eprint( $eprint_without_version ) {
 
         $query = array(
+            'post_type' => O3PO_PublicationType::get_active_publication_type_names(),
+            'post_status' => 'any',
             'posts_per_page' => -1
                        );
         $my_query = new WP_Query( $query );
@@ -93,36 +95,37 @@ trait O3PO_Ready2PublishStorage {
 
     public static function get_manuscripts( $post_status ) {
 
-        if($post_status === 'unprocessed')
-            $query_post_status = array('publish', 'future', 'draft', 'pending', 'private', 'auto-draft');
-        elseif($post_status === 'partial')
-            $query_post_status = array('private');
-
-        $eprints_having_post = array();
         $query = array(
-            #'post_status' => $query_post_status,
             'posts_per_page' => -1,
+            'post_type' => O3PO_PublicationType::get_active_publication_type_names()
                        );
+
+        $eprints_already_having_post = array();
+        /* if($post_status === 'unprocessed') */
+        /*     $query['post_status'] = array('publish', 'future', 'draft', 'pending', 'private', 'auto-draft'); */
+        /* else */
+        /* if($post_status === 'partial') */
+        /*     $query['post_status'] = array('publish'); */
         $my_query = new WP_Query($query);
         while($my_query->have_posts()) {
             $my_query->the_post();
             $post_id = get_the_ID();
             $post_type = get_post_type($post_id);
             $eprint = get_post_meta( $post_id, $post_type . '_eprint', true );
-            echo($eprint);
-            $eprints_having_post[preg_replace('#v[0-9]+$#u', '', $eprint)] = $post_id;
+            if(!empty($eprint))
+                $eprints_already_having_post[preg_replace('#v[0-9]+$#u', '', $eprint)] = $post_id;
         }
-            echo(json_encode($eprints_having_post));
 
         $result = array();
         foreach(static::get_all_manuscripts() as $id => $manuscript_info)
         {
             $eprint = $manuscript_info['eprint'];
             $eprint_without_version = preg_replace('#v[0-9]+$#u', '', $eprint);
-            if($post_status === 'unprocessed' or !isset($eprints_having_post[$eprint_without_version]))
+            if($post_status === 'unprocessed' and !isset($eprints_already_having_post[$eprint_without_version]) or $post_status === 'partial' and isset($eprints_already_having_post[$eprint_without_version]) and get_post_status($eprints_already_having_post[$eprint_without_version]) !== 'publish')
             {
                 $result[$id] = $manuscript_info;
-                #$result[$id]['post_id'] = $eprints_having_post[$eprint_without_version];
+                if(isset($eprints_already_having_post[$eprint_without_version]))
+                    $result[$id]['post_id'] = $eprints_already_having_post[$eprint_without_version];
             }
         }
 

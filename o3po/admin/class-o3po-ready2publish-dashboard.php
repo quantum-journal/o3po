@@ -62,45 +62,62 @@ class O3PO_Ready2PublishDashboard {
     }
 
     public function render() {
-        echo '<h3>Manuscripts submitted for publication</h3>';
-        echo '<ul>';
-        foreach($this->get_manuscripts('unprocessed') as $id => $manuscript_info)
+
+        $partially_published_manuscripts = $this->get_manuscripts('partial');
+        if(!empty($partially_published_manuscripts))
         {
-            echo '<li><div class="manuscript-ready2publish">';
-            echo '<span>' . esc_html($manuscript_info['eprint']) . '</span>: ';
-            echo '<span>' . esc_html($manuscript_info['title']) . '</span>';
-            echo '<div style="margin-left:">';
-            echo '<span><a href="mailto:' . esc_attr($manuscript_info['corresponding_author_email']) . '">Email ' . esc_html($manuscript_info['corresponding_author_email']) . '</a></span>';
-            echo ' | ';
-            echo '<span class=""><a href="/' . $this->slug . '?action=' . 'publish' . '&id=' . urlencode($id) . '">Start publishing</a></span>';
-            /* echo ' | '; */
-            /* echo '<span class=""><a href="/' . $this->slug . '?action=' . 'ignore' . '&id=' . urlencode($id) . '">Ignore</a></span>'; */
-            echo '</div>';
-            echo '</div></li>';
+            echo '<h3>Partially published manuscripts</h3>';
+            echo '<ul>';
+            foreach($partially_published_manuscripts as $id => $manuscript_info)
+            {
+                echo '<li><div class="manuscript-ready2publish">';
+                echo '<span>' . esc_html($manuscript_info['eprint']) . '</span>: ';
+                echo '<span>' . esc_html($manuscript_info['title']) . '</span>';
+                echo '<div style="margin-left:">';
+                echo '<span><a href="mailto:' . esc_attr($manuscript_info['corresponding_author_email']) . '">Email ' . esc_html($manuscript_info['corresponding_author_email']) . '</a></span>';
+                echo ' | ';
+                echo '<span class=""><a href="/' . $this->slug . '?action=' . 'continue' . '&id=' . urlencode($id) . '">Continue</a></span>';
+                    /* echo ' | '; */
+                    /* echo '<span class=""><a href="/' . $this->slug . '?action=' . 'ignore' . '&id=' . urlencode($id) . '">Ignore</a></span>'; */
+                echo '</div>';
+                echo '</div></li>';
+            }
+            echo '</ul>';
         }
-        echo '</ul>';
-        echo '<h3>Partially published manuscripts</h3>';
-        echo '<ul>';
-        foreach($this->get_manuscripts('partial') as $id => $manuscript_info)
+
+        $unprocessed_manuscripts = $this->get_manuscripts('unprocessed');
+        if(!empty($unprocessed_manuscripts))
         {
-            echo '<li><div class="manuscript-ready2publish">';
-            echo '<span>' . esc_html($manuscript_info['eprint']) . '</span>: ';
-            echo '<span>' . esc_html($manuscript_info['title']) . '</span>';
-            echo '<div style="margin-left:">';
-            echo '<span><a href="mailto:' . esc_attr($manuscript_info['corresponding_author_email']) . '">Email ' . esc_html($manuscript_info['corresponding_author_email']) . '</a></span>';
-            echo ' | ';
-            echo '<span class=""><a href="/' . $this->slug . '?action=' . 'continue' . '&id=' . urlencode($id) . '">Continue</a></span>';
-            /* echo ' | '; */
-            /* echo '<span class=""><a href="/' . $this->slug . '?action=' . 'ignore' . '&id=' . urlencode($id) . '">Ignore</a></span>'; */
-            echo '</div>';
-            echo '</div></li>';
+            echo '<h3>Manuscripts awaiting publication</h3>';
+            echo '<ul>';
+            foreach($unprocessed_manuscripts as $id => $manuscript_info)
+            {
+                echo '<li><div class="manuscript-ready2publish">';
+                echo '<span>' . esc_html($manuscript_info['eprint']) . '</span>: ';
+                echo '<span>' . esc_html($manuscript_info['title']) . '</span>';
+                echo '<div style="margin-left:">';
+                echo '<span><a href="mailto:' . esc_attr($manuscript_info['corresponding_author_email']) . '">Email ' . esc_html($manuscript_info['corresponding_author_email']) . '</a></span>';
+                echo ' | ';
+                echo '<span class=""><a href="/' . $this->slug . '?action=' . 'publish' . '&id=' . urlencode($id) . '">Start publishing</a></span>';
+                    /* echo ' | '; */
+                    /* echo '<span class=""><a href="/' . $this->slug . '?action=' . 'ignore' . '&id=' . urlencode($id) . '">Ignore</a></span>'; */
+                echo '</div>';
+                echo '</div></li>';
+            }
+            echo '</ul>';
         }
-        echo '</ul>';
-        echo '<h3>Ignored submissions</h3>';
-        echo '<span>Coming soon...</span>';
     }
 
     public function insert_post( $id ) {
+            // Do nothing if in maintenance mode
+        $settings = O3PO_Settings::instance();
+        if($settings->get_field_value('maintenance_mode')!=='unchecked')
+            return;
+
+            // Check if the user has permissions to save data
+		if(!current_user_can('edit_posts'))
+			return;
+
         $manuscript_info = $this->get_manuscript($id);
 
         $post_type = $manuscript_info['post_type'];
@@ -166,8 +183,12 @@ class O3PO_Ready2PublishDashboard {
                 break;
             case 'continue':
                 if($id !== null)
-                    $post_id = $this->post_id_for_eprint($id);
+                {
+                    $post_eprint = $this->get_manuscript($id)['eprint'];
+                    $eprint_without_version = preg_replace('#v[0-9]+$#u', '', $post_eprint);
+                    $post_id = $this->post_id_for_eprint($eprint_without_version);
                     $this->display_post($post_id);
+                }
                 break;
             default:
                 echo "unsupported action " . $action;
