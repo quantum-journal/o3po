@@ -97,15 +97,11 @@ trait O3PO_Ready2PublishStorage {
 
         $query = array(
             'posts_per_page' => -1,
+            'post_status' => 'any',
             'post_type' => O3PO_PublicationType::get_active_publication_type_names()
                        );
 
         $eprints_already_having_post = array();
-        /* if($post_status === 'unprocessed') */
-        /*     $query['post_status'] = array('publish', 'future', 'draft', 'pending', 'private', 'auto-draft'); */
-        /* else */
-        /* if($post_status === 'partial') */
-        /*     $query['post_status'] = array('publish'); */
         $my_query = new WP_Query($query);
         while($my_query->have_posts()) {
             $my_query->the_post();
