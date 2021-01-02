@@ -1335,10 +1335,22 @@ abstract class O3PO_PublicationType {
         $xml .= '	<publisher_item>' . "\n";
         $xml .= '	  <item_number item_number_type="article-number">' . $pages . '</item_number>' . "\n";
         $xml .= '	</publisher_item>' . "\n";
-            // something to consider for the future
-            // $xml .= '	<crossmark></crossmark>' . "\n";
-            // for funding information, we don't do this currently
-            // $xml .= '	<fr:program name="fundref">{0,1}</fr:program>' . "\n";
+            // Now comes the Crossmark/Fundref funder information
+        /* $xml .= '	<crossmark>' . "\n"; */
+        /* $xml .= '	  <custom_metadata>' . "\n"; */
+        /* $xml .= '	    <fr:program name="fundref">' . "\n"; */
+
+     	/* $xml .= '	      <fr:assertion name="fundgroup">' . "\n"; */
+        /* $xml .= '	        <fr:assertion name="funder_name">U.S. Department of Energy' . "\n"; */
+        /*     //If identifier is known */
+       	/* $xml .= '	          <fr:assertion name="funder_identifier">http://dx.doi.org/10.13039/100000015</fr:assertion>' . "\n"; */
+      	/* $xml .= '	        </fr:assertion>' . "\n"; */
+     	/* $xml .= '	        <fr:assertion name="award_number">DE-FG03-03SF22691</fr:assertion>' . "\n"; */
+    	/* $xml .= '	      </fr:assertion>' . "\n"; */
+    	/* $xml .= '	    </fr:program>' . "\n"; */
+        /* $xml .= '	  </custom_metadata>' . "\n"; */
+        /* $xml .= '	</crossmark>' . "\n"; */
+            // access indications
         $xml .= '	<ai:program name="AccessIndicators">' . "\n";
         $xml .= '	  <ai:free_to_read></ai:free_to_read>' . "\n";
         $xml .= '	  <ai:license_ref start_date="' . $date_published . '">' . esc_html($this->get_journal_property('license_url')) . '</ai:license_ref>' . "\n";

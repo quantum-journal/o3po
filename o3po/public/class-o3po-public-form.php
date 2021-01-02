@@ -614,7 +614,6 @@ abstract class O3PO_PublicForm {
     }
 
 
-
     public function validate_array_of_at_most_1000_name_styles( $id, $input ) {
 
         if(!is_array($input))
@@ -634,6 +633,7 @@ abstract class O3PO_PublicForm {
 
         return $result;
     }
+
 
     public function render_summary() {
         echo "<p>Please verify that the following information is correct before submitting.</p>";

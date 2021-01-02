@@ -70,6 +70,12 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         $this->specify_field('author_last_names', Null, Null, 'meta_data', 'author_data', array(), array($this, 'validate_array_of_at_most_1000_names'), array());
         $this->specify_field('author_name_styles', Null, Null, 'meta_data', 'author_data', array(), array($this, 'validate_array_of_at_most_1000_name_styles'), array());
 
+        $this->specify_section('funder_information', 'Funder information', array($this, 'render_funder_information'), 'meta_data', array($this, 'render_funder_information_summary')); # We render everything here as part of the section and set the render callable of the fields to Null
+        $this->specify_field('award_numbers', Null, Null, 'meta_data', 'funder_information', array(), array($this, 'validate_array_of_at_most_1000_names'), array('0' => ''));
+        $this->specify_field('funder_names', Null, Null, 'meta_data', 'funder_information', array(), array($this, 'validate_array_of_at_most_1000_names'), array('0' => ''));
+        $this->specify_field('funder_identifiers', Null, Null, 'meta_data', 'funder_information', array(), array($this, 'validate_array_of_at_most_1000_names'), array('0' => ''));
+
+
         $this->specify_page('dissemination', 'Dissemination options');
 
         $this->specify_section('dissemination_material', 'Optional material', array($this, 'render_dissemination_material_section'), 'dissemination');
@@ -334,6 +340,71 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
 
     }
 
+    public function render_funder_information() {
+
+        $settings = O3PO_Settings::instance();
+
+        $award_numbers = $this->get_field_value('award_numbers');
+        $funder_names = $this->get_field_value('funder_names');
+        $funder_identifiers = $this->get_field_value('funder_identifiers');
+
+        echo '<p>Due to <a href="https://www.coalition-s.org/why-plan-s/" target=”_blank”>Plan S</a> ' . $settings->get_field_value('journal_title') .' needs to collect and submit information about the funding that enabled your research as part of the manuscript meta-data.</p><p>Please provide all grants and funding sources that have a grant/award number, together with name of the funder and, if known, the funder id. Entries without a grant/award number are ignored.</p><p>You should have received this information from all your funders requiring the collection of such information. You can probably copy and past this from the acknowledgements section of our manuscript.</p>';
+        echo '<div id="' . $this->plugin_name . '-' . $this->slug . '-funder-information">';
+        foreach($award_numbers as $x => $foo)
+        {
+            echo '<div class="' . $this->plugin_name . '-' . $this->slug . ' ' . $this->plugin_name . '-' . $this->slug . '-fundgroup">';
+
+            echo '<div style="float:left;">';
+            $this->render_single_line_field('award_numbers[' . $x . ']', '', 'on', 'width:20em;max-width:100%;', 'Grant/award number', true, 'display:block;');
+            echo '</div>';
+
+            echo '<div style="float:left;">';
+            $this->render_single_line_field('funder_identifiers[' . $x . ']', '', 'on', 'width:15em;max-width:100%;', 'Funder id (optional)', true, 'display:block;');
+            echo '</div>';
+
+            echo '<div style="float:left;">';
+            $this->render_single_line_field('funder_names[' . $x . ']', '', 'on', 'width:50em;max-width:100%;', 'Funder name', true, 'display:block;');
+            echo '</div>';
+            echo '<div style="clear:both"></div>';
+            echo '</div>';
+        }
+        echo '</div>';
+        echo '<script>
+        function addFundgroup() {
+            var item = document.getElementById("' . $this->plugin_name . '-' . $this->slug . '-funder-information").lastElementChild;
+            var clone = item.cloneNode(true);
+            var fundgroupNumber = parseInt(RegExp("\\\\[([0-9]*)\\\\]$").exec(clone.getElementsByTagName("input")[0].name)[1]) + 1;
+            var inputs = clone.getElementsByTagName("input");
+            for (i = 0; i < inputs.length; i++) {
+              inputs[i].value = "";
+
+              inputs[i].name = inputs[i].name.replace(RegExp("\[[0-9]*\]$"), "["+fundgroupNumber+"]");
+              inputs[i].id = inputs[i].id.replace(RegExp("\[[0-9]*\]$"), "["+fundgroupNumber+"]");
+            }
+            var labels = clone.getElementsByTagName("label")
+            for (i = 0; i < labels.length; i++) {
+              labels[i].setAttribute("for", labels[i].getAttribute("for").replace(RegExp("\[[0-9]*\]$"), "["+fundgroupNumber+"]"));
+            }
+            var selects = clone.getElementsByTagName("select")
+            for (i = 0; i < selects.length; i++) {
+              selects[i].name = selects[i].name.replace(RegExp("\[[0-9]*\]$"), "["+fundgroupNumber+"]");
+              selects[i].id = selects[i].id.replace(RegExp("\[[0-9]*\]$"), "["+fundgroupNumber+"]");
+              selects[i].selectedIndex = 0;
+            }
+            document.getElementById("' . $this->plugin_name . '-' . $this->slug . '-funder-information").appendChild(clone);
+        }
+        function removeFundgroup() {
+            var select = document.getElementById("' . $this->plugin_name . '-' . $this->slug . '-funder-information");
+            if(select.childElementCount > 1) {
+                select.removeChild(select.lastElementChild);
+            }
+        }
+        </script>';
+        echo '<button type="button" onclick="addFundgroup()">Add funding source</button>';
+        echo '<button type="button" onclick="removeFundgroup()">Remove funding source</button>';
+
+    }
+
     public function render_payment_amount() {
         $this->render_select_field('payment_amount', [
                                        array('value' => '450€',
@@ -374,7 +445,8 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         $summary = "";
         foreach($this->sections as $section_id => $section_options)
         {
-            $summary .= "\n" . '<h3 id="' . esc_attr($section_id) . '">' . esc_html($section_options['title']) . ':</h3>';
+            if(!empty($section_options['title']))
+                $summary .= "\n" . '<h3 id="' . esc_attr($section_id) . '">' . esc_html($section_options['title']) . ':</h3>';
             if($section_options['summary_callback'] !== null)
             {
                 $summary .= call_user_func($section_options['summary_callback']);
@@ -596,6 +668,21 @@ while(nextSibling) {
 }
 </script>';
 
+    }
+
+
+    public function render_funder_information_summary() {
+
+        $award_numbers = $this->get_field_value('award_numbers');
+        $funder_names = $this->get_field_value('funder_names');
+        $funder_identifiers = $this->get_field_value('funder_identifiers');
+
+        $out = '';
+        foreach($award_numbers as $x => $foo)
+            if(!empty($award_numbers[$x]))
+                $out .= '<p>Award number: ' . esc_html($award_numbers[$x]) . ' from ' . esc_html($funder_names[$x]) . ' ' . esc_html($funder_identifiers[$x]) . '</p>';
+
+        return $out;
     }
 
 
