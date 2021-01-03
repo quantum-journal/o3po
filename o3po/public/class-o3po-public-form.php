@@ -146,8 +146,8 @@ abstract class O3PO_PublicForm {
         }
         elseif($this->navigation === 'Submit' and count($this->errors) === 0)
         {
-            $this->submitted_successfully = $this->on_submit();
-            $this->add_sideloaded_files_to_media_library();
+            $attach_ids = $this->add_sideloaded_files_to_media_library();
+            $this->submitted_successfully = $this->on_submit($attach_ids);
         }
 
         if(count($this->errors) > 0)
@@ -546,6 +546,7 @@ abstract class O3PO_PublicForm {
         include_once( ABSPATH . 'wp-admin/includes/image.php' );
 
         $sideloaded_files = $this->get_session_data('sideloaded_files', array());
+        $attach_ids = array();
         foreach($sideloaded_files as $key => $sideloaded_file)
         {
             $parent_post_id = 0;
@@ -566,6 +567,7 @@ abstract class O3PO_PublicForm {
                 $attach_id = new WP_Error("sideload-error", "wp_insert_attachment() returned 0");
             if(is_wp_error($attach_id))
                 return $attach_id;
+            $attach_ids[] = $attach_id;
             $attach_data = wp_generate_attachment_metadata( $attach_id, $filename );
             $update_attachment_result = wp_update_attachment_metadata( $attach_id, $attach_data );
             if($update_attachment_result === False)
@@ -575,6 +577,7 @@ abstract class O3PO_PublicForm {
         }
         $this->put_session_data('sideloaded_files', $sideloaded_files);
 
+        return $attach_ids;
     }
 
 
@@ -670,6 +673,6 @@ abstract class O3PO_PublicForm {
     }
 
 
-    abstract public function on_submit();
+    abstract public function on_submit($attach_ids);
 
 }

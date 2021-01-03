@@ -11,7 +11,7 @@
  */
 
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-o3po-public-form.php';
-require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/trait-o3po-ready2publish-storage.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-ready2publish-storage.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-environment.php';
 
@@ -25,7 +25,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-envir
  */
 class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpecifyer {
 
-    use O3PO_Ready2PublishStorage;
+        //use O3PO_Ready2PublishStorage;
 
     public static function specify_settings( $settings ) {
         $settings->specify_section('ready2publish_settings', 'Ready2Publish Form', array('O3PO_Ready2PublishForm', 'render_ready2publish_settings'), 'ready2publish_settings');
@@ -34,12 +34,14 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
     }
 
     private $environment;
+    private $storage;
 
-    public function __construct( $plugin_name, $slug, $environment ) {
+    public function __construct( $plugin_name, $slug, $environment, $storage ) {
 
         parent::__construct($plugin_name, $slug, 'Submit your manuscript for publication');
         $this->specify_pages_sections_and_fields();
         $this->environment = $environment;
+        $this->storage = $storage;
 
     }
 
@@ -438,9 +440,14 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         echo '</div>';
     }
 
-    public function on_submit() {
+    public function on_submit( $attach_ids ) {
 
         $settings = O3PO_Settings::instance();
+
+        $manuscript_info = array();
+        foreach($this->fields as $id => $field_options)
+            $manuscript_info[$id] = $this->get_field_value($id);
+        $this->storage->store_manuscript($manuscript_info);
 
         $summary = "";
         foreach($this->sections as $section_id => $section_options)

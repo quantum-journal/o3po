@@ -94,6 +94,15 @@ class O3PO {
 	protected $journal_secondary;
 
         /**
+         * The ready to publish storage.
+         *
+         * @since    0.3.1+
+         * @access   protected
+         * @var      O3PO_Ready2Publish_Storage    $ready2publish_storage    The ready to publish storage.
+         */
+	protected $ready2publish_storage;
+
+        /**
          * The ready to publish form.
          *
          * @since    0.3.1+
@@ -215,6 +224,11 @@ class O3PO {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-journal.php';
 
             /**
+             * The class representing ready to publish storages.
+             */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-o3po-ready2publish-storage.php';
+
+            /**
              * The class representing ready to publish forms.
              */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-o3po-ready2publish-form.php';
@@ -249,11 +263,14 @@ class O3PO {
         $this->journal = static::setup_primary_journal($settings);
         $this->journal_secondary = static::setup_secondary_journal($settings);
 
+            //create the ready to publish storage
+        $this->ready2publish_storage = new O3PO_Ready2PublishStorage($this->plugin_name, $settings->get_field_value("ready2publish_slug"));
+
             //create the ready to publish form
-        $this->ready2publish_form = new O3PO_Ready2PublishForm($this->plugin_name, $settings->get_field_value("ready2publish_slug"), $this->environment);
+        $this->ready2publish_form = new O3PO_Ready2PublishForm($this->plugin_name, $settings->get_field_value("ready2publish_slug"), $this->environment, $this->ready2publish_storage);
 
             //create the ready to publish dashboard
-        $this->ready2publish_dashboard = new O3PO_Ready2PublishDashboard($this->plugin_name, $this->get_plugin_pretty_name(), $settings->get_field_value("ready2publish_slug") . '-dashboard', "Ready2Publish");
+        $this->ready2publish_dashboard = new O3PO_Ready2PublishDashboard($this->plugin_name, $this->get_plugin_pretty_name(), $settings->get_field_value("ready2publish_slug") . '-dashboard', "Ready2Publish", $this->ready2publish_storage);
 
             //create the publication types for each journal
         $this->primary_publication_type = new O3PO_PrimaryPublicationType($this->journal, $this->environment);

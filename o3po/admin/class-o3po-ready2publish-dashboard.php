@@ -10,7 +10,7 @@
  * @subpackage O3PO/includes
  */
 
-require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/trait-o3po-ready2publish-storage.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-ready2publish-storage.php';
 
 /**
  * Class for displaying manuscripts ready to publish on the admin panel.
@@ -22,7 +22,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/trait-o3po-ready
  */
 class O3PO_Ready2PublishDashboard {
 
-    use O3PO_Ready2PublishStorage;
+        //use O3PO_Ready2PublishStorage;
 
         /**
          *
@@ -35,25 +35,34 @@ class O3PO_Ready2PublishDashboard {
 
     protected $title;
 
-    private $meta_fields = ['eprint',
-                            'title',
-                            'corresponding_author_email',
-                            'abstract',
-                            'author_given_names',
-                            'author_surnames',
-                            'author_name_styles',
-                            'popular_summary',
-                            'featured_image',
-                            'featured_image_caption',
-                            'multimedia_comment',
-                            'fermats_library'];
+    private static $meta_fields = [
+        'eprint',
+        'title',
+        'corresponding_author_email',
+        'abstract',
+        'author_given_names', // is populated from author_first_names
+        'author_surnames', // is populated from author_last_names
+        'author_name_styles',
+        'award_numbers',
+        'funder_names',
+        'funder_identifiers',
+        'popular_summary',
+        'featured_image',
+        'featured_image_caption',
+        'multimedia_comment',
+        'fermats_library'
+                                   ];
 
-    public function __construct( $plugin_name, $plugin_pretty_name, $slug, $title ) {
+    private $storage;
+
+    public function __construct( $plugin_name, $plugin_pretty_name, $slug, $title, $storage ) {
 
         $this->plugin_name = $plugin_name;
         $this->slug = $slug;
         $this->title = $title;
         $this->plugin_pretty_name = $plugin_pretty_name;
+        $this->storage = $storage;
+
     }
 
     public function setup() {
@@ -63,7 +72,7 @@ class O3PO_Ready2PublishDashboard {
 
     public function render() {
 
-        $partially_published_manuscripts = $this->get_manuscripts('partial');
+        $partially_published_manuscripts = $this->storage->get_manuscripts('partial');
         if(!empty($partially_published_manuscripts))
         {
             echo '<h3>Partially published manuscripts</h3>';
@@ -85,7 +94,7 @@ class O3PO_Ready2PublishDashboard {
             echo '</ul>';
         }
 
-        $unprocessed_manuscripts = $this->get_manuscripts('unprocessed');
+        $unprocessed_manuscripts = $this->storage->get_manuscripts('unprocessed');
         if(!empty($unprocessed_manuscripts))
         {
             echo '<h3>Manuscripts awaiting publication</h3>';
@@ -118,9 +127,9 @@ class O3PO_Ready2PublishDashboard {
 		if(!current_user_can('edit_posts'))
 			return;
 
-        $manuscript_info = $this->get_manuscript($id);
+        $manuscript_info = $this->storage->get_manuscript($id);
 
-        $post_type = $manuscript_info['post_type'];
+        $post_type = 'paper';
         $postarr = [
             'post_type' => $post_type,
                     ];
@@ -129,9 +138,30 @@ class O3PO_Ready2PublishDashboard {
             return $post_id;
         else
         {
-            foreach( $this->meta_fields as $field_id)
-                update_post_meta($post_id, $post_type . '_' . $field_id, $manuscript_info[$field_id]);
             update_post_meta($post_id, $post_type . '_number_authors', count($manuscript_info['author_name_styles']));
+
+                // Translate from first/last to given surname
+            $manuscript_info['author_given_names'] = array();
+            $manuscript_info['author_surnames'] = array();
+            foreach($manuscript_info['author_name_styles'] as $author_num => $name_style)
+            {
+                if($name_style === 'eastern')
+                {
+                    $manuscript_info['author_given_names'][$author_num] = $manuscript_info['author_last_names'][$author_num];
+                    $manuscript_info['author_surnames'][$author_num] = $manuscript_info['author_first_names'][$author_num];
+                }
+                else
+                {
+                    $manuscript_info['author_given_names'][$author_num] = $manuscript_info['author_first_names'][$author_num];
+                    $manuscript_info['author_surnames'][$author_num] = $manuscript_info['author_last_names'][$author_num];
+                }
+            }
+            unset($manuscript_info['author_first_names']);
+            unset($manuscript_info['author_last_names']);
+
+            foreach( static::meta_fields as $field_id)
+                update_post_meta($post_id, $post_type . '_' . $field_id, $manuscript_info[$field_id]);
+
 
         }
 
@@ -184,7 +214,7 @@ class O3PO_Ready2PublishDashboard {
             case 'continue':
                 if($id !== null)
                 {
-                    $post_eprint = $this->get_manuscript($id)['eprint'];
+                    $post_eprint = $this->storage->get_manuscript($id)['eprint'];
                     $eprint_without_version = preg_replace('#v[0-9]+$#u', '', $post_eprint);
                     $post_id = $this->post_id_for_eprint($eprint_without_version);
                     $this->display_post($post_id);
