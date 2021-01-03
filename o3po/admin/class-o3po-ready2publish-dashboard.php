@@ -159,7 +159,7 @@ class O3PO_Ready2PublishDashboard {
             unset($manuscript_info['author_first_names']);
             unset($manuscript_info['author_last_names']);
 
-            foreach( static::meta_fields as $field_id)
+            foreach( static::$meta_fields as $field_id)
                 update_post_meta($post_id, $post_type . '_' . $field_id, $manuscript_info[$field_id]);
 
 
@@ -216,7 +216,7 @@ class O3PO_Ready2PublishDashboard {
                 {
                     $post_eprint = $this->storage->get_manuscript($id)['eprint'];
                     $eprint_without_version = preg_replace('#v[0-9]+$#u', '', $post_eprint);
-                    $post_id = $this->post_id_for_eprint($eprint_without_version);
+                    $post_id = $this->storage->post_id_for_eprint($eprint_without_version);
                     $this->display_post($post_id);
                 }
                 break;

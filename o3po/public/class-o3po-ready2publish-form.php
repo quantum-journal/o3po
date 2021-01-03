@@ -484,7 +484,9 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
 
         $headers = array( 'From: ' . "publish@quantum-journal.org", 'Content-Type: text/html; charset=UTF-8');
         $file_upload_result = $this->get_session_data('file_upload_result_' . 'featured_image_upload');
-        $attachment = array($file_upload_result['file']);
+        $attachment = array();
+        if(!empty($file_upload_result['file']))
+            $attachment[] = $file_upload_result['file'];
 
             // This is just a temporary solution.
             // In the long run the papers in the queue will be displayed

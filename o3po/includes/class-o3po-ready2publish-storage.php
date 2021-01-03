@@ -60,7 +60,7 @@ class O3PO_Ready2PublishStorage {
         $settings = O3PO_Settings::instance();
 
         $clean_manuscript_info = array();
-        foreach(static::manuscript_info_fields as $field)
+        foreach(static::$manuscript_info_fields as $field)
             if(isset($manuscript_info[$field]))
                 $clean_manuscript_info[$field] = $manuscript_info[$field];
 
@@ -169,6 +169,8 @@ class O3PO_Ready2PublishStorage {
         $result = array();
         foreach($this->get_all_manuscripts() as $id => $manuscript_info)
         {
+            if(empty($manuscript_info['eprint']))
+                continue;
             $eprint = $manuscript_info['eprint'];
             $eprint_without_version = preg_replace('#v[0-9]+$#u', '', $eprint);
             if($post_status === 'unprocessed' and !isset($eprints_already_having_post[$eprint_without_version]) or $post_status === 'partial' and isset($eprints_already_having_post[$eprint_without_version]) and get_post_status($eprints_already_having_post[$eprint_without_version]) !== 'publish')

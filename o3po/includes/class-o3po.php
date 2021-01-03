@@ -226,7 +226,7 @@ class O3PO {
             /**
              * The class representing ready to publish storages.
              */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-o3po-ready2publish-storage.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-ready2publish-storage.php';
 
             /**
              * The class representing ready to publish forms.
