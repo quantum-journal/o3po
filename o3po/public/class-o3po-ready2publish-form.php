@@ -145,7 +145,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         $id = 'featured_image_upload';
         $upload_max_filesize = O3PO_Environment::max_file_upload_bytes();
 
-        $this->render_image_upload_field($id, 'Image must be in jpg or png format, have a white background, and an aspect ratio of 2:1. The maximum file size is ' . ($upload_max_filesize > 1024 ? (round($upload_max_filesize/1024, 2)) . 'M' : $upload_max_filesize) . 'B. The featured image appears on the Quantum homepage, e.g., <a href="/papers/">in the list of published papers</a>, and on social media. A good image helps draw attention to your article.', false);
+        $this->render_image_upload_field($id, 'Image must be in jpg or png format, have a white background, and an aspect ratio of 2:1. The maximum file size is ' . ($upload_max_filesize > 1024*1024 ? (round($upload_max_filesize/(1024*1024), 2)) . 'M' : ($upload_max_filesize > 1024 ? (round($upload_max_filesize/(1024), 2)) . 'K' : $upload_max_filesize)) . 'B. The featured image appears on the Quantum homepage, e.g., <a href="/papers/">in the list of published papers</a>, and on social media. A good image helps draw attention to your article.', false);
     }
 
         /**

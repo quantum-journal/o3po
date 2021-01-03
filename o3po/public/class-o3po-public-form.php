@@ -525,7 +525,7 @@ abstract class O3PO_PublicForm {
             echo('<p>Changed your mind? You can chose to upload a different file below.</p>');
         }
 
-        echo('<input type="hidden" name="MAX_FILE_SIZE" value="30720" />');
+        echo('<input type="hidden" name="MAX_FILE_SIZE" value="30000000" />');
         # $_FILES looks funny if an array is used as name of the upload
         echo('<input type="file" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '">');
         if(!empty($label))

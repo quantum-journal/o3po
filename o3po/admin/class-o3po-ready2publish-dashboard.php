@@ -159,7 +159,7 @@ class O3PO_Ready2PublishDashboard {
             unset($manuscript_info['author_first_names']);
             unset($manuscript_info['author_last_names']);
 
-            foreach( static::$meta_fields as $field_id)
+            foreach(static::$meta_fields as $field_id)
                 update_post_meta($post_id, $post_type . '_' . $field_id, $manuscript_info[$field_id]);
 
 
