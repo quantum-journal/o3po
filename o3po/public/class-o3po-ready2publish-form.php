@@ -506,7 +506,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
             if($this->get_field_value('payment_method') === 'invoice')
             {
                 $to = 'invoice@quantum-journal.org';
-                $subject  = "Invoice request for " . $this->get_field_value('eprint');
+                $subject  = "TEST - DO NOT ISSUE INVOICE: Invoice request for " . $this->get_field_value('eprint');
                 $message = "";
                 $message .= "<p>An Invoice was requested for https://arxiv.org/abs/" . $this->get_field_value('eprint') . ":</p>";
                 $message .= "<p>" . $this->get_field_value('invoice_recipient') . "</p>";
@@ -522,7 +522,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         if($successfully_sent)
         {
             $to = $this->get_field_value('corresponding_author_email');
-            $subject  = "Manuscript " . $this->get_field_value('eprint') . " received for publication";
+            $subject  = "TEST - THIS WILL NOT BE PUBLISHED: Manuscript " . $this->get_field_value('eprint') . " received for publication";
             $message = "<p>Dear author,<br />\n<br />\nWe confirm having received your manuscript \"" . $this->get_field_value('title') . "\" for publication.</p>\n";
             if($this->get_field_value('payment_method') === 'waiver')
             {
