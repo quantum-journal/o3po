@@ -184,7 +184,8 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         {
             $result['user_name'] = $file_of_this_id['name'];
             $result['size'] = $file_of_this_id['size'];
-            $this->append_session_data('sideloaded_files', $result['file']);
+            $result['id'] = $id;
+            $this->append_session_data('sideloaded_files', $result);
         }
 
         return $result;
@@ -447,6 +448,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         $manuscript_info = array();
         foreach($this->fields as $id => $field_options)
             $manuscript_info[$id] = $this->get_field_value($id);
+        $manuscript_info['featured_image_attachment_id'] = $attach_ids['featured_image_upload'];
         $this->storage->store_manuscript($manuscript_info);
 
         $summary = "";

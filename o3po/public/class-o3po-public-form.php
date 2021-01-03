@@ -516,7 +516,7 @@ abstract class O3PO_PublicForm {
          * @param    string   $label Label of the field. May contain html and is not escaped!
          */
     public function render_image_upload_field( $id, $label='', $esc_label=true ) {
-        $file_upload_result = $this->get_session_data('file_upload_result_' . 'featured_image_upload');
+        $file_upload_result = $this->get_session_data('file_upload_result_' . $id);
 
         if(!empty($file_upload_result['file']))
         {
@@ -550,10 +550,10 @@ abstract class O3PO_PublicForm {
         foreach($sideloaded_files as $key => $sideloaded_file)
         {
             $parent_post_id = 0;
-            $filename = basename($sideloaded_file);
+            $filename = basename($sideloaded_file['file']);
 
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            $actual_mime_type = finfo_file($finfo, $sideloaded_file);
+            $actual_mime_type = finfo_file($finfo, $sideloaded_file['file']);
 
             $attachment = array(
                 'guid'           => $filename,
@@ -562,17 +562,17 @@ abstract class O3PO_PublicForm {
                 'post_content'   => '',
                 'post_status'    => 'inherit'
                                 );
-            $attach_id = wp_insert_attachment($attachment, $sideloaded_file, $parent_post_id);
+            $attach_id = wp_insert_attachment($attachment, $sideloaded_file['file'], $parent_post_id);
             if($attach_id === 0)
                 $attach_id = new WP_Error("sideload-error", "wp_insert_attachment() returned 0");
-            if(is_wp_error($attach_id))
-                return $attach_id;
-            $attach_ids[] = $attach_id;
-            $attach_data = wp_generate_attachment_metadata( $attach_id, $filename );
-            $update_attachment_result = wp_update_attachment_metadata( $attach_id, $attach_data );
-            if($update_attachment_result === False)
-                return new WP_Error("sideload-error", "Unable to update attachment meta-data.");
-
+            if(!is_wp_error($attach_id))
+            {
+                $attach_data = wp_generate_attachment_metadata( $attach_id, $filename );
+                $update_attachment_result = wp_update_attachment_metadata( $attach_id, $attach_data );
+                /* if($update_attachment_result === False) */
+                /*     return new WP_Error("sideload-error", "Unable to update attachment meta-data."); */
+            }
+            $attach_ids[$sideloaded_file['id']] = $attach_id;
             unset($sideloaded_files[$key]);
         }
         $this->put_session_data('sideloaded_files', $sideloaded_files);
@@ -673,6 +673,6 @@ abstract class O3PO_PublicForm {
     }
 
 
-    abstract public function on_submit($attach_ids);
+    abstract public function on_submit( $attach_ids );
 
 }

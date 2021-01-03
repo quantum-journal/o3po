@@ -35,21 +35,20 @@ class O3PO_Ready2PublishDashboard {
 
     protected $title;
 
-    private static $meta_fields = [
+    private static $meta_fields_to_set_when_inserting_post = [
         'eprint',
         'title',
         'corresponding_author_email',
         'abstract',
-        'author_given_names', // is populated from author_first_names
-        'author_surnames', // is populated from author_last_names
+        'author_given_names',
+        'author_surnames',
         'author_name_styles',
         'award_numbers',
         'funder_names',
         'funder_identifiers',
         'popular_summary',
-        'featured_image',
-        'featured_image_caption',
-        'multimedia_comment',
+        'feature_image_caption',
+        'dissemination_multimedia',
         'fermats_library'
                                    ];
 
@@ -118,6 +117,7 @@ class O3PO_Ready2PublishDashboard {
     }
 
     public function insert_post( $id ) {
+
             // Do nothing if in maintenance mode
         $settings = O3PO_Settings::instance();
         if($settings->get_field_value('maintenance_mode')!=='unchecked')
@@ -139,29 +139,12 @@ class O3PO_Ready2PublishDashboard {
         else
         {
             update_post_meta($post_id, $post_type . '_number_authors', count($manuscript_info['author_name_styles']));
-
-                // Translate from first/last to given surname
-            $manuscript_info['author_given_names'] = array();
-            $manuscript_info['author_surnames'] = array();
-            foreach($manuscript_info['author_name_styles'] as $author_num => $name_style)
-            {
-                if($name_style === 'eastern')
-                {
-                    $manuscript_info['author_given_names'][$author_num] = $manuscript_info['author_last_names'][$author_num];
-                    $manuscript_info['author_surnames'][$author_num] = $manuscript_info['author_first_names'][$author_num];
-                }
-                else
-                {
-                    $manuscript_info['author_given_names'][$author_num] = $manuscript_info['author_first_names'][$author_num];
-                    $manuscript_info['author_surnames'][$author_num] = $manuscript_info['author_last_names'][$author_num];
-                }
-            }
-            unset($manuscript_info['author_first_names']);
-            unset($manuscript_info['author_last_names']);
-
-            foreach(static::$meta_fields as $field_id)
+            foreach(static::$meta_fields_to_set_when_inserting_post as $field_id)
                 update_post_meta($post_id, $post_type . '_' . $field_id, $manuscript_info[$field_id]);
-
+                // We also do a few more things that are normally done by the publication type class
+            set_post_thumbnail($post_id, $manuscript_info['feature_image_attachment_id']);
+            wp_update_post( array('ID' => $post_id, 'post_title' => addslashes($manuscript_info['title']) ));
+            update_post_meta( $post_id, $post_type . '_buffer_email', 'checked');
 
         }
 
@@ -169,15 +152,19 @@ class O3PO_Ready2PublishDashboard {
     }
 
     public function insert_and_display_post( $id ) {
+
         $post_id = $this->insert_post($id);
         $this->display_post( $post_id );
+
     }
 
     public function display_post( $post_id ) {
+
         if(is_wp_error($post_id))
             echo "ERROR: " . $post_id->get_error_message();
         else
             header('Location: /wp-admin/post.php?post=' . $post_id . '&action=edit');
+
     }
 
         /**

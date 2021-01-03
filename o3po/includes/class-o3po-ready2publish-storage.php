@@ -20,32 +20,33 @@
  */
 class O3PO_Ready2PublishStorage {
 
-    private static $manuscript_info_fields = array(
+    private static $manuscript_info_fields_to_store = array(
         'eprint',
         'title',
         'corresponding_author_email',
         'abstract',
-        'author_first_names',
-        'author_last_names',
+        'author_given_names', // is populated from author_last_names
+        'author_surnames', // is populated from author_last_names
         'author_name_styles',
         'award_numbers',
         'funder_names',
         'funder_identifiers',
         'popular_summary',
-        'featured_image',
-        'featured_image_caption',
-        'multimedia_comment',
+        'feature_image_attachment_id', // due to compatibility with the publication type class we call these fields feature_image_... and not featured_image_... as in the form
+        'feature_image_caption',
+        'dissemination_multimedia',
         'fermats_library',
         'payment_method',
         'invoice_recipient',
         'invoice_address',
         'invoice_vat_number',
-        'author_comments',
+        'ready2publish_comments',
     );
 
 
     private $plugin_name;
     private $slug;
+
 
     public function __construct( $plugin_name, $slug ) {
 
@@ -59,15 +60,35 @@ class O3PO_Ready2PublishStorage {
 
         $settings = O3PO_Settings::instance();
 
+            // Translate a few manuscript info fields
+        $manuscript_info['feature_image_attachment_id'] = $manuscript_info['featured_image_attachment_id'];
+        $manuscript_info['feature_image_caption'] = $manuscript_info['featured_image_caption'];
+        $manuscript_info['ready2publish_comments'] = $manuscript_info['comments'];
+        if(empty($manuscript_info['author_given_names']))
+        {
+            $manuscript_info['author_given_names'] = array();
+            $manuscript_info['author_surnames'] = array();
+            foreach($manuscript_info['author_name_styles'] as $author_num => $name_style)
+            {
+                if($name_style === 'eastern')
+                {
+                    $manuscript_info['author_given_names'][$author_num] = $manuscript_info['author_last_names'][$author_num];
+                    $manuscript_info['author_surnames'][$author_num] = $manuscript_info['author_first_names'][$author_num];
+                }
+                else
+                {
+                    $manuscript_info['author_given_names'][$author_num] = $manuscript_info['author_first_names'][$author_num];
+                    $manuscript_info['author_surnames'][$author_num] = $manuscript_info['author_last_names'][$author_num];
+                }
+            }
+        }
+
         $clean_manuscript_info = array();
-        foreach(static::$manuscript_info_fields as $field)
-            if(isset($manuscript_info[$field]))
-                $clean_manuscript_info[$field] = $manuscript_info[$field];
+        foreach(static::$manuscript_info_fields_to_store as $field)
+            $clean_manuscript_info[$field] = $manuscript_info[$field];
 
         $manuscripts = get_option($this->plugin_name . '-' . $this->slug, array());
-
         $manuscripts[] = $clean_manuscript_info;
-
         update_option($this->plugin_name . '-' . $this->slug, $manuscripts);
 
     }
@@ -85,41 +106,41 @@ class O3PO_Ready2PublishStorage {
                 'title' => 'On Foo Bar',
                 'corresponding_author_email' => "foo@bar.com",
                 'abstract' => "Some boring abstract",
-                'author_first_names' => ['Christian', 'Marcus', 'Wang'],
-                'author_last_names' => ['Gogolin', 'Huber', 'Ning'],
+                'author_given_names' => ['Christian', 'Marcus', 'Ning'],
+                'author_surnames' => ['Gogolin', 'Huber', 'Wang'],
                 'author_name_styles' => ['western', 'western', 'eastern'],
                 'award_numbers' => array('563452431', 'ADUOIPIS'),
                 'funder_names' => array('Foo agency', 'Bar agency'),
                 'funder_identifiers' => array('563452431', ''),
                 'popular_summary' => 'A very popular summary',
-                'featured_image' => '',
-                'featured_image_caption' => '',
-                'multimedia_comment' => '',
+                'feature_image_attachment_id' => 3273,
+                'feature_image_caption' => 'A great featured image!',
+                'dissemination_multimedia' => 'Maybe you can embed this video?',
                 'fermats_library' => 'checked',
-                'payment_method' => '',
-                'invoice_recipient' => '',
-                'invoice_address' => '',
-                'invoice_vat_number' => '',
-                'author_comments' => '',
+                'payment_method' => 'paypal',
+                'invoice_recipient' => 'Foo institute',
+                'invoice_address' => 'Bar street in Baz Town 3245143',
+                'invoice_vat_number' => 'AVT324123',
+                'ready2publish_comments' => 'No comment',
                             ],
                 '12346' => [
                 'eprint' => '1234.1349v2',
                 'title' => 'A longer title that usual papers have it',
                 'corresponding_author_email' => "baz@gmail.com",
                 'abstract' => "This abstract is much better",
-                'author_first_names' => ['Adam', 'Eva'],
-                'author_last_names' => ['Riese', 'Zwerg'],
+                'author_given_names' => ['Adam', 'Eva'],
+                'author_surnames' => ['Riese', 'Zwerg'],
                 'author_name_styles' => ['western', 'western'],
                 'popular_summary' => 'An even more popular summary',
-                'featured_image' => '',
-                'featured_image_caption' => '',
-                'multimedia_comment' => '',
+                'feature_image_attachment_id' => 3273,
+                'feature_image_caption' => '',
+                'dissemination_multimedia' => '',
                 'fermats_library' => '',
                 'payment_method' => '',
                 'invoice_recipient' => '',
                 'invoice_address' => '',
                 'invoice_vat_number' => '',
-                'author_comments' => '',
+                'ready2publish_comments' => '',
                             ]];
 
         $manuscripts = get_option($this->plugin_name . '-' . $this->slug, array());

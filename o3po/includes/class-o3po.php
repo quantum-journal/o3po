@@ -264,7 +264,7 @@ class O3PO {
         $this->journal_secondary = static::setup_secondary_journal($settings);
 
             //create the ready to publish storage
-        $this->ready2publish_storage = new O3PO_Ready2PublishStorage($this->plugin_name, $settings->get_field_value("ready2publish_slug"));
+        $this->ready2publish_storage = new O3PO_Ready2PublishStorage($this->plugin_name, $settings->get_field_value("ready2publish_slug") . '-storage');
 
             //create the ready to publish form
         $this->ready2publish_form = new O3PO_Ready2PublishForm($this->plugin_name, $settings->get_field_value("ready2publish_slug"), $this->environment, $this->ready2publish_storage);
