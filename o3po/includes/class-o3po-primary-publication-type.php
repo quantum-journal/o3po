@@ -282,7 +282,8 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             }
 
             $new_abstract = $parse_publication_source_result['abstract'];
-            if(!empty($new_abstract)) {
+                // Only update the abstract from source if eprint was changed or abstract was empty
+            if(!empty($new_abstract) and (empty($abstract) or $eprint_was_changed_on_last_save === "true")) {
                 $abstract = $new_abstract;
                 update_post_meta( $post_id, $post_type . '_abstract',  addslashes($new_abstract));
             }
@@ -590,7 +591,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         echo "<h4>How to publish in 10 easy steps</h4>" . "\n";
 		echo '<table style="width:100%">' . "\n";
         echo '<tr><td>Step 0</td><td>Check on <a href="'. $this->get_journal_property('scholastica_manuscripts_url').'" target="_blank">Scholastica that the manuscript has actually been accepted</a>!</td></tr>' . "\n";
-        echo '<tr><td>Step 1</td><td>Put the eprint number in the box below and press "Publish"'.(empty($eprint) ? "" : " DONE!").'</td></tr>' . "\n";
+        echo '<tr><td>Step 1</td><td>Put the eprint number in the box below'.(empty($eprint) ? ' and press "Publish"' : " DONE!").'</td></tr>' . "\n";
         if(!empty($arxiv_pdf_attach_ids))
         {
             echo '<tr><td>Step 2</td><td>Review the validation results below.</td></tr>' . "\n";

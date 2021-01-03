@@ -567,10 +567,10 @@ abstract class O3PO_PublicForm {
                 $attach_id = new WP_Error("sideload-error", "wp_insert_attachment() returned 0");
             if(!is_wp_error($attach_id))
             {
-                $attach_data = wp_generate_attachment_metadata( $attach_id, $filename );
-                $update_attachment_result = wp_update_attachment_metadata( $attach_id, $attach_data );
+                $attach_data = wp_generate_attachment_metadata($attach_id, $sideloaded_file['file']);
+                $update_attachment_result = wp_update_attachment_metadata($attach_id, $attach_data);
                 /* if($update_attachment_result === False) */
-                /*     return new WP_Error("sideload-error", "Unable to update attachment meta-data."); */
+                /*     $attach_id = new WP_Error("sideload-error", "Unable to update attachment meta-data of attachment " . $attach_id . "."); */
             }
             $attach_ids[$sideloaded_file['id']] = $attach_id;
             unset($sideloaded_files[$key]);
