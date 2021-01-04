@@ -82,6 +82,7 @@ class O3PO_Journal implements O3PO_SettingsSpecifyer {
             'crossref_id',
             'crossref_pw',
             'crossref_test_deposite_url',
+            'crossref_crossmark_policy_page_doi',
             'ads_api_search_url',
             'ads_api_token',
             'developer_email',

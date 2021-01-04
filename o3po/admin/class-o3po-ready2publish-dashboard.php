@@ -43,6 +43,7 @@ class O3PO_Ready2PublishDashboard {
         'author_given_names',
         'author_surnames',
         'author_name_styles',
+        'number_award_numbers',
         'award_numbers',
         'funder_names',
         'funder_identifiers',

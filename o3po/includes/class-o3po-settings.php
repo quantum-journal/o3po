@@ -304,6 +304,8 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->specify_field('crossref_email', 'Email for communication with Crossref', array( $this, 'render_crossref_email_setting' ), 'crossref_settings', 'crossref_settings', array(), array($this, 'validate_email'), '');
         $this->specify_field('crossref_archive_locations', 'Archive locations', array( $this, 'render_crossref_archive_locations_setting' ), 'crossref_settings', 'crossref_settings', array(), array($this, 'trim'), '');
 
+        $this->specify_field('crossref_crossmark_policy_page_doi', 'Crossmark policy page doi', array( $this, 'render_crossref_crossmark_policy_page_doi_setting' ), 'crossref_settings', 'crossref_settings', array(), array($this, 'trim'), '');
+
         $this->specify_section('ads_settings', 'ADS', array( $this, 'render_ads_settings' ), 'ads_settings');
         $this->specify_field('ads_api_search_url', 'ADS API URL', array( $this, 'render_ads_api_search_url_setting' ), 'ads_settings', 'ads_settings', array(), array($this, 'validate_url'), 'https://api.adsabs.harvard.edu/v1/search/query');
         $this->specify_field('ads_api_token', 'ADS API token', array( $this, 'render_ads_api_token_setting' ), 'ads_settings', 'ads_settings', array(), array($this, 'trim'), '');
@@ -919,6 +921,19 @@ class O3PO_Settings extends O3PO_Singleton {
 
         $this->render_single_line_field('crossref_archive_locations');
         echo '<p>(Comma separated list containing a subset of CLOCKSS, LOCKSS Portico, KB, DWT, Internet Archive, depending on which archives the primary journal\'s content is archived in.)</p>';
+
+    }
+
+        /**
+         * Render the setting for the crossmark policy page.
+         *
+         * @since    0.3.1+
+         * @access   public
+         */
+    public function render_crossref_crossmark_policy_page_doi_setting() {
+
+        $this->render_single_line_field('crossref_crossmark_policy_page_doi');
+        echo '<p>(DOI of the <a href="https://www.crossref.org/education/crossmark/crossmark-policy-page/">crossmark policy page</a>. You can register this special DOI <a href="https://apps.crossref.org/webDeposit/">here</a>.)</p>';
 
     }
 

@@ -28,6 +28,7 @@ class O3PO_Ready2PublishStorage {
         'author_given_names', // is populated from author_last_names
         'author_surnames', // is populated from author_last_names
         'author_name_styles',
+        'number_award_numbers',
         'award_numbers',
         'funder_names',
         'funder_identifiers',
@@ -83,6 +84,22 @@ class O3PO_Ready2PublishStorage {
             }
         }
 
+            //Clean award
+        $cleaned_award_numbers = array();
+        $clean_funder_identifiers = array();
+        $clean_funder_names = array();
+        foreach($manuscript_info['award_numbers'] as $key => $award_number)
+            if(!empty($award_number))
+            {
+                $cleaned_award_numbers[] = $award_numbers[$key];
+                $clean_funder_identifiers[] = $funder_identifiers[$key];
+                $clean_funder_names[] = $funder_names[$key];
+            }
+        $manuscript_info['number_award_numbers'] = count($cleaned_award_numbers);
+        $manuscript_info['award_numbers'] = $cleaned_award_numbers;
+        $manuscript_info['funder_identifiers'] = $cleaned_funder_identifiers;
+        $manuscript_info['funder_names'] = $cleaned_funder_names;
+
         $clean_manuscript_info = array();
         foreach(static::$manuscript_info_fields_to_store as $field)
             $clean_manuscript_info[$field] = $manuscript_info[$field];
@@ -109,6 +126,7 @@ class O3PO_Ready2PublishStorage {
                 'author_given_names' => ['Christian', 'Marcus', 'Ning'],
                 'author_surnames' => ['Gogolin', 'Huber', 'Wang'],
                 'author_name_styles' => ['western', 'western', 'eastern'],
+                'number_award_numbers' => 2,
                 'award_numbers' => array('563452431', 'ADUOIPIS'),
                 'funder_names' => array('Foo agency', 'Bar agency'),
                 'funder_identifiers' => array('563452431', ''),
@@ -131,6 +149,10 @@ class O3PO_Ready2PublishStorage {
                 'author_given_names' => ['Adam', 'Eva'],
                 'author_surnames' => ['Riese', 'Zwerg'],
                 'author_name_styles' => ['western', 'western'],
+                'number_award_numbers' => 2,
+                'award_numbers' => array('563452431', 'ADUOIPIS'),
+                'funder_names' => array('Foo agency', 'Bar agency'),
+                'funder_identifiers' => array('563452431', ''),
                 'popular_summary' => 'An even more popular summary',
                 'feature_image_attachment_id' => 3273,
                 'feature_image_caption' => '',

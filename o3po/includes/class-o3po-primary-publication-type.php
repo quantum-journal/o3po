@@ -87,6 +87,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $this->the_admin_panel_crossref($post_id);
         $this->the_admin_panel_doaj($post_id);
         $this->the_admin_panel_clockss($post_id);
+        $this->the_admin_panel_funder_information($post_id);
         $this->the_admin_panel_arxiv($post_id);
         echo '</table>';
 
