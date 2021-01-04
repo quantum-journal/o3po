@@ -1377,7 +1377,7 @@ abstract class O3PO_PublicationType {
             $xml .= '	  <crossmark_policy>' . esc_html($crossref_crossmark_policy_page_doi) . '</crossmark_policy>' . "\n";
             $xml .= '	  <crossmark_domains>' . "\n";
             $xml .= '	    <crossmark_domain>' . "\n";
-            $xml .= '	      <domain>quantum-journal.org</domain>' . "\n";
+            $xml .= '	      <domain>' . substr(get_site_url(null, '', 'https'), 8) . '</domain>' . "\n";
             $xml .= '	    </crossmark_domain>' . "\n";
             $xml .= '	  </crossmark_domains>' . "\n";
             $xml .= '	  <crossmark_domain_exclusive>false</crossmark_domain_exclusive>' . "\n";
