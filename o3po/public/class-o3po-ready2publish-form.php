@@ -514,7 +514,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
             // from there.
         $to = ($this->environment->is_test_environment() ? $settings->get_field_value('developer_email') : "publish@quantum-journal.org" );
         $subject  = "TEST - DO NOT PUBLISH: " . $this->get_field_value('title') . " was submitted for publication";
-        $message = "The following manuscript was submitted for publication:" . "\n\n" . $summary;
+        $message = "The following manuscript was submitted for publication and you can publish it from the <a href=" . get_site_url(null, '/wp-admin/index.php', 'admin') . ">Wordpress Dashboard</a>:" . "\n\n" . $summary;
 
         $successfully_sent = wp_mail( $to, $subject, $message, $headers, $attachment);
 
