@@ -86,20 +86,20 @@ class O3PO_Ready2PublishStorage {
         }
 
             //Clean award
-        $cleaned_award_numbers = array();
+        $clean_award_numbers = array();
         $clean_funder_identifiers = array();
         $clean_funder_names = array();
         foreach($manuscript_info['award_numbers'] as $key => $award_number)
             if(!empty($award_number))
             {
-                $cleaned_award_numbers[] = $award_numbers[$key];
+                $clean_award_numbers[] = $award_numbers[$key];
                 $clean_funder_identifiers[] = $funder_identifiers[$key];
                 $clean_funder_names[] = $funder_names[$key];
             }
-        $manuscript_info['number_award_numbers'] = count($cleaned_award_numbers);
-        $manuscript_info['award_numbers'] = $cleaned_award_numbers;
-        $manuscript_info['funder_identifiers'] = $cleaned_funder_identifiers;
-        $manuscript_info['funder_names'] = $cleaned_funder_names;
+        $manuscript_info['number_award_numbers'] = count($clean_award_numbers);
+        $manuscript_info['award_numbers'] = $clean_award_numbers;
+        $manuscript_info['funder_identifiers'] = $clean_funder_identifiers;
+        $manuscript_info['funder_names'] = $clean_funder_names;
 
         $clean_manuscript_info = array();
         foreach(static::$manuscript_info_fields_to_store as $field)
@@ -170,7 +170,8 @@ class O3PO_Ready2PublishStorage {
 
         $manuscripts = get_option($this->plugin_name . '-' . $this->slug, array());
 
-        return array_merge($manuscripts, $test_manuscripts);
+        #return array_merge($manuscripts, $test_manuscripts);
+        return array_merge($manuscripts);
     }
 
     public static function post_id_for_eprint( $eprint_without_version ) {

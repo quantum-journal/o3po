@@ -75,11 +75,13 @@ class O3PO_Ready2PublishDashboard {
         $settings = O3PO_Settings::instance();
         $out = "";
         $out .= '<li><div class="manuscript-ready2publish">';
-        $out .= '<a style="display:inline-block;min-width:150px;margin-right:5px" target="_blank" href="' . esc_attr($settings->get_field_value('arxiv_url_abs_prefix') . $manuscript_info['eprint']) . '">' . esc_html($manuscript_info['eprint']) . '</a>';
+        $out .= '<a style="display:inline-block;margin-right:5px" target="_blank" href="' . esc_attr($settings->get_field_value('arxiv_url_abs_prefix') . $manuscript_info['eprint']) . '">' . esc_html($manuscript_info['eprint']) . '</a>';
         $out .= '<div style="margin-left:5px">';
         $out .= '<div>Title: ' . esc_html($manuscript_info['title']) . '</div>';
         if(!empty($manuscript_info['ready2publish_comments']))
             $out .= '<div>Author comment: ' . esc_html($manuscript_info['ready2publish_comments']) . '</div>';
+        if(!empty($manuscript_info['time_submitted']))
+           $out .= '<div>Submitted: ' . gmdate("Y-m-d H:i:s", $manuscript_info['time_submitted']) . " GMT" . '</div>';
         $out .= '<div style="float:right">';
         $out .= '<span><a href="mailto:' . esc_attr($manuscript_info['corresponding_author_email']) . '">' . esc_html($manuscript_info['corresponding_author_email']) . '</a></span>';
         $out .= ' | ';
@@ -101,9 +103,11 @@ class O3PO_Ready2PublishDashboard {
         {
             echo '<h3>Partially published manuscripts</h3>';
             echo '<ul>';
-            foreach($partially_published_manuscripts as $id => $manuscript_info)
+            #foreach($partially_published_manuscripts as $id => $manuscript_info)
+            reset($partially_published_manuscripts);
+            for(end($partially_published_manuscripts); ($id=key($partially_published_manuscripts))!==null; prev($partially_published_manuscripts))
             {
-                echo $this->render_manuscript_entry($id, $manuscript_info, 'continue');
+                echo $this->render_manuscript_entry($id, $partially_published_manuscripts[$id], 'continue');
             }
             echo '</ul>';
         }
@@ -113,9 +117,11 @@ class O3PO_Ready2PublishDashboard {
         {
             echo '<h3>Manuscripts awaiting publication</h3>';
             echo '<ul>';
-            foreach($unprocessed_manuscripts as $id => $manuscript_info)
+            #foreach($unprocessed_manuscripts as $id => $manuscript_info)
+            reset($unprocessed_manuscripts);
+            for(end($unprocessed_manuscripts); ($id=key($unprocessed_manuscripts))!==null; prev($unprocessed_manuscripts))
             {
-                echo $this->render_manuscript_entry($id, $manuscript_info, 'publish');
+                echo $this->render_manuscript_entry($id, $unprocessed_manuscripts[$id], 'publish');
             }
             echo '</ul>';
         }
@@ -147,7 +153,8 @@ class O3PO_Ready2PublishDashboard {
             foreach(static::$meta_fields_to_set_when_inserting_post as $field_id)
                 update_post_meta($post_id, $post_type . '_' . $field_id, $manuscript_info[$field_id]);
                 // We also do a few more things that are normally done by the publication type class
-            set_post_thumbnail($post_id, $manuscript_info['feature_image_attachment_id']);
+            if(!empty($manuscript_info['feature_image_attachment_id']))
+                set_post_thumbnail($post_id, $manuscript_info['feature_image_attachment_id']);
             wp_update_post( array('ID' => $post_id, 'post_title' => addslashes($manuscript_info['title']) ));
             update_post_meta( $post_id, $post_type . '_buffer_email', 'checked');
 

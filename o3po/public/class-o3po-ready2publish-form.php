@@ -465,7 +465,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         $manuscript_info = array();
         foreach($this->fields as $id => $field_options)
             $manuscript_info[$id] = $this->get_field_value($id);
-        $manuscript_info['featured_image_attachment_id'] = $attach_ids['featured_image_upload'];
+        $manuscript_info['featured_image_attachment_id'] = !empty($attach_ids['featured_image_upload']) ? $attach_ids['featured_image_upload'] : null ;
         $manuscript_info['time_submitted'] = time();
         $this->storage->store_manuscript($manuscript_info);
 
