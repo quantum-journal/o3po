@@ -631,7 +631,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 		echo '		<th><label for="' . $post_type . '_eprint" class="' . $post_type . '_eprint_label">' . 'Eprint' . '</label></th>';
 		echo '		<td>';
 		echo '			<input type="text" id="' . $post_type . '_eprint" name="' . $post_type . '_eprint" class="' . $post_type . '_eprint_field required" placeholder="" value="' . esc_attr($eprint) . '">';
-		echo '                  <input type="checkbox" name="' . $post_type . '_fetch_metadata_from_arxiv"' . (empty($eprint) ? 'checked' : '' ) . '>Fetch title, authors, and abstract from the arXiv upon next Save/Update';
+		echo '                  <input type="checkbox" name="' . $post_type . '_fetch_metadata_from_arxiv"' . (empty($eprint) ? 'checked' : '' ) . '>Fetch title, authors, and abstract from the arXiv upon next Save/Update. This happens automatically in case the arXiv number is changed.';
 		echo '			<p>(The arXiv identifier including the version and, for old eprints, the prefix, e.g., 1701.1234v5 or quant-ph/123456v3.)</p>';
 		echo '		</td>';
 		echo '	</tr>';

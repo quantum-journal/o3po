@@ -90,11 +90,13 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         $this->specify_section('dissemination_fermats_library', 'Fermat\'s library', null, 'dissemination');
         $this->specify_field('fermats_library', 'Opt-in to Fermat\'s library', array( $this, 'render_fermats_library' ), 'dissemination', 'dissemination_fermats_library', array(), array($this, 'checked_or_unchecked'), 'unchecked');
 
+        $this->specify_section('dissemination_copyright_confirmation', 'License and copyright', null, 'dissemination');
+        $this->specify_field('copyright_confirmation', 'Confirm copyright', array( $this, 'render_copyright_confirmation' ), 'dissemination', 'dissemination_copyright_confirmation', array(), array($this, 'checked_if_on_or_passt_containing_page'), 'unchecked');
+
         $this->specify_page('payment', 'Payment');
 
         $this->specify_section('payment_method', 'Payment method', null, 'payment');
         $this->specify_field('payment_method', Null, array($this, 'render_payment_method'), 'payment', 'payment_method', array(), array($this, 'one_of_invoice_noinvoice_waiver'), array());
-
 
         $this->specify_section('payment_invoice', 'Invoicing information', null, 'payment');
         $this->specify_field('payment_amount', 'Amount', array($this, 'render_payment_amount'), 'payment', 'payment_invoice', array(), array($this, 'validate_non_negative_euros'), "450€");
@@ -116,7 +118,11 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
 
 
     public function render_agree_to_publish() {
-        $this->render_checkbox_field('agree_to_publish', 'I certify that this is the final version. All authors hereby give their consent to publish it and allow Quantum the necessary processing and storage of personal data.');
+
+        $settings = O3PO_Settings::instance();
+
+        $this->render_checkbox_field('agree_to_publish', 'I certify that this is the final version this work which I am submitting for publication. I certify that all authors have given their consent to publish it in its present form and allow ' . $settings->get_field_value('journal_title') . ' the necessary processing and storage of personal data.');
+
     }
 
     public function render_acceptance_code() {
@@ -126,11 +132,15 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
     }
 
     public function render_popular_summary() {
-        $this->render_multi_line_field('popular_summary', 12, 'width:100%', true, '');
+
+        $this->render_multi_line_field('popular_summary', 12, 'width:100%', true);
+
     }
 
     public function render_featured_image_caption() {
+
         $this->render_multi_line_field('featured_image_caption', 6, 'width:100%', true);
+
     }
 
 
@@ -138,6 +148,12 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
 
         $settings = O3PO_Settings::instance();
         $this->render_checkbox_field('fermats_library', 'All authors want this paper to appear on <a href="'. esc_attr($settings->get_field_value('fermats_library_about_url')) . ' target="_blank">Fermat\'s library</a>. Fermat\'s library is a platform on which readers can leave comments in publish research articles.', false);
+    }
+
+    public function render_copyright_confirmation() {
+
+        $settings = O3PO_Settings::instance();
+        $this->render_checkbox_field('copyright_confirmation', 'I hereby grant ' . $settings->get_field_value('journal_title') . ' the right to publish the work and all data entered into the preceding form fields except for the corresponding author email address under the ' . $settings->get_field_value('license_name') . ' license and certify that I either hold the necessary copyright or have obtained permission from the respective copyright owners to grant this right.', false);
     }
 
     public function render_featured_image_upload() {
@@ -200,14 +216,14 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
 
         if(empty(trim($input)))
         {
-            $this->add_error( $id, 'empty-acceptance-code', "An acceptance code must be provided in '" . $this->fields[$id]['title'] . "'.", 'error');
+            $this->add_error($id, 'empty-acceptance-code', "An acceptance code must be provided in '" . $this->fields[$id]['title'] . "'.", 'error');
             return $this->get_field_default($id);
         }
 
         if(in_array($input, $acceptance_codes))
             return $input;
 
-        $this->add_error( $id, 'invalid-acceptance-code', "The acceptance code '" . $input ."' given in '" . $this->fields[$id]['title'] . "' is not valid.", 'error');
+        $this->add_error($id, 'invalid-acceptance-code', "The acceptance code '" . $input ."' given in '" . $this->fields[$id]['title'] . "' is not valid.", 'error');
         return $this->get_field_default($id);
     }
 
@@ -215,7 +231,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
 
         if(empty(trim($input)))
         {
-            $this->add_error( $id, 'eprint-empty', "The arXiv identifier asked for in '" . $this->fields[$id]['title'] . "' may not be empty.", 'error');
+            $this->add_error($id, 'eprint-empty', "The arXiv identifier asked for in '" . $this->fields[$id]['title'] . "' may not be empty.", 'error');
             return $this->get_field_default($id);
         }
 
@@ -265,9 +281,10 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
 
     public function render_title() {
 
-        #$this->render_single_line_field('title', '', 'on', 'width:100%;');
         $this->render_multi_line_field('title', 1, 'width:100%;', true);
+
     }
+
 
     public function render_abstract() {
 
@@ -449,6 +466,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         foreach($this->fields as $id => $field_options)
             $manuscript_info[$id] = $this->get_field_value($id);
         $manuscript_info['featured_image_attachment_id'] = $attach_ids['featured_image_upload'];
+        $manuscript_info['time_submitted'] = time();
         $this->storage->store_manuscript($manuscript_info);
 
         $summary = "";
@@ -506,14 +524,15 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
             if($this->get_field_value('payment_method') === 'invoice')
             {
                 $to = 'invoice@quantum-journal.org';
-                $subject  = "TEST - DO NOT ISSUE INVOICE: Invoice request for " . $this->get_field_value('eprint');
+                $subject  = "TEST - DO NOT ISSUE INVOICE: Invoice request for " . esc_html($this->get_field_value('eprint'));
                 $message = "";
-                $message .= "<p>An Invoice was requested for https://arxiv.org/abs/" . $this->get_field_value('eprint') . ":</p>";
-                $message .= "<p>" . $this->get_field_value('invoice_recipient') . "</p>";
-                $message .= "<p>" . $this->get_field_value('invoice_address') . "</p>";
-                $message .= "<p>Vat-Nr: " . $this->get_field_value('invoice_vat_number') . "</p>";
-                $message .= "<p>Amount: " . $this->get_field_value('payment_amount') . "</p>";
-                $message .= "<p>Comments:\n" . $this->get_field_value('comments') . "</p>";
+                $message .= "<p>An Invoice was requested for <a href=\"https://arxiv.org/abs/" . esc_attr($this->get_field_value('eprint')) . "\" >https://arxiv.org/abs/" . esc_html($this->get_field_value('eprint')) . "</a>:</p>";
+                $message .= "<p>" . esc_html($this->get_field_value('corresponding_author_email')) . "</p>";
+                $message .= "<p>" . esc_html($this->get_field_value('invoice_recipient')) . "</p>";
+                $message .= "<p>" . esc_html($this->get_field_value('invoice_address')) . "</p>";
+                $message .= "<p>Vat-Nr: " . esc_html($this->get_field_value('invoice_vat_number')) . "</p>";
+                $message .= "<p>Amount: " . esc_html($this->get_field_value('payment_amount')) . "</p>";
+                $message .= "<p>Comments:\n" . esc_html($this->get_field_value('comments')) . "</p>";
                 $successfully_sent = wp_mail($to, $subject, $message, $headers);
             }
         }
@@ -716,7 +735,7 @@ while(nextSibling) {
         if(in_array($input, $allowed))
             return $input;
 
-        $this->add_error( $id, 'neither-of-paypal-invoice-transfer', "The selection '" . $this->fields[$id]['title'] . "' must be one of: " . implode($allowed) . ". Selection reset.", 'error');
+        $this->add_error($id, 'neither-of-paypal-invoice-transfer', "The selection '" . $this->fields[$id]['title'] . "' must be one of: " . implode($allowed) . ". Selection reset.", 'error');
         return $this->get_field_default($id);
     }
 

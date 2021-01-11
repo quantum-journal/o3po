@@ -70,6 +70,30 @@ class O3PO_Ready2PublishDashboard {
         wp_add_dashboard_widget($this->slug, esc_html($this->plugin_pretty_name . " " . $this->title), array($this, 'render'));
     }
 
+    public function render_manuscript_entry( $id, $manuscript_info, $action ) {
+
+        $settings = O3PO_Settings::instance();
+        $out = "";
+        $out .= '<li><div class="manuscript-ready2publish">';
+        $out .= '<a style="display:inline-block;min-width:150px;margin-right:5px" target="_blank" href="' . esc_attr($settings->get_field_value('arxiv_url_abs_prefix') . $manuscript_info['eprint']) . '">' . esc_html($manuscript_info['eprint']) . '</a>';
+        $out .= '<div style="margin-left:5px">';
+        $out .= '<div>Title: ' . esc_html($manuscript_info['title']) . '</div>';
+        if(!empty($manuscript_info['ready2publish_comments']))
+            $out .= '<div>Author comment: ' . esc_html($manuscript_info['ready2publish_comments']) . '</div>';
+        $out .= '<div style="float:right">';
+        $out .= '<span><a href="mailto:' . esc_attr($manuscript_info['corresponding_author_email']) . '">' . esc_html($manuscript_info['corresponding_author_email']) . '</a></span>';
+        $out .= ' | ';
+        #$out .= '<span class=""><a href="/' . $this->slug . '?action=' . $action . '&id=' . urlencode($id) . '">' . ($action === 'continue' ? "Go to post" : "Begin publishing") .  '</a></span>';
+        $out .= '<span class=""><a href="/' . $this->slug . '?action=' . $action . '&id=' . urlencode($id) . '">' . ($action === 'continue' ? "Go to post" : "Begin publishing") .  '</a></span>';
+        $out .= '</div>';
+        $out .= '<div style="clear:both"></div>';
+        $out .= '</div>';
+        $out .= '</div></li>';
+
+        return $out;
+    }
+
+
     public function render() {
 
         $partially_published_manuscripts = $this->storage->get_manuscripts('partial');
@@ -79,17 +103,7 @@ class O3PO_Ready2PublishDashboard {
             echo '<ul>';
             foreach($partially_published_manuscripts as $id => $manuscript_info)
             {
-                echo '<li><div class="manuscript-ready2publish">';
-                echo '<span>' . esc_html($manuscript_info['eprint']) . '</span>: ';
-                echo '<span>' . esc_html($manuscript_info['title']) . '</span>';
-                echo '<div style="margin-left:">';
-                echo '<span><a href="mailto:' . esc_attr($manuscript_info['corresponding_author_email']) . '">Email ' . esc_html($manuscript_info['corresponding_author_email']) . '</a></span>';
-                echo ' | ';
-                echo '<span class=""><a href="/' . $this->slug . '?action=' . 'continue' . '&id=' . urlencode($id) . '">Continue</a></span>';
-                    /* echo ' | '; */
-                    /* echo '<span class=""><a href="/' . $this->slug . '?action=' . 'ignore' . '&id=' . urlencode($id) . '">Ignore</a></span>'; */
-                echo '</div>';
-                echo '</div></li>';
+                echo $this->render_manuscript_entry($id, $manuscript_info, 'continue');
             }
             echo '</ul>';
         }
@@ -101,17 +115,7 @@ class O3PO_Ready2PublishDashboard {
             echo '<ul>';
             foreach($unprocessed_manuscripts as $id => $manuscript_info)
             {
-                echo '<li><div class="manuscript-ready2publish">';
-                echo '<span>' . esc_html($manuscript_info['eprint']) . '</span>: ';
-                echo '<span>' . esc_html($manuscript_info['title']) . '</span>';
-                echo '<div style="margin-left:">';
-                echo '<span><a href="mailto:' . esc_attr($manuscript_info['corresponding_author_email']) . '">Email ' . esc_html($manuscript_info['corresponding_author_email']) . '</a></span>';
-                echo ' | ';
-                echo '<span class=""><a href="/' . $this->slug . '?action=' . 'publish' . '&id=' . urlencode($id) . '">Start publishing</a></span>';
-                    /* echo ' | '; */
-                    /* echo '<span class=""><a href="/' . $this->slug . '?action=' . 'ignore' . '&id=' . urlencode($id) . '">Ignore</a></span>'; */
-                echo '</div>';
-                echo '</div></li>';
+                echo $this->render_manuscript_entry($id, $manuscript_info, 'publish');
             }
             echo '</ul>';
         }
@@ -121,7 +125,7 @@ class O3PO_Ready2PublishDashboard {
 
             // Do nothing if in maintenance mode
         $settings = O3PO_Settings::instance();
-        if($settings->get_field_value('maintenance_mode')!=='unchecked')
+        if($settings->get_field_value('maintenance_mode') !== 'unchecked')
             return;
 
             // Check if the user has permissions to save data

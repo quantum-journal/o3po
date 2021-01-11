@@ -375,7 +375,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         if(preg_match('/^[0-9.-]*$/u', $doi_prefix))
             return $doi_prefix;
 
-        $this->add_error( $id, 'illegal-doi-prefix', "The DOI prefix '" . $input ."' given in '" . $this->fields[$id]['title'] . "' may consist only of numbers 0-9, dot . and the dash - character. Field reset.", 'error');
+        $this->add_error($id, 'illegal-doi-prefix', "The DOI prefix '" . $input ."' given in '" . $this->fields[$id]['title'] . "' may consist only of numbers 0-9, dot . and the dash - character. Field reset.", 'error');
         return $this->get_field_default($id);
     }
 
@@ -393,7 +393,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         if(preg_match('/^[a-zA-Z0-9.-]*$/u', $doi_suffix))
             return $doi_suffix;
 
-        $this->add_error( $id, 'illegal-doi-suffix', "The DOI suffix '" . $input ."' given in '" . $this->fields[$id]['title'] . "' may consist only of lower and upper case English alphabet letters a-z and A-Z, numbers 0-9, dot . and the dash - character. Field reset.", 'error');
+        $this->add_error($id, 'illegal-doi-suffix', "The DOI suffix '" . $input ."' given in '" . $this->fields[$id]['title'] . "' may consist only of lower and upper case English alphabet letters a-z and A-Z, numbers 0-9, dot . and the dash - character. Field reset.", 'error');
         return $this->get_field_default($id);
     }
 
@@ -411,7 +411,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         if(preg_match('/^[0-9]{4}$/u', $first_volume_year)) //this will cause a year 10000 bug and rejects years pre 1000
             return $first_volume_year;
 
-        $this->add_error( $id, 'illegal-year', "The year '" . $input ."' given in '" . $this->fields[$id]['title'] . "' must consist of exactly four digits in the range 0-9. Field reset.", 'error');
+        $this->add_error($id, 'illegal-year', "The year '" . $input ."' given in '" . $this->fields[$id]['title'] . "' must consist of exactly four digits in the range 0-9. Field reset.", 'error');
         return $this->get_field_default($id);
     }
 
@@ -430,7 +430,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         if(preg_match('#^([-.a-zA-Z]+/[0-9]{7}|[0-9]{4}.[0-9]{4,5})v[0-9]+$#u', $eprint))
             return $eprint;
 
-        $this->add_error( $id, 'malformed-eprint', "The arXiv identifier '" . $input ."' given in '" . $this->fields[$id]['title'] . "' is not valid.", 'error');
+        $this->add_error($id, 'malformed-eprint', "The arXiv identifier '" . $input ."' given in '" . $this->fields[$id]['title'] . "' is not valid.", 'error');
         return $this->get_field_default($id);
     }
 
@@ -466,7 +466,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         if(O3PO_Utility::valid_issn($trimmed_input))
             return $trimmed_input;
 
-        $this->add_error( $id, 'invalid-issn', "The ISSN '" . $input ."' given in '" . $this->fields[$id]['title'] . "' is invalid. Field reset.", 'error');
+        $this->add_error($id, 'invalid-issn', "The ISSN '" . $input ."' given in '" . $this->fields[$id]['title'] . "' is invalid. Field reset.", 'error');
         return $this->get_field_default($id);
     }
 
@@ -484,7 +484,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         if(O3PO_Utility::valid_email($input_trimmed))
             return $input_trimmed;
 
-        $this->add_error( $id, 'invalid-email', "The input '" . $input . "' to '" . $this->fields[$id]['title'] . "' was not a valid email address. Field reset.", 'error');
+        $this->add_error($id, 'invalid-email', "The input '" . $input . "' to '" . $this->fields[$id]['title'] . "' was not a valid email address. Field reset.", 'error');
         return $this->get_field_default($id);
     }
 
@@ -504,12 +504,12 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         $parsed = parse_url($url);
         if(empty($parsed['scheme']) or empty($parsed['host']))
         {
-            $this->add_error( $id, 'url-validated', "The URL '" . $input . "' given in '" . $this->fields[$id]['title'] . "' was malformed. Field reset.", 'error');
+            $this->add_error($id, 'url-validated', "The URL '" . $input . "' given in '" . $this->fields[$id]['title'] . "' was malformed. Field reset.", 'error');
             return $this->get_field_default($id);
         }
         elseif($url !== $input)
         {
-            $this->add_error( $id, 'url-validated', "The URL '" . $input . "' given in '" . $this->fields[$id]['title'] . "' was malformed or contained special or illegal characters, which were removed or escaped. Please check.", 'updated');
+            $this->add_error($id, 'url-validated', "The URL '" . $input . "' given in '" . $this->fields[$id]['title'] . "' was malformed or contained special or illegal characters, which were removed or escaped. Please check.", 'updated');
             return $url;
         }
 
@@ -538,7 +538,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
             return $array;
         }
         catch (Exception $e) {
-            $this->add_error( $id, 'not-comma-separated-list', "The input to '" . $this->fields[$id]['title'] . "' could not be interpreted as a comma separated list. Field reset.", 'error');
+            $this->add_error($id, 'not-comma-separated-list', "The input to '" . $this->fields[$id]['title'] . "' could not be interpreted as a comma separated list. Field reset.", 'error');
             return $this->get_field_default($id);
         }
     }
@@ -557,7 +557,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         if(preg_match('/^[A-Z]{2}$/u', $input))
             return $input;
 
-        $this->add_error( $id, 'url-validated', "The two letter country code '" . $input . "' given in '" . $this->fields[$id]['title'] . "' was malformed. Field reset.", 'error');
+        $this->add_error($id, 'url-validated', "The two letter country code '" . $input . "' given in '" . $this->fields[$id]['title'] . "' was malformed. Field reset.", 'error');
         return $this->get_field_default($id);
     }
 
@@ -576,7 +576,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         if(preg_match('/^[1-9][0-9]*$/u', $input))
             return $input;
 
-        $this->add_error( $id, 'not-a-positive-integer', "The input '" . $input . "' given in '" . $this->fields[$id]['title'] . "' was not a positive integer without leading zeros. Field reset.", 'error');
+        $this->add_error($id, 'not-a-positive-integer', "The input '" . $input . "' given in '" . $this->fields[$id]['title'] . "' was not a positive integer without leading zeros. Field reset.", 'error');
         return $this->get_field_default($id);
     }
 
@@ -594,7 +594,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         if(preg_match('/^[0-9][0-9]*(\.[0-9]*|)€$/u', $input))
             return $input;
 
-        $this->add_error( $id, 'not-a-non-negative-euro', "The input '" . $input . "' given in '" . $this->fields[$id]['title'] . "' was not a non-negative amount of euros. Field reset.", 'error');
+        $this->add_error($id, 'not-a-non-negative-euro', "The input '" . $input . "' given in '" . $this->fields[$id]['title'] . "' was not a non-negative amount of euros. Field reset.", 'error');
         return $this->get_field_default($id);
     }
 
@@ -611,7 +611,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         if($input === "checked" or $input === "unchecked")
             return $input;
 
-        $this->add_error( $id, 'not-checked-or-unchecked', "The box '" . $this->fields[$id]['title'] . "' must be either checked or unchecked. Box reset.", 'error');
+        $this->add_error($id, 'not-checked-or-unchecked', "The box '" . $this->fields[$id]['title'] . "' must be either checked or unchecked. Box reset.", 'error');
         return $this->get_field_default($id);
     }
 
@@ -628,7 +628,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         if($input === "checked")
             return $input;
 
-        $this->add_error( $id, 'not-checked', "The box '" . $this->fields[$id]['title'] . "' must be checked.", 'error');
+        $this->add_error($id, 'not-checked', "The box '" . $this->fields[$id]['title'] . "' must be checked.", 'error');
 
         return $this->get_field_default($id);
     }
@@ -659,7 +659,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         $input = trim($input);
         $trimmed_striped_input = strip_tags($input);
         if($trimmed_striped_input !== $input)
-            $this->add_error( $id, 'tags-stripped', "The field '" . $this->fields[$id]['title'] . "' cannot contain html tags. Tags were removed.", 'error');
+            $this->add_error($id, 'tags-stripped', "The field '" . $this->fields[$id]['title'] . "' cannot contain html tags. Tags were removed.", 'error');
 
         return $trimmed_striped_input;
     }

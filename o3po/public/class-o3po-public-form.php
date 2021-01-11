@@ -181,7 +181,7 @@ abstract class O3PO_PublicForm {
         {
             foreach($this->errors as $error_num => $error)
             {
-                echo('<div id="' . esc_attr($error['code']) . '" class="alert ' . ($error['type'] === 'error' ? 'alert-danger' : 'alert-warning') . '">' . esc_html($error['message']) . '</div>');
+                echo('<div id="' . esc_attr($error['code']) . '" class="alert ' . ($error['type'] === 'error' ? 'alert-danger' : 'alert-warning') . '"><a href="#' . esc_html($error['setting']) . '">' . esc_html($error['message']) . '</a></div>');
             }
         }
         else
@@ -354,6 +354,7 @@ abstract class O3PO_PublicForm {
 
     protected function add_error( $setting, $code, $message, $type='error' ) {
         $this->errors[] = array('setting' => $setting,
+                                'id' => $setting,
                                 'code' => $code,
                                 'message' => $message,
                                 'type' => $type
@@ -670,6 +671,40 @@ abstract class O3PO_PublicForm {
                 }
             }
         }
+    }
+
+
+            /**
+         * Ensure that a check box field is checked
+         *
+         * @sinde    0.3.1+
+         * @access   public
+         * @param    string   $id    The field this was input to.
+         * @param    string   $input    User input.
+         */
+    public function checked_if_on_or_passt_containing_page( $id, $input ) {
+
+        if($input === "checked")
+            return $input;
+
+        $page = $this->fields[$id]['page'];
+        $page_id_of_field = mb_substr($page, mb_strlen($this->plugin_name . '-' . $this->slug . ':'));
+        foreach($this->pages as $page_id => $page_info)
+        {
+            if($page_id === $page_id_of_field)
+            {
+                $this->add_error( $id, 'not-checked', "The box '" . $this->fields[$id]['title'] . "' must be checked.", 'error');
+                break;
+            }
+            elseif($page_id === $this->coming_from_page)
+            {
+                if($input !== "unchecked")
+                    $this->add_error( $id, 'neither-checked-nor-unchecked', "The box '" . $this->fields[$id]['title'] . "' must be checked or unchecked.", 'error');
+                break;
+            }
+        }
+
+        return $this->get_field_default($id);
     }
 
 

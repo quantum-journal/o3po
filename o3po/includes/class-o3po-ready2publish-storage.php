@@ -42,6 +42,7 @@ class O3PO_Ready2PublishStorage {
         'invoice_address',
         'invoice_vat_number',
         'ready2publish_comments',
+        'time_submitted',
     );
 
 
@@ -140,6 +141,7 @@ class O3PO_Ready2PublishStorage {
                 'invoice_address' => 'Bar street in Baz Town 3245143',
                 'invoice_vat_number' => 'AVT324123',
                 'ready2publish_comments' => 'No comment',
+                'time_submitted' => 1610393598,
                             ],
                 '12346' => [
                 'eprint' => '1234.1349v2',
@@ -162,7 +164,8 @@ class O3PO_Ready2PublishStorage {
                 'invoice_recipient' => '',
                 'invoice_address' => '',
                 'invoice_vat_number' => '',
-                'ready2publish_comments' => '',
+                'ready2publish_comments' => 'I did not get the form!!!',
+                'time_submitted' => 1610393599,
                             ]];
 
         $manuscripts = get_option($this->plugin_name . '-' . $this->slug, array());
