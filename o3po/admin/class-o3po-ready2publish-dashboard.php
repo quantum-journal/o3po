@@ -125,6 +125,9 @@ class O3PO_Ready2PublishDashboard {
             }
             echo '</ul>';
         }
+
+        if(empty($partially_published_manuscripts) and empty($unprocessed_manuscripts))
+            echo '<p>No manuscripts awaiting publication.</p>';
     }
 
     public function insert_post( $id ) {

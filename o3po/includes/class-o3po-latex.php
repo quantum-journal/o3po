@@ -244,6 +244,11 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                     if(!empty($doi[1]))
                         $citations[$n]['doi'] = static::un_escape_url($doi[1]);
                 }
+                if(!empty($citations[$n]['doi']))
+                {
+                    $citations[$n]['doi'] = preg_replace('#(http|https)://(doi\.org|dx\.doi.org)/#u', '', $citations[$n]['doi']);
+                    $citations[$n]['doi'] = preg_replace('#.*10\.#u', '10.', $citations[$n]['doi']);
+                }
 
                 preg_match('#\\\\verb{url}\s*?\\\\verb ([^\s]*)\s*\\\\endverb#u', $entry, $url);
                 if(!empty($url[1]))

@@ -113,7 +113,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
     }
 
     public function render_eprint_field() {
-        $this->render_single_line_field('eprint', 'e.g., 1234.56789v2', 'on', '', 'The arXiv identifyer of your manuscript including the specific version you want to have published.');
+        $this->render_single_line_field('eprint', 'e.g., 1234.56789v2', 'on', '', 'The arXiv identifier of your manuscript including the specific version you want to have published.');
     }
 
 
@@ -368,7 +368,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         $funder_names = $this->get_field_value('funder_names');
         $funder_identifiers = $this->get_field_value('funder_identifiers');
 
-        echo '<p>Due to <a href="https://www.coalition-s.org/why-plan-s/" target=”_blank”>Plan S</a> ' . $settings->get_field_value('journal_title') .' needs to collect and submit information about the funding that enabled your research as part of the manuscript meta-data.</p><p>Please provide all grants and funding sources that have a grant/award number, together with name of the funder and, if known, the funder id. Entries without a grant/award number are ignored.</p><p>You should have received this information from all your funders requiring the collection of such information. You can probably copy and past this from the acknowledgements section of our manuscript.</p>';
+        echo '<p>IMPORTANT: Due to <a href="https://www.coalition-s.org/why-plan-s/" target=”_blank”>Plan S</a> ' . $settings->get_field_value('journal_title') .' needs to collect and submit information about the funding that enabled your research as part of the manuscript meta-data.</p><p>Please provide all grants and funding sources that have a grant/award number, together with name of the funder and, if known, the funder id. Entries without a grant/award number are ignored and hence need not be entered.</p><p>You should have received this information from all your funders requiring the collection of such information. You can probably copy and past this from the acknowledgements section of your manuscript.</p>';
         echo '<div id="' . $this->plugin_name . '-' . $this->slug . '-funder-information">';
         foreach($award_numbers as $x => $foo)
         {
@@ -430,7 +430,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
                                        array('value' => '450€',
                                              'description' => '450€ Regular publication fee (for manuscripts submitted from 01.05.2020 on)'),
                                        array('value' => '225€',
-                                             'description' => '225€ Half regular publication fee (for flitting the fee)'),
+                                             'description' => '225€ Half regular publication fee (for splitting the fee)'),
                                        array('value' => '200€',
                                              'description' => '200€ Old publication fee (for manuscripts submitted before May 1st 2020)'),
                                        array('value' => '100€',
