@@ -194,7 +194,7 @@ abstract class O3PO_PublicForm {
             }
         }
 
-        echo '<form method="post" enctype="multipart/form-data">';
+        echo '<form method="post" enctype="multipart/form-data" action="' . home_url($this->slug) . '">';
 
         echo '<input type="hidden" name="session_id" value="' . $this->session_id . '">';
 
@@ -682,7 +682,7 @@ abstract class O3PO_PublicForm {
          * @param    string   $id    The field this was input to.
          * @param    string   $input    User input.
          */
-    public function checked_if_on_or_passt_containing_page( $id, $input ) {
+    public function checked_if_on_or_past_containing_page_unless_back_or_upload( $id, $input ) {
 
         if($input === "checked")
             return $input;
@@ -693,7 +693,8 @@ abstract class O3PO_PublicForm {
         {
             if($page_id === $page_id_of_field)
             {
-                $this->add_error( $id, 'not-checked', "The box '" . $this->fields[$id]['title'] . "' must be checked.", 'error');
+                if(!in_array($this->navigation, ['Back', 'Upload']))
+                    $this->add_error( $id, 'not-checked', "The box '" . $this->fields[$id]['title'] . "' must be checked.", 'error');
                 break;
             }
             elseif($page_id === $this->coming_from_page)

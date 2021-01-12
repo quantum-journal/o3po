@@ -91,7 +91,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         $this->specify_field('fermats_library', 'Opt-in to Fermat\'s library', array( $this, 'render_fermats_library' ), 'dissemination', 'dissemination_fermats_library', array(), array($this, 'checked_or_unchecked'), 'unchecked');
 
         $this->specify_section('dissemination_copyright_confirmation', 'License and copyright', null, 'dissemination');
-        $this->specify_field('copyright_confirmation', 'Confirm copyright', array( $this, 'render_copyright_confirmation' ), 'dissemination', 'dissemination_copyright_confirmation', array(), array($this, 'checked_if_on_or_passt_containing_page'), 'unchecked');
+        $this->specify_field('copyright_confirmation', 'Confirm copyright', array( $this, 'render_copyright_confirmation' ), 'dissemination', 'dissemination_copyright_confirmation', array(), array($this, 'checked_if_on_or_past_containing_page_unless_back_or_upload'), 'unchecked');
 
         $this->specify_page('payment', 'Payment');
 
