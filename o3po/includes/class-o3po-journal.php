@@ -692,11 +692,11 @@ for (i = 0; i < elemets_to_condense.length; i++) {
         $settings = O3PO_Settings::instance();
         $input_trimmed = trim($input);
         $example_expanded = static::$doi_suffix_template->example_expand();
-        $in_url = esc_url_raw(strip_tags(stripslashes($example_expanded)));
+        $in_url = preg_replace('#(http|https)://#', '', esc_url_raw(strip_tags(stripslashes($example_expanded))));
 
         if($input !== $input_trimmed or $in_url !== $example_expanded)
         {
-            add_settings_error( $field, 'url-validated', "The template '" . $input . "' given in in '" . $settings->get_field_title($field) . "' was malformed or contained special or illegal characters. Field reset.", 'error');
+            add_settings_error( $field, 'url-validated', "The template '" . $input . "' given in in '" . $settings->get_field_title($field) . "' was malformed or contained special or illegal characters. Field reset." . $input . $input_trimmed . $in_url . $example_expanded , 'error');
             return $settings->get_field_default($field);
         }
 
