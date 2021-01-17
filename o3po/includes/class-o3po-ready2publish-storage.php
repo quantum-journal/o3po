@@ -22,6 +22,8 @@ class O3PO_Ready2PublishStorage {
 
     private static $manuscript_info_fields_to_store = array(
         'eprint',
+        'agree_to_publish',
+        'acceptance_code',
         'title',
         'corresponding_author_email',
         'abstract',
@@ -37,7 +39,9 @@ class O3PO_Ready2PublishStorage {
         'feature_image_caption',
         'dissemination_multimedia',
         'fermats_library',
+        'copyright_confirmation',
         'payment_method',
+        'payment_amount',
         'invoice_recipient',
         'invoice_address',
         'invoice_vat_number',
@@ -137,6 +141,10 @@ class O3PO_Ready2PublishStorage {
                 'dissemination_multimedia' => 'Maybe you can embed this video?',
                 'fermats_library' => 'checked',
                 'payment_method' => 'paypal',
+                'payment_amount' => '450€',
+                'agree_to_publish' => 'checked'
+                'acceptance_code' => 'AAA',
+                'copyright_confirmation' = 'checked',
                 'invoice_recipient' => 'Foo institute',
                 'invoice_address' => 'Bar street in Baz Town 3245143',
                 'invoice_vat_number' => 'AVT324123',
@@ -160,7 +168,11 @@ class O3PO_Ready2PublishStorage {
                 'feature_image_caption' => '',
                 'dissemination_multimedia' => '',
                 'fermats_library' => '',
-                'payment_method' => '',
+                'payment_method' => 'invoice',
+                'payment_amount' => '450€',
+                'agree_to_publish' => 'checked'
+                'acceptance_code' => 'AAA',
+                'copyright_confirmation' = 'checked',
                 'invoice_recipient' => '',
                 'invoice_address' => '',
                 'invoice_vat_number' => '',
