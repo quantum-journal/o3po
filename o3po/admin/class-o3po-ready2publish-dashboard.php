@@ -10,6 +10,7 @@
  * @subpackage O3PO/includes
  */
 
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-ready2publish-storage.php';
 
 /**
@@ -20,7 +21,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-ready
  * @subpackage O3PO/includes
  * @author     Christian Gogolin <o3po@quantum-journal.org>
  */
-class O3PO_Ready2PublishDashboard {
+class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
 
         //use O3PO_Ready2PublishStorage;
 
@@ -65,6 +66,12 @@ class O3PO_Ready2PublishDashboard {
 
     }
 
+    public static function specify_settings( $settings ) {
+
+        $settings->specify_field('invoice_header_img', 'Invoice header image', array('O3PO_Ready2PublishDashboard', 'render_invoice_header_img_setting'), 'ready2publish_settings', 'ready2publish_settings', array(), array('O3PO_Form', 'trim_strip_tags'), '/wp-content/uploads/2016/12/logo.png');
+    }
+
+
     public function setup() {
 
         wp_add_dashboard_widget($this->slug, esc_html($this->plugin_pretty_name . " " . $this->title), array($this, 'render'));
@@ -82,10 +89,13 @@ class O3PO_Ready2PublishDashboard {
             $out .= '<div>Author comment: ' . esc_html($manuscript_info['ready2publish_comments']) . '</div>';
         if(!empty($manuscript_info['time_submitted']))
            $out .= '<div>Submitted: ' . gmdate("Y-m-d H:i:s", $manuscript_info['time_submitted']) . " GMT" . '</div>';
+        if($manuscript_info['payment_method'] == 'invoice')
+            $out .= '<div>Invoice: ' . "An invoice was requested!" . '</div>';
         $out .= '<div style="float:right">';
         $out .= '<span><a href="mailto:' . esc_attr($manuscript_info['corresponding_author_email']) . '">' . esc_html($manuscript_info['corresponding_author_email']) . '</a></span>';
         $out .= ' | ';
-        #$out .= '<span class=""><a href="/' . $this->slug . '?action=' . $action . '&id=' . urlencode($id) . '">' . ($action === 'continue' ? "Go to post" : "Begin publishing") .  '</a></span>';
+        $out .= '<span class=""><a href="/' . $this->slug . '?action=' . 'show_invoice' . '&id=' . urlencode($id) . '">' . "Create invoice" .  '</a></span>';
+        $out .= ' | ';
         $out .= '<span class=""><a href="/' . $this->slug . '?action=' . $action . '&id=' . urlencode($id) . '">' . ($action === 'continue' ? "Go to post" : "Begin publishing") .  '</a></span>';
         $out .= '</div>';
         $out .= '<div style="clear:both"></div>';
@@ -222,11 +232,91 @@ class O3PO_Ready2PublishDashboard {
                     $this->display_post($post_id);
                 }
                 break;
+            case 'show_invoice':
+                if($id !== null)
+                    $this->show_invoice($id);
+                break;
             default:
                 echo "unsupported action " . $action;
         }
         exit();
     }
 
+        /**
+         * Render the setting for the invoice header image.
+         *
+         * @since    0.3.1+
+         * @access   public
+         */
+    public static function render_invoice_header_img_setting() {
 
+        $settings = O3PO_Settings::instance();
+        $settings->render_single_line_field('invoice_header_img');
+        echo('<p>Path to the image to show in the head of invoices.</p>');
+    }
+
+    public function show_invoice($id)
+    {
+		if(!current_user_can('edit_posts'))
+			return;
+
+        $settings = O3PO_Settings::instance();
+        $manuscript = $this->storage->get_manuscript($id);
+
+        $invoice_html = '';
+        $invoice_html .= '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">' . "\n";
+        $invoice_html .= '<html xmlns="http://www.w3.org/1999/xhtml">' . "\n";
+        $invoice_html .= '<header><style type="text/css">';
+        $invoice_html .= '@media print {input, textarea {border: none !important;box-shadow: none !important;outline: none !important;}}';
+        $invoice_html .= '</style></header>';
+        $invoice_html .= '<body style="font-family:Sans-Serif;font-size:11pt;">';
+        $invoice_html .= '<div>';
+        $invoice_html .= '<img src="' . esc_attr($settings->get_field_value("invoice_header_img")) . '" style="width:6cm;float:left">';
+        $invoice_html .= '<div style="width:6cm;float:right;text-align:right">' . "\n";
+        $invoice_html .= '<strong>' . esc_html($settings->get_field_value('publisher')) . '</strong><br /><br />';
+
+        foreach(["publisher_street_and_number", "publisher_zip_code_and_city", "publisher_country", "publisher_phone", "publisher_email"] as $field)
+        {
+            if(!empty($settings->get_field_value($field)))
+                $invoice_html .= esc_html($settings->get_field_value($field)) . '<br />';
+        }
+        $invoice_html .= esc_html(get_site_url()) . '<br />';
+        $invoice_html .= '</div>';
+        $invoice_html .= '<div style="clear:both"></div>';
+        $invoice_html .= '<div>';
+        $invoice_html .= esc_html($manuscript['invoice_recipient']) . '<br />';
+        $invoice_html .= str_replace('\n', '<br />', esc_html($manuscript['invoice_address'])) . '<br />';
+        $invoice_html .= '</div>';
+        $invoice_html .= '<div style="float:left;font-size:16pt;">Invoice Nr. <input style="font-size:16pt;"></input></div>';
+        $invoice_html .= '<div style="float:right">Invoice date: <strong>' . date('Y-m-d') . '</strong></div>';
+        $invoice_html .= '<div style="clear:both"></div>';
+
+        $invoice_html .= '<table style="width:100%">
+  <tr>
+    <th>Quantity</th>
+    <th>Description</th>
+    <th>Price per item</th>
+    <th>Total price</th>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>Publication fee for article:<br /><strong>' . esc_html($manuscript['title']) . '</strong></td>
+    <td><strong>' . $manuscript['payment_amount'] . '</strong></td>
+    <td><strong>' . $manuscript['payment_amount'] . '</strong></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td><strong>Total</strong></td>
+    <td><strong>' . $manuscript['payment_amount'] .'</strong></td>
+  </tr>
+</table>';
+        $invoice_html .= '<div>' . $settings->get_field_value('invoice_footer') . '</div>';
+        $invoice_html .= '</div>';
+        $invoice_html .= '</body>';
+        $invoice_html .= '</html>';
+
+        echo $invoice_html;
+
+    }
 }
