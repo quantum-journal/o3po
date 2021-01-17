@@ -91,7 +91,6 @@ abstract class O3PO_PublicForm {
             if(isset($_POST[$this->plugin_name . '-' . $this->slug][$id]))
             {
                 $sanitized_value = $this->sanitize_user_input(wp_unslash($_POST[$this->plugin_name . '-' . $this->slug][$id]));
-
                 if($field_options['max_length'] !== false)
                     $sanitized_value = substr($sanitized_value, 0, $field_options['max_length']);
                 $this->field_values[$id] = call_user_func($this->fields[$id]['validation_callable'], $id, $sanitized_value);
@@ -286,6 +285,7 @@ abstract class O3PO_PublicForm {
 
         do_action( 'parse_request', $wp );
         $this->setup_query($this->make_post($this->title, $this->handle_form_data_and_produce_content()));
+        remove_filter( 'the_content', 'wpautop' ); // wpautop converts newline to <br /> in the post content and we don't want to that that to happen for thr virtual post we are displaying here!
         do_action( 'wp', $wp );
 
         do_action( 'template_redirect' );
@@ -391,8 +391,9 @@ abstract class O3PO_PublicForm {
         }
         else
         {
-            $string = iconv("UTF-8","UTF-8//IGNORE", $input);
-            $string = preg_replace('/[[:^print:]]/u', '', $string);
+            $string = $input;
+            $string = iconv("UTF-8","UTF-8//IGNORE", $string);
+            $string = preg_replace('/[^[:print:]\r\n]/u', '', $string);
             return $string;
         }
     }
@@ -658,15 +659,15 @@ abstract class O3PO_PublicForm {
                     if(is_array($value))
                     {
                         foreach($value as $val)
-                            echo '<p>' . (!empty($val) ? esc_html($val) : 'Not provided') . '</p>';
+                            echo '<p style="white-space:pre-wrap;">' . (!empty($val) ? esc_html($val) : 'Not provided') . '</p>';
                     }
                     else
                     {
                         $result = $this->get_session_data('file_upload_result_' . $id);
                         if(empty($result['error']) and !empty($result['user_name']))
-                            echo '<p>' . esc_html($result['user_name']) . '</p>';
+                            echo '<p style="white-space:pre-wrap;">' . esc_html($result['user_name']) . '</p>';
                         else
-                            echo '<p>' . (!empty($value) ? esc_html($value) : 'Not provided') . '</p>';
+                            echo '<p style="white-space:pre-wrap;">' . (!empty($value) ? esc_html($value) : 'Not provided') . '</p>';
                     }
                 }
             }
