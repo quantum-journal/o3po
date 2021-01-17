@@ -96,9 +96,9 @@ class O3PO_Ready2PublishStorage {
         foreach($manuscript_info['award_numbers'] as $key => $award_number)
             if(!empty($award_number))
             {
-                $clean_award_numbers[] = $award_numbers[$key];
-                $clean_funder_identifiers[] = $funder_identifiers[$key];
-                $clean_funder_names[] = $funder_names[$key];
+                $clean_award_numbers[] = $manuscript_info['award_numbers'][$key];
+                $clean_funder_identifiers[] = $manuscript_info['funder_identifiers'][$key];
+                $clean_funder_names[] = $manuscript_info['funder_names'][$key];
             }
         $manuscript_info['number_award_numbers'] = count($clean_award_numbers);
         $manuscript_info['award_numbers'] = $clean_award_numbers;
@@ -142,9 +142,9 @@ class O3PO_Ready2PublishStorage {
                 'fermats_library' => 'checked',
                 'payment_method' => 'paypal',
                 'payment_amount' => '450€',
-                'agree_to_publish' => 'checked'
+                'agree_to_publish' => 'checked',
                 'acceptance_code' => 'AAA',
-                'copyright_confirmation' = 'checked',
+                'copyright_confirmation' => 'checked',
                 'invoice_recipient' => 'Foo institute',
                 'invoice_address' => 'Bar street in Baz Town 3245143',
                 'invoice_vat_number' => 'AVT324123',
@@ -170,9 +170,9 @@ class O3PO_Ready2PublishStorage {
                 'fermats_library' => '',
                 'payment_method' => 'invoice',
                 'payment_amount' => '450€',
-                'agree_to_publish' => 'checked'
+                'agree_to_publish' => 'checked',
                 'acceptance_code' => 'AAA',
-                'copyright_confirmation' = 'checked',
+                'copyright_confirmation' => 'checked',
                 'invoice_recipient' => '',
                 'invoice_address' => '',
                 'invoice_vat_number' => '',
