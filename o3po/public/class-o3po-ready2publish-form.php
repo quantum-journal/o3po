@@ -562,7 +562,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
             }
             $message .= "\n";
             $message .= "<p>Please find a summary of the information you provided below.</p>\n\n";
-            $message .= "<p>Thank you for choosing to publish in " . $settings->get_field_value('journal_title') . " and congratulations on your work being pubished soon.<br />\n<br />\nBest regards,<br />\n<br />\n" . $settings->get_field_value('executive_board') . "<br />\n<br />\nExecutive Board of Quantum</p>\n\n";
+            $message .= "<p>Thank you for choosing to publish in " . $settings->get_field_value('journal_title') . " and congratulations on your work being published soon.<br />\n<br />\nBest regards,<br />\n<br />\n" . $settings->get_field_value('executive_board') . "<br />\n<br />\nExecutive Board of Quantum</p>\n\n";
             $message .= "<h1>Summary of the information provided:</h1>\n\n" . $summary;
 
             $successfully_sent = wp_mail($to, $subject, $message, $headers, $attachment);
