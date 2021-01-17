@@ -732,7 +732,7 @@ abstract class O3PO_PublicationType {
             $validation_result .= "ERROR: Corresponding author email is malformed.\n" ;
         foreach($award_numbers as $key => $award_number)
             if(empty($award_number))
-                $validation_result .= "ERROR: Award number of award " . ($key+1) . " is empty.\n" ;
+                $validation_result .= "WARNING: Award number of award " . ($key+1) . " is empty.\n" ;
 
             // Generate Crossref xml
         $timestamp = time();
@@ -2296,6 +2296,8 @@ abstract class O3PO_PublicationType {
 
         $post_type = get_post_type($post_id);
         $number_award_numbers = get_post_meta( $post_id, $post_type . '_number_award_numbers', true );
+        if(empty($number_award_numbers))
+            $number_award_numbers = 0;
 		$award_numbers = get_post_meta( $post_id, $post_type . '_award_numbers', true );
         $funder_names = get_post_meta( $post_id, $post_type . '_funder_names', true );
         $funder_identifiers = get_post_meta( $post_id, $post_type . '_funder_identifiers', true );

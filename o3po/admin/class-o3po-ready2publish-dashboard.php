@@ -321,7 +321,7 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
         $invoice_html .= '<div>';
         #$invoice_html .= esc_html($manuscript['invoice_recipient']) . '<br />';
         #$invoice_html .= nl2br(esc_html($manuscript['invoice_address'])) . '<br />';
-        $invoice_html .= '<textarea style="width:85mm;height:40mm;resize: none;">' . esc_html($manuscript['invoice_recipient'] . "\n" . $manuscript['invoice_address']) . '</textarea>';
+        $invoice_html .= '<textarea style="width:85mm;height:40mm;resize: none;">' . esc_html($manuscript['invoice_recipient'] . "\n" . $manuscript['invoice_address'] . (!empty($manuscript['invoice_vat_number']) ? "\nVat-Nr: " . $manuscript['invoice_vat_number'] : '')) . '</textarea>';
         $invoice_html .= '</div>';
         $invoice_html .= '<div style="margin-bottom:2em">';
         $invoice_html .= '<div style="float:left;font-size:16pt;">Invoice Nr. <input required style="font-size:16pt;"></input></div>';
