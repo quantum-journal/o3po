@@ -27,6 +27,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-buffe
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-journal.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/trait-o3po-form.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-o3po-ready2publish-form.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-o3po-ready2publish-dashboard.php';
 
 /**
  * Manage the settings of the plugin.
@@ -130,6 +131,7 @@ class O3PO_Settings extends O3PO_Singleton {
         O3PO_Journal::specify_settings($this);
         O3PO_EmailTemplates::specify_settings($this);
         O3PO_Ready2PublishForm::specify_settings($this);
+        O3PO_Ready2PublishDashboard::specify_settings($this);
 
         static::$configured = true;
 	}
@@ -282,6 +284,9 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->specify_field('journal_level_doi_suffix', 'Journal level DOI suffix', array( $this, 'render_journal_level_doi_suffix_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'validate_doi_suffix'), '');
         $this->specify_field('eissn', 'eISSN', array( $this, 'render_eissn_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'validate_issn_or_empty'), '');
         $this->specify_field('publisher', 'Publisher', array( $this, 'render_publisher_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'trim'), '');
+        $this->specify_field('publisher_street_and_number', 'Publisher street and number', array( $this, 'render_publisher_street_and_number_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'trim'), '');
+        $this->specify_field('publisher_zip_code_and_city', 'Publisher zip code and city', array( $this, 'render_publisher_zip_code_and_city_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'trim'), '');
+        $this->specify_field('publisher_phone', 'Publisher phone', array( $this, 'render_publisher_phone_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'trim'), '');
         $this->specify_field('secondary_journal_title', 'Secondary journal title', array( $this, 'render_secondary_journal_title_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'trim'), '');
         $this->specify_field('secondary_journal_level_doi_suffix', 'Secondary journal level DOI suffix', array( $this, 'render_secondary_journal_level_doi_suffix_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'validate_doi_suffix'), '');
         $this->specify_field('secondary_journal_eissn', 'Secondary journal eISSN', array( $this, 'render_secondary_journal_eissn_setting' ), 'journal_settings', 'journal_settings', array(), array($this, 'validate_issn_or_empty'), '');
@@ -673,7 +678,48 @@ class O3PO_Settings extends O3PO_Singleton {
     public function render_publisher_setting() {
 
         $this->render_single_line_field('publisher');
-        echo('<p>(The name of your publisher.)</p>');
+        echo('<p>(The name of the publisher.)</p>');
+
+    }
+
+        /**
+         * Render the setting for the publisher street and number.
+         *
+         * @since    0.3.1+
+         * @access   public
+         */
+    public function render_publisher_street_and_number_setting() {
+
+        $this->render_single_line_field('publisher_street_and_number');
+        echo('<p>(The street and house number number of the publisher.)</p>');
+
+    }
+
+
+        /**
+         * Render the setting for the publisher zip code and city.
+         *
+         * @since    0.3.1+
+         * @access   public
+         */
+    public function render_publisher_zip_code_and_city_setting() {
+
+        $this->render_single_line_field('publisher_zip_code_and_city');
+        echo('<p>(The zip code and city of the publisher.)</p>');
+
+    }
+
+
+        /**
+         * Render the setting for the publisher phone.
+         *
+         * @since    0.3.1+
+         * @access   public
+         */
+    public function render_publisher_phone_setting() {
+
+        $this->render_single_line_field('publisher_phone');
+        echo('<p>(The phone number of the publisher. Should include the country code.)</p>');
 
     }
 
