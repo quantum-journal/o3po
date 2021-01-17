@@ -204,14 +204,14 @@ trait O3PO_Form {
             echo'<script>
 function UpdatePreview(id) {
 var source = document.getElementById(id);
-var target = document.getElementById(id + "_preview");
-//var label = document.getElementById(id + "_preview_lable");
+var target = document.getElementById(id + "-preview");
+//var label = document.getElementById(id + "-preview-lable");
 target.textContent = source.value;
 MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
 }
 </script>';
-            echo '<span id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '_preview_lable" stype="">LaTeX preview:</span><br/>';
-            echo '<span id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '_preview">' . (!empty($value) ? esc_html($value) : 'Nothing to show') . '</span>';
+            echo '<span id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '-preview-lable" stype="">LaTeX preview:</span><br/>';
+            echo '<span id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '-preview" style="white-space:pre-wrap;">' . (!empty($value) ? esc_html($value) : 'Nothing to show') . '</span>';
         }
     }
 
