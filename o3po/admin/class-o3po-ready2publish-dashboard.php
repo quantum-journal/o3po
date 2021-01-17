@@ -68,7 +68,9 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
 
     public static function specify_settings( $settings ) {
 
-        $settings->specify_field('invoice_header_img', 'Invoice header image', array('O3PO_Ready2PublishDashboard', 'render_invoice_header_img_setting'), 'ready2publish_settings', 'ready2publish_settings', array(), array('O3PO_Form', 'trim_strip_tags'), '/wp-content/uploads/2016/12/logo.png');
+        $settings->specify_field('invoice_header_img', 'Invoice header image', array('O3PO_Ready2PublishDashboard', 'render_invoice_header_img_setting'), 'ready2publish_settings', 'ready2publish_settings', array(), array($settings, 'trim_strip_tags'), '');
+
+        $settings->specify_field('invoice_footer', 'Invoice footer', array('O3PO_Ready2PublishDashboard', 'render_invoice_footer_setting'), 'ready2publish_settings', 'ready2publish_settings', array(), array($settings, 'trim'), '');
     }
 
 
@@ -255,6 +257,25 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
         echo('<p>Path to the image to show in the head of invoices.</p>');
     }
 
+        /**
+         * Render the setting for the invoice header image.
+         *
+         * @since    0.3.1+
+         * @access   public
+         */
+    public static function render_invoice_footer_setting() {
+
+        $settings = O3PO_Settings::instance();
+        $settings->render_multi_line_field('invoice_footer');
+        echo('<p>Text to put in the footer of invoices. May contain arbitrary html tags.</p>');
+    }
+
+        /**
+         * Render the setting for the invoice header image.
+         *
+         * @since    0.3.1+
+         * @access   public
+         */
     public function show_invoice($id)
     {
 		if(!current_user_can('edit_posts'))
@@ -267,51 +288,74 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
         $invoice_html .= '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">' . "\n";
         $invoice_html .= '<html xmlns="http://www.w3.org/1999/xhtml">' . "\n";
         $invoice_html .= '<header><style type="text/css">';
-        $invoice_html .= '@media print {input, textarea {border: none !important;box-shadow: none !important;outline: none !important;}}';
-        $invoice_html .= '</style></header>';
+        $invoice_html .= '@media print {@page {size: A4;} body {margin:25mm;} input, textarea {border: none !important;box-shadow: none !important;outline: none !important;font-family: inherit;
+   font-size: inherit;} a, a:visited {color: blue;}} input:required:invalid {border: 3pt solid red;}';
+        $invoice_html .= '</style>';
+        $invoice_html .= '<script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+              tex2jax: {inlineMath: [[\'$\',\'$\'], [\'\\(\',\'\\)\']], processEscapes: true},
+              TeX: {equationNumbers: {autoNumber: "AMS"}}
+            });
+        </script>
+        <script type="text/javascript" async src="' . $settings->get_field_value('mathjax_url') . '?config=TeX-AMS_CHTML"></script>';
+        $invoice_html .= '</header>';
         $invoice_html .= '<body style="font-family:Sans-Serif;font-size:11pt;">';
         $invoice_html .= '<div>';
-        $invoice_html .= '<img src="' . esc_attr($settings->get_field_value("invoice_header_img")) . '" style="width:6cm;float:left">';
+        $invoice_html .= '<div style="height:45mm;float:left">';
+        $invoice_html .= '<img src="' . esc_attr($settings->get_field_value("invoice_header_img")) . '" style="width:6cm;">';
+        $invoice_html .= '</div>';
         $invoice_html .= '<div style="width:6cm;float:right;text-align:right">' . "\n";
         $invoice_html .= '<strong>' . esc_html($settings->get_field_value('publisher')) . '</strong><br /><br />';
 
-        foreach(["publisher_street_and_number", "publisher_zip_code_and_city", "publisher_country", "publisher_phone", "publisher_email"] as $field)
+        foreach(["publisher_street_and_number", "publisher_zip_code_and_city", "publisher_country", "publisher_phone"] as $field)
         {
             if(!empty($settings->get_field_value($field)))
                 $invoice_html .= esc_html($settings->get_field_value($field)) . '<br />';
         }
-        $invoice_html .= esc_html(get_site_url()) . '<br />';
-        $invoice_html .= '</div>';
-        $invoice_html .= '<div style="clear:both"></div>';
-        $invoice_html .= '<div>';
-        $invoice_html .= esc_html($manuscript['invoice_recipient']) . '<br />';
-        $invoice_html .= str_replace('\n', '<br />', esc_html($manuscript['invoice_address'])) . '<br />';
-        $invoice_html .= '</div>';
-        $invoice_html .= '<div style="float:left;font-size:16pt;">Invoice Nr. <input style="font-size:16pt;"></input></div>';
-        $invoice_html .= '<div style="float:right">Invoice date: <strong>' . date('Y-m-d') . '</strong></div>';
-        $invoice_html .= '<div style="clear:both"></div>';
 
-        $invoice_html .= '<table style="width:100%">
-  <tr>
-    <th>Quantity</th>
+        if(!empty($settings->get_field_value("publisher_email")))
+            $invoice_html .= '<a href="mailto:' . esc_attr($settings->get_field_value("publisher_email")) . '">' . esc_html($settings->get_field_value("publisher_email")) . '</a><br />';
+        $invoice_html .= '<a href="' . esc_attr(get_site_url()) . '">' . esc_html(get_site_url()) . '</a><br />';
+        $invoice_html .= '</div>';
+        $invoice_html .= '<div style="clear:left"></div>';
+        $invoice_html .= '<div>';
+        #$invoice_html .= esc_html($manuscript['invoice_recipient']) . '<br />';
+        #$invoice_html .= nl2br(esc_html($manuscript['invoice_address'])) . '<br />';
+        $invoice_html .= '<textarea style="width:85mm;height:40mm;resize: none;">' . esc_html($manuscript['invoice_recipient'] . "\n" . $manuscript['invoice_address']) . '</textarea>';
+        $invoice_html .= '</div>';
+        $invoice_html .= '<div style="margin-bottom:2em">';
+        $invoice_html .= '<div style="float:left;font-size:16pt;">Invoice Nr. <input required style="font-size:16pt;"></input></div>';
+        $invoice_html .= '<div style="float:right">Invoice date: <strong>' . esc_html(date('Y-m-d')) . '</strong></div>';
+        $invoice_html .= '<div style="clear:both"></div>';
+        $invoice_html .= '</div>';
+        $invoice_html .= '<table style="width:100%;border-collapse: collapse;">
+  <colgroup>
+    <col span="1" style="width: 15%;">
+    <col span="1" style="width: 50%;">
+    <col span="1" style="width: 20%;">
+    <col span="1" style="width: 15%;">
+  </colgroup>
+  <tr style="text-align:left;border-bottom: 1pt solid black;">
+    <th >Quantity</th>
     <th>Description</th>
-    <th>Price per item</th>
-    <th>Total price</th>
+    <th style="text-align:right;">Price per item</th>
+    <th style="text-align:right;">Total price</th>
   </tr>
   <tr>
-    <td>1</td>
-    <td>Publication fee for article:<br /><strong>' . esc_html($manuscript['title']) . '</strong></td>
-    <td><strong>' . $manuscript['payment_amount'] . '</strong></td>
-    <td><strong>' . $manuscript['payment_amount'] . '</strong></td>
+    <td style="vertical-align: top;padding-top:1em;padding-bottom:1em">' . '<input style="width:6em;text-align:left" value="' . "1" . '"></input>' . '</td>
+    <!--<td style="vertical-align: top;padding-top:1em;padding-bottom:1em">Publication fee for article:<br /><textarea style="font-weight: bold;width:100%;resize: none;min-height: 5em;">' . esc_html($manuscript['title']) . '</textarea></td>-->
+    <td style="vertical-align: top;padding-top:1em;padding-bottom:1em">Publication fee for article:<br /><strong>' . esc_html($manuscript['title']) . '</strong></td>
+    <td style="vertical-align: bottom;text-align:right;padding-top:1em;padding-bottom:1em"><strong>' . '<input style="font-weight: bold;width:6em;text-align:right" value="' . esc_attr($manuscript['payment_amount']) . '"></input>' . '</strong></td>
+    <td style="vertical-align: bottom;text-align:right;padding-top:1em;padding-bottom:1em"><strong>' . '<input style="font-weight: bold;width:6em;text-align:right" value="' . esc_attr($manuscript['payment_amount']) . '"></input>' . '</strong></td>
   </tr>
-  <tr>
+  <tr style="border-top: 1pt solid black;">
     <td></td>
     <td></td>
-    <td><strong>Total</strong></td>
-    <td><strong>' . $manuscript['payment_amount'] .'</strong></td>
+    <td style="text-align:right;padding-top:1em;padding-bottom:1em"><strong>Total</strong></td>
+    <td style="text-align:right;padding-top:1em;padding-bottom:1em">' . '<input style="font-weight: bold;width:6em;text-align:right" value="' . esc_attr($manuscript['payment_amount']) . '"></input>' . '</td>
   </tr>
 </table>';
-        $invoice_html .= '<div>' . $settings->get_field_value('invoice_footer') . '</div>';
+        $invoice_html .= '<div style="margin-top:2em">' . $settings->get_field_value('invoice_footer') . '</div>';
         $invoice_html .= '</div>';
         $invoice_html .= '</body>';
         $invoice_html .= '</html>';
