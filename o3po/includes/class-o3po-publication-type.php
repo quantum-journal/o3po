@@ -2792,7 +2792,7 @@ abstract class O3PO_PublicationType {
         /**
          * Get the polupar summary.
          *
-         * Get the popilar summary if available. To be used in the single
+         * Get the popular summary if available. To be used in the single
          * templates.
          *
          * @since  0.3.0
