@@ -488,15 +488,15 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
                     if(is_array($value))
                     {
                         foreach($value as $val)
-                            $summary .= '<p>' . (!empty($val) ? esc_html($val) : 'Not provided') . '</p>' . "\n";
+                            $summary .= '<p style="white-space:pre-wrap;">' . (!empty($val) ? esc_html($val) : 'Not provided') . '</p>' . "\n";
                     }
                     else
                     {
                         $result = $this->get_session_data('file_upload_result_' . $id);
                         if(empty($result['error']) and !empty($result['user_name']))
-                            $summary .= '<p>' . esc_html($result['user_name']) . '</p>';
+                            $summary .= '<p style="white-space:pre-wrap;">' . esc_html($result['user_name']) . '</p>';
                         else
-                            $summary .= '<p>' . (!empty($value) ? esc_html($value) : 'Not provided') . '</p>';
+                            $summary .= '<p style="white-space:pre-wrap;">' . (!empty($value) ? esc_html($value) : 'Not provided') . '</p>';
                     }
                 }
             }
