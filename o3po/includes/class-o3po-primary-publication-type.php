@@ -45,9 +45,9 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
          * @param    object               $journal        The journal this publication type is associated with.
          * @param    O3PO_Environment     $environment    The evironment in which this post type is to be created.
          */
-    public function __construct( $journal, $environment ) {
+    public function __construct( $journal, $environment, $ready2publish_storage ) {
 
-        parent::__construct($journal, 4, $environment);
+        parent::__construct($journal, 4, $environment, $ready2publish_storage);
     }
 
         /**

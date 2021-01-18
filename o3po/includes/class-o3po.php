@@ -273,8 +273,8 @@ class O3PO {
         $this->ready2publish_dashboard = new O3PO_Ready2PublishDashboard($this->plugin_name, $this->get_plugin_pretty_name(), $settings->get_field_value("ready2publish_slug") . '-dashboard', "Ready2Publish", $this->ready2publish_storage);
 
             //create the publication types for each journal
-        $this->primary_publication_type = new O3PO_PrimaryPublicationType($this->journal, $this->environment);
-        $this->secondary_publication_type = new O3PO_SecondaryPublicationType($this->primary_publication_type->get_publication_type_name(), $this->primary_publication_type->get_publication_type_name_plural(), $this->journal_secondary, $this->environment);
+        $this->primary_publication_type = new O3PO_PrimaryPublicationType($this->journal, $this->environment, $this->ready2publish_storage);
+        $this->secondary_publication_type = new O3PO_SecondaryPublicationType($this->primary_publication_type->get_publication_type_name(), $this->primary_publication_type->get_publication_type_name_plural(), $this->journal_secondary, $this->environment, $this->ready2publish_storage);
 
 	}
 

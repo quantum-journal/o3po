@@ -62,9 +62,9 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @param    O3PO_Journal         $journal                               The journal this publication type is associated with.
          * @param    O3PO_Environment     $environment                           The evironment in which this post type is to be created.
          */
-    public function __construct( $target_publication_type_name, $target_publication_type_name_plural, $journal, $environment ) {
+    public function __construct( $target_publication_type_name, $target_publication_type_name_plural, $journal, $environment, $ready2publish_storage ) {
 
-        parent::__construct($journal, 1, $environment);
+        parent::__construct($journal, 1, $environment, $ready2publish_storage);
 
         $this->target_publication_type_name = $target_publication_type_name;
         $this->target_publication_type_name_plural = $target_publication_type_name_plural;
