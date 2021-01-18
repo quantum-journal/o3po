@@ -524,7 +524,7 @@ abstract class O3PO_PublicForm {
         {
             echo('<p>Image file ' . esc_html($file_upload_result['user_name']) . ' was uploaded and saved successfully:</p>');
             echo('<img style="display:block;max-width:100%;max-height:10em;width: auto;height: auto;" src="' . esc_attr($file_upload_result['url']) . '" >');
-            echo('<p>Changed your mind? You can chose to upload a different file below.</p>');
+            echo('<p>Changed your mind? You can choose to upload a different file below.</p>');
         }
 
         echo('<input type="hidden" name="MAX_FILE_SIZE" value="30000000" />');
@@ -533,7 +533,7 @@ abstract class O3PO_PublicForm {
         if(!empty($label))
             echo '<label for="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '">' . ($esc_label ? esc_html($label) : $label) . '</label>';
 
-        echo '<input type="submit" name="navigation" value="Upload" />';
+        echo '<p><input type="submit" name="navigation" value="Upload" /></p>';
     }
 
 
