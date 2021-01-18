@@ -1804,31 +1804,34 @@ abstract class O3PO_PublicationType {
          * Echo an intro text for the admin panel.
          *
          * @since     0.1.0
+         * @since     0.3.1+       Not static anymore.
          * @access    protected
          * @param     int          $post_id    Id of the post.
          */
-    static protected function the_admin_panel_intro_text( $post_id ) {
+    protected function the_admin_panel_intro_text( $post_id ) {
 
         $post_type = get_post_type($post_id);
         $ready2publish_storage_id = get_post_meta( $post_id, $post_type . '_ready2publish_storage_id', true );
         if(!empty($ready2publish_storage_id))
         {
-            $manuscript_info = $this->ready2publish_storage->get_manuscript($id);
+            $manuscript_info = $this->ready2publish_storage->get_manuscript($ready2publish_storage_id);
             if(!empty($manuscript_info['ready2publish_comments']))
             {
                 echo '<div>The authors provided the following comments during submission of the final version:</div>';
                 echo '<div style="white-space:pre-wrap;">' . esc_html($manuscript_info['ready2publish_comments']) . '</div>';
             }
-            $manuscript_info = $this->ready2publish_storage->get_manuscript($id);
+            $manuscript_info = $this->ready2publish_storage->get_manuscript($ready2publish_storage_id);
             if(!empty($manuscript_info['dissemination_multimedia']))
             {
                 echo '<div>The authors provided the following multi media content that may be interesting to publish in some way via the large editor box at the top:</div>';
                 echo '<div style="white-space:pre-wrap;">' . esc_html($manuscript_info['dissemination_multimedia']) . '</div>';
             }
-            $out .= '<span>You can also: </span>';
+            $out = '';
+            $out .= '<span>Quick actions: </span>';
             $out .= '<span><a href="mailto:' . esc_attr($manuscript_info['corresponding_author_email']) . '">Email the corresponding author ' . esc_html($manuscript_info['corresponding_author_email']) . '</a></span>';
             $out .= ' | ';
-            $out .= '<span class=""><a href="/' . $this->slug . '?action=' . 'show_invoice' . '&id=' . urlencode($id) . '">' . "Create an invoice" .  '</a></span>';
+            $out .= '<span class=""><a target="_blank" href="/' . 'ready2publish-dashboard' . '?action=' . 'show_invoice' . '&id=' . urlencode($ready2publish_storage_id) . '">' . "Create an invoice" .  '</a></span>';
+            echo $out;
         }
     }
 

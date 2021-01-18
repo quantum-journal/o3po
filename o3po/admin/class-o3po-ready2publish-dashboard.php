@@ -100,7 +100,7 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
         $out .= '<div style="float:right">';
         $out .= '<span><a href="mailto:' . esc_attr($manuscript_info['corresponding_author_email']) . '">Email ' . esc_html($manuscript_info['corresponding_author_email']) . '</a></span>';
         $out .= ' | ';
-        $out .= '<span class=""><a href="/' . $this->slug . '?action=' . 'show_invoice' . '&id=' . urlencode($id) . '">' . "Create invoice" .  '</a></span>';
+        $out .= '<span class=""><a target="_blank" href="/' . $this->slug . '?action=' . 'show_invoice' . '&id=' . urlencode($id) . '">' . "Create invoice" .  '</a></span>';
         $out .= ' | ';
         $out .= '<span class=""><a href="/' . $this->slug . '?action=' . $action . '&id=' . urlencode($id) . '">' . ($action === 'continue' ? "Go to post" : "Begin publishing") .  '</a></span>';
         $out .= '</div>';
