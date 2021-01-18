@@ -70,7 +70,11 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
 
         $settings->specify_field('invoice_header_img', 'Invoice header image', array('O3PO_Ready2PublishDashboard', 'render_invoice_header_img_setting'), 'ready2publish_settings', 'ready2publish_settings', array(), array($settings, 'trim_strip_tags'), '');
 
+        $settings->specify_field('invoice_email', 'Invoice email', array('O3PO_Ready2PublishDashboard', 'render_invoice_email_setting'), 'ready2publish_settings', 'ready2publish_settings', array(), array($settings, 'validate_email'), '');
+
         $settings->specify_field('invoice_footer', 'Invoice footer', array('O3PO_Ready2PublishDashboard', 'render_invoice_footer_setting'), 'ready2publish_settings', 'ready2publish_settings', array(), array($settings, 'trim'), '');
+
+
     }
 
 
@@ -94,7 +98,7 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
         if($manuscript_info['payment_method'] == 'invoice')
             $out .= '<div>Invoice: ' . "An invoice was requested!" . '</div>';
         $out .= '<div style="float:right">';
-        $out .= '<span><a href="mailto:' . esc_attr($manuscript_info['corresponding_author_email']) . '">' . esc_html($manuscript_info['corresponding_author_email']) . '</a></span>';
+        $out .= '<span><a href="mailto:' . esc_attr($manuscript_info['corresponding_author_email']) . '">Email ' . esc_html($manuscript_info['corresponding_author_email']) . '</a></span>';
         $out .= ' | ';
         $out .= '<span class=""><a href="/' . $this->slug . '?action=' . 'show_invoice' . '&id=' . urlencode($id) . '">' . "Create invoice" .  '</a></span>';
         $out .= ' | ';
@@ -167,6 +171,7 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
             update_post_meta($post_id, $post_type . '_number_authors', count($manuscript_info['author_name_styles']));
             foreach(static::$meta_fields_to_set_when_inserting_post as $field_id)
                 update_post_meta($post_id, $post_type . '_' . $field_id, $manuscript_info[$field_id]);
+            update_post_meta($post_id, $post_type . '_ready2publish_storage_id', $id);
                 // We also do a few more things that are normally done by the publication type class
             if(!empty($manuscript_info['feature_image_attachment_id']))
                 set_post_thumbnail($post_id, $manuscript_info['feature_image_attachment_id']);
@@ -258,6 +263,19 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
     }
 
         /**
+         * Render the setting for the invoice email.
+         *
+         * @since    0.3.1+
+         * @access   public
+         */
+    public static function render_invoice_email_setting() {
+
+        $settings = O3PO_Settings::instance();
+        $settings->render_single_line_field('invoice_email');
+        echo('<p>The email address of the publisher displayed on invoices.</p>');
+    }
+
+        /**
          * Render the setting for the invoice header image.
          *
          * @since    0.3.1+
@@ -293,11 +311,11 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
         $invoice_html .= '</style>';
         $invoice_html .= '<script type="text/x-mathjax-config">
         MathJax.Hub.Config({
-              tex2jax: {inlineMath: [[\'$\',\'$\'], [\'\\(\',\'\\)\']], processEscapes: true},
+              tex2jax: {inlineMath: [[\'$\',\'$\'], [\'\\\\(\',\'\\\\)\']], processEscapes: true},
               TeX: {equationNumbers: {autoNumber: "AMS"}}
             });
         </script>
-        <script type="text/javascript" async src="' . $settings->get_field_value('mathjax_url') . '?config=TeX-AMS_CHTML"></script>';
+        <script type="text/javascript" async src="' . esc_attr($settings->get_field_value('mathjax_url')) . '?config=TeX-AMS_CHTML"></script>';
         $invoice_html .= '</header>';
         $invoice_html .= '<body style="font-family:Sans-Serif;font-size:11pt;">';
         $invoice_html .= '<div>';
@@ -313,14 +331,12 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
                 $invoice_html .= esc_html($settings->get_field_value($field)) . '<br />';
         }
 
-        if(!empty($settings->get_field_value("publisher_email")))
-            $invoice_html .= '<a href="mailto:' . esc_attr($settings->get_field_value("publisher_email")) . '">' . esc_html($settings->get_field_value("publisher_email")) . '</a><br />';
+        if(!empty($settings->get_field_value("invoice_email")))
+            $invoice_html .= '<a href="mailto:' . esc_attr($settings->get_field_value("invoice_email")) . '">' . esc_html($settings->get_field_value("invoice_email")) . '</a><br />';
         $invoice_html .= '<a href="' . esc_attr(get_site_url()) . '">' . esc_html(get_site_url()) . '</a><br />';
         $invoice_html .= '</div>';
         $invoice_html .= '<div style="clear:left"></div>';
         $invoice_html .= '<div>';
-        #$invoice_html .= esc_html($manuscript['invoice_recipient']) . '<br />';
-        #$invoice_html .= nl2br(esc_html($manuscript['invoice_address'])) . '<br />';
         $invoice_html .= '<textarea style="width:85mm;height:40mm;resize: none;">' . esc_html($manuscript['invoice_recipient'] . "\n" . $manuscript['invoice_address'] . (!empty($manuscript['invoice_vat_number']) ? "\nVat-Nr: " . $manuscript['invoice_vat_number'] : '')) . '</textarea>';
         $invoice_html .= '</div>';
         $invoice_html .= '<div style="margin-bottom:2em">';

@@ -210,8 +210,8 @@ target.textContent = source.value;
 MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
 }
 </script>';
-            echo '<span id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '-preview-lable" stype="">LaTeX preview:</span><br/>';
-            echo '<span id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '-preview" style="white-space:pre-wrap;">' . (!empty($value) ? esc_html($value) : 'Nothing to show') . '</span>';
+            echo '<p><span id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '-preview-lable" stype="">LaTeX preview:</span><br/>';
+            echo '<span id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '-preview" style="white-space:pre-wrap;">' . (!empty($value) ? esc_html($value) : 'Nothing to show') . '</span></p>';
         }
     }
 
@@ -267,7 +267,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         else
             $name_end = '[' . $id . ']';
 
-        echo '<select id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . $name_end . '"' . ($onchange !== false ? ' onchange="' . $onchange . '"' : '') . '>';
+        echo '<select class="o3po-' . $this->slug . ' o3po-' . $this->slug . '-select" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . $name_end . '"' . ($onchange !== false ? ' onchange="' . $onchange . '"' : '') . '>';
         foreach($options as $option)
             echo '<option value="' . $option['value'] . '"' . ($value == $option['value'] ? 'selected': '' ) . '>' . $option['description'] . '</option>';
         echo '</select>';
