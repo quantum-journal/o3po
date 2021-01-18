@@ -123,3 +123,7 @@ input.o3po-ready2publish-text {
 div.o3po-ready2publish-author {
     margin-bottom: 1rem;
 }
+
+select.o3po-ready2publish, input.o3po-ready2publish, textarea.o3po-ready2publish {
+    margin-bottom: 1rem;
+}
