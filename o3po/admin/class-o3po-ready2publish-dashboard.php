@@ -170,7 +170,7 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
         {
             update_post_meta($post_id, $post_type . '_number_authors', count($manuscript_info['author_name_styles']));
             foreach(static::$meta_fields_to_set_when_inserting_post as $field_id)
-                update_post_meta($post_id, $post_type . '_' . $field_id, $manuscript_info[$field_id]);
+                update_post_meta($post_id, $post_type . '_' . $field_id, addslashes($manuscript_info[$field_id]));
             update_post_meta($post_id, $post_type . '_ready2publish_storage_id', $id);
                 // We also do a few more things that are normally done by the publication type class
             if(!empty($manuscript_info['feature_image_attachment_id']))
