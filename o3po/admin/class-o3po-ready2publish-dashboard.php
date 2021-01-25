@@ -100,11 +100,9 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
         if($manuscript_info['payment_method'] == 'invoice')
             $out .= '<div>Invoice: ' . "An invoice was requested!" . '</div>';
         $out .= '<div style="float:right">';
-        $out .= '<span><a href="mailto:' . esc_attr($manuscript_info['corresponding_author_email']) . '">Email ' . esc_html($manuscript_info['corresponding_author_email']) . '</a></span>';
-        $out .= ' | ';
-        $out .= '<span class=""><a target="_blank" href="/' . $this->slug . '?action=' . 'show_invoice' . '&id=' . urlencode($id) . '">' . "Create invoice" .  '</a></span>';
-        $out .= ' | ';
-        $out .= '<span class=""><a href="/' . $this->slug . '?action=' . $action . '&id=' . urlencode($id) . '">' . ($action === 'continue' ? "Go to post" : "Begin publishing") .  '</a></span>';
+        $out .= '<span><a class="button-secondary" href="mailto:' . esc_attr($manuscript_info['corresponding_author_email']) . '">Email ' . esc_html($manuscript_info['corresponding_author_email']) . '</a></span>';
+        $out .= '<span class=""><a class="button-secondary" target="_blank" href="/' . $this->slug . '?action=' . 'show_invoice' . '&id=' . urlencode($id) . '">' . "Create invoice" .  '</a></span>';
+        $out .= '<span class=""><a class="button-secondary" href="/' . $this->slug . '?action=' . $action . '&id=' . urlencode($id) . '">' . ($action === 'continue' ? "Go to post" : "Begin publishing") .  '</a></span>';
         $out .= '</div>';
         $out .= '<div style="clear:both"></div>';
         $out .= '</div>';
@@ -430,9 +428,8 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
             }
             $out = '';
             $out .= '<div>Quick actions:</div>';
-            $out .= '<input type="button" href="mailto:' . esc_attr($manuscript_info['corresponding_author_email']) . '">' . "Email corresponding author" . '</input>';
-            $out .= ' | ';
-            $out .= '<input type="button" target="_blank" href="/' . 'ready2publish-dashboard' . '?action=' . 'show_invoice' . '&id=' . urlencode($ready2publish_storage_id) . '">' . "Create invoice" .  '</input>';
+            $out .= '<a class="button-secondary" type="button" href="mailto:' . esc_attr($manuscript_info['corresponding_author_email']) . '">' . "Email corresponding author" . '</a>';
+            $out .= '<a class="button-secondary" type="button" target="_blank" href="/' . 'ready2publish-dashboard' . '?action=' . 'show_invoice' . '&id=' . urlencode($ready2publish_storage_id) . '">' . "Create invoice" .  '</a>';
             echo $out;
         }
 

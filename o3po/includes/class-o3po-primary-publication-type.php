@@ -602,6 +602,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             echo '<tr><td></td><td>Authors names</td></tr>' . "\n";
             echo '<tr><td></td><td>Affiliations (number, association, spelling)</td></tr>' . "\n";
             echo '<tr><td></td><td>References (total number, DOIs)</td></tr>' . "\n";
+            echo '<tr><td></td><td>Funder information (compare with acknowledgments)</td></tr>' . "\n";
             echo '<tr><td>Step 4</td><td>Only if requested by the authors: Tick the opt-in to fermats library box.'.(empty($fermats_library==="checked") ? "" : " DONE!").'</td></tr>';
             echo '<tr><td>Step 5</td><td>If provided by the authors: Copy over the <a href="#' . $post_type. '_popular_summary">popular summary</a>.'.(empty($popular_summary) ? "" : " DONE!").'</td></tr>';
             echo '<tr><td>Step 6</td><td>If provided by the authors: Copy over the <a href="#' . $post_type . '_feature_image_caption">feature image caption</a>.'.(empty($feature_image_caption) ? "" : " DONE!").'</td></tr>';
