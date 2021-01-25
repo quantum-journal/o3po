@@ -152,7 +152,7 @@ abstract class O3PO_PublicationType {
          * @param    int                  $default_number_authors          The default number of authors.
          * @param    O3PO_Environment     $environment                     The evironment in which this post type is to be created.
          */
-    public function __construct( $journal, $default_number_authors, $environment, $ready2publish_storage ) {
+    public function __construct( $journal, $default_number_authors, $environment ) {
 
         if(!isset(self::$active_publication_types))
             self::$active_publication_types = array();
@@ -164,7 +164,6 @@ abstract class O3PO_PublicationType {
 
         $this->default_number_authors = $default_number_authors;
         $this->environment = $environment;
-        $this->ready2publish_storage = $ready2publish_storage;
 
         foreach(self::$active_publication_types as $active_publication_type)
             if($active_publication_type->get_publication_type_name() == $this->get_publication_type_name() )
@@ -317,9 +316,10 @@ abstract class O3PO_PublicationType {
          */
     public final function add_metabox() {
 
+        $settings = O3PO_Settings::instance();
         add_meta_box(
             'metadata_metabox',
-            'Metadata',
+            $settings->get_plugin_pretty_name() . ' Meta-data',
             array($this, 'render_metabox'),
             $this->get_publication_type_name(),
             'advanced',
@@ -1810,29 +1810,6 @@ abstract class O3PO_PublicationType {
          */
     protected function the_admin_panel_intro_text( $post_id ) {
 
-        $post_type = get_post_type($post_id);
-        $ready2publish_storage_id = get_post_meta( $post_id, $post_type . '_ready2publish_storage_id', true );
-        if(!empty($ready2publish_storage_id))
-        {
-            $manuscript_info = $this->ready2publish_storage->get_manuscript($ready2publish_storage_id);
-            if(!empty($manuscript_info['ready2publish_comments']))
-            {
-                echo '<div>The authors provided the following comments during submission of the final version:</div>';
-                echo '<div style="white-space:pre-wrap;">' . esc_html($manuscript_info['ready2publish_comments']) . '</div>';
-            }
-            $manuscript_info = $this->ready2publish_storage->get_manuscript($ready2publish_storage_id);
-            if(!empty($manuscript_info['dissemination_multimedia']))
-            {
-                echo '<div>The authors provided the following multi media content that may be interesting to publish in some way via the large editor box at the top:</div>';
-                echo '<div style="white-space:pre-wrap;">' . esc_html($manuscript_info['dissemination_multimedia']) . '</div>';
-            }
-            $out = '';
-            $out .= '<span>Quick actions: </span>';
-            $out .= '<span><a href="mailto:' . esc_attr($manuscript_info['corresponding_author_email']) . '">Email the corresponding author ' . esc_html($manuscript_info['corresponding_author_email']) . '</a></span>';
-            $out .= ' | ';
-            $out .= '<span class=""><a target="_blank" href="/' . 'ready2publish-dashboard' . '?action=' . 'show_invoice' . '&id=' . urlencode($ready2publish_storage_id) . '">' . "Create an invoice" .  '</a></span>';
-            echo $out;
-        }
     }
 
         /**

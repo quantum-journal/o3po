@@ -374,10 +374,7 @@ class O3PO {
         $this->loader->add_action('wp_dashboard_setup', $this->ready2publish_dashboard, 'setup');
         $this->loader->add_action('init', $this->ready2publish_dashboard, 'init');
         $this->loader->add_action('do_parse_request', $this->ready2publish_dashboard, 'do_parse_request', PHP_INT_MAX, 3 );
-
-
-
-        #$this->loader->add_action('get_template_part_template-parts/content', $this->journal, 'foo', 99, 2);
+        $this->loader->add_action('add_meta_boxes', $this->ready2publish_dashboard, 'add_metabox');
 
             //add hooks for the primary publication type...
         $this->loader->add_filter('the_author', $this->primary_publication_type, 'get_the_author', PHP_INT_MAX, 1);

@@ -36,6 +36,8 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
 
     protected $title;
 
+    protected static $associated_post_type = 'paper';
+
     private static $meta_fields_to_set_when_inserting_post = [
         'eprint',
         'title',
@@ -159,7 +161,7 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
 
         $manuscript_info = $this->storage->get_manuscript($id);
 
-        $post_type = 'paper';
+        $post_type = static::$associated_post_type;
         $postarr = [
             'post_type' => $post_type,
                     ];
@@ -379,4 +381,61 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
         echo $invoice_html;
 
     }
+
+        /**
+         * Adds the meta box for ready2publish dashboard functionality
+         * on the publication type edit page.
+         *
+         * @since    0.3.1+
+         * @access   public
+         */
+    public final function add_metabox() {
+
+        add_meta_box(
+            $this->slug . '_metabox',
+            esc_html($this->plugin_pretty_name . " " . $this->title),
+            array($this, 'render_metabox'),
+            static::$associated_post_type,
+            'side',
+            'default'
+                     );
+
+	}
+
+        /**
+         * Render the meta box.
+         *
+         * @since    0.3.1+
+         * @access   public
+         * @param    WP_Post     $post   The post for which to render the metabox.
+         * */
+    public function render_metabox( $post ) {
+
+        $post_id = $post->ID;
+        $post_type = get_post_type($post_id);
+        $ready2publish_storage_id = get_post_meta( $post_id, $post_type . '_ready2publish_storage_id', true );
+        if(!empty($ready2publish_storage_id))
+        {
+            $manuscript_info = $this->storage->get_manuscript($ready2publish_storage_id);
+            if(!empty($manuscript_info['ready2publish_comments']))
+            {
+                echo '<div>The authors provided the following comments during submission of the final version:</div>';
+                echo '<textarea rows="5" style="width:100%;">' . esc_html($manuscript_info['ready2publish_comments']) . '</textarea>';
+            }
+            $manuscript_info = $this->storage->get_manuscript($ready2publish_storage_id);
+            if(!empty($manuscript_info['dissemination_multimedia']))
+            {
+                echo '<div>The authors provided the following multi media content that may be interesting to publish in some way via the large editor box at the top:</div>';
+                echo '<textarea rows="10" style="width:100%;">' . esc_html($manuscript_info['dissemination_multimedia']) . '</textarea>';
+            }
+            $out = '';
+            $out .= '<div>Quick actions:</div>';
+            $out .= '<input type="button" href="mailto:' . esc_attr($manuscript_info['corresponding_author_email']) . '">' . "Email corresponding author" . '</input>';
+            $out .= ' | ';
+            $out .= '<input type="button" target="_blank" href="/' . 'ready2publish-dashboard' . '?action=' . 'show_invoice' . '&id=' . urlencode($ready2publish_storage_id) . '">' . "Create invoice" .  '</input>';
+            echo $out;
+        }
+
+    }
+
 }
