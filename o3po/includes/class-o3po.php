@@ -96,7 +96,7 @@ class O3PO {
         /**
          * The ready to publish storage.
          *
-         * @since    0.3.1+
+         * @since    0.4.0
          * @access   protected
          * @var      O3PO_Ready2Publish_Storage    $ready2publish_storage    The ready to publish storage.
          */
@@ -105,7 +105,7 @@ class O3PO {
         /**
          * The ready to publish form.
          *
-         * @since    0.3.1+
+         * @since    0.4.0
          * @access   protected
          * @var      O3PO_Ready2Publish_Form    $ready2publish_form    The ready to publish form.
          */
@@ -114,7 +114,7 @@ class O3PO {
         /**
          * The ready to publish dashboard.
          *
-         * @since    0.3.1+
+         * @since    0.4.0
          * @access   protected
          * @var      O3PO_Ready2Publish_Dashboard    $ready2publish_dashboard    The ready to publish dashboard.
          */
@@ -371,7 +371,7 @@ class O3PO {
         $this->loader->add_action('init', $this->ready2publish_form, 'init');
         $this->loader->add_action('do_parse_request', $this->ready2publish_form, 'do_parse_request', PHP_INT_MAX, 2 );
 
-        $this->loader->add_action('wp_dashboard_setup', $this->ready2publish_dashboard, 'setup');
+        $this->loader->add_action('wp_dashboard_setup', $this->ready2publish_dashboard, 'wp_dashboard_setup');
         $this->loader->add_action('init', $this->ready2publish_dashboard, 'init');
         $this->loader->add_action('do_parse_request', $this->ready2publish_dashboard, 'do_parse_request', PHP_INT_MAX, 3 );
         $this->loader->add_action('add_meta_boxes', $this->ready2publish_dashboard, 'add_metabox');

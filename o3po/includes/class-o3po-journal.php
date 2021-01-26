@@ -630,7 +630,7 @@ for (i = 0; i < elemets_to_condense.length; i++) {
          *
          * To be called during during O3PO_Settings::configure().
          *
-         * @since    0.3.1+
+         * @since    0.4.1+
          * @access   public
          * @param O3PO_Settings $settings Settings object.
          */
@@ -664,7 +664,7 @@ for (i = 0; i < elemets_to_condense.length; i++) {
         /**
          * Render the setting for the DOI suffix template.
          *
-         * @since    0.3.1+
+         * @since    0.4.0
          * @access   public
          */
     public static function render_doi_suffix_template_setting() {

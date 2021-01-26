@@ -16,28 +16,65 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-ready
 /**
  * Class for displaying manuscripts ready to publish on the admin panel.
  *
- * @since      0.3.1+
+ * @since      0.4.0
  * @package    O3PO
  * @subpackage O3PO/includes
  * @author     Christian Gogolin <o3po@quantum-journal.org>
  */
 class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
 
-        //use O3PO_Ready2PublishStorage;
-
         /**
+         * The slug of this dashboard.
          *
+         * @since    0.4.0
+         * @access   protected
+         * @var      string    $slug    The slug of this dashboard.
          */
     protected $slug;
 
+        /**
+         * The name of the plugin.
+         *
+         * @since    0.4.0
+         * @access   protected
+         * @var      string    $plugin_name    The name of the plugin.
+         */
     protected $plugin_name;
 
+        /**
+         * The plugin pretty name
+         *
+         * @since    0.4.0
+         * @access   protected
+         * @var      string    $plugin_pretty_name    The pretty name of the plugin.
+         */
     protected $plugin_pretty_name;
 
+        /**
+         * The title of this dashboard
+         *
+         * @since    0.4.0
+         * @access   protected
+         * @var      string    $title    The title of this dashboard.
+         */
     protected $title;
 
+        /**
+         * The associated post type
+         *
+         * @since    0.4.0
+         * @access   protected
+         * @var      string    $associated_post_type    The post type that can be created with this dashboard.
+         */
     protected static $associated_post_type = 'paper';
 
+        /**
+         * The meta fields to set
+         *
+         * @since    0.4.0
+         * @access   protected
+         * @var      array    $meta_fields_to_set_when_inserting_post    The meta fields to set when creating and inserting a post.
+         */
     private static $meta_fields_to_set_when_inserting_post = [
         'eprint',
         'title',
@@ -56,8 +93,26 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
         'fermats_library'
                                    ];
 
+        /**
+         * The storage from where to get manuscript information
+         *
+         * @since    0.4.0
+         * @access   protected
+         * @var      O3PO_Ready2Publish_Storage    $storage    The storage from where to get manuscript information.
+         */
     private $storage;
 
+        /**
+         * Construct this dashboard.
+         *
+         * @since    0.4.0
+         * @access   public
+         * @param    string               $plugin_name                 The name of the plugin.
+         * @param    string               $plugin_pretty_name          The pretty name of the plugin.
+         * @param    string               $slug                        The slug of this dashboard.
+         * @param    string               $title                       The title of this dashboard.
+         * @param    string               O3PO_Ready2Publish_Storage   The storage from where this dashboard draws manuscript information.
+         */
     public function __construct( $plugin_name, $plugin_pretty_name, $slug, $title, $storage ) {
 
         $this->plugin_name = $plugin_name;
@@ -68,6 +123,15 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
 
     }
 
+        /**
+         * Specifies class specific settings sections and fields.
+         *
+         * To be called during during O3PO_Settings::configure().
+         *
+         * @since    0.4.0
+         * @access   public
+         * @param O3PO_Settings $settings Settings object.
+         */
     public static function specify_settings( $settings ) {
 
         $settings->specify_field('invoice_header_img', 'Invoice header image', array('O3PO_Ready2PublishDashboard', 'render_invoice_header_img_setting'), 'ready2publish_settings', 'ready2publish_settings', array(), array($settings, 'trim_strip_tags'), '');
@@ -79,14 +143,30 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
 
     }
 
+        /**
+         * Setup the dashboard box
+         *
+         * To be added to the 'wp_dashboard_setup' action.
+         *
+         * @since  0.4.0
+         * @access public
+         */
+    public function wp_dashboard_setup() {
 
-    public function setup() {
-
-        wp_add_dashboard_widget($this->slug, esc_html($this->plugin_pretty_name . " " . $this->title), array($this, 'render'));
+        wp_add_dashboard_widget($this->slug, esc_html($this->plugin_pretty_name . " " . $this->title), array($this, 'render_dashboard_widget'));
     }
 
-    public function render_manuscript_entry( $id, $manuscript_info, $action ) {
+        /**
+         * Render a single manuscript entry.
+         *
+         * @since    0.4.0
+         * @access   public
+         * @params   int    $id                The id of the manuscript
+         * @params   string $action            The action appropriate for this entry, e.g., 'continue' or 'publish'
+         */
+    public function render_manuscript_entry( $id, $action ) {
 
+        $manuscript_info = $this->storage->get_manuscript($id);
         $settings = O3PO_Settings::instance();
         $out = "";
         $out .= '<li><div class="manuscript-ready2publish">';
@@ -111,19 +191,23 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
         return $out;
     }
 
-
-    public function render() {
+        /**
+         * Render the dashboard widget.
+         *
+         * @since    0.4.0
+         * @access   public
+         */
+    public function render_dashboard_widget() {
 
         $partially_published_manuscripts = $this->storage->get_manuscripts('partial');
         if(!empty($partially_published_manuscripts))
         {
             echo '<h3>Partially published manuscripts</h3>';
             echo '<ul>';
-            #foreach($partially_published_manuscripts as $id => $manuscript_info)
             reset($partially_published_manuscripts);
             for(end($partially_published_manuscripts); ($id=key($partially_published_manuscripts))!==null; prev($partially_published_manuscripts))
             {
-                echo $this->render_manuscript_entry($id, $partially_published_manuscripts[$id], 'continue');
+                echo $this->render_manuscript_entry($id, 'continue');
             }
             echo '</ul>';
         }
@@ -133,11 +217,10 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
         {
             echo '<h3>Manuscripts awaiting publication</h3>';
             echo '<ul>';
-            #foreach($unprocessed_manuscripts as $id => $manuscript_info)
             reset($unprocessed_manuscripts);
             for(end($unprocessed_manuscripts); ($id=key($unprocessed_manuscripts))!==null; prev($unprocessed_manuscripts))
             {
-                echo $this->render_manuscript_entry($id, $unprocessed_manuscripts[$id], 'publish');
+                echo $this->render_manuscript_entry($id, 'publish');
             }
             echo '</ul>';
         }
@@ -146,6 +229,16 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
             echo '<p>No manuscripts awaiting publication.</p>';
     }
 
+        /**
+         * Insert a post
+         *
+         * Inserts a post of the associated post type
+         * generated from the manuscript information in storage.
+         *
+         * @since    0.4.0
+         * @access   public
+         * @params   int    $id                The id of the manuscript
+         */
     public function insert_post( $id ) {
 
             // Do nothing if in maintenance mode
@@ -183,6 +276,17 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
         return $post_id;
     }
 
+        /**
+         * Insert and display a post
+         *
+         * Inserts a post of the associated post type
+         * generated from the manuscript information in storage and
+         * displays the post edit page.
+         *
+         * @since    0.4.0
+         * @access   public
+         * @params   int    $id                The id of the manuscript
+         */
     public function insert_and_display_post( $id ) {
 
         $post_id = $this->insert_post($id);
@@ -190,6 +294,13 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
 
     }
 
+        /**
+         * Display a post
+         *
+         * @since    0.4.0
+         * @access   public
+         * @params   int    $post_id                The post_id of the post to display
+         */
     public function display_post( $post_id ) {
 
         if(is_wp_error($post_id))
@@ -213,6 +324,18 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
             //flush_rewrite_rules( true );  //// <---------- ONLY COMMENT IN WHILE TESTING
     }
 
+        /**
+         * Parse dashboard requests
+         *
+         * Parse requests aimed at performing actions on manuscripts
+         * such as starting or continuing the publishing process.
+         *
+         * @since    0.4.0
+         * @access   public
+         * @params   bool            $bool                Whether or not to parse the request.
+         * @params   WP              $wp                  Current WordPress environment instance.
+         * @params   array|string    $extra_query_vars    Extra passed query variables.
+         */
     public function do_parse_request( $bool, $wp, $extra_query_vars ) {
 
         $home_path = parse_url(home_url(), PHP_URL_PATH);
@@ -252,7 +375,7 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
         /**
          * Render the setting for the invoice header image.
          *
-         * @since    0.3.1+
+         * @since    0.4.0
          * @access   public
          */
     public static function render_invoice_header_img_setting() {
@@ -265,7 +388,7 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
         /**
          * Render the setting for the invoice email.
          *
-         * @since    0.3.1+
+         * @since    0.4.0
          * @access   public
          */
     public static function render_invoice_email_setting() {
@@ -278,7 +401,7 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
         /**
          * Render the setting for the invoice header image.
          *
-         * @since    0.3.1+
+         * @since    0.4.0
          * @access   public
          */
     public static function render_invoice_footer_setting() {
@@ -291,8 +414,9 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
         /**
          * Render the setting for the invoice header image.
          *
-         * @since    0.3.1+
+         * @since    0.4.0
          * @access   public
+         * @param    int    $id    The id of the manuscript whose invoice to show.
          */
     public function show_invoice($id)
     {
@@ -432,7 +556,6 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
             $out .= '<a class="button-secondary" type="button" target="_blank" href="/' . 'ready2publish-dashboard' . '?action=' . 'show_invoice' . '&id=' . urlencode($ready2publish_storage_id) . '">' . "Create invoice" .  '</a>';
             echo $out;
         }
-
     }
 
 }

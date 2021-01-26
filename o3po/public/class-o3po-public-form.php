@@ -272,7 +272,16 @@ abstract class O3PO_PublicForm {
             //flush_rewrite_rules( true );  //// <---------- ONLY COMMENT IN WHILE TESTING
     }
 
-
+        /**
+         * Parse form requests
+         *
+         * Processes form input and displays the form.
+         *
+         * @since    0.4.0
+         * @access   public
+         * @params   bool            $bool                Whether or not to parse the request.
+         * @params   WP              $wp                  Current WordPress environment instance.
+         */
     public function do_parse_request( $bool, $wp ) {
 
         $home_path = parse_url(home_url(), PHP_URL_PATH);
