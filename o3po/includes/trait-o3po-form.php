@@ -4,7 +4,7 @@
  * Trait for forms.
  *
  * @link       https://quantum-journal.org/o3po/
- * @since      0.3.1+
+ * @since      0.4.0
  *
  * @package    O3PO
  * @subpackage O3PO/includes
@@ -13,7 +13,7 @@
 /**
  * Trait for forms such as the settings form.
  *
- * @since      0.3.1+
+ * @since      0.4.0
  * @package    O3PO
  * @subpackage O3PO/includes
  * @author     Christian Gogolin <o3po@quantum-journal.org>
@@ -35,7 +35,7 @@ trait O3PO_Form {
          * Used for css classes when rendering the sections and fields.
          * Used then storing/retreiving data from the database.
          *
-         * @since 0.3.1+
+         * @since 0.4.0
          * @access protected
          * @var string $slug Slug of the form.
          */
@@ -44,7 +44,7 @@ trait O3PO_Form {
         /**
          * Array of all pages of the form.
          *
-         * @since    0.3.1+
+         * @since    0.4.0
          * @access   protected
          * @var      array     $sections   Dictionary of all pages and their properties.
          */
@@ -53,7 +53,7 @@ trait O3PO_Form {
         /**
          * Array of all sections of the form.
          *
-         * @since    0.3.1+
+         * @since    0.4.0
          * @access   protected
          * @var      array     $sections   Dictionary of all sections and their properties.
          */
@@ -62,7 +62,7 @@ trait O3PO_Form {
         /**
          * Array of all field of the form.
          *
-         * @since    0.3.1+
+         * @since    0.4.0
          * @access   protected
          * @var      array     $fields    Dictionary of all fields and their properties.
          */
@@ -75,9 +75,9 @@ trait O3PO_Form {
          *
          * @since  0.3.1+
          * @access private
-         * @param string   $id       Slug-name to identify the page.
-         * @param string   $title    Formatted title of the section. Shown as the heading for the section.
-         * @param callable $callback Function that echos out the any content at the top of the page (before the first section).
+         * @param  string   $id       Slug-name to identify the page.
+         * @param  string   $title    Formatted title of the section. Shown as the heading for the section.
+         * @param  callable $callback Function that echos out the any content at the top of the page (before the first section).
          */
     public function specify_page( $id, $title, $callback=null ) {
 
@@ -93,12 +93,12 @@ trait O3PO_Form {
          *
          * Keeps a record of all sections in $this->sections.
          *
-         * @since  0.3.1+
+         * @since  0.4.0
          * @access private
-         * @param string   $id       Slug-name to identify the section. Used in the 'id' attribute of tags.
-         * @param string   $title    Formatted title of the section. Shown as the heading for the section.
-         * @param callable $callback Function that echos out any content at the top of the section (between heading and fields).
-         * @param string   $page     The slug-name of the page on which to show the section.
+         * @param  string   $id       Slug-name to identify the section. Used in the 'id' attribute of tags.
+         * @param  string   $title    Formatted title of the section. Shown as the heading for the section.
+         * @param  callable $callback Function that echos out any content at the top of the section (between heading and fields).
+         * @param  string   $page     The slug-name of the page on which to show the section.
          */
     public function specify_section( $id, $title, $callback, $page, $summary_callback=null ) {
 
@@ -112,14 +112,14 @@ trait O3PO_Form {
          *
          * Keeps a record of all fields in $this->fields.
          *
-         * @since  0.3.1+
+         * @since  0.4.0
          * @access private
-         * @param string   $id       Slug-name to identify the field. Used in the 'id' attribute of tags.
-         * @param string   $title    Formatted title of the field. Shown as the heading for the field.
-         * @param callable $callback Function that echos out any content at the top of the field (between heading and fields).
-         * @param string   $page     The slug-name of the page on which to show the field.
-         * @param string   $section     The slug-name of the section in which to show the field.
-         * @param string   $field  The slug-name of the field of the page
+         * @param  string   $id       Slug-name to identify the field. Used in the 'id' attribute of tags.
+         * @param  string   $title    Formatted title of the field. Shown as the heading for the field.
+         * @param  callable $callback Function that echos out any content at the top of the field (between heading and fields).
+         * @param  string   $page     The slug-name of the page on which to show the field.
+         * @param  string   $section     The slug-name of the section in which to show the field.
+         * @param  string   $field  The slug-name of the field of the page
          *                           in which to show the box.
          * @param array    $args {
          *     Extra arguments used when outputting the field. May be an empty array().
@@ -295,9 +295,10 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         /**
          * Get the default value of a field by id.
          *
-         * @since    0.3.1+
-         * @acceess  public
-         * @param    int    $id     Id of the field.
+         * @since   0.4.0
+         * @acceess public
+         * @param   int    $id Id of the field.
+         * @return string Default value of the field
          */
     public function get_field_default( $id ) {
 
@@ -311,9 +312,9 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * Get the default value of all fields.
          *
          *
-         * @since    0.3.1+
-         * @acceess  public
-         * @param boolean $include_fake_fields Whether to also include fake fields in the list.
+         * @since   0.4.0
+         * @acceess public
+         * @param   boolean $include_fake_fields Whether to also include fake fields in the list.
          */
     public function get_field_defaults( $include_fake_fields=false ) {
 
@@ -328,7 +329,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
        /**
          * Get the title of a field by id.
          *
-         * @since    0.3.1+
+         * @since    0.4.0
          * @acceess  prublic
          * @param    int    $id     Id of the field.
          */
@@ -347,10 +348,10 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * Fake fields cannot be modified, but have default values that
          * can be used to avoid hard coding values.
          *
-         * @since  0.3.1+
+         * @since  0.4.0
          * @access private
-         * @param string   $id       Slug-name to identify the section. Used in the 'id' attribute of tags.
-         * @param string   $default  Default value for the field.
+         * @param  string  $id      Slug-name to identify the section. Used in the 'id' attribute of tags.
+         * @param  string  $default Default value for the field.
          */
     public function specify_fake_field( $id, $default ) {
 
@@ -364,7 +365,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         /**
          * Clean user input to doi_prefix fields
          *
-         * @since    0.3.1+
+         * @since    0.4.0
          * @access   private
          * @param    string   $id    The field this was input to.
          * @param    string   $input User input.
@@ -382,10 +383,10 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         /**
          * Clean user input to doi_suffix fields
          *
-         * @since    0.3.1+
-         * @access   private
-         * @param    string   $id    The field this was input to.
-         * @param    string   $input User input.
+         * @since  0.4.0
+         * @access private
+         * @param  string  $id    The field this was input to.
+         * @param  string  $input User input.
          */
     public function validate_doi_suffix( $id, $input ) {
 
@@ -418,11 +419,11 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         /**
          * Clean user input to eprint fields
          *
-         * @since    0.3.1+
-         * @access   private
-         * @param    string   $id    The field this was input to.
-         * @param    string   $input    User input.
-         * @return string Valid issn or empty string.
+         * @since  0.4.0
+         * @access private
+         * @param  string  $id    The field this was input to.
+         * @param  string  $input User input.
+         * @return string  Valid issn or empty string.
          */
     public function validate_eprint( $id, $input ) {
 
@@ -437,10 +438,10 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         /**
          * Clean user input to issn fields
          *
-         * @since    0.3.1+
-         * @access   private
-         * @param    string   $id    The field this was input to.
-         * @param    string   $input    User input.
+         * @since  0.4.0
+         * @access private
+         * @param  string  $id    The field this was input to.
+         * @param  string  $input User input.
          * @return string Valid issn or empty string.
          */
     public function validate_issn_or_empty( $id, $input ) {
@@ -473,10 +474,10 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         /**
          * Clean user input to email fields
          *
-         * @since    0.3.1+
-         * @access   private
-         * @param    string   $id    The field this was input to.
-         * @param    string   $input    User input.
+         * @since  0.4.0
+         * @access private
+         * @param  string  $id    The field this was input to.
+         * @param  string  $input User input.
          */
     public function validate_email( $id, $input ) {
 
@@ -618,10 +619,10 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         /**
          * Ensure that a check box field is checked
          *
-         * @sinde    0.3.1+
-         * @access   public
-         * @param    string   $id    The field this was input to.
-         * @param    string   $input    User input.
+         * @sinde  0.4.0
+         * @access public
+         * @param  string $id    The field this was input to.
+         * @param  string $input User input.
          */
     public function checked( $id, $input ) {
 
@@ -680,9 +681,9 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         /**
          * Get the value of a field by id.
          *
-         * @since    0.3.1+
-         * @acceess  prublic
-         * @param    int    $id     Id of the field.
+         * @since   0.4.0
+         * @acceess prublic
+         * @param   int     $id Id of the field.
          */
     abstract public function get_field_value( $id );
 

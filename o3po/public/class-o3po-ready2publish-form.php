@@ -4,7 +4,7 @@
  * Class for the ready to publish form.
  *
  * @link       https://quantum-journal.org/o3po/
- * @since      0.3.1+
+ * @since      0.4.0
  *
  * @package    O3PO
  * @subpackage O3PO/includes
@@ -18,7 +18,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-envir
 /**
  * Class for the ready to publish form.
  *
- * @since      0.3.1+
+ * @since      0.4.0
  * @package    O3PO
  * @subpackage O3PO/includes
  * @author     Christian Gogolin <o3po@quantum-journal.org>
@@ -49,7 +49,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         /**
          * Specifies form sections and fields.
          *
-         * @since 0.3.1+
+         * @since 0.4.0
          * @access private
          */
     protected function specify_pages_sections_and_fields() {
@@ -100,8 +100,8 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
 
         $this->specify_section('payment_invoice', 'Invoicing information', null, 'payment');
         $this->specify_field('payment_amount', 'Amount', array($this, 'render_payment_amount'), 'payment', 'payment_invoice', array(), array($this, 'validate_non_negative_euros'), "450€");
-        $this->specify_field('invoice_recipient', 'Recipient', array( $this, 'render_invoice_recipient' ), 'payment', 'payment_invoice', array(), array($this, 'trim_strip_tags'), '');
-        $this->specify_field('invoice_address', 'Address', array( $this, 'render_invoice_address' ), 'payment', 'payment_invoice', array(), array($this, 'non_empty_if_payment_method_is_invoice'), '');
+        $this->specify_field('invoice_recipient', 'Recipient', array( $this, 'render_invoice_recipient' ), 'payment', 'payment_invoice', array(), array($this, 'non_empty_if_payment_method_is_invoice_and_on_or_past_containing_page'), '');
+        $this->specify_field('invoice_address', 'Address', array( $this, 'render_invoice_address' ), 'payment', 'payment_invoice', array(), array($this, 'non_empty_if_payment_method_is_invoice_and_on_or_past_containing_page'), '');
         $this->specify_field('invoice_vat_number', 'VAT number (if applicable)', array( $this, 'render_invoice_vat_number' ), 'payment', 'payment_invoice', array(), array($this, 'trim_strip_tags'), '');
 
         $this->specify_field('comments', 'Comments', array( $this, 'render_comments' ), 'payment', 'payment_invoice', array(), array($this, 'trim_strip_tags'), '');
@@ -740,12 +740,29 @@ while(nextSibling) {
     }
 
 
-    public function non_empty_if_payment_method_is_invoice( $id, $input ) {
+    public function non_empty_if_payment_method_is_invoice_and_on_or_past_containing_page( $id, $input ) {
 
-        $input = trim($input);
-        if(!empty($this->get_field_value('payment_method')) and $this->get_field_value('payment_method') === 'invoice' and empty($input))
-            $this->add_error($id, 'empty-despite-invoice-requested', "The field '" . $this->fields[$id]['title'] . "' must not be empty if you are requesting an invoice.", 'error');
+        $input = trim(strip_tags($input));
 
-        return $input;
+        if(!empty($input))
+            return $input;
+
+        $page = $this->fields[$id]['page'];
+        $page_id_of_field = mb_substr($page, mb_strlen($this->plugin_name . '-' . $this->slug . ':'));
+        foreach($this->pages as $page_id => $page_info)
+        {
+            if($page_id === $page_id_of_field)
+            {
+                if(!empty($this->get_field_value('payment_method')) and $this->get_field_value('payment_method') === 'invoice' and empty($input))
+                    $this->add_error($id, 'empty-despite-invoice-requested', "The field '" . $this->fields[$id]['title'] . "' must not be empty if you are requesting an invoice.", 'error');
+                break;
+            }
+            elseif($page_id === $this->coming_from_page)
+            {
+                break;
+            }
+        }
+
+        return $this->get_field_default($id);
     }
 }
