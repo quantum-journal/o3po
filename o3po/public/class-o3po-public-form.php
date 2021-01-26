@@ -4,7 +4,7 @@
  * Class for the ready to publish form.
  *
  * @link       https://quantum-journal.org/o3po/
- * @since      0.3.1+
+ * @since      0.4.0
  *
  * @package    O3PO
  * @subpackage O3PO/includes
@@ -16,7 +16,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-envir
 /**
  * Class for the ready to publish form.
  *
- * @since      0.3.1+
+ * @since      0.4.0
  * @package    O3PO
  * @subpackage O3PO/includes
  * @author     Christian Gogolin <o3po@quantum-journal.org>
@@ -31,7 +31,7 @@ abstract class O3PO_PublicForm {
 
     private $title;
 
-    private $coming_from_page = false;
+    protected $coming_from_page = false;
     private $page_to_display = false;
     private $navigation = false;
     private $submitted_successfully = false;
@@ -48,7 +48,7 @@ abstract class O3PO_PublicForm {
         /**
          * Specifies form sections and fields.
          *
-         * @since 0.3.1+
+         * @since  0.4.0
          * @access private
          */
     abstract protected function specify_pages_sections_and_fields();
@@ -56,7 +56,7 @@ abstract class O3PO_PublicForm {
         /**
          * Read all form values from $_POST and process.
          *
-         * @since 0.3.1+
+         * @since  0.4.0
          * @access public
          */
     public function read_and_validate_field_values() {
@@ -373,9 +373,9 @@ abstract class O3PO_PublicForm {
         /**
          * Get the value of a field by id.
          *
-         * @since    0.3.1+
-         * @acceess  prublic
-         * @param    int    $id     Id of the field.
+         * @since   0.4.0
+         * @acceess prublic
+         * @param   int     $id Id of the field.
          */
     public function get_field_value( $id ) {
 
@@ -549,7 +549,7 @@ abstract class O3PO_PublicForm {
         /**
          * Add the files uploaded by the user to the media library.
          *
-         * @since 0.3.1+
+         * @since  0.4.0
          * @access protected
          */
     protected function add_sideloaded_files_to_media_library() {
@@ -687,10 +687,10 @@ abstract class O3PO_PublicForm {
             /**
          * Ensure that a check box field is checked
          *
-         * @sinde    0.3.1+
-         * @access   public
-         * @param    string   $id    The field this was input to.
-         * @param    string   $input    User input.
+         * @sinde  0.4.0
+         * @access public
+         * @param  string $id    The field this was input to.
+         * @param  string $input User input.
          */
     public function checked_if_on_or_past_containing_page_unless_back_or_upload( $id, $input ) {
 

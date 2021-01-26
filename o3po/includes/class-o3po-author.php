@@ -139,8 +139,8 @@ class O3PO_Author {
         /**
          * Get the full name of the author.
          *
-         * @since 0.3.0
-         * @since 0.3.1+ Name styles are honored
+         * @since  0.3.0
+         * @since  0.4.0  Name styles are honored
          * @access public
          * @return string The name of the author.
          */
@@ -170,7 +170,7 @@ class O3PO_Author {
         /**
          * Get the name in bibtex format.
          *
-         * @since 0.3.1+
+         * @since  0.4.0
          * @access public
          * @return string The name of the author.
          */
@@ -231,7 +231,7 @@ class O3PO_Author {
         /**
          * Get the name style.
          *
-         * @since 0.3.1+
+         * @since  0.4.0
          * @access public
          * @return string The name of the author.
          */

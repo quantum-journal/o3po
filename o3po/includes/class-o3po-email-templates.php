@@ -29,18 +29,18 @@ class O3PO_EmailTemplates implements O3PO_SettingsSpecifyer {
          *
          * Used to cache templates after they were first requested.
          *
-         * @since 0.3.1+
+         * @since  0.4.0
          * @access private
-         * @var array  $templates  Array of templates used for caching.
+         * @var    array   $templates Array of templates used for caching.
          */
     private static $templates = array();
 
         /**
          * Get a template by name.
          *
-         * @since 0.3.1+
+         * @since  0.4.0
          * @access public
-         * @param string $template_name The name of the template.
+         * @param  string                 $template_name The name of the template.
          * @return O3PO_ShortcodeTemplate The requested template.
          */
     public static function get_template( $template_name ) {
@@ -197,12 +197,15 @@ class O3PO_EmailTemplates implements O3PO_SettingsSpecifyer {
         /**
          * Expand a email template and return the resulting text.
          *
-         * @since 0.3.1+
+         * @since  0.4.0
          * @access public
-         * @param string $template_name The name of the template.
-         * @param array $replacements Array of replacements for all or a subset of the shotcodes in the template.
-         * @param boolean $error_if_not_all_appearing_specified Whether to throw an exception in case not for all shortcodes appearing in the template replacements are specified.
-         * @return string Expanded template with shortcodes replaced by replacements.
+         * @param  string  $template_name                        The name of the template.
+         * @param  array   $replacements                         Array of replacements for all or a subset
+         *                                                       of the shotcodes in the template.
+         * @param  boolean $error_if_not_all_appearing_specified Whether to throw an exception in case not for
+         *                                                       all shortcodes appearing in the template
+         *                                                       replacements are specified.
+         * @return string  Expanded template with shortcodes replaced by replacements.
          */
     public static function expand( $template_name, $replacements, $error_if_not_all_appearing_specified=true ) {
 
@@ -213,7 +216,7 @@ class O3PO_EmailTemplates implements O3PO_SettingsSpecifyer {
         /**
          * Render the short codes for a specific template to an HTML list.
          *
-         * @since  0.3.1+
+         * @since  0.4.0
          * @access public
          * @param  string $template_name The name of the O3PO_EmailTemplates class method.
          * @return string An HTML list of the short codes.
@@ -227,8 +230,8 @@ class O3PO_EmailTemplates implements O3PO_SettingsSpecifyer {
         /**
          * Render the head of the email settings.
          *
-         * @since    0.3.1+
-         * @access   public
+         * @since  0.4.0
+         * @access public
          */
     public static function render_email_settings() {
 
@@ -240,8 +243,8 @@ class O3PO_EmailTemplates implements O3PO_SettingsSpecifyer {
         /**
          * Render the executive board of the email settings
          *
-         * @since    0.3.1+
-         * @access   public
+         * @since  0.4.0
+         * @access public
          */
     public static function render_executive_board_setting() {
 
@@ -254,8 +257,8 @@ class O3PO_EmailTemplates implements O3PO_SettingsSpecifyer {
         /**
          * Render the editor in chief of the email settings
          *
-         * @since    0.3.1+
-         * @access   public
+         * @since  0.4.0
+         * @access public
          */
     public static function render_editor_in_chief_setting() {
 
@@ -269,8 +272,8 @@ class O3PO_EmailTemplates implements O3PO_SettingsSpecifyer {
         /**
          * Render the email template for the self notification subject
          *
-         * @since    0.3.1+
-         * @access   public
+         * @since  0.4.0
+         * @access public
          */
     public static function render_self_notification_subject_template_settings() {
 
@@ -283,8 +286,8 @@ class O3PO_EmailTemplates implements O3PO_SettingsSpecifyer {
         /**
          * Render the email template for the self notification body
          *
-         * @since    0.3.1+
-         * @access   public
+         * @since  0.4.0
+         * @access public
          */
     public static function render_self_notification_body_template_settings() {
 
@@ -297,8 +300,8 @@ class O3PO_EmailTemplates implements O3PO_SettingsSpecifyer {
         /**
          * Render the email template for the author notification subject
          *
-         * @since    0.3.1+
-         * @access   public
+         * @since  0.4.0
+         * @access public
          */
     public static function render_author_notification_subject_template_settings() {
 
@@ -311,8 +314,8 @@ class O3PO_EmailTemplates implements O3PO_SettingsSpecifyer {
         /**
          * Render the email template for the author notification body
          *
-         * @since    0.3.1+
-         * @access   public
+         * @since  0.4.0
+         * @access public
          */
     public static function render_author_notification_body_template_settings() {
 
@@ -325,8 +328,8 @@ class O3PO_EmailTemplates implements O3PO_SettingsSpecifyer {
         /**
          * Render the email template for the author notification secondary subject
          *
-         * @since    0.3.1+
-         * @access   public
+         * @since  0.4.0
+         * @access public
          */
     public static function render_author_notification_secondary_subject_template_settings() {
 
@@ -339,8 +342,8 @@ class O3PO_EmailTemplates implements O3PO_SettingsSpecifyer {
         /**
          * Render the email template for the author notification secondary body
          *
-         * @since    0.3.1+
-         * @access   public
+         * @since  0.4.0
+         * @access public
          */
     public static function render_author_notification_secondary_body_template_settings() {
 
@@ -353,8 +356,8 @@ class O3PO_EmailTemplates implements O3PO_SettingsSpecifyer {
         /**
          * Render the email template for the fermats library notification subject
          *
-         * @since    0.3.1+
-         * @access   public
+         * @since  0.4.0
+         * @access public
          */
     public static function render_fermats_library_notification_subject_template_settings() {
 
@@ -367,8 +370,8 @@ class O3PO_EmailTemplates implements O3PO_SettingsSpecifyer {
         /**
          * Render the email template for the fermats library notification body
          *
-         * @since    0.3.1+
-         * @access   public
+         * @since  0.4.0
+         * @access public
          */
     public static function render_fermats_library_notification_body_template_settings() {
 
@@ -383,9 +386,9 @@ class O3PO_EmailTemplates implements O3PO_SettingsSpecifyer {
          *
          * To be called from O3PO_Settings::configure().
          *
-         * @since    0.3.1+
-         * @access   public
-         * @param O3PO_Settings $settings Settings object.
+         * @since  0.4.0
+         * @access public
+         * @param  O3PO_Settings $settings Settings object.
          */
     public static function specify_settings( $settings ) {
 

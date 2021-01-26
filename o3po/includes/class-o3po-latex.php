@@ -1597,9 +1597,9 @@ class O3PO_Latex_Dictionary_Provider
         /**
          * Remove font changing commands.
          *
-         * @since    0.3.1+
-         * @access   public
-         * @param    string   $text          LaTeX text to remove font commands from.
+         * @since  0.4.0
+         * @access public
+         * @param  string $text LaTeX text to remove font commands from.
          */
     static public function remove_font_changing_commands( $text ) {
         $preg_replacements = array(

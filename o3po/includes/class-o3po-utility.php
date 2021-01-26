@@ -204,7 +204,7 @@ class O3PO_Utility
          * Verify that an email is well formed.
          *
          * @since 0.2.0
-         * @since 0.3.1+    uses filter_var() with FILTER_VALIDATE_EMAIL
+         * @since 0.4.0     uses filter_var() with FILTER_VALIDATE_EMAIL
          * @param string    $email    Email to be checked
          * @return bool     Whether $email is well formed.
          */

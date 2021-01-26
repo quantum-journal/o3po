@@ -36,18 +36,18 @@ class O3PO_Journal implements O3PO_SettingsSpecifyer {
         /**
          * The shortcode template used to construct DOIs.
          *
-         * @since    0.3.1+
-         * @access   private
-         * @var      O3PO_ShortcodeTemplate  $doi_suffix_template  The shortcode template used to construct DOIs.
+         * @since  0.4.0
+         * @access private
+         * @var    O3PO_ShortcodeTemplate $doi_suffix_template The shortcode template used to construct DOIs.
          */
     private static $doi_suffix_template;
 
         /**
          * Initialize the journal.
          *
-         * @since    0.1.0
-         * @access   public
-         * @param    array    $journal_config   Array with values for the keys returned by get_journal_config_properties().
+         * @since   0.1.0
+         * @access  public
+         * @param   array  $journal_config Array with values for the keys returned by get_journal_config_properties().
          */
 	public function __construct( $journal_config ) {
 
@@ -681,11 +681,11 @@ for (i = 0; i < elemets_to_condense.length; i++) {
         /**
          * Clean user input to the doi_suffix_template setting.
          *
-         * @since    0.3.1+
-         * @access   private
-         * @param    string   $field    The field this was input to.
-         * @param    string   $input    User input.
-         * @return   string   Validated doi suffix.
+         * @since  0.4.0
+         * @access private
+         * @param  string  $field    The field this was input to.
+         * @param  string  $input    User input.
+         * @return string  Validated doi suffix.
          */
     public static function validate_doi_suffix_template( $field, $input ) {
 
@@ -717,12 +717,12 @@ for (i = 0; i < elemets_to_condense.length; i++) {
          * Returns the doi suffix according to the template
          * specified in settings.
          *
-         * @since  0.3.1+
+         * @since  0.4.0
          * @access private
-         * @param  string $date_published A date in ISO_8601 format.
-         * @param  string|int $volume The volume for which to construct the DOI.
-         * @param  string|int $pages The page/article number for which to construct the DOI.
-         * @return string The doi suffix constructed according to the template of this publication type.
+         * @param  string     $date_published A date in ISO_8601 format.
+         * @param  string|int $volume         The volume for which to construct the DOI.
+         * @param  string|int $pages          The page/article number for which to construct the DOI.
+         * @return string     The doi suffix constructed according to the template of this publication type.
          */
     public function construct_doi_suffix( $date_published, $volume, $pages ) {
 

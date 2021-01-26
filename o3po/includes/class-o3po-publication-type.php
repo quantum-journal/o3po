@@ -1803,10 +1803,10 @@ abstract class O3PO_PublicationType {
         /**
          * Echo an intro text for the admin panel.
          *
-         * @since     0.1.0
-         * @since     0.3.1+       Not static anymore.
-         * @access    protected
-         * @param     int          $post_id    Id of the post.
+         * @since  0.1.0
+         * @since  0.4.0     Not static anymore.
+         * @access protected
+         * @param  int       $post_id Id of the post.
          */
     protected function the_admin_panel_intro_text( $post_id ) {
 
@@ -2286,8 +2286,8 @@ abstract class O3PO_PublicationType {
         /**
          * Echo the funder information for the admin panel.
          *
-         * @since 0.3.1+
-         * @param int    $post_id    Id of the post.
+         * @since 0.4.0
+         * @param int   $post_id Id of the post.
          */
     protected static function the_admin_panel_funder_information($post_id) {
 

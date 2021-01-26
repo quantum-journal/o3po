@@ -65,9 +65,9 @@ class O3PO_Settings extends O3PO_Singleton {
         /**
          * Whether this singleton had already been configured.
          *
-         * @since    0.3.1+
-         * @access   private
-         * @var      string    $version    Whether this singleton had already been configured.
+         * @since  0.4.0
+         * @access private
+         * @var    string  $version Whether this singleton had already been configured.
          */
 	private static $configured = false;
 
@@ -85,11 +85,11 @@ class O3PO_Settings extends O3PO_Singleton {
          *
          * Also checks whether it has been configured.
          *
-         * @since    0.3.1+
-         * @param    string    $plugin_name                      Simple name of this plugin.
-         * @param    string    $plugin_pretty_name               Pretty name of this plugin.
-         * @param    string    $version                          Version of this plugin.
-         * @param    callback  $active_post_type_names_callback  The callback from which to get the active post type names.
+         * @since  0.4.0
+         * @param  string   $plugin_name                     Simple name of this plugin.
+         * @param  string   $plugin_pretty_name              Pretty name of this plugin.
+         * @param  string   $version                         Version of this plugin.
+         * @param  callback $active_post_type_names_callback The callback from which to get the active post type names.
          * @return O3PO_Settings The settings singleton.
          */
     public static function instance($plugin_name=null, $plugin_pretty_name=null, $version=null, $active_post_type_names_callback=null)
@@ -139,7 +139,7 @@ class O3PO_Settings extends O3PO_Singleton {
         /**
          * Check whether this settings singleton has already been configured or not.
          *
-         * @since 0.3.1+
+         * @since  0.4.0
          * @access public
          * @return boolean Whether this settings singleton has already been configured or not.
          */
@@ -151,9 +151,9 @@ class O3PO_Settings extends O3PO_Singleton {
         /**
          * Get the value of a field by id.
          *
-         * @since    0.3.1+
-         * @acceess  prublic
-         * @param    int    $id     Id of the field.
+         * @since   0.4.0
+         * @acceess prublic
+         * @param   int     $id Id of the field.
          */
     public function get_field_value( $id ) {
 
@@ -253,7 +253,7 @@ class O3PO_Settings extends O3PO_Singleton {
         /**
          * Specifies plugin wide settings sections and fields.
          *
-         * @since 0.3.1+
+         * @since  0.3.1+
          * @access private
          */
     private function specify_sections_and_fields() {
@@ -685,8 +685,8 @@ class O3PO_Settings extends O3PO_Singleton {
         /**
          * Render the setting for the publisher street and number.
          *
-         * @since    0.3.1+
-         * @access   public
+         * @since  0.3.1+
+         * @access public
          */
     public function render_publisher_street_and_number_setting() {
 
@@ -699,8 +699,8 @@ class O3PO_Settings extends O3PO_Singleton {
         /**
          * Render the setting for the publisher zip code and city.
          *
-         * @since    0.3.1+
-         * @access   public
+         * @since  0.3.1+
+         * @access public
          */
     public function render_publisher_zip_code_and_city_setting() {
 
@@ -713,8 +713,8 @@ class O3PO_Settings extends O3PO_Singleton {
         /**
          * Render the setting for the publisher phone.
          *
-         * @since    0.3.1+
-         * @access   public
+         * @since  0.4.0
+         * @access public
          */
     public function render_publisher_phone_setting() {
 
@@ -973,8 +973,8 @@ class O3PO_Settings extends O3PO_Singleton {
         /**
          * Render the setting for the crossmark policy page.
          *
-         * @since    0.3.1+
-         * @access   public
+         * @since  0.4.0
+         * @access public
          */
     public function render_crossref_crossmark_policy_page_doi_setting() {
 
@@ -1445,10 +1445,10 @@ class O3PO_Settings extends O3PO_Singleton {
         /**
          * Validate settings.
          *
-         * @since    0.3.1+
-         * @access   public
-         * @param    array    $input    Array of all given input values to validate with ids as keys.
-         * @return array Array of validated inputs.
+         * @since  0.4.0
+         * @access public
+         * @param  array  $input Array of all given input values to validate with ids as keys.
+         * @return array  Array of validated inputs.
          */
     public function validate_input( $input ) {
 
@@ -1512,7 +1512,7 @@ class O3PO_Settings extends O3PO_Singleton {
 /**
  * Interface for classes specifying settings.
  *
- * @since      0.3.1+
+ * @since      0.4.0
  * @package    O3PO
  * @subpackage O3PO/includes
  * @author     Christian Gogolin <o3po@quantum-journal.org>

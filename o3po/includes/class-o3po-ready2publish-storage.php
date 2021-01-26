@@ -4,7 +4,7 @@
  * Trait for the storage of data on manuscripts ready to publish.
  *
  * @link       https://quantum-journal.org/o3po/
- * @since      0.3.1+
+ * @since      0.4.0
  *
  * @package    O3PO
  * @subpackage O3PO/includes
@@ -13,7 +13,7 @@
 /**
  * Trait for the storage of data on manuscripts ready to publish.
  *
- * @since      0.3.1+
+ * @since      0.4.0
  * @package    O3PO
  * @subpackage O3PO/includes
  * @author     Christian Gogolin <o3po@quantum-journal.org>

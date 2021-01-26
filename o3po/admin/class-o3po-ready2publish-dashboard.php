@@ -4,7 +4,7 @@
  * Class for displaying manuscripts ready to publish on the admin panel.
  *
  * @link       https://quantum-journal.org/o3po/
- * @since      0.3.1+
+ * @since      0.4.0
  *
  * @package    O3PO
  * @subpackage O3PO/includes
@@ -508,7 +508,7 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
          * Adds the meta box for ready2publish dashboard functionality
          * on the publication type edit page.
          *
-         * @since    0.3.1+
+         * @since    0.4.0
          * @access   public
          */
     public final function add_metabox() {
@@ -527,7 +527,7 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
         /**
          * Render the meta box.
          *
-         * @since    0.3.1+
+         * @since    0.4.0
          * @access   public
          * @param    WP_Post     $post   The post for which to render the metabox.
          * */
@@ -556,6 +556,7 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
             $out .= '<a class="button-secondary" type="button" target="_blank" href="/' . 'ready2publish-dashboard' . '?action=' . 'show_invoice' . '&id=' . urlencode($ready2publish_storage_id) . '">' . "Create invoice" .  '</a>';
             echo $out;
         }
+
     }
 
 }
