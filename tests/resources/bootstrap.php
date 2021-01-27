@@ -1338,3 +1338,13 @@ function trackback( $trackback_url, $title, $excerpt, $ID ) {
     #not really implemented
     return null;
 }
+
+/* function add_query_arg($arg) { */
+
+/*     #not really implemented */
+/*     if($arg != array()) */
+/*         throw(new Exception("Only implemented for arg=array()")); */
+
+/*     throw(new Exception("")); */
+/*     #return ... */
+/* } */

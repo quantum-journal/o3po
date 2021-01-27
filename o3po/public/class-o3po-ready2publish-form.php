@@ -25,8 +25,6 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-envir
  */
 class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpecifyer {
 
-        //use O3PO_Ready2PublishStorage;
-
     public static function specify_settings( $settings ) {
         $settings->specify_section('ready2publish_settings', 'Ready2Publish Form', array('O3PO_Ready2PublishForm', 'render_ready2publish_settings'), 'ready2publish_settings');
         $settings->specify_field('acceptance_codes', 'Acceptance codes currently valid', array('O3PO_Ready2PublishForm', 'render_acceptance_codes_setting' ), 'ready2publish_settings', 'ready2publish_settings', array(), array($settings, 'validate_array_as_comma_separated_list'), array('AAA'));
