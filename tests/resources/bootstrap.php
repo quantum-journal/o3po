@@ -135,6 +135,7 @@ function esc_html_filter( $text ) {
     return $text;
 }
 add_filter( 'esc_html', 'esc_html_filter' );
+#add_filter( 'clean_url', 'esc_html_filter' );
 
 
 function is_admin() {
@@ -1157,20 +1158,23 @@ function checked( $helper, $current=true, $echo=true, $type='checked' ) {
     return $result;
 }
 
-function apply_filters( $hook, $orig_text, $text=false )
+function apply_filters( $hook, $value )
 {
     global $filters;
+    $args = func_get_args();
 
-    if($text === false)
-        $text = $orig_text;
+    #echo "apply_filters:" . $hook . " " . $value . " " . json_encode($args);
 
     if(!empty($filters[$hook]))
     {
         foreach($filters[$hook] as $callable)
-            $text = call_user_func($callable, $text);
+            if(!empty($args))
+                $value = call_user_func($callable, $value, $args);
+            else
+                $value = call_user_func($callable, $value);
     }
 
-    return $text;
+    return $value;
 }
 
 /**

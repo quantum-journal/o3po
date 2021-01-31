@@ -282,10 +282,10 @@ abstract class O3PO_PublicForm {
          * @params   bool            $bool                Whether or not to parse the request.
          * @params   WP              $wp                  Current WordPress environment instance.
          */
-    public function do_parse_request( $bool, $wp ) {
+    public function do_parse_request( $bool, $wp, $do_not_exit=False ) {
 
         $home_path = parse_url(home_url(), PHP_URL_PATH);
-        $path = trim(preg_replace("#^/?{$home_path}/#", '/', esc_url(add_query_arg(array()))), '/' );
+        $path = trim(preg_replace("#^/?{$home_path}/#", '/', add_query_arg(array())), '/' );
 
         if($path !== $this->slug)
             return $bool;
@@ -309,7 +309,8 @@ abstract class O3PO_PublicForm {
             require_once $template;
         }
 
-        exit();
+        if(!$do_not_exit)
+            exit(); // @codeCoverageIgnore
     }
 
 
@@ -653,7 +654,7 @@ abstract class O3PO_PublicForm {
         echo "<p>Please verify that the following information is correct before submitting.</p>";
         foreach($this->sections as $section_id => $section_options)
         {
-            echo '<h3 id="' . esc_attr($section_id) . '">' . esc_html($section_options['title']) . '</h3>';
+            echo '<h3 id="' . esc_attr($section_id) . '_summary">' . esc_html($section_options['title']) . '</h3>';
             if($section_options['summary_callback'] !== null)
             {
                 echo call_user_func($section_options['summary_callback']);
