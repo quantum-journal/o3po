@@ -1435,6 +1435,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                                 $current_affiliation = O3PO_Latex::expand_latex_macros($new_author_latex_macro_definitions, $current_affiliation);
                                 $current_affiliation = O3PO_Latex::latex_to_utf8_outside_math_mode($current_affiliation);
                                 $current_affiliation = O3PO_Latex::normalize_whitespace_and_linebreak_characters($current_affiliation);
+                                $current_affiliation = O3PO_Latex::remove_font_changing_commands($current_affiliation);
 
                                 if( $author_info[1][$x] === 'affiliation' or $author_info[1][$x] === 'address' )
                                 {

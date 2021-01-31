@@ -23,7 +23,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-utili
 class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
 {
         /**
-         * Convert LaTeX code to utf8, leaving along everything within math mode.
+         * Convert LaTeX code to utf8, leaving alone everything within math mode.
          *
          * Does not attempt to deal with commands that cannot be reasonably represented in utf8, such as \small, \newblock, \emph, ...
          *
@@ -1602,6 +1602,18 @@ class O3PO_Latex_Dictionary_Provider
          * @param  string $text LaTeX text to remove font commands from.
          */
     static public function remove_font_changing_commands( $text ) {
+        $str_replacements = array(
+                '\\tiny' => '',
+                '\\scriptsize' => '',
+                '\\footnotesize' => '',
+                '\\small' => '',
+                '\\normalsize' => '',
+                '\\large' => '',
+                '\\Large' => '',
+                '\\LARGE' => '',
+                '\\huge' => '',
+                '\\Huge' => '',
+                                      );
         $preg_replacements = array(
             '\\\\(bf|tt|sf|sl)(series|family)(?![a-zA-Z])' => '',
             '\\\\text(em|it|bf|tt|rm|sl|sc)(?![a-zA-Z])' => '',
@@ -1613,6 +1625,10 @@ class O3PO_Latex_Dictionary_Provider
             '\\\\font (plus|minus)(?![a-zA-Z])' => '',
             '\\\\font(?![a-zA-Z])' => '',
                                    );
+        foreach ($str_replacements as $target => $substitute) {
+            if( mb_strpos($text, '\\') === false ) break;
+            $text = str_replace($target, $substitute, $text);
+        }
         foreach ($preg_replacements as $target => $substitute) {
             if( mb_strpos($text, '\\') === false ) break;
             $text = preg_replace('#'.$target.'#u', $substitute, $text);
