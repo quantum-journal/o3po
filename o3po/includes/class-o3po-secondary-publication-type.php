@@ -158,7 +158,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 
         $new_reviewers_summary = isset( $_POST[ $post_type . '_reviewers_summary' ] ) ? $_POST[ $post_type . '_reviewers_summary' ] : '';
 
-		$new_number_reviewers = isset( $_POST[ $post_type . '_number_reviewers' ] ) ? sanitize_text_field( $_POST[ $post_type . '_number_reviewers' ] ) : '';
+		$new_number_reviewers = isset( $_POST[ $post_type . '_number_reviewers' ] ) ? intval(sanitize_text_field( $_POST[ $post_type . '_number_reviewers' ] )) : '';
 
         $new_reviewer_given_names[] = array();
         $new_reviewer_surnames[] = array();

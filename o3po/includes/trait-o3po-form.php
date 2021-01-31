@@ -508,7 +508,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
             $this->add_error($id, 'url-validated', "The URL '" . $input . "' given in '" . $this->fields[$id]['title'] . "' was malformed. Field reset.", 'error');
             return $this->get_field_default($id);
         }
-        elseif($url !== $input)
+        elseif($url !== $input_trimmed)
         {
             $this->add_error($id, 'url-validated', "The URL '" . $input . "' given in '" . $this->fields[$id]['title'] . "' was malformed or contained special or illegal characters, which were removed or escaped. Please check.", 'updated');
             return $url;

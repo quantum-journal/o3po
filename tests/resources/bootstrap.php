@@ -135,7 +135,6 @@ function esc_html_filter( $text ) {
     return $text;
 }
 add_filter( 'esc_html', 'esc_html_filter' );
-#add_filter( 'clean_url', 'esc_html_filter' );
 
 
 function is_admin() {
@@ -1162,8 +1161,6 @@ function apply_filters( $hook, $value )
 {
     global $filters;
     $args = func_get_args();
-
-    #echo "apply_filters:" . $hook . " " . $value . " " . json_encode($args);
 
     if(!empty($filters[$hook]))
     {

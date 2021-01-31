@@ -242,8 +242,8 @@ class O3PO_SettingsTest extends O3PO_TestCase
             ['https://doaj.org/api/v1/docs#!/CRUD_Articles/post_api_v1_articles', 'https://doaj.org/api/v1/docs#!/CRUD_Articles/post_api_v1_articles'],
             ['https://codex.wordpress.org/Function_Reference/get_post_thumbnail_id', 'https://codex.wordpress.org/Function_Reference/get_post_thumbnail_id'],
             ['ftp://fo.bar', 'ftp://fo.bar'], #in the fake wordpress environment of the test system esc_url and esc_url_raw currently have no effect, so this validation doesn't really work during unit tests
-            ['  https://foo.de  ', 'https://foo.de'],
-            ['foo.de', $settings->get_field_default('license_url')],
+            ['  https://foo.au  ', 'https://foo.au'],
+            ['foo.us', 'http://foo.us'],
             ['/path/', $settings->get_field_default('license_url')],
                 ];
     }

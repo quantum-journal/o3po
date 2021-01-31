@@ -488,7 +488,7 @@ abstract class O3PO_PublicationType {
 
         $new_title = isset( $_POST[ $post_type . '_title' ] ) ? $_POST[ $post_type . '_title' ] : '';
         $new_title_mathml = isset( $_POST[ $post_type . '_title_mathml' ] ) ? $_POST[ $post_type . '_title_mathml' ] : '';
-        $new_number_authors = isset( $_POST[ $post_type . '_number_authors' ] ) ? sanitize_text_field( $_POST[ $post_type . '_number_authors' ] ) : '';
+        $new_number_authors = isset( $_POST[ $post_type . '_number_authors' ] ) ? intval(sanitize_text_field( $_POST[ $post_type . '_number_authors' ] )) : '';
         for ($x = 0; $x < $new_number_authors; $x++) {
             $new_author_given_names[] = isset( $_POST[ $post_type . '_author_given_names' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_given_names' ][$x] ) : '';
             $new_author_surnames[] = isset( $_POST[ $post_type . '_author_surnames' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_surnames' ][$x] ) : '';
@@ -499,7 +499,7 @@ abstract class O3PO_PublicationType {
             $new_author_orcids[] = isset( $_POST[ $post_type . '_author_orcids' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_orcids' ][$x] ) : '';
             $new_author_urls[] = isset( $_POST[ $post_type . '_author_urls' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_urls' ][$x] ) : '';
         }
-        $new_number_affiliations = isset( $_POST[ $post_type . '_number_affiliations' ] ) ? sanitize_text_field( $_POST[ $post_type . '_number_affiliations' ] ) : '';
+        $new_number_affiliations = isset( $_POST[ $post_type . '_number_affiliations' ] ) ? intval(sanitize_text_field( $_POST[ $post_type . '_number_affiliations' ] )) : '';
         $new_affiliations = array();
         for ($x = 0; $x < $new_number_affiliations; $x++) {
              $new_affiliations[] = isset( $_POST[ $post_type . '_affiliations' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_affiliations' ][$x] ) : '';

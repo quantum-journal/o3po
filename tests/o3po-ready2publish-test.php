@@ -56,8 +56,6 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
 
         # fake request uri for add_query_arg() called in do_parse_request()
         $_SERVER['REQUEST_URI'] = parse_url(home_url(), PHP_URL_PATH) . $settings->get_field_value("ready2publish_slug");
-        # needed to make setup_query() work
-        #add_filter('the_posts', array($this, 'add_zero_element') );
 
         #ob_start();
         $form->do_parse_request(True, Null, True);
@@ -69,15 +67,5 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
         echo "Output:" . json_encode($content);
 
         $this->assertValidHTMLFragment($content);
-    }
-
-    static function add_zero_element($in) {
-
-        echo "in:" . json_encode(array($in));
-
-        $out = array($in);
-        $out[0] = "zero_element";
-
-        return $out;
     }
 }
