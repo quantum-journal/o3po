@@ -73,7 +73,7 @@ trait O3PO_Form {
          *
          * Keeps a record of all sections in $this->sections.
          *
-         * @since  0.3.1+
+         * @since  0.4.0
          * @access private
          * @param  string   $id       Slug-name to identify the page.
          * @param  string   $title    Formatted title of the section. Shown as the heading for the section.

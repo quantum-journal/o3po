@@ -253,7 +253,7 @@ class O3PO_Settings extends O3PO_Singleton {
         /**
          * Specifies plugin wide settings sections and fields.
          *
-         * @since  0.3.1+
+         * @since  0.4.0
          * @access private
          */
     private function specify_sections_and_fields() {
@@ -685,7 +685,7 @@ class O3PO_Settings extends O3PO_Singleton {
         /**
          * Render the setting for the publisher street and number.
          *
-         * @since  0.3.1+
+         * @since  0.4.0
          * @access public
          */
     public function render_publisher_street_and_number_setting() {
@@ -699,7 +699,7 @@ class O3PO_Settings extends O3PO_Singleton {
         /**
          * Render the setting for the publisher zip code and city.
          *
-         * @since  0.3.1+
+         * @since  0.4.0
          * @access public
          */
     public function render_publisher_zip_code_and_city_setting() {
