@@ -29,7 +29,7 @@ run-tests: test
 test: test-.
 
 test-%: $(shell find . -type f -name '*.php') setsttysizenonzero
-	$(PHPUNITCOMMAND) --verbose --debug --coverage-clover=coverage.xml --coverage-html=coverage-html --whitelist $(SRC) --bootstrap tests/resources/bootstrap.php --test-suffix 'test.php' tests/$(subst test-,,$@)
+	$(PHPUNITCOMMAND) --verbose --coverage-clover=coverage.xml --coverage-html=coverage-html --whitelist $(SRC) --bootstrap tests/resources/bootstrap.php --test-suffix 'test.php' tests/$(subst test-,,$@)
 
 setsttysizenonzero:
 	@if [ "$(shell stty size)" = "0 0" ]; then stty cols 80; fi
