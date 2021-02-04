@@ -161,8 +161,8 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
          *
          * @since    0.4.0
          * @access   public
-         * @params   int    $id                The id of the manuscript
-         * @params   string $action            The action appropriate for this entry, e.g., 'continue' or 'publish'
+         * @param   int    $id                The id of the manuscript
+         * @param   string $action            The action appropriate for this entry, e.g., 'continue' or 'publish'
          */
     public function render_manuscript_entry( $id, $action ) {
 
@@ -237,7 +237,7 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
          *
          * @since    0.4.0
          * @access   public
-         * @params   int    $id                The id of the manuscript
+         * @param   int    $id                The id of the manuscript
          */
     public function insert_post( $id ) {
 
@@ -298,7 +298,7 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
          *
          * @since    0.4.0
          * @access   public
-         * @params   int    $id                The id of the manuscript
+         * @param   int    $id                The id of the manuscript
          */
     public function insert_and_display_post( $id ) {
 
@@ -312,7 +312,7 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
          *
          * @since    0.4.0
          * @access   public
-         * @params   int    $post_id                The post_id of the post to display
+         * @param   int    $post_id                The post_id of the post to display
          */
     public function display_post( $post_id ) {
 
@@ -345,9 +345,9 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
          *
          * @since    0.4.0
          * @access   public
-         * @params   bool            $bool                Whether or not to parse the request.
-         * @params   WP              $wp                  Current WordPress environment instance.
-         * @params   array|string    $extra_query_vars    Extra passed query variables.
+         * @param   bool            $bool                Whether or not to parse the request.
+         * @param   WP              $wp                  Current WordPress environment instance.
+         * @param   array|string    $extra_query_vars    Extra passed query variables.
          */
     public function do_parse_request( $bool, $wp, $extra_query_vars ) {
 
