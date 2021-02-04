@@ -671,8 +671,8 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
             // In the long run the papers in the queue will be displayed
             // on the admin page and publishing can be directly initiated
             // from there.
-        $to = ($this->environment->is_test_environment() ? $settings->get_field_value('developer_email') : "publish@quantum-journal.org" );
-        $subject  = "TEST - DO NOT PUBLISH: " . $this->get_field_value('title') . " was submitted for publication";
+        $to = ($this->environment->is_test_environment() ? $settings->get_field_value('developer_email') : 'publish@quantum-journal.org');
+        $subject  = $this->get_field_value('title') . " was submitted for publication";
         $message = "The following manuscript was submitted for publication and you can publish it from the <a href=" . get_site_url(null, '/wp-admin/index.php', 'admin') . ">Wordpress Dashboard</a>:" . "\n\n" . $summary;
 
         $successfully_sent = wp_mail( $to, $subject, $message, $headers, $attachment);
@@ -682,8 +682,8 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         {
             if($this->get_field_value('payment_method') === 'invoice')
             {
-                $to = 'invoice@quantum-journal.org';
-                $subject  = "TEST - DO NOT ISSUE INVOICE: Invoice request for " . esc_html($this->get_field_value('eprint'));
+                $to = ($this->environment->is_test_environment() ? $settings->get_field_value('developer_email') : 'invoice@quantum-journal.org');
+                $subject  = "Invoice request for " . esc_html($this->get_field_value('eprint'));
                 $message = "";
                 $message .= "<p>An Invoice was requested for <a href=\"https://arxiv.org/abs/" . esc_attr($this->get_field_value('eprint')) . "\" >https://arxiv.org/abs/" . esc_html($this->get_field_value('eprint')) . "</a>:</p>";
                 $message .= "<p>" . esc_html($this->get_field_value('corresponding_author_email')) . "</p>";
@@ -700,7 +700,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         if($successfully_sent)
         {
             $to = $this->get_field_value('corresponding_author_email');
-            $subject  = "TEST - THIS WILL NOT BE PUBLISHED: Manuscript " . $this->get_field_value('eprint') . " received for publication";
+            $subject  = "Manuscript " . $this->get_field_value('eprint') . " received for publication";
             $message = "<p>Dear author,<br />\n<br />\nWe confirm having received your manuscript \"" . $this->get_field_value('title') . "\" for publication.</p>\n";
             if($this->get_field_value('payment_method') === 'waiver')
             {
