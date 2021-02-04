@@ -25,17 +25,78 @@ abstract class O3PO_PublicForm {
 
     use O3PO_Form;
 
+        /**
+         * Errors identified in the form
+         *
+         * @since    0.4.0
+         * @access   private
+         * @var      array   $errors Array of errors.
+         */
     private $errors = array();
 
+        /**
+         * Field values of the form.
+         *
+         * @since    0.4.0
+         * @access   private
+         * @var      array   $field_values Array of field values.
+         */
     private $field_values = array();
 
+        /**
+         * Title
+         *
+         * @since    0.4.0
+         * @access   private
+         * @var      string   $title Title of the form.
+         */
     private $title;
 
+        /**
+         * The page id of the page the user is coming from
+         *
+         * @since    0.4.0
+         * @access   private
+         * @var      int     $coming_from_page Page id.
+         */
     protected $coming_from_page = false;
+
+        /**
+         * Page to display
+         *
+         * @since    0.4.0
+         * @access   private
+         * @var      int     $page_to_display Id of page to display.
+         */
     private $page_to_display = false;
+
+        /**
+         * Value of the navigation
+         *
+         * @since    0.4.0
+         * @access   private
+         * @var      string   $navigation One of 'Next', 'Back', 'Submit', or 'Upload'
+         */
     private $navigation = false;
+
+        /**
+         * Whether the form was submitted successfully
+         *
+         * @since    0.4.0
+         * @access   private
+         * @var      boolean   $submitted_successfully Whether the form was submitted successfully.
+         */
     private $submitted_successfully = false;
 
+        /**
+         * Read all form values from $_POST and process.
+         *
+         * @since  0.4.0
+         * @access public
+         * @param  string $plugin_name The name of the plugin.
+         * @param  string $slug        The slug of the form.
+         * @param  string $title       The title of the form.
+         */
     public function __construct( $plugin_name, $slug, $title ) {
 
         $this->plugin_name = $plugin_name;
@@ -79,7 +140,7 @@ abstract class O3PO_PublicForm {
         if($this->session_id == false)
             return;
 
-        if(isset($_POST['navigation']) and in_array(wp_unslash($_POST['navigation']), ['Next', 'Back', 'Submit', 'Upload' ]))
+        if(isset($_POST['navigation']) and in_array(wp_unslash($_POST['navigation']), ['Next', 'Back', 'Submit', 'Upload']))
             $this->navigation = wp_unslash($_POST['navigation']);
         else
             $this->navigation = false;
@@ -170,6 +231,12 @@ abstract class O3PO_PublicForm {
     }
 
 
+        /**
+         * Handle the form data and render the form
+         *
+         * @since  0.4.0
+         * @access public
+         */
     public function handle_form_data_and_produce_content() {
 
         if($this->session_id == false)
@@ -238,11 +305,29 @@ abstract class O3PO_PublicForm {
     }
 
 
+        /**
+         * The message to show after submission
+         *
+         * @since  0.4.0
+         * @access public
+         * @return string Message to display.
+         * @param  boolean $submitted_successfully Whether the form was submitted successfully.
+         */
     public function submitted_message( $submitted_successfully ) {
 
         return 'Thank you! Your request has been submitted.';
     }
 
+
+        /**
+         * Render the form navigation
+         *
+         * @since  0.4.0
+         * @access public
+         * @param  int $previous_page_id Id of the previous page
+         * @param  int $page_id          Id of this page
+         * @param  int $next_page_id     Id of the next page
+         */
     public function render_navigation( $previous_page_id, $page_id, $next_page_id ) {
         echo('<div display="none">');
         echo('<input type="hidden" name="coming_from_page" value="' . $page_id . '">');
@@ -277,11 +362,12 @@ abstract class O3PO_PublicForm {
          *
          * Processes form input and displays the form.
          *
-         * @since    0.4.0
-         * @access   public
-         * @params   bool            $bool                Whether or not to parse the request.
-         * @params   WP              $wp                  Current WordPress environment instance.
-         */
+         * @since   0.4.0
+         * @access  public
+         * @param   bool   $bool        Whether or not to parse the request.
+         * @param   WP     $wp          Current WordPress environment instance.
+         * @param   bool   $do_not_exit Whether to exit after parsing the request. Can be set to false for testing only.
+         * */
     public function do_parse_request( $bool, $wp, $do_not_exit=False ) {
 
         $home_path = parse_url(home_url(), PHP_URL_PATH);
@@ -314,6 +400,14 @@ abstract class O3PO_PublicForm {
     }
 
 
+        /**
+         * Make a fake post to show the form
+         *
+         * @since  0.4.0
+         * @access public
+         * @param  string $title   Title of the post
+         * @param  string $content Content of the post
+         */
     private function make_post( $title, $content ) {
         $post = new WP_Post((object) array(
             'ID'             => 0,
@@ -341,6 +435,14 @@ abstract class O3PO_PublicForm {
         return $post;
     }
 
+
+        /**
+         * Setup the query to show a post
+         *
+         * @since  0.4.0
+         * @access public
+         * @param  WP_Post $wp_post Post to show.
+         */
     private function setup_query( $wp_post ) {
 
         global $wp_query;
@@ -362,6 +464,16 @@ abstract class O3PO_PublicForm {
         $GLOBALS['post']          = $post;
     }
 
+        /**
+         * Add an error or warning to the list of errors
+         *
+         * @since  0.4.0
+         * @access public
+         * @param  string   $setting Setting that produced the error.
+         * @param  string   $code    Error code.
+         * @param  string   $message Error message
+         * @param  string   $type    Type of error, one of 'error' or 'warning'.
+         */
     protected function add_error( $setting, $code, $message, $type='error' ) {
         $this->errors[] = array('setting' => $setting,
                                 'id' => $setting,
@@ -390,6 +502,15 @@ abstract class O3PO_PublicForm {
             return $this->field_values[$id];
     }
 
+
+        /**
+         * Sanitize user input
+         *
+         * @since  0.4.0
+         * @access public
+         * @param  string $input The input to sanitize.
+         * @return string Sanitized input
+         */
     public function sanitize_user_input( $input ) {
 
         if(is_array($input))
@@ -408,7 +529,13 @@ abstract class O3PO_PublicForm {
         }
     }
 
-
+        /**
+         * Generate a unique session id
+         *
+         * @since  0.4.0
+         * @access public
+         * @return string Random hex string
+         */
     public function generate_session_id() {
 
         $id = bin2hex(random_bytes(32));
@@ -428,6 +555,10 @@ abstract class O3PO_PublicForm {
 
 
         /**
+         * Check whether an id is a valid session id
+         *
+         * @since  0.4.0
+         * @param  int   $id Id to validate
          * @return mixed Session id or False if invalid.
          */
     public function validate_session_id( $id ) {
@@ -439,7 +570,12 @@ abstract class O3PO_PublicForm {
             return false;
     }
 
-
+        /**
+         * Discard a session and all its data
+         *
+         * @since  0.4.0
+         * @param  int   $session_id Id to discard
+         */
     private function discard_session( $session_id ) {
 
         $class_options = $this->get_class_option();
@@ -448,6 +584,12 @@ abstract class O3PO_PublicForm {
         $this->update_class_option($class_options);
     }
 
+        /**
+         * Renew a session and all its data
+         *
+         * @since  0.4.0
+         * @param  int   $session_id Id to renew
+         */
     private function renew_session_id( $session_id ) {
 
         $class_options = $this->get_class_option();
@@ -455,7 +597,13 @@ abstract class O3PO_PublicForm {
         $this->update_class_option($class_options);
     }
 
-
+        /**
+         * Get all recent session ids
+         *
+         * @since  0.4.0
+         * @param  int   $dicard_older_than Discard all session ids older than this many seconds
+         * @return array Recent session ids
+         */
     private function get_session_ids( $dicard_older_than=24*60*60 ) {
 
         $class_options = $this->get_class_option();
@@ -476,15 +624,34 @@ abstract class O3PO_PublicForm {
             return array();
     }
 
+        /**
+         * Get the option element used by this class
+         *
+         * @since  0.4.0
+         * @return array Class option
+         */
     private function get_class_option() {
         return get_option($this->plugin_name . '-' . $this->slug, array());
     }
 
+        /**
+         * Set the option element used by this class
+         *
+         * @since  0.4.0
+         * @param  array Class option
+         */
     private function update_class_option( $class_options ) {
         update_option($this->plugin_name . '-' . $this->slug, $class_options);
     }
 
-
+        /**
+         * Set field in the data of a session
+         *
+         * @since  0.4.0
+         * @param  string $field      The field to set.
+         * @param  mixed  $value      The value to set.
+         * @param  string $session_id The session id for which to set the field.
+         */
     protected function put_session_data( $field, $value, $session_id=Null )
     {
         if($session_id === Null)
@@ -501,6 +668,14 @@ abstract class O3PO_PublicForm {
 
     }
 
+        /**
+         * Get field from the data of a session
+         *
+         * @since  0.4.0
+         * @param  string $field      The field to get.
+         * @param  mixed  $default    The default value in case the field is not set.
+         * @param   string $session_id The session id for which to get the field.
+         */
     protected function get_session_data( $field, $default=Null, $session_id=Null ) {
 
         if($session_id === Null)
@@ -514,6 +689,13 @@ abstract class O3PO_PublicForm {
     }
 
 
+        /**
+         * Append a field value pair to the current session data
+         *
+         * @since  0.4.0
+         * @param  string $field      The field to set.
+         * @param  mixed  $value      The value to set.
+         */
     protected function append_session_data( $field, $value ) {
 
         $session_data = $this->get_session_data($field, array());
@@ -523,9 +705,13 @@ abstract class O3PO_PublicForm {
     }
 
         /**
+         * Render an image upload field
          *
-         *
-         * @param    string   $label Label of the field. May contain html and is not escaped!
+         * @since  0.0.4
+         * @access public
+         * @param  string $id        Id of the field
+         * @param  string $label     Label of the field. May contain html and is not escaped!
+         * @param  bool   $esc_label Whether to escape the label
          */
     public function render_image_upload_field( $id, $label='', $esc_label=true ) {
         $file_upload_result = $this->get_session_data('file_upload_result_' . $id);
@@ -593,6 +779,13 @@ abstract class O3PO_PublicForm {
     }
 
 
+        /**
+         * Delete the sideloaded files of a session
+         *
+         * @since  0.4.0
+         * @access private
+         * @param  string  $session_id Session id.
+         */
     private function delete_sideloaded_files( $session_id )
     {
         $sideloaded_files = $this->get_session_data('sideloaded_files', array(), $session_id);
@@ -604,7 +797,14 @@ abstract class O3PO_PublicForm {
 
     }
 
-
+        /**
+         * Validate that an array of at most 1000 names
+         *
+         * @since  0.4.0
+         * @access private
+         * @param  string  $id    The id of the field whose input is validated.
+         * @param  array   $input The input.
+         */
     public function validate_array_of_at_most_1000_names( $id, $input ) {
 
         if(!is_array($input))
@@ -628,7 +828,14 @@ abstract class O3PO_PublicForm {
         return $result;
     }
 
-
+        /**
+         * Validate that an array of at most 1000 name styles
+         *
+         * @since  0.4.0
+         * @access private
+         * @param  string  $id    The id of the field whose input is validated.
+         * @param  array   $input The input.
+         */
     public function validate_array_of_at_most_1000_name_styles( $id, $input ) {
 
         if(!is_array($input))
@@ -650,6 +857,12 @@ abstract class O3PO_PublicForm {
     }
 
 
+        /**
+         * Render the form summary
+         *
+         * @since  0.4.0
+         * @access public
+         */
     public function render_summary() {
         echo "<p>Please verify that the following information is correct before submitting.</p>";
         foreach($this->sections as $section_id => $section_options)
@@ -685,7 +898,7 @@ abstract class O3PO_PublicForm {
     }
 
 
-            /**
+        /**
          * Ensure that a check box field is checked
          *
          * @sinde  0.4.0
@@ -720,6 +933,15 @@ abstract class O3PO_PublicForm {
     }
 
 
+        /**
+         * Called on form submission
+         *
+         * Must be implemented by sub classes.
+         *
+         * @since  0.4.0
+         * @access private
+         * @param  array   $attach_ids The ids of attachments created during form submission.
+         */
     abstract public function on_submit( $attach_ids );
 
 }

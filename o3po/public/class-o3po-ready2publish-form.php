@@ -25,15 +25,50 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-envir
  */
 class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpecifyer {
 
+
+        /**
+         * Specify the settings of this form
+         *
+         * @since    0.4.0
+         * @access   public
+         * @param    O3PO_Settings $settings Settings instance
+         */
     public static function specify_settings( $settings ) {
+
         $settings->specify_section('ready2publish_settings', 'Ready2Publish Form', array('O3PO_Ready2PublishForm', 'render_ready2publish_settings'), 'ready2publish_settings');
         $settings->specify_field('acceptance_codes', 'Acceptance codes currently valid', array('O3PO_Ready2PublishForm', 'render_acceptance_codes_setting' ), 'ready2publish_settings', 'ready2publish_settings', array(), array($settings, 'validate_array_as_comma_separated_list'), array('AAA'));
 
     }
 
+        /**
+         * Environment
+         *
+         * @since    0.4.0
+         * @access   private
+         * @var      O3PO_Environment   $environment Environment in which this form operates.
+         */
     private $environment;
+
+        /**
+         * Storage used by this form.
+         *
+         * @since    0.4.0
+         * @access   private
+         * @var      array   $storage Storage of the form.
+         */
     private $storage;
 
+
+        /**
+         * Construct this form
+         *
+         * @since  0.4.0
+         * @access public
+         * @param  string                    $plugin_name Name of the plugin
+         * @param  string                    $slug        Slug of this form
+         * @param  O3PO_Environment          $environment Environment in which the form operates
+         * @param  O3PO_Ready2PublishStorage $storage     Storage used by the form
+         */
     public function __construct( $plugin_name, $slug, $environment, $storage ) {
 
         parent::__construct($plugin_name, $slug, 'Submit your manuscript for publication');
