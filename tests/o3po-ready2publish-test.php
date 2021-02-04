@@ -64,7 +64,7 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
 
         $content = $wp_query->post->ID->post_content;
 
-        echo "Output:" . json_encode($content);
+        #echo "Output:" . json_encode($content);
 
         $this->assertValidHTMLFragment($content);
     }
