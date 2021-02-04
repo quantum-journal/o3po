@@ -145,11 +145,22 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         $this->specify_section('summary', '', array($this, 'render_summary'), 'summary');
     }
 
+        /**
+         * Render the eprint field
+         *
+         * @since    0.4.0
+         * @access   public
+         */
     public function render_eprint_field() {
         $this->render_single_line_field('eprint', 'e.g., 1234.56789v2', 'on', '', 'The arXiv identifier of your manuscript including the specific version you want to have published.');
     }
 
-
+        /**
+         * Render the agreement ot publish checkbox
+         *
+         * @since    0.4.0
+         * @access   public
+         */
     public function render_agree_to_publish() {
 
         $settings = O3PO_Settings::instance();
@@ -158,37 +169,72 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
 
     }
 
+        /**
+         * Render the acceptance code field
+         *
+         * @since    0.4.0
+         * @access   public
+         */
     public function render_acceptance_code() {
         echo '<div style="float:left;">';
         $this->render_single_line_field('acceptance_code', null, 'off', '', 'Please enter the acceptance code sent to you in the email from Scholastica notifying you of the acceptance of your manuscript.', true, 'display:block;');
         echo '</div>';
     }
 
+        /**
+         * Render the popular summary text box
+         *
+         * @since    0.4.0
+         * @access   public
+         */
     public function render_popular_summary() {
 
         $this->render_multi_line_field('popular_summary', 12, 'width:100%', true);
 
     }
 
+        /**
+         * Render the feature image caption text box
+         *
+         * @since    0.4.0
+         * @access   public
+         */
     public function render_featured_image_caption() {
 
         $this->render_multi_line_field('featured_image_caption', 6, 'width:100%', true);
 
     }
 
-
+        /**
+         * Render the Fermat's library checkbox
+         *
+         * @since    0.4.0
+         * @access   public
+         */
     public function render_fermats_library() {
 
         $settings = O3PO_Settings::instance();
         $this->render_checkbox_field('fermats_library', 'All authors want this paper to appear on <a href="'. esc_attr($settings->get_field_value('fermats_library_about_url')) . '" target="_blank">Fermat\'s library</a>. Fermat\'s library is a platform on which readers can leave comments in published research articles.', false);
     }
 
+        /**
+         * Render the check box to confirm the copyright
+         *
+         * @since    0.4.0
+         * @access   public
+         */
     public function render_copyright_confirmation() {
 
         $settings = O3PO_Settings::instance();
         $this->render_checkbox_field('copyright_confirmation', 'I hereby grant ' . $settings->get_field_value('journal_title') . ' the right to publish the work and all data entered into the preceding form fields, except for the corresponding author email address, under the ' . $settings->get_field_value('license_name') . ' license and certify that I either hold the necessary copyright or have obtained permission from the respective copyright owners to grant this right.', false);
     }
 
+        /**
+         * Render the featured image upload
+         *
+         * @since    0.4.0
+         * @access   public
+         */
     public function render_featured_image_upload() {
 
         $id = 'featured_image_upload';
@@ -198,9 +244,15 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
     }
 
         /**
+         * Validate the feature image upload
          *
-         * @param array $file_of_this_id Array with fields such as those
-         * of a single element of $_FILE
+         * @since  0.4.0
+         * @access public
+         * @param  string $id              Id of the image upload field
+         * @param  array  $file_of_this_id Array with fields such as those
+         *                                 of a single element of the $_FILE
+         *                                 variable
+         * @return array Various image upload information
          */
     public function validate_featured_image_upload( $id, $file_of_this_id ) {
 
@@ -240,7 +292,15 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         return $result;
     }
 
-
+        /**
+         * Validate the provided acceptance code
+         *
+         * @since  0.4.0
+         * @access public
+         * @param  string $id    Id of the field
+         * @param  string $input The input
+         * @return string The acceptance code if valid otherwise the field default value
+         */
     public function validate_acceptance_code( $id, $input ) {
 
         $input = trim($input);
@@ -260,6 +320,16 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         return $this->get_field_default($id);
     }
 
+
+        /**
+         * Validate the license and fetch and store meta-data from the arXiv
+         *
+         * @since  0.4.0
+         * @access public
+         * @param  string $id    Id of the field
+         * @param  string $input The input
+         * @return string The eprint
+         */
     public function validate_eprint_fetch_meta_data_check_license_and_store_in_session($id, $input) {
 
         if(empty(trim($input)))
@@ -311,21 +381,36 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         return $eprint;
     }
 
-
+        /**
+         * Render the title field
+         *
+         * @since    0.4.0
+         * @access   public
+         */
     public function render_title() {
 
         $this->render_multi_line_field('title', 1, 'width:100%;', true);
 
     }
 
-
+        /**
+         * Render the abstract field
+         *
+         * @since    0.4.0
+         * @access   public
+         */
     public function render_abstract() {
 
         $this->render_multi_line_field('abstract', 12, 'width:100%;', true);
 
     }
 
-
+        /**
+         * Render the author data field(s)
+         *
+         * @since    0.4.0
+         * @access   public
+         */
     public function render_author_data() {
 
         $author_first_names = $this->get_field_value('author_first_names');
@@ -393,6 +478,12 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
 
     }
 
+        /**
+         * Render the funder information field(s)
+         *
+         * @since    0.4.0
+         * @access   public
+         */
     public function render_funder_information() {
 
         $settings = O3PO_Settings::instance();
@@ -458,6 +549,12 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
 
     }
 
+        /**
+         * Render the payment amount select box
+         *
+         * @since    0.4.0
+         * @access   public
+         */
     public function render_payment_amount() {
         $this->render_select_field('payment_amount', [
                                        array('value' => '450€',
@@ -471,12 +568,24 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
                                                                       ]);
     }
 
+        /**
+         * Render the lead in text of the settings of this form
+         *
+         * @since    0.4.0
+         * @access   public
+         */
     public static function render_ready2publish_settings() {
 
         echo '<p>Configure the form for submission of accepted manuscripts ready for publication.</p>';
 
     }
 
+        /**
+         * Render the setting for valid acceptance codes
+         *
+         * @since    0.4.0
+         * @access   public
+         */
     public static function render_acceptance_codes_setting() {
 
         $settings = O3PO_Settings::instance();
@@ -484,6 +593,12 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         echo '<p>(Comma separated list of currently valid acceptance codes the user can enter to make it past the first page of the form.)</p>';
     }
 
+        /**
+         * Render the corresponding author email field
+         *
+         * @since    0.4.0
+         * @access   public
+         */
     public function render_corresponding_author_email() {
 
         echo '<div style="float:left;">';
@@ -491,6 +606,17 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         echo '</div>';
     }
 
+        /**
+         * On submit
+         *
+         * Executed on form submission. Stores the information in the storage
+         * and sends various emails.
+         *
+         * @since   0.4.0
+         * @access  public
+         * @param   array $attach_ids Id of attachments created during form submission.
+         * @return  bool Whether this step of form submission was successful.
+         */
     public function on_submit( $attach_ids ) {
 
         $settings = O3PO_Settings::instance();
@@ -604,7 +730,14 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         return $successfully_sent;
     }
 
-
+        /**
+         * Render the final message after form submission
+         *
+         * @since  0.4.0
+         * @access public
+         * @param  bool   $submitted_successfully Whether the form submission was successful.
+         * @return string The message
+         */
     public function submitted_message( $submitted_successfully ) {
         if($submitted_successfully)
         {
@@ -629,48 +762,101 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         }
     }
 
-
+        /**
+         * Render the help text of the basic manuscript data section
+         *
+         * @since    0.4.0
+         * @access   public
+         */
     public function render_basic_manuscript_data_section() {
 
         $settings = O3PO_Settings::instance();
         echo '<p>Data entered into this form remains valid for 24 hours after the last interaction unless you close your browser window. If you have questions or encounter any problems please <a href="mailto:' . esc_attr($settings->get_field_value('publisher_email')) . '">contact us</a>.</p>';
     }
 
+        /**
+         * Render the help text of the manuscript meta-data section
+         *
+         * @since    0.4.0
+         * @access   public
+         */
     public function render_manuscript_data_section() {
 
         echo '<p>The following information was fetched from the arXiv for your convenience. Please check and correct carefully. You may use standard LaTeX formulas in both title and abstract, but please remove all manual LaTeX formating commands such as \bf and do not abuse math mode to emphasize parts of your text.</p>';
     }
 
+        /**
+         * Render the help text of the dissemination material section
+         *
+         * @since    0.4.0
+         * @access   public
+         */
     public function render_dissemination_material_section() {
 
         echo '<p>Now you can add a popular summary and other supporting material to your article. These steps are optional, but they can help you reach a larger audience. Here too, you may use LaTeX formulas in the popular summary and the caption of the featured image.</p>';
     }
 
 
+        /**
+         * Render the invoice recipient field
+         *
+         * @since    0.4.0
+         * @access   public
+         */
     public function render_invoice_recipient() {
 
         $this->render_single_line_field('invoice_recipient', 'Person/Institution the invoice needs to be addressed to', 'on', 'width:100%;');
 
     }
 
+        /**
+         * Render the invoice address field
+         *
+         * @since    0.4.0
+         * @access   public
+         */
     public function render_invoice_address() {
 
         $this->render_multi_line_field('invoice_address', 6, 'width:100%;');
 
     }
 
+        /**
+         * Render the invoice recipient vat number field
+         *
+         * @since    0.4.0
+         * @access   public
+         */
     public function render_invoice_vat_number() {
         $this->render_single_line_field('invoice_vat_number', 'e.g., ATU99999999');
     }
 
+        /**
+         * Render the comments text box.
+         *
+         * @since    0.4.0
+         * @access   public
+         */
     public function render_comments() {
         $this->render_multi_line_field('comments', 6, 'width:100%;', false, 'E.g., in case you want to split the bill or you have other relevant information that did not fit into this form.');
     }
 
+        /**
+         * Render the multi media text box
+         *
+         * @since    0.4.0
+         * @access   public
+         */
     public function render_dissemination_multimedia() {
         $this->render_multi_line_field('dissemination_multimedia', 6, 'width:100%;', false, 'You may provide links to recordings of conference talks, animations, short videos, or interactive content illustrating your work. If appropriate and technically feasible these will be embedded on the page of your manuscript.');
     }
 
+        /**
+         * Render the payment method section.
+         *
+         * @since    0.4.0
+         * @access   public
+         */
     public function render_payment_method() {
         echo '<p>Quantum is a non-profit journal, supported by voluntary publication fees - for a full explanation and break-down of running costs see <a href="https://quantum-journal.org/update-on-quantums-publication-fees/">this blog post</a>. If you are able to afford the publication fee (for example through your funding agency), we thank you for your support.</p>';
 
@@ -733,7 +919,12 @@ while(nextSibling) {
 
     }
 
-
+        /**
+         * Render the summary of the funder information
+         *
+         * @since    0.4.0
+         * @access   public
+         */
     public function render_funder_information_summary() {
 
         $award_numbers = $this->get_field_value('award_numbers');
@@ -748,7 +939,12 @@ while(nextSibling) {
         return $out;
     }
 
-
+        /**
+         * Render the summary of the author data
+         *
+         * @since    0.4.0
+         * @access   public
+         */
     public function render_author_data_summary() {
 
         $author_first_names = $this->get_field_value('author_first_names');
@@ -761,7 +957,14 @@ while(nextSibling) {
         return $out;
     }
 
-
+        /**
+         * Validate the payment method input
+         *
+         * @since  0.4.0
+         * @access public
+         * @param  string $id    Id of the field
+         * @param  string $input Input
+         */
     public function one_of_invoice_noinvoice_waiver( $id, $input ) {
 
         $allowed = ["invoice", "noinvoice", "waiver"];
@@ -772,7 +975,14 @@ while(nextSibling) {
         return $this->get_field_default($id);
     }
 
-
+        /**
+         * Validate that field is non empty under certain conditions
+         *
+         * @since  0.4.0
+         * @access public
+         * @param  string $id    Id of the field
+         * @param  string $input Input
+         */
     public function non_empty_if_payment_method_is_invoice_and_on_or_past_containing_page( $id, $input ) {
 
         $input = trim(strip_tags($input));
