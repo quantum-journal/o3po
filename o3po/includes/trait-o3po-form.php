@@ -99,6 +99,8 @@ trait O3PO_Form {
          * @param  string   $title    Formatted title of the section. Shown as the heading for the section.
          * @param  callable $callback Function that echos out any content at the top of the section (between heading and fields).
          * @param  string   $page     The slug-name of the page on which to show the section.
+         * @param  callable $summary_callback Callback to call when composing
+         *                                    the summary of this form.
          */
     public function specify_section( $id, $title, $callback, $page, $summary_callback=null ) {
 
@@ -119,9 +121,7 @@ trait O3PO_Form {
          * @param  callable $callback Function that echos out any content at the top of the field (between heading and fields).
          * @param  string   $page     The slug-name of the page on which to show the field.
          * @param  string   $section     The slug-name of the section in which to show the field.
-         * @param  string   $field  The slug-name of the field of the page
-         *                           in which to show the box.
-         * @param array    $args {
+         * @param  array    $args {
          *     Extra arguments used when outputting the field. May be an empty array().
          *
          *     @type string $label_for When supplied, the label will be wrapped
@@ -135,6 +135,7 @@ trait O3PO_Form {
          *                                      and return a valid value for the field. Should
          *                                      call $this->add_error() to indicate problems.
          * @param string   $default  Default value for the field.
+         * @param  int      $max_length Maximum length of the value of the field.
          */
     public function specify_field($id, $title, $callback, $page, $section, $args, $validation_callable, $default, $max_length=false ) {
 
@@ -170,9 +171,15 @@ trait O3PO_Form {
         /**
          * Render a standard text box type field.
          *
-         * @since    0.1.0
-         * @access   public
-         * @param    string    $id   Id of the field.
+         * @since  0.4.0
+         * @access public
+         * @param  string      $id           Id of the field.
+         * @param  string|null $placeholder  Placeholder text (default is null).
+         * @param  string      $autocomplete Whether to auto complete 'or' (default) or 'off.
+         * @param  string      $style        CSS style.
+         * @param  string      $label        HTML label.
+         * @param  boolean     $esc_label    Whether to escape the content of label.
+         * @param  string      $label_style  CSS style for the label.
          */
     public function render_single_line_field( $id , $placeholder=null, $autocomplete='on', $style=false, $label=false, $esc_label=true, $label_style=false) {
 
@@ -191,9 +198,13 @@ trait O3PO_Form {
         /**
          * Render a multi line text box type field.
          *
-         * @since    0.1.0
+         * @since    0.4.0
          * @access   public
-         * @param    string    $id   Id of the field.
+         * @param    string  $id          Id of the field.
+         * @param    int     $rows        Number of rows
+         * @param    string  $style       CSS style
+         * @param    boolean $preview     Whether to show a LaTeX preview below the field.
+         * @param    string  $placeholder Placeholder
          */
     public function render_multi_line_field( $id, $rows=false, $style=false, $preview=false, $placeholder=false ) {
 
@@ -257,8 +268,16 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
 
     }
 
-
-    public function render_select_field( $id, $options, $onchange=false) {
+        /**
+         * Render a select type field.
+         *
+         * @since    0.4.0
+         * @access   public
+         * @param    string  $id       Id of the field.
+         * @param    array   $options  The options between which to select
+         * @param    string  $onchange The HTML onchange parameter
+         */
+    public function render_select_field( $id, $options, $onchange=false ) {
 
         $value = $this->get_field_value($id);
 
@@ -280,7 +299,8 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          *
          * @since    0.3.0
          * @access   public
-         * @param    string    $id   Id of the field.
+         * @param    string    $id          Id of the field.
+         * @param    string    $placeholder Placeholder text.
          */
     public function render_array_as_comma_separated_list_field( $id, $placeholder=null ) {
 

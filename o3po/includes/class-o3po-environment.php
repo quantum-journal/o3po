@@ -172,6 +172,7 @@ class O3PO_Environment {
          * @param    string    $extension         Extension of the file under which to save the download.
          * @param    string    $mime_type         Expected mime type of the download.
          * @param    int       $parent_post_id    Id of post to which to link the download.
+         * @param    int       $timeout_seconds   Timeout of the download.
          * */
     public function download_to_media_library( $url, $filename, $extension, $mime_type, $parent_post_id, $timeout_seconds = 40 ) {
 
@@ -356,6 +357,13 @@ class O3PO_Environment {
             return '';
     }
 
+        /**
+         * Maximum file size allowed in uploads
+         *
+         * @since   0.4.0
+         * @access  public
+         * @returns int Maximum file size in bytes.
+         * */
     public static function max_file_upload_bytes() {
 
         $val = ini_get('upload_max_filesize');

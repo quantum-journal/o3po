@@ -1262,7 +1262,12 @@ class O3PO_Settings extends O3PO_Singleton {
 
     }
 
-
+        /**
+         * Render the setting for the about URL of Fermat's library.
+         *
+         * @since    0.4.0
+         * @access   public
+         */
     public function render_fermats_library_about_url_setting() {
 
         $this->render_single_line_field('fermats_library_about_url');
@@ -1519,6 +1524,18 @@ class O3PO_Settings extends O3PO_Singleton {
  */
 interface O3PO_SettingsSpecifyer  {
 
+        /**
+         * Specify settings
+         *
+         * Should be overwritten by classes implementing this interface.
+         * In this function classes can specify their settings fields
+         * by calling $settings->specify_field().
+         *
+         * @since  0.4.0
+         * @access public
+         * @param  O3PO_Settings Settings object in which the fields can be
+         *                       specified.
+         */
     static function specify_settings( $settings );
 
 }

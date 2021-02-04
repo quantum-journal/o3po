@@ -212,6 +212,15 @@ class O3PO_Arxiv {
         }
     }
 
+
+        /**
+         * Check whether a url is a CC-BY license url
+         *
+         * @since  0.4.0
+         * @access public
+         * @param  string  $url Url to check
+         * @return bool    True if it is a CC-BY license
+         */
     public static function is_cc_by_license_url( $url ) {
 
         return preg_match('#creativecommons.org/licenses/(by-nc-sa|by-sa|by)/4.0/#u', $url) === 1;

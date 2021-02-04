@@ -20,6 +20,15 @@
  */
 class O3PO_Ready2PublishStorage {
 
+        /**
+         * Manuscript fields to store
+         *
+         * array of fields to store. All other fields are ignored.
+         *
+         * @since    0.4.0
+         * @access   private
+         * @var      array   Array of fields to store.
+         */
     private static $manuscript_info_fields_to_store = array(
         'eprint',
         'agree_to_publish',
@@ -49,11 +58,33 @@ class O3PO_Ready2PublishStorage {
         'time_submitted',
     );
 
-
+        /**
+         * Name of the plugin under which this storage operates
+         *
+         * @since    0.4.0
+         * @access   private
+         * @var      string   PLugin name.
+         */
     private $plugin_name;
+
+        /**
+         * Slug of the storage
+         *
+         * @since    0.4.0
+         * @access   private
+         * @var      string   Slug.
+         */
     private $slug;
 
 
+        /**
+         * Construct the storage
+         *
+         * @since    0.4.0
+         * @access   public
+         * @param    string $plugin_name The name of the plugin under which this storage runs.
+         * @param    string $slug        Slug of this storage.
+         * */
     public function __construct( $plugin_name, $slug ) {
 
         $this->plugin_name = $plugin_name;
@@ -61,8 +92,14 @@ class O3PO_Ready2PublishStorage {
 
     }
 
-
-    public function store_manuscript($manuscript_info) {
+        /**
+         * Store a manuscript
+         *
+         * @since    0.4.0
+         * @access   public
+         * @param    array $manuscript_info Information about the manuscript to store.
+         * */
+    public function store_manuscript( $manuscript_info ) {
 
         $settings = O3PO_Settings::instance();
 
@@ -115,77 +152,39 @@ class O3PO_Ready2PublishStorage {
 
     }
 
+
+        /**
+         * Get a manuscript by ID
+         *
+         * @since    0.4.0
+         * @access   public
+         * @param    int    $id ID of the manuscript to get.
+         * */
     public function get_manuscript( $id ) {
 
         return $this->get_all_manuscripts()[$id];
     }
 
-
+        /**
+         * Get all manuscripts
+         *
+         * @since    0.4.0
+         * @access   public
+         * */
     public function get_all_manuscripts() {
 
-        $test_manuscripts = ['12345' => [
-                'eprint' => '1234.00099v2',
-                'title' => 'On Foo Bar',
-                'corresponding_author_email' => "foo@bar.com",
-                'abstract' => "Some boring abstract",
-                'author_given_names' => ['Christian', 'Marcus', 'Ning'],
-                'author_surnames' => ['Gogolin', 'Huber', 'Wang'],
-                'author_name_styles' => ['western', 'western', 'eastern'],
-                'number_award_numbers' => 2,
-                'award_numbers' => array('563452431', 'ADUOIPIS'),
-                'funder_names' => array('Foo agency', 'Bar agency'),
-                'funder_identifiers' => array('563452431', ''),
-                'popular_summary' => 'A very popular summary',
-                'feature_image_attachment_id' => 3273,
-                'feature_image_caption' => 'A great featured image!',
-                'dissemination_multimedia' => 'Maybe you can embed this video?',
-                'fermats_library' => 'checked',
-                'payment_method' => 'paypal',
-                'payment_amount' => '450€',
-                'agree_to_publish' => 'checked',
-                'acceptance_code' => 'AAA',
-                'copyright_confirmation' => 'checked',
-                'invoice_recipient' => 'Foo institute',
-                'invoice_address' => 'Bar street in Baz Town 3245143',
-                'invoice_vat_number' => 'AVT324123',
-                'ready2publish_comments' => 'No comment',
-                'time_submitted' => 1610393598,
-                            ],
-                '12346' => [
-                'eprint' => '1234.1349v2',
-                'title' => 'A longer title that usual papers have it',
-                'corresponding_author_email' => "baz@gmail.com",
-                'abstract' => "This abstract is much better",
-                'author_given_names' => ['Adam', 'Eva'],
-                'author_surnames' => ['Riese', 'Zwerg'],
-                'author_name_styles' => ['western', 'western'],
-                'number_award_numbers' => 2,
-                'award_numbers' => array('563452431', 'ADUOIPIS'),
-                'funder_names' => array('Foo agency', 'Bar agency'),
-                'funder_identifiers' => array('563452431', ''),
-                'popular_summary' => 'An even more popular summary',
-                'feature_image_attachment_id' => 3273,
-                'feature_image_caption' => '',
-                'dissemination_multimedia' => '',
-                'fermats_library' => '',
-                'payment_method' => 'invoice',
-                'payment_amount' => '450€',
-                'agree_to_publish' => 'checked',
-                'acceptance_code' => 'AAA',
-                'copyright_confirmation' => 'checked',
-                'invoice_recipient' => '',
-                'invoice_address' => '',
-                'invoice_vat_number' => '',
-                'ready2publish_comments' => 'I did not get the form!!!',
-                'time_submitted' => 1610393599,
-                            ]];
-
-        $manuscripts = get_option($this->plugin_name . '-' . $this->slug, array());
-
-        #return array_merge($manuscripts, $test_manuscripts);
-        return array_merge($manuscripts);
+        return get_option($this->plugin_name . '-' . $this->slug, array());
     }
 
+        /**
+         * Find the id of the post belonging to this eprint
+         *
+         * @since  0.4.0
+         * @access public
+         * @param  string   $eprint_without_version The eprint without version.
+         * @return int|null                         The post id or null in case no post is found
+         *                                          for the eprint
+         * */
     public static function post_id_for_eprint( $eprint_without_version ) {
 
         $query = array(
@@ -206,6 +205,15 @@ class O3PO_Ready2PublishStorage {
         return null;
     }
 
+        /**
+         * Get manuscripts by post status
+         *
+         * @since  0.4.0
+         * @access public
+         * @param  string $post_status One of 'unprocessed', 'published', or 'partial'
+         * @return array  Array mapping manuscript ids to manuscript information
+         *                and the post_id if any
+         * */
     public function get_manuscripts( $post_status ) {
 
         $query = array(
