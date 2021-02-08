@@ -1388,13 +1388,19 @@ abstract class O3PO_PublicationType {
                 $xml .= '	    <fr:program name="fundref">' . "\n";
                 for ($x = 0; $x < $number_award_numbers; $x++)
                 {
-                    $xml .= '	      <fr:assertion name="fundgroup">' . "\n";
-                    $xml .= '	        <fr:assertion name="funder_name">' . esc_html($funder_names[$x]) . "\n";
-                    if(!empty($funder_identifiers[$x]))
-                        $xml .= '	          <fr:assertion name="funder_identifier">' . esc_html($funder_identifiers[$x]) .'</fr:assertion>' . "\n";
-                    $xml .= '	        </fr:assertion>' . "\n";
-                    $xml .= '	        <fr:assertion name="award_number">' . esc_html($award_numbers[$x]) .'</fr:assertion>' . "\n";
-                    $xml .= '	      </fr:assertion>' . "\n";
+                    if(!empty($award_numbers[$x]))
+                    {
+                        $xml .= '	      <fr:assertion name="fundgroup">' . "\n";
+                        if(!empty($funder_names[$x]))
+                        {
+                            $xml .= '	        <fr:assertion name="funder_name">' . esc_html($funder_names[$x]) . "\n";
+                            if(!empty($funder_identifiers[$x]))
+                                $xml .= '	          <fr:assertion name="funder_identifier">' . esc_html($funder_identifiers[$x]) .'</fr:assertion>' . "\n";
+                            $xml .= '	        </fr:assertion>' . "\n";
+                        }
+                        $xml .= '	        <fr:assertion name="award_number">' . esc_html($award_numbers[$x]) .'</fr:assertion>' . "\n";
+                        $xml .= '	      </fr:assertion>' . "\n";
+                    }
                 }
                 $xml .= '	    </fr:program>' . "\n";
             }
