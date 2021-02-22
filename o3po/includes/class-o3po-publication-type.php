@@ -1211,6 +1211,9 @@ abstract class O3PO_PublicationType {
          * This function return a string containing xml formated meta-data about the
          * given $post_id that can be uploaded to and then processed by Crossref.
          *
+         * See https://www.crossref.org/education/content-registration/crossrefs-metadata-deposit-schema/crossref-xsd-schema-quick-reference/
+         * for the documentation of the Corssref XML scheme.
+         *
          * @since    0.1.0
          * @access   public
          * @param    int       $post_id         Id of the post for which the crossref xml is to be generated.

@@ -169,6 +169,14 @@ class O3PO_Admin {
             $active_tab = key($this->meta_data_explorer_tabs);
         }
 
+        if(isset( $_GET['max_entries'] ))
+            $max_entries = $_GET['max_entries'];
+        else
+        {
+            $max_entries = -1;
+        }
+
+
         $html .= '<h2 class="nav-tab-wrapper">' . "\n";
         foreach($this->meta_data_explorer_tabs as $tab_slug => $tab_name)
             $html .= '<a href="' . esc_url('?page=' . $this->get_plugin_name() . '-meta-data-explorer' . '&amp;tab=' . $tab_slug) . '" class="nav-tab' . ($active_tab == $tab_slug ? ' nav-tab-active' : '') . '">' . esc_html($tab_name) . '</a>' . "\n";
@@ -212,20 +220,21 @@ class O3PO_Admin {
                 $html .= '<option value="' . $format . '"' . ( ($output_format === $format) ? " selected" : "" ) . '>' . $format . '</option>';
 			$html .= '</select><label for="output_format">Chose the output format</label><br />';
 
+            $html .= '<label for="' . 'max_entries' . '">Maximum number of entries (use -1 for unlimited):</label><br /><input name="max_entries" value="' . $max_entries . '">';
+
             $html .= '<label for="' . 'meta_data_field_list' . '">Comma separated list of meta-data elements to export:</label><br /><input style="width:100%;" type="text" name="' . 'meta_data_field_list" id="' . 'meta_data_field_list" placeholder="' . '' . '" value="' . implode($meta_data_field_list, ', ') . '" />';
-            $html .= '<p>The available elements are (beware that nor all of them will work for all publication types!):</p>';
+            $html .= '<p>The available elements are (beware that not all of them will work for all publication types!):</p>';
             $html .= '<ul>';
             foreach(array_keys($this->get_meta_data_field_map()) as $field)
                 $html .= '<li>' . esc_html($field) . '</li>';
             $html .= '</ul>';
             $html .= '<input id="submit" type="submit" value="Generate table"></form>';
 
-
             $out = "";
             $query = array(
                 'post_type' => $post_type,
                 'post_status' => array('publish'),
-                'posts_per_page' => -1,
+                'posts_per_page' => $max_entries,
                            );
             $my_query = new WP_Query( $query );
             if ( $my_query->have_posts() ) {
@@ -250,6 +259,22 @@ class O3PO_Admin {
                         }
                         $out = mb_substr($out, 0, -2);
                         $out .= "],\n";
+                    }
+                    elseif($output_format === 'csv')
+                    {
+                        $out .= "";
+                        foreach($meta_data_field_list as $field)
+                        {
+                            $value = call_user_func($this->get_meta_data_field_map()[$field]['callable'], $post_id);
+                            if(is_wp_error($value))
+                                $value = ''.$value->get_error_message().'';
+                            elseif($this->get_meta_data_field_map()[$field]['field_type'] === 'string')
+                                $value = str_replace('"', '""', $value);
+                                $value = '"' . $value . '"';
+                            $out .= $value . ',';
+                        }
+                        $out = mb_substr($out, 0, -1);
+                        $out .= "\n";
                     }
                     else
                     {
@@ -538,7 +563,8 @@ class O3PO_Admin {
     public function get_output_formats() {
 
         return [
-            'python'
+            'python',
+            'csv',
                 ];
     }
 

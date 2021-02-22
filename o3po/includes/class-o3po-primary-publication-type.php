@@ -1632,10 +1632,19 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
          */
     public function get_arxiv_upload_date( $post_id ) {
 
+        $post_type = get_post_type($post_id);
         $eprint = static::get_eprint($post_id);
         $arxiv_url_abs_prefix = $this->get_journal_property('arxiv_url_abs_prefix');
 
-        return O3PO_Arxiv::get_arxiv_upload_date($arxiv_url_abs_prefix, $eprint);
+        $arxiv_upload_dates = static::get_post_meta_field_containing_array( $post_id, $post_type . '_arxiv_upload_dates');
+        if(empty($arxiv_upload_dates[$eprint]))
+        {
+            $arxiv_upload_dates[$eprint] = O3PO_Arxiv::get_arxiv_upload_date($arxiv_url_abs_prefix, $eprint);
+            if(!is_wp_error($arxiv_upload_dates[$eprint]))
+                update_post_meta( $post_id, $post_type . '_arxiv_upload_dates', $arxiv_upload_dates);
+        }
+
+        return $arxiv_upload_dates[$eprint];
     }
 
 

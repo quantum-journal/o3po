@@ -195,7 +195,7 @@ class O3PO_Arxiv {
             @$dom->loadHTML($html);
             $x_path = new DOMXPath($dom);
             $date = -1;
-            $arxiv_submission_history = $x_path->query("/html/body//div[@class='submission-history']/b[last()]/following-sibling::text()");
+            $arxiv_submission_history = $x_path->query("(/html/body//div[@class='submission-history']/b[last()]/following-sibling::text() | /html/body//div[@class='submission-history']/strong[last()]/following-sibling::text())");
             foreach($arxiv_submission_history as $entry){
                 $date_info = $entry->nodeValue;
                 preg_match('#[0-9]+ [A-Z][a-z]{2} [0-9]{4} [:0-9]+ [A-Z]+ #u', $date_info, $date);
