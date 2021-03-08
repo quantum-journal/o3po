@@ -173,7 +173,7 @@ class O3PO_Admin {
             $max_entries = $_GET['max_entries'];
         else
         {
-            $max_entries = -1;
+            $max_entries = 10;
         }
 
 
