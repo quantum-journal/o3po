@@ -246,8 +246,8 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 }
                 if(!empty($citations[$n]['doi']))
                 {
-                    $citations[$n]['doi'] = preg_replace('#(http|https)://(doi\.org|dx\.doi.org)/#u', '', $citations[$n]['doi']);
-                    if(!preg_match('#10\.[0-9]{4,9}/.{1,200}#u', $citations[$n]['doi']))
+                    $citations[$n]['doi'] = preg_replace('#(http://|https://|)(doi\.org/|dx\.doi.org/)#u', '', $citations[$n]['doi']);
+                    if(!preg_match('#^10\.[0-9]{4,9}/.{1,200}$#u', $citations[$n]['doi']))
                         unset($citations[$n]['doi']);
                 }
 
@@ -500,8 +500,8 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 $citations[$n]['doi'] = static::un_escape_url($doi[1]);
             if(!empty($citations[$n]['doi']))
             {
-                $citations[$n]['doi'] = preg_replace('#(http|https)://(doi\.org|dx\.doi.org)/#u', '', $citations[$n]['doi']);
-                if(!preg_match('#10\.[0-9]{4,9}/.{1,200}#u', $citations[$n]['doi']))
+                $citations[$n]['doi'] = preg_replace('#(http://|https://|)(doi\.org/|dx\.doi.org/)#u', '', $citations[$n]['doi']);
+                if(!preg_match('#^10\.[0-9]{4,9}/.{1,200}$#u', $citations[$n]['doi']))
                     unset($citations[$n]['doi']);
             }
 
@@ -547,8 +547,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
         return $citations;
     }
 
-
-    	/**
+        /**
          * Convert utf8 text to LaTeX code.
          *
          * @since    0.1.0
