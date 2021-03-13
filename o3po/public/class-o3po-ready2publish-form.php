@@ -334,7 +334,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
 
         if(empty(trim($input)))
         {
-            $this->add_error($id, 'eprint-empty', "The arXiv identifier asked for in '" . $this->fields[$id]['title'] . "' may not be empty.", 'error');
+            $this->add_error($id, 'eprint-empty', "The arXiv identifier in '" . $this->fields[$id]['title'] . "' must not be empty.", 'error');
             return $this->get_field_default($id);
         }
 
@@ -347,18 +347,18 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         {
             $settings = O3PO_Settings::instance();
             $arxiv_url_abs_prefix = $settings->get_field_value('arxiv_url_abs_prefix');
-            $meta_data = O3PO_Arxiv::fetch_meta_data_from_abstract_page($arxiv_url_abs_prefix, $eprint);
+            $meta_data = O3PO_Arxiv::fetch_meta_data_from_abstract_page($arxiv_url_abs_prefix, $eprint, 20, False);
 
             if(!empty($meta_data['arxiv_fetch_results']) and (strpos($meta_data['arxiv_fetch_results'], 'ERROR') !== false or strpos($meta_data['arxiv_fetch_results'], 'WARNING') !== false))
             {
-                $this->add_error($id, 'arxiv-fetch-error', $meta_data['arxiv_fetch_results'] . "Are you sure the arXiv identifier is correct and the preprint already available? We could not fetch the abstract page from arxiv.org", 'error');
+                $this->add_error($id, 'arxiv-fetch-error', $meta_data['arxiv_fetch_results'] . "Are you sure the arXiv identifier is correct and the preprint already available? We could not fetch some information from the abstract page on arxiv.org. This error may also indicate that arxiv.org introduced some breaking change. If you suspect this may be the case, please let us know under " . $settings->get_field_value('publisher_email') . ". Thank you and apologies for the inconvenience!", 'error');
                 return $this->get_field_default($id);
             }
 
             $arxiv_license = $meta_data['arxiv_license'];
             if(!O3PO_Arxiv::is_cc_by_license_url($arxiv_license))
             {
-                $this->add_error($id, 'upload-error', "It seems like your manuscript " . $eprint . " is not published under one of the three creative commons licenses (CC BY 4.0, CC BY-SA 4.0, or CC BY-NC-SA 4.0) on the arXiv. Please update the arXiv version of your manuscript and choose the CC BY 4.0 license." . json_encode($meta_data), 'error');
+                $this->add_error($id, 'license-error', "It seems like your manuscript " . $eprint . " is not published under one of the creative commons licenses (CC BY 4.0, CC BY-SA 4.0, CC BY-NC-SA 4.0, or CC BY-NC-ND 4.0) on the arXiv. This is mandatory, as was communicated in the acceptance email. You will please have to upload a new version to the arXiv and choose the CC BY 4.0 license." , 'error');
                 return $this->get_field_default($id);
             }
 
@@ -592,6 +592,8 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         $settings->render_array_as_comma_separated_list_field('acceptance_codes');
         echo '<p>(Comma separated list of currently valid acceptance codes the user can enter to make it past the first page of the form.)</p>';
     }
+
+
 
         /**
          * Render the corresponding author email field

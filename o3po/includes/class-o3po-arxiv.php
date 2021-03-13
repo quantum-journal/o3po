@@ -37,9 +37,10 @@ class O3PO_Arxiv {
          * @param  string  $arxiv_url_abs_prefix The url prefix under which arXiv abstracts can be found.
          * @param  string  $eprint The eprint for which to fetch the meta-data.
          * @param  int     $timeout An optional timeout.
+         * @param  bool    $check_license Whether to fetch and check the license.
          * @return array   An array containing the extracted meta-data.
          */
-    public static function fetch_meta_data_from_abstract_page( $arxiv_url_abs_prefix, $eprint, $timeout=10 ) {
+    public static function fetch_meta_data_from_abstract_page( $arxiv_url_abs_prefix, $eprint, $timeout=10, $check_license=True ) {
 
         try
         {
@@ -96,8 +97,8 @@ class O3PO_Arxiv {
                 {
                     foreach ($arxiv_license_urls as $x => $arxiv_license_url) {
                         $arxiv_license = $arxiv_license_url->nodeValue;
-                        if(!static::is_cc_by_license_url($arxiv_license))
-                            $arxiv_fetch_results .= "ERROR: It seems like " . $arxiv_abs_page_url . " is not published under one of the three creative commons licenses (CC BY 4.0, CC BY-SA 4.0, or CC BY-NC-SA 4.0). Please inform the authors that this is mandatory and remind them that we will publish under CC BY 4.0 and that, by our terms and conditions, they grant us the right to do so.\n";
+                        if($check_license and !static::is_cc_by_license_url($arxiv_license))
+                            $arxiv_fetch_results .= "ERROR: It seems like " . $arxiv_abs_page_url . " is not published under one of the creative commons licenses (CC BY 4.0, CC BY-SA 4.0, CC BY-NC-SA 4.0, or CC BY-NC-ND 4.0). Please inform the authors that they must put the paper on the arXiv under CC BY 4.0 and remind them that we will publish under CC BY 4.0 and that, by our terms and conditions, they grant us the right to do so.\n";
                     }
                 }
                 else
@@ -223,7 +224,7 @@ class O3PO_Arxiv {
          */
     public static function is_cc_by_license_url( $url ) {
 
-        return preg_match('#creativecommons.org/licenses/(by-nc-sa|by-sa|by)/4.0/#u', $url) === 1;
+        return preg_match('#creativecommons.org/licenses/(by-nc-nd|by-nc-sa|by-sa|by)/4.0/#u', $url) === 1;
     }
 
 
