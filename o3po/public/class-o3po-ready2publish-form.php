@@ -576,7 +576,10 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
          */
     public static function render_ready2publish_settings() {
 
-        echo '<p>Configure the form for submission of accepted manuscripts ready for publication.</p>';
+        $settings = O3PO_Settings::instance();
+        $form_url = home_url() . '/' .$settings->get_field_value("ready2publish_slug");
+
+        echo '<p>This plugin provides a form through which authors can submit final versions of manuscripts for publication under <a href="' . esc_attr($form_url) . '" target="_blank">' . esc_html($form_url) . '</a>. You can configure this form here.</p>';
 
     }
 
