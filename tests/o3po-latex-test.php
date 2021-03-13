@@ -5,6 +5,32 @@ require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-latex.php';
 class O3PO_LatexTest extends O3PO_TestCase
 {
 
+    public function test_special_biblatex_bib() {
+        $path = dirname( __FILE__ ) . '/resources/arxiv/mitigation_paper_v2.bbl';
+        $content = file_get_contents($path);
+        $encoding = mb_detect_encoding($content, 'UTF-8, ISO-8859-1', true);
+        $filecontents = mb_convert_encoding($content, 'UTF-8', $encoding);
+        $bbl = $filecontents;
+        $parsed_bbl = O3PO_Latex::parse_single_bbl($bbl);
+        $this->assertEquals(count($parsed_bbl), 62);
+    }
+
+
+    public function test_firstoftwo_secondoftwo() {
+        $path = dirname( __FILE__ ) . '/resources/arxiv/mlcir010.bbl';
+        $content = file_get_contents($path);
+        $encoding = mb_detect_encoding($content, 'UTF-8, ISO-8859-1', true);
+        $filecontents = mb_convert_encoding($content, 'UTF-8', $encoding);
+        $filecontents_without_comments = preg_replace('#(?<!\\\\)%.*#u', '', $filecontents);//remove all comments
+        $bbl = $filecontents;
+        $author_latex_macro_definitions = O3PO_Latex::extract_latex_macros($filecontents_without_comments);
+        $author_latex_macro_definitions_without_specials = O3PO_Latex::remove_special_macros_to_ignore_in_bbl($author_latex_macro_definitions);
+        $bbl = O3PO_Latex::expand_latex_macros($author_latex_macro_definitions_without_specials, $bbl);
+
+        $this->assertStringNotContains($bbl, 'P.~Aliferis, D.~Gottesman'); #checks that \@firstoftwo and \@secondoftwo was expanded
+    }
+
+
 
     public function test_get_bbl_file() {
 

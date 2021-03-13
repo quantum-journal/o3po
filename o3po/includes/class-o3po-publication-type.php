@@ -316,9 +316,10 @@ abstract class O3PO_PublicationType {
          */
     public final function add_metabox() {
 
+        $settings = O3PO_Settings::instance();
         add_meta_box(
             'metadata_metabox',
-            'Metadata',
+            $settings->get_plugin_pretty_name() . ' Meta-data',
             array($this, 'render_metabox'),
             $this->get_publication_type_name(),
             'advanced',
@@ -487,18 +488,18 @@ abstract class O3PO_PublicationType {
 
         $new_title = isset( $_POST[ $post_type . '_title' ] ) ? $_POST[ $post_type . '_title' ] : '';
         $new_title_mathml = isset( $_POST[ $post_type . '_title_mathml' ] ) ? $_POST[ $post_type . '_title_mathml' ] : '';
-        $new_number_authors = isset( $_POST[ $post_type . '_number_authors' ] ) ? sanitize_text_field( $_POST[ $post_type . '_number_authors' ] ) : '';
-	for ($x = 0; $x < $new_number_authors; $x++) {
-             $new_author_given_names[] = isset( $_POST[ $post_type . '_author_given_names' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_given_names' ][$x] ) : '';
-             $new_author_surnames[] = isset( $_POST[ $post_type . '_author_surnames' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_surnames' ][$x] ) : '';
-             $new_author_name_styles[] = isset( $_POST[ $post_type . '_author_name_styles' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_name_styles' ][$x] ) : 'western';
-             $affiliation_nums = isset( $_POST[ $post_type . '_author_affiliations' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_affiliations' ][$x] ) : '';
-             $affiliation_nums = trim( preg_replace("/[^,0-9]/u", "", $affiliation_nums ), ',');
-             $new_author_affiliations[] = $affiliation_nums;
-             $new_author_orcids[] = isset( $_POST[ $post_type . '_author_orcids' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_orcids' ][$x] ) : '';
-             $new_author_urls[] = isset( $_POST[ $post_type . '_author_urls' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_urls' ][$x] ) : '';
+        $new_number_authors = isset( $_POST[ $post_type . '_number_authors' ] ) ? intval(sanitize_text_field( $_POST[ $post_type . '_number_authors' ] )) : '';
+        for ($x = 0; $x < $new_number_authors; $x++) {
+            $new_author_given_names[] = isset( $_POST[ $post_type . '_author_given_names' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_given_names' ][$x] ) : '';
+            $new_author_surnames[] = isset( $_POST[ $post_type . '_author_surnames' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_surnames' ][$x] ) : '';
+            $new_author_name_styles[] = isset( $_POST[ $post_type . '_author_name_styles' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_name_styles' ][$x] ) : 'western';
+            $affiliation_nums = isset( $_POST[ $post_type . '_author_affiliations' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_affiliations' ][$x] ) : '';
+            $affiliation_nums = trim( preg_replace("/[^,0-9]/u", "", $affiliation_nums ), ',');
+            $new_author_affiliations[] = $affiliation_nums;
+            $new_author_orcids[] = isset( $_POST[ $post_type . '_author_orcids' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_orcids' ][$x] ) : '';
+            $new_author_urls[] = isset( $_POST[ $post_type . '_author_urls' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_author_urls' ][$x] ) : '';
         }
-        $new_number_affiliations = isset( $_POST[ $post_type . '_number_affiliations' ] ) ? sanitize_text_field( $_POST[ $post_type . '_number_affiliations' ] ) : '';
+        $new_number_affiliations = isset( $_POST[ $post_type . '_number_affiliations' ] ) ? intval(sanitize_text_field( $_POST[ $post_type . '_number_affiliations' ] )) : '';
         $new_affiliations = array();
         for ($x = 0; $x < $new_number_affiliations; $x++) {
              $new_affiliations[] = isset( $_POST[ $post_type . '_affiliations' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_affiliations' ][$x] ) : '';
@@ -525,6 +526,16 @@ abstract class O3PO_PublicationType {
         $new_bbl = isset( $_POST[ $post_type . '_bbl' ] ) ? $_POST[ $post_type . '_bbl' ] : '';
         delete_transient($post_id . '_bibliography_html'); //Delete cached version of the bibliography html
 
+        $new_number_award_numbers = isset( $_POST[ $post_type . '_number_award_numbers' ] ) ? sanitize_text_field( $_POST[ $post_type . '_number_award_numbers' ] ) : 0;
+        $new_award_numbers = array();
+        $new_funder_identifiers = array();
+        $new_funder_names = array();
+        for ($x = 0; $x < $new_number_award_numbers; $x++) {
+            $new_award_numbers[] = isset( $_POST[ $post_type . '_award_numbers' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_award_numbers' ][$x] ) : '';
+            $new_funder_identifiers[] = isset( $_POST[ $post_type . '_funder_identifiers' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_funder_identifiers' ][$x] ) : '';
+            $new_funder_names[] = isset( $_POST[ $post_type . '_funder_names' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_funder_names' ][$x] ) : '';
+        }
+
         update_post_meta( $post_id, $post_type . '_title', $new_title );
 		update_post_meta( $post_id, $post_type . '_title_mathml', $new_title_mathml );
 		update_post_meta( $post_id, $post_type . '_number_authors', $new_number_authors );
@@ -546,6 +557,10 @@ abstract class O3PO_PublicationType {
         update_post_meta( $post_id, $post_type . '_bbl', $new_bbl );
         update_post_meta( $post_id, $post_type . '_buffer_email', $new_buffer_email ); #we keep using the buffer_email and buffer_email_xxx fields for compatibility, even though the new buffer.com interface does no longer send emails but uses the buffer.com api
         update_post_meta( $post_id, $post_type . '_buffer_special_text', $new_buffer_special_text );
+        update_post_meta($post_id, $post_type . '_number_award_numbers', $new_number_award_numbers);
+        update_post_meta($post_id, $post_type . '_award_numbers', $new_award_numbers);
+        update_post_meta($post_id, $post_type . '_funder_identifiers', $new_funder_identifiers);
+        update_post_meta($post_id, $post_type . '_funder_names', $new_funder_names);
 
     }
 
@@ -584,6 +599,18 @@ abstract class O3PO_PublicationType {
         $abstract = get_post_meta( $post_id, $post_type . '_abstract', true );
         $publisher = $this->get_journal_property('publisher');
 
+        $number_award_numbers = get_post_meta( $post_id, $post_type . '_number_award_numbers', true );
+        $award_numbers = get_post_meta( $post_id, $post_type . '_award_numbers', true );
+        $funder_identifiers = get_post_meta( $post_id, $post_type . '_funder_identifiers', true );
+        $funder_names = get_post_meta( $post_id, $post_type . '_funder_names', true );
+        if(empty($award_numbers))
+        {
+            $award_numbers = array();
+            $funder_identifiers = array();
+            $funder_names = array();
+            $number_award_numbers = 0;
+        }
+
             // Set the permalink
         if( !empty( $doi_suffix ) ) {
             wp_update_post( array('ID' => $post_id, 'post_name' => addslashes($doi_suffix) ));
@@ -616,7 +643,7 @@ abstract class O3PO_PublicationType {
             $validation_result .= "WARNING: The page number " . $pages . " of this " . $post_type . " is not exactly one larger than the so-far highest page number " . $highest_pages . " of all posts of type " . $post_type . ". This can be correct if you are modifying an already published post, or if there are posts scheduled for publication in the future. Please double check.\n";
         $pages_still_free_info = $this->journal->pages_still_free_info( $post_id, $pages, array($post_type) );
         if(!$pages_still_free_info['still_free'])
-            $validation_result .= "ERROR: The page number " . $pages . " is already taken by the " . $post_type . " " . $pages_still_free_info['title'] . ". This prevents assignment of a DOI as well as the downloading and parsing of the source files and pdf from the arXiv.\n";
+            $validation_result .= "ERROR: The page number " . $pages . " is already taken by the " . $post_type . " " . $pages_still_free_info['title'] . ". This may have prevented the assignment of a DOI as well as the downloading and parsing of the source files and pdf from the arXiv.\n";
 
         if ($doi_suffix_was_changed_on_last_save === "true")
             $validation_result .= "REVIEW: The doi suffix was set to ". $doi_suffix . ".\n";
@@ -704,6 +731,9 @@ abstract class O3PO_PublicationType {
             $validation_result .= "ERROR: Corresponding author email is empty.\n" ;
         else if(!O3PO_Utility::valid_email($corresponding_author_email))
             $validation_result .= "ERROR: Corresponding author email is malformed.\n" ;
+        foreach($award_numbers as $key => $award_number)
+            if(empty($award_number))
+                $validation_result .= "WARNING: Award number of award " . ($key+1) . " is empty.\n" ;
 
             // Generate Crossref xml
         $timestamp = time();
@@ -1027,6 +1057,7 @@ abstract class O3PO_PublicationType {
         $affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_affiliations');
         $author_given_names = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_given_names');
         $author_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
+        $author_name_styles = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_name_styles');
         $author_affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_affiliations');
         $journal = get_post_meta( $post_id, $post_type . '_journal', true );
         $volume = get_post_meta( $post_id, $post_type . '_volume', true );
@@ -1040,7 +1071,8 @@ abstract class O3PO_PublicationType {
         if(!empty($number_authors))
         {
             for ($x = 0; $x < $number_authors; $x++) {
-                if(!empty($author_surnames[$x])) echo '<meta name="citation_author" content="' . esc_attr($author_given_names[$x] . " " . $author_surnames[$x]) . '">'."\n";
+                $author = new O3PO_Author($author_given_names[$x], $author_surnames[$x], $author_name_styles[$x]);
+                if(!empty($author_surnames[$x])) echo '<meta name="citation_author" content="' . esc_attr($author->get_name()) . '">'."\n";
                 if ( !empty($author_affiliations) && !empty($author_affiliations[$x]) ) {
                     foreach(preg_split('/\s*,\s*/u', $author_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY) as $affiliation_num) {
                         if ( !empty($affiliations[$affiliation_num-1]) )
@@ -1179,6 +1211,9 @@ abstract class O3PO_PublicationType {
          * This function return a string containing xml formated meta-data about the
          * given $post_id that can be uploaded to and then processed by Crossref.
          *
+         * See https://www.crossref.org/education/content-registration/crossrefs-metadata-deposit-schema/crossref-xsd-schema-quick-reference/
+         * for the documentation of the Corssref XML scheme.
+         *
          * @since    0.1.0
          * @access   public
          * @param    int       $post_id         Id of the post for which the crossref xml is to be generated.
@@ -1221,9 +1256,14 @@ abstract class O3PO_PublicationType {
         $post_url = get_permalink( $post_id );
         if(empty($post_url)) return 'ERROR: Unable to generate XML for Crossref, url is empty';
         $pdf_pretty_permalink = $this->get_pdf_pretty_permalink($post_id);
+        $number_award_numbers = get_post_meta( $post_id, $post_type . '_number_award_numbers', true );
+        $award_numbers = get_post_meta( $post_id, $post_type . '_award_numbers', true );
+        $funder_identifiers = get_post_meta( $post_id, $post_type . '_funder_identifiers', true );
+        $funder_names = get_post_meta( $post_id, $post_type . '_funder_names', true );
+        $crossref_crossmark_policy_page_doi = $this->get_journal_property('crossref_crossmark_policy_page_doi');
 
         $xml  = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        $xml .= '<doi_batch version="4.4.0" xmlns="http://www.crossref.org/schema/4.4.0" xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:jats="http://www.ncbi.nlm.nih.gov/JATS1" xmlns:ai="http://www.crossref.org/AccessIndicators.xsd">' . "\n";
+        $xml .= '<doi_batch version="4.4.2" xmlns="http://www.crossref.org/schema/4.4.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.crossref.org/schema/4.4.2 http://data.crossref.org/schemas/crossref4.4.2.xsd" xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:jats="http://www.ncbi.nlm.nih.gov/JATS1" xmlns:ai="http://www.crossref.org/AccessIndicators.xsd" xmlns:fr="http://www.crossref.org/fundref.xsd">' . "\n";
         $xml .= '  <head>' . "\n";
             //a unique id for each batch
         $xml .= '    <doi_batch_id>' . $doi_batch_id . '</doi_batch_id>' . "\n";
@@ -1244,7 +1284,7 @@ abstract class O3PO_PublicationType {
         $xml .= '  </head>' . "\n";
         $xml .= '  <body>' . "\n";
         $xml .= '    <journal>' . "\n";
-        $xml .= '      <journal_metadata language="en" metadata_distribution_opts="any" reference_distribution_opts="any">' . "\n";
+        $xml .= '      <journal_metadata language="en" reference_distribution_opts="any">' . "\n";
         $xml .= '	<full_title>' . esc_html($journal) . '</full_title>' . "\n";
         $xml .= '	<abbrev_title>' . esc_html($journal) . '</abbrev_title>' . "\n";
         if(!empty($this->get_journal_property('eissn')))
@@ -1282,7 +1322,7 @@ abstract class O3PO_PublicationType {
             //$xml .= '	         <doi_data>{0,1}</doi_data>' . "\n";
         $xml .= '	     </journal_volume>' . "\n";
         $xml .= '      </journal_issue>' . "\n";
-        $xml .= '      <journal_article language="en" metadata_distribution_opts="any" publication_type="full_text" reference_distribution_opts="any">' . "\n";
+        $xml .= '      <journal_article language="en" publication_type="full_text" reference_distribution_opts="any">' . "\n";
         $xml .= '	<titles>' . "\n";
             // Minimal face markup and MathML are supported in the title
         $xml .= '	  <title>' . (!empty($title_mathml) ? $title_mathml : esc_html($title)) . '</title>' . "\n";
@@ -1333,14 +1373,48 @@ abstract class O3PO_PublicationType {
         $xml .= '	<publisher_item>' . "\n";
         $xml .= '	  <item_number item_number_type="article-number">' . $pages . '</item_number>' . "\n";
         $xml .= '	</publisher_item>' . "\n";
-            // something to consider for the future
-            // $xml .= '	<crossmark></crossmark>' . "\n";
-            // for funding information, we don't do this currently
-            // $xml .= '	<fr:program name="fundref">{0,1}</fr:program>' . "\n";
-        $xml .= '	<ai:program name="AccessIndicators">' . "\n";
-        $xml .= '	  <ai:free_to_read></ai:free_to_read>' . "\n";
-        $xml .= '	  <ai:license_ref start_date="' . $date_published . '">' . esc_html($this->get_journal_property('license_url')) . '</ai:license_ref>' . "\n";
-        $xml .= '	</ai:program>' . "\n";
+            // Now comes the Crossmark/Fundref funder information
+        if(!empty($crossref_crossmark_policy_page_doi))
+        {
+            $xml .= '	<crossmark>' . "\n";
+            $xml .= '	  <crossmark_version>1</crossmark_version>' . "\n";
+            $xml .= '	  <crossmark_policy>' . esc_html($crossref_crossmark_policy_page_doi) . '</crossmark_policy>' . "\n";
+            $xml .= '	  <crossmark_domains>' . "\n";
+            $xml .= '	    <crossmark_domain>' . "\n";
+            $xml .= '	      <domain>' . substr(get_site_url(null, '', 'https'), 8) . '</domain>' . "\n";
+            $xml .= '	    </crossmark_domain>' . "\n";
+            $xml .= '	  </crossmark_domains>' . "\n";
+            $xml .= '	  <crossmark_domain_exclusive>false</crossmark_domain_exclusive>' . "\n";
+            $xml .= '	  <custom_metadata>' . "\n";
+            if($number_award_numbers > 0)
+            {
+                $xml .= '	    <fr:program name="fundref">' . "\n";
+                for ($x = 0; $x < $number_award_numbers; $x++)
+                {
+                    if(!empty($award_numbers[$x]))
+                    {
+                        $xml .= '	      <fr:assertion name="fundgroup">' . "\n";
+                        if(!empty($funder_names[$x]))
+                        {
+                            $xml .= '	        <fr:assertion name="funder_name">' . esc_html($funder_names[$x]) . "\n";
+                            if(!empty($funder_identifiers[$x]))
+                                $xml .= '	          <fr:assertion name="funder_identifier">' . esc_html($funder_identifiers[$x]) .'</fr:assertion>' . "\n";
+                            $xml .= '	        </fr:assertion>' . "\n";
+                        }
+                        $xml .= '	        <fr:assertion name="award_number">' . esc_html($award_numbers[$x]) .'</fr:assertion>' . "\n";
+                        $xml .= '	      </fr:assertion>' . "\n";
+                    }
+                }
+                $xml .= '	    </fr:program>' . "\n";
+            }
+                // access indications
+            $xml .= '	    <ai:program name="AccessIndicators">' . "\n";
+            $xml .= '	      <ai:free_to_read></ai:free_to_read>' . "\n";
+            $xml .= '	      <ai:license_ref start_date="' . $date_published . '">' . esc_html($this->get_journal_property('license_url')) . '</ai:license_ref>' . "\n";
+            $xml .= '	    </ai:program>' . "\n";
+            $xml .= '	  </custom_metadata>' . "\n";
+            $xml .= '	</crossmark>' . "\n";
+        }
             // for clinical trials, we don't have that
             // $xml .= '	<ct:program>{0,1}</ct:program>' . "\n";
             // for relations between programs
@@ -1676,8 +1750,9 @@ abstract class O3PO_PublicationType {
         $json_array["bibjson"]["month"] = mb_substr($date_published, 5, 2);
         $json_array["bibjson"]["day"] = mb_substr($date_published, 8, 2);
         for ($x = 0; $x < $number_authors; $x++) {
+            $author = new O3PO_Author($author_given_names[$x], $author_surnames[$x], $author_name_styles[$x]);
             $author_array = array(
-                "name" => $author_given_names[$x] . ' ' . $author_surnames[$x]
+                "name" => $author->get_name()
                     /* "affiliation" => "string", */
                     /* "email" => "string", */
                                   );
@@ -1737,16 +1812,12 @@ abstract class O3PO_PublicationType {
         /**
          * Echo an intro text for the admin panel.
          *
-         * @since     0.1.0
-         * @access    protected
-         * @param     int          $post_id    Id of the post.
+         * @since  0.1.0
+         * @since  0.4.0     Not static anymore.
+         * @access protected
+         * @param  int       $post_id Id of the post.
          */
-    static protected function the_admin_panel_intro_text( $post_id ) {
-
-        $post_type = get_post_type($post_id);
-
-        echo '<p>Use the large editor field above only for additional content on the page of this ' . $post_type . ' that does not fit into the fields below.</p>';
-        echo '<p>Hint: You can drag and drop this box to appear closer to the top of the admin panel page.</p>';
+    protected function the_admin_panel_intro_text( $post_id ) {
 
     }
 
@@ -2222,6 +2293,42 @@ abstract class O3PO_PublicationType {
     }
 
         /**
+         * Echo the funder information for the admin panel.
+         *
+         * @since 0.4.0
+         * @param int   $post_id Id of the post.
+         */
+    protected static function the_admin_panel_funder_information($post_id) {
+
+        $post_type = get_post_type($post_id);
+        $number_award_numbers = get_post_meta( $post_id, $post_type . '_number_award_numbers', true );
+        if(empty($number_award_numbers))
+            $number_award_numbers = 0;
+		$award_numbers = get_post_meta( $post_id, $post_type . '_award_numbers', true );
+        $funder_names = get_post_meta( $post_id, $post_type . '_funder_names', true );
+        $funder_identifiers = get_post_meta( $post_id, $post_type . '_funder_identifiers', true );
+
+        echo '	<tr>';
+        echo '		<th><label for="' . $post_type . '_funder_information" class="' . $post_type . '_funder_information_label">' . 'Funder information' . '</label></th>';
+        echo '		<td>';
+        echo '			<input style="width:4rem" type="number" id="' . $post_type . '_number_award_numbers" name="' . $post_type . '_number_award_numbers" class="' . $post_type . '_number_award_numbers_field required" placeholder="' . '' . '" value="' . esc_attr($number_award_numbers) . '"><p>(Please put here the number of grants/awards that have a award number and contributed to the funding of this work. To update the number of entries in the list below please save the post.)</p>';
+        $something_was_displayed = false;
+        for ($x = 0; $x < $number_award_numbers; $x++)
+        {
+            $something_was_displayed = true;
+            echo '			<div style="float:left"><input type="text" name="' . $post_type . '_award_numbers[]" class="' . $post_type . '_award_numbers_field" placeholder="' . '' . '" value="' . esc_attr( isset($award_numbers[$x]) ? $award_numbers[$x] : '' ) . '" /><br /><label for="' . $post_type . '_award_numbers" class="' . $post_type . '_award_numbers_label">Award number</label></div>';
+            echo '			<div style="float:left"><input type="text" name="' . $post_type . '_funder_names[]" class="' . $post_type . '_funder_names_field" placeholder="' . '' . '" value="' . esc_attr( isset($funder_names[$x]) ? $funder_names[$x] : '' ) . '" /><br /><label for="' . $post_type . '_funder_names" class="' . $post_type . '_funder_names_label">Funder name</label></div>';
+            echo '			<div style="float:left"><input type="text" name="' . $post_type . '_funder_identifiers[]" class="' . $post_type . '_funder_identifiers_field" placeholder="' . '' . '" value="' . esc_attr( isset($funder_identifiers[$x]) ? $funder_identifiers[$x] : '' ) . '" /><br /><label for="' . $post_type . '_funder_identifiers" class="' . $post_type . '_funder_identifiers_label">Funder identifyer</label></div>';
+        }
+        if($something_was_displayed === false)
+            echo '<p>No funder information available for this manuscript.</p>';
+        echo '		</td>';
+        echo '	</tr>';
+
+    }
+
+
+        /**
          * Outputs some java script for the single page of this publication
          * type.
          *
@@ -2693,7 +2800,7 @@ abstract class O3PO_PublicationType {
         /**
          * Get the polupar summary.
          *
-         * Get the popilar summary if available. To be used in the single
+         * Get the popular summary if available. To be used in the single
          * templates.
          *
          * @since  0.3.0
@@ -2724,13 +2831,16 @@ abstract class O3PO_PublicationType {
          * @param    int    $post_id     Id of the post.
          */
     public static function get_formated_authors( $post_id ) {
+
         $post_type = get_post_type($post_id);
         $number_authors = get_post_meta( $post_id, $post_type . '_number_authors', true );
         $author_given_names = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_given_names');
         $author_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
+        $author_name_styles = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_name_styles');
         $author_names = array();
         for ($x = 0; $x < $number_authors; $x++) {
-            $author_names[] = $author_given_names[$x] . " " . $author_surnames[$x];
+            $author = new O3PO_Author($author_given_names[$x], $author_surnames[$x], $author_name_styles[$x]);
+            $author_names[] = $author->get_name();
         }
 
         return O3PO_Utility::oxford_comma_implode($author_names);
@@ -2749,9 +2859,11 @@ abstract class O3PO_PublicationType {
         $number_authors = get_post_meta( $post_id, $post_type . '_number_authors', true );
         $author_given_names = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_given_names');
         $author_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
+        $author_name_styles = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_name_styles');
         $formated_authors = "";
         for ($x = 0; $x < $number_authors; $x++) {
-            $formated_authors .= $author_surnames[$x] . ', ' . $author_given_names[$x] ;
+            $author = new O3PO_Author($author_given_names[$x], $author_surnames[$x], $author_name_styles[$x]);
+            $formated_authors .= $author->get_name_bibtex();
             if( $x < $number_authors-1) $formated_authors .= " and ";
         }
 
@@ -2790,6 +2902,7 @@ abstract class O3PO_PublicationType {
         $number_authors = get_post_meta( $post_id, $post_type . '_number_authors', true );
         $author_given_names = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_given_names');
         $author_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
+        $author_name_styles = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_name_styles');
         $author_orcids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_orcids');
         $number_affiliations = get_post_meta( $post_id, $post_type . '_number_affiliations', true );
         $author_affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_affiliations');
@@ -2806,10 +2919,11 @@ abstract class O3PO_PublicationType {
 
         $formated_authors = "";
         for ($x = 0; $x < $number_authors; $x++) {
+            $author = new O3PO_Author($author_given_names[$x], $author_surnames[$x], $author_name_styles[$x]);
 	    	if ( !empty($author_orcids[$x]) )
-                $formated_authors .= '<a href="' . $this->get_journal_property('orcid_url_prefix') . $author_orcids[$x] . '">' . $author_given_names[$x] . " " . $author_surnames[$x] . '</a>';
+                $formated_authors .= '<a href="' . $this->get_journal_property('orcid_url_prefix') . $author_orcids[$x] . '">' . $author->get_name() . '</a>';
             else
-                $formated_authors .= $author_given_names[$x] . " " . $author_surnames[$x];
+                $formated_authors .= $author->get_name();
             if ( !$all_authors_have_same_affiliation and !empty($author_affiliations[$x]) )
 		    	$formated_authors .= '<sup>' . $author_affiliations[$x] . '</sup>';
             if( $x < $number_authors-1 and $number_authors > 2) $formated_authors .= ",";

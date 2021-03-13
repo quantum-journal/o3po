@@ -4,7 +4,9 @@ require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-shortcode-templ
 
 class O3PO_ShortcodeTemplateTest extends O3PO_TestCase
 {
-
+        /**
+         * @doesNotPerformAssertions
+         */
     public function test_construct() {
 
         return new O3PO_ShortcodeTemplate('template with [shortcode]', array('[shortcode]' => array('description' => "A nice shortcode", 'example' => 'example value')));

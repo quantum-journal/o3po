@@ -4,7 +4,7 @@
  * A class to represent shortcode templates.
  *
  * @link       https://quantum-journal.org/o3po/
- * @since      0.3.1+
+ * @since      0.4.0
  *
  * @package    O3PO
  * @subpackage O3PO/includes
@@ -24,14 +24,14 @@ class O3PO_ShortcodeTemplate {
         /**
          * Array holding the shortcodes of this template
          *
-         * @since 0.3.1+
+         * @since  0.4.0
          * @access private
-         * @var array The array keys are the shortcodes, the values are arrays
-         *            with two fields: 'description' holding the description
-         *            of the shortcode and 'example' holding an exemplary value
-         *            which is representative for the values with which the
-         *            shortcode is ususally replaced. Shortcodes must be of the
-         *            format [shortcode].
+         * @var    array The array keys are the shortcodes, the values are arrays
+         *               with two fields: 'description' holding the description
+         *               of the shortcode and 'example' holding an exemplary value
+         *               which is representative for the values with which the
+         *               shortcode is ususally replaced. Shortcodes must be of the
+         *               format [shortcode].
          */
     private $shortcodes;
 
@@ -39,9 +39,9 @@ class O3PO_ShortcodeTemplate {
         /**
          * The template
          *
-         * @since 0.3.1+
+         * @since  0.4.0
          * @access private
-         * @avr string The string specifying the template.
+         * @var    string  The string specifying the template.
          */
     private $template;
 
@@ -49,10 +49,12 @@ class O3PO_ShortcodeTemplate {
         /**
          * Construct a shortcode template.
          *
-         * @since 0.3.1+
+         * @since  0.4.0
          * @access public
-         * @param string $template The template containing a subset of the shortcodes.
-         * @param array $shortcodes Array whose keys are the shortcodes inclosed in [...] and whose values are associative arrays containing a 'description' and an 'example' value for the shortcode.
+         * @param  string  $template    The template containing a subset of the shortcodes.
+         * @param  array   $shortcodes  Array whose keys are the shortcodes inclosed in [...]
+         *                              and whose values are associative arrays containing a
+         *                              'description' and an 'example' value for the shortcode.
          */
     public function __construct( $template, $shortcodes ) {
 
@@ -72,9 +74,9 @@ class O3PO_ShortcodeTemplate {
         /**
          * Get all the shortcodes
          *
-         * @since 0.3.1+
+         * @since  0.4.0
          * @access public
-         * @return array The array of all shortcodes.
+         * @return array  The array of all shortcodes.
          */
     public function get_shortcodes() {
 
@@ -84,9 +86,9 @@ class O3PO_ShortcodeTemplate {
         /**
          * Get all the descriptions
          *
-         * @since 0.3.1+
+         * @since  0.4.0
          * @access public
-         * @return array Associative array of shortcode descriptions.
+         * @return array  Associative array of shortcode descriptions.
          */
     public function get_shortcode_descriptions() {
 
@@ -100,19 +102,19 @@ class O3PO_ShortcodeTemplate {
         /**
          * Return the expanded version of the template
          *
-         * @since 0.3.1+
+         * @since  0.4.0
          * @access public
-         * @param array $replacements Array of strings with which to replace the
-         *                            shortcodes. Must be either an array of the
-         *                            same length as $shortcodes or have a subset
-         *                            of shortcodes as array keys and their
-         *                            replacements as values.
-         * @param boolean $error_if_not_all_appearing_specified Throw an exception if
-         *                                            template contains
-         *                                            shortcodes for which no
-         *                                            value was provided
-         *                                            (default true).
-         * @return string The expanded template.
+         * @param  array  $replacements                          Array of strings with which to replace the
+         *                                                       shortcodes. Must be either an array of the
+         *                                                       same length as $shortcodes or have a subset
+         *                                                       of shortcodes as array keys and their
+         *                                                       replacements as values.
+         * @param boolean $error_if_not_all_appearing_specified  Throw an exception if
+         *                                                       template contains
+         *                                                       shortcodes for which no
+         *                                                       value was provided
+         *                                                       (default true).
+         * @return string                                        The expanded template.
          */
     public function expand( $replacements, $error_if_not_all_appearing_specified=true ) {
 
@@ -144,7 +146,7 @@ class O3PO_ShortcodeTemplate {
         /**
          * Return the template with short codes replaced by their example values
          *
-         * @since 0.3.1+
+         * @since  0.4.0
          * @access public
          * @return string The expanded template based on the examples.
          */
@@ -161,7 +163,7 @@ class O3PO_ShortcodeTemplate {
         /**
          * Render a list of shortcodes as html to help users.
          *
-         * @sinde 0.3.1+
+         * @sinde  0.4.0
          * @access public
          */
     public function render_short_codes() {

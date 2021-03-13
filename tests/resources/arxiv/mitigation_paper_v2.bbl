@@ -1,0 +1,4471 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 2.8 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\sortlist[entry]{none/global/}
+  \entry{Preskill2018}{article}{}
+    \name{author}{1}{}{%
+      {{hash=PJ}{%
+         family={Preskill},
+         familyi={P\bibinitperiod},
+         given={John},
+         giveni={J\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {{Verein zur F{\"{o}}rderung des Open Access Publizierens in den
+  Quantenwissenschaften}}%
+    }
+    \strng{namehash}{PJ1}
+    \strng{fullhash}{PJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb https://doi.org/10.22331/q-2018-08-06-79
+    \endverb
+    \field{issn}{2521-327X}
+    \field{pages}{79}
+    \field{title}{Quantum {C}omputing in the {NISQ} era and beyond}
+    \field{volume}{2}
+    \field{journaltitle}{{Quantum}}
+    \field{month}{08}
+    \field{year}{2018}
+  \endentry
+
+  \entry{qiskit_ref}{misc}{}
+    \name{author}{250}{}{%
+      {{hash=AH}{%
+         family={Abraham},
+         familyi={A\bibinitperiod},
+         given={H{\'e}ctor},
+         giveni={H\bibinitperiod},
+      }}%
+      {{hash=AIY}{%
+         family={Akhalwaya},
+         familyi={A\bibinitperiod},
+         given={Ismail\bibnamedelima Yunus},
+         giveni={I\bibinitperiod\bibinitdelim Y\bibinitperiod},
+      }}%
+      {{hash=AG}{%
+         family={Aleksandrowicz},
+         familyi={A\bibinitperiod},
+         given={Gadi},
+         giveni={G\bibinitperiod},
+      }}%
+      {{hash=AT}{%
+         family={Alexander},
+         familyi={A\bibinitperiod},
+         given={Thomas},
+         giveni={T\bibinitperiod},
+      }}%
+      {{hash=AG}{%
+         family={Alexandrowics},
+         familyi={A\bibinitperiod},
+         given={Gadi},
+         giveni={G\bibinitperiod},
+      }}%
+      {{hash=AE}{%
+         family={Arbel},
+         familyi={A\bibinitperiod},
+         given={Eli},
+         giveni={E\bibinitperiod},
+      }}%
+      {{hash=AA}{%
+         family={Asfaw},
+         familyi={A\bibinitperiod},
+         given={Abraham},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=AC}{%
+         family={Azaustre},
+         familyi={A\bibinitperiod},
+         given={Carlos},
+         giveni={C\bibinitperiod},
+      }}%
+      {{hash=A}{%
+         family={AzizNgoueya},
+         familyi={A\bibinitperiod},
+      }}%
+      {{hash=BP}{%
+         family={Barkoutsos},
+         familyi={B\bibinitperiod},
+         given={Panagiotis},
+         giveni={P\bibinitperiod},
+      }}%
+      {{hash=BG}{%
+         family={Barron},
+         familyi={B\bibinitperiod},
+         given={George},
+         giveni={G\bibinitperiod},
+      }}%
+      {{hash=BL}{%
+         family={Bello},
+         familyi={B\bibinitperiod},
+         given={Luciano},
+         giveni={L\bibinitperiod},
+      }}%
+      {{hash=BHY}{%
+         family={Ben-Haim},
+         familyi={B\bibinitperiod-H\bibinitperiod},
+         given={Yael},
+         giveni={Y\bibinitperiod},
+      }}%
+      {{hash=BD}{%
+         family={Bevenius},
+         familyi={B\bibinitperiod},
+         given={Daniel},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=BLS}{%
+         family={Bishop},
+         familyi={B\bibinitperiod},
+         given={Lev\bibnamedelima S.},
+         giveni={L\bibinitperiod\bibinitdelim S\bibinitperiod},
+      }}%
+      {{hash=BS}{%
+         family={Bosch},
+         familyi={B\bibinitperiod},
+         given={Samuel},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=BS}{%
+         family={Bravyi},
+         familyi={B\bibinitperiod},
+         given={Sergey},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=BD}{%
+         family={Bucher},
+         familyi={B\bibinitperiod},
+         given={David},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=CF}{%
+         family={Cabrera},
+         familyi={C\bibinitperiod},
+         given={Fran},
+         giveni={F\bibinitperiod},
+      }}%
+      {{hash=CP}{%
+         family={Calpin},
+         familyi={C\bibinitperiod},
+         given={Padraic},
+         giveni={P\bibinitperiod},
+      }}%
+      {{hash=CL}{%
+         family={Capelluto},
+         familyi={C\bibinitperiod},
+         given={Lauren},
+         giveni={L\bibinitperiod},
+      }}%
+      {{hash=CJ}{%
+         family={Carballo},
+         familyi={C\bibinitperiod},
+         given={Jorge},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=CG}{%
+         family={Carrascal},
+         familyi={C\bibinitperiod},
+         given={Gin{\'e}s},
+         giveni={G\bibinitperiod},
+      }}%
+      {{hash=CA}{%
+         family={Chen},
+         familyi={C\bibinitperiod},
+         given={Adrian},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=CCF}{%
+         family={Chen},
+         familyi={C\bibinitperiod},
+         given={Chun-Fu},
+         giveni={C\bibinitperiod-F\bibinitperiod},
+      }}%
+      {{hash=CR}{%
+         family={Chen},
+         familyi={C\bibinitperiod},
+         given={Richard},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=CJM}{%
+         family={Chow},
+         familyi={C\bibinitperiod},
+         given={Jerry\bibnamedelima M.},
+         giveni={J\bibinitperiod\bibinitdelim M\bibinitperiod},
+      }}%
+      {{hash=CC}{%
+         family={Claus},
+         familyi={C\bibinitperiod},
+         given={Christian},
+         giveni={C\bibinitperiod},
+      }}%
+      {{hash=CC}{%
+         family={Clauss},
+         familyi={C\bibinitperiod},
+         given={Christian},
+         giveni={C\bibinitperiod},
+      }}%
+      {{hash=CAJ}{%
+         family={Cross},
+         familyi={C\bibinitperiod},
+         given={Abigail\bibnamedelima J.},
+         giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+      {{hash=CAW}{%
+         family={Cross},
+         familyi={C\bibinitperiod},
+         given={Andrew\bibnamedelima W.},
+         giveni={A\bibinitperiod\bibinitdelim W\bibinitperiod},
+      }}%
+      {{hash=CS}{%
+         family={Cross},
+         familyi={C\bibinitperiod},
+         given={Simon},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=CBJ}{%
+         family={Cruz-Benito},
+         familyi={C\bibinitperiod-B\bibinitperiod},
+         given={Juan},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=CC}{%
+         family={Culver},
+         familyi={C\bibinitperiod},
+         given={Chris},
+         giveni={C\bibinitperiod},
+      }}%
+      {{hash=CGAD}{%
+         family={C{\'o}rcoles-Gonzales},
+         familyi={C\bibinitperiod-G\bibinitperiod},
+         given={Antonio\bibnamedelima D.},
+         giveni={A\bibinitperiod\bibinitdelim D\bibinitperiod},
+      }}%
+      {{hash=DS}{%
+         family={Dague},
+         familyi={D\bibinitperiod},
+         given={Sean},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=DTE}{%
+         family={Dandachi},
+         familyi={D\bibinitperiod},
+         given={Tareq\bibnamedelima El},
+         giveni={T\bibinitperiod\bibinitdelim E\bibinitperiod},
+      }}%
+      {{hash=DM}{%
+         family={Dartiailh},
+         familyi={D\bibinitperiod},
+         given={Matthieu},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=D}{%
+         family={DavideFrr},
+         familyi={D\bibinitperiod},
+      }}%
+      {{hash=DAR}{%
+         family={Davila},
+         familyi={D\bibinitperiod},
+         given={Abd{\'o}n\bibnamedelima Rodr{\'\i}guez},
+         giveni={A\bibinitperiod\bibinitdelim R\bibinitperiod},
+      }}%
+      {{hash=DD}{%
+         family={Ding},
+         familyi={D\bibinitperiod},
+         given={Delton},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=DJ}{%
+         family={Doi},
+         familyi={D\bibinitperiod},
+         given={Jun},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=DE}{%
+         family={Drechsler},
+         familyi={D\bibinitperiod},
+         given={Eric},
+         giveni={E\bibinitperiod},
+      }}%
+      {{hash=D}{%
+         family={Drew},
+         familyi={D\bibinitperiod},
+      }}%
+      {{hash=DE}{%
+         family={Dumitrescu},
+         familyi={D\bibinitperiod},
+         given={Eugene},
+         giveni={E\bibinitperiod},
+      }}%
+      {{hash=DK}{%
+         family={Dumon},
+         familyi={D\bibinitperiod},
+         given={Karel},
+         giveni={K\bibinitperiod},
+      }}%
+      {{hash=DI}{%
+         family={Duran},
+         familyi={D\bibinitperiod},
+         given={Ivan},
+         giveni={I\bibinitperiod},
+      }}%
+      {{hash=ESK}{%
+         family={EL-Safty},
+         familyi={E\bibinitperiod-S\bibinitperiod},
+         given={Kareem},
+         giveni={K\bibinitperiod},
+      }}%
+      {{hash=EE}{%
+         family={Eastman},
+         familyi={E\bibinitperiod},
+         given={Eric},
+         giveni={E\bibinitperiod},
+      }}%
+      {{hash=EP}{%
+         family={Eendebak},
+         familyi={E\bibinitperiod},
+         given={Pieter},
+         giveni={P\bibinitperiod},
+      }}%
+      {{hash=ED}{%
+         family={Egger},
+         familyi={E\bibinitperiod},
+         given={Daniel},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=EM}{%
+         family={Everitt},
+         familyi={E\bibinitperiod},
+         given={Mark},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=FPM}{%
+         family={Fern{\'a}ndez},
+         familyi={F\bibinitperiod},
+         given={Paco\bibnamedelima Mart{\'\i}n},
+         giveni={P\bibinitperiod\bibinitdelim M\bibinitperiod},
+      }}%
+      {{hash=FAH}{%
+         family={Ferrera},
+         familyi={F\bibinitperiod},
+         given={Axel\bibnamedelima Hern{\'a}ndez},
+         giveni={A\bibinitperiod\bibinitdelim H\bibinitperiod},
+      }}%
+      {{hash=FA}{%
+         family={Frisch},
+         familyi={F\bibinitperiod},
+         given={Albert},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=FA}{%
+         family={Fuhrer},
+         familyi={F\bibinitperiod},
+         given={Andreas},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=GM}{%
+         family={GEORGE},
+         familyi={G\bibinitperiod},
+         given={MELVIN},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=GJ}{%
+         family={Gacon},
+         familyi={G\bibinitperiod},
+         given={Julien},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=G}{%
+         family={Gadi},
+         familyi={G\bibinitperiod},
+      }}%
+      {{hash=GBG}{%
+         family={Gago},
+         familyi={G\bibinitperiod},
+         given={Borja\bibnamedelima Godoy},
+         giveni={B\bibinitperiod\bibinitdelim G\bibinitperiod},
+      }}%
+      {{hash=GJM}{%
+         family={Gambetta},
+         familyi={G\bibinitperiod},
+         given={Jay\bibnamedelima M.},
+         giveni={J\bibinitperiod\bibinitdelim M\bibinitperiod},
+      }}%
+      {{hash=GA}{%
+         family={Gammanpila},
+         familyi={G\bibinitperiod},
+         given={Adhisha},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=GL}{%
+         family={Garcia},
+         familyi={G\bibinitperiod},
+         given={Luis},
+         giveni={L\bibinitperiod},
+      }}%
+      {{hash=GS}{%
+         family={Garion},
+         familyi={G\bibinitperiod},
+         given={Shelly},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=GMJ}{%
+         family={Gomez-Mosquera},
+         familyi={G\bibinitperiod-M\bibinitperiod},
+         given={Juan},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=dlPGS}{%
+         prefix={de\bibnamedelima la},
+         prefixi={d\bibinitperiod\bibinitdelim l\bibinitperiod},
+         family={Puente\bibnamedelima Gonz{\'a}lez},
+         familyi={P\bibinitperiod\bibinitdelim G\bibinitperiod},
+         given={Salvador},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=GI}{%
+         family={Gould},
+         familyi={G\bibinitperiod},
+         given={Ian},
+         giveni={I\bibinitperiod},
+      }}%
+      {{hash=GD}{%
+         family={Greenberg},
+         familyi={G\bibinitperiod},
+         given={Donny},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=GD}{%
+         family={Grinko},
+         familyi={G\bibinitperiod},
+         given={Dmitry},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=GW}{%
+         family={Guan},
+         familyi={G\bibinitperiod},
+         given={Wen},
+         giveni={W\bibinitperiod},
+      }}%
+      {{hash=GJA}{%
+         family={Gunnels},
+         familyi={G\bibinitperiod},
+         given={John\bibnamedelima A.},
+         giveni={J\bibinitperiod\bibinitdelim A\bibinitperiod},
+      }}%
+      {{hash=HI}{%
+         family={Haide},
+         familyi={H\bibinitperiod},
+         given={Isabel},
+         giveni={I\bibinitperiod},
+      }}%
+      {{hash=HI}{%
+         family={Hamamura},
+         familyi={H\bibinitperiod},
+         given={Ikko},
+         giveni={I\bibinitperiod},
+      }}%
+      {{hash=HV}{%
+         family={Havlicek},
+         familyi={H\bibinitperiod},
+         given={Vojtech},
+         giveni={V\bibinitperiod},
+      }}%
+      {{hash=HJ}{%
+         family={Hellmers},
+         familyi={H\bibinitperiod},
+         given={Joe},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=HL}{%
+         family={Herok},
+         familyi={H\bibinitperiod},
+         given={{\L}ukasz},
+         giveni={{\L}\bibinitperiod},
+      }}%
+      {{hash=HS}{%
+         family={Hillmich},
+         familyi={H\bibinitperiod},
+         given={Stefan},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=HH}{%
+         family={Horii},
+         familyi={H\bibinitperiod},
+         given={Hiroshi},
+         giveni={H\bibinitperiod},
+      }}%
+      {{hash=HC}{%
+         family={Howington},
+         familyi={H\bibinitperiod},
+         given={Connor},
+         giveni={C\bibinitperiod},
+      }}%
+      {{hash=HS}{%
+         family={Hu},
+         familyi={H\bibinitperiod},
+         given={Shaohan},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=HW}{%
+         family={Hu},
+         familyi={H\bibinitperiod},
+         given={Wei},
+         giveni={W\bibinitperiod},
+      }}%
+      {{hash=IH}{%
+         family={Imai},
+         familyi={I\bibinitperiod},
+         given={Haruki},
+         giveni={H\bibinitperiod},
+      }}%
+      {{hash=IT}{%
+         family={Imamichi},
+         familyi={I\bibinitperiod},
+         given={Takashi},
+         giveni={T\bibinitperiod},
+      }}%
+      {{hash=IK}{%
+         family={Ishizaki},
+         familyi={I\bibinitperiod},
+         given={Kazuaki},
+         giveni={K\bibinitperiod},
+      }}%
+      {{hash=IR}{%
+         family={Iten},
+         familyi={I\bibinitperiod},
+         given={Raban},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=IT}{%
+         family={Itoko},
+         familyi={I\bibinitperiod},
+         given={Toshinari},
+         giveni={T\bibinitperiod},
+      }}%
+      {{hash=JAA}{%
+         family={Javadi-Abhari},
+         familyi={J\bibinitperiod-A\bibinitperiod},
+         given={Ali},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=J}{%
+         family={Jessica},
+         familyi={J\bibinitperiod},
+      }}%
+      {{hash=JK}{%
+         family={Johns},
+         familyi={J\bibinitperiod},
+         given={Kiran},
+         giveni={K\bibinitperiod},
+      }}%
+      {{hash=KT}{%
+         family={Kachmann},
+         familyi={K\bibinitperiod},
+         given={Tal},
+         giveni={T\bibinitperiod},
+      }}%
+      {{hash=KN}{%
+         family={Kanazawa},
+         familyi={K\bibinitperiod},
+         given={Naoki},
+         giveni={N\bibinitperiod},
+      }}%
+      {{hash=KB}{%
+         family={Kang-Bae},
+         familyi={K\bibinitperiod-B\bibinitperiod},
+      }}%
+      {{hash=KA}{%
+         family={Karazeev},
+         familyi={K\bibinitperiod},
+         given={Anton},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=KP}{%
+         family={Kassebaum},
+         familyi={K\bibinitperiod},
+         given={Paul},
+         giveni={P\bibinitperiod},
+      }}%
+      {{hash=KS}{%
+         family={King},
+         familyi={K\bibinitperiod},
+         given={Spencer},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=K}{%
+         family={Knabberjoe},
+         familyi={K\bibinitperiod},
+      }}%
+      {{hash=KA}{%
+         family={Kovyrshin},
+         familyi={K\bibinitperiod},
+         given={Arseny},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=KV}{%
+         family={Krishnan},
+         familyi={K\bibinitperiod},
+         given={Vivek},
+         giveni={V\bibinitperiod},
+      }}%
+      {{hash=KK}{%
+         family={Krsulich},
+         familyi={K\bibinitperiod},
+         given={Kevin},
+         giveni={K\bibinitperiod},
+      }}%
+      {{hash=KG}{%
+         family={Kus},
+         familyi={K\bibinitperiod},
+         given={Gawel},
+         giveni={G\bibinitperiod},
+      }}%
+      {{hash=LR}{%
+         family={LaRose},
+         familyi={L\bibinitperiod},
+         given={Ryan},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=LR}{%
+         family={Lambert},
+         familyi={L\bibinitperiod},
+         given={Rapha{\"e}l},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=LJ}{%
+         family={Latone},
+         familyi={L\bibinitperiod},
+         given={Joe},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=LS}{%
+         family={Lawrence},
+         familyi={L\bibinitperiod},
+         given={Scott},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=LD}{%
+         family={Liu},
+         familyi={L\bibinitperiod},
+         given={Dennis},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=LP}{%
+         family={Liu},
+         familyi={L\bibinitperiod},
+         given={Peng},
+         giveni={P\bibinitperiod},
+      }}%
+      {{hash=MY}{%
+         family={Maeng},
+         familyi={M\bibinitperiod},
+         given={Yunho},
+         giveni={Y\bibinitperiod},
+      }}%
+      {{hash=MA}{%
+         family={Malyshev},
+         familyi={M\bibinitperiod},
+         given={Aleksei},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=MJ}{%
+         family={Marecek},
+         familyi={M\bibinitperiod},
+         given={Jakub},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=MM}{%
+         family={Marques},
+         familyi={M\bibinitperiod},
+         given={Manoel},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=MD}{%
+         family={Mathews},
+         familyi={M\bibinitperiod},
+         given={Dolph},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=MA}{%
+         family={Matsuo},
+         familyi={M\bibinitperiod},
+         given={Atsushi},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=MDT}{%
+         family={McClure},
+         familyi={M\bibinitperiod},
+         given={Douglas\bibnamedelima T.},
+         giveni={D\bibinitperiod\bibinitdelim T\bibinitperiod},
+      }}%
+      {{hash=MC}{%
+         family={McGarry},
+         familyi={M\bibinitperiod},
+         given={Cameron},
+         giveni={C\bibinitperiod},
+      }}%
+      {{hash=MD}{%
+         family={McKay},
+         familyi={M\bibinitperiod},
+         given={David},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=MD}{%
+         family={McPherson},
+         familyi={M\bibinitperiod},
+         given={Dan},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=MS}{%
+         family={Meesala},
+         familyi={M\bibinitperiod},
+         given={Srujan},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=MM}{%
+         family={Mevissen},
+         familyi={M\bibinitperiod},
+         given={Martin},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=MA}{%
+         family={Mezzacapo},
+         familyi={M\bibinitperiod},
+         given={Antonio},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=MR}{%
+         family={Midha},
+         familyi={M\bibinitperiod},
+         given={Rohit},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=MZ}{%
+         family={Minev},
+         familyi={M\bibinitperiod},
+         given={Zlatko},
+         giveni={Z\bibinitperiod},
+      }}%
+      {{hash=MA}{%
+         family={Mitchell},
+         familyi={M\bibinitperiod},
+         given={Abby},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=MN}{%
+         family={Moll},
+         familyi={M\bibinitperiod},
+         given={Nikolaj},
+         giveni={N\bibinitperiod},
+      }}%
+      {{hash=MMD}{%
+         family={Mooring},
+         familyi={M\bibinitperiod},
+         given={Michael\bibnamedelima Duane},
+         giveni={M\bibinitperiod\bibinitdelim D\bibinitperiod},
+      }}%
+      {{hash=MR}{%
+         family={Morales},
+         familyi={M\bibinitperiod},
+         given={Renier},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=MN}{%
+         family={Moran},
+         familyi={M\bibinitperiod},
+         given={Niall},
+         giveni={N\bibinitperiod},
+      }}%
+      {{hash=MP}{%
+         family={Murali},
+         familyi={M\bibinitperiod},
+         given={Prakash},
+         giveni={P\bibinitperiod},
+      }}%
+      {{hash=MJ}{%
+         family={M{\"u}ggenburg},
+         familyi={M\bibinitperiod},
+         given={Jan},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=ND}{%
+         family={Nadlinger},
+         familyi={N\bibinitperiod},
+         given={David},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=NG}{%
+         family={Nannicini},
+         familyi={N\bibinitperiod},
+         given={Giacomo},
+         giveni={G\bibinitperiod},
+      }}%
+      {{hash=NP}{%
+         family={Nation},
+         familyi={N\bibinitperiod},
+         given={Paul},
+         giveni={P\bibinitperiod},
+      }}%
+      {{hash=NY}{%
+         family={Naveh},
+         familyi={N\bibinitperiod},
+         given={Yehuda},
+         giveni={Y\bibinitperiod},
+      }}%
+      {{hash=NP}{%
+         family={Neuweiler},
+         familyi={N\bibinitperiod},
+         given={Patrick},
+         giveni={P\bibinitperiod},
+      }}%
+      {{hash=NP}{%
+         family={Niroula},
+         familyi={N\bibinitperiod},
+         given={Pradeep},
+         giveni={P\bibinitperiod},
+      }}%
+      {{hash=NH}{%
+         family={Norlen},
+         familyi={N\bibinitperiod},
+         given={Hassi},
+         giveni={H\bibinitperiod},
+      }}%
+      {{hash=OLJ}{%
+         family={O'Riordan},
+         familyi={O\bibinitperiod},
+         given={Lee\bibnamedelima James},
+         giveni={L\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+      {{hash=OO}{%
+         family={Ogunbayo},
+         familyi={O\bibinitperiod},
+         given={Oluwatobi},
+         giveni={O\bibinitperiod},
+      }}%
+      {{hash=OP}{%
+         family={Ollitrault},
+         familyi={O\bibinitperiod},
+         given={Pauline},
+         giveni={P\bibinitperiod},
+      }}%
+      {{hash=OS}{%
+         family={Oud},
+         familyi={O\bibinitperiod},
+         given={Steven},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=PD}{%
+         family={Padilha},
+         familyi={P\bibinitperiod},
+         given={Dan},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=PH}{%
+         family={Paik},
+         familyi={P\bibinitperiod},
+         given={Hanhee},
+         giveni={H\bibinitperiod},
+      }}%
+      {{hash=PS}{%
+         family={Perriello},
+         familyi={P\bibinitperiod},
+         given={Simone},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=PA}{%
+         family={Phan},
+         familyi={P\bibinitperiod},
+         given={Anna},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=PM}{%
+         family={Pistoia},
+         familyi={P\bibinitperiod},
+         given={Marco},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=PiA}{%
+         family={Pozas-iKerstjens},
+         familyi={P\bibinitperiod-i\bibinitperiod},
+         given={Alejandro},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=PV}{%
+         family={Prutyanov},
+         familyi={P\bibinitperiod},
+         given={Viktor},
+         giveni={V\bibinitperiod},
+      }}%
+      {{hash=PD}{%
+         family={Puzzuoli},
+         familyi={P\bibinitperiod},
+         given={Daniel},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=PJ}{%
+         family={P{\'e}rez},
+         familyi={P\bibinitperiod},
+         given={Jes{\'u}s},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=Q}{%
+         family={Quintiii},
+         familyi={Q\bibinitperiod},
+      }}%
+      {{hash=RR}{%
+         family={Raymond},
+         familyi={R\bibinitperiod},
+         given={Rudy},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=RRMC}{%
+         family={Redondo},
+         familyi={R\bibinitperiod},
+         given={Rafael Mart{\'\i}n-Cuevas},
+         giveni={R\bibinitperiod\bibinitdelim M\bibinitperiod-C\bibinitperiod},
+      }}%
+      {{hash=RM}{%
+         family={Reuter},
+         familyi={R\bibinitperiod},
+         given={Max},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=RJ}{%
+         family={Rice},
+         familyi={R\bibinitperiod},
+         given={Julia},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=RDM}{%
+         family={Rodr{\'\i}guez},
+         familyi={R\bibinitperiod},
+         given={Diego\bibnamedelima M.},
+         giveni={D\bibinitperiod\bibinitdelim M\bibinitperiod},
+      }}%
+      {{hash=RM}{%
+         family={Rossmannek},
+         familyi={R\bibinitperiod},
+         given={Max},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=RM}{%
+         family={Ryu},
+         familyi={R\bibinitperiod},
+         given={Mingi},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=ST}{%
+         family={SAPV},
+         familyi={S\bibinitperiod},
+         given={Tharrmashastha},
+         giveni={T\bibinitperiod},
+      }}%
+      {{hash=S}{%
+         family={SamFerracin},
+         familyi={S\bibinitperiod},
+      }}%
+      {{hash=SM}{%
+         family={Sandberg},
+         familyi={S\bibinitperiod},
+         given={Martin},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=SN}{%
+         family={Sathaye},
+         familyi={S\bibinitperiod},
+         given={Ninad},
+         giveni={N\bibinitperiod},
+      }}%
+      {{hash=SB}{%
+         family={Schmitt},
+         familyi={S\bibinitperiod},
+         given={Bruno},
+         giveni={B\bibinitperiod},
+      }}%
+      {{hash=SC}{%
+         family={Schnabel},
+         familyi={S\bibinitperiod},
+         given={Chris},
+         giveni={C\bibinitperiod},
+      }}%
+      {{hash=SZ}{%
+         family={Schoenfeld},
+         familyi={S\bibinitperiod},
+         given={Zachary},
+         giveni={Z\bibinitperiod},
+      }}%
+      {{hash=STL}{%
+         family={Scholten},
+         familyi={S\bibinitperiod},
+         given={Travis\bibnamedelima L.},
+         giveni={T\bibinitperiod\bibinitdelim L\bibinitperiod},
+      }}%
+      {{hash=SE}{%
+         family={Schoute},
+         familyi={S\bibinitperiod},
+         given={Eddie},
+         giveni={E\bibinitperiod},
+      }}%
+      {{hash=SJ}{%
+         family={Schwarm},
+         familyi={S\bibinitperiod},
+         given={Joachim},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=SIF}{%
+         family={Sertage},
+         familyi={S\bibinitperiod},
+         given={Ismael\bibnamedelima Faro},
+         giveni={I\bibinitperiod\bibinitdelim F\bibinitperiod},
+      }}%
+      {{hash=SK}{%
+         family={Setia},
+         familyi={S\bibinitperiod},
+         given={Kanav},
+         giveni={K\bibinitperiod},
+      }}%
+      {{hash=SN}{%
+         family={Shammah},
+         familyi={S\bibinitperiod},
+         given={Nathan},
+         giveni={N\bibinitperiod},
+      }}%
+      {{hash=SY}{%
+         family={Shi},
+         familyi={S\bibinitperiod},
+         given={Yunong},
+         giveni={Y\bibinitperiod},
+      }}%
+      {{hash=SA}{%
+         family={Silva},
+         familyi={S\bibinitperiod},
+         given={Adenilton},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=SA}{%
+         family={Simonetto},
+         familyi={S\bibinitperiod},
+         given={Andrea},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=SN}{%
+         family={Singstock},
+         familyi={S\bibinitperiod},
+         given={Nick},
+         giveni={N\bibinitperiod},
+      }}%
+      {{hash=SY}{%
+         family={Siraichi},
+         familyi={S\bibinitperiod},
+         given={Yukio},
+         giveni={Y\bibinitperiod},
+      }}%
+      {{hash=SI}{%
+         family={Sitdikov},
+         familyi={S\bibinitperiod},
+         given={Iskandar},
+         giveni={I\bibinitperiod},
+      }}%
+      {{hash=SS}{%
+         family={Sivarajah},
+         familyi={S\bibinitperiod},
+         given={Seyon},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=SMB}{%
+         family={Sletfjerding},
+         familyi={S\bibinitperiod},
+         given={Magnus\bibnamedelima Berg},
+         giveni={M\bibinitperiod\bibinitdelim B\bibinitperiod},
+      }}%
+      {{hash=SJA}{%
+         family={Smolin},
+         familyi={S\bibinitperiod},
+         given={John\bibnamedelima A.},
+         giveni={J\bibinitperiod\bibinitdelim A\bibinitperiod},
+      }}%
+      {{hash=SM}{%
+         family={Soeken},
+         familyi={S\bibinitperiod},
+         given={Mathias},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=SIO}{%
+         family={Sokolov},
+         familyi={S\bibinitperiod},
+         given={Igor\bibnamedelima Olegovich},
+         giveni={I\bibinitperiod\bibinitdelim O\bibinitperiod},
+      }}%
+      {{hash=S}{%
+         family={SooluThomas},
+         familyi={S\bibinitperiod},
+      }}%
+      {{hash=SD}{%
+         family={Steenken},
+         familyi={S\bibinitperiod},
+         given={Dominik},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=SM}{%
+         family={Stypulkoski},
+         familyi={S\bibinitperiod},
+         given={Matt},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=SJ}{%
+         family={Suen},
+         familyi={S\bibinitperiod},
+         given={Jack},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=TH}{%
+         family={Takahashi},
+         familyi={T\bibinitperiod},
+         given={Hitomi},
+         giveni={H\bibinitperiod},
+      }}%
+      {{hash=TI}{%
+         family={Tavernelli},
+         familyi={T\bibinitperiod},
+         given={Ivano},
+         giveni={I\bibinitperiod},
+      }}%
+      {{hash=TC}{%
+         family={Taylor},
+         familyi={T\bibinitperiod},
+         given={Charles},
+         giveni={C\bibinitperiod},
+      }}%
+      {{hash=TP}{%
+         family={Taylour},
+         familyi={T\bibinitperiod},
+         given={Pete},
+         giveni={P\bibinitperiod},
+      }}%
+      {{hash=TS}{%
+         family={Thomas},
+         familyi={T\bibinitperiod},
+         given={Soolu},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=TM}{%
+         family={Tillet},
+         familyi={T\bibinitperiod},
+         given={Mathieu},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=TM}{%
+         family={Tod},
+         familyi={T\bibinitperiod},
+         given={Maddy},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=dlTE}{%
+         prefix={de\bibnamedelima la},
+         prefixi={d\bibinitperiod\bibinitdelim l\bibinitperiod},
+         family={Torre},
+         familyi={T\bibinitperiod},
+         given={Enrique},
+         giveni={E\bibinitperiod},
+      }}%
+      {{hash=TK}{%
+         family={Trabing},
+         familyi={T\bibinitperiod},
+         given={Kenso},
+         giveni={K\bibinitperiod},
+      }}%
+      {{hash=TM}{%
+         family={Treinish},
+         familyi={T\bibinitperiod},
+         given={Matthew},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=T}{%
+         family={TrishaPe},
+         familyi={T\bibinitperiod},
+      }}%
+      {{hash=TW}{%
+         family={Turner},
+         familyi={T\bibinitperiod},
+         given={Wes},
+         giveni={W\bibinitperiod},
+      }}%
+      {{hash=VY}{%
+         family={Vaknin},
+         familyi={V\bibinitperiod},
+         given={Yotam},
+         giveni={Y\bibinitperiod},
+      }}%
+      {{hash=VCR}{%
+         family={Valcarce},
+         familyi={V\bibinitperiod},
+         given={Carmen\bibnamedelima Recio},
+         giveni={C\bibinitperiod\bibinitdelim R\bibinitperiod},
+      }}%
+      {{hash=VF}{%
+         family={Varchon},
+         familyi={V\bibinitperiod},
+         given={Francois},
+         giveni={F\bibinitperiod},
+      }}%
+      {{hash=VAC}{%
+         family={Vazquez},
+         familyi={V\bibinitperiod},
+         given={Almudena\bibnamedelima Carrera},
+         giveni={A\bibinitperiod\bibinitdelim C\bibinitperiod},
+      }}%
+      {{hash=VLD}{%
+         family={Vogt-Lee},
+         familyi={V\bibinitperiod-L\bibinitperiod},
+         given={Desiree},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=VC}{%
+         family={Vuillot},
+         familyi={V\bibinitperiod},
+         given={Christophe},
+         giveni={C\bibinitperiod},
+      }}%
+      {{hash=WJ}{%
+         family={Weaver},
+         familyi={W\bibinitperiod},
+         given={James},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=WR}{%
+         family={Wieczorek},
+         familyi={W\bibinitperiod},
+         given={Rafal},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=WJA}{%
+         family={Wildstrom},
+         familyi={W\bibinitperiod},
+         given={Jonathan\bibnamedelima A.},
+         giveni={J\bibinitperiod\bibinitdelim A\bibinitperiod},
+      }}%
+      {{hash=WR}{%
+         family={Wille},
+         familyi={W\bibinitperiod},
+         given={Robert},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=WE}{%
+         family={Winston},
+         familyi={W\bibinitperiod},
+         given={Erick},
+         giveni={E\bibinitperiod},
+      }}%
+      {{hash=WJJ}{%
+         family={Woehr},
+         familyi={W\bibinitperiod},
+         given={Jack\bibnamedelima J.},
+         giveni={J\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+      {{hash=WS}{%
+         family={Woerner},
+         familyi={W\bibinitperiod},
+         given={Stefan},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=WR}{%
+         family={Woo},
+         familyi={W\bibinitperiod},
+         given={Ryan},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=WCJ}{%
+         family={Wood},
+         familyi={W\bibinitperiod},
+         given={Christopher\bibnamedelima J.},
+         giveni={C\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+      {{hash=WR}{%
+         family={Wood},
+         familyi={W\bibinitperiod},
+         given={Ryan},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=WS}{%
+         family={Wood},
+         familyi={W\bibinitperiod},
+         given={Stephen},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=WJ}{%
+         family={Wootton},
+         familyi={W\bibinitperiod},
+         given={James},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=YD}{%
+         family={Yeralin},
+         familyi={Y\bibinitperiod},
+         given={Daniyar},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=YR}{%
+         family={Young},
+         familyi={Y\bibinitperiod},
+         given={Richard},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=YJ}{%
+         family={Yu},
+         familyi={Y\bibinitperiod},
+         given={Jessie},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=ZC}{%
+         family={Zachow},
+         familyi={Z\bibinitperiod},
+         given={Christopher},
+         giveni={C\bibinitperiod},
+      }}%
+      {{hash=ZL}{%
+         family={Zdanski},
+         familyi={Z\bibinitperiod},
+         given={Laura},
+         giveni={L\bibinitperiod},
+      }}%
+      {{hash=ZC}{%
+         family={Zoufal},
+         familyi={Z\bibinitperiod},
+         given={Christa},
+         giveni={C\bibinitperiod},
+      }}%
+      {{hash=Z}{%
+         family={Zoufalc},
+         familyi={Z\bibinitperiod},
+      }}%
+      {{hash=a}{%
+         family={azulehner},
+         familyi={a\bibinitperiod},
+      }}%
+      {{hash=b}{%
+         family={bcamorrison},
+         familyi={b\bibinitperiod},
+      }}%
+      {{hash=b}{%
+         family={brandhsn},
+         familyi={b\bibinitperiod},
+      }}%
+      {{hash=cz}{%
+         prefix={chlorophyll},
+         prefixi={c\bibinitperiod},
+         family={zz},
+         familyi={z\bibinitperiod},
+      }}%
+      {{hash=d}{%
+         family={dan1pal},
+         familyi={d\bibinitperiod},
+      }}%
+      {{hash=d}{%
+         family={dime10},
+         familyi={d\bibinitperiod},
+      }}%
+      {{hash=d}{%
+         family={drholmie},
+         familyi={d\bibinitperiod},
+      }}%
+      {{hash=e}{%
+         family={elfrocampeador},
+         familyi={e\bibinitperiod},
+      }}%
+      {{hash=f}{%
+         family={faisaldebouni},
+         familyi={f\bibinitperiod},
+      }}%
+      {{hash=f}{%
+         family={fanizzamarco},
+         familyi={f\bibinitperiod},
+      }}%
+      {{hash=g}{%
+         family={gruu},
+         familyi={g\bibinitperiod},
+      }}%
+      {{hash=k}{%
+         family={kanejess},
+         familyi={k\bibinitperiod},
+      }}%
+      {{hash=k}{%
+         family={klinvill},
+         familyi={k\bibinitperiod},
+      }}%
+      {{hash=k}{%
+         family={kurarrr},
+         familyi={k\bibinitperiod},
+      }}%
+      {{hash=l}{%
+         family={lerongil},
+         familyi={l\bibinitperiod},
+      }}%
+      {{hash=m}{%
+         family={ma5x},
+         familyi={m\bibinitperiod},
+      }}%
+      {{hash=ma}{%
+         prefix={merav},
+         prefixi={m\bibinitperiod},
+         family={aharoni},
+         familyi={a\bibinitperiod},
+      }}%
+      {{hash=o}{%
+         family={ordmoj},
+         familyi={o\bibinitperiod},
+      }}%
+      {{hash=s}{%
+         family={sethmerkel},
+         familyi={s\bibinitperiod},
+      }}%
+      {{hash=s}{%
+         family={strickroman},
+         familyi={s\bibinitperiod},
+      }}%
+      {{hash=s}{%
+         family={sumitpuri},
+         familyi={s\bibinitperiod},
+      }}%
+      {{hash=t}{%
+         family={tigerjack},
+         familyi={t\bibinitperiod},
+      }}%
+      {{hash=t}{%
+         family={toural},
+         familyi={t\bibinitperiod},
+      }}%
+      {{hash=v}{%
+         family={vvilpas},
+         familyi={v\bibinitperiod},
+      }}%
+      {{hash=w}{%
+         family={welien},
+         familyi={w\bibinitperiod},
+      }}%
+      {{hash=w}{%
+         family={willhbang},
+         familyi={w\bibinitperiod},
+      }}%
+      {{hash=y}{%
+         family={yang.luh},
+         familyi={y\bibinitperiod},
+      }}%
+      {{hash=y}{%
+         family={yelojakit},
+         familyi={y\bibinitperiod},
+      }}%
+      {{hash=y}{%
+         family={yotamvakninibm},
+         familyi={y\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{AH+1}
+  \strng{fullhash}{AHAIYAGATAGAEAAACABPBGBLBHYBDBLSBSBSBDCFCPCLCJCGCACCFCRCJMCCCCCAJCAWCSCBJCCCGADDSDTEDMDDARDDDJDEDDEDKDIESKEEEPEDEMFPMFAHFAFAGMGJGGBGGJMGAGLGSGMJPGSdlGIGDGDGWGJAHIHIHVHJHLHSHHHCHSHWIHITIKIRITJAAJJKKTKNKBKAKPKSKKAKVKKKGLRLRLJLSLDLPMYMAMJMMMDMAMDTMCMDMD}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.5281/zenodo.2562110
+    \endverb
+    \field{title}{Qiskit: An Open-source Framework for Quantum Computing}
+    \field{year}{2019}
+  \endentry
+
+  \entry{ref_IBMb}{misc}{}
+    \name{author}{1}{}{%
+      {{hash=I}{%
+         family={IBM},
+         familyi={I\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{I1}
+    \strng{fullhash}{I1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{title}{https://quantumexperience.ng.bluemix.net/qx/}
+    \verb{url}
+    \verb https://quantumexperience.ng.bluemix.net/qx/
+    \endverb
+    \field{year}{Access: 2018.12.28}
+  \endentry
+
+  \entry{ref_rigetti}{misc}{}
+    \name{author}{1}{}{%
+      {{hash=R}{%
+         family={Rigetti},
+         familyi={R\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{R1}
+    \strng{fullhash}{R1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{title}{https://www.rigetti.com/forest}
+    \verb{url}
+    \verb https://www.rigetti.com/forest
+    \endverb
+    \field{year}{Access: 2018.12.28}
+  \endentry
+
+  \entry{ref_dwave}{misc}{}
+    \name{author}{1}{}{%
+      {{hash=DW}{%
+         family={D-Wave},
+         familyi={D\bibinitperiod-W\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{DW1}
+    \strng{fullhash}{DW1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{note}{[Access: 2018.12.28]}
+    \field{title}{https://cloud.dwavesys.com/qubist/}
+    \verb{url}
+    \verb https://cloud.dwavesys.com/qubist/
+    \endverb
+  \endentry
+
+  \entry{mike&ike}{book}{}
+    \name{author}{2}{}{%
+      {{hash=NMA}{%
+         family={Nielsen},
+         familyi={N\bibinitperiod},
+         given={Michael\bibnamedelima A.},
+         giveni={M\bibinitperiod\bibinitdelim A\bibinitperiod},
+      }}%
+      {{hash=CIL}{%
+         family={Chuang},
+         familyi={C\bibinitperiod},
+         given={Isaac\bibnamedelima L.},
+         giveni={I\bibinitperiod\bibinitdelim L\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Cambridge University Press}%
+    }
+    \strng{namehash}{NMACIL1}
+    \strng{fullhash}{NMACIL1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1017/CBO9780511976667
+    \endverb
+    \field{title}{Quantum Computation and Quantum Information: 10th Anniversary
+  Edition}
+    \field{year}{2010}
+  \endentry
+
+  \entry{Georgescu2014}{article}{}
+    \name{author}{3}{}{%
+      {{hash=GIM}{%
+         family={{Georgescu}},
+         familyi={G\bibinitperiod},
+         given={I.\bibnamedelima M.},
+         giveni={I\bibinitperiod\bibinitdelim M\bibinitperiod},
+      }}%
+      {{hash=AS}{%
+         family={{Ashhab}},
+         familyi={A\bibinitperiod},
+         given={S.},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=NF}{%
+         family={{Nori}},
+         familyi={N\bibinitperiod},
+         given={Franco},
+         giveni={F\bibinitperiod},
+      }}%
+    }
+    \keyw{03.65.-w, 03.67.Ac, Quantum mechanics, Quantum algorithms protocols
+  and simulations, Quantum Physics, Condensed Matter - Other Condensed Matter}
+    \strng{namehash}{GIMASNF1}
+    \strng{fullhash}{GIMASNF1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1103/RevModPhys.86.153
+    \endverb
+    \verb{eprint}
+    \verb 1308.6253
+    \endverb
+    \field{pages}{153\bibrangedash 185}
+    \field{title}{{Quantum simulation}}
+    \field{volume}{86}
+    \field{journaltitle}{Reviews of Modern Physics}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{month}{01}
+    \field{year}{2014}
+  \endentry
+
+  \entry{tamura2019}{misc}{}
+    \name{author}{2}{}{%
+      {{hash=TK}{%
+         family={Tamura},
+         familyi={T\bibinitperiod},
+         given={Kentaro},
+         giveni={K\bibinitperiod},
+      }}%
+      {{hash=SY}{%
+         family={Shikano},
+         familyi={S\bibinitperiod},
+         given={Yutaka},
+         giveni={Y\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{TKSY1}
+    \strng{fullhash}{TKSY1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{eprint}
+    \verb 1906.04410
+    \endverb
+    \field{title}{Quantum Random Numbers generated by the Cloud Superconducting
+  Quantum Computer}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{year}{2019}
+  \endentry
+
+  \entry{Li2017}{article}{}
+    \name{author}{2}{}{%
+      {{hash=LY}{%
+         family={{Li}},
+         familyi={L\bibinitperiod},
+         given={Ying},
+         giveni={Y\bibinitperiod},
+      }}%
+      {{hash=BSC}{%
+         family={{Benjamin}},
+         familyi={B\bibinitperiod},
+         given={Simon\bibnamedelima C.},
+         giveni={S\bibinitperiod\bibinitdelim C\bibinitperiod},
+      }}%
+    }
+    \keyw{Quantum Physics}
+    \strng{namehash}{LYBSC1}
+    \strng{fullhash}{LYBSC1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb https://doi.org/10.1103/PhysRevX.7.021050
+    \endverb
+    \verb{eprint}
+    \verb 1611.09301
+    \endverb
+    \field{number}{021050}
+    \field{pages}{021050}
+    \field{title}{{Efficient variational quantum simulator incorporating active
+  error minimisation}}
+    \field{volume}{7}
+    \field{journaltitle}{Phys Rev X}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{year}{2017}
+  \endentry
+
+  \entry{Kandala2017}{article}{}
+    \name{author}{7}{}{%
+      {{hash=KA}{%
+         family={{Kandala}},
+         familyi={K\bibinitperiod},
+         given={Abhinav},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=MA}{%
+         family={{Mezzacapo}},
+         familyi={M\bibinitperiod},
+         given={Antonio},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=TK}{%
+         family={{Temme}},
+         familyi={T\bibinitperiod},
+         given={Kristan},
+         giveni={K\bibinitperiod},
+      }}%
+      {{hash=TM}{%
+         family={{Takita}},
+         familyi={T\bibinitperiod},
+         given={Maika},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=BM}{%
+         family={{Brink}},
+         familyi={B\bibinitperiod},
+         given={Markus},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=CJM}{%
+         family={{Chow}},
+         familyi={C\bibinitperiod},
+         given={Jerry\bibnamedelima M.},
+         giveni={J\bibinitperiod\bibinitdelim M\bibinitperiod},
+      }}%
+      {{hash=GJM}{%
+         family={{Gambetta}},
+         familyi={G\bibinitperiod},
+         given={Jay\bibnamedelima M.},
+         giveni={J\bibinitperiod\bibinitdelim M\bibinitperiod},
+      }}%
+    }
+    \keyw{Quantum Physics, Condensed Matter - Superconductivity}
+    \strng{namehash}{KA+1}
+    \strng{fullhash}{KAMATKTMBMCJMGJM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1038/nature23879
+    \endverb
+    \verb{eprint}
+    \verb 1704.05018
+    \endverb
+    \field{pages}{242\bibrangedash 246}
+    \field{title}{{Hardware-efficient variational quantum eigensolver for small
+  molecules and quantum magnets}}
+    \field{volume}{549}
+    \field{journaltitle}{\nat}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{year}{2017}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{Kandala2019}{article}{}
+    \name{author}{6}{}{%
+      {{hash=KA}{%
+         family={{Kandala}},
+         familyi={K\bibinitperiod},
+         given={Abhinav},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=TK}{%
+         family={{Temme}},
+         familyi={T\bibinitperiod},
+         given={Kristan},
+         giveni={K\bibinitperiod},
+      }}%
+      {{hash=CAD}{%
+         family={{Corcoles}},
+         familyi={C\bibinitperiod},
+         given={Antonio\bibnamedelima D.},
+         giveni={A\bibinitperiod\bibinitdelim D\bibinitperiod},
+      }}%
+      {{hash=MA}{%
+         family={{Mezzacapo}},
+         familyi={M\bibinitperiod},
+         given={Antonio},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=CJM}{%
+         family={{Chow}},
+         familyi={C\bibinitperiod},
+         given={Jerry\bibnamedelima M.},
+         giveni={J\bibinitperiod\bibinitdelim M\bibinitperiod},
+      }}%
+      {{hash=GJM}{%
+         family={{Gambetta}},
+         familyi={G\bibinitperiod},
+         given={Jay\bibnamedelima M.},
+         giveni={J\bibinitperiod\bibinitdelim M\bibinitperiod},
+      }}%
+    }
+    \keyw{Quantum Physics}
+    \strng{namehash}{KA+1}
+    \strng{fullhash}{KATKCADMACJMGJM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb https://doi.org/10.1038/s41586-019-1040-7
+    \endverb
+    \verb{eprint}
+    \verb 1805.04492
+    \endverb
+    \field{number}{491}
+    \field{pages}{491}
+    \field{title}{{Extending the computational reach of a noisy superconducting
+  quantum processor}}
+    \field{volume}{567}
+    \field{journaltitle}{Nature}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{year}{2019}
+  \endentry
+
+  \entry{Temme2017}{article}{}
+    \name{author}{3}{}{%
+      {{hash=TK}{%
+         family={{Temme}},
+         familyi={T\bibinitperiod},
+         given={Kristan},
+         giveni={K\bibinitperiod},
+      }}%
+      {{hash=BS}{%
+         family={{Bravyi}},
+         familyi={B\bibinitperiod},
+         given={Sergey},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=GJM}{%
+         family={{Gambetta}},
+         familyi={G\bibinitperiod},
+         given={Jay\bibnamedelima M.},
+         giveni={J\bibinitperiod\bibinitdelim M\bibinitperiod},
+      }}%
+    }
+    \keyw{Quantum Physics, Condensed Matter - Other Condensed Matter}
+    \strng{namehash}{TKBSGJM1}
+    \strng{fullhash}{TKBSGJM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1103/PhysRevLett.119.180509
+    \endverb
+    \field{eid}{180509}
+    \verb{eprint}
+    \verb 1612.02058
+    \endverb
+    \field{number}{18}
+    \field{pages}{180509}
+    \field{title}{{Error Mitigation for Short-Depth Quantum Circuits}}
+    \field{volume}{119}
+    \field{journaltitle}{\prl}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{month}{11}
+    \field{year}{2017}
+  \endentry
+
+  \entry{Endo2018}{article}{}
+    \name{author}{3}{}{%
+      {{hash=ES}{%
+         family={{Endo}},
+         familyi={E\bibinitperiod},
+         given={Suguru},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=BSC}{%
+         family={{Benjamin}},
+         familyi={B\bibinitperiod},
+         given={Simon\bibnamedelima C.},
+         giveni={S\bibinitperiod\bibinitdelim C\bibinitperiod},
+      }}%
+      {{hash=LY}{%
+         family={{Li}},
+         familyi={L\bibinitperiod},
+         given={Ying},
+         giveni={Y\bibinitperiod},
+      }}%
+    }
+    \keyw{Quantum Physics}
+    \strng{namehash}{ESBSCLY1}
+    \strng{fullhash}{ESBSCLY1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1103/PhysRevX.8.031027
+    \endverb
+    \field{eid}{031027}
+    \verb{eprint}
+    \verb 1712.09271
+    \endverb
+    \field{pages}{031027}
+    \field{title}{{Practical Quantum Error Mitigation for Near-Future
+  Applications}}
+    \field{volume}{8}
+    \field{journaltitle}{Physical Review X}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{year}{2018}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{Premakumar2018}{article}{}
+    \name{author}{2}{}{%
+      {{hash=PVN}{%
+         family={{Premakumar}},
+         familyi={P\bibinitperiod},
+         given={Vickram\bibnamedelima N.},
+         giveni={V\bibinitperiod\bibinitdelim N\bibinitperiod},
+      }}%
+      {{hash=JR}{%
+         family={{Joynt}},
+         familyi={J\bibinitperiod},
+         given={Robert},
+         giveni={R\bibinitperiod},
+      }}%
+    }
+    \keyw{Quantum Physics}
+    \strng{namehash}{PVNJR1}
+    \strng{fullhash}{PVNJR1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{eprint}
+    \verb 1812.07076
+    \endverb
+    \field{pages}{arXiv:1812.07076}
+    \field{title}{{Error Mitigation in Quantum Computers subject to Spatially
+  Correlated Noise}}
+    \field{journaltitle}{arXiv e-prints}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{year}{2018}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{Bonet-Monroig2018}{article}{}
+    \name{author}{4}{}{%
+      {{hash=BX}{%
+         family={{Bonet-Monroig}},
+         familyi={B\bibinitperiod},
+         given={X.},
+         giveni={X\bibinitperiod},
+      }}%
+      {{hash=SR}{%
+         family={{Sagastizabal}},
+         familyi={S\bibinitperiod},
+         given={R.},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=SM}{%
+         family={{Singh}},
+         familyi={S\bibinitperiod},
+         given={M.},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=OTE}{%
+         family={{O'Brien}},
+         familyi={O\bibinitperiod},
+         given={T.\bibnamedelima E.},
+         giveni={T\bibinitperiod\bibinitdelim E\bibinitperiod},
+      }}%
+    }
+    \keyw{Quantum Physics}
+    \strng{namehash}{BX+1}
+    \strng{fullhash}{BXSRSMOTE1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1103/PhysRevA.98.062339
+    \endverb
+    \verb{eprint}
+    \verb 1807.10050
+    \endverb
+    \field{pages}{062339}
+    \field{title}{{Low-cost error mitigation by symmetry verification}}
+    \field{volume}{98}
+    \field{journaltitle}{Phys. Rev. A}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{year}{2018}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{Combes2017}{article}{}
+    \name{author}{4}{}{%
+      {{hash=CJ}{%
+         family={{Combes}},
+         familyi={C\bibinitperiod},
+         given={Joshua},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=GC}{%
+         family={{Granade}},
+         familyi={G\bibinitperiod},
+         given={Christopher},
+         giveni={C\bibinitperiod},
+      }}%
+      {{hash=FC}{%
+         family={{Ferrie}},
+         familyi={F\bibinitperiod},
+         given={Christopher},
+         giveni={C\bibinitperiod},
+      }}%
+      {{hash=FST}{%
+         family={{Flammia}},
+         familyi={F\bibinitperiod},
+         given={Steven\bibnamedelima T.},
+         giveni={S\bibinitperiod\bibinitdelim T\bibinitperiod},
+      }}%
+    }
+    \keyw{Quantum Physics}
+    \strng{namehash}{CJ+1}
+    \strng{fullhash}{CJGCFCFST1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{eprint}
+    \verb 1702.03688
+    \endverb
+    \field{title}{{Logical Randomized Benchmarking}}
+    \field{journaltitle}{arXiv e-prints}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{year}{2017}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{Sun2018}{article}{}
+    \name{author}{2}{}{%
+      {{hash=SM}{%
+         family={{Sun}},
+         familyi={S\bibinitperiod},
+         given={Mingyu},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=GMR}{%
+         family={{Geller}},
+         familyi={G\bibinitperiod},
+         given={Michael\bibnamedelima R.},
+         giveni={M\bibinitperiod\bibinitdelim R\bibinitperiod},
+      }}%
+    }
+    \keyw{Quantum Physics}
+    \strng{namehash}{SMGMR1}
+    \strng{fullhash}{SMGMR1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{eprint}
+    \verb 1810.10523
+    \endverb
+    \field{title}{{Efficient characterization of correlated SPAM errors}}
+    \field{journaltitle}{arXiv e-prints}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{year}{2018}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{Lundeen2008}{article}{}
+    \name{author}{9}{}{%
+      {{hash=LJS}{%
+         family={Lundeen},
+         familyi={L\bibinitperiod},
+         given={J.\bibnamedelima S.},
+         giveni={J\bibinitperiod\bibinitdelim S\bibinitperiod},
+      }}%
+      {{hash=FA}{%
+         family={Feito},
+         familyi={F\bibinitperiod},
+         given={A.},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=CRH}{%
+         family={Coldenstrodt-Ronge},
+         familyi={C\bibinitperiod-R\bibinitperiod},
+         given={H.},
+         giveni={H\bibinitperiod},
+      }}%
+      {{hash=PKL}{%
+         family={Pregnell},
+         familyi={P\bibinitperiod},
+         given={K.\bibnamedelima L.},
+         giveni={K\bibinitperiod\bibinitdelim L\bibinitperiod},
+      }}%
+      {{hash=SC}{%
+         family={Silberhorn},
+         familyi={S\bibinitperiod},
+         given={Ch.},
+         giveni={C\bibinitperiod},
+      }}%
+      {{hash=RTC}{%
+         family={Ralph},
+         familyi={R\bibinitperiod},
+         given={T.\bibnamedelima C.},
+         giveni={T\bibinitperiod\bibinitdelim C\bibinitperiod},
+      }}%
+      {{hash=EJ}{%
+         family={Eisert},
+         familyi={E\bibinitperiod},
+         given={J.},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=PMB}{%
+         family={Plenio},
+         familyi={P\bibinitperiod},
+         given={M.\bibnamedelima B.},
+         giveni={M\bibinitperiod\bibinitdelim B\bibinitperiod},
+      }}%
+      {{hash=WIA}{%
+         family={Walmsley},
+         familyi={W\bibinitperiod},
+         given={I.\bibnamedelima A.},
+         giveni={I\bibinitperiod\bibinitdelim A\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Nature Publishing Group}%
+    }
+    \strng{namehash}{LJS+1}
+    \strng{fullhash}{LJSFACRHPKLSCRTCEJPMBWIA1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{pages}{27}
+    \field{title}{Tomography of quantum detectors}
+    \verb{url}
+    \verb http://dx.doi.org/10.1038/nphys1133
+    \endverb
+    \field{volume}{5}
+    \field{journaltitle}{Nature Physics}
+    \field{month}{11}
+    \field{year}{2008}
+  \endentry
+
+  \entry{Zhang2012a}{article}{}
+    \name{author}{9}{}{%
+      {{hash=ZL}{%
+         family={Zhang},
+         familyi={Z\bibinitperiod},
+         given={Lijian},
+         giveni={L\bibinitperiod},
+      }}%
+      {{hash=CRHB}{%
+         family={Coldenstrodt-Ronge},
+         familyi={C\bibinitperiod-R\bibinitperiod},
+         given={Hendrik\bibnamedelima B.},
+         giveni={H\bibinitperiod\bibinitdelim B\bibinitperiod},
+      }}%
+      {{hash=DA}{%
+         family={Datta},
+         familyi={D\bibinitperiod},
+         given={Animesh},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=PG}{%
+         family={Puentes},
+         familyi={P\bibinitperiod},
+         given={Graciana},
+         giveni={G\bibinitperiod},
+      }}%
+      {{hash=LJS}{%
+         family={Lundeen},
+         familyi={L\bibinitperiod},
+         given={Jeff\bibnamedelima S.},
+         giveni={J\bibinitperiod\bibinitdelim S\bibinitperiod},
+      }}%
+      {{hash=JXM}{%
+         family={Jin},
+         familyi={J\bibinitperiod},
+         given={Xian-Min},
+         giveni={X\bibinitperiod-M\bibinitperiod},
+      }}%
+      {{hash=SBJ}{%
+         family={Smith},
+         familyi={S\bibinitperiod},
+         given={Brian\bibnamedelima J.},
+         giveni={B\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+      {{hash=PMB}{%
+         family={Plenio},
+         familyi={P\bibinitperiod},
+         given={Martin\bibnamedelima B.},
+         giveni={M\bibinitperiod\bibinitdelim B\bibinitperiod},
+      }}%
+      {{hash=WIA}{%
+         family={Walmsley},
+         familyi={W\bibinitperiod},
+         given={Ian\bibnamedelima A.},
+         giveni={I\bibinitperiod\bibinitdelim A\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Nature Publishing Group}%
+    }
+    \strng{namehash}{ZL+1}
+    \strng{fullhash}{ZLCRHBDAPGLJSJXMSBJPMBWIA1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1038/nphoton.2012.107
+    \endverb
+    \field{pages}{364}
+    \field{title}{Mapping coherence in measurement via full quantum tomography
+  of a hybrid optical detector}
+    \field{volume}{6}
+    \field{journaltitle}{Nature Photonics}
+    \field{month}{05}
+    \field{year}{2012}
+  \endentry
+
+  \entry{Zhang2012b}{article}{}
+    \name{author}{7}{}{%
+      {{hash=ZL}{%
+         family={{Zhang}},
+         familyi={Z\bibinitperiod},
+         given={Lijian},
+         giveni={L\bibinitperiod},
+      }}%
+      {{hash=DA}{%
+         family={{Datta}},
+         familyi={D\bibinitperiod},
+         given={Animesh},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=CHB}{%
+         family={{Coldenstrodt-Ronge}},
+         familyi={C\bibinitperiod},
+         given={Hendrik\bibnamedelima B.},
+         giveni={H\bibinitperiod\bibinitdelim B\bibinitperiod},
+      }}%
+      {{hash=JXM}{%
+         family={{Jin}},
+         familyi={J\bibinitperiod},
+         given={Xian-Min},
+         giveni={X\bibinitperiod-M\bibinitperiod},
+      }}%
+      {{hash=EJ}{%
+         family={{Eisert}},
+         familyi={E\bibinitperiod},
+         given={Jens},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=PMB}{%
+         family={{Plenio}},
+         familyi={P\bibinitperiod},
+         given={Martin\bibnamedelima B.},
+         giveni={M\bibinitperiod\bibinitdelim B\bibinitperiod},
+      }}%
+      {{hash=WIA}{%
+         family={{Walmsley}},
+         familyi={W\bibinitperiod},
+         given={Ian\bibnamedelima A.},
+         giveni={I\bibinitperiod\bibinitdelim A\bibinitperiod},
+      }}%
+    }
+    \keyw{Quantum Physics}
+    \strng{namehash}{ZL+2}
+    \strng{fullhash}{ZLDACHBJXMEJPMBWIA1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1088/1367-2630/14/11/115005
+    \endverb
+    \field{eid}{115005}
+    \verb{eprint}
+    \verb 1207.3501
+    \endverb
+    \field{pages}{115005}
+    \field{title}{{Recursive quantum detector tomography}}
+    \field{volume}{14}
+    \field{journaltitle}{New Journal of Physics}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{month}{11}
+    \field{year}{2012}
+  \endentry
+
+  \entry{Renema2012}{article}{}
+    \name{author}{9}{}{%
+      {{hash=RJJ}{%
+         family={Renema},
+         familyi={R\bibinitperiod},
+         given={J.\bibnamedelima J.},
+         giveni={J\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+      {{hash=FG}{%
+         family={Frucci},
+         familyi={F\bibinitperiod},
+         given={G.},
+         giveni={G\bibinitperiod},
+      }}%
+      {{hash=ZZ}{%
+         family={Zhou},
+         familyi={Z\bibinitperiod},
+         given={Z.},
+         giveni={Z\bibinitperiod},
+      }}%
+      {{hash=MF}{%
+         family={Mattioli},
+         familyi={M\bibinitperiod},
+         given={F.},
+         giveni={F\bibinitperiod},
+      }}%
+      {{hash=GA}{%
+         family={Gaggero},
+         familyi={G\bibinitperiod},
+         given={A.},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=LR}{%
+         family={Leoni},
+         familyi={L\bibinitperiod},
+         given={R.},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=dDMJA}{%
+         prefix={de},
+         prefixi={d\bibinitperiod},
+         family={Dood},
+         familyi={D\bibinitperiod},
+         given={M.\bibnamedelima J.\bibnamedelima A.},
+         giveni={M\bibinitperiod\bibinitdelim J\bibinitperiod\bibinitdelim
+  A\bibinitperiod},
+      }}%
+      {{hash=FA}{%
+         family={Fiore},
+         familyi={F\bibinitperiod},
+         given={A.},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=vEMP}{%
+         prefix={van},
+         prefixi={v\bibinitperiod},
+         family={Exter},
+         familyi={E\bibinitperiod},
+         given={M.\bibnamedelima P.},
+         giveni={M\bibinitperiod\bibinitdelim P\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {OSA}%
+    }
+    \keyw{Detectors; Multiphoton processes; Photon statistics; Coherent states;
+  Electron beam lithography; Optical fields; Photon counting; Quantum
+  detectors; Supercontinuum lasers}
+    \strng{namehash}{RJJ+1}
+    \strng{fullhash}{RJJFGZZMFGALRDMJAdFAEMPv1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{abstract}{%
+    We present an experimental method to characterize multi-photon detectors
+  with a small overall detection efficiency. We do this by separating the
+  nonlinear action of the multiphoton detection event from linear losses in the
+  detector. Such a characterization is a necessary step for quantum information
+  protocols with single and multiphoton detectors and can provide quantitative
+  information to understand the underlying physics of a given detector. This
+  characterization is applied to a superconducting multiphoton nanodetector,
+  consisting of an NbN nanowire with a bowtie-shaped subwavelength
+  constriction. Depending on the bias current, this detector has regimes with
+  single and multiphoton sensitivity. We present the first full experimental
+  characterization of such a detector.%
+    }
+    \verb{doi}
+    \verb 10.1364/OE.20.002806
+    \endverb
+    \field{number}{3}
+    \field{pages}{2806\bibrangedash 2813}
+    \field{title}{Modified detector tomography technique applied to a
+  superconducting multiphoton nanodetector}
+    \verb{url}
+    \verb http://www.opticsexpress.org/abstract.cfm?URI=oe-20-3-2806
+    \endverb
+    \field{volume}{20}
+    \field{journaltitle}{Opt. Express}
+    \field{year}{2012}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{Blumoff2016}{article}{}
+    \name{author}{15}{}{%
+      {{hash=BJZ}{%
+         family={Blumoff},
+         familyi={B\bibinitperiod},
+         given={J.\bibnamedelima Z.},
+         giveni={J\bibinitperiod\bibinitdelim Z\bibinitperiod},
+      }}%
+      {{hash=CK}{%
+         family={Chou},
+         familyi={C\bibinitperiod},
+         given={K.},
+         giveni={K\bibinitperiod},
+      }}%
+      {{hash=SC}{%
+         family={Shen},
+         familyi={S\bibinitperiod},
+         given={C.},
+         giveni={C\bibinitperiod},
+      }}%
+      {{hash=RM}{%
+         family={Reagor},
+         familyi={R\bibinitperiod},
+         given={M.},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=AC}{%
+         family={Axline},
+         familyi={A\bibinitperiod},
+         given={C.},
+         giveni={C\bibinitperiod},
+      }}%
+      {{hash=BRT}{%
+         family={Brierley},
+         familyi={B\bibinitperiod},
+         given={R.\bibnamedelima T.},
+         giveni={R\bibinitperiod\bibinitdelim T\bibinitperiod},
+      }}%
+      {{hash=SMP}{%
+         family={Silveri},
+         familyi={S\bibinitperiod},
+         given={M.\bibnamedelima P.},
+         giveni={M\bibinitperiod\bibinitdelim P\bibinitperiod},
+      }}%
+      {{hash=WC}{%
+         family={Wang},
+         familyi={W\bibinitperiod},
+         given={C.},
+         giveni={C\bibinitperiod},
+      }}%
+      {{hash=VB}{%
+         family={Vlastakis},
+         familyi={V\bibinitperiod},
+         given={B.},
+         giveni={B\bibinitperiod},
+      }}%
+      {{hash=NSE}{%
+         family={Nigg},
+         familyi={N\bibinitperiod},
+         given={S.\bibnamedelima E.},
+         giveni={S\bibinitperiod\bibinitdelim E\bibinitperiod},
+      }}%
+      {{hash=FL}{%
+         family={Frunzio},
+         familyi={F\bibinitperiod},
+         given={L.},
+         giveni={L\bibinitperiod},
+      }}%
+      {{hash=DMH}{%
+         family={Devoret},
+         familyi={D\bibinitperiod},
+         given={M.\bibnamedelima H.},
+         giveni={M\bibinitperiod\bibinitdelim H\bibinitperiod},
+      }}%
+      {{hash=JL}{%
+         family={Jiang},
+         familyi={J\bibinitperiod},
+         given={L.},
+         giveni={L\bibinitperiod},
+      }}%
+      {{hash=GSM}{%
+         family={Girvin},
+         familyi={G\bibinitperiod},
+         given={S.\bibnamedelima M.},
+         giveni={S\bibinitperiod\bibinitdelim M\bibinitperiod},
+      }}%
+      {{hash=SRJ}{%
+         family={Schoelkopf},
+         familyi={S\bibinitperiod},
+         given={R.\bibnamedelima J.},
+         giveni={R\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {American Physical Society}%
+    }
+    \strng{namehash}{BJZ+1}
+    \strng{fullhash}{BJZCKSCRMACBRTSMPWCVBNSEFLDMHJLGSMSRJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1103/PhysRevX.6.031041
+    \endverb
+    \field{issue}{3}
+    \field{pages}{031041}
+    \field{title}{Implementing and Characterizing Precise Multiqubit
+  Measurements}
+    \verb{url}
+    \verb https://link.aps.org/doi/10.1103/PhysRevX.6.031041
+    \endverb
+    \field{volume}{6}
+    \field{journaltitle}{Phys. Rev. X}
+    \field{year}{2016}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{Koch2007}{article}{}
+    \name{author}{10}{}{%
+      {{hash=KJ}{%
+         family={Koch},
+         familyi={K\bibinitperiod},
+         given={Jens},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=YTM}{%
+         family={Yu},
+         familyi={Y\bibinitperiod},
+         given={Terri\bibnamedelima M.},
+         giveni={T\bibinitperiod\bibinitdelim M\bibinitperiod},
+      }}%
+      {{hash=GJ}{%
+         family={Gambetta},
+         familyi={G\bibinitperiod},
+         given={Jay},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=HAA}{%
+         family={Houck},
+         familyi={H\bibinitperiod},
+         given={A.\bibnamedelima A.},
+         giveni={A\bibinitperiod\bibinitdelim A\bibinitperiod},
+      }}%
+      {{hash=SDI}{%
+         family={Schuster},
+         familyi={S\bibinitperiod},
+         given={D.\bibnamedelima I.},
+         giveni={D\bibinitperiod\bibinitdelim I\bibinitperiod},
+      }}%
+      {{hash=MJ}{%
+         family={Majer},
+         familyi={M\bibinitperiod},
+         given={J.},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=BA}{%
+         family={Blais},
+         familyi={B\bibinitperiod},
+         given={Alexandre},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=DMH}{%
+         family={Devoret},
+         familyi={D\bibinitperiod},
+         given={M.\bibnamedelima H.},
+         giveni={M\bibinitperiod\bibinitdelim H\bibinitperiod},
+      }}%
+      {{hash=GSM}{%
+         family={Girvin},
+         familyi={G\bibinitperiod},
+         given={S.\bibnamedelima M.},
+         giveni={S\bibinitperiod\bibinitdelim M\bibinitperiod},
+      }}%
+      {{hash=SRJ}{%
+         family={Schoelkopf},
+         familyi={S\bibinitperiod},
+         given={R.\bibnamedelima J.},
+         giveni={R\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {American Physical Society}%
+    }
+    \strng{namehash}{KJ+1}
+    \strng{fullhash}{KJYTMGJHAASDIMJBADMHGSMSRJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1103/PhysRevA.76.042319
+    \endverb
+    \field{issue}{4}
+    \field{pages}{042319}
+    \field{title}{Charge-insensitive qubit design derived from the Cooper pair
+  box}
+    \verb{url}
+    \verb https://link.aps.org/doi/10.1103/PhysRevA.76.042319
+    \endverb
+    \field{volume}{76}
+    \field{journaltitle}{Phys. Rev. A}
+    \field{year}{2007}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{Oszmaniec2018}{article}{}
+    \name{author}{3}{}{%
+      {{hash=OM}{%
+         family={Oszmaniec},
+         familyi={O\bibinitperiod},
+         given={Michał},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=MFB}{%
+         family={Maciejewski},
+         familyi={M\bibinitperiod},
+         given={Filip\bibnamedelima B.},
+         giveni={F\bibinitperiod\bibinitdelim B\bibinitperiod},
+      }}%
+      {{hash=PZ}{%
+         family={Puchała},
+         familyi={P\bibinitperiod},
+         given={Zbigniew},
+         giveni={Z\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {American Physical Society (APS)}%
+    }
+    \strng{namehash}{OMMFBPZ1}
+    \strng{fullhash}{OMMFBPZ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1103/physreva.100.012351
+    \endverb
+    \field{issn}{2469-9934}
+    \field{number}{1}
+    \field{title}{Simulating all quantum measurements using only projective
+  measurements and postselection}
+    \verb{url}
+    \verb http://dx.doi.org/10.1103/PhysRevA.100.012351
+    \endverb
+    \field{volume}{100}
+    \field{journaltitle}{Physical Review A}
+    \field{year}{2019}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{Grover1996}{article}{}
+    \name{author}{1}{}{%
+      {{hash=GLK}{%
+         family={{Grover}},
+         familyi={G\bibinitperiod},
+         given={Lov\bibnamedelima K.},
+         giveni={L\bibinitperiod\bibinitdelim K\bibinitperiod},
+      }}%
+    }
+    \keyw{Quantum Physics}
+    \strng{namehash}{GLK1}
+    \strng{fullhash}{GLK1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{eprint}
+    \verb quant-ph/9605043
+    \endverb
+    \field{pages}{quant\bibrangedash ph/9605043}
+    \field{title}{{A fast quantum mechanical algorithm for database search}}
+    \field{journaltitle}{arXiv e-prints}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{year}{1996}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{Bernstein1993}{inproceedings}{}
+    \name{author}{2}{}{%
+      {{hash=BE}{%
+         family={Bernstein},
+         familyi={B\bibinitperiod},
+         given={E.},
+         giveni={E\bibinitperiod},
+      }}%
+      {{hash=VU}{%
+         family={Vazirani},
+         familyi={V\bibinitperiod},
+         given={U.},
+         giveni={U\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{BEVU1}
+    \strng{fullhash}{BEVU1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{booktitle}{Proc. of the Twenty-Fifth Annual ACM Symposium on Theory
+  of Computing (STOC ’93)}
+    \verb{doi}
+    \verb DOI:10.1145/167088.167097
+    \endverb
+    \field{pages}{11–20}
+    \field{title}{Quantum complexity theory}
+    \field{year}{1993}
+  \endentry
+
+  \entry{Peres2006}{book}{}
+    \name{author}{1}{}{%
+      {{hash=PA}{%
+         family={Peres},
+         familyi={P\bibinitperiod},
+         given={Asher},
+         giveni={A\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Springer Science \& Business Media}%
+    }
+    \strng{namehash}{PA1}
+    \strng{fullhash}{PA1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb https://doi.org/10.1007/0-306-47120-5
+    \endverb
+    \field{title}{Quantum theory: Concepts and methods}
+    \field{volume}{57}
+    \field{year}{2006}
+  \endentry
+
+  \entry{Hradil2004}{inbook}{}
+    \name{author}{4}{}{%
+      {{hash=HZ}{%
+         family={Hradil},
+         familyi={H\bibinitperiod},
+         given={Zden{\v{e}}k},
+         giveni={Z\bibinitperiod},
+      }}%
+      {{hash=RJ}{%
+         family={{\v{R}}eh{\'a}{\v{c}}ek},
+         familyi={{\v{R}}\bibinitperiod},
+         given={Jaroslav},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=FJ}{%
+         family={Fiur{\'a}{\v{s}}ek},
+         familyi={F\bibinitperiod},
+         given={Jarom{\'i}r},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=JM}{%
+         family={Je{\v{z}}ek},
+         familyi={J\bibinitperiod},
+         given={Miroslav},
+         giveni={M\bibinitperiod},
+      }}%
+    }
+    \name{editor}{2}{}{%
+      {{hash=PM}{%
+         family={Paris},
+         familyi={P\bibinitperiod},
+         given={Matteo},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=RJ}{%
+         family={{\v{R}}eh{\'a}{\v{c}}ek},
+         familyi={{\v{R}}\bibinitperiod},
+         given={Jaroslav},
+         giveni={J\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Springer Berlin Heidelberg}%
+    }
+    \strng{namehash}{HZ+1}
+    \strng{fullhash}{HZRJFJJM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{abstract}{%
+    Maximum Likelihood estimation is a versatile tool covering wide range of
+  applications, but its benefits are apparent particularly in the quantum
+  domain. For a given set of measurements, the most likely state is estimated.
+  Though this problem is nonlinear, it can be effectively solved by an
+  iterative algorithm exploiting the convexity of the likelihood functional and
+  the manifold of density matrices. This formulation fully replaces the inverse
+  Radon transformation routinely used for tomographic reconstructions.
+  Moreover, it provides the most efficient estimation strategy saturating the
+  Cramer-Rao lower bound asymptotically. In this sense it exploits the acquired
+  data set in the optimal way and minimizes the artifacts associated with the
+  reconstruction procedure. The idea of maximum likelihood reconstruction is
+  further extended to the estimation of quantum processes, measurements, and
+  discrimination between quantum states. This technique is well suited for
+  future applications in quantum information science due to its ability to
+  quantify very subtle and fragile quantum effects.%
+    }
+    \field{booktitle}{Quantum State Estimation}
+    \verb{doi}
+    \verb 10.1007/978-3-540-44481-7_3
+    \endverb
+    \field{isbn}{978-3-540-44481-7}
+    \field{pages}{59\bibrangedash 112}
+    \field{title}{3 Maximum-Likelihood Methods in Quantum Mechanics}
+    \list{location}{1}{%
+      {Berlin, Heidelberg}%
+    }
+    \field{year}{2004}
+  \endentry
+
+  \entry{Fiurasek2001}{article}{}
+    \name{author}{1}{}{%
+      {{hash=FJ}{%
+         family={{Fiur{\'a}{\v{s}}ek}},
+         familyi={F\bibinitperiod},
+         given={Jarom{\'\i}r},
+         giveni={J\bibinitperiod},
+      }}%
+    }
+    \keyw{03.65.Ta, 03.65.Wj, Foundations of quantum mechanics, measurement
+  theory, State reconstruction quantum tomography, Quantum Physics}
+    \strng{namehash}{FJ1}
+    \strng{fullhash}{FJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1103/PhysRevA.64.024102
+    \endverb
+    \field{eid}{024102}
+    \verb{eprint}
+    \verb quant-ph/0101027
+    \endverb
+    \field{pages}{024102}
+    \field{title}{{Maximum-likelihood estimation of quantum measurement}}
+    \field{volume}{64}
+    \field{journaltitle}{Physical Review A}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{month}{08}
+    \field{year}{2001}
+  \endentry
+
+  \entry{Harrow2017}{article}{}
+    \name{author}{2}{}{%
+      {{hash=HAW}{%
+         family={{Harrow}},
+         familyi={H\bibinitperiod},
+         given={Aram\bibnamedelima W.},
+         giveni={A\bibinitperiod\bibinitdelim W\bibinitperiod},
+      }}%
+      {{hash=MA}{%
+         family={{Montanaro}},
+         familyi={M\bibinitperiod},
+         given={Ashley},
+         giveni={A\bibinitperiod},
+      }}%
+    }
+    \keyw{Quantum Physics}
+    \strng{namehash}{HAWMA1}
+    \strng{fullhash}{HAWMA1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1038/nature23458
+    \endverb
+    \verb{eprint}
+    \verb 1809.07442
+    \endverb
+    \field{pages}{203\bibrangedash 209}
+    \field{title}{{Quantum computational supremacy}}
+    \field{volume}{549}
+    \field{journaltitle}{\nat}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{month}{09}
+    \field{year}{2017}
+  \endentry
+
+  \entry{Pashayan2017}{article}{}
+    \name{author}{3}{}{%
+      {{hash=PH}{%
+         family={Pashayan},
+         familyi={P\bibinitperiod},
+         given={Hakop},
+         giveni={H\bibinitperiod},
+      }}%
+      {{hash=BSD}{%
+         family={Bartlett},
+         familyi={B\bibinitperiod},
+         given={Stephen\bibnamedelima D.},
+         giveni={S\bibinitperiod\bibinitdelim D\bibinitperiod},
+      }}%
+      {{hash=GD}{%
+         family={Gross},
+         familyi={G\bibinitperiod},
+         given={David},
+         giveni={D\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Verein zur Forderung des Open Access Publizierens in den
+  Quantenwissenschaften}%
+    }
+    \strng{namehash}{PHBSDGD1}
+    \strng{fullhash}{PHBSDGD1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.22331/q-2020-01-13-223
+    \endverb
+    \field{issn}{2521-327X}
+    \field{pages}{223}
+    \field{title}{From estimation of quantum probabilities to simulation of
+  quantum circuits}
+    \verb{url}
+    \verb http://dx.doi.org/10.22331/q-2020-01-13-223
+    \endverb
+    \field{volume}{4}
+    \field{journaltitle}{Quantum}
+    \field{year}{2020}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{Navascues2014}{article}{}
+    \name{author}{2}{}{%
+      {{hash=NM}{%
+         family={{Navascu{\'e}s}},
+         familyi={N\bibinitperiod},
+         given={Miguel},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=PS}{%
+         family={{Popescu}},
+         familyi={P\bibinitperiod},
+         given={Sandu},
+         giveni={S\bibinitperiod},
+      }}%
+    }
+    \keyw{03.67.-a, 03.65.Ta, Quantum information, Foundations of quantum
+  mechanics, measurement theory, Quantum Physics}
+    \strng{namehash}{NMPS1}
+    \strng{fullhash}{NMPS1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1103/PhysRevLett.112.140502
+    \endverb
+    \field{eid}{140502}
+    \verb{eprint}
+    \verb 1211.2101
+    \endverb
+    \field{pages}{140502}
+    \field{title}{{How Energy Conservation Limits Our Measurements}}
+    \field{volume}{112}
+    \field{journaltitle}{\prl}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{month}{04}
+    \field{year}{2014}
+  \endentry
+
+  \entry{Puchala2018}{article}{}
+    \name{author}{4}{}{%
+      {{hash=PZ}{%
+         family={{Pucha{\l}a}},
+         familyi={P\bibinitperiod},
+         given={Z.},
+         giveni={Z\bibinitperiod},
+      }}%
+      {{hash=PL}{%
+         family={{Pawela}},
+         familyi={P\bibinitperiod},
+         given={{\L}.},
+         giveni={{\L}\bibinitperiod},
+      }}%
+      {{hash=KA}{%
+         family={{Krawiec}},
+         familyi={K\bibinitperiod},
+         given={A.},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=KR}{%
+         family={{Kukulski}},
+         familyi={K\bibinitperiod},
+         given={R.},
+         giveni={R\bibinitperiod},
+      }}%
+    }
+    \keyw{Quantum Physics}
+    \strng{namehash}{PZ+1}
+    \strng{fullhash}{PZPLKAKR1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1103/PhysRevA.98.042103
+    \endverb
+    \verb{eprint}
+    \verb 1804.05856
+    \endverb
+    \field{number}{042103}
+    \field{pages}{042103}
+    \field{title}{{Strategies for optimal single-shot discrimination of quantum
+  measurements}}
+    \field{volume}{98}
+    \field{journaltitle}{Phys. Rev. A}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{year}{2018}
+  \endentry
+
+  \entry{Puchala2018b}{article}{}
+    \name{author}{5}{}{%
+      {{hash=PZ}{%
+         family={{Pucha{\l}a}},
+         familyi={P\bibinitperiod},
+         given={Zbigniew},
+         giveni={Z\bibinitperiod},
+      }}%
+      {{hash=PL}{%
+         family={{Pawela}},
+         familyi={P\bibinitperiod},
+         given={{\L}ukasz},
+         giveni={{\L}\bibinitperiod},
+      }}%
+      {{hash=KAr}{%
+         family={{Krawiec}},
+         familyi={K\bibinitperiod},
+         given={Aleksand\bibnamedelima ra},
+         giveni={A\bibinitperiod\bibinitdelim r\bibinitperiod},
+      }}%
+      {{hash=KR}{%
+         family={{Kukulski}},
+         familyi={K\bibinitperiod},
+         given={Ryszard},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=OM}{%
+         family={{Oszmaniec}},
+         familyi={O\bibinitperiod},
+         given={Micha{\l}},
+         giveni={M\bibinitperiod},
+      }}%
+    }
+    \keyw{Quantum Physics}
+    \strng{namehash}{PZ+2}
+    \strng{fullhash}{PZPLKArKROM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{eid}{arXiv:1810.05122}
+    \verb{eprint}
+    \verb 1810.05122
+    \endverb
+    \field{pages}{arXiv:1810.05122}
+    \field{title}{{Multiple-shot and unambiguous discrimination of von Neumann
+  measurements}}
+    \field{journaltitle}{arXiv e-prints}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{year}{2018}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{Watrous2018}{book}{}
+    \name{author}{1}{}{%
+      {{hash=WJ}{%
+         family={Watrous},
+         familyi={W\bibinitperiod},
+         given={John},
+         giveni={J\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Cambridge University Press}%
+    }
+    \strng{namehash}{WJ1}
+    \strng{fullhash}{WJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1017/9781316848142
+    \endverb
+    \field{title}{The Theory of Quantum Information}
+    \field{year}{2018}
+  \endentry
+
+  \entry{Haapasalo2012}{article}{}
+    \name{author}{3}{}{%
+      {{hash=HE}{%
+         family={Haapasalo},
+         familyi={H\bibinitperiod},
+         given={Erkka},
+         giveni={E\bibinitperiod},
+      }}%
+      {{hash=HT}{%
+         family={Heinosaari},
+         familyi={H\bibinitperiod},
+         given={Teiko},
+         giveni={T\bibinitperiod},
+      }}%
+      {{hash=PJP}{%
+         family={Pellonpaa},
+         familyi={P\bibinitperiod},
+         given={Juha-Pekka},
+         giveni={J\bibinitperiod-P\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Springer}%
+    }
+    \strng{namehash}{HEHTPJP1}
+    \strng{fullhash}{HEHTPJP1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1007/s11128-011-0330-2
+    \endverb
+    \field{number}{6}
+    \field{pages}{1751\bibrangedash 1763}
+    \field{title}{Quantum measurements on finite dimensional systems:
+  relabeling and mixing}
+    \field{volume}{11}
+    \field{journaltitle}{Quant. Inf. Process.}
+    \field{year}{2012}
+  \endentry
+
+  \entry{Oszmaniec2017}{article}{}
+    \name{author}{4}{}{%
+      {{hash=OM}{%
+         family={{Oszmaniec}},
+         familyi={O\bibinitperiod},
+         given={M.},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=GL}{%
+         family={{Guerini}},
+         familyi={G\bibinitperiod},
+         given={L.},
+         giveni={L\bibinitperiod},
+      }}%
+      {{hash=WP}{%
+         family={{Wittek}},
+         familyi={W\bibinitperiod},
+         given={P.},
+         giveni={P\bibinitperiod},
+      }}%
+      {{hash=AA}{%
+         family={{Ac{\'{\i}}n}},
+         familyi={A\bibinitperiod},
+         given={A.},
+         giveni={A\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{OM+1}
+    \strng{fullhash}{OMGLWPAA1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1103/PhysRevLett.119.190501
+    \endverb
+    \field{eid}{190501}
+    \verb{eprint}
+    \verb 1609.06139
+    \endverb
+    \field{number}{19}
+    \field{pages}{190501}
+    \field{title}{{Simulating Positive-Operator-Valued Measures with Projective
+  Measurements}}
+    \field{volume}{119}
+    \field{journaltitle}{Physical Review Letters}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{month}{11}
+    \field{year}{2017}
+  \endentry
+
+  \entry{Guerini2017}{article}{}
+    \name{author}{4}{}{%
+      {{hash=GL}{%
+         family={{Guerini}},
+         familyi={G\bibinitperiod},
+         given={Leonardo},
+         giveni={L\bibinitperiod},
+      }}%
+      {{hash=BJ}{%
+         family={{Bavaresco}},
+         familyi={B\bibinitperiod},
+         given={Jessica},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=TM}{%
+         family={{Terra Cunha}},
+         familyi={T\bibinitperiod},
+         given={Marcelo},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=AA}{%
+         family={{Ac{\'\i}n}},
+         familyi={A\bibinitperiod},
+         given={Antonio},
+         giveni={A\bibinitperiod},
+      }}%
+    }
+    \keyw{Quantum Physics}
+    \strng{namehash}{GL+1}
+    \strng{fullhash}{GLBJTMAA1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1063/1.4994303
+    \endverb
+    \field{eid}{092102}
+    \verb{eprint}
+    \verb 1705.06343
+    \endverb
+    \field{number}{9}
+    \field{pages}{092102}
+    \field{title}{{Operational framework for quantum measurement simulability}}
+    \field{volume}{58}
+    \field{journaltitle}{Journal of Mathematical Physics}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{year}{2017}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{Knill2008}{article}{}
+    \name{author}{10}{}{%
+      {{hash=KE}{%
+         family={{Knill}},
+         familyi={K\bibinitperiod},
+         given={E.},
+         giveni={E\bibinitperiod},
+      }}%
+      {{hash=LD}{%
+         family={{Leibfried}},
+         familyi={L\bibinitperiod},
+         given={D.},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=RR}{%
+         family={{Reichle}},
+         familyi={R\bibinitperiod},
+         given={R.},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=BJ}{%
+         family={{Britton}},
+         familyi={B\bibinitperiod},
+         given={J.},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=BRB}{%
+         family={{Blakestad}},
+         familyi={B\bibinitperiod},
+         given={R.\bibnamedelima B.},
+         giveni={R\bibinitperiod\bibinitdelim B\bibinitperiod},
+      }}%
+      {{hash=JJD}{%
+         family={{Jost}},
+         familyi={J\bibinitperiod},
+         given={J.\bibnamedelima D.},
+         giveni={J\bibinitperiod\bibinitdelim D\bibinitperiod},
+      }}%
+      {{hash=LC}{%
+         family={{Langer}},
+         familyi={L\bibinitperiod},
+         given={C.},
+         giveni={C\bibinitperiod},
+      }}%
+      {{hash=OR}{%
+         family={{Ozeri}},
+         familyi={O\bibinitperiod},
+         given={R.},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=SS}{%
+         family={{Seidelin}},
+         familyi={S\bibinitperiod},
+         given={S.},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=WDJ}{%
+         family={{Wineland}},
+         familyi={W\bibinitperiod},
+         given={D.\bibnamedelima J.},
+         giveni={D\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+    }
+    \keyw{03.67.Lx, 03.67.Pp, 37.10.De, 37.10.Gh, Quantum computation, Quantum
+  error correction and other methods for protection against decoherence, Atom
+  cooling methods, Atom traps and guides, Quantum Physics}
+    \strng{namehash}{KE+1}
+    \strng{fullhash}{KELDRRBJBRBJJDLCORSSWDJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1103/PhysRevA.77.012307
+    \endverb
+    \field{eid}{012307}
+    \verb{eprint}
+    \verb 0707.0963
+    \endverb
+    \field{pages}{012307}
+    \field{title}{{Randomized benchmarking of quantum gates}}
+    \field{volume}{77}
+    \field{journaltitle}{Physical Review A}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{month}{01}
+    \field{year}{2008}
+  \endentry
+
+  \entry{Gambetta2012}{article}{}
+    \name{author}{12}{}{%
+      {{hash=GJM}{%
+         family={{Gambetta}},
+         familyi={G\bibinitperiod},
+         given={Jay\bibnamedelima M.},
+         giveni={J\bibinitperiod\bibinitdelim M\bibinitperiod},
+      }}%
+      {{hash=CAD}{%
+         family={{C{\'o}rcoles}},
+         familyi={C\bibinitperiod},
+         given={A.\bibnamedelima D.},
+         giveni={A\bibinitperiod\bibinitdelim D\bibinitperiod},
+      }}%
+      {{hash=MST}{%
+         family={{Merkel}},
+         familyi={M\bibinitperiod},
+         given={S.\bibnamedelima T.},
+         giveni={S\bibinitperiod\bibinitdelim T\bibinitperiod},
+      }}%
+      {{hash=JBR}{%
+         family={{Johnson}},
+         familyi={J\bibinitperiod},
+         given={B.\bibnamedelima R.},
+         giveni={B\bibinitperiod\bibinitdelim R\bibinitperiod},
+      }}%
+      {{hash=SJA}{%
+         family={{Smolin}},
+         familyi={S\bibinitperiod},
+         given={John\bibnamedelima A.},
+         giveni={J\bibinitperiod\bibinitdelim A\bibinitperiod},
+      }}%
+      {{hash=CJM}{%
+         family={{Chow}},
+         familyi={C\bibinitperiod},
+         given={Jerry\bibnamedelima M.},
+         giveni={J\bibinitperiod\bibinitdelim M\bibinitperiod},
+      }}%
+      {{hash=RCA}{%
+         family={{Ryan}},
+         familyi={R\bibinitperiod},
+         given={Colm\bibnamedelima A.},
+         giveni={C\bibinitperiod\bibinitdelim A\bibinitperiod},
+      }}%
+      {{hash=RC}{%
+         family={{Rigetti}},
+         familyi={R\bibinitperiod},
+         given={Chad},
+         giveni={C\bibinitperiod},
+      }}%
+      {{hash=PS}{%
+         family={{Poletto}},
+         familyi={P\bibinitperiod},
+         given={S.},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=OTA}{%
+         family={{Ohki}},
+         familyi={O\bibinitperiod},
+         given={Thomas\bibnamedelima A.},
+         giveni={T\bibinitperiod\bibinitdelim A\bibinitperiod},
+      }}%
+      {{hash=KMB}{%
+         family={{Ketchen}},
+         familyi={K\bibinitperiod},
+         given={Mark\bibnamedelima B.},
+         giveni={M\bibinitperiod\bibinitdelim B\bibinitperiod},
+      }}%
+      {{hash=SM}{%
+         family={{Steffen}},
+         familyi={S\bibinitperiod},
+         given={M.},
+         giveni={M\bibinitperiod},
+      }}%
+    }
+    \keyw{03.67.-a, 42.50.Pq, 85.25.-j, Quantum information, Cavity quantum
+  electrodynamics, micromasers, Superconducting devices, Quantum Physics,
+  Condensed Matter - Mesoscale and Nanoscale Physics, Condensed Matter -
+  Superconductivity}
+    \strng{namehash}{GJM+1}
+    \strng{fullhash}{GJMCADMSTJBRSJACJMRCARCPSOTAKMBSM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1103/PhysRevLett.109.240504
+    \endverb
+    \field{eid}{240504}
+    \verb{eprint}
+    \verb 1204.6308
+    \endverb
+    \field{pages}{240504}
+    \field{title}{{Characterization of Addressability by Simultaneous
+  Randomized Benchmarking}}
+    \field{volume}{109}
+    \field{journaltitle}{\prl}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{month}{12}
+    \field{year}{2012}
+  \endentry
+
+  \entry{Guta2018}{article}{}
+    \name{author}{4}{}{%
+      {{hash=GM}{%
+         family={{Guta}},
+         familyi={G\bibinitperiod},
+         given={Madalin},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=KJ}{%
+         family={{Kahn}},
+         familyi={K\bibinitperiod},
+         given={Jonas},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=KR}{%
+         family={{Kueng}},
+         familyi={K\bibinitperiod},
+         given={Richard},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=TJA}{%
+         family={{Tropp}},
+         familyi={T\bibinitperiod},
+         given={Joel\bibnamedelima A.},
+         giveni={J\bibinitperiod\bibinitdelim A\bibinitperiod},
+      }}%
+    }
+    \keyw{Quantum Physics, Computer Science - Information Theory, Mathematics -
+  Probability, Primary: 81P50. Secondary: 15B52}
+    \strng{namehash}{GM+1}
+    \strng{fullhash}{GMKJKRTJA1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{eprint}
+    \verb 1809.11162
+    \endverb
+    \field{pages}{arXiv:1809.11162}
+    \field{title}{{Fast state tomography with optimal error bounds}}
+    \field{journaltitle}{arXiv e-prints}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{year}{2018}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{Weissman2003}{article}{}
+    \name{author}{5}{}{%
+      {{hash=WT}{%
+         family={{Weissman}},
+         familyi={W\bibinitperiod},
+         given={T.},
+         giveni={T\bibinitperiod},
+      }}%
+      {{hash=OE}{%
+         family={{Ordentlich}},
+         familyi={O\bibinitperiod},
+         given={E.},
+         giveni={E\bibinitperiod},
+      }}%
+      {{hash=SG}{%
+         family={{Seroussi}},
+         familyi={S\bibinitperiod},
+         given={G.},
+         giveni={G\bibinitperiod},
+      }}%
+      {{hash=VS}{%
+         family={{Verdul}},
+         familyi={V\bibinitperiod},
+         given={S.},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=WMJ}{%
+         family={{Weinberger}},
+         familyi={W\bibinitperiod},
+         given={M.\bibnamedelima J.},
+         giveni={M\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{WT+1}
+    \strng{fullhash}{WTOESGVSWMJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{title}{Inequalities for the L1 Deviation of the Empirical
+  Distribution}
+    \field{journaltitle}{Technical Report HPL-2003-97R1, Hewlett-Packard Labs}
+    \field{month}{08}
+    \field{year}{2003}
+  \endentry
+
+  \entry{cvxopt}{misc}{}
+    \name{author}{3}{}{%
+      {{hash=AMS}{%
+         family={{Andersen}},
+         familyi={A\bibinitperiod},
+         given={M.\bibnamedelima S.},
+         giveni={M\bibinitperiod\bibinitdelim S\bibinitperiod},
+      }}%
+      {{hash=DJ}{%
+         family={{Dahl}},
+         familyi={D\bibinitperiod},
+         given={J.},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=VL}{%
+         family={{Vandenberghe}},
+         familyi={V\bibinitperiod},
+         given={L.},
+         giveni={L\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{AMSDJVL1}
+    \strng{fullhash}{AMSDJVL1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{title}{CVXOPT: A Python package for convex optimization, version
+  1.2}
+    \verb{url}
+    \verb https://cvxopt.org/
+    \endverb
+    \field{year}{2019}
+  \endentry
+
+  \entry{qiskit_github}{misc}{}
+    \name{author}{1}{}{%
+      {{hash=I}{%
+         family={IBM},
+         familyi={I\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{I1}
+    \strng{fullhash}{I1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{title}{Qiskit Github repository}
+    \verb{url}
+    \verb https://github.com/Qiskit/ibmq-device-information/tree/master/backend
+    \verb s
+    \endverb
+    \field{year}{Access: 2019.07.09}
+  \endentry
+
+  \entry{Kohout2013}{article}{}
+    \name{author}{6}{}{%
+      {{hash=BR}{%
+         family={{Blume-Kohout}},
+         familyi={B\bibinitperiod},
+         given={Robin},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=KJ}{%
+         family={{King Gamble}},
+         familyi={K\bibinitperiod},
+         given={John},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=NE}{%
+         family={{Nielsen}},
+         familyi={N\bibinitperiod},
+         given={Erik},
+         giveni={E\bibinitperiod},
+      }}%
+      {{hash=MJ}{%
+         family={{Mizrahi}},
+         familyi={M\bibinitperiod},
+         given={Jonathan},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=SJD}{%
+         family={{Sterk}},
+         familyi={S\bibinitperiod},
+         given={Jonathan\bibnamedelima D.},
+         giveni={J\bibinitperiod\bibinitdelim D\bibinitperiod},
+      }}%
+      {{hash=MP}{%
+         family={{Maunz}},
+         familyi={M\bibinitperiod},
+         given={Peter},
+         giveni={P\bibinitperiod},
+      }}%
+    }
+    \keyw{Quantum Physics}
+    \strng{namehash}{BR+1}
+    \strng{fullhash}{BRKJNEMJSJDMP1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{eid}{arXiv:1310.4492}
+    \verb{eprint}
+    \verb 1310.4492
+    \endverb
+    \field{pages}{arXiv:1310.4492}
+    \field{title}{{Robust, self-consistent, closed-form tomography of quantum
+  logic gates on a trapped ion qubit}}
+    \field{journaltitle}{arXiv e-prints}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{year}{2013}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{SelfCons2013}{article}{}
+    \name{author}{8}{}{%
+      {{hash=MST}{%
+         family={{Merkel}},
+         familyi={M\bibinitperiod},
+         given={Seth\bibnamedelima T.},
+         giveni={S\bibinitperiod\bibinitdelim T\bibinitperiod},
+      }}%
+      {{hash=GJM}{%
+         family={{Gambetta}},
+         familyi={G\bibinitperiod},
+         given={Jay\bibnamedelima M.},
+         giveni={J\bibinitperiod\bibinitdelim M\bibinitperiod},
+      }}%
+      {{hash=SJA}{%
+         family={{Smolin}},
+         familyi={S\bibinitperiod},
+         given={John\bibnamedelima A.},
+         giveni={J\bibinitperiod\bibinitdelim A\bibinitperiod},
+      }}%
+      {{hash=PS}{%
+         family={{Poletto}},
+         familyi={P\bibinitperiod},
+         given={Stefano},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=CAD}{%
+         family={{C{\'o}rcoles}},
+         familyi={C\bibinitperiod},
+         given={Antonio\bibnamedelima D.},
+         giveni={A\bibinitperiod\bibinitdelim D\bibinitperiod},
+      }}%
+      {{hash=JBR}{%
+         family={{Johnson}},
+         familyi={J\bibinitperiod},
+         given={Blake\bibnamedelima R.},
+         giveni={B\bibinitperiod\bibinitdelim R\bibinitperiod},
+      }}%
+      {{hash=RCA}{%
+         family={{Ryan}},
+         familyi={R\bibinitperiod},
+         given={Colm\bibnamedelima A.},
+         giveni={C\bibinitperiod\bibinitdelim A\bibinitperiod},
+      }}%
+      {{hash=SM}{%
+         family={{Steffen}},
+         familyi={S\bibinitperiod},
+         given={Matthias},
+         giveni={M\bibinitperiod},
+      }}%
+    }
+    \keyw{03.65.Wj, 03.67.Ac, 42.50.Pq, State reconstruction quantum
+  tomography, Quantum algorithms protocols and simulations, Cavity quantum
+  electrodynamics, micromasers, Quantum Physics}
+    \strng{namehash}{MST+1}
+    \strng{fullhash}{MSTGJMSJAPSCADJBRRCASM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1103/PhysRevA.87.062119
+    \endverb
+    \field{eid}{062119}
+    \verb{eprint}
+    \verb 1211.0322
+    \endverb
+    \field{number}{6}
+    \field{pages}{062119}
+    \field{title}{{Self-consistent quantum process tomography}}
+    \field{volume}{87}
+    \field{journaltitle}{Phys. Rev. A}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{year}{2013}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{Pusey2017}{article}{}
+    \name{author}{4}{}{%
+      {{hash=MMD}{%
+         family={{Mazurek}},
+         familyi={M\bibinitperiod},
+         given={Michael\bibnamedelima D.},
+         giveni={M\bibinitperiod\bibinitdelim D\bibinitperiod},
+      }}%
+      {{hash=PMF}{%
+         family={{Pusey}},
+         familyi={P\bibinitperiod},
+         given={Matthew\bibnamedelima F.},
+         giveni={M\bibinitperiod\bibinitdelim F\bibinitperiod},
+      }}%
+      {{hash=RKJ}{%
+         family={{Resch}},
+         familyi={R\bibinitperiod},
+         given={Kevin\bibnamedelima J.},
+         giveni={K\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+      {{hash=SRW}{%
+         family={{Spekkens}},
+         familyi={S\bibinitperiod},
+         given={Robert\bibnamedelima W.},
+         giveni={R\bibinitperiod\bibinitdelim W\bibinitperiod},
+      }}%
+    }
+    \keyw{Quantum Physics, Physics - Optics}
+    \strng{namehash}{MMD+1}
+    \strng{fullhash}{MMDPMFRKJSRW1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{eid}{arXiv:1710.05948}
+    \verb{eprint}
+    \verb 1710.05948
+    \endverb
+    \field{pages}{arXiv:1710.05948}
+    \field{title}{{Experimentally bounding deviations from quantum theory in
+  the landscape of generalized probabilistic theories}}
+    \field{journaltitle}{arXiv e-prints}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{year}{2017}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{QAOA2014}{article}{}
+    \name{author}{3}{}{%
+      {{hash=FE}{%
+         family={{Farhi}},
+         familyi={F\bibinitperiod},
+         given={Edward},
+         giveni={E\bibinitperiod},
+      }}%
+      {{hash=GJ}{%
+         family={{Goldstone}},
+         familyi={G\bibinitperiod},
+         given={Jeffrey},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=GS}{%
+         family={{Gutmann}},
+         familyi={G\bibinitperiod},
+         given={Sam},
+         giveni={S\bibinitperiod},
+      }}%
+    }
+    \keyw{Quantum Physics}
+    \strng{namehash}{FEGJGS1}
+    \strng{fullhash}{FEGJGS1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{eid}{arXiv:1411.4028}
+    \verb{eprint}
+    \verb 1411.4028
+    \endverb
+    \field{pages}{arXiv:1411.4028}
+    \field{title}{{A Quantum Approximate Optimization Algorithm}}
+    \field{journaltitle}{arXiv e-prints}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{year}{2014}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{Smolin2012}{article}{}
+    \name{author}{3}{}{%
+      {{hash=SJA}{%
+         family={{Smolin}},
+         familyi={S\bibinitperiod},
+         given={John\bibnamedelima A.},
+         giveni={J\bibinitperiod\bibinitdelim A\bibinitperiod},
+      }}%
+      {{hash=GJM}{%
+         family={{Gambetta}},
+         familyi={G\bibinitperiod},
+         given={Jay\bibnamedelima M.},
+         giveni={J\bibinitperiod\bibinitdelim M\bibinitperiod},
+      }}%
+      {{hash=SG}{%
+         family={{Smith}},
+         familyi={S\bibinitperiod},
+         given={Graeme},
+         giveni={G\bibinitperiod},
+      }}%
+    }
+    \keyw{Quantum Physics}
+    \strng{namehash}{SJAGJMSG1}
+    \strng{fullhash}{SJAGJMSG1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1103/PhysRevLett.108.070502
+    \endverb
+    \verb{eprint}
+    \verb 1106.5458
+    \endverb
+    \field{number}{070502}
+    \field{pages}{070502}
+    \field{title}{{Maximum Likelihood, Minimum Effort}}
+    \field{volume}{108}
+    \field{journaltitle}{Phys. Rev. Lett}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{year}{2012}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{Schumacher1996}{article}{}
+    \name{author}{1}{}{%
+      {{hash=SB}{%
+         family={{Schumacher}},
+         familyi={S\bibinitperiod},
+         given={Benjamin},
+         giveni={B\bibinitperiod},
+      }}%
+    }
+    \keyw{Quantum Physics}
+    \strng{namehash}{SB1}
+    \strng{fullhash}{SB1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{eid}{quant-ph/9604023}
+    \verb{eprint}
+    \verb quant-ph/9604023
+    \endverb
+    \field{pages}{quant\bibrangedash ph/9604023}
+    \field{title}{{Sending quantum entanglement through noisy channels}}
+    \field{journaltitle}{arXiv e-prints}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{year}{1996}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{Horodecki1998}{article}{}
+    \name{author}{3}{}{%
+      {{hash=HP}{%
+         family={{Horodecki}},
+         familyi={H\bibinitperiod},
+         given={Pawel},
+         giveni={P\bibinitperiod},
+      }}%
+      {{hash=HM}{%
+         family={{Horodecki}},
+         familyi={H\bibinitperiod},
+         given={Michal},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=HR}{%
+         family={{Horodecki}},
+         familyi={H\bibinitperiod},
+         given={Ryszard},
+         giveni={R\bibinitperiod},
+      }}%
+    }
+    \keyw{Quantum Physics}
+    \strng{namehash}{HPHMHR1}
+    \strng{fullhash}{HPHMHR1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{eid}{quant-ph/9807091}
+    \verb{eprint}
+    \verb quant-ph/9807091
+    \endverb
+    \field{pages}{quant\bibrangedash ph/9807091}
+    \field{title}{{General teleportation channel, singlet fraction and
+  quasi-distillation}}
+    \field{journaltitle}{arXiv e-prints}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{year}{1998}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{Chefles1998}{article}{}
+    \name{author}{1}{}{%
+      {{hash=CA}{%
+         family={{Chefles}},
+         familyi={C\bibinitperiod},
+         given={Anthony},
+         giveni={A\bibinitperiod},
+      }}%
+    }
+    \keyw{Quantum Physics}
+    \strng{namehash}{CA1}
+    \strng{fullhash}{CA1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1016/S0375-9601(98)00064-4
+    \endverb
+    \verb{eprint}
+    \verb quant-ph/9807022
+    \endverb
+    \field{number}{6}
+    \field{pages}{339\bibrangedash 347}
+    \field{title}{{Unambiguous discrimination between linearly independent
+  quantum states}}
+    \field{volume}{239}
+    \field{journaltitle}{Physics Letters A}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{year}{1998}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{Barnett2009}{article}{}
+    \name{author}{2}{}{%
+      {{hash=BSM}{%
+         family={{Barnett}},
+         familyi={B\bibinitperiod},
+         given={Stephen\bibnamedelima M.},
+         giveni={S\bibinitperiod\bibinitdelim M\bibinitperiod},
+      }}%
+      {{hash=CS}{%
+         family={{Croke}},
+         familyi={C\bibinitperiod},
+         given={Sarah},
+         giveni={S\bibinitperiod},
+      }}%
+    }
+    \keyw{Quantum Physics}
+    \strng{namehash}{BSMCS1}
+    \strng{fullhash}{BSMCS1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1364/AOP.1.000238
+    \endverb
+    \verb{eprint}
+    \verb 0810.1970
+    \endverb
+    \field{number}{2}
+    \field{pages}{238}
+    \field{title}{{Quantum state discrimination}}
+    \field{volume}{1}
+    \field{journaltitle}{Advances in Optics and Photonics}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{year}{2009}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{Renes2004}{article}{}
+    \name{author}{4}{}{%
+      {{hash=RJM}{%
+         family={{Renes}},
+         familyi={R\bibinitperiod},
+         given={Joseph\bibnamedelima M.},
+         giveni={J\bibinitperiod\bibinitdelim M\bibinitperiod},
+      }}%
+      {{hash=BR}{%
+         family={{Blume-Kohout}},
+         familyi={B\bibinitperiod},
+         given={Robin},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=SAJ}{%
+         family={{Scott}},
+         familyi={S\bibinitperiod},
+         given={A.\bibnamedelima J.},
+         giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+      {{hash=CCM}{%
+         family={{Caves}},
+         familyi={C\bibinitperiod},
+         given={Carlton\bibnamedelima M.},
+         giveni={C\bibinitperiod\bibinitdelim M\bibinitperiod},
+      }}%
+    }
+    \keyw{03.67.Dd, 03.65.Ca, 03.65.Fd, Quantum cryptography, Formalism,
+  Algebraic methods, Quantum Physics, Computer Science - Information Theory,
+  Mathematics - Functional Analysis}
+    \strng{namehash}{RJM+1}
+    \strng{fullhash}{RJMBRSAJCCM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1063/1.1737053
+    \endverb
+    \verb{eprint}
+    \verb quant-ph/0310075
+    \endverb
+    \field{number}{6}
+    \field{pages}{2171\bibrangedash 2180}
+    \field{title}{{Symmetric informationally complete quantum measurements}}
+    \field{volume}{45}
+    \field{journaltitle}{Journal of Mathematical Physics}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{year}{2004}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{Ishizaka2008}{article}{}
+    \name{author}{2}{}{%
+      {{hash=IS}{%
+         family={{Ishizaka}},
+         familyi={I\bibinitperiod},
+         given={Satoshi},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=HT}{%
+         family={{Hiroshima}},
+         familyi={H\bibinitperiod},
+         given={Tohya},
+         giveni={T\bibinitperiod},
+      }}%
+    }
+    \keyw{03.67.Hk, 03.67.Ac, 03.67.Bg, 03.67.Lx, Quantum communication,
+  Quantum algorithms protocols and simulations, Entanglement production and
+  manipulation, Quantum computation, Quantum Physics}
+    \strng{namehash}{ISHT1}
+    \strng{fullhash}{ISHT1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1103/PhysRevLett.101.240501
+    \endverb
+    \field{eid}{240501}
+    \verb{eprint}
+    \verb 0807.4568
+    \endverb
+    \field{number}{24}
+    \field{pages}{240501}
+    \field{title}{{Asymptotic Teleportation Scheme as a Universal Programmable
+  Quantum Processor}}
+    \field{volume}{101}
+    \field{journaltitle}{\prl}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{year}{2008}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{RevModPhysComp2010}{article}{}
+    \name{author}{2}{}{%
+      {{hash=CAM}{%
+         family={Childs},
+         familyi={C\bibinitperiod},
+         given={Andrew\bibnamedelima M.},
+         giveni={A\bibinitperiod\bibinitdelim M\bibinitperiod},
+      }}%
+      {{hash=vDW}{%
+         prefix={van},
+         prefixi={v\bibinitperiod},
+         family={Dam},
+         familyi={D\bibinitperiod},
+         given={Wim},
+         giveni={W\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {American Physical Society}%
+    }
+    \strng{namehash}{CAMDWv1}
+    \strng{fullhash}{CAMDWv1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1103/RevModPhys.82.1
+    \endverb
+    \field{issue}{1}
+    \field{pages}{1\bibrangedash 52}
+    \field{title}{Quantum algorithms for algebraic problems}
+    \verb{url}
+    \verb https://link.aps.org/doi/10.1103/RevModPhys.82.1
+    \endverb
+    \field{volume}{82}
+    \field{journaltitle}{Rev. Mod. Phys.}
+    \field{year}{2010}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{Preskill2012}{article}{}
+    \name{author}{1}{}{%
+      {{hash=PJ}{%
+         family={{Preskill}},
+         familyi={P\bibinitperiod},
+         given={John},
+         giveni={J\bibinitperiod},
+      }}%
+    }
+    \keyw{Quantum Physics, Condensed Matter - Strongly Correlated Electrons}
+    \strng{namehash}{PJ2}
+    \strng{fullhash}{PJ2}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{eprint}
+    \verb 1203.5813
+    \endverb
+    \field{title}{{Quantum computing and the entanglement frontier}}
+    \field{journaltitle}{arXiv e-prints}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{month}{03}
+    \field{year}{2012}
+  \endentry
+
+  \entry{Coles2018}{article}{}
+    \name{author}{32}{}{%
+      {{hash=CPJ}{%
+         family={{Coles}},
+         familyi={C\bibinitperiod},
+         given={Patrick\bibnamedelima J.},
+         giveni={P\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+      {{hash=ES}{%
+         family={{Eidenbenz}},
+         familyi={E\bibinitperiod},
+         given={Stephan},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=PS}{%
+         family={{Pakin}},
+         familyi={P\bibinitperiod},
+         given={Scott},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=AA}{%
+         family={{Adedoyin}},
+         familyi={A\bibinitperiod},
+         given={Adetokunbo},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=AJ}{%
+         family={{Ambrosiano}},
+         familyi={A\bibinitperiod},
+         given={John},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=AP}{%
+         family={{Anisimov}},
+         familyi={A\bibinitperiod},
+         given={Petr},
+         giveni={P\bibinitperiod},
+      }}%
+      {{hash=CW}{%
+         family={{Casper}},
+         familyi={C\bibinitperiod},
+         given={William},
+         giveni={W\bibinitperiod},
+      }}%
+      {{hash=CG}{%
+         family={{Chennupati}},
+         familyi={C\bibinitperiod},
+         given={Gopinath},
+         giveni={G\bibinitperiod},
+      }}%
+      {{hash=CC}{%
+         family={{Coffrin}},
+         familyi={C\bibinitperiod},
+         given={Carleton},
+         giveni={C\bibinitperiod},
+      }}%
+      {{hash=DH}{%
+         family={{Djidjev}},
+         familyi={D\bibinitperiod},
+         given={Hristo},
+         giveni={H\bibinitperiod},
+      }}%
+      {{hash=GD}{%
+         family={{Gunter}},
+         familyi={G\bibinitperiod},
+         given={David},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=KS}{%
+         family={{Karra}},
+         familyi={K\bibinitperiod},
+         given={Satish},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=LN}{%
+         family={{Lemons}},
+         familyi={L\bibinitperiod},
+         given={Nathan},
+         giveni={N\bibinitperiod},
+      }}%
+      {{hash=LS}{%
+         family={{Lin}},
+         familyi={L\bibinitperiod},
+         given={Shizeng},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=LA}{%
+         family={{Lokhov}},
+         familyi={L\bibinitperiod},
+         given={Andrey},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=MA}{%
+         family={{Malyzhenkov}},
+         familyi={M\bibinitperiod},
+         given={Alexander},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=MD}{%
+         family={{Mascarenas}},
+         familyi={M\bibinitperiod},
+         given={David},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=MS}{%
+         family={{Mniszewski}},
+         familyi={M\bibinitperiod},
+         given={Susan},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=NB}{%
+         family={{Nadiga}},
+         familyi={N\bibinitperiod},
+         given={Balu},
+         giveni={B\bibinitperiod},
+      }}%
+      {{hash=OD}{%
+         family={{O'Malley}},
+         familyi={O\bibinitperiod},
+         given={Dan},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=OD}{%
+         family={{Oyen}},
+         familyi={O\bibinitperiod},
+         given={Diane},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=PL}{%
+         family={{Prasad}},
+         familyi={P\bibinitperiod},
+         given={Lakshman},
+         giveni={L\bibinitperiod},
+      }}%
+      {{hash=RR}{%
+         family={{Roberts}},
+         familyi={R\bibinitperiod},
+         given={Randy},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=RP}{%
+         family={{Romero}},
+         familyi={R\bibinitperiod},
+         given={Phil},
+         giveni={P\bibinitperiod},
+      }}%
+      {{hash=SN}{%
+         family={{Santhi}},
+         familyi={S\bibinitperiod},
+         given={Nandakishore},
+         giveni={N\bibinitperiod},
+      }}%
+      {{hash=SN}{%
+         family={{Sinitsyn}},
+         familyi={S\bibinitperiod},
+         given={Nikolai},
+         giveni={N\bibinitperiod},
+      }}%
+      {{hash=SP}{%
+         family={{Swart}},
+         familyi={S\bibinitperiod},
+         given={Pieter},
+         giveni={P\bibinitperiod},
+      }}%
+      {{hash=VM}{%
+         family={{Vuffray}},
+         familyi={V\bibinitperiod},
+         given={Marc},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=WJ}{%
+         family={{Wendelberger}},
+         familyi={W\bibinitperiod},
+         given={Jim},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=YB}{%
+         family={{Yoon}},
+         familyi={Y\bibinitperiod},
+         given={Boram},
+         giveni={B\bibinitperiod},
+      }}%
+      {{hash=ZR}{%
+         family={{Zamora}},
+         familyi={Z\bibinitperiod},
+         given={Richard},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=ZW}{%
+         family={{Zhu}},
+         familyi={Z\bibinitperiod},
+         given={Wei},
+         giveni={W\bibinitperiod},
+      }}%
+    }
+    \keyw{Computer Science - Emerging Technologies, Quantum Physics}
+    \strng{namehash}{CPJ+1}
+  \strng{fullhash}{CPJESPSAAAJAPCWCGCCDHGDKSLNLSLAMAMDMSNBODODPLRRRPSNSNSPVMWJYBZRZW1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{eprint}
+    \verb 1804.03719
+    \endverb
+    \field{title}{{Quantum Algorithm Implementations for Beginners}}
+    \field{journaltitle}{arXiv e-prints}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{cs.ET}
+    \field{year}{2018}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{online_repo}{misc}{}
+    \field{note}{Additional experimental data, such as the exact form of the
+  implemented and reconstructed operators, is accessible online in the github
+  repository -- \url{https://github.com/fbm2718/mitigation_paper2019}. For the
+  Python code implementing the ideas from the work, see GitHub repository:
+  \url{https://github.com/fbm2718/QREM}.}
+  \endentry
+
+  \entry{VQE2017IBM}{article}{}
+    \name{author}{10}{}{%
+      {{hash=MN}{%
+         family={{Moll}},
+         familyi={M\bibinitperiod},
+         given={Nikolaj},
+         giveni={N\bibinitperiod},
+      }}%
+      {{hash=BP}{%
+         family={{Barkoutsos}},
+         familyi={B\bibinitperiod},
+         given={Panagiotis},
+         giveni={P\bibinitperiod},
+      }}%
+      {{hash=BLS}{%
+         family={{Bishop}},
+         familyi={B\bibinitperiod},
+         given={Lev\bibnamedelima S.},
+         giveni={L\bibinitperiod\bibinitdelim S\bibinitperiod},
+      }}%
+      {{hash=CJM}{%
+         family={{Chow}},
+         familyi={C\bibinitperiod},
+         given={Jerry\bibnamedelima M.},
+         giveni={J\bibinitperiod\bibinitdelim M\bibinitperiod},
+      }}%
+      {{hash=CA}{%
+         family={{Cross}},
+         familyi={C\bibinitperiod},
+         given={Andrew},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=EDJ}{%
+         family={{Egger}},
+         familyi={E\bibinitperiod},
+         given={Daniel\bibnamedelima J.},
+         giveni={D\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+      {{hash=FS}{%
+         family={{Filipp}},
+         familyi={F\bibinitperiod},
+         given={Stefan},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=FA}{%
+         family={{Fuhrer}},
+         familyi={F\bibinitperiod},
+         given={Andreas},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=GJM}{%
+         family={{Gambetta}},
+         familyi={G\bibinitperiod},
+         given={Jay\bibnamedelima M.},
+         giveni={J\bibinitperiod\bibinitdelim M\bibinitperiod},
+      }}%
+      {{hash=GM}{%
+         family={{Ganzhorn}},
+         familyi={G\bibinitperiod},
+         given={Marc},
+         giveni={M\bibinitperiod},
+      }}%
+    }
+    \keyw{Quantum Physics}
+    \strng{namehash}{MN+1}
+    \strng{fullhash}{MNBPBLSCJMCAEDJFSFAGJMGM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1088/2058-9565/aab822
+    \endverb
+    \verb{eprint}
+    \verb 1710.01022
+    \endverb
+    \field{pages}{030503}
+    \field{title}{{Quantum optimization using variational algorithms on
+  near-term quantum devices}}
+    \field{volume}{3}
+    \field{journaltitle}{Quantum Science and Technology}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{year}{2018}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{Wang2019}{article}{}
+    \name{author}{3}{}{%
+      {{hash=WJ}{%
+         family={{Wang}},
+         familyi={W\bibinitperiod},
+         given={Jinzhao},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=SVB}{%
+         family={{Scholz}},
+         familyi={S\bibinitperiod},
+         given={Volkher\bibnamedelima B.},
+         giveni={V\bibinitperiod\bibinitdelim B\bibinitperiod},
+      }}%
+      {{hash=RR}{%
+         family={{Renner}},
+         familyi={R\bibinitperiod},
+         given={Renato},
+         giveni={R\bibinitperiod},
+      }}%
+    }
+    \keyw{Quantum Physics}
+    \strng{namehash}{WJSVBRR1}
+    \strng{fullhash}{WJSVBRR1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1103/PhysRevLett.122.190401
+    \endverb
+    \field{eid}{190401}
+    \verb{eprint}
+    \verb 1808.09988
+    \endverb
+    \field{number}{19}
+    \field{pages}{190401}
+    \field{title}{{Confidence Polytopes in Quantum State Tomography}}
+    \field{volume}{122}
+    \field{journaltitle}{\prl}
+    \field{eprinttype}{arXiv}
+    \field{eprintclass}{quant-ph}
+    \field{year}{2019}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{Chen2019}{article}{}
+    \name{author}{4}{}{%
+      {{hash=CY}{%
+         family={Chen},
+         familyi={C\bibinitperiod},
+         given={Yanzhu},
+         giveni={Y\bibinitperiod},
+      }}%
+      {{hash=FM}{%
+         family={Farahzad},
+         familyi={F\bibinitperiod},
+         given={Maziar},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=YS}{%
+         family={Yoo},
+         familyi={Y\bibinitperiod},
+         given={Shinjae},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=WTC}{%
+         family={Wei},
+         familyi={W\bibinitperiod},
+         given={Tzu-Chieh},
+         giveni={T\bibinitperiod-C\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {American Physical Society (APS)}%
+    }
+    \strng{namehash}{CY+1}
+    \strng{fullhash}{CYFMYSWTC1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1103/physreva.100.052315
+    \endverb
+    \field{issn}{2469-9934}
+    \field{number}{5}
+    \field{title}{Detector tomography on IBM quantum computers and mitigation
+  of an imperfect measurement}
+    \verb{url}
+    \verb http://dx.doi.org/10.1103/PhysRevA.100.052315
+    \endverb
+    \field{volume}{100}
+    \field{journaltitle}{Physical Review A}
+    \field{year}{2019}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+\endsortlist
+\endinput

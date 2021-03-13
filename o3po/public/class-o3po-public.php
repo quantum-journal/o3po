@@ -274,9 +274,9 @@ var search_field = document.getElementsByClassName("search-field");
          *
          * To be added to the 'parse_query' action.
          *
-         * @since      0.3.1+
-         * @access     public
-         * @param      WP_Query    $query_object      Query that lead to the current search.
+         * @since  0.4.0
+         * @access public
+         * @param  WP_Query $query_object Query that lead to the current search.
          */
     public function clean_newline_and_protect_from_search_string( $query_object ) {
         if( $query_object->is_search() ) {
