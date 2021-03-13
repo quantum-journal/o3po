@@ -11,6 +11,7 @@
  */
 
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-latex.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-environment.php';
 
 /**
  * Encapsulates the interface with the external service arXiv.
@@ -26,17 +27,20 @@ class O3PO_Arxiv {
         /**
          * Fetch meta-data from the abstract page of an eprint on the arXiv.
          *
-         * extracts the abstract, number_authors, author_given_names,
-         * author_surnames and title
+         * Extracts the abstract, number_authors, author_first_names,
+         * author_last_names and title. As there is no way to tell,
+         * whether the first name is the given or surname we cannot deduce the
+         * given names and surnames and instead return first and last names.
          *
          * @since  0.3.0
          * @access public
          * @param  string  $arxiv_url_abs_prefix The url prefix under which arXiv abstracts can be found.
          * @param  string  $eprint The eprint for which to fetch the meta-data.
          * @param  int     $timeout An optional timeout.
+         * @param  bool    $check_license Whether to fetch and check the license.
          * @return array   An array containing the extracted meta-data.
          */
-    public static function fetch_meta_data_from_abstract_page( $arxiv_url_abs_prefix, $eprint, $timeout=10 ) {
+    public static function fetch_meta_data_from_abstract_page( $arxiv_url_abs_prefix, $eprint, $timeout=10, $check_license=True ) {
 
         try
         {
@@ -50,16 +54,17 @@ class O3PO_Arxiv {
                 $x_path = new DOMXPath($dom);
 
                 $number_authors = 0;
-                $author_given_names = array();
-                $author_surnames = array();
+                $author_first_names = array();
+                $author_last_names = array();
                 $title = '';
+                $arxiv_license = '';
                 $arxiv_author_links = $x_path->query("/html/body//div[@class='authors']/a");
                 if(isset($arxiv_author_links[0]))
                 {
                     foreach($arxiv_author_links as $x => $arxiv_author_link) {
                         $arxiv_author_names = preg_split('/\s+(?=\S+$)/u', $arxiv_author_link->nodeValue, -1, PREG_SPLIT_NO_EMPTY);
-                        $author_given_names[$x] = empty($arxiv_author_names[0]) ? '' : $arxiv_author_names[0];
-                        $author_surnames[$x] = empty($arxiv_author_names[1]) ? '' : $arxiv_author_names[1];
+                        $author_first_names[$x] = empty($arxiv_author_names[0]) ? '' : $arxiv_author_names[0];
+                        $author_last_names[$x] = empty($arxiv_author_names[1]) ? '' : $arxiv_author_names[1];
                         $number_authors = $x+1;
                     }
                 }
@@ -70,7 +75,7 @@ class O3PO_Arxiv {
                 if(!empty($arxiv_titles->item(0)->nodeValue))
                     $arxiv_title_text = preg_replace("/[\r\n\s]+/u", " ", trim( $arxiv_titles->item(0)->nodeValue ) );
                 if(!empty($arxiv_title_text) ) {
-                    $title = addslashes( O3PO_Latex::latex_to_utf8_outside_math_mode($arxiv_title_text) );
+                    $title = O3PO_Latex::latex_to_utf8_outside_math_mode($arxiv_title_text);
                 }
                 else
                     $arxiv_fetch_results .= "WARNING: Failed to fetch title from " . $arxiv_abs_page_url . ".\n";
@@ -83,16 +88,19 @@ class O3PO_Arxiv {
 
                 $abstract = '';
                 if (!empty($arxiv_abstract_text))
-                    $abstract = addslashes( O3PO_Latex::latex_to_utf8_outside_math_mode($arxiv_abstract_text) );
+                    $abstract =O3PO_Latex::latex_to_utf8_outside_math_mode($arxiv_abstract_text);
                 else
                     $arxiv_fetch_results .= "WARNING: Failed to fetch abstract from " . $arxiv_abs_page_url . ".\n";
 
                 $arxiv_license_urls = $x_path->query("/html/body//div[contains(@class, 'abs-license')]/a/@href");
                 if(isset($arxiv_license_urls[0]))
+                {
                     foreach ($arxiv_license_urls as $x => $arxiv_license_url) {
-                        if( preg_match('#creativecommons.org/licenses/(by-nc-sa|by-sa|by)/4.0/#u', $arxiv_license_url->nodeValue) !== 1)
-                            $arxiv_fetch_results .= "ERROR: It seems like " . $arxiv_abs_page_url . " is not published under one of the three creative commons license (CC BY 4.0, CC BY-SA 4.0, or CC BY-NC-SA 4.0). Please inform the authors that this is mandatory and remind them that we will publish under CC BY 4.0 and that, by our terms and conditions, they grant us the right to do so.\n";
+                        $arxiv_license = $arxiv_license_url->nodeValue;
+                        if($check_license and !static::is_cc_by_license_url($arxiv_license))
+                            $arxiv_fetch_results .= "ERROR: It seems like " . $arxiv_abs_page_url . " is not published under one of the creative commons licenses (CC BY 4.0, CC BY-SA 4.0, CC BY-NC-SA 4.0, or CC BY-NC-ND 4.0). Please inform the authors that they must put the paper on the arXiv under CC BY 4.0 and remind them that we will publish under CC BY 4.0 and that, by our terms and conditions, they grant us the right to do so.\n";
                     }
+                }
                 else
                     $arxiv_fetch_results .= "ERROR: No license informatin found on " . $arxiv_abs_page_url . ".\n";
 
@@ -103,9 +111,10 @@ class O3PO_Arxiv {
                     'arxiv_fetch_results' => $arxiv_fetch_results,
                     'abstract' => $abstract,
                     'number_authors' => $number_authors,
-                    'author_given_names' => $author_given_names,
-                    'author_surnames' => $author_surnames,
+                    'author_first_names' => $author_first_names,
+                    'author_last_names' => $author_last_names,
                     'title' => $title,
+                    'arxiv_license' => $arxiv_license,
                              );
             }
             else
@@ -187,7 +196,7 @@ class O3PO_Arxiv {
             @$dom->loadHTML($html);
             $x_path = new DOMXPath($dom);
             $date = -1;
-            $arxiv_submission_history = $x_path->query("/html/body//div[@class='submission-history']/b[last()]/following-sibling::text()");
+            $arxiv_submission_history = $x_path->query("(/html/body//div[@class='submission-history']/b[last()]/following-sibling::text() | /html/body//div[@class='submission-history']/strong[last()]/following-sibling::text())");
             foreach($arxiv_submission_history as $entry){
                 $date_info = $entry->nodeValue;
                 preg_match('#[0-9]+ [A-Z][a-z]{2} [0-9]{4} [:0-9]+ [A-Z]+ #u', $date_info, $date);
@@ -203,4 +212,21 @@ class O3PO_Arxiv {
             return new WP_Error('exception', $e->getMessage());
         }
     }
+
+
+        /**
+         * Check whether a url is a CC-BY license url
+         *
+         * @since  0.4.0
+         * @access public
+         * @param  string  $url Url to check
+         * @return bool    True if it is a CC-BY license
+         */
+    public static function is_cc_by_license_url( $url ) {
+
+        return preg_match('#creativecommons.org/licenses/(by-nc-nd|by-nc-sa|by-sa|by)/4.0/#u', $url) === 1;
+    }
+
+
+
 }

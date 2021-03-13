@@ -47,7 +47,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
          */
     public function __construct( $journal, $environment ) {
 
-        parent::__construct($journal, 4, $environment);
+        parent::__construct($journal, 4, $environment );
     }
 
         /**
@@ -87,6 +87,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $this->the_admin_panel_crossref($post_id);
         $this->the_admin_panel_doaj($post_id);
         $this->the_admin_panel_clockss($post_id);
+        $this->the_admin_panel_funder_information($post_id);
         $this->the_admin_panel_arxiv($post_id);
         echo '</table>';
 
@@ -138,23 +139,23 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             if(!empty($fetch_meta_data_from_abstract_page_result['arxiv_fetch_results']))
                 $arxiv_fetch_results .= $fetch_meta_data_from_abstract_page_result['arxiv_fetch_results'];
             if(!empty($fetch_meta_data_from_abstract_page_result['abstract']))
-                $new_abstract = $fetch_meta_data_from_abstract_page_result['abstract'];
+                $new_abstract = addslashes($fetch_meta_data_from_abstract_page_result['abstract']);
             if(!empty($fetch_meta_data_from_abstract_page_result['title']))
-                update_post_meta( $post_id, $post_type . '_title', $fetch_meta_data_from_abstract_page_result['title'] );
+                update_post_meta( $post_id, $post_type . '_title', addslashes($fetch_meta_data_from_abstract_page_result['title']));
             if(!empty($fetch_meta_data_from_abstract_page_result['number_authors']))
                 update_post_meta( $post_id, $post_type . '_number_authors', $fetch_meta_data_from_abstract_page_result['number_authors'] );
-            if(!empty($fetch_meta_data_from_abstract_page_result['author_given_names']))
-                update_post_meta( $post_id, $post_type . '_author_given_names', $fetch_meta_data_from_abstract_page_result['author_given_names'] );
-            if(!empty($fetch_meta_data_from_abstract_page_result['author_surnames']))
-                update_post_meta( $post_id, $post_type . '_author_surnames', $fetch_meta_data_from_abstract_page_result['author_surnames'] );
+            if(!empty($fetch_meta_data_from_abstract_page_result['author_first_names']))
+                update_post_meta( $post_id, $post_type . '_author_given_names', $fetch_meta_data_from_abstract_page_result['author_first_names'] ); # we take the first name as the given name, which is not always correct
+            if(!empty($fetch_meta_data_from_abstract_page_result['author_last_names']))
+                update_post_meta( $post_id, $post_type . '_author_surnames', $fetch_meta_data_from_abstract_page_result['author_last_names'] ); # we take the last name as the surname, which is not always correct
             if(isset($fetch_meta_data_from_abstract_page_result['number_authors']) and $fetch_meta_data_from_abstract_page_result['number_authors'] >= 0)
-                update_post_meta( $post_id, $post_type . '_author_name_styles', array_fill(0, $fetch_meta_data_from_abstract_page_result['number_authors'], 'western') ); #we cannot guess the name style from the arXiv page but must set this to a legal value
+                update_post_meta( $post_id, $post_type . '_author_name_styles', array_fill(0, $fetch_meta_data_from_abstract_page_result['number_authors'], 'western') ); #we cannot guess the name style from the arXiv page but must set this to some legal value
 		}
         else if(strpos($old_arxiv_fetch_results, 'ERROR') !== false or strpos($old_arxiv_fetch_results, 'WARNING') !== false)
             $arxiv_fetch_results .= "WARNING: No meta-data was fetched from the arXiv this time, but there were errors or warnings during the last fetch. Please make sure to resolve all of them manually or trigger a new fetch attempt by ticking the corresponding box below.\n";
 
         update_post_meta( $post_id, $post_type . '_arxiv_fetch_results', $arxiv_fetch_results );
-		update_post_meta( $post_id, $post_type . '_abstract', $new_abstract );
+		update_post_meta( $post_id, $post_type . '_abstract', $new_abstract);
 		update_post_meta( $post_id, $post_type . '_abstract_mathml', $new_abstract_mathml );
 		update_post_meta( $post_id, $post_type . '_eprint', $new_eprint );
 		update_post_meta( $post_id, $post_type . '_fermats_library', $new_fermats_library );
@@ -282,7 +283,8 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             }
 
             $new_abstract = $parse_publication_source_result['abstract'];
-            if(!empty($new_abstract)) {
+                // Only update the abstract from source if eprint was changed or abstract was empty
+            if(!empty($new_abstract) and (empty($abstract) or $eprint_was_changed_on_last_save === "true")) {
                 $abstract = $new_abstract;
                 update_post_meta( $post_id, $post_type . '_abstract',  addslashes($new_abstract));
             }
@@ -590,7 +592,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         echo "<h4>How to publish in 10 easy steps</h4>" . "\n";
 		echo '<table style="width:100%">' . "\n";
         echo '<tr><td>Step 0</td><td>Check on <a href="'. $this->get_journal_property('scholastica_manuscripts_url').'" target="_blank">Scholastica that the manuscript has actually been accepted</a>!</td></tr>' . "\n";
-        echo '<tr><td>Step 1</td><td>Put the eprint number in the box below and press "Publish"'.(empty($eprint) ? "" : " DONE!").'</td></tr>' . "\n";
+        echo '<tr><td>Step 1</td><td>Put the eprint number in the box below'.(empty($eprint) ? ' and press "Publish"' : " DONE!").'</td></tr>' . "\n";
         if(!empty($arxiv_pdf_attach_ids))
         {
             echo '<tr><td>Step 2</td><td>Review the validation results below.</td></tr>' . "\n";
@@ -600,6 +602,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             echo '<tr><td></td><td>Authors names</td></tr>' . "\n";
             echo '<tr><td></td><td>Affiliations (number, association, spelling)</td></tr>' . "\n";
             echo '<tr><td></td><td>References (total number, DOIs)</td></tr>' . "\n";
+            echo '<tr><td></td><td>Funder information (compare with acknowledgments)</td></tr>' . "\n";
             echo '<tr><td>Step 4</td><td>Only if requested by the authors: Tick the opt-in to fermats library box.'.(empty($fermats_library==="checked") ? "" : " DONE!").'</td></tr>';
             echo '<tr><td>Step 5</td><td>If provided by the authors: Copy over the <a href="#' . $post_type. '_popular_summary">popular summary</a>.'.(empty($popular_summary) ? "" : " DONE!").'</td></tr>';
             echo '<tr><td>Step 6</td><td>If provided by the authors: Copy over the <a href="#' . $post_type . '_feature_image_caption">feature image caption</a>.'.(empty($feature_image_caption) ? "" : " DONE!").'</td></tr>';
@@ -629,7 +632,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 		echo '		<th><label for="' . $post_type . '_eprint" class="' . $post_type . '_eprint_label">' . 'Eprint' . '</label></th>';
 		echo '		<td>';
 		echo '			<input type="text" id="' . $post_type . '_eprint" name="' . $post_type . '_eprint" class="' . $post_type . '_eprint_field required" placeholder="" value="' . esc_attr($eprint) . '">';
-		echo '                  <input type="checkbox" name="' . $post_type . '_fetch_metadata_from_arxiv"' . (empty($eprint) ? 'checked' : '' ) . '>Fetch title, authors, and abstract from the arXiv upon next Save/Update';
+		echo '                  <input type="checkbox" name="' . $post_type . '_fetch_metadata_from_arxiv"' . (empty($eprint) ? 'checked' : '' ) . '>Fetch title, authors, and abstract from the arXiv upon next Save/Update. This happens automatically in case the arXiv number is changed.';
 		echo '			<p>(The arXiv identifier including the version and, for old eprints, the prefix, e.g., 1701.1234v5 or quant-ph/123456v3.)</p>';
 		echo '		</td>';
 		echo '	</tr>';
@@ -1432,6 +1435,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                                 $current_affiliation = O3PO_Latex::expand_latex_macros($new_author_latex_macro_definitions, $current_affiliation);
                                 $current_affiliation = O3PO_Latex::latex_to_utf8_outside_math_mode($current_affiliation);
                                 $current_affiliation = O3PO_Latex::normalize_whitespace_and_linebreak_characters($current_affiliation);
+                                $current_affiliation = O3PO_Latex::remove_font_changing_commands($current_affiliation);
 
                                 if( $author_info[1][$x] === 'affiliation' or $author_info[1][$x] === 'address' )
                                 {
@@ -1470,6 +1474,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                     $thisabstract = O3PO_Latex::expand_latex_macros($new_author_latex_macro_definitions, $thisabstract);
                     $thisabstract = O3PO_Latex::latex_to_utf8_outside_math_mode($thisabstract, false);
                     $thisabstract = O3PO_Latex::normalize_whitespace_and_linebreak_characters($thisabstract, false, true);
+                    $thisabstract = O3PO_Latex::remove_font_changing_commands($thisabstract);
                     if(!empty($thisabstract))
                     {
                         if(!empty($abstract))
@@ -1627,10 +1632,19 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
          */
     public function get_arxiv_upload_date( $post_id ) {
 
+        $post_type = get_post_type($post_id);
         $eprint = static::get_eprint($post_id);
         $arxiv_url_abs_prefix = $this->get_journal_property('arxiv_url_abs_prefix');
 
-        return O3PO_Arxiv::get_arxiv_upload_date($arxiv_url_abs_prefix, $eprint);
+        $arxiv_upload_dates = static::get_post_meta_field_containing_array( $post_id, $post_type . '_arxiv_upload_dates');
+        if(empty($arxiv_upload_dates[$eprint]))
+        {
+            $arxiv_upload_dates[$eprint] = O3PO_Arxiv::get_arxiv_upload_date($arxiv_url_abs_prefix, $eprint);
+            if(!is_wp_error($arxiv_upload_dates[$eprint]))
+                update_post_meta( $post_id, $post_type . '_arxiv_upload_dates', $arxiv_upload_dates);
+        }
+
+        return $arxiv_upload_dates[$eprint];
     }
 
 

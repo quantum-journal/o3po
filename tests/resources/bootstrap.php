@@ -116,6 +116,10 @@ function add_filter( $hook, $callable ) {
     $filters[$hook][] = $callable;
 }
 
+function remove_filter( $hook, $callable ) {
+}
+
+
 function esc_html_filter( $text ) {
 
     $replacements = array(
@@ -142,10 +146,8 @@ function get_site_url() {
     return 'https://foo.bar.com';
 }
 
-function get_option( $option, $default = false ) {
-
-    if($option === 'o3po-settings')
-        return array(
+$options = array();
+$options['o3po-settings'] = array(
             'production_site_url' => get_site_url(),#we test as if this were the production system
             'journal_title' => 'fake_journal_title',
             'journal_subtitle' => 'fake_journal_subtitle',
@@ -201,14 +203,29 @@ function get_option( $option, $default = false ) {
             'first_volume_year' => "2009",
             'custom_search_page' => 'checked',
             'page_template_for_publication_posts' => 'checked',
+            'ready2publish_slug' => 'ready2publish',
                      );
+
+function get_option( $option, $default = false ) {
+    global $options;
+
+    if($option === 'o3po-settings')
+        return $options['o3po-settings'];
     elseif($option === 'blog_charset')
         return 'UTF-8';
     elseif($option === 'rewrite_rules')
         return array();
+    elseif($default !== false)
+        return $default;
     else
         throw(new Exception("We don't know how to fake the option " . $option . "."));
 
+}
+
+function update_option( $option, $content) {
+    global $options;
+
+    $options[$option] = $content;
 }
 
 function get_file_data( $file, $options ) {
@@ -320,7 +337,7 @@ class WP_Post
 
 class WP_Query
 {
-    private $posts;
+    public $posts;
     private $query;
     public $query_vars;
     public $post_count;
@@ -424,6 +441,10 @@ class WP_Query
 
     function is_main_query() {
         return isset($this->query_vars['is_main']) ? $this->query_vars['is_main'] : false;
+    }
+
+    function init() {
+
     }
 }
 
@@ -1136,17 +1157,21 @@ function checked( $helper, $current=true, $echo=true, $type='checked' ) {
     return $result;
 }
 
-function apply_filters( $hook, $orig_text, $text )
+function apply_filters( $hook, $value )
 {
     global $filters;
+    $args = func_get_args();
 
     if(!empty($filters[$hook]))
     {
         foreach($filters[$hook] as $callable)
-            $text = call_user_func($callable, $text);
+            if(!empty($args))
+                $value = call_user_func($callable, $value, $args);
+            else
+                $value = call_user_func($callable, $value);
     }
 
-    return $text;
+    return $value;
 }
 
 /**
@@ -1337,4 +1362,37 @@ function trackback( $trackback_url, $title, $excerpt, $ID ) {
 
     #not really implemented
     return null;
+}
+
+function add_query_arg( $arg ) {
+
+    #not really implemented
+    if($arg != array())
+        throw(new Exception("Only implemented for arg=array()"));
+
+    #throw(new Exception(json_encode($arg)));
+    return $_SERVER['REQUEST_URI'];
+}
+
+if (!function_exists('array_key_first')) {
+    function array_key_first(array $arr) {
+        foreach($arr as $key => $unused) {
+            return $key;
+        }
+        return NULL;
+    }
+}
+
+function do_action($action) {
+
+}
+
+function is_user_logged_in() {
+
+    return True;
+}
+
+function get_current_user_id() {
+
+    return 478567245;
 }

@@ -169,6 +169,14 @@ class O3PO_Admin {
             $active_tab = key($this->meta_data_explorer_tabs);
         }
 
+        if(isset( $_GET['max_entries'] ))
+            $max_entries = $_GET['max_entries'];
+        else
+        {
+            $max_entries = 10;
+        }
+
+
         $html .= '<h2 class="nav-tab-wrapper">' . "\n";
         foreach($this->meta_data_explorer_tabs as $tab_slug => $tab_name)
             $html .= '<a href="' . esc_url('?page=' . $this->get_plugin_name() . '-meta-data-explorer' . '&amp;tab=' . $tab_slug) . '" class="nav-tab' . ($active_tab == $tab_slug ? ' nav-tab-active' : '') . '">' . esc_html($tab_name) . '</a>' . "\n";
@@ -212,20 +220,21 @@ class O3PO_Admin {
                 $html .= '<option value="' . $format . '"' . ( ($output_format === $format) ? " selected" : "" ) . '>' . $format . '</option>';
 			$html .= '</select><label for="output_format">Chose the output format</label><br />';
 
+            $html .= '<label for="' . 'max_entries' . '">Maximum number of entries (use -1 for unlimited):</label><br /><input name="max_entries" value="' . $max_entries . '">';
+
             $html .= '<label for="' . 'meta_data_field_list' . '">Comma separated list of meta-data elements to export:</label><br /><input style="width:100%;" type="text" name="' . 'meta_data_field_list" id="' . 'meta_data_field_list" placeholder="' . '' . '" value="' . implode($meta_data_field_list, ', ') . '" />';
-            $html .= '<p>The available elements are (beware that nor all of them will work for all publication types!):</p>';
+            $html .= '<p>The available elements are (beware that not all of them will work for all publication types!):</p>';
             $html .= '<ul>';
             foreach(array_keys($this->get_meta_data_field_map()) as $field)
                 $html .= '<li>' . esc_html($field) . '</li>';
             $html .= '</ul>';
             $html .= '<input id="submit" type="submit" value="Generate table"></form>';
 
-
             $out = "";
             $query = array(
                 'post_type' => $post_type,
                 'post_status' => array('publish'),
-                'posts_per_page' => -1,
+                'posts_per_page' => $max_entries,
                            );
             $my_query = new WP_Query( $query );
             if ( $my_query->have_posts() ) {
@@ -251,6 +260,22 @@ class O3PO_Admin {
                         $out = mb_substr($out, 0, -2);
                         $out .= "],\n";
                     }
+                    elseif($output_format === 'csv')
+                    {
+                        $out .= "";
+                        foreach($meta_data_field_list as $field)
+                        {
+                            $value = call_user_func($this->get_meta_data_field_map()[$field]['callable'], $post_id);
+                            if(is_wp_error($value))
+                                $value = ''.$value->get_error_message().'';
+                            elseif($this->get_meta_data_field_map()[$field]['field_type'] === 'string')
+                                $value = str_replace('"', '""', $value);
+                                $value = '"' . $value . '"';
+                            $out .= $value . ',';
+                        }
+                        $out = mb_substr($out, 0, -1);
+                        $out .= "\n";
+                    }
                     else
                     {
                         $out .= 'unsupported output format';
@@ -269,8 +294,7 @@ class O3PO_Admin {
             $doi_prefix = $settings->get_field_value('doi_prefix');
             $doi_url_prefix = $settings->get_field_value('doi_url_prefix');
             $cited_by_refresh_seconds = $settings->get_field_value('cited_by_refresh_seconds');
-            #$first_volume_year = $settings->get_field_value('first_volume_year');
-            #$start_date = $first_volume_year . '-01-01';
+            $first_volume_year = $settings->get_field_value('first_volume_year');
 
             $fetch_if_outdated = false;
             if(isset($_POST['refresh']) and $_POST['refresh'] === 'checked')
@@ -315,7 +339,7 @@ class O3PO_Admin {
                     if($num <= 0)
                         break;
                 }
-                $html .= '</table>' ;
+                $html .= '</table>';
 
                 $delta_x = 1;
                 while($max_citations/$delta_x > 25)
@@ -330,7 +354,41 @@ class O3PO_Admin {
 <tr><td style="text-align: right;">Total number of citations:</td><td style="text-align: left;">' . array_sum($citations_this_type) . '</td></tr>
 <tr><td style="text-align: right;">Mean number of citations:</td><td style="text-align: left;">' . O3PO_Utility::array_mean($citations_this_type) . '</td></tr>
 <tr><td style="text-align: right;">Median number of citations:</td><td style="text-align: left;">' . O3PO_Utility::array_median($citations_this_type) . '</td></tr></table>';
+
+                $all_citing_dois_published_in_year = $citations_data['all_citing_dois_published_in_year'];
+                $html .= '<table><tr><td>Year</td><td>Citations with DOI</td><td>Citations to ' . O3PO_PublicationType::get_active_publication_types($post_type)->get_publication_type_name_plural() .' from two preceding years</td><td>' . ucfirst(O3PO_PublicationType::get_active_publication_types($post_type)->get_publication_type_name_plural()) .' in preceding two years</td><td>Journal Impact Factor</td></tr>';
+                foreach($all_citing_dois_published_in_year as $year => $all_citing_dois)
+                {
+                    $html .= '<tr>';
+                    $html .= '<td>' . $year . '</td>';
+                    $html .= '<td style="text-align: right;">' . count($all_citing_dois) . '</td>';
+                    $all_citations_with_doi_in_two_years_preceeding = 0;
+                    if(isset($citations_data['all_citing_dois_in_two_years_preceeding'][$year]))
+                        $all_citations_with_doi_in_two_years_preceeding = count($citations_data['all_citing_dois_in_two_years_preceeding'][$year]);
+
+                    $html .= '<td style="text-align: right;">' . $all_citations_with_doi_in_two_years_preceeding . '</td>';
+
+                    $papers_published_in_two_years_preceeding = 0;
+                    if(isset($citations_data['all_papers_published_in_two_years_preceeding'][$year]))
+                        $papers_published_in_two_years_preceeding = $citations_data['all_papers_published_in_two_years_preceeding'][$year];
+                    $html .= '<td style="text-align: right;">' . $papers_published_in_two_years_preceeding . '</td>';
+                    $html .= '<td style="text-align: right;">' . ($papers_published_in_two_years_preceeding > 0 ? $all_citations_with_doi_in_two_years_preceeding/$papers_published_in_two_years_preceeding : 'n/a') . '</td>';
+                    $html .= '</tr>';
+                }
+                $html .= '</table>';
+                $html .= '<p>Note that the Journal impact factor can only be finally calculated up to the year preceding the current year (though the value might still change when more citable items are added to the source data bases).</p>';
+                $year_to_display = intval(date("Y"))-1;
+                if(!empty($citations_data['all_citing_dois_in_two_years_preceeding'][$year_to_display]))
+                {
+                $html .= '<h5>Citations in ' . $year_to_display . ' to articles published in ' . ($year_to_display-2) . ' and ' . ($year_to_display-1) . '</h5>';
+                sort($citations_data['all_citing_dois_in_two_years_preceeding'][$year_to_display]);
+                foreach($citations_data['all_citing_dois_in_two_years_preceeding'][$year_to_display] as $doi)
+                    $html .= '<div><a href="' . esc_attr($doi_url_prefix . $doi) . '">' . esc_html($doi) . '</a></div>';
+        }
+
             }
+
+
             wp_reset_postdata();
 
             $html .= '<h4>Why is the data not always up to date?</h4>';
@@ -505,7 +563,8 @@ class O3PO_Admin {
     public function get_output_formats() {
 
         return [
-            'python'
+            'python',
+            'csv',
                 ];
     }
 

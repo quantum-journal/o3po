@@ -8,8 +8,8 @@
 * Donate link: https://quantum-journal.org/donate/
 * Tags: publishing, open-access
 * Requires at least: 4.0.1
-* Tested up to: 5.2.1
-* Requires PHP: 5.6
+* Tested up to: 5.6.0
+* Requires PHP: 7.0
 * Stable tag: 1.0.0
 * License: GPLv3 or later
 * License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -29,20 +29,23 @@ O-3PO offers the following features:
 * Automatic download of LaTeX source code and PDF from the arXiv
 * Automatic extraction of meta-data
 * Automagic interpretation of references and DOI links
-* DOI registration at and cited-by retrieval from [Crossref REST API](https://api.crossref.org/)
+* DOI registration with Plan S compliant rich meta-data deposits including bibliography and funder information
+* Xited-by data retrieval from [Crossref REST API](https://api.crossref.org/) and [NASA ads](https://ui.adsabs.harvard.edu/)
+* Merging of cited-by information from multiple sources and bibliometrics calculation
 * Meta-data deposition at the [DOAJ API](https://doaj.org/api/v1/docs)
-* Article source and pdf download as well as meta-data extraction from, and journal reference feed for the [arXiv](https://arxiv.org/help/api/index)
+* Article source and pdf download as well as meta-data extraction from, as well as journal reference feed for the [arXiv](https://arxiv.org/help/api/index)
 * Meta-data and full text deposition in the [CLOCKSS](https://www.clockss.org/clockss/Home) archive
 * Posting of updates on publications to the [Buffer.com](https://buffer.com/app) queue
 * Linking to [Fermat's library](https://fermatslibrary.com/)
-* Cited-by information retrieval from [NASA ads](https://ui.adsabs.harvard.edu/)
-* Merging of cited-by information from multiple sources and bibliometrics calculation
 * Automatic and customizable emails for author communication
 * Search centered navigation of articles
 * Integration of publications in to RSS feed
 * Presentation of journal content by volume
 * Web-statement endpoint for the verification of licenses
-* Transformation of \cite commands into hyperlinks referencing bibliography items
+* Transformation of \cite commands in post content into hyperlinks referencing bibliography items
+* Form for the submission of works that are ready to publish by the authors, including various sanity checks and collection of additional meta data
+* Queuing system for manuscripts awaiting publication
+* Functionality for the generation of invoices
 
 ## Works best with
 
@@ -88,6 +91,16 @@ It is obviously a play on the name of humanoid robot character from a series of 
 
 ## Changelog
 
+### 0.4.0
+* Added form for submission to works ready to publish
+* Added dashboard widget displaying a queue of works awaiting publication
+* Added functionality to generate invoices
+* Correctly handle and display different name style (given name(s) first or last)
+* Improved error handling in interaction with CLOCKSS
+* Updated used Crossref meta-data scheme to version 4.4.2 and include funder information
+* Improved fuzzy identification of DOIs from bibliographies
+* Better handling of LaTeX commands when converting to utf-8
+* Advanced bibliometrics including calculation of a lower bound on the journal impact factor (JIF) from openly available citation data
 ### 0.3.1
 * Uncluttered RSS feed content
 * Use button instead of form/input elements for action buttons (full text, print, ...)

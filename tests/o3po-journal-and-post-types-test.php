@@ -461,7 +461,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
                                                                                                     )],
 
             [dirname(__FILE__) . '/resources/arxiv/1801.03508.tar.gz', "application/x-tar", array(
-                    'num_dois' => 26,
+                    'num_dois' => 25,
 
                                                                                                     )],
 
