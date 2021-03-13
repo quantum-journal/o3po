@@ -76,7 +76,13 @@ class O3PO_Clockss {
             {
                 try
                 {
+                    set_error_handler(
+                        function ($severity, $message, $file, $line) {
+                            throw new ErrorException($message, $severity, $severity, $file, $line);
+                        }
+                                      );
                     ftp_close($ftp_connection);
+                    restore_error_handler();
                 } catch(Exception $e) {
                     $clockss_response .= "ERROR: There was an exception while closing the ftp connection to CLOCKSS. " . $e->getMessage() . "\n";
                 }

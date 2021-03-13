@@ -21,7 +21,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-short
  * @subpackage O3PO/includes
  * @author     Christian Gogolin <o3po@quantum-journal.org>
  */
-class O3PO_Journal {
+class O3PO_Journal implements O3PO_SettingsSpecifyer {
 
 
         /**
@@ -36,18 +36,18 @@ class O3PO_Journal {
         /**
          * The shortcode template used to construct DOIs.
          *
-         * @since    0.3.1+
-         * @access   private
-         * @var      O3PO_ShortcodeTemplate  $doi_suffix_template  The shortcode template used to construct DOIs.
+         * @since  0.4.0
+         * @access private
+         * @var    O3PO_ShortcodeTemplate $doi_suffix_template The shortcode template used to construct DOIs.
          */
     private static $doi_suffix_template;
 
         /**
          * Initialize the journal.
          *
-         * @since    0.1.0
-         * @access   public
-         * @param    array    $journal_config   Array with values for the keys returned by get_journal_config_properties().
+         * @since   0.1.0
+         * @access  public
+         * @param   array  $journal_config Array with values for the keys returned by get_journal_config_properties().
          */
 	public function __construct( $journal_config ) {
 
@@ -82,6 +82,7 @@ class O3PO_Journal {
             'crossref_id',
             'crossref_pw',
             'crossref_test_deposite_url',
+            'crossref_crossmark_policy_page_doi',
             'ads_api_search_url',
             'ads_api_token',
             'developer_email',
@@ -629,7 +630,7 @@ for (i = 0; i < elemets_to_condense.length; i++) {
          *
          * To be called during during O3PO_Settings::configure().
          *
-         * @since    0.3.1+
+         * @since    0.4.1+
          * @access   public
          * @param O3PO_Settings $settings Settings object.
          */
@@ -663,7 +664,7 @@ for (i = 0; i < elemets_to_condense.length; i++) {
         /**
          * Render the setting for the DOI suffix template.
          *
-         * @since    0.3.1+
+         * @since    0.4.0
          * @access   public
          */
     public static function render_doi_suffix_template_setting() {
@@ -680,22 +681,22 @@ for (i = 0; i < elemets_to_condense.length; i++) {
         /**
          * Clean user input to the doi_suffix_template setting.
          *
-         * @since    0.3.1+
-         * @access   private
-         * @param    string   $field    The field this was input to.
-         * @param    string   $input    User input.
-         * @return   string   Validated doi suffix.
+         * @since  0.4.0
+         * @access private
+         * @param  string  $field    The field this was input to.
+         * @param  string  $input    User input.
+         * @return string  Validated doi suffix.
          */
     public static function validate_doi_suffix_template( $field, $input ) {
 
         $settings = O3PO_Settings::instance();
         $input_trimmed = trim($input);
         $example_expanded = static::$doi_suffix_template->example_expand();
-        $in_url = esc_url_raw(strip_tags(stripslashes($example_expanded)));
+        $in_url = preg_replace('#(http|https)://#', '', esc_url_raw(strip_tags(stripslashes($example_expanded))));
 
         if($input !== $input_trimmed or $in_url !== $example_expanded)
         {
-            add_settings_error( $field, 'url-validated', "The template '" . $input . "' given in in '" . $settings->get_field_title($field) . "' was malformed or contained special or illegal characters. Field reset.", 'error');
+            add_settings_error( $field, 'url-validated', "The template '" . $input . "' given in in '" . $settings->get_field_title($field) . "' was malformed or contained special or illegal characters. Field reset." . $input . $input_trimmed . $in_url . $example_expanded , 'error');
             return $settings->get_field_default($field);
         }
 
@@ -716,12 +717,12 @@ for (i = 0; i < elemets_to_condense.length; i++) {
          * Returns the doi suffix according to the template
          * specified in settings.
          *
-         * @since  0.3.1+
+         * @since  0.4.0
          * @access private
-         * @param  string $date_published A date in ISO_8601 format.
-         * @param  string|int $volume The volume for which to construct the DOI.
-         * @param  string|int $pages The page/article number for which to construct the DOI.
-         * @return string The doi suffix constructed according to the template of this publication type.
+         * @param  string     $date_published A date in ISO_8601 format.
+         * @param  string|int $volume         The volume for which to construct the DOI.
+         * @param  string|int $pages          The page/article number for which to construct the DOI.
+         * @return string     The doi suffix constructed according to the template of this publication type.
          */
     public function construct_doi_suffix( $date_published, $volume, $pages ) {
 

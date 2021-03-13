@@ -106,12 +106,12 @@
                         <ul class="dropdown-menu">
                             <li>
                                 <a href="../reports/errors.html">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">3</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">0</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="../reports/markers.html">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">0</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">0</span>
                                 </a>
                             </li>
                             <li>
@@ -136,14 +136,15 @@
                                 <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-891915071"></a>
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-225011154"></a>
                                 <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
             </div>
-            <div id="namespace-891915071" class="accordion-body collapse in">
+            <div id="namespace-225011154" class="accordion-body collapse in">
                 <div class="accordion-inner">
 
                     
                     <ul>
+                                                    <li class="interface"><a href="../classes/O3PO_SettingsSpecifyer.html">O3PO_SettingsSpecifyer</a></li>
                                                                             <li class="trait"><a href="../classes/O3PO_Form.html">O3PO_Form</a></li>
                                                                             <li class="class"><a href="../classes/O3PO.html">O3PO</a></li>
                                                     <li class="class"><a href="../classes/O3PO_Activator.html">O3PO_Activator</a></li>
@@ -168,6 +169,8 @@
                                                     <li class="class"><a href="../classes/O3PO_PrimaryPublicationType.html">O3PO_PrimaryPublicationType</a></li>
                                                     <li class="class"><a href="../classes/O3PO_Public.html">O3PO_Public</a></li>
                                                     <li class="class"><a href="../classes/O3PO_PublicationType.html">O3PO_PublicationType</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_PublicForm.html">O3PO_PublicForm</a></li>
+                                                    <li class="class"><a href="../classes/O3PO_Ready2PublishDashboard.html">O3PO_Ready2PublishDashboard</a></li>
                                                     <li class="class"><a href="../classes/O3PO_Ready2PublishForm.html">O3PO_Ready2PublishForm</a></li>
                                                     <li class="class"><a href="../classes/O3PO_Ready2PublishStorage.html">O3PO_Ready2PublishStorage</a></li>
                                                     <li class="class"><a href="../classes/O3PO_Relevanssi.html">O3PO_Relevanssi</a></li>
@@ -273,6 +276,8 @@
                                                                                                                                                                     <div class="namespace-wrapper">\O3PO_EmailTemplates</div>
                             </dd>
 
+                                                                            <dt>Implements</dt>
+                                                        <dd><a href="../classes/O3PO_SettingsSpecifyer.html"><div class="namespace-wrapper">\O3PO_SettingsSpecifyer</div></a></dd>
                         
                         
                         
@@ -385,7 +390,7 @@
                             since
                         </th>
                         <td>
-                                                            0.3.1+                                
+                                                            0.4.0                                
                                                     </td>
                     </tr>
                             </table>
@@ -412,12 +417,15 @@
                                                     <tr>
                                 <td>array</td>
                                 <td>$replacements </td>
-                                <td><p>Array of replacements for all or a subset of the shotcodes in the template.</p></td>
+                                <td><p>Array of replacements for all or a subset
+of the shotcodes in the template.</p></td>
                             </tr>
                                                     <tr>
                                 <td>boolean</td>
                                 <td>$error_if_not_all_appearing_specified </td>
-                                <td><p>Whether to throw an exception in case not for all shortcodes appearing in the template replacements are specified.</p></td>
+                                <td><p>Whether to throw an exception in case not for
+all shortcodes appearing in the template
+replacements are specified.</p></td>
                             </tr>
                                             </table>
                 
@@ -440,7 +448,7 @@
                             since
                         </th>
                         <td>
-                                                            0.3.1+                                
+                                                            0.4.0                                
                                                     </td>
                     </tr>
                             </table>
@@ -485,7 +493,7 @@
                             since
                         </th>
                         <td>
-                                                            0.3.1+                                
+                                                            0.4.0                                
                                                     </td>
                     </tr>
                             </table>
@@ -519,7 +527,7 @@
                             since
                         </th>
                         <td>
-                                                            0.3.1+                                
+                                                            0.4.0                                
                                                     </td>
                     </tr>
                             </table>
@@ -553,7 +561,7 @@
                             since
                         </th>
                         <td>
-                                                            0.3.1+                                
+                                                            0.4.0                                
                                                     </td>
                     </tr>
                             </table>
@@ -587,7 +595,7 @@
                             since
                         </th>
                         <td>
-                                                            0.3.1+                                
+                                                            0.4.0                                
                                                     </td>
                     </tr>
                             </table>
@@ -621,7 +629,7 @@
                             since
                         </th>
                         <td>
-                                                            0.3.1+                                
+                                                            0.4.0                                
                                                     </td>
                     </tr>
                             </table>
@@ -655,7 +663,7 @@
                             since
                         </th>
                         <td>
-                                                            0.3.1+                                
+                                                            0.4.0                                
                                                     </td>
                     </tr>
                             </table>
@@ -689,7 +697,7 @@
                             since
                         </th>
                         <td>
-                                                            0.3.1+                                
+                                                            0.4.0                                
                                                     </td>
                     </tr>
                             </table>
@@ -723,7 +731,7 @@
                             since
                         </th>
                         <td>
-                                                            0.3.1+                                
+                                                            0.4.0                                
                                                     </td>
                     </tr>
                             </table>
@@ -757,7 +765,7 @@
                             since
                         </th>
                         <td>
-                                                            0.3.1+                                
+                                                            0.4.0                                
                                                     </td>
                     </tr>
                             </table>
@@ -791,7 +799,7 @@
                             since
                         </th>
                         <td>
-                                                            0.3.1+                                
+                                                            0.4.0                                
                                                     </td>
                     </tr>
                             </table>
@@ -825,7 +833,7 @@
                             since
                         </th>
                         <td>
-                                                            0.3.1+                                
+                                                            0.4.0                                
                                                     </td>
                     </tr>
                             </table>
@@ -859,7 +867,7 @@
                             since
                         </th>
                         <td>
-                                                            0.3.1+                                
+                                                            0.4.0                                
                                                     </td>
                     </tr>
                             </table>
@@ -901,7 +909,7 @@
                             since
                         </th>
                         <td>
-                                                            0.3.1+                                
+                                                            0.4.0                                
                                                     </td>
                     </tr>
                             </table>
@@ -957,7 +965,7 @@
                 <section class="span10 offset1">
                     <hr />
                     Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
-                    on February 15th, 2020 at 07:05.
+                    on March 13th, 2021 at 11:33.
                 </section>
             </section>
         </section>

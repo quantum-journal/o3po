@@ -139,21 +139,61 @@ class O3PO_Author {
         /**
          * Get the full name of the author.
          *
-         * TODO: Name styles are not currently honored.
-         *
-         * @sice 0.3.0
+         * @since  0.3.0
+         * @since  0.4.0  Name styles are honored
          * @access public
          * @return string The name of the author.
          */
     public function get_name() {
         $out = '';
-        if(!empty($this->given_name))
-            $out .= $this->given_name;
-        if(!empty($this->given_name) and !empty($this->surname))
-            $out .= ' ';
-        if(!empty($this->surname))
-            $out .= $this->surname;
+        if($this->name_style !== "eastern")
+        {
+            if(!empty($this->given_name))
+                $out .= $this->given_name;
+            if(!empty($this->given_name) and !empty($this->surname))
+                $out .= ' ';
+            if(!empty($this->surname))
+                $out .= $this->surname;
+        }
+        else
+        {
+            if(!empty($this->surname))
+                $out .= $this->surname;
+            if(!empty($this->given_name) and !empty($this->surname))
+                $out .= ' ';
+            if(!empty($this->given_name))
+                $out .= $this->given_name;
+        }
+        return $out;
+    }
 
+        /**
+         * Get the name in bibtex format.
+         *
+         * @since  0.4.0
+         * @access public
+         * @return string The name of the author.
+         */
+    public function get_name_bibtex() {
+        $out = '';
+        if($this->name_style !== "eastern")
+        {
+            if(!empty($this->surname))
+                $out .= $this->surname;
+            if(!empty($this->given_name) and !empty($this->surname))
+                $out .= ', ';
+            if(!empty($this->given_name))
+                $out .= $this->given_name;
+        }
+        else
+        {
+            if(!empty($this->surname))
+                $out .= $this->surname;
+            if(!empty($this->given_name) and !empty($this->surname))
+                $out .= ' ';
+            if(!empty($this->given_name))
+                $out .= $this->given_name;
+        }
         return $out;
     }
 
@@ -186,6 +226,17 @@ class O3PO_Author {
             $out .= $affiliation;
         }
         return $out;
+    }
+
+        /**
+         * Get the name style.
+         *
+         * @since  0.4.0
+         * @access public
+         * @return string The name of the author.
+         */
+    public function get_name_style() {
+        return $this->name_style;
     }
 }
 

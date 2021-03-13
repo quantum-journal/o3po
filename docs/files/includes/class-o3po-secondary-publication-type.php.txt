@@ -64,7 +64,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          */
     public function __construct( $target_publication_type_name, $target_publication_type_name_plural, $journal, $environment ) {
 
-        parent::__construct($journal, 1, $environment);
+        parent::__construct($journal, 1, $environment );
 
         $this->target_publication_type_name = $target_publication_type_name;
         $this->target_publication_type_name_plural = $target_publication_type_name_plural;
@@ -158,7 +158,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 
         $new_reviewers_summary = isset( $_POST[ $post_type . '_reviewers_summary' ] ) ? $_POST[ $post_type . '_reviewers_summary' ] : '';
 
-		$new_number_reviewers = isset( $_POST[ $post_type . '_number_reviewers' ] ) ? sanitize_text_field( $_POST[ $post_type . '_number_reviewers' ] ) : '';
+		$new_number_reviewers = isset( $_POST[ $post_type . '_number_reviewers' ] ) ? intval(sanitize_text_field( $_POST[ $post_type . '_number_reviewers' ] )) : '';
 
         $new_reviewer_given_names[] = array();
         $new_reviewer_surnames[] = array();
@@ -174,7 +174,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 			$new_reviewer_given_names[] = isset( $_POST[ $post_type . '_reviewer_given_names' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_reviewer_given_names' ][$x] ) : '';
 			$new_reviewer_surnames[] = isset( $_POST[ $post_type . '_reviewer_surnames' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_reviewer_surnames' ][$x] ) : '';
 			$new_reviewer_name_styles[] = isset( $_POST[ $post_type . '_reviewer_name_styles' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_reviewer_name_styles' ][$x] ) : '';
-			$affiliation_nums = isset( $_POST[ $post_type . '_reviewer_affiliations' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_reviewer_affiliations' ][$x] ) : '';
+			$affiliation_nums = isset( $_POST[ $post_type . '_reviewer_affiliations' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_reviewer_affiliations' ][$x] ) : 'western';
 			$affiliation_nums = trim( preg_replace("/[^,0-9]/u", "", $affiliation_nums ), ',');
 			$new_reviewer_affiliations[] = $affiliation_nums;
 			$new_reviewer_orcids[] = isset( $_POST[ $post_type . '_reviewer_orcids' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_reviewer_orcids' ][$x] ) : '';
@@ -504,11 +504,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         $post_type = get_post_type($post_id);
         if ( $post_type === $this->get_publication_type_name() ) {
             $doi = static::get_doi( $post_id );
-            $authors = static::get_formated_authors($post_id);
             $excerpt = '';
-            #$excerpt .= '<h2>' . esc_html($authors) . '</h2>' . "\n";
-                //$excerpt .= '<a href="' . $this->get_journal_property('doi_url_prefix') . $doi . '">' . $this->get_journal_property('doi_url_prefix') . $doi . '</a>';
-            #$excerpt .= static::lead_in_paragraph($post_id) . "\n";
             $excerpt .= '<p>' . get_post_field('post_content', $post_id) . '</p>' . "\n";
             $excerpt = str_replace(']]>', ']]&gt;', $excerpt);
             $bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
@@ -788,7 +784,9 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         $reviewers_html .= '<h3>Reviewed by</h3>';
         $reviewer_names = array();
         for ($x = 0; $x < $number_reviewers; $x++) {
-            $reviewer_names[] = $reviewer_given_names[$x] . ' ' . $reviewer_surnames[$x];
+            $reviewer = new O3PO_Author($reviewer_given_names[$x], $reviewer_surnames[$x], $reviewer_name_styles[$x]);
+
+            $reviewer_names[] = $reviewer->get_name();
         }
         $reviewers_html .= '<p>';
         $reviewers_html .= O3PO_Utility::oxford_comma_implode($reviewer_names) . '<br />';
@@ -859,13 +857,13 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         if ( get_post_type($post_id) === $this->get_publication_type_name() ) {
             $old_content = $content;
             $doi = $this->get_doi($post_id);
-            $authors = $this->get_formated_authors($post_id);
             $type = get_post_meta( $post_id, $post_type . '_type', true );
             $number_target_dois = get_post_meta( $post_id, $post_type . '_number_target_dois', true );
             $target_dois = $this->get_post_meta_field_containing_array( $post_id, $post_type . '_target_dois');
             $number_authors = get_post_meta( $post_id, $post_type . '_number_authors', true );
             $author_given_names = $this->get_post_meta_field_containing_array( $post_id, $post_type . '_author_given_names');
             $author_surnames = $this->get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
+            $author_name_styles = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_name_styles');
             $author_urls = $this->get_post_meta_field_containing_array( $post_id, $post_type . '_author_urls');
             $author_affiliations = $this->get_post_meta_field_containing_array( $post_id, $post_type . '_author_affiliations');
             $affiliations = $this->get_post_meta_field_containing_array( $post_id, $post_type . '_affiliations');
@@ -895,10 +893,11 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 
             $content .= "<p><strong>By";
             for ($x = 0; $x < $number_authors; $x++) {
+                $author = new O3PO_Author($author_given_names[$x], $author_surnames[$x], $author_name_styles[$x]);
                 if( !empty($author_urls[$x]))
-                    $content .= ' <a href="' . $author_urls[$x] . '">' . $author_given_names[$x] . ' ' . $author_surnames[$x] . '</a>';
+                    $content .= ' <a href="' . $author_urls[$x] . '">' . $author->get_name() . '</a>';
                 else
-                    $content .= ' ' . $author_given_names[$x] . ' ' . $author_surnames[$x];
+                    $content .= ' ' . $author->get_name();
                 if( !$all_authors_have_same_affiliation && !empty($author_affiliations) && !empty($author_affiliations[$x]) )
                 {
                     $content .= ' (';

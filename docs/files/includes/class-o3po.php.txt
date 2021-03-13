@@ -94,6 +94,33 @@ class O3PO {
 	protected $journal_secondary;
 
         /**
+         * The ready to publish storage.
+         *
+         * @since    0.4.0
+         * @access   protected
+         * @var      O3PO_Ready2Publish_Storage    $ready2publish_storage    The ready to publish storage.
+         */
+	protected $ready2publish_storage;
+
+        /**
+         * The ready to publish form.
+         *
+         * @since    0.4.0
+         * @access   protected
+         * @var      O3PO_Ready2Publish_Form    $ready2publish_form    The ready to publish form.
+         */
+	protected $ready2publish_form;
+
+        /**
+         * The ready to publish dashboard.
+         *
+         * @since    0.4.0
+         * @access   protected
+         * @var      O3PO_Ready2Publish_Dashboard    $ready2publish_dashboard    The ready to publish dashboard.
+         */
+    protected $ready2publish_dashboard;
+
+        /**
          * The primary publication type.
          *
          * @since    0.1.0
@@ -197,6 +224,21 @@ class O3PO {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-journal.php';
 
             /**
+             * The class representing ready to publish storages.
+             */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-ready2publish-storage.php';
+
+            /**
+             * The class representing ready to publish forms.
+             */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-o3po-ready2publish-form.php';
+
+            /**
+             * The class representing ready to publish dashboard.
+             */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-o3po-ready2publish-dashboard.php';
+
+            /**
              * The class providing the primary publication type.
              */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-primary-publication-type.php';
@@ -221,9 +263,18 @@ class O3PO {
         $this->journal = static::setup_primary_journal($settings);
         $this->journal_secondary = static::setup_secondary_journal($settings);
 
+            //create the ready to publish storage
+        $this->ready2publish_storage = new O3PO_Ready2PublishStorage($this->plugin_name, $settings->get_field_value("ready2publish_slug") . '-storage');
+
+            //create the ready to publish form
+        $this->ready2publish_form = new O3PO_Ready2PublishForm($this->plugin_name, $settings->get_field_value("ready2publish_slug"), $this->environment, $this->ready2publish_storage);
+
+            //create the ready to publish dashboard
+        $this->ready2publish_dashboard = new O3PO_Ready2PublishDashboard($this->plugin_name, $this->get_plugin_pretty_name(), $settings->get_field_value("ready2publish_slug") . '-dashboard', "Ready2Publish", $this->ready2publish_storage);
+
             //create the publication types for each journal
-        $this->primary_publication_type = new O3PO_PrimaryPublicationType($this->journal, $this->environment);
-        $this->secondary_publication_type = new O3PO_SecondaryPublicationType($this->primary_publication_type->get_publication_type_name(), $this->primary_publication_type->get_publication_type_name_plural(), $this->journal_secondary, $this->environment);
+        $this->primary_publication_type = new O3PO_PrimaryPublicationType($this->journal, $this->environment, $this->ready2publish_storage);
+        $this->secondary_publication_type = new O3PO_SecondaryPublicationType($this->primary_publication_type->get_publication_type_name(), $this->primary_publication_type->get_publication_type_name_plural(), $this->journal_secondary, $this->environment, $this->ready2publish_storage);
 
 	}
 
@@ -294,6 +345,8 @@ class O3PO {
 		$this->loader->add_action('wp_head', $plugin_public, 'add_open_graph_meta_tags_for_social_media');
         $this->loader->add_action('wp_head', $plugin_public, 'enable_mathjax');
         $this->loader->add_action('get_custom_logo', $plugin_public, 'fix_custom_logo_html');
+
+        $this->loader->add_action('parse_query', $plugin_public, 'clean_newline_and_protect_from_search_string');
         if($settings->get_field_value('extended_search_and_navigation')==='checked')
             $this->loader->add_action('loop_start', $plugin_public, 'extended_search_and_navigation_at_loop_start');
         if($settings->get_field_value('search_form_on_search_page')==='checked')
@@ -315,8 +368,13 @@ class O3PO {
             $this->loader->add_filter('loop_start', $this->journal, 'add_notice_to_search_results_at_loop_start');
         }
 
+        $this->loader->add_action('init', $this->ready2publish_form, 'init');
+        $this->loader->add_action('do_parse_request', $this->ready2publish_form, 'do_parse_request', PHP_INT_MAX, 2 );
 
-        #$this->loader->add_action('get_template_part_template-parts/content', $this->journal, 'foo', 99, 2);
+        $this->loader->add_action('wp_dashboard_setup', $this->ready2publish_dashboard, 'wp_dashboard_setup');
+        $this->loader->add_action('init', $this->ready2publish_dashboard, 'init');
+        $this->loader->add_action('do_parse_request', $this->ready2publish_dashboard, 'do_parse_request', PHP_INT_MAX, 3 );
+        $this->loader->add_action('add_meta_boxes', $this->ready2publish_dashboard, 'add_metabox');
 
             //add hooks for the primary publication type...
         $this->loader->add_filter('the_author', $this->primary_publication_type, 'get_the_author', PHP_INT_MAX, 1);
