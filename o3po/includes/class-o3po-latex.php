@@ -189,8 +189,34 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
         else
             $biblatex = false;
 
-        if( $biblatex ) {
+
             $str_replacements = array(
+                '\\ensuremath' => '',
+                '\\eprintprefix' => '',
+                '\\newblock' => '',
+                '\\natexlab' => '',
+                '\\citenamefont' => '',
+                '\\bibnamefont' => '',
+                '\\BibitemOpen' => '',
+                '\\bibfnamefont' => '',
+                '\\doibase' => '',
+                '\\urlprefix' => '',
+                '\\url' => '',
+                '\\doi' => '',
+                '\\cite' => '',
+                '\\protect' => '',
+                '\\path' => '',
+                '\\penalty0' => '',
+                '\\tiny' => '',
+                '\\scriptsize' => '',
+                '\\footnotesize' => '',
+                '\\small' => '',
+                '\\normalsize' => '',
+                '\\large' => '',
+                '\\Large' => '',
+                '\\LARGE' => '',
+                '\\huge' => '',
+                '\\Huge' => '',
                 '\\bibrangedash ' => '-',
                 '\\bibinitperiod' => '.',
                 '\\bibinitdelim ' => ' ',
@@ -198,8 +224,31 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
             $preg_replacements = array(
                 '\\\\\s+' => ' ',
                 '(?<!\\\\)%.*' => '', //remove all comments
+                '\\\\bib(info|field)\s*{(year|pages|journal|title|author|volume|editor|publisher|booktitle|address|series|series and number|howpublished|note|school|edition|eid|number)}\s*' => '',
+                '\\\\BibitemShut\s*{(No|)Stop}' => '',
+                '\\\\enquote\s*' => '', //this should be improved to actually add quotes
+                '\\\\selectlanguage\s*{[a-zA-Z]+}' => '',
+                '\\\\(href|Eprint|eprint)(@noop|)\s*{[^}]*}' => '',
+                '\\\\(bf|tt|sf|sl)(series|family)[\s{]' => '',
+                '\\\\text(em|it|bf|tt|rm|sl|sc)[\s{]' => '',
+                '\\\\emph[\s{]' => '',
+                '\\\\(em|it|tt|bf|sl)(|shape)(?![a-zA-Z])' => '',
+                '\\\\clearsans' => '',
+                '\\\\clearlight' => '',
+                '\\\\textsfl' => '',
+                '\\\\textsf' => '',
+                '\\\\clearthin' => '',
+                '\\\\textsft' => '',
+                '\\\\text(super|sub)script' => '',
+                '\\\\spaceskip=' => '',
+                '\\\\fontdimen[0-9]*' => '',
+                '\\\\font (plus|minus)' => '',
+                '\\\\font' => '',
+                '\\\\hskip[^\\\\]*\\\\relax' => '',
+                '\\\\relax' => '',
                                        );
 
+        if( $biblatex ) {
             $entries = preg_split('/\\\\entry/u', $bbl, -1, PREG_SPLIT_NO_EMPTY);
             foreach($entries as $n => $entry) {
                 if(mb_strpos($entry, '\\endentry' ) === false ) continue;
@@ -216,11 +265,17 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 if(!empty($name[1]))
                     foreach(preg_split('/{{hash=/u', $name[1], -1, PREG_SPLIT_NO_EMPTY) as $i => $author_bbl) {
                         if($i === 0) continue;
+                        preg_match('#prefix={(.*?)},#u', $author_bbl, $prefix );
+                        preg_match('#prefixi={(.*?)},#u', $author_bbl, $prefixi );
                         preg_match('#family={(.*?)},#u', $author_bbl, $family );
                         preg_match('#familyi={(.*?)},#u', $author_bbl, $familyi );
                         preg_match('#given={(.*?)},#u', $author_bbl, $given );
                         preg_match('#giveni={(.*?)},#u', $author_bbl, $giveni );
 
+                        if(!empty($prefix[1]))
+                            $citations[$n]['author'][$i]['prefix'] = $prefix[1];
+                        if(!empty($prefixi[1]))
+                            $citations[$n]['author'][$i]['prefixi'] = $prefixi[1];
                         if(!empty($family[1]))
                             $citations[$n]['author'][$i]['family'] = $family[1];
                         if(!empty($familyi[1]))
@@ -264,9 +319,12 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 if(!empty($citations[$n]['url']) && ( (!empty($citations[$n]['doi']) &&  mb_strpos($citations[$n]['url'], $citations[$n]['doi']) !== false || mb_strpos($citations[$n]['url'], 'doi.org/') !== false) || (!empty($citations[$n]['eprint']) && mb_strpos($citations[$n]['url'], $citations[$n]['eprint']) !== false )))
                     unset($citations[$n]['url']);
 
-                preg_match('#\\\\verb{eprint}\s*?\\\\verb ([^\s]*)\s*\\\\endverb#u', $entry, $eprint);
+                preg_match('#\\\\verb{eprint}\s*?\\\\verb\s*([.0-9v]*)\s*\\\\endverb#u', $entry, $eprint);
                 if(!empty($eprint[1]))
                     $citations[$n]['eprint'] = $eprint[1];
+
+                if(!empty($citations[$n]['url']) && ( (!empty($citations[$n]['doi']) &&  mb_strpos($citations[$n]['url'], $citations[$n]['doi']) !== false || mb_strpos($citations[$n]['url'], 'doi.org/') !== false) || (!empty($citations[$n]['eprint']) && mb_strpos($citations[$n]['url'], $citations[$n]['eprint']) !== false )))
+                    unset($citations[$n]['url']);
 
                 $fields = array(
                     'pages',
@@ -297,7 +355,11 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                     foreach( $citations[$n]['author'] as $i => $author) {
                         if(!empty($author['given']))
                             $text .= $author['given'];
-                        if(!empty($author['given']) && !empty($author['family']))
+                        if(!empty($author['given']) && (!empty($author['family']) || !empty($author['prefix'])))
+                            $text .= " ";
+                        if(!empty($author['prefix']))
+                            $text .= $author['prefix'];
+                        if(!empty($author['family']) && !empty($author['prefix']))
                             $text .= " ";
                         if(!empty($author['family']))
                             $text .= $author['family'];
@@ -420,55 +482,6 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
 
             $citations = array();
 
-            $str_replacements = array(
-                '\\ensuremath' => '',
-                '\\eprintprefix' => '',
-                '\\newblock' => '',
-                '\\natexlab' => '',
-                '\\citenamefont' => '',
-                '\\bibnamefont' => '',
-                '\\BibitemOpen' => '',
-                '\\bibfnamefont' => '',
-                '\\doibase' => '',
-                '\\urlprefix' => '',
-                '\\url' => '',
-                '\\doi' => '',
-                '\\cite' => '',
-                '\\protect' => '',
-                '\\path' => '',
-                '\\penalty0' => '',
-                '\\tiny' => '',
-                '\\scriptsize' => '',
-                '\\footnotesize' => '',
-                '\\small' => '',
-                '\\normalsize' => '',
-                '\\large' => '',
-                '\\Large' => '',
-                '\\LARGE' => '',
-                '\\huge' => '',
-                '\\Huge' => '',
-                                      );
-            $preg_replacements = array(
-                '\\\\\s' => ' ',
-                '(?<!\\\\)%.*' => '', //remove all comments
-                '\\\\bib(info|field)\s*{(year|pages|journal|title|author|volume|editor|publisher|booktitle|address|series|series and number|howpublished|note|school|edition|eid|number)}\s*' => '',
-                '\\\\BibitemShut\s*{(No|)Stop}' => '',
-                '\\\\enquote\s*' => '', //this should be improved to actually add quotes
-                '\\\\selectlanguage\s*{[a-zA-Z]+}' => '',
-                '\\\\(href|Eprint|eprint)(@noop|)\s*{[^}]*}' => '',
-                '\\\\(bf|tt|sf|sl)(series|family)[\s{]' => '',
-                '\\\\text(em|it|bf|tt|rm|sl|sc)[\s{]' => '',
-                '\\\\emph[\s{]' => '',
-                '\\\\(em|it|tt|bf|sl)(|shape)(?![a-zA-Z])' => '',
-                '\\\\text(super|sub)script' => '',
-                '\\\\spaceskip=' => '',
-                '\\\\fontdimen[0-9]*' => '',
-                '\\\\font (plus|minus)' => '',
-                '\\\\font' => '',
-                '\\\\hskip[^\\\\]*\\\\relax' => '',
-                '\\\\relax' => '',
-                                       );
-
             foreach($entries as $n => $entry) {
                 $entry = preg_replace('#(\\\\end{thebibliography}|\\\\end{references}).*#su', '', $entry);
                 if(mb_strpos($entry, 'begin{thebibliography}' ) !== false || mb_strpos($entry, 'begin{references}' ) !==false || empty($entry) || ($n === 0 && !$contains_thebibliography_environment && !$contains_references_environment) ) continue;
@@ -590,9 +603,22 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
         /**
          * Extracts LaTeX command definitions from latex code.
          *
-         * Extracts LaTeX command definitions from latex code. The definitions are of the following form:
+         * Extracts LaTeX command definitions from latex code.
+         *
+         * Supported are:
+         *
+         *  newcommand
+         *  providecommand
+         *  renewcommand
+         *  renewcommand.
+         *  def
+         *  DeclarePairedDelimiter
+         *
+         * For a command such as
          *
          * \newcommand{\myvec}[1]{\vec{#1}}
+         *
+         * the resulting definition is of the following form:
          *
          * Full match	0-22	`\newcommand{\myvec}[1]`
          * Group 1.	1-11	`newcommand`
@@ -615,7 +641,15 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
         foreach($latex_macro_definitions2 as $key => $def_macro)
             $latex_macro_definitions2[$key][3] = '[' . substr_count($def_macro[3], '#') . ']'; //determine the number of arguments of \def macro definitions
 
-        $latex_macro_definitions = array_merge($latex_macro_definitions1, $latex_macro_definitions2);
+        preg_match_all('#\\\\(DeclarePairedDelimiter)\{((?:[^{}]++|\{(?1)\})*)\}\{((?:[^{}]++|\{(?2)\})*)\}\{((?:[^{}]++|\{(?3)\})*)\}#u', $latex_source_without_comments, $latex_macro_definitions3, PREG_SET_ORDER);
+        foreach($latex_macro_definitions3 as $key => $def_macro)
+        {
+            $latex_macro_definitions3[$key][5] = '{' . $def_macro[3] . '}#1{' . $def_macro[4] . '}';
+            $latex_macro_definitions3[$key][4] = '';
+            $latex_macro_definitions3[$key][3] = '[1]';
+        }
+
+        $latex_macro_definitions = array_merge($latex_macro_definitions1, $latex_macro_definitions2, $latex_macro_definitions3);
 
         return $latex_macro_definitions;
     }
