@@ -136,10 +136,10 @@
                                 <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-1915561720"></a>
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-871648587"></a>
                                 <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
             </div>
-            <div id="namespace-1915561720" class="accordion-body collapse in">
+            <div id="namespace-871648587" class="accordion-body collapse in">
                 <div class="accordion-inner">
 
                     
@@ -1352,8 +1352,17 @@ such written by authors by hand.</p>
                 <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
                 <pre class="signature" style="margin-right: 54px;">extract_latex_macros(string  <span class="argument">$latex_source</span>) </pre>
                 <p><em>Extracts LaTeX command definitions from latex code.</em></p>
-                <p>Extracts LaTeX command definitions from latex code. The definitions are of the following form:</p>
+                <p>Extracts LaTeX command definitions from latex code.</p>
+<p>Supported are:</p>
+<p>newcommand
+providecommand
+renewcommand
+renewcommand.
+def
+DeclarePairedDelimiter</p>
+<p>For a command such as</p>
 <p>\newcommand{\myvec}[1]{\vec{#1}}</p>
+<p>the resulting definition is of the following form:</p>
 <p>Full match  0-22    <code>\newcommand{\myvec}[1]</code>
 Group 1.    1-11    <code>newcommand</code>
 Group 2.    12-18   <code>\myvec</code>
@@ -1783,7 +1792,7 @@ from a text such as a title.</em></p>
                 <section class="span10 offset1">
                     <hr />
                     Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
-                    on March 13th, 2021 at 11:33.
+                    on March 30th, 2021 at 18:23.
                 </section>
             </section>
         </section>

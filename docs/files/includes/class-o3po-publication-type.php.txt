@@ -3385,7 +3385,7 @@ abstract class O3PO_PublicationType {
     }
 
         /**
-         * Get the src of the feature image.
+         * Excerpt from a string with html and LaTeX
          *
          * Safely extracts not more than the first $count characters from a string
          * containing html and LaTeX code (including mathematical formulas).

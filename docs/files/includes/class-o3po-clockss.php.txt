@@ -54,25 +54,34 @@ class O3PO_Clockss {
                 throw new Exception('Got invalid_url_used_in_unit_tests as url, aborting because we take this as an indication that we were called in a unit test.');
 
             $ftp_connection = ftp_connect($clockss_ftp_url, 21, 10);
-            $login_result = ftp_login($ftp_connection, $clockss_username, $clockss_password);
-
-            if(ftp_put($ftp_connection, $remote_filename_without_extension . '.xml', $tmpfile_clockss_xml, FTP_BINARY))
-                $clockss_response .= "INFO: successfully uploaded the meta-data xml to CLOCKSS.\n";
+            if($ftp_connection === False)
+                $clockss_response .= "ERROR: Establishing an ftp connection to CLOCKSS under " . $clockss_ftp_url . " failed. Maybe try again in a few minutes.";
             else
-                $clockss_response .= "ERROR: There was an error uploading the meta-data xml to CLOCKSS: " . $php_errormsg . "\n";
+            {
+                $login_result = ftp_login($ftp_connection, $clockss_username, $clockss_password);
+                if($login_result === False)
+                    $clockss_response .= "ERROR: Could not log in to CLOCKSS under " . $clockss_ftp_url . " with user name " . $clockss_username . ".";
+                else
+                {
+                    ftp_pasv($ftp_connection, true);
 
-            if(ftp_put($ftp_connection, $remote_filename_without_extension . '.pdf', $pdf_path, FTP_BINARY))
-                $clockss_response .= "INFO: successfully uploaded the fulltext pdf to CLOCKSS.\n";
-            else
-                $clockss_response .= "ERROR: There was an error uploading the fulltext pdf to CLOCKSS: " . $php_errormsg . "\n";
+                    if(ftp_put($ftp_connection, $remote_filename_without_extension . '.xml', $tmpfile_clockss_xml, FTP_BINARY))
+                        $clockss_response .= "INFO: successfully uploaded the meta-data xml to CLOCKSS.\n";
+                    else
+                        $clockss_response .= "ERROR: There was an error uploading the meta-data xml to CLOCKSS: " . $php_errormsg . "\n";
 
-
+                    if(ftp_put($ftp_connection, $remote_filename_without_extension . '.pdf', $pdf_path, FTP_BINARY))
+                        $clockss_response .= "INFO: successfully uploaded the fulltext pdf to CLOCKSS.\n";
+                    else
+                        $clockss_response .= "ERROR: There was an error uploading the fulltext pdf to CLOCKSS: " . $php_errormsg . "\n";
+                }
+            }
         } catch(Exception $e) {
             $clockss_response .= "ERROR: There was an exception during the ftp transfer to CLOCKSS. " . $e->getMessage() . "\n";
         } finally {
             ini_set('track_errors', $trackErrors);
             restore_error_handler();
-            if($ftp_connection !== null)
+            if($ftp_connection !== False)
             {
                 try
                 {

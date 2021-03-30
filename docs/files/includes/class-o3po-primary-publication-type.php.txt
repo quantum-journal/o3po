@@ -1277,7 +1277,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
          * Parse the source files.
          *
          * Depending on the manuscript we either got a single uncompressed .tex file
-         * or a tar.gz archive from the arXivm which we have to extract and then analyse.
+         * or a tar.gz archive from the arXiv which we have to extract and then analyse.
          *
          * @since   0.3.0
          * @access  private
@@ -1356,6 +1356,13 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                     {
                         $new_author_latex_macro_definitions = array_merge_recursive($new_author_latex_macro_definitions, $author_latex_macro_definitions_from_this_file);
                     }
+                }
+            }
+            foreach($source_files as $entry ) {
+                if($entry->isFile() && ( mb_substr($entry->getPathname(), -4) === '.bbl' || mb_substr($entry->getPathname(), -4) === '.tex' ) )
+                {
+                    $filecontents = $this->environment->file_get_contents_utf8($entry->getPathname());
+                    $filecontents_without_comments = preg_replace('#(?<!\\\\)%.*#u', '', $filecontents);//remove all comments
 
                         //Look for bibliographies and extract them
                     $thisbbl = O3PO_Latex::extract_bibliographies($filecontents_without_comments);//we search the file with comments removed to not accidentially pic up a commented out bibliography
