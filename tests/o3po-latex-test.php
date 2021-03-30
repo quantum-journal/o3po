@@ -183,7 +183,7 @@ class O3PO_LatexTest extends O3PO_TestCase
         foreach($some_expected_macros as $macro)
             $this->assertContains($macro, $macros);
 
-        $this->assertEquals(83, count($macros));
+        $this->assertEquals(111, count($macros));
 
         return $macros;
     }

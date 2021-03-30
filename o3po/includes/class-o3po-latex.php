@@ -641,12 +641,23 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
         foreach($latex_macro_definitions2 as $key => $def_macro)
             $latex_macro_definitions2[$key][3] = '[' . substr_count($def_macro[3], '#') . ']'; //determine the number of arguments of \def macro definitions
 
-        preg_match_all('#\\\\(DeclarePairedDelimiter)\{((?:[^{}]++|\{(?1)\})*)\}\{((?:[^{}]++|\{(?2)\})*)\}\{((?:[^{}]++|\{(?3)\})*)\}#u', $latex_source_without_comments, $latex_macro_definitions3, PREG_SET_ORDER);
+        preg_match_all('#\\\\(DeclarePairedDelimiter|DeclareMathOperator)\{((?:[^{}]++|\{(?1)\})*)\}\{((?:[^{}]++|\{(?2)\})*)\}(?:\{((?:[^{}]++|\{(?3)\})*)\}|)#u', $latex_source_without_comments, $latex_macro_definitions3, PREG_SET_ORDER);
         foreach($latex_macro_definitions3 as $key => $def_macro)
         {
-            $latex_macro_definitions3[$key][5] = '{' . $def_macro[3] . '}#1{' . $def_macro[4] . '}';
-            $latex_macro_definitions3[$key][4] = '';
-            $latex_macro_definitions3[$key][3] = '[1]';
+            # convert the format to a standard newcommand macro
+            if($latex_macro_definitions3[$key][1] === 'DeclarePairedDelimiter')
+            {
+                $latex_macro_definitions3[$key][5] = '{' . $def_macro[3] . '}#1{' . $def_macro[4] . '}';
+                $latex_macro_definitions3[$key][4] = '';
+                $latex_macro_definitions3[$key][3] = '[1]';
+            }
+            elseif($latex_macro_definitions3[$key][1] === 'DeclareMathOperator')
+            {
+                $latex_macro_definitions3[$key][5] = $def_macro[3];
+                $latex_macro_definitions3[$key][4] = '';
+                $latex_macro_definitions3[$key][3] = '[0]';
+            }
+            $latex_macro_definitions3[$key][1] = '\\newcommand';
         }
 
         $latex_macro_definitions = array_merge($latex_macro_definitions1, $latex_macro_definitions2, $latex_macro_definitions3);
