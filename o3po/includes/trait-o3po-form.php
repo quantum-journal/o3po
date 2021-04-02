@@ -620,6 +620,24 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
     }
 
         /**
+         * Validate non-negative float
+         *
+         * @since    0.3.0
+         * @access   private
+         * @param    string   $id    The field this was input to.
+         * @param    string   $input    User input.
+         */
+    public function validate_non_negative_float( $id, $input ) {
+
+        $input = trim($input);
+        if(preg_match('/^[0-9][0-9]*(\.[0-9]*|)$/u', $input))
+            return $input;
+
+        $this->add_error($id, 'not-a-non-negative-float', "The input '" . $input . "' given in '" . $this->fields[$id]['title'] . "' was not a non-negative floating point number. Field reset.", 'error');
+        return $this->get_field_default($id);
+    }
+
+        /**
          * Restrict input to checked or unchecked fields
          *
          * @since    0.3.0

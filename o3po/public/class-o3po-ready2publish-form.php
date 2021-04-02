@@ -798,7 +798,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
          */
     public function render_dissemination_material_section() {
 
-        echo '<p>Now you can add a popular summary and other supporting material to your article. These steps are optional, but they can help you reach a larger audience. Here too, you may use LaTeX formulas in the popular summary and the caption of the featured image.</p>';
+        echo '<p>Now you can add a popular summary (which should be aimed at a general physics audience) and other supporting material to your article. These steps are optional, but they can help you reach a larger audience. Here too, you may use LaTeX formulas in the popular summary and the caption of the featured image.</p>';
     }
 
 

@@ -138,6 +138,10 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
 
         $settings->specify_field('invoice_email', 'Invoice email', array('O3PO_Ready2PublishDashboard', 'render_invoice_email_setting'), 'ready2publish_settings', 'ready2publish_settings', array(), array($settings, 'validate_email'), '');
 
+        $settings->specify_field('publisher_vat_number', 'Publisher VAT number', array('O3PO_Ready2PublishDashboard', 'render_publisher_vat_number_setting'), 'ready2publish_settings', 'ready2publish_settings', array(), array($settings, 'trim'), '');
+
+        $settings->specify_field('default_vat_percent', 'Default VAT percent', array('O3PO_Ready2PublishDashboard', 'render_default_vat_percent_setting'), 'ready2publish_settings', 'ready2publish_settings', array(), array($settings, 'validate_non_negative_float'), '20');
+
         $settings->specify_field('invoice_footer', 'Invoice footer', array('O3PO_Ready2PublishDashboard', 'render_invoice_footer_setting'), 'ready2publish_settings', 'ready2publish_settings', array(), array($settings, 'trim'), '');
 
 
@@ -412,6 +416,32 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
     }
 
         /**
+         * Render the setting for the default vat.
+         *
+         * @since    0.4.0
+         * @access   public
+         */
+    public static function render_publisher_vat_number_setting() {
+
+        $settings = O3PO_Settings::instance();
+        $settings->render_single_line_field('publisher_vat_number');
+        echo('<p>The VAT number of the publisher. Is printed on invoices.</p>');
+    }
+
+        /**
+         * Render the setting for the default vat.
+         *
+         * @since    0.4.0
+         * @access   public
+         */
+    public static function render_default_vat_percent_setting() {
+
+        $settings = O3PO_Settings::instance();
+        $settings->render_single_line_field('default_vat_percent');
+        echo('<p>The default VAT for invoices in percent. The VAT can be manually changed on each invoice.</p>');
+    }
+
+        /**
          * Render the setting for the invoice header image.
          *
          * @since    0.4.0
@@ -451,8 +481,8 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
               tex2jax: {inlineMath: [[\'$\',\'$\'], [\'\\\\(\',\'\\\\)\']], processEscapes: true},
               TeX: {equationNumbers: {autoNumber: "AMS"}}
             });
-        </script>
-        <script type="text/javascript" async src="' . esc_attr($settings->get_field_value('mathjax_url')) . '?config=TeX-AMS_CHTML"></script>';
+        </script>';
+        $invoice_html .= '<script type="text/javascript" async src="' . esc_attr($settings->get_field_value('mathjax_url')) . '?config=TeX-AMS_CHTML"></script>';
         $invoice_html .= '</header>';
         $invoice_html .= '<body style="font-family:Sans-Serif;font-size:11pt;">';
         $invoice_html .= '<div>';
@@ -467,10 +497,11 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
             if(!empty($settings->get_field_value($field)))
                 $invoice_html .= esc_html($settings->get_field_value($field)) . '<br />';
         }
-
         if(!empty($settings->get_field_value("invoice_email")))
             $invoice_html .= '<a href="mailto:' . esc_attr($settings->get_field_value("invoice_email")) . '">' . esc_html($settings->get_field_value("invoice_email")) . '</a><br />';
         $invoice_html .= '<a href="' . esc_attr(get_site_url()) . '">' . esc_html(get_site_url()) . '</a><br />';
+        if(!empty($settings->get_field_value('publisher_vat_number')))
+            $invoice_html .= '<br /><strong>' . esc_html($settings->get_field_value('publisher_vat_number')) . '</strong><br />';
         $invoice_html .= '</div>';
         $invoice_html .= '<div style="clear:left"></div>';
         $invoice_html .= '<div>';
@@ -495,21 +526,55 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
     <th style="text-align:right;">Total price</th>
   </tr>
   <tr>
-    <td style="vertical-align: top;padding-top:1em;padding-bottom:1em">' . '<input style="width:6em;text-align:left" value="' . "1" . '"></input>' . '</td>
+    <td style="vertical-align: top;padding-top:1em;padding-bottom:1em">' . '<input style="width:6em;text-align:left" value="' . "1" . '" readonly></input>' . '</td>
     <!--<td style="vertical-align: top;padding-top:1em;padding-bottom:1em">Publication fee for article:<br /><textarea style="font-weight: bold;width:100%;resize: none;min-height: 5em;">' . esc_html($manuscript['title']) . '</textarea></td>-->
     <td style="vertical-align: top;padding-top:1em;padding-bottom:1em">Publication fee for article:<br /><strong>' . esc_html($manuscript['title']) . '</strong></td>
-    <td style="vertical-align: bottom;text-align:right;padding-top:1em;padding-bottom:1em"><strong>' . '<input style="font-weight: bold;width:6em;text-align:right" value="' . esc_attr($manuscript['payment_amount']) . '"></input>' . '</strong></td>
-    <td style="vertical-align: bottom;text-align:right;padding-top:1em;padding-bottom:1em"><strong>' . '<input style="font-weight: bold;width:6em;text-align:right" value="' . esc_attr($manuscript['payment_amount']) . '"></input>' . '</strong></td>
+    <td style="vertical-align: bottom;text-align:right;padding-top:1em;padding-bottom:1em"><strong>' . '<input id="net-price-per-publication" class="oninput-updates-invoice" style="font-weight: bold;width:6em;text-align:right" value="' . esc_attr($manuscript['payment_amount']) . '"></input>' . '</strong></td>
+    <td style="vertical-align: bottom;text-align:right;padding-top:1em;padding-bottom:1em"><strong>' . '<input id="total-net-price" style="font-weight: bold;width:6em;text-align:right" value="' . esc_attr($manuscript['payment_amount']) . '" readonly></input>' . '</strong></td>
   </tr>
+
+  <tr>
+    <td style="vertical-align: top;padding-top:1em;padding-bottom:1em">' . '<input style="width:6em;text-align:left" value="' . "1" . '" readonly></input>' . '</td>
+    <td style="vertical-align: top;padding-top:1em;padding-bottom:1em">Value added tax <input required id="vat-percent" class="oninput-updates-invoice" style="width:3em; text-align:right" value="' . $settings->get_field_value('default_vat_percent') . '"></input>%</td>
+    <td style="vertical-align: bottom;text-align:right;padding-top:1em;padding-bottom:1em"><strong>' . '<input id="vat-per-item" style="font-weight: bold;width:6em;text-align:right" value="' . "foo" . '" readonly></input>' . '</strong></td>
+    <td style="vertical-align: bottom;text-align:right;padding-top:1em;padding-bottom:1em"><strong>' . '<input id="vat-total" style="font-weight: bold;width:6em;text-align:right" value="' . "foo" . '" readonly></input>' . '</strong></td>
+  </tr>
+
+
   <tr style="border-top: 1pt solid black;">
     <td></td>
     <td></td>
     <td style="text-align:right;padding-top:1em;padding-bottom:1em"><strong>Total</strong></td>
-    <td style="text-align:right;padding-top:1em;padding-bottom:1em">' . '<input style="font-weight: bold;width:6em;text-align:right" value="' . esc_attr($manuscript['payment_amount']) . '"></input>' . '</td>
+    <td style="text-align:right;padding-top:1em;padding-bottom:1em">' . '<input id="invoice-total" style="font-weight: bold;width:6em;text-align:right" value="' . esc_attr($manuscript['payment_amount']) . '" readonly></input>' . '</td>
   </tr>
 </table>';
         $invoice_html .= '<div style="margin-top:2em">' . $settings->get_field_value('invoice_footer') . '</div>';
         $invoice_html .= '</div>';
+        $invoice_html .= '<script type="application/javascript">
+function updateInvoice() {
+  var netPricePerPublication = document.getElementById(\'net-price-per-publication\').value;
+  document.getElementById(\'total-net-price\').value = netPricePerPublication;
+  var net_price_string = document.getElementById(\'total-net-price\').value;
+  var currency_symbol = net_price_string.substring(net_price_string.length - 1, net_price_string.length);
+  net_price_string = parseFloat(net_price_string.substring(0, net_price_string.length - 1)).toFixed(2) + currency_symbol;
+  document.getElementById(\'net-price-per-publication\').value = net_price_string
+  document.getElementById(\'total-net-price\').value = net_price_string;
+  var net_price = parseFloat(net_price_string.substring(0, net_price_string.length - 1));
+  var vat = document.getElementById(\'vat-percent\').value * 0.01 * net_price;
+  var vat_rounded = Math.round((vat + Number.EPSILON) * 100) / 100;
+  var vat_rounded_str = vat_rounded.toFixed(2) + currency_symbol;
+  document.getElementById(\'vat-per-item\').value = vat_rounded_str;
+  document.getElementById(\'vat-total\').value = vat_rounded_str;
+  var total = vat_rounded + net_price;
+  document.getElementById(\'invoice-total\').value = total.toFixed(2) + currency_symbol;
+}
+var elements = document.getElementsByClassName(\'oninput-updates-invoice\');
+for(var i=0; i<elements.length; i++) {
+  elements[i].addEventListener(\'input\', updateInvoice);
+  elements[i].addEventListener(\'propertychange\', updateInvoice);
+}
+document.addEventListener(\'DOMContentLoaded\', updateInvoice);
+</script>';
         $invoice_html .= '</body>';
         $invoice_html .= '</html>';
 
