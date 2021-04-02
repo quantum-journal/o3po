@@ -196,6 +196,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 '\\newblock' => '',
                 '\\natexlab' => '',
                 '\\citenamefont' => '',
+                '\\bibinitperiod' => '.',
                 '\\bibnamefont' => '',
                 '\\BibitemOpen' => '',
                 '\\bibfnamefont' => '',
@@ -288,7 +289,10 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
 
                 preg_match('#\\\\list{publisher}{[^}*]}(?=\{((?:[^{}]++|\{(?1)\})++)\})#u', $entry, $publisher);
                 if(!empty($publisher[1]))
+                {
+                    $citations[$n]['publisher'] = preg_replace("#\s+#u", ' ', $publisher[1]);
                     $citations[$n]['publisher'] = str_replace('%', '', $publisher[1]);
+                }
 
                 preg_match('#\\\\verb{doi}\s*?\\\\verb ([^\s]*)\s*\\\\endverb#u', $entry, $doi);
                 if(!empty($doi[1]))
@@ -678,6 +682,8 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
     static private $additional_default_macros = array(
         array('', '\\newcommand', '\\@firstoftwo', '[2]', '', '#1'),
         array('', '\\newcommand', '\\@secondoftwo', '[2]', '', '#2'),
+        array('', '\\newcommand', '\\@gobble', '[1]', '', ''),
+        array('', '\\newcommand', '\\@gobbletwo', '[2]', '', ''),
                                                       );
         /**
          * Get special macros we sometimes want to ignore in expansion.

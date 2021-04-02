@@ -479,9 +479,12 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
                     "author_affiliations" => array("/1,3###2,3###1,2,3/u"),
                                                                                                     )],
 
+        [dirname(__FILE__) . '/resources/arxiv/2006.01273v3.tar.gz', "application/x-tar", array(
+                    "validation_result" => array('#Author and affiliations data updated from arxiv source#'),
+                    #"author_affiliations" => array("/1,3###2,3###1,2,3/u"),
+                    'num_dois' => 82,
+                                                                                                    )],
             ];
-
-
     }
 
         /**
@@ -516,21 +519,24 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         }
 
         # We do some more in-depth parsing of the extracted bbl:
-        if($parse_publication_source_result['bbl'])
+        $bbl = $parse_publication_source_result['bbl'];
+        if(!empty($bbl))
         {
-            $parsed_bbl = O3PO_Latex::parse_bbl($parse_publication_source_result['bbl']);
+            $new_author_latex_macro_definitions = $parse_publication_source_result['author_latex_macro_definitions'];
+            $new_author_latex_macro_definitions_without_specials = O3PO_Latex::remove_special_macros_to_ignore_in_bbl($new_author_latex_macro_definitions);
+            $bbl = O3PO_Latex::expand_latex_macros($new_author_latex_macro_definitions_without_specials, $bbl);
+
+            $parsed_bbl = O3PO_Latex::parse_bbl($bbl);
             $num_dois = 0;
             foreach($parsed_bbl as $n => $entry) {
 
-                $this->assertFalse( O3PO_Latex::strpos_outside_math_mode($entry['text'], '\\'), "The text " . $entry['text'] . " extracted from the bbl in " . $path_source . " still contains one ore more backslashes that were not caught by parse_bbl");
-
                 $output = $primary_publication_type->get_formated_bibliography_entry_html($entry);
+                $this->assertFalse( O3PO_Latex::strpos_outside_math_mode($output, '\\'), "The text " . $entry['text'] . " extracted from the bbl in " . $path_source . " still contains one ore more backslashes that were not caught by parse_bbl. Full entry:" . json_encode($entry));
                 $this->assertValidHTMLFragment($output);
 
                 if( !empty($entry['doi']) )
                     $num_dois += 1;
             }
-            #print("  ".$path_source.":".$num_dois."  ");
 
             if(!empty($expectation['num_dois']))
                 $this->assertSame($num_dois, $expectation['num_dois']);
