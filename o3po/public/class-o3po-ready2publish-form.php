@@ -14,6 +14,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-o3po-public-
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-ready2publish-storage.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-environment.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-arxiv.php';
 
 /**
  * Class for the ready to publish form.
@@ -250,14 +251,16 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
          * @access public
          * @param  string $id              Id of the image upload field
          * @param  array  $file_of_this_id Array with fields such as those
-         *                                 of a single element of the $_FILE
+         *                                 of a single element of the $_FILES
          *                                 variable
          * @return array Various image upload information
          */
     public function validate_featured_image_upload( $id, $file_of_this_id ) {
 
+        if(empty($file_of_this_id['tmp_name']))
+            return;
+
         $temp_file = $file_of_this_id['tmp_name'];
-        $size = $file_of_this_id['size'];
         $mime_type = $file_of_this_id['type'];
 
         $filesize = filesize($temp_file);
@@ -277,6 +280,9 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         if($width !== 2*$height )
             return array('error' => "The image must must have an aspect ratio of 2:1. The current image size is " . $width . "x" . $height . ".");
 
+        if(empty($file_of_this_id['name']))
+            return array('error' => "No name was specified for the image.");
+
         require_once( ABSPATH . 'wp-admin/includes/file.php' );
 
         $result = wp_handle_sideload($file_of_this_id, array('test_form' => FALSE));
@@ -284,7 +290,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         if(empty($result['error']) and !empty($result['file']))
         {
             $result['user_name'] = $file_of_this_id['name'];
-            $result['size'] = $file_of_this_id['size'];
+            $result['size'] = $filesize;# = $file_of_this_id['size'];
             $result['id'] = $id;
             $this->append_session_data('sideloaded_files', $result);
         }
@@ -976,7 +982,7 @@ while(nextSibling) {
         if(in_array($input, $allowed))
             return $input;
 
-        $this->add_error($id, 'neither-of-paypal-invoice-transfer', "The selection '" . $this->fields[$id]['title'] . "' must be one of: " . implode($allowed) . ". Selection reset.", 'error');
+        $this->add_error($id, 'neither-of-paypal-invoice-transfer', "The selection '" . $this->fields[$id]['title'] . "' must be one of: " . implode(' ', $allowed) . ". Selection reset.", 'error');
         return $this->get_field_default($id);
     }
 
