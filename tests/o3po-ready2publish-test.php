@@ -48,8 +48,8 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
 
         /**
          * @depends test_initialize_settings
-         * @depends test_initialize_ready2publish_storage
          * @depends test_setup_environment
+         * @depends test_initialize_ready2publish_storage
          */
     public function test_form_html_and_logic( $settings, $environment, $storage ) {
 
@@ -96,12 +96,12 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
         $this->assertContains("not a valid email address", $content);
         $this->assertSame($form->get_page_to_display(), 'basic_manuscript_data');
 
-        # now try with session id and some data in $_POST
+        # now try with session id and a mal formed eprint in $_POST
         $form = new O3PO_Ready2PublishForm('o3po', $settings->get_field_value("ready2publish_slug"), $environment, $storage);
         $_POST['coming_from_page'] = 'basic_manuscript_data';
         $_POST['navigation'] = 'Next';
         $_POST['o3po-ready2publish'] = array(
-            'eprint' => '2006.01273v3',
+            'eprint' => '2006.01273v3xasdf',
             'acceptance_code' => 'AAA',
             'agree_to_publish' => 'checked',
             'corresponding_author_email' => 'foo@bar.com',
@@ -113,13 +113,175 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
         $_POST['session_id'] = $method->invoke($form)[0];
         $form->do_parse_request(True, Null, True);
         $content = $wp_query->post->ID->post_content;
-        echo "Output:\n" . $content;
+        #echo "Output:\n" . $content;
+        $this->assertValidHTMLFragment($content);
+        $this->assertRegExp('/alert.*The arXiv identifier.*is not valid/u', $content);
+        $this->assertSame($form->get_page_to_display(), 'basic_manuscript_data');
+
+        # now try with session id and a well formed eprint with the wrong license
+        $form = new O3PO_Ready2PublishForm('o3po', $settings->get_field_value("ready2publish_slug"), $environment, $storage);
+        $_POST['coming_from_page'] = 'basic_manuscript_data';
+        $_POST['navigation'] = 'Next';
+        $_POST['o3po-ready2publish'] = array(
+            'eprint' => '0809.2542v4',
+            'acceptance_code' => 'AAA',
+            'agree_to_publish' => 'checked',
+            'corresponding_author_email' => 'foo@bar.com',
+            'payment_method' => 'invoice',
+                                             );
+        $class = new ReflectionClass('O3PO_Ready2PublishForm');
+        $method = $class->getMethod('get_session_ids');
+        $method->setAccessible(true);
+        $_POST['session_id'] = $method->invoke($form)[0];
+        $form->do_parse_request(True, Null, True);
+        $content = $wp_query->post->ID->post_content;
+        #echo "Output:\n" . $content;
+        $this->assertValidHTMLFragment($content);
+        $this->assertRegExp('/alert.*is not published under one of the creative commons licenses/u', $content);
+        $this->assertSame($form->get_page_to_display(), 'basic_manuscript_data');
+
+        # now try with session id and a well formed but non existing eprint
+        $form = new O3PO_Ready2PublishForm('o3po', $settings->get_field_value("ready2publish_slug"), $environment, $storage);
+        $_POST['coming_from_page'] = 'basic_manuscript_data';
+        $_POST['navigation'] = 'Next';
+        $_POST['o3po-ready2publish'] = array(
+            'eprint' => '2006.01273v11413',
+            'acceptance_code' => 'AAA',
+            'agree_to_publish' => 'checked',
+            'corresponding_author_email' => 'foo@bar.com',
+            'payment_method' => 'invoice',
+                                             );
+        $class = new ReflectionClass('O3PO_Ready2PublishForm');
+        $method = $class->getMethod('get_session_ids');
+        $method->setAccessible(true);
+        $_POST['session_id'] = $method->invoke($form)[0];
+        $form->do_parse_request(True, Null, True);
+        $content = $wp_query->post->ID->post_content;
+        #echo "Output:\n" . $content;
+        $this->assertValidHTMLFragment($content);
+        $this->assertRegExp('/alert.*Failed to fetch or parse arXiv abstract html for 2006\.01273v11413/u', $content);
+        $this->assertSame($form->get_page_to_display(), 'basic_manuscript_data');
+
+        # now try with session id and an actual eprint
+        $form = new O3PO_Ready2PublishForm('o3po', $settings->get_field_value("ready2publish_slug"), $environment, $storage);
+        $_POST['coming_from_page'] = 'basic_manuscript_data';
+        $_POST['navigation'] = 'Next';
+        $_POST['o3po-ready2publish'] = array(
+            'eprint' => '2006.01273v3',
+            'acceptance_code' => 'AAA',
+            'agree_to_publish' => 'checked',
+            'corresponding_author_email' => 'foo@bar.com',
+            'payment_method' => 'invoice',
+            'invoice_recipient' => "Foo University",
+                                             );
+        $class = new ReflectionClass('O3PO_Ready2PublishForm');
+        $method = $class->getMethod('get_session_ids');
+        $method->setAccessible(true);
+        $_POST['session_id'] = $method->invoke($form)[0];
+        $form->do_parse_request(True, Null, True);
+        $content = $wp_query->post->ID->post_content;
+        #echo "Output:\n" . $content;
         $this->assertValidHTMLFragment($content);
         $this->assertContains("2006.01273v3", $content);
         $this->assertContains("Mills", $content);
         $this->assertContains("Daniel", $content);
         $this->assertNotContains("alert", $content);
         $this->assertSame($form->get_page_to_display(), 'meta_data');
+
+        # advance towards end of form
+        $_POST['coming_from_page'] = $form->get_page_to_display();
+        $form = new O3PO_Ready2PublishForm('o3po', $settings->get_field_value("ready2publish_slug"), $environment, $storage);
+        $_POST['navigation'] = 'Next';
+        $form->do_parse_request(True, Null, True);
+        $content = $wp_query->post->ID->post_content;
+        #echo "Output:\n" . $content;
+        $this->assertValidHTMLFragment($content);
+        $this->assertSame($form->get_page_to_display(), 'dissemination');
+
+        # without checking copyright_confirmation we should see an error now
+        $_POST['coming_from_page'] = $form->get_page_to_display();
+        $form = new O3PO_Ready2PublishForm('o3po', $settings->get_field_value("ready2publish_slug"), $environment, $storage);
+        $_POST['navigation'] = 'Next';
+        $form->do_parse_request(True, Null, True);
+        $content = $wp_query->post->ID->post_content;
+        #echo "Output:\n" . $content;
+        $this->assertValidHTMLFragment($content);
+        $this->assertRegExp('/alert.*The box.*Confirm copyright.*must be checked/u', $content);
+        $this->assertSame($form->get_page_to_display(), 'dissemination');
+
+        # now try with copyright_confirmation checked
+        $_POST['coming_from_page'] = $form->get_page_to_display();
+        $form = new O3PO_Ready2PublishForm('o3po', $settings->get_field_value("ready2publish_slug"), $environment, $storage);
+        $_POST['o3po-ready2publish']['copyright_confirmation'] = 'checked';
+        $_POST['navigation'] = 'Next';
+        $form->do_parse_request(True, Null, True);
+        $content = $wp_query->post->ID->post_content;
+        #echo "Output:\n" . $content;
+        $this->assertValidHTMLFragment($content);
+        $this->assertNotContains("alert", $content);
+        $this->assertSame($form->get_page_to_display(), 'payment');
+
+        # without invoice address we cannot finish payment
+        $_POST['coming_from_page'] = $form->get_page_to_display();
+        $form = new O3PO_Ready2PublishForm('o3po', $settings->get_field_value("ready2publish_slug"), $environment, $storage);
+        $_POST['navigation'] = 'Next';
+        $form->do_parse_request(True, Null, True);
+        $content = $wp_query->post->ID->post_content;
+        #echo "Output:\n" . $content;
+        $this->assertValidHTMLFragment($content);
+        $this->assertRegExp('/alert.*The field.*Address.*must not be empty/u', $content);
+        $this->assertSame($form->get_page_to_display(), 'payment');
+
+        # and we also cannot submit as long as there are errors
+        $_POST['coming_from_page'] = $form->get_page_to_display();
+        $form = new O3PO_Ready2PublishForm('o3po', $settings->get_field_value("ready2publish_slug"), $environment, $storage);
+        $_POST['navigation'] = 'Submit';
+        $form->do_parse_request(True, Null, True);
+        $content = $wp_query->post->ID->post_content;
+        #echo "Output:\n" . $content;
+        $this->assertValidHTMLFragment($content);
+        $this->assertRegExp('/alert.*The field.*Address.*must not be empty/u', $content);
+        $this->assertSame($form->get_page_to_display(), 'payment');
+
+        # but with address we can advance to the summary
+        $_POST['coming_from_page'] = $form->get_page_to_display();
+        $form = new O3PO_Ready2PublishForm('o3po', $settings->get_field_value("ready2publish_slug"), $environment, $storage);
+        $_POST['o3po-ready2publish']['invoice_address'] = "Some street 2\nBar city\nFoo country";
+        $_POST['navigation'] = 'Next';
+        $form->do_parse_request(True, Null, True);
+        $content = $wp_query->post->ID->post_content;
+        #echo "Output:\n" . $content;
+        $this->assertValidHTMLFragment($content);
+        $this->assertSame($form->get_page_to_display(), 'summary');
+
+        # ... and submit
+        $_POST['coming_from_page'] = $form->get_page_to_display();
+        $form = new O3PO_Ready2PublishForm('o3po', $settings->get_field_value("ready2publish_slug"), $environment, $storage);
+        $_POST['navigation'] = 'Submit';
+        $form->do_parse_request(True, Null, True);
+        $content = $wp_query->post->ID->post_content;
+        $this->assertValidHTMLFragment($content);
+        #echo "Output:\n" . $content;
+        $this->assertSame($form->get_page_to_display(), 'summary');
+
+        # test the submitted message
+        $form = new O3PO_Ready2PublishForm('o3po', $settings->get_field_value("ready2publish_slug"), $environment, $storage);
+        $form->do_parse_request(True, Null, True);
+        $message = $form->submitted_message(True);
+        $this->assertValidHTMLFragment($message);
+        $message = $form->submitted_message(False);
+        $this->assertValidHTMLFragment($message);
+        # no test with noinvoice
+        $_POST['o3po-ready2publish']['payment_method'] = 'noinvoice';
+        /* $class = new ReflectionClass('O3PO_Ready2PublishForm'); */
+        /* $method = $class->getMethod('get_session_ids'); */
+        /* $method->setAccessible(true); */
+        /* $_POST['session_id'] = $method->invoke($form)[0]; */
+        $form->do_parse_request(True, Null, True);
+        $message = $form->submitted_message(True);
+        $this->assertValidHTMLFragment($message);
+        $message = $form->submitted_message(False);
+        $this->assertValidHTMLFragment($message);
 
     }
 

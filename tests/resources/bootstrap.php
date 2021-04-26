@@ -206,6 +206,7 @@ $options['o3po-settings'] = array(
             'ready2publish_slug' => 'ready2publish',
                      );
 $options['o3po-ready2publish'] = array();
+$options['o3po-ready2publish-storage'] = array();
 function get_option( $option, $default = false ) {
     global $options;
 
@@ -217,6 +218,8 @@ function get_option( $option, $default = false ) {
         return array();
     elseif($option === 'o3po-ready2publish')
         return $options['o3po-ready2publish'];
+    elseif($option === 'o3po-ready2publish-storage')
+        return $options['o3po-ready2publish-storage'];
     #elseif($default !== false)
     #    return $default;
     else

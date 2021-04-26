@@ -243,15 +243,8 @@ abstract class O3PO_PublicForm {
         if($this->session_id == false)
             return 'Invalid session id or session expired. Access denied. We are sorry, but you will have to <a href="/' . $this->slug . '">start from scratch</a>.';
 
-        ob_start();
-        if(count($this->errors) > 0)
-        {
-            foreach($this->errors as $error_num => $error)
-            {
-                echo('<div class="' . esc_attr($error['code']) . ' alert ' . ($error['type'] === 'error' ? 'alert-danger' : 'alert-warning') . '"><a href="#' . esc_html($error['setting']) . '">' . esc_html($error['message']) . '</a></div>' . "\n");
-            }
-        }
-        else
+
+        if(count($this->errors) === 0)
         {
             if($this->navigation === 'Submit' and $this->coming_from_page !== false)
             {
@@ -261,6 +254,14 @@ abstract class O3PO_PublicForm {
             }
         }
 
+        ob_start();
+        if(count($this->errors) > 0)
+        {
+            foreach($this->errors as $error_num => $error)
+            {
+                echo('<div class="' . esc_attr($error['code']) . ' alert ' . ($error['type'] === 'error' ? 'alert-danger' : 'alert-warning') . '"><a href="#' . esc_html($error['setting']) . '">' . esc_html($error['message']) . '</a></div>' . "\n");
+            }
+        }
         echo '<form method="post" enctype="multipart/form-data" action="' . home_url($this->slug) . '">';
 
         echo '<input type="hidden" name="session_id" value="' . $this->session_id . '">';
