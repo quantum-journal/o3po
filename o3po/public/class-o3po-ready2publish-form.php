@@ -505,15 +505,15 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
             echo '<div class="' . $this->plugin_name . '-' . $this->slug . ' ' . $this->plugin_name . '-' . $this->slug . '-fundgroup">';
 
             echo '<div style="float:left;">';
-            $this->render_single_line_field('award_numbers[' . $x . ']', '', 'on', 'width:20em;max-width:100%;', 'Grant/award number', true, 'display:block;');
+            $this->render_single_line_field('award_numbers[' . $x . ']', 'Grant/award number', 'on', 'width:20em;max-width:100%;', '', true, 'display:block;');
             echo '</div>';
 
             echo '<div style="float:left;">';
-            $this->render_single_line_field('funder_identifiers[' . $x . ']', '', 'on', 'width:15em;max-width:100%;', 'Funder id (optional)', true, 'display:block;');
+            $this->render_single_line_field('funder_identifiers[' . $x . ']', 'Funder id (optional)', 'on', 'width:15em;max-width:100%;', '', true, 'display:block;');
             echo '</div>';
 
             echo '<div style="float:left;">';
-            $this->render_single_line_field('funder_names[' . $x . ']', '', 'on', 'width:50em;max-width:100%;', 'Funder name', true, 'display:block;');
+            $this->render_single_line_field('funder_names[' . $x . ']', 'Funder name', 'on', 'width:50em;max-width:100%;', '', true, 'display:block;');
             echo '</div>';
             echo '<div style="clear:both"></div>';
             echo '</div>';
