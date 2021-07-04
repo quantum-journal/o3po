@@ -52,7 +52,7 @@ class O3PO_TestCase extends PHPUnit_Framework_TestCase
             $this->assertNotContains($needle, $haystack);
     }
 
-    public static function assertRegexp( $pattern, $string, $message = '' ) {
+    public static function assertRegexpCompat($pattern, $string, $message = '' ) {
         if(method_exists(__CLASS__, 'assertMatchesRegularExpression'))
             static::assertMatchesRegularExpression($pattern, $string, $message = '');
         else

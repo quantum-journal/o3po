@@ -116,7 +116,7 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
         $content = $wp_query->post->ID->post_content;
         #echo "Output:\n" . $content;
         $this->assertValidHTMLFragment($content);
-        $this->assertRegExp('/alert.*The arXiv identifier.*is not valid/u', $content);
+        $this->assertRegExpCompat('/alert.*The arXiv identifier.*is not valid/u', $content);
         $this->assertSame($form->get_page_to_display(), 'basic_manuscript_data');
 
         # now try with session id and a well formed eprint with the wrong license
@@ -138,7 +138,7 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
         $content = $wp_query->post->ID->post_content;
         #echo "Output:\n" . $content;
         $this->assertValidHTMLFragment($content);
-        $this->assertRegExp('/alert.*is not published under one of the creative commons licenses/u', $content);
+        $this->assertRegExpCompat('/alert.*is not published under one of the creative commons licenses/u', $content);
         $this->assertSame($form->get_page_to_display(), 'basic_manuscript_data');
 
         # now try with session id and a well formed but non existing eprint
@@ -160,7 +160,7 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
         $content = $wp_query->post->ID->post_content;
         #echo "Output:\n" . $content;
         $this->assertValidHTMLFragment($content);
-        $this->assertRegExp('/alert.*Failed to fetch or parse arXiv abstract html for 2006\.01273v11413/u', $content);
+        $this->assertRegExpCompat('/alert.*Failed to fetch or parse arXiv abstract html for 2006\.01273v11413/u', $content);
         $this->assertSame($form->get_page_to_display(), 'basic_manuscript_data');
 
         # now try with session id and an actual eprint
@@ -207,7 +207,7 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
         $content = $wp_query->post->ID->post_content;
         #echo "Output:\n" . $content;
         $this->assertValidHTMLFragment($content);
-        $this->assertRegExp('/alert.*The box.*Confirm copyright.*must be checked/u', $content);
+        $this->assertRegExpCompat('/alert.*The box.*Confirm copyright.*must be checked/u', $content);
         $this->assertSame($form->get_page_to_display(), 'dissemination');
 
         # now try with copyright_confirmation checked
@@ -230,7 +230,7 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
         $content = $wp_query->post->ID->post_content;
         #echo "Output:\n" . $content;
         $this->assertValidHTMLFragment($content);
-        $this->assertRegExp('/alert.*The field.*Address.*must not be empty/u', $content);
+        $this->assertRegExpCompat('/alert.*The field.*Address.*must not be empty/u', $content);
         $this->assertSame($form->get_page_to_display(), 'payment');
 
         # and we also cannot submit as long as there are errors
@@ -241,7 +241,7 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
         $content = $wp_query->post->ID->post_content;
         #echo "Output:\n" . $content;
         $this->assertValidHTMLFragment($content);
-        $this->assertRegExp('/alert.*The field.*Address.*must not be empty/u', $content);
+        $this->assertRegExpCompat('/alert.*The field.*Address.*must not be empty/u', $content);
         $this->assertSame($form->get_page_to_display(), 'payment');
 
         # but with address we can advance to the summary
