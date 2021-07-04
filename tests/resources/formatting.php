@@ -296,7 +296,7 @@ function wptexturize( $text, $reset = false ) {
 		}
 	}
 
-	return implode( '', $textarr );
+	return implode($textarr);
 }
 
 /**
@@ -365,7 +365,7 @@ function wptexturize_primes( $haystack, $needle, $prime, $open_quote, $close_quo
 		}
 	}
 
-	return implode( $open_quote, $sentences );
+	return implode($open_quote, $sentences);
 }
 
 /**
@@ -776,7 +776,7 @@ function wp_replace_in_html_tags( $haystack, $replace_pairs ) {
 	}
 
 	if ( $changed ) {
-		$haystack = implode( $textarr );
+		$haystack = implode($textarr);
 	}
 
 	return $haystack;
@@ -2761,7 +2761,7 @@ function wp_rel_nofollow_callback( $matches ) {
 		if ( false === array_search( 'nofollow', $parts ) ) {
 			$parts[] = 'nofollow';
 		}
-		$rel = implode( ' ', $parts );
+		$rel = implode($parts);
 		unset( $atts['rel'] );
 
 		$html = '';
@@ -3379,12 +3379,12 @@ function wp_trim_words( $text, $num_words = 55, $more = null ) {
 		$sep = ' ';
 	}
 
-	if ( count( $words_array ) > $num_words ) {
+	if (count($words_array) > $num_words ) {
 		array_pop( $words_array );
-		$text = implode( $sep, $words_array );
+		$text = implode($sep, $words_array);
 		$text = $text . $more;
 	} else {
-		$text = implode( $sep, $words_array );
+		$text = implode($sep, $words_array);
 	}
 
 	/**
@@ -4167,10 +4167,10 @@ function sanitize_option( $option, $value ) {
 			break;
 
 		case 'ping_sites':
-			$value = explode( "\n", $value );
+			$value = explode("\n", $value);
 			$value = array_filter( array_map( 'trim', $value ) );
 			$value = array_filter( array_map( 'esc_url_raw', $value ) );
-			$value = implode( "\n", $value );
+			$value = implode("\n", $value);
 			break;
 
 		case 'gmt_offset':
@@ -4288,10 +4288,10 @@ function sanitize_option( $option, $value ) {
 			if ( is_wp_error( $value ) ) {
 				$error = $value->get_error_message();
 			} else {
-				$value = explode( "\n", $value );
-				$value = array_filter( array_map( 'trim', $value ) );
-				$value = array_unique( $value );
-				$value = implode( "\n", $value );
+				$value = explode("\n", $value);
+				$value = array_filter(array_map('trim', $value));
+				$value = array_unique($value);
+				$value = implode("\n", $value);
 			}
 			break;
 	}
@@ -4855,8 +4855,8 @@ function sanitize_trackback_urls( $to_ping ) {
 		if ( !preg_match( '#^https?://.#i', $url ) )
 			unset( $urls_to_ping[$k] );
 	}
-	$urls_to_ping = array_map( 'esc_url_raw', $urls_to_ping );
-	$urls_to_ping = implode( "\n", $urls_to_ping );
+	$urls_to_ping = array_map('esc_url_raw', $urls_to_ping);
+	$urls_to_ping = implode("\n", $urls_to_ping);
 	/**
 	 * Filters a list of trackback URLs following sanitization.
 	 *
