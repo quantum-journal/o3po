@@ -66,7 +66,7 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
         $content = $wp_query->post->ID->post_content;
         #echo "Output:" . json_encode($content);
         $this->assertValidHTMLFragment($content);
-        $this->assertNotContains("alert", $content);
+        $this->assertStringNotContains("alert", $content);
 
         # try to advance to next page without session id
         $form = new O3PO_Ready2PublishForm('o3po', $settings->get_field_value("ready2publish_slug"), $environment, $storage);
@@ -76,7 +76,7 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
         $content = $wp_query->post->ID->post_content;
         #echo "Output:" . json_encode($content);
         $this->assertValidHTMLFragment($content);
-        $this->assertContains("Invalid session id", $content);
+        $this->assertStringContains("Invalid session id", $content);
         $this->assertSame($form->get_page_to_display(), false);
 
         # now try with session id
@@ -93,10 +93,10 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
         $content = $wp_query->post->ID->post_content;
         #echo "Output:\n" . $content;
         $this->assertValidHTMLFragment($content);
-        $this->assertContains("The arXiv identifier in &amp;#039;ArXiv identifier&amp;#039; must not be empty.", $content);
-        $this->assertContains("The box &amp;#039;Consent to publish&amp;#039; must be checked", $content);
-        $this->assertContains("An acceptance code must be provided", $content);
-        $this->assertContains("not a valid email address", $content);
+        $this->assertStringContains("The arXiv identifier in &amp;#039;ArXiv identifier&amp;#039; must not be empty.", $content);
+        $this->assertStringContains("The box &amp;#039;Consent to publish&amp;#039; must be checked", $content);
+        $this->assertStringContains("An acceptance code must be provided", $content);
+        $this->assertStringContains("not a valid email address", $content);
         $this->assertSame($form->get_page_to_display(), 'basic_manuscript_data');
 
         # now try with session id and a mal formed eprint in $_POST
@@ -185,10 +185,10 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
         $content = $wp_query->post->ID->post_content;
         #echo "Output:\n" . $content;
         $this->assertValidHTMLFragment($content);
-        $this->assertContains("2006.01273v3", $content);
-        $this->assertContains("Mills", $content);
-        $this->assertContains("Daniel", $content);
-        $this->assertNotContains("alert", $content);
+        $this->assertStringContains("2006.01273v3", $content);
+        $this->assertStringContains("Mills", $content);
+        $this->assertStringContains("Daniel", $content);
+        $this->assertStringNotContains("alert", $content);
         $this->assertSame($form->get_page_to_display(), 'meta_data');
 
         # advance towards end of form
@@ -221,7 +221,7 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
         $content = $wp_query->post->ID->post_content;
         #echo "Output:\n" . $content;
         $this->assertValidHTMLFragment($content);
-        $this->assertNotContains("alert", $content);
+        $this->assertStringNotContains("alert", $content);
         $this->assertSame($form->get_page_to_display(), 'payment');
 
         # without invoice address we cannot finish payment
@@ -322,8 +322,8 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
         /**
          * @dataProvider validate_featured_image_upload_provider
          * @depends test_initialize_settings
-         * @depends test_initialize_ready2publish_storage
          * @depends test_setup_environment
+         * @depends test_initialize_ready2publish_storage
          */
     public function test_validate_featured_image_upload( $file_of_this_id, $max_file_size, $expected_key, $settings, $environment, $storage ) {
 

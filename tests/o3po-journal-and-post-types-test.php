@@ -1921,6 +1921,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         global $_POST;
 
         $_GET['tab'] = 'meta-data';
+        $_GET['max_entries'] = 1735;
         $post_type_names = O3PO_PublicationType::get_active_publication_type_names();
         $this->assertNotEmpty($post_type_names);
 
