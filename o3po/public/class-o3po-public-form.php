@@ -152,12 +152,13 @@ abstract class O3PO_PublicForm {
             if(isset($_POST[$this->plugin_name . '-' . $this->slug][$id]))
             {
                 $sanitized_value = $this->sanitize_user_input(wp_unslash($_POST[$this->plugin_name . '-' . $this->slug][$id]));
-                if($field_options['max_length'] !== false)
-                    $sanitized_value = substr($sanitized_value, 0, $field_options['max_length']);
-                $this->field_values[$id] = call_user_func($this->fields[$id]['validation_callable'], $id, $sanitized_value);
             }
             else
-                $this->field_values[$id] = $this->get_field_default($id);
+                $sanitized_value = $this->get_field_default($id);
+
+            if($field_options['max_length'] !== false)
+                $sanitized_value = substr($sanitized_value, 0, $field_options['max_length']);
+            $this->field_values[$id] = call_user_func($this->fields[$id]['validation_callable'], $id, $sanitized_value);
         }
         if($this->navigation === 'Upload' and count($this->errors) === 0)
         {
@@ -242,15 +243,8 @@ abstract class O3PO_PublicForm {
         if($this->session_id == false)
             return 'Invalid session id or session expired. Access denied. We are sorry, but you will have to <a href="/' . $this->slug . '">start from scratch</a>.';
 
-        ob_start();
-        if(count($this->errors) > 0)
-        {
-            foreach($this->errors as $error_num => $error)
-            {
-                echo('<div id="' . esc_attr($error['code']) . '" class="alert ' . ($error['type'] === 'error' ? 'alert-danger' : 'alert-warning') . '"><a href="#' . esc_html($error['setting']) . '">' . esc_html($error['message']) . '</a></div>');
-            }
-        }
-        else
+
+        if(count($this->errors) === 0)
         {
             if($this->navigation === 'Submit' and $this->coming_from_page !== false)
             {
@@ -260,6 +254,14 @@ abstract class O3PO_PublicForm {
             }
         }
 
+        ob_start();
+        if($this->navigation !== false and count($this->errors) > 0)
+        {
+            foreach($this->errors as $error_num => $error)
+            {
+                echo('<div class="' . esc_attr($error['code']) . ' alert ' . ($error['type'] === 'error' ? 'alert-danger' : 'alert-warning') . '"><a href="#' . esc_html($error['setting']) . '">' . esc_html($error['message']) . '</a></div>' . "\n");
+            }
+        }
         echo '<form method="post" enctype="multipart/form-data" action="' . home_url($this->slug) . '">';
 
         echo '<input type="hidden" name="session_id" value="' . $this->session_id . '">';
@@ -481,6 +483,30 @@ abstract class O3PO_PublicForm {
                                 'message' => $message,
                                 'type' => $type
                                 );
+    }
+
+        /**
+         * Return page to display
+         *
+         * @since  0.4.0
+         * @access public
+         * @return string Page id to be displayed
+         */
+    public function get_page_to_display() {
+
+        return $this->page_to_display;
+    }
+
+        /**
+         * Return all errors
+         *
+         * @since  0.4.0
+         * @access public
+         * @return array All errors recorded so far.
+         */
+    public function get_errors() {
+
+        return $this->errors;
     }
 
         /**

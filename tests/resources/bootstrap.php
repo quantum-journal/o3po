@@ -205,7 +205,8 @@ $options['o3po-settings'] = array(
             'page_template_for_publication_posts' => 'checked',
             'ready2publish_slug' => 'ready2publish',
                      );
-
+$options['o3po-ready2publish'] = array();
+$options['o3po-ready2publish-storage'] = array();
 function get_option( $option, $default = false ) {
     global $options;
 
@@ -215,8 +216,12 @@ function get_option( $option, $default = false ) {
         return 'UTF-8';
     elseif($option === 'rewrite_rules')
         return array();
-    elseif($default !== false)
-        return $default;
+    elseif($option === 'o3po-ready2publish')
+        return $options['o3po-ready2publish'];
+    elseif($option === 'o3po-ready2publish-storage')
+        return $options['o3po-ready2publish-storage'];
+    #elseif($default !== false)
+    #    return $default;
     else
         throw(new Exception("We don't know how to fake the option " . $option . "."));
 
@@ -881,6 +886,7 @@ function wp_remote_get( $url, $args=array() ) {
         'https://arxiv.org/abs/1609.09584v4' => dirname(__FILE__) . '/arxiv/1609.09584v4.html',
         'https://arxiv.org/abs/0908.2921v2' => dirname(__FILE__) . '/arxiv/0908.2921v2.html',
         'https://arxiv.org/abs/1806.02820v3' => dirname(__FILE__) . '/arxiv/1806.02820v3.html',
+        'https://arxiv.org/abs/2006.01273v3' => dirname(__FILE__) . '/arxiv/2006.01273v3.html',
          'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0908.2921&fl=citation' => dirname(__FILE__) . '/ads/0908.2921.json',
         'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0809.2542&fl=citation' => dirname(__FILE__) . '/ads/0809.2542.json',
         'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2010CoTPh..54.1023Z+OR+bibcode:2011EPJB...81..155H+OR+bibcode:2011JSMTE..05..023Z+OR+bibcode:2014PhyA..414..240P&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => dirname(__FILE__) . '/ads/0809.2542_citations.json',
