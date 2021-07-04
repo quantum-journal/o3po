@@ -2643,10 +2643,10 @@ abstract class O3PO_PublicationType {
 
 
         if(!empty($sources))
-            $cited_by_html .= '<p>The above citations are from ' . implode($sources, ' and ') . '. The list may be incomplete as not all publishers provide suitable and complete citation data.</p>';
+            $cited_by_html .= '<p>The above citations are from ' . implode(' and ', $sources) . '. The list may be incomplete as not all publishers provide suitable and complete citation data.</p>';
 
         if(!empty($explanations))
-            $cited_by_html .= '<p>' . implode($explanations, ' ') . '</p>';
+            $cited_by_html .= '<p>' . implode(' ', $explanations) . '</p>';
 
         return array(
             'html' => $cited_by_html,
@@ -3407,13 +3407,13 @@ abstract class O3PO_PublicationType {
         $parts_with_delimiters = O3PO_Latex::preg_split_at_latex_math_mode_delimters($str, -1, PREG_SPLIT_DELIM_CAPTURE);
 
         $num_parts_to_take_entirely = 0;
-        while(mb_strlen(implode(array_slice($parts, 0, $num_parts_to_take_entirely+1), '')) <= $count and $num_parts_to_take_entirely < count($parts))
+        while(mb_strlen(implode(array_slice($parts, 0, $num_parts_to_take_entirely+1))) <= $count and $num_parts_to_take_entirely < count($parts))
             $num_parts_to_take_entirely += 1;
 
         $num_parts_with_delimiters = 2*$num_parts_to_take_entirely;
         if($num_parts_to_take_entirely % 2 === 1) $num_parts_with_delimiters -= 1;
-        $count_from_parts_taken_entirely = mb_strlen(implode(array_slice($parts, 0, $num_parts_to_take_entirely), ''));
-        $excerpt = implode(array_slice($parts_with_delimiters, 0, $num_parts_with_delimiters), '');
+        $count_from_parts_taken_entirely = mb_strlen(implode(array_slice($parts, 0, $num_parts_to_take_entirely)));
+        $excerpt = implode(array_slice($parts_with_delimiters, 0, $num_parts_with_delimiters));
 
 
         if($count_from_parts_taken_entirely < $count && $num_parts_to_take_entirely % 2 === 0 && !empty($parts_with_delimiters[$num_parts_with_delimiters]))

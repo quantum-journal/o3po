@@ -308,7 +308,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         if(!is_array($value))
             $value = array();
 
-        echo '<input class="regular-text ltr o3po-' . $this->slug . ' o3po-' . $this->slug . '-text" type="text" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="' . esc_attr(implode($value, ',')) . '"' . ($placeholder ? ' placeholder="' . esc_attr($placeholder) . '"' : '' ) . ' />';
+        echo '<input class="regular-text ltr o3po-' . $this->slug . ' o3po-' . $this->slug . '-text" type="text" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="' . esc_attr(implode(',', $value)) . '"' . ($placeholder ? ' placeholder="' . esc_attr($placeholder) . '"' : '' ) . ' />';
 
     }
 

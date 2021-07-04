@@ -371,7 +371,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         }
 
         if($exit_code != 0)
-            return "ERROR: Exiftool (" . $command . ") finished with exit code=" . $exit_code . " for file " . $path . " the output was: " . implode($output," ");
+            return "ERROR: Exiftool (" . $command . ") finished with exit code=" . $exit_code . " for file " . $path . " the output was: " . implode(" ", $output);
         else {
             $command  = $exiftool_binary_path;
             $command .= ' -delete_original!';

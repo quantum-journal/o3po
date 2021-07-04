@@ -222,7 +222,7 @@ class O3PO_Admin {
 
             $html .= '<label for="' . 'max_entries' . '">Maximum number of entries (use -1 for unlimited):</label><br /><input name="max_entries" value="' . $max_entries . '">';
 
-            $html .= '<label for="' . 'meta_data_field_list' . '">Comma separated list of meta-data elements to export:</label><br /><input style="width:100%;" type="text" name="' . 'meta_data_field_list" id="' . 'meta_data_field_list" placeholder="' . '' . '" value="' . implode($meta_data_field_list, ', ') . '" />';
+            $html .= '<label for="' . 'meta_data_field_list' . '">Comma separated list of meta-data elements to export:</label><br /><input style="width:100%;" type="text" name="' . 'meta_data_field_list" id="' . 'meta_data_field_list" placeholder="' . '' . '" value="' . implode(', ', $meta_data_field_list) . '" />';
             $html .= '<p>The available elements are (beware that not all of them will work for all publication types!):</p>';
             $html .= '<ul>';
             foreach(array_keys($this->get_meta_data_field_map()) as $field)

@@ -180,7 +180,7 @@ class O3PO_Ads {
 
                     $bibentry_data = array(
                         'doi' => !empty($doc->doi) ? $doc->doi[0] : '',
-                        'title' => !empty($doc->title) ? implode($doc->title, ' - ') : '',
+                        'title' => !empty($doc->title) ? implode(' - ', $doc->title) : '',
                         'authors' => !empty($authors) ? $authors : '',
                         'page' => !empty($doc->page) ? $doc->page[0] : '',
                         'issue' => !empty($doc->issue) ? $doc->issue : '',
