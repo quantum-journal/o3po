@@ -561,6 +561,14 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
             }
         }
 
+        # trim() all string values to remove unwanted white space
+        foreach($citations as $n => $citation)
+        {
+            foreach($citation as $key => $value)
+                if(is_string($value))
+                    $citations[$n][$key] = trim($value);
+        }
+
         return $citations;
     }
 

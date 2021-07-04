@@ -46,6 +46,10 @@ class O3PO_Buffer {
          */
     public static function create_update( $buffer_url, $access_token, $profile_ids, $text='', $media=array(), $attachment=true, $shorten=false, $now=false, $top=false, $timeout=15 ) {
 
+        set_error_handler(function($errno, $errstr, $errfile, $errline, array $errcontext) {
+                throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
+            });
+
         try
         {
 
@@ -110,6 +114,8 @@ class O3PO_Buffer {
                 return new WP_Error("buffer_error", 'The response from buffer.com could not be interpreted.');
         } catch(Exception $e) {
             return new WP_Error("exception", $e->getMessage());
+        } finally {
+            restore_error_handler();
         }
     }
 

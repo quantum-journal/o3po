@@ -961,7 +961,7 @@ abstract class O3PO_PublicationType {
          */
     public final function add_custom_post_types_to_query( $query ) {
 
-            //$query->get('post_type') can either an array or a string
+            //$query->get('post_type') can either be an array or a string
         if(is_array($query->get('post_type')))
             $get_post_type_as_array = $query->get('post_type');
         else
@@ -972,7 +972,7 @@ abstract class O3PO_PublicationType {
              * We want to add the custom post type and not loose regular posts, so we have to
              * add 'post' explicitly.
              * See also: https://wordpress.stackexchange.com/questions/311446/adding-custom-post-type-to-queries-doing-it-the-right-way */
-        if ( empty($get_post_type_as_array))
+        if(empty($get_post_type_as_array))
             $get_post_type_as_array = array('post');
         if(in_array('', $get_post_type_as_array) and !in_array('post', $get_post_type_as_array))
             $get_post_type_as_array = array_merge( $get_post_type_as_array, array('post'));
