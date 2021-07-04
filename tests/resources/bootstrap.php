@@ -417,7 +417,11 @@ class WP_Query
     }
 
     function get($key) {
-        return $this->query[$key];
+        if(is_array($this->query))
+            return $this->query[$key];
+        else
+            return Null;
+
     }
 
     function set($key, $val) {

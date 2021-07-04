@@ -944,7 +944,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
              array(
                  '#ERROR: It seems like .* is not published under .* creative commons#',
                  '#REVIEW: The pdf was downloaded successfully from the arXiv\.#',
-                 '#REVIEW: The source was downloaded successfully from the arXiv .* and is of mime-type application/x-gzip#',
+                 '#REVIEW: The source was downloaded successfully from the arXiv .* and is of mime-type application/.*gzip#',
                  '#REVIEW: Found BibTeX or manually formated bibliographic information#',
                  '#REVIEW: Author and affiliations data updated from arxiv source#',
                  '#REVIEW: Bibliographic information updated.#',

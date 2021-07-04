@@ -26,6 +26,7 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
 
         /**
          * @depends test_initialize_settings
+         * @doesNotPerformAssertions
          */
     public function test_initialize_ready2publish_storage( $settings ) {
 
@@ -38,6 +39,7 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
          * @depends test_initialize_settings
          * @depends test_initialize_ready2publish_storage
          * @depends test_setup_environment
+         * @doesNotPerformAssertions
          */
     public function test_initialize_ready2publish_form( $settings, $storage, $environment ) {
 
