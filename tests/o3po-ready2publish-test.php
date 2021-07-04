@@ -64,6 +64,7 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
         $content = $wp_query->post->ID->post_content;
         #echo "Output:" . json_encode($content);
         $this->assertValidHTMLFragment($content);
+        $this->assertNotContains("alert", $content);
 
         # try to advance to next page without session id
         $form = new O3PO_Ready2PublishForm('o3po', $settings->get_field_value("ready2publish_slug"), $environment, $storage);

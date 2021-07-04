@@ -255,7 +255,7 @@ abstract class O3PO_PublicForm {
         }
 
         ob_start();
-        if(count($this->errors) > 0)
+        if($this->navigation !== false and count($this->errors) > 0)
         {
             foreach($this->errors as $error_num => $error)
             {
