@@ -46,7 +46,7 @@ class O3PO_TestCase extends PHPUnit_Framework_TestCase
     }
 
     public function assertStringNotContains( $needle, $haystack ) {
-        if(method_exists($this, 'assertStringContainsString'))
+        if(method_exists($this, 'assertStringNotContainsString'))
             $this->assertStringNotContainsString($needle, $haystack);
         else
             $this->assertNotContains($needle, $haystack);

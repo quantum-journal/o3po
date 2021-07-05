@@ -50,6 +50,9 @@ class O3PO_Buffer {
                 throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
             });
 
+        if(is_wp_error($buffer_url))
+            return $buffer_url;
+
         try
         {
 
