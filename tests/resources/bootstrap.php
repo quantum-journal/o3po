@@ -46,12 +46,18 @@ class O3PO_TestCase extends PHPUnit_Framework_TestCase
     }
 
     public function assertStringNotContains( $needle, $haystack ) {
-        if(method_exists($this, 'assertStringContainsString'))
+        if(method_exists($this, 'assertStringNotContainsString'))
             $this->assertStringNotContainsString($needle, $haystack);
         else
             $this->assertNotContains($needle, $haystack);
     }
 
+    public static function assertRegexpCompat($pattern, $string, $message = '' ) {
+        if(method_exists(__CLASS__, 'assertMatchesRegularExpression'))
+            static::assertMatchesRegularExpression($pattern, $string, $message = '');
+        else
+            parent::assertRegexp($pattern, $string, $message = '');
+    }
 
     public function assertValidHTMLFragment( $html ) {
 
@@ -411,7 +417,11 @@ class WP_Query
     }
 
     function get($key) {
-        return $this->query[$key];
+        if(is_array($this->query))
+            return $this->query[$key];
+        else
+            return Null;
+
     }
 
     function set($key, $val) {

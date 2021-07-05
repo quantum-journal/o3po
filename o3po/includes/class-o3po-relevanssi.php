@@ -71,7 +71,7 @@ class O3PO_Relevanssi {
                 $result = relevanssi_index_pdf($attachment_post_id, false, $send_file);
                 return is_array($result) and isset($result['success']) and $result['success'] === true;
             }
-            catch (Exception $e) {
+            catch(Throwable $e) {
                 return false;
             }
         }

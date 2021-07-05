@@ -109,7 +109,7 @@ class O3PO_Author {
         if(in_array((string)$name_style, static::$name_styles))
             $this->name_style = (string)$name_style;
         else
-            throw new InvalidArgumentException('The value of $name_style (' . $name_style . ') is not one of the allowed values ' . implode(static::$name_styles, ', ') . '.');
+            throw new InvalidArgumentException('The value of $name_style (' . $name_style . ') is not one of the allowed values ' . implode(', ', static::$name_styles) . '.');
         if(empty($orcid) or O3PO_Utility::check_orcid($orcid) === true)
             $this->orcid = (string)$orcid;
         else

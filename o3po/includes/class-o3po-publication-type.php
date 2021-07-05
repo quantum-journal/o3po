@@ -429,7 +429,7 @@ abstract class O3PO_PublicationType {
 
             $validation_result .= $this->validate_and_process_data($post_id);
         }
-        catch(Exception $e) {
+        catch(Throwable $e) {
             $validation_result .= "ERROR: There was an exception while saving and processing the entered meta-data: " . $e->getMessage() . "\n";
         }
         finally {
@@ -790,7 +790,7 @@ abstract class O3PO_PublicationType {
             else
                 $crossref_response = NULL;
             update_post_meta( $post_id, $post_type . '_crossref_response', $crossref_response );
-        } catch(Exception $e) {
+        } catch(Throwable $e) {
             $validation_result .= "ERROR: There was an exception while registering the DOI with Crossref: " . $e->getMessage() . "\n";
         } finally {
                 /* Force the post private until everything validates without errors,
@@ -961,7 +961,7 @@ abstract class O3PO_PublicationType {
          */
     public final function add_custom_post_types_to_query( $query ) {
 
-            //$query->get('post_type') can either an array or a string
+            //$query->get('post_type') can either be an array or a string
         if(is_array($query->get('post_type')))
             $get_post_type_as_array = $query->get('post_type');
         else
@@ -972,7 +972,7 @@ abstract class O3PO_PublicationType {
              * We want to add the custom post type and not loose regular posts, so we have to
              * add 'post' explicitly.
              * See also: https://wordpress.stackexchange.com/questions/311446/adding-custom-post-type-to-queries-doing-it-the-right-way */
-        if ( empty($get_post_type_as_array))
+        if(empty($get_post_type_as_array))
             $get_post_type_as_array = array('post');
         if(in_array('', $get_post_type_as_array) and !in_array('post', $get_post_type_as_array))
             $get_post_type_as_array = array_merge( $get_post_type_as_array, array('post'));
@@ -2643,10 +2643,10 @@ abstract class O3PO_PublicationType {
 
 
         if(!empty($sources))
-            $cited_by_html .= '<p>The above citations are from ' . implode($sources, ' and ') . '. The list may be incomplete as not all publishers provide suitable and complete citation data.</p>';
+            $cited_by_html .= '<p>The above citations are from ' . implode(' and ', $sources) . '. The list may be incomplete as not all publishers provide suitable and complete citation data.</p>';
 
         if(!empty($explanations))
-            $cited_by_html .= '<p>' . implode($explanations, ' ') . '</p>';
+            $cited_by_html .= '<p>' . implode(' ', $explanations) . '</p>';
 
         return array(
             'html' => $cited_by_html,
@@ -3407,13 +3407,13 @@ abstract class O3PO_PublicationType {
         $parts_with_delimiters = O3PO_Latex::preg_split_at_latex_math_mode_delimters($str, -1, PREG_SPLIT_DELIM_CAPTURE);
 
         $num_parts_to_take_entirely = 0;
-        while(mb_strlen(implode(array_slice($parts, 0, $num_parts_to_take_entirely+1), '')) <= $count and $num_parts_to_take_entirely < count($parts))
+        while(mb_strlen(implode(array_slice($parts, 0, $num_parts_to_take_entirely+1))) <= $count and $num_parts_to_take_entirely < count($parts))
             $num_parts_to_take_entirely += 1;
 
         $num_parts_with_delimiters = 2*$num_parts_to_take_entirely;
         if($num_parts_to_take_entirely % 2 === 1) $num_parts_with_delimiters -= 1;
-        $count_from_parts_taken_entirely = mb_strlen(implode(array_slice($parts, 0, $num_parts_to_take_entirely), ''));
-        $excerpt = implode(array_slice($parts_with_delimiters, 0, $num_parts_with_delimiters), '');
+        $count_from_parts_taken_entirely = mb_strlen(implode(array_slice($parts, 0, $num_parts_to_take_entirely)));
+        $excerpt = implode(array_slice($parts_with_delimiters, 0, $num_parts_with_delimiters));
 
 
         if($count_from_parts_taken_entirely < $count && $num_parts_to_take_entirely % 2 === 0 && !empty($parts_with_delimiters[$num_parts_with_delimiters]))

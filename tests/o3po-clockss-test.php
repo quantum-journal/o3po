@@ -26,7 +26,7 @@ class O3PO_ClockssTest extends O3PO_TestCase
          */
     public function test_ftp_upload_meta_data_and_pdf_to_clockss( $clockss_xml, $pdf_path, $remote_filename_without_extension, $clockss_ftp_url, $clockss_username, $clockss_password, $expected ) {
 
-        $this->assertRegExp($expected, O3PO_Clockss::ftp_upload_meta_data_and_pdf_to_clockss($clockss_xml, $pdf_path, $remote_filename_without_extension, $clockss_ftp_url, $clockss_username, $clockss_password));
+        $this->assertRegExpCompat($expected, O3PO_Clockss::ftp_upload_meta_data_and_pdf_to_clockss($clockss_xml, $pdf_path, $remote_filename_without_extension, $clockss_ftp_url, $clockss_username, $clockss_password));
 
     }
 

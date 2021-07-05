@@ -257,7 +257,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
                          '#' . $settings->get_field_value('publisher')  . '#',
                            )
                          as $regexp)
-                    $this->assertRegexp($regexp, $content);
+                    $this->assertRegexpCompat($regexp, $content);
             }
             else
                 $this->assertSame($orig_content, $content);
@@ -298,7 +298,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
                          '#' . $settings->get_field_value('publisher')  . '#',
                            )
                          as $regexp)
-                    $this->assertRegexp($regexp, $content);
+                    $this->assertRegexpCompat($regexp, $content);
             }
             else
                 $this->assertSame($orig_content, $content);
@@ -514,7 +514,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
                 else
                     $expectations = $expectation[$key];
                 foreach($expectations as $expect)
-                    $this->assertRegexp($expect, $result);
+                    $this->assertRegexpCompat($expect, $result);
             }
         }
 
@@ -593,7 +593,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
 
         foreach($expections as $expection)
         {
-            $this->assertRegexp($expection, $validation_result);
+            $this->assertRegexpCompat($expection, $validation_result);
         }
 
         $this->assertFalse(strpos('Exception while downloading the source', $validation_result));
@@ -626,7 +626,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
 
         foreach($expections as $expection)
         {
-            $this->assertRegexp($expection, $validation_result);
+            $this->assertRegexpCompat($expection, $validation_result);
         }
 
         $this->assertFalse(strpos('Exception while downloading the source', $validation_result));
@@ -667,7 +667,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         $method->setAccessible(true);
         $validation_result = $method->invokeArgs($primary_publication_type, array($post_id));
 
-        $this->assertRegexp('#INFO: This .* was publicly published#', $validation_result);
+        $this->assertRegexpCompat('#INFO: This .* was publicly published#', $validation_result);
         $this->assertFalse(strpos('ERROR', $validation_result));
     }
 
@@ -696,7 +696,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         $method->setAccessible(true);
         $validation_result = $method->invokeArgs($secondary_publication_type, array($post_id));
 
-        $this->assertRegexp('#INFO: This .* was publicly published#', $validation_result);
+        $this->assertRegexpCompat('#INFO: This .* was publicly published#', $validation_result);
         $this->assertFalse(strpos('ERROR', $validation_result));
     }
 
@@ -806,7 +806,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         {
             foreach($expections as $expection)
             {
-                $this->assertRegexp($expection, get_post_meta( $post_id, $post_type . '_arxiv_fetch_results', true));
+                $this->assertRegexpCompat($expection, get_post_meta( $post_id, $post_type . '_arxiv_fetch_results', true));
             }
         }
         else
@@ -856,7 +856,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         {
             foreach($expections as $expection)
             {
-                $this->assertRegexp($expection, get_post_meta( $post_id, $post_type . '_arxiv_fetch_results', true));
+                $this->assertRegexpCompat($expection, get_post_meta( $post_id, $post_type . '_arxiv_fetch_results', true));
             }
         }
         else
@@ -944,7 +944,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
              array(
                  '#ERROR: It seems like .* is not published under .* creative commons#',
                  '#REVIEW: The pdf was downloaded successfully from the arXiv\.#',
-                 '#REVIEW: The source was downloaded successfully from the arXiv .* and is of mime-type application/x-gzip#',
+                 '#REVIEW: The source was downloaded successfully from the arXiv .* and is of mime-type application/.*gzip#',
                  '#REVIEW: Found BibTeX or manually formated bibliographic information#',
                  '#REVIEW: Author and affiliations data updated from arxiv source#',
                  '#REVIEW: Bibliographic information updated.#',
@@ -1042,7 +1042,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         $validation_result = get_post_meta( $post_id, $post_type . '_validation_result');
         foreach($expections_first as $expection)
         {
-            $this->assertRegexp($expection, $validation_result);
+            $this->assertRegexpCompat($expection, $validation_result);
         }
 
             //call it again to potentially trigger a post actually published event on the second try in case there was something to REVIEW in the first run
@@ -1054,7 +1054,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         $validation_result = get_post_meta( $post_id, $post_type . '_validation_result');
         foreach($expections_second as $expection)
         {
-            $this->assertRegexp($expection, $validation_result);
+            $this->assertRegexpCompat($expection, $validation_result);
         }
 
 
@@ -1108,7 +1108,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         $validation_result = get_post_meta( $post_id, $post_type . '_validation_result');
         foreach($expections_second as $expection)
         {
-            $this->assertRegexp($expection, $validation_result);
+            $this->assertRegexpCompat($expection, $validation_result);
         }
 
 
@@ -1353,7 +1353,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
                              '#' . $settings->get_field_value('doi_url_prefix')  . '#',
                            )
                          as $regexp)
-                    $this->assertRegexp($regexp, $content);
+                    $this->assertRegexpCompat($regexp, $content);
             }
             else
                 $this->assertSame($orig_content, $content);
@@ -1393,7 +1393,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
                              '#' . $settings->get_field_value('doi_url_prefix')  . '#',
                            )
                          as $regexp)
-                    $this->assertRegexp($regexp, $content);
+                    $this->assertRegexpCompat($regexp, $content);
             }
             else
                 $this->assertSame($orig_content, $content);
@@ -1434,7 +1434,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
                              '#' . $settings->get_field_value('doi_url_prefix')  . '#',
                            )
                          as $regexp)
-                    $this->assertRegexp($regexp, $content);
+                    $this->assertRegexpCompat($regexp, $content);
             }
             else
                 $this->assertSame($orig_content, $content);
@@ -1475,7 +1475,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
                            )
                          as $regexp)
                 {
-                    $this->assertRegexp($regexp, $content);
+                    $this->assertRegexpCompat($regexp, $content);
                 }
             }
             else
@@ -1563,7 +1563,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         ob_end_clean();
 
         if(!empty($expected))
-            $this->assertRegExp('#'.$expected.'#', $output);
+            $this->assertRegExpCompat('#'.$expected.'#', $output);
     }
 
 
@@ -1611,7 +1611,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         ob_end_clean();
 
         if(!empty($expected))
-            $this->assertRegExp('#'.$expected.'#', $output);
+            $this->assertRegExpCompat('#'.$expected.'#', $output);
     }
 
 
@@ -1668,7 +1668,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         ob_end_clean();
 
         if(!empty($expected))
-            $this->assertRegExp('#'.$expected.'#', $output);
+            $this->assertRegExpCompat('#'.$expected.'#', $output);
     }
 
 
@@ -1921,6 +1921,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         global $_POST;
 
         $_GET['tab'] = 'meta-data';
+        $_GET['max_entries'] = 1735;
         $post_type_names = O3PO_PublicationType::get_active_publication_type_names();
         $this->assertNotEmpty($post_type_names);
 

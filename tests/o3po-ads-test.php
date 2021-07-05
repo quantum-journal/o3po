@@ -121,7 +121,7 @@ class O3PO_AdsTest extends O3PO_TestCase
                 'ads_api_search_url' => 'https://api.adsabs.harvard.edu/v1/search/query',
                 'api_token' => '',
                 'eprint' => '0000.0008',
-                'expected' => new WP_Error('exception', 'There was an error parsing the data received from ADS: Invalid argument supplied for foreach()'),
+                'expected' => new WP_Error('exception', 'There was an error parsing the data received from ADS:'), # The precise error message depends on the PHP version which is why we test this via assertStringContainsString() below
                   ),
                 ];
     }
@@ -130,8 +130,14 @@ class O3PO_AdsTest extends O3PO_TestCase
          * @dataProvider ads_provider
          */
     public function test_get_cited_by_bibentries( $ads_api_search_url, $api_token, $eprint, $expected ) {
-
-        $this->assertEquals($expected, O3PO_Ads::get_cited_by_bibentries( $ads_api_search_url, $api_token, $eprint ));
+        if(is_wp_error($expected))
+        {
+            $error = O3PO_Ads::get_cited_by_bibentries($ads_api_search_url, $api_token, $eprint);
+            $this->assertTrue(is_wp_error($error));
+            $this->assertStringContains($expected->get_error_message(), $error->get_error_message());
+        }
+        else
+            $this->assertEquals($expected, O3PO_Ads::get_cited_by_bibentries( $ads_api_search_url, $api_token, $eprint ));
 
     }
 

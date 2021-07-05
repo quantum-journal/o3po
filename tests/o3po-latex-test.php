@@ -366,7 +366,7 @@ ab' , 'äb'],
         else
             $this->assertSame($expected, O3PO_Latex::preg_split_at_latex_math_mode_delimters($input));
 
-        $this->assertSame($input[0], implode(O3PO_Latex::preg_split_at_latex_math_mode_delimters($input[0], -1, PREG_SPLIT_DELIM_CAPTURE), ''));
+        $this->assertSame($input[0], implode(O3PO_Latex::preg_split_at_latex_math_mode_delimters($input[0], -1, PREG_SPLIT_DELIM_CAPTURE)));
     }
 
     public function strpos_outside_math_mode_provider() {

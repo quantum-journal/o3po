@@ -76,7 +76,7 @@ class O3PO_Clockss {
                         $clockss_response .= "ERROR: There was an error uploading the fulltext pdf to CLOCKSS: " . $php_errormsg . "\n";
                 }
             }
-        } catch(Exception $e) {
+        } catch(Throwable $e) {
             $clockss_response .= "ERROR: There was an exception during the ftp transfer to CLOCKSS. " . $e->getMessage() . "\n";
         } finally {
             ini_set('track_errors', $trackErrors);
@@ -92,7 +92,7 @@ class O3PO_Clockss {
                                       );
                     ftp_close($ftp_connection);
                     restore_error_handler();
-                } catch(Exception $e) {
+                } catch(Throwable $e) {
                     $clockss_response .= "ERROR: There was an exception while closing the ftp connection to CLOCKSS. " . $e->getMessage() . "\n";
                 }
             }

@@ -366,12 +366,12 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         try
         {
             exec($command, $output, $exit_code); // We can not use escapeshellcmd() here as it escapes even the content of arguments enclosed in '' and this breaks things. In PHP safe mode escapeshellcmd() is forcefully run inside exec(), which is why we cannot add licencing information in safe mode.
-        } catch (Exception $e) {
+        } catch(Throwable $e) {
             return "ERROR: Running exiftool resulted in the exception: " + $e->getText();
         }
 
         if($exit_code != 0)
-            return "ERROR: Exiftool (" . $command . ") finished with exit code=" . $exit_code . " for file " . $path . " the output was: " . implode($output," ");
+            return "ERROR: Exiftool (" . $command . ") finished with exit code=" . $exit_code . " for file " . $path . " the output was: " . implode(" ", $output);
         else {
             $command  = $exiftool_binary_path;
             $command .= ' -delete_original!';
@@ -379,7 +379,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             try
             {
                 exec($command, $output, $exit_code);
-            } catch (Exception $e) {
+            } catch(Throwable $e) {
                 return "ERROR: Running exiftool to delete temporary files resulted in the exception: " + $e->getText();
             }
         }
@@ -1490,7 +1490,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                     }
                 }
             }
-        } catch (Exception $e) {
+        } catch(Throwable $e) {
             $validation_result .= "ERROR: While processing the source files an exception occurred: '" . $e->getMessage() . "' in " . $e->getFile() . ":" . $e->getLine() . "\n";
         } finally {
             try {
@@ -1498,7 +1498,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                     unlink($path_tar);
                 if(!empty($path_folder))
                     $this->environment->save_recursive_remove_dir($path_folder, $path_folder);
-            } catch (Exception $e) {
+            } catch(Throwable $e) {
                 $validation_result .= "ERROR: While processing the source files an exception occurred: " . $e->getMessage() . "\n";
             }
         }
