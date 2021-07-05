@@ -25,17 +25,23 @@ class O3PO_SingletonTest extends O3PO_TestCase
 
     }
 
+        /**
+         * @expectedException Exception
+         */
     public function test___sleep() {
 
-        $reflection = new ReflectionClass('O3PO_Singleton');
-        $this->assertTrue($reflection->getMethod('__sleep')->isPrivate());
+        $singleton = O3PO_Singleton::instance();
+        $singleton->__sleep();
 
     }
 
+        /**
+         * @expectedException Exception
+         */
     public function test___wakeup() {
 
-        $reflection = new ReflectionClass('O3PO_Singleton');
-        $this->assertTrue($reflection->getMethod('__wakeup')->isPrivate());
+        $singleton = O3PO_Singleton::instance();
+        $singleton->__wakeup();
 
     }
 }
