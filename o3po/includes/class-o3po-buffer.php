@@ -50,9 +50,6 @@ class O3PO_Buffer {
                 throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
             });
 
-        if(is_wp_error($buffer_url))
-            return $buffer_url;
-
         try
         {
 
@@ -115,7 +112,7 @@ class O3PO_Buffer {
                 return new WP_Error("buffer_error", $json->error);
             else
                 return new WP_Error("buffer_error", 'The response from buffer.com could not be interpreted.');
-        } catch(Exception $e) {
+        } catch(Throwable $e) {
             return new WP_Error("exception", $e->getMessage());
         } finally {
             restore_error_handler();
@@ -158,7 +155,7 @@ class O3PO_Buffer {
                     'service' => $profile->service,
                                                );
 
-        } catch(Exception $e) {
+        } catch(Throwable $e) {
             return new WP_Error("exception", $e->getMessage());
         } finally {
             restore_error_handler();

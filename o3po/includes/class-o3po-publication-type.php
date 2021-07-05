@@ -429,7 +429,7 @@ abstract class O3PO_PublicationType {
 
             $validation_result .= $this->validate_and_process_data($post_id);
         }
-        catch(Exception $e) {
+        catch(Throwable $e) {
             $validation_result .= "ERROR: There was an exception while saving and processing the entered meta-data: " . $e->getMessage() . "\n";
         }
         finally {
@@ -790,7 +790,7 @@ abstract class O3PO_PublicationType {
             else
                 $crossref_response = NULL;
             update_post_meta( $post_id, $post_type . '_crossref_response', $crossref_response );
-        } catch(Exception $e) {
+        } catch(Throwable $e) {
             $validation_result .= "ERROR: There was an exception while registering the DOI with Crossref: " . $e->getMessage() . "\n";
         } finally {
                 /* Force the post private until everything validates without errors,

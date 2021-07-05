@@ -203,7 +203,7 @@ class O3PO_Ads {
                 $all_bibentries = array_merge($all_bibentries, $bibentries);
             }
         }
-        catch(Exception $e) {
+        catch(Throwable $e) {
             return new WP_Error('exception', 'There was an error parsing the data received from ADS: ' . $e->getMessage());
         }
 

@@ -154,7 +154,7 @@ class O3PO_Crossref {
                 $body = $xml->query_result->body[0];
                 return $body;
             }
-        } catch (Exception $e) {
+        } catch(Throwable $e) {
             return new WP_Error("exception", $e->getMessage());
         } finally {
             libxml_use_internal_errors($use_errors);
@@ -227,7 +227,7 @@ class O3PO_Crossref {
                           ));
             }
         }
-        catch (Exception $e) {
+        catch(Throwable $e) {
             return new WP_Error("exception", $e->getMessage());
         }
 

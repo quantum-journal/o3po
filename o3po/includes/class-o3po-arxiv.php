@@ -120,7 +120,7 @@ class O3PO_Arxiv {
             else
                 throw new Exception($response->get_error_message());
         }
-        catch(Exception $e) {
+        catch(Throwable $e) {
             return array(
                 'arxiv_fetch_results' => "ERROR: Failed to fetch or parse arXiv abstract html for " . $eprint . " " . $e->getMessage() . "\n",
                          );
@@ -208,7 +208,7 @@ class O3PO_Arxiv {
             else
                 return $date;
         }
-        catch(Exception $e) {
+        catch(Throwable $e) {
             return new WP_Error('exception', $e->getMessage());
         }
     }

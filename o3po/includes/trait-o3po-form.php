@@ -557,8 +557,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
                 $array[$key] = trim($id);
 
             return $array;
-        }
-        catch (Exception $e) {
+        } catch(Throwable $e) {
             $this->add_error($id, 'not-comma-separated-list', "The input to '" . $this->fields[$id]['title'] . "' could not be interpreted as a comma separated list. Field reset.", 'error');
             return $this->get_field_default($id);
         }
