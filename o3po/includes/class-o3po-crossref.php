@@ -199,6 +199,8 @@ class O3PO_Crossref {
                     $cite = $f_link->report_cite;
                 elseif(!empty($f_link->standard_cite))
                     $cite = $f_link->standard_cite;
+                elseif(!empty($f_link->database_cite))
+                    $cite = $f_link->database_cite;
                 else
                     throw new Exception("Encountered an unhandled forward link type.");
 
@@ -224,6 +226,7 @@ class O3PO_Crossref {
                         'isbn' => $cite->isbn,
                         'issn' => $cite->issn,
                         'type' => $cite->publication_type,
+                        'institution' => $cite->institution_name,
                           ));
             }
         }
