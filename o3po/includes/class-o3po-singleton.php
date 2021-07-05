@@ -20,7 +20,7 @@
  * A modern implementation of the Singleton Pattern in php.
  *
  * @since      0.1.0
- * @since      0.4.0+ __wakeup() and __sleep() no longer private
+ * @since      0.4.0 __wakeup() and __sleep() no longer private
  * @package    O3PO
  * @subpackage O3PO/includes
  * @author     Christian Gogolin <o3po@quantum-journal.org>

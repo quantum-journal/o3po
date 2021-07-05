@@ -92,6 +92,7 @@ It is obviously a play on the name of humanoid robot character from a series of 
 ## Changelog
 
 ### 0.4.0
+* Compatibility with PHP 8.0
 * Added form for submission to works ready to publish
 * Added dashboard widget displaying a queue of works awaiting publication
 * Added functionality to generate invoices
