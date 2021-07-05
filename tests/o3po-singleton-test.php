@@ -25,21 +25,17 @@ class O3PO_SingletonTest extends O3PO_TestCase
 
     }
 
-        /**
-         * @expectedException Exception
-         */
     public function test___sleep() {
 
+        $this->expectException(Exception::class);
         $singleton = O3PO_Singleton::instance();
         $singleton->__sleep();
 
     }
 
-        /**
-         * @expectedException Exception
-         */
     public function test___wakeup() {
 
+        $this->expectException(Exception::class);
         $singleton = O3PO_Singleton::instance();
         $singleton->__wakeup();
 
