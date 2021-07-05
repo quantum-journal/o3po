@@ -40,7 +40,7 @@ class O3PO_Relevanssi {
         $mime = get_post_mime_type( $post_id );
         if(!empty($mime) and !$block) {
             $settings = O3PO_Settings::instance();
-            $pattern = $settings->get_plugin_option('relevanssi_mime_types_to_exclude');
+            $pattern = $settings->get_field_value('relevanssi_mime_types_to_exclude');
             if(!empty($pattern))
                 $block = preg_match($pattern, $mime) === 1;
         }
@@ -71,7 +71,7 @@ class O3PO_Relevanssi {
                 $result = relevanssi_index_pdf($attachment_post_id, false, $send_file);
                 return is_array($result) and isset($result['success']) and $result['success'] === true;
             }
-            catch (Exception $e) {
+            catch(Throwable $e) {
                 return false;
             }
         }

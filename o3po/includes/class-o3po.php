@@ -94,6 +94,33 @@ class O3PO {
 	protected $journal_secondary;
 
         /**
+         * The ready to publish storage.
+         *
+         * @since    0.4.0
+         * @access   protected
+         * @var      O3PO_Ready2Publish_Storage    $ready2publish_storage    The ready to publish storage.
+         */
+	protected $ready2publish_storage;
+
+        /**
+         * The ready to publish form.
+         *
+         * @since    0.4.0
+         * @access   protected
+         * @var      O3PO_Ready2Publish_Form    $ready2publish_form    The ready to publish form.
+         */
+	protected $ready2publish_form;
+
+        /**
+         * The ready to publish dashboard.
+         *
+         * @since    0.4.0
+         * @access   protected
+         * @var      O3PO_Ready2Publish_Dashboard    $ready2publish_dashboard    The ready to publish dashboard.
+         */
+    protected $ready2publish_dashboard;
+
+        /**
          * The primary publication type.
          *
          * @since    0.1.0
@@ -197,6 +224,21 @@ class O3PO {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-journal.php';
 
             /**
+             * The class representing ready to publish storages.
+             */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-ready2publish-storage.php';
+
+            /**
+             * The class representing ready to publish forms.
+             */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-o3po-ready2publish-form.php';
+
+            /**
+             * The class representing ready to publish dashboard.
+             */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-o3po-ready2publish-dashboard.php';
+
+            /**
              * The class providing the primary publication type.
              */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-primary-publication-type.php';
@@ -213,18 +255,26 @@ class O3PO {
 
         $this->loader = new O3PO_Loader();
 
-        $settings = O3PO_Settings::instance();
-        $settings->configure($this->plugin_name, $this->get_plugin_pretty_name(), $this->version, 'O3PO_PublicationType::get_active_publication_type_names');
+        $settings = O3PO_Settings::instance($this->plugin_name, $this->get_plugin_pretty_name(), $this->version, 'O3PO_PublicationType::get_active_publication_type_names'); # configure settings singleton during first initialization
 
-        $this->environment = new O3PO_Environment($settings->get_plugin_option("production_site_url"));
+        $this->environment = new O3PO_Environment($settings->get_field_value("production_site_url"));
 
             //create the journals
         $this->journal = static::setup_primary_journal($settings);
         $this->journal_secondary = static::setup_secondary_journal($settings);
 
+            //create the ready to publish storage
+        $this->ready2publish_storage = new O3PO_Ready2PublishStorage($this->plugin_name, $settings->get_field_value("ready2publish_slug") . '-storage');
+
+            //create the ready to publish form
+        $this->ready2publish_form = new O3PO_Ready2PublishForm($this->plugin_name, $settings->get_field_value("ready2publish_slug"), $this->environment, $this->ready2publish_storage);
+
+            //create the ready to publish dashboard
+        $this->ready2publish_dashboard = new O3PO_Ready2PublishDashboard($this->plugin_name, $this->get_plugin_pretty_name(), $settings->get_field_value("ready2publish_slug") . '-dashboard', "Ready2Publish", $this->ready2publish_storage);
+
             //create the publication types for each journal
-        $this->primary_publication_type = new O3PO_PrimaryPublicationType($this->journal, $this->environment);
-        $this->secondary_publication_type = new O3PO_SecondaryPublicationType($this->primary_publication_type->get_publication_type_name(), $this->primary_publication_type->get_publication_type_name_plural(), $this->journal_secondary, $this->environment);
+        $this->primary_publication_type = new O3PO_PrimaryPublicationType($this->journal, $this->environment, $this->ready2publish_storage);
+        $this->secondary_publication_type = new O3PO_SecondaryPublicationType($this->primary_publication_type->get_publication_type_name(), $this->primary_publication_type->get_publication_type_name_plural(), $this->journal_secondary, $this->environment, $this->ready2publish_storage);
 
 	}
 
@@ -273,7 +323,7 @@ class O3PO {
         $this->loader->add_action( 'load-post.php', Null, 'O3PO_PublicationType::init_metabox' );
         $this->loader->add_action( 'load-post-new.php', Null, 'O3PO_PublicationType::init_metabox' );
 
-        if(!empty($settings->get_plugin_option('relevanssi_mime_types_to_exclude')))
+        if(!empty($settings->get_field_value('relevanssi_mime_types_to_exclude')))
             $this->loader->add_filter( 'relevanssi_do_not_index', null, 'O3PO_Relevanssi::exclude_mime_types_by_regexp', 10, 2 );
 
 	}
@@ -295,9 +345,11 @@ class O3PO {
 		$this->loader->add_action('wp_head', $plugin_public, 'add_open_graph_meta_tags_for_social_media');
         $this->loader->add_action('wp_head', $plugin_public, 'enable_mathjax');
         $this->loader->add_action('get_custom_logo', $plugin_public, 'fix_custom_logo_html');
-        if($settings->get_plugin_option('extended_search_and_navigation')==='checked')
+
+        $this->loader->add_action('parse_query', $plugin_public, 'clean_newline_and_protect_from_search_string');
+        if($settings->get_field_value('extended_search_and_navigation')==='checked')
             $this->loader->add_action('loop_start', $plugin_public, 'extended_search_and_navigation_at_loop_start');
-        if($settings->get_plugin_option('search_form_on_search_page')==='checked')
+        if($settings->get_field_value('search_form_on_search_page')==='checked')
             $this->loader->add_action('loop_start', $plugin_public, 'search_form_at_loop_start_on_search_page');
 
         $this->loader->add_action('loop_start', $plugin_public, 'secondary_journal_help_text');
@@ -310,14 +362,19 @@ class O3PO {
         $this->loader->add_filter('loop_end', $this->journal, 'compress_entries_in_volume_view');
         $this->loader->add_action('template_include', $this->journal, 'volume_endpoint_template');
         $this->loader->add_action('the_posts', $this->journal, 'add_fake_post_to_volume_overview_page');
-        if($settings->get_plugin_option('custom_search_page')==='checked')
+        if($settings->get_field_value('custom_search_page')==='checked')
         {
             $this->loader->add_filter('get_search_form', $this->journal, 'add_notice_to_search_form');
             $this->loader->add_filter('loop_start', $this->journal, 'add_notice_to_search_results_at_loop_start');
         }
 
+        $this->loader->add_action('init', $this->ready2publish_form, 'init');
+        $this->loader->add_action('do_parse_request', $this->ready2publish_form, 'do_parse_request', PHP_INT_MAX, 2 );
 
-        #$this->loader->add_action('get_template_part_template-parts/content', $this->journal, 'foo', 99, 2);
+        $this->loader->add_action('wp_dashboard_setup', $this->ready2publish_dashboard, 'wp_dashboard_setup');
+        $this->loader->add_action('init', $this->ready2publish_dashboard, 'init');
+        $this->loader->add_action('do_parse_request', $this->ready2publish_dashboard, 'do_parse_request', PHP_INT_MAX, 3 );
+        $this->loader->add_action('add_meta_boxes', $this->ready2publish_dashboard, 'add_metabox');
 
             //add hooks for the primary publication type...
         $this->loader->add_filter('the_author', $this->primary_publication_type, 'get_the_author', PHP_INT_MAX, 1);
@@ -348,7 +405,7 @@ class O3PO {
         $this->loader->add_filter('the_content_feed', $this->primary_publication_type, 'get_feed_content', 1); //The low priority number is crucial to ensure early execution and prevent (expensive) auto generation of excerpt from content via wp_trim_excerpt() (see default-filters.php in WP)
         $this->loader->add_filter('the_excerpt_rss', $this->primary_publication_type, 'get_feed_content', 1); //The low priority number is crucial to ensure early execution and prevent (expensive) auto generation of excerpt from content via wp_trim_excerpt() (see default-filters.php in WP)
         $this->loader->add_filter('transition_post_status', $this->primary_publication_type, 'on_transition_post_status', 10, 3);
-        if($settings->get_plugin_option('page_template_for_publication_posts')==='checked')
+        if($settings->get_field_value('page_template_for_publication_posts')==='checked')
             $this->loader->add_filter('template_include', $this->primary_publication_type, 'use_page_template');
 
             //add hooks for the secondary publication type...
@@ -364,7 +421,7 @@ class O3PO {
         $this->loader->add_filter('request', $this->secondary_publication_type, 'add_custom_post_types_to_rss_feed');
         $this->loader->add_filter('the_author', $this->secondary_publication_type, 'the_author_feed', PHP_INT_MAX, 1);
         $this->loader->add_filter('transition_post_status', $this->secondary_publication_type, 'on_transition_post_status', 10, 3);
-        if($settings->get_plugin_option('page_template_for_publication_posts')==='checked')
+        if($settings->get_field_value('page_template_for_publication_posts')==='checked')
             $this->loader->add_filter('template_include', $this->secondary_publication_type, 'use_page_template');
 
 	}
@@ -425,8 +482,8 @@ class O3PO {
 
         $journal_config_properties = O3PO_Journal::get_journal_config_properties();
         $journal_config = array();
-        foreach(array_intersect(array_keys($settings->get_all_settings_fields_map()), $journal_config_properties) as $journal_config_property){
-            $journal_config[$journal_config_property] = $settings->get_plugin_option($journal_config_property);
+        foreach(array_intersect(array_keys($settings->get_field_defaults(true)), $journal_config_properties) as $journal_config_property){
+            $journal_config[$journal_config_property] = $settings->get_field_value($journal_config_property);
         }
         return $journal_config;
     }
@@ -444,8 +501,8 @@ class O3PO {
 
             //add some properties that are named differently (for a reason) in settings
             /* $journal_config['volumes_endpoint'] = 'volumes'; */
-        $journal_config['publication_type_name'] = $settings->get_plugin_option('primary_publication_type_name');
-        $journal_config['publication_type_name_plural'] = $settings->get_plugin_option('primary_publication_type_name_plural');
+        $journal_config['publication_type_name'] = $settings->get_field_value('primary_publication_type_name');
+        $journal_config['publication_type_name_plural'] = $settings->get_field_value('primary_publication_type_name_plural');
 
             //create the primary journal
         return new O3PO_Journal($journal_config);
@@ -463,12 +520,12 @@ class O3PO {
 
         $journal_config = static::journal_config_from_settings($settings);
                     //reconfigure for the secondary journal
-        $journal_config['journal_title'] = $settings->get_plugin_option('secondary_journal_title');
-        $journal_config['journal_level_doi_suffix'] = $settings->get_plugin_option('secondary_journal_level_doi_suffix');
-        $journal_config['eissn'] = $settings->get_plugin_option('secondary_journal_eissn');
+        $journal_config['journal_title'] = $settings->get_field_value('secondary_journal_title');
+        $journal_config['journal_level_doi_suffix'] = $settings->get_field_value('secondary_journal_level_doi_suffix');
+        $journal_config['eissn'] = $settings->get_field_value('secondary_journal_eissn');
         $journal_config['volumes_endpoint'] = 'secondary_volumes';
-        $journal_config['publication_type_name'] = $settings->get_plugin_option('secondary_publication_type_name');
-        $journal_config['publication_type_name_plural'] = $settings->get_plugin_option('secondary_publication_type_name_plural');
+        $journal_config['publication_type_name'] = $settings->get_field_value('secondary_publication_type_name');
+        $journal_config['publication_type_name_plural'] = $settings->get_field_value('secondary_publication_type_name_plural');
 
             //create the secondary journal
         return new O3PO_Journal($journal_config);

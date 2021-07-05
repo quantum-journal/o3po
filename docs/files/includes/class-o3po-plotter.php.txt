@@ -24,10 +24,9 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-setti
 class O3PO_Plotter {
 
         /**
-         * Fetch meta-data from the abstract page of an eprint on the arXiv.
+         * Histogram
          *
-         * extracts the abstract, number_authors, author_given_names,
-         * author_surnames and title
+         * Display the provided data as a histogram.
          *
          * @since  0.3.0
          * @access public

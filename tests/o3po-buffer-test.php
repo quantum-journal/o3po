@@ -2,7 +2,7 @@
 
 require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-buffer.php';
 
-class O3PO_BufferTest extends PHPUnit_Framework_TestCase
+class O3PO_BufferTest extends O3PO_TestCase
 {
 
     public function create_update_provider() {
@@ -160,7 +160,7 @@ class O3PO_BufferTest extends PHPUnit_Framework_TestCase
             array(
                 'https://api.bufferapp.com/1',
                 '1/345792aa62c_10',
-                new WP_Error('exception', 'Undefined index: headers'),
+                new WP_Error('exception', ''),
                   ),
 
                 ];
@@ -170,6 +170,15 @@ class O3PO_BufferTest extends PHPUnit_Framework_TestCase
          * @dataProvider get_profile_information_provider
          */
     public function test_get_profile_information( $buffer_api_url, $access_token, $expected ){
-        $this->assertEquals(O3PO_Buffer::get_profile_information($buffer_api_url, $access_token), $expected);
+
+        if(is_wp_error($expected))
+        {
+            $error = O3PO_Buffer::get_profile_information($buffer_api_url, $access_token);
+            $this->assertTrue(is_wp_error($error));
+            if(!empty($expected->get_error_message()))
+                $this->assertStringContains($expected->get_error_message(), $error->get_error_message());
+        }
+        else
+            $this->assertEquals(O3PO_Buffer::get_profile_information($buffer_api_url, $access_token), $expected);
     }
 }

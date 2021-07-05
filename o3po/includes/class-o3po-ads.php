@@ -180,7 +180,7 @@ class O3PO_Ads {
 
                     $bibentry_data = array(
                         'doi' => !empty($doc->doi) ? $doc->doi[0] : '',
-                        'title' => !empty($doc->title) ? implode($doc->title, ' - ') : '',
+                        'title' => !empty($doc->title) ? implode(' - ', $doc->title) : '',
                         'authors' => !empty($authors) ? $authors : '',
                         'page' => !empty($doc->page) ? $doc->page[0] : '',
                         'issue' => !empty($doc->issue) ? $doc->issue : '',
@@ -203,7 +203,7 @@ class O3PO_Ads {
                 $all_bibentries = array_merge($all_bibentries, $bibentries);
             }
         }
-        catch(Exception $e) {
+        catch(Throwable $e) {
             return new WP_Error('exception', 'There was an error parsing the data received from ADS: ' . $e->getMessage());
         }
 

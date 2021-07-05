@@ -2,7 +2,7 @@
 
 require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-author.php';
 
-class O3PO_AuthorTest extends PHPUnit_Framework_TestCase
+class O3PO_AuthorTest extends O3PO_TestCase
 {
 
     public function author_provider() {
@@ -85,9 +85,11 @@ class O3PO_AuthorTest extends PHPUnit_Framework_TestCase
 
         $this->assertSame($author->get_surname(), $surname);
         $this->assertSame($author->get_surname(), $author->get('surname'));
-        $this->assertSame($author->get_affiliations_csv(), is_array($affiliations) ? implode($affiliations, ',') : $affiliations);
-        $this->assertSame($author->get_name(), trim($given_name . ' ' . $surname));
-
+        $this->assertSame($author->get_affiliations_csv(), is_array($affiliations) ? implode(',', $affiliations) : $affiliations);
+        if($author->get_name_style() !== 'eastern')
+            $this->assertSame($author->get_name(), trim($given_name . ' ' . $surname));
+        else
+            $this->assertSame($author->get_name(), trim($surname . ' ' . $given_name));
     }
 
 }

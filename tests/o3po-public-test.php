@@ -1,7 +1,7 @@
 <?php
 
 require_once(dirname( __FILE__ ) . '/../o3po/public/class-o3po-public.php');
-
+require_once(dirname( __FILE__ ) . '/o3po-settings-test.php');
 
 class O3PO_PublicTest extends O3PO_TestCase
 {
@@ -20,9 +20,6 @@ class O3PO_PublicTest extends O3PO_TestCase
                                        'Plugin Name' => 'Plugin Name',
                                        'Text Domain' => 'Text Domain'
                                                                                     ));
-
-        $settings = O3PO_Settings::instance();
-        $settings->configure($file_data['Text Domain'], $file_data['Plugin Name'], $file_data['Version'], array( $this, 'fake_get_active_publication_type_names'));
 
         return $public;
     }
@@ -138,10 +135,11 @@ class O3PO_PublicTest extends O3PO_TestCase
 
 
     public function secondary_journal_help_text_query_provider() {
-        $settings = O3PO_Settings::instance();
+
+        $settings = O3PO_SettingsTest::get_settings();
 
         return [
-            [new WP_Query(null, array('post_type' => $settings->get_plugin_option('secondary_publication_type_name')))],
+            [new WP_Query(null, array('post_type' => $settings->get_field_value('secondary_publication_type_name')))],
             [new WP_Query(null, array('category' => O3PO_SecondaryPublicationType::get_associated_categories()[0]))],
         ];
     }

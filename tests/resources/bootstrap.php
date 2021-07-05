@@ -37,6 +37,28 @@ if(!class_exists('PHPUnit_Framework_TestCase')){
 
 class O3PO_TestCase extends PHPUnit_Framework_TestCase
 {
+
+    public function assertStringContains( $needle, $haystack ) {
+        if(method_exists($this, 'assertStringContainsString'))
+            $this->assertStringContainsString($needle, $haystack);
+        else
+            $this->assertContains($needle, $haystack);
+    }
+
+    public function assertStringNotContains( $needle, $haystack ) {
+        if(method_exists($this, 'assertStringNotContainsString'))
+            $this->assertStringNotContainsString($needle, $haystack);
+        else
+            $this->assertNotContains($needle, $haystack);
+    }
+
+    public static function assertRegexpCompat($pattern, $string, $message = '' ) {
+        if(method_exists(__CLASS__, 'assertMatchesRegularExpression'))
+            static::assertMatchesRegularExpression($pattern, $string, $message = '');
+        else
+            parent::assertRegexp($pattern, $string, $message = '');
+    }
+
     public function assertValidHTMLFragment( $html ) {
 
         $dom = new DOMDocument;
@@ -100,6 +122,10 @@ function add_filter( $hook, $callable ) {
     $filters[$hook][] = $callable;
 }
 
+function remove_filter( $hook, $callable ) {
+}
+
+
 function esc_html_filter( $text ) {
 
     $replacements = array(
@@ -126,10 +152,8 @@ function get_site_url() {
     return 'https://foo.bar.com';
 }
 
-function get_option( $option, $default = false ) {
-
-    if($option === 'o3po-settings')
-        return array(
+$options = array();
+$options['o3po-settings'] = array(
             'production_site_url' => get_site_url(),#we test as if this were the production system
             'journal_title' => 'fake_journal_title',
             'journal_subtitle' => 'fake_journal_subtitle',
@@ -185,14 +209,34 @@ function get_option( $option, $default = false ) {
             'first_volume_year' => "2009",
             'custom_search_page' => 'checked',
             'page_template_for_publication_posts' => 'checked',
+            'ready2publish_slug' => 'ready2publish',
                      );
+$options['o3po-ready2publish'] = array();
+$options['o3po-ready2publish-storage'] = array();
+function get_option( $option, $default = false ) {
+    global $options;
+
+    if($option === 'o3po-settings')
+        return $options['o3po-settings'];
     elseif($option === 'blog_charset')
         return 'UTF-8';
     elseif($option === 'rewrite_rules')
         return array();
+    elseif($option === 'o3po-ready2publish')
+        return $options['o3po-ready2publish'];
+    elseif($option === 'o3po-ready2publish-storage')
+        return $options['o3po-ready2publish-storage'];
+    #elseif($default !== false)
+    #    return $default;
     else
         throw(new Exception("We don't know how to fake the option " . $option . "."));
 
+}
+
+function update_option( $option, $content) {
+    global $options;
+
+    $options[$option] = $content;
 }
 
 function get_file_data( $file, $options ) {
@@ -304,7 +348,7 @@ class WP_Post
 
 class WP_Query
 {
-    private $posts;
+    public $posts;
     private $query;
     public $query_vars;
     public $post_count;
@@ -373,7 +417,11 @@ class WP_Query
     }
 
     function get($key) {
-        return $this->query[$key];
+        if(is_array($this->query))
+            return $this->query[$key];
+        else
+            return Null;
+
     }
 
     function set($key, $val) {
@@ -408,6 +456,10 @@ class WP_Query
 
     function is_main_query() {
         return isset($this->query_vars['is_main']) ? $this->query_vars['is_main'] : false;
+    }
+
+    function init() {
+
     }
 }
 
@@ -844,6 +896,7 @@ function wp_remote_get( $url, $args=array() ) {
         'https://arxiv.org/abs/1609.09584v4' => dirname(__FILE__) . '/arxiv/1609.09584v4.html',
         'https://arxiv.org/abs/0908.2921v2' => dirname(__FILE__) . '/arxiv/0908.2921v2.html',
         'https://arxiv.org/abs/1806.02820v3' => dirname(__FILE__) . '/arxiv/1806.02820v3.html',
+        'https://arxiv.org/abs/2006.01273v3' => dirname(__FILE__) . '/arxiv/2006.01273v3.html',
          'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0908.2921&fl=citation' => dirname(__FILE__) . '/ads/0908.2921.json',
         'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0809.2542&fl=citation' => dirname(__FILE__) . '/ads/0809.2542.json',
         'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2010CoTPh..54.1023Z+OR+bibcode:2011EPJB...81..155H+OR+bibcode:2011JSMTE..05..023Z+OR+bibcode:2014PhyA..414..240P&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => dirname(__FILE__) . '/ads/0809.2542_citations.json',
@@ -1120,17 +1173,21 @@ function checked( $helper, $current=true, $echo=true, $type='checked' ) {
     return $result;
 }
 
-function apply_filters( $hook, $orig_text, $text )
+function apply_filters( $hook, $value )
 {
     global $filters;
+    $args = func_get_args();
 
     if(!empty($filters[$hook]))
     {
         foreach($filters[$hook] as $callable)
-            $text = call_user_func($callable, $text);
+            if(!empty($args))
+                $value = call_user_func($callable, $value, $args);
+            else
+                $value = call_user_func($callable, $value);
     }
 
-    return $text;
+    return $value;
 }
 
 /**
@@ -1321,4 +1378,37 @@ function trackback( $trackback_url, $title, $excerpt, $ID ) {
 
     #not really implemented
     return null;
+}
+
+function add_query_arg( $arg ) {
+
+    #not really implemented
+    if($arg != array())
+        throw(new Exception("Only implemented for arg=array()"));
+
+    #throw(new Exception(json_encode($arg)));
+    return $_SERVER['REQUEST_URI'];
+}
+
+if (!function_exists('array_key_first')) {
+    function array_key_first(array $arr) {
+        foreach($arr as $key => $unused) {
+            return $key;
+        }
+        return NULL;
+    }
+}
+
+function do_action($action) {
+
+}
+
+function is_user_logged_in() {
+
+    return True;
+}
+
+function get_current_user_id() {
+
+    return 478567245;
 }

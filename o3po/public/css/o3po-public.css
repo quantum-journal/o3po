@@ -104,9 +104,26 @@ form.search-form input.search-submit {
     {
         display: none !important;
     }
+
+    html
+    {
+	color: black !important
+    }
 }
 div.publication-action-buttons button {
     display: inline-block;
     margin-right: 1em;
+    margin-bottom: 1rem;
+}
+
+input.o3po-ready2publish-text {
+    margin-right:1em;
+}
+
+div.o3po-ready2publish-author {
+    margin-bottom: 1rem;
+}
+
+select.o3po-ready2publish, input.o3po-ready2publish, textarea.o3po-ready2publish {
     margin-bottom: 1rem;
 }

@@ -1,6 +1,6 @@
 <?php
 
-class O3PO_Test extends PHPUnit_Framework_TestCase
+class O3PO_Test extends O3PO_TestCase
 {
         /**
          * @runInSeparateProcess

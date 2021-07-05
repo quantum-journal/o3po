@@ -2,8 +2,34 @@
 
 require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-latex.php';
 
-class O3PO_LatexTest extends PHPUnit_Framework_TestCase
+class O3PO_LatexTest extends O3PO_TestCase
 {
+
+    public function test_special_biblatex_bib() {
+        $path = dirname( __FILE__ ) . '/resources/arxiv/mitigation_paper_v2.bbl';
+        $content = file_get_contents($path);
+        $encoding = mb_detect_encoding($content, 'UTF-8, ISO-8859-1', true);
+        $filecontents = mb_convert_encoding($content, 'UTF-8', $encoding);
+        $bbl = $filecontents;
+        $parsed_bbl = O3PO_Latex::parse_single_bbl($bbl);
+        $this->assertEquals(count($parsed_bbl), 62);
+    }
+
+
+    public function test_firstoftwo_secondoftwo() {
+        $path = dirname( __FILE__ ) . '/resources/arxiv/mlcir010.bbl';
+        $content = file_get_contents($path);
+        $encoding = mb_detect_encoding($content, 'UTF-8, ISO-8859-1', true);
+        $filecontents = mb_convert_encoding($content, 'UTF-8', $encoding);
+        $filecontents_without_comments = preg_replace('#(?<!\\\\)%.*#u', '', $filecontents);//remove all comments
+        $bbl = $filecontents;
+        $author_latex_macro_definitions = O3PO_Latex::extract_latex_macros($filecontents_without_comments);
+        $author_latex_macro_definitions_without_specials = O3PO_Latex::remove_special_macros_to_ignore_in_bbl($author_latex_macro_definitions);
+        $bbl = O3PO_Latex::expand_latex_macros($author_latex_macro_definitions_without_specials, $bbl);
+
+        $this->assertStringNotContains($bbl, 'P.~Aliferis, D.~Gottesman'); #checks that \@firstoftwo and \@secondoftwo was expanded
+    }
+
 
 
     public function test_get_bbl_file() {
@@ -138,13 +164,26 @@ class O3PO_LatexTest extends PHPUnit_Framework_TestCase
 
     }
 
+
         /**
          * @depends test_get_latex_file
          */
     public function test_extract_latex_macros_latex( $latex ) {
 
-        $macros = O3PO_Latex::extract_latex_macros($latex);;
-        $this->assertEquals(count($macros), 68);
+        $macros = O3PO_Latex::extract_latex_macros($latex);
+
+        $some_expected_macros = [
+            ["\\newcommand{\\refsub}[2]","newcommand","\\refsub","[2]","","\\hyperref[#1]{\\ref*{#1}#2}"],
+            ["\\newcommand{\\stoc\n    }[1]","newcommand","\\stoc","[1]","","\\if\\lName1\\skp{ }{Proceedings of the #1 {ACM} Symposium on the Theory of Computing ({STOC})}{ }\\else{STOC}\\fi"],
+            ["\\newcommand{\\inputTikZ}[1]","newcommand","\\inputTikZ","[1]","","\n  \\beginpgfgraphicnamed{tikz/#1-external}\n  \\input{tikz/#1.tikz}\n  \\endpgfgraphicnamed\n"],
+            ["\\def\\?#1","def","\\?","[1]","","\\if.#1{}\\else#1\\fi"],
+            ["\\def\\_#1#2","def","\\_","[2]","","#2foo#1"]
+                            ];
+
+        foreach($some_expected_macros as $macro)
+            $this->assertContains($macro, $macros);
+
+        $this->assertEquals(111, count($macros));
 
         return $macros;
     }
@@ -327,7 +366,7 @@ ab' , 'äb'],
         else
             $this->assertSame($expected, O3PO_Latex::preg_split_at_latex_math_mode_delimters($input));
 
-        $this->assertSame($input[0], implode(O3PO_Latex::preg_split_at_latex_math_mode_delimters($input[0], -1, PREG_SPLIT_DELIM_CAPTURE), ''));
+        $this->assertSame($input[0], implode(O3PO_Latex::preg_split_at_latex_math_mode_delimters($input[0], -1, PREG_SPLIT_DELIM_CAPTURE)));
     }
 
     public function strpos_outside_math_mode_provider() {
@@ -349,6 +388,39 @@ ab' , 'äb'],
          */
     public function test_strpos_outside_math_mode( $input, $expected ) {
         $this->assertSame($expected, O3PO_Latex::strpos_outside_math_mode($input[0], $input[1]));
+    }
+
+    public function utf8_to_latex_provider() {
+        return [
+            ['foo', 'foo'],
+            ['ô', '{\\^{o}}'],
+            ['é', '{\\\'{e}}'],
+                ];
+    }
+
+        /**
+         * @dataProvider utf8_to_latex_provider
+         */
+    public function test_utf8_to_latex( $input, $expected ) {
+        $this->assertSame($expected, O3PO_Latex::utf8_to_latex($input, $expected));
+    }
+
+
+
+    public function utf8_to_bibtex_provider() {
+        return [
+            ['foo', 'foo'],
+            ['ô', '{\\^{o}}'],
+            ['é', '{\\\'{e}}'],
+            ['and some $$y$$ equation é', 'and some {$y$} equation {\\\'{e}}'],
+                ];
+    }
+
+        /**
+         * @dataProvider utf8_to_bibtex_provider
+         */
+    public function test_utf8_to_bibtex( $input, $expected ) {
+        $this->assertSame($expected, O3PO_Latex::utf8_to_bibtex($input, $expected));
     }
 
 

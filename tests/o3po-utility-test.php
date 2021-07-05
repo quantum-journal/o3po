@@ -2,7 +2,7 @@
 
 require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-utility.php';
 
-class O3PO_UtilityTest extends PHPUnit_Framework_TestCase
+class O3PO_UtilityTest extends O3PO_TestCase
 {
         /**
          * @dataProvider orcid_provider
@@ -126,15 +126,26 @@ class O3PO_UtilityTest extends PHPUnit_Framework_TestCase
 
     public function valid_email_provider() {
         return [
-            ['info@quantum-journal.org', true],
-            ['info@subdomain.quantum-journal.org', true],
-            ['a-öadaed@foo.com', true],
+            ['info@foo.org', true],
+            ['info@foo-bar.org', true],
+            ['info@subdomain.foo-bar.org', true],
+            ['john.doe@subdomain.foo-bar.org', true],
+            ['john-doe@subdomain.foo-bar.org', true],
+            ['a-öadaed@foo.com', false],
+            ['abc@föö.com', false],
+            ['aregister@cgogolin.de', true],
+            ['aaregister@cgogolin.de', true],
+            ['aaaregister@cgogolin.de', true],
+            ['aaaaregister@cgogolin.de', true],
+            ['aaaaaregister@cgogolin.de', true],
+            ['aaaaaaregister@cgogolin.de', true],
             /* ['a-öadaedfoo.com', false], */
             /* ['info@.org', false], */
             /* ['info@.', false], */
             ['info@', false],
             ['@foo.de', false],
-            ['.@foo.de', true],
+            ['.@foo.de', false],
+            ['a.@foo.de', false],
             ['@@foo.de', false],
         ];
     }
