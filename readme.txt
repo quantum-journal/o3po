@@ -91,6 +91,9 @@ It is obviously a play on the name of humanoid robot character from a series of 
 
 ## Changelog
 
+### 0.4.1
+* Support database cites in cited by data
+
 ### 0.4.0
 * Compatibility with PHP 8.0
 * Added form for submission to works ready to publish
