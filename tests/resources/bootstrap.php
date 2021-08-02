@@ -54,9 +54,9 @@ class O3PO_TestCase extends PHPUnit_Framework_TestCase
 
     public static function assertRegexpCompat($pattern, $string, $message = '' ) {
         if(method_exists(__CLASS__, 'assertMatchesRegularExpression'))
-            static::assertMatchesRegularExpression($pattern, $string, $message = '');
+            static::assertMatchesRegularExpression($pattern, $string, $message = $message);
         else
-            parent::assertRegexp($pattern, $string, $message = '');
+            parent::assertRegexp($pattern, $string, $message = $message);
     }
 
     public function assertValidHTMLFragment( $html ) {
