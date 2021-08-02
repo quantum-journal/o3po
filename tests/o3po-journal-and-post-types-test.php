@@ -468,18 +468,18 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
                     "author_affiliations" => array("/1,3###2,3###1,2,3/u"),
                                                                                                     )],
 
-        [dirname(__FILE__) . '/resources/arxiv/2006.01273v3.tar.gz', "application/x-tar", array(
+            [dirname(__FILE__) . '/resources/arxiv/2006.01273v3.tar.gz', "application/x-tar", array(
                     "validation_result" => array('#Author and affiliations data updated from arxiv source#'),
                     #"author_affiliations" => array("/1,3###2,3###1,2,3/u"),
                     'num_dois' => 82,
                                                                                                     )],
-        [dirname(__FILE__) . '/resources/arxiv/1902.02110v6.tar.gz', "application/x-tar", array(
+            [dirname(__FILE__) . '/resources/arxiv/1902.02110v6.tar.gz', "application/x-tar", array(
                     "validation_result" => array('#Author and affiliations data updated from arxiv source#'),
                     "affiliations" => array("#Department of Statistical Methods, Faculty of Economics and Sociology University of Lodz, 41/43 Rewolucji 1905 St., 90-214 Lodz, Poland#", "#Department of Computer Science, Faculty of Physics and Applied Informatics University of Lodz, 149/153 Pomorska St., 90-236 Lodz, Poland#"),
                     "author_affiliations" => array("/1###2###2/u"),
                     'num_dois' => 58,
                                                                                                     )],
-            ];
+                ];
     }
 
         /**
