@@ -170,6 +170,12 @@ class O3PO_Clockss {
         $xml .= '  <back></back>' . "\n";
         $xml .= '</article>' . "\n";
 
+        # re-encode escape sequences that are valid escape sequences in html but
+        # not in xml to prevent such sequences from leaking into the xml
+        $xml = preg_replace_callback('#&[A-Z0-9]+;#i', function ($matches) {
+                return htmlentities(html_entity_decode($matches[0]), ENT_XML1);
+            }, $xml);
+
         return $xml;
     }
 
