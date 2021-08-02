@@ -461,8 +461,6 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
                     'num_dois' => 24,
                     "author_affiliations" => array("/1###2,3###1,4/u"),
                                                                                                     )],
-
-
             [dirname(__FILE__) . '/resources/arxiv/1902.02359v2.tar.gz', "application/x-tar", array(
                     "validation_result" => array('#Author and affiliations data updated from arxiv source#'),
                     "author_affiliations" => array("/1,3###2,3###1,2,3/u"),
