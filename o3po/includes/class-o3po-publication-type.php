@@ -1428,76 +1428,11 @@ abstract class O3PO_PublicationType {
         $post_url = get_permalink( $post_id );
         if(empty($post_url)) return 'ERROR: Unable to generate XML for CLOCKSS, url is empty';
 
-        $xml  = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        $xml .= '<article xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" article-type="research-article" dtd-version="1.1" xml:lang="en">' . "\n";
-        $xml .= '  <front>' . "\n";
+        $eissn = $this->get_journal_property('eissn');
+        $journal_title = $this->get_journal_property('journal_title');
+        $publisher = $this->get_journal_property('publisher');
 
-        $xml .= '    <journal-meta>' . "\n";
-        $xml .= '      <journal-id journal-id-type="publisher">' . esc_html($journal) . '</journal-id>' . "\n";
-        if(!empty($this->get_journal_property('eissn')) && $journal === $this->get_journal_property('journal_title'))
-            $xml .= '      <issn>' . $this->get_journal_property('eissn') . '</issn>' . "\n";
-        /* elseif(!empty($this->get_journal_property('secondary_journal_eissn')) && $journal === $this->get_journal_property('secondary_journal_title')) */
-        /*     $xml .= '      <issn>' . $this->get_journal_property('secondary_journal_eissn') . '</issn>' . "\n"; */
-
-        $xml .= '      <publisher>' . "\n";
-        $xml .= '        <publisher-name>' . esc_html( $this->get_journal_property('publisher')) . '</publisher-name>' . "\n";
-        $xml .= '      </publisher>' . "\n";
-        $xml .= '    </journal-meta>' . "\n";
-
-        $xml .= '    <article-meta>' . "\n";
-        $xml .= '      <article-id pub-id-type="doi">' . esc_html($doi) . '</article-id>' . "\n";
-        $xml .= '      <title-group>' . "\n";
-        $xml .= '        <article-title>' . "\n";
-        $xml .= '          ' . (!empty($title_mathml) ? $title_mathml : esc_html($title)) . "\n";
-        $xml .= '        </article-title>' . "\n";
-        $xml .= '      </title-group>' . "\n";
-
-        $xml .= '      <contrib-group>' . "\n";
-        for ($x = 0; $x < $number_authors; $x++) {
-            $xml .= '        <contrib contrib-type="author">' . "\n";
-            $xml .= '          <name>' . "\n";
-            $xml .= '            <surname>' . esc_html($author_surnames[$x]) . '</surname>' . "\n";
-            $xml .= '            <given-names>' . esc_html($author_given_names[$x]) . '</given-names>' . "\n";
-            $xml .= '          </name>' . "\n";
-            if ( !empty($author_affiliations) && !empty($author_affiliations[$x]) ) {
-                foreach(preg_split('/\s*,\s*/u', $author_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY) as $affiliation_num) {
-                    $xml .= '          <xref ref-type="aff" rid="aff-' . $affiliation_num . '"/>' . "\n";
-                }
-            }
-            $xml .= '        </contrib>' . "\n";
-        }
-        $xml .= '      </contrib-group>' . "\n";
-        foreach($affiliations as $n => $affiliation)
-            $xml .= '      <aff id="aff-' . ($n+1) . '">' . esc_html($affiliation) . '</aff>' . "\n";
-
-        $xml .= '      <pub-date date-type="pub" publication-format="electronic" iso-8601-date="' . $date_published . '">' . "\n";
-        $xml .= '        <day>' . mb_substr($date_published, 8, 2) . '</day>' . "\n";
-        $xml .= '        <month>' . mb_substr($date_published, 5, 2) . '</month>' . "\n";
-        $xml .= '        <year>' . mb_substr($date_published, 0, 4) . '</year>' . "\n";
-        $xml .= '      </pub-date>' . "\n";
-        $xml .= '      <volume>' . $volume . '</volume>' . "\n";
-//        $xml .= '  <issue>18</issue>' . "\n";
-        $xml .= '      <fpage>' . $pages . '</fpage>' . "\n";
-//        $xml .= '  <lpage>10219</lpage>' . "\n";
-        $xml .= '      <permissions>' . "\n";
-        $xml .= '        <copyright-statement>' . 'This work is published under the ' . esc_html($this->get_journal_property('license_name')) . ' license ' . esc_html($this->get_journal_property('license_url')) . '.' . '</copyright-statement>' . "\n";
-        $xml .= '        <copyright-year>' . mb_substr($date_published, 0, 4) .'</copyright-year>' . "\n";
-        $xml .= '      </permissions>' . "\n";
-        if( !empty($abstract) || !empty($abstract_mathml) )
-        {
-            $xml .= '      <abstract>' . "\n";
-            $xml .= '        <p>' . "\n";
-            $xml .= '          ' . (!empty($abstract_mathml) ? $abstract_mathml : esc_html($abstract)) . "\n";
-            $xml .= '        </p>' . "\n";
-            $xml .= '      </abstract>' . "\n";
-        }
-        $xml .= '    </article-meta>' . "\n";
-
-        $xml .= '  </front>' . "\n";
-
-        $xml .= '  <body></body>' . "\n";
-        $xml .= '  <back></back>' . "\n";
-        $xml .= '</article>' . "\n";
+        $xml = O3PO_Clockss::generate_clockss_xml($eissn, $journal, $journal_title, $publisher, $title, $title_mathml, $doi, $number_authors, $author_surnames, $author_given_names, $author_affiliations, $affiliations, $date_published, $volume, $pages, $this->get_journal_property('license_name'), $this->get_journal_property('license_url'), $abstract_mathml, $abstract);
 
         return $xml;
     }
