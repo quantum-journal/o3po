@@ -1430,6 +1430,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                                     if(!empty($affiliations_from_optional_argument[1][0]))
                                         $new_author_affiliations[$author_number] = $affiliations_from_optional_argument[1][0];
                                 }
+                                $was_affiliation_since_last_author = False;
                             }
                             else if( $author_info[1][$x] === 'orcid' and !empty($author_info[3][$x]))
                                 $new_author_orcids[$author_number] = $author_info[3][$x];

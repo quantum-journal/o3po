@@ -406,6 +406,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         return [
             [dirname(__FILE__) . '/resources/arxiv/1711.04662v3.tar.gz', "application/gzip", array(
                     "affiliations" => array('#Aix-Marseille Univ, Université de Toulon, CNRS, LIS, Marseille, and IXXI, Lyon, France#', '#Aix-Marseille Univ, Université de Toulon, CNRS, LIS, Marseille, France and Departamento de Física Teórica and IFIC, Universidad de Valencia-CSIC, Dr. Moliner 50, 46100-Burjassot, Spain#', '#Aix-Marseille Univ, Université de Toulon, CNRS, LIS, Marseille, France#'),
+                    "author_affiliations" => '/1###2###3/u',
                     "validation_result" => array("#REVIEW: Found BibTeX or manually formated bibliographic information#", "#REVIEW: Author homepage data updated from arxiv source#"),
                     "bbl" => array('#\\\\begin{thebibliography}#', '#ahlbrecht2012molecular#', '#venegas2012quantum#'),
                     'num_dois' => 28,
@@ -414,77 +415,69 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
                     "validation_result" => "#REVIEW: Found BibTeX or manually formated bibliographic information#",
                     "author_affiliations" => '/1/u',
                     "affiliations" => '#Fakultät für Physik und Astronomie, Universität Würzburg, Am Hubland, 97074 Würzburg, Germany#',
+                    "author_affiliations" => '/1/u',
                     "bbl" => array('#\\\\begin{thebibliography}#', '#DeGennes#', '#Ising#'),
                     'num_dois' => 0,
                                                                                                    )],
             [dirname(__FILE__) . '/resources/arxiv/1708.05489v2.tar.gz', "application/gz", array(
                     "validation_result" => array("#REVIEW: Found BibTeX or manually formated bibliographic information#", '#REVIEW: Author and affiliations data updated from arxiv source.#'),
-                    "author_affiliations" => array('/1/u', '/2/u'),
+                    "author_affiliations" => array('/1###2###1/u'),
                     "affiliations" => array('#Institute of Theoretical Physics, Faculty of Physics, University of Warsaw, Pasteura 5, 02-093 Warsaw, Poland#', '#Department of Physics, Saint Anselm College, Manchester, NH 03102, USA#'),
                     "bbl" => array('#\\\\begin{thebibliography}#', '#\\[Abdolrahimi\\(2014\\)\\]{Abdolrahimi:2014aa}#', '#\\\\end{thebibliography}#'),
                     'num_dois' => 21,
                                                                                                  )],
             [dirname(__FILE__) . '/resources/arxiv/0908.2921v2.tex', "text/tex", array(
                     "validation_result" => array('#Found BibTeX or manually formated bibliograph#', '#Author and affiliations data updated from arxiv source#'),
-                    #"author_latex_macro_definitions" => '#\\\\newcommand{\\\\bra}#',
-                        /*"author_orcids" => , */
                     "author_affiliations" => '/1/u',
                     "affiliations" => '#Fakultät für Physik und Astronomie, Universität Würzburg, Am Hubland, 97074 Würzburg, Germany#',
                     "bbl" => '#\\\\begin{thebibliography}#',
                     'num_dois' => 0,
                                                                                        )],
-
-
             [dirname(__FILE__) . '/resources/arxiv/1704.02130v3.tar.gz', "application/x-tar", array(
                     "validation_result" => array('#REVIEW: Found BibLaTeX formated bibliographic information#', '#Author and affiliations data updated from arxiv source#'),
-                    #"author_latex_macro_definitions" => '#\\\\newcommand{\\\\bra}#',
-                        /*"author_orcids" => , */
-                    "author_affiliations" => '/1/u',
                     "affiliations" => '#Laboratoire d\'Information Quantique, CP 224, Université libre de Bruxelles \(ULB\), 1050 Brussels, Belgium#',
+                    "author_affiliations" => '/1/u',
                     "bbl" => array( '#biblatex auxiliary file#', '#entry{AM16}{article}{}#', '#verb 10\.1109/ISIT\.2002\.1023345#' ),
                     'num_dois' => 17,
                                                                                                     )],
-
             [dirname(__FILE__) . '/resources/arxiv/1603.04424v3.tar.gz', "application/x-tar", array(
                     "author_affiliations" => array("/1###1###2###1,3/u"),
                     'num_dois' => 21,
                                                                                                     )],
-
             [dirname(__FILE__) . '/resources/arxiv/1610.00336v2.tar.gz', "application/x-tar", array(
-                    "author_affiliations" => array("/4/u"),
+                    #"author_affiliations" => array("/1,2###3###4,5######5,6###7###5,6###5,6,8/u"), # affiliations are not auto recognizable
                     'num_dois' => 54,
                                                                                                     )],
-
             [dirname(__FILE__) . '/resources/arxiv/1610.06169.tar.gz', "application/x-tar", array(
                     'num_dois' => 48,
                     "author_affiliations" => array("/1,2###3,2###4###5,6,7/u"),
                                                                                                     )],
-
             [dirname(__FILE__) . '/resources/arxiv/1801.03508.tar.gz', "application/x-tar", array(
                     'num_dois' => 25,
-
                                                                                                     )],
-
-
             [dirname(__FILE__) . '/resources/arxiv/1812.11437v3.tar.gz', "application/x-tar", array(
                     "validation_result" => array('#Author and affiliations data updated from arxiv source#'),
                     "affiliations" => array('#Instituto de Física, Universidad Nacional Autónoma de México, México, D.F., México#', '#Institute of Physics, Slovak Academy of Sciences, Dúbravská cesta 9, Bratislava 84511, Slovakia#', '#Faculty of Informatics, Masaryk University, Botanická 68a, 60200 Brno, Czech Republic#', '#Faculty of Physics, University of Vienna, 1090 Vienna, Austria#'),
                     'num_dois' => 24,
                     "author_affiliations" => array("/1###2,3###1,4/u"),
                                                                                                     )],
-
-
             [dirname(__FILE__) . '/resources/arxiv/1902.02359v2.tar.gz', "application/x-tar", array(
                     "validation_result" => array('#Author and affiliations data updated from arxiv source#'),
                     "author_affiliations" => array("/1,3###2,3###1,2,3/u"),
                                                                                                     )],
 
-        [dirname(__FILE__) . '/resources/arxiv/2006.01273v3.tar.gz', "application/x-tar", array(
+            [dirname(__FILE__) . '/resources/arxiv/2006.01273v3.tar.gz', "application/x-tar", array(
                     "validation_result" => array('#Author and affiliations data updated from arxiv source#'),
                     #"author_affiliations" => array("/1,3###2,3###1,2,3/u"),
                     'num_dois' => 82,
                                                                                                     )],
-            ];
+            [dirname(__FILE__) . '/resources/arxiv/1902.02110v6.tar.gz', "application/x-tar", array(
+                    "validation_result" => array('#Author and affiliations data updated from arxiv source#'),
+                    "affiliations" => array("#Department of Statistical Methods, Faculty of Economics and Sociology University of Lodz, 41/43 Rewolucji 1905 St., 90-214 Lodz, Poland#", "#Department of Computer Science, Faculty of Physics and Applied Informatics University of Lodz, 149/153 Pomorska St., 90-236 Lodz, Poland#"),
+                    "author_affiliations" => array("/1###2###2/u"),
+                    'num_dois' => 58,
+                                                                                                    )],
+                ];
     }
 
         /**
