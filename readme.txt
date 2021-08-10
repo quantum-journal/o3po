@@ -93,6 +93,7 @@ It is obviously a play on the name of humanoid robot character from a series of 
 
 ### 0.4.1
 * Support database cites in cited by data
+* Fix for recognizing certain ways of specifying affiliations
 
 ### 0.4.0
 * Compatibility with PHP 8.0
