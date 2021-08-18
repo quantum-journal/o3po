@@ -28,6 +28,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-journ
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/trait-o3po-form.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-o3po-ready2publish-form.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-o3po-ready2publish-dashboard.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-people-shortcodes.php';
 
 /**
  * Manage the settings of the plugin.
@@ -132,6 +133,7 @@ class O3PO_Settings extends O3PO_Singleton {
         O3PO_EmailTemplates::specify_settings($this);
         O3PO_Ready2PublishForm::specify_settings($this);
         O3PO_Ready2PublishDashboard::specify_settings($this);
+        O3PO_PeopleShortcodes::specify_settings($this);
 
         static::$configured = true;
 	}
@@ -152,13 +154,23 @@ class O3PO_Settings extends O3PO_Singleton {
          * Get the value of a field by id.
          *
          * @since   0.4.0
+         * @since   0.4.1 If $id is of the form foo[bar] and a field of that name does not exist then an attempt is made to return index bar of field foo.
          * @acceess prublic
          * @param   int     $id Id of the field.
          */
     public function get_field_value( $id ) {
 
         if(!array_key_exists($id, $this->fields))
-            throw new Exception('The non existing ' . $this->slug . ' field ' . $id . ' was requested. Known ' . $this->slug . ' fields are: ' . json_encode($this->fields));
+        {
+            if(preg_match('#(.*)\[(.*)\]#u', $id, $matches) === 1)
+            {
+                $array = $matches[1];
+                $key = $matches[2];
+                return $this->get_field_value($array)[$key];
+            }
+            else
+                throw new Exception('The non existing ' . $this->slug . ' field ' . $id . ' was requested. Known ' . $this->slug . ' fields are: ' . json_encode($this->fields));
+        }
 
         $fields = get_option($this->plugin_name . '-' . $this->slug, array());
         if(array_key_exists($id, $fields))
