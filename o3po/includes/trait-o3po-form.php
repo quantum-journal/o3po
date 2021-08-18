@@ -717,7 +717,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         $result = array();
         foreach($input as $key => $input)
         {
-            $result = $this->validate_url($id, $input);
+            $result[] = $this->validate_url($id, $input);
         }
 
         return $result;

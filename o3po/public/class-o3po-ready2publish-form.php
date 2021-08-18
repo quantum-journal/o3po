@@ -515,6 +515,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
             echo '<div style="float:left;">';
             $this->render_single_line_field('funder_names[' . $x . ']', 'Funder name', 'on', 'width:50em;max-width:100%;', '', true, 'display:block;');
             echo '</div>';
+
             echo '<div style="clear:both"></div>';
             echo '</div>';
         }

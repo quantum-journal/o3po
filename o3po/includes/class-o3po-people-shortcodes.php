@@ -33,14 +33,14 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
     public static function specify_settings( $settings ) {
 
         $settings->specify_section('people_shortcode_settings', 'People', array('O3PO_PeopleShortcodes', 'render_people_shortcode_settings'), 'people_shortcode_settings'); # We render everything here as part of the section and set the render callable of the fields to Null
-        $settings->specify_field('editor_first_names', Null, Null, 'people_shortcode_settings', 'people_shortcode_settings', array(), array('O3PO_PeopleShortcodes', 'validate_array_of_at_most_1000_names'), array(''));
-        $settings->specify_field('editor_last_names', Null, Null, 'people_shortcode_settings', 'people_shortcode_settings', array(), array('O3PO_PeopleShortcodes', 'validate_array_of_at_most_1000_names'), array(''));
-        $settings->specify_field('editor_since_year', Null, Null, 'people_shortcode_settings', 'people_shortcode_settings', array(), array('O3PO_PeopleShortcodes', 'validate_array_of_at_most_1000_years'), array(date('Y')));
-        $settings->specify_field('editor_url', Null, Null, 'people_shortcode_settings', 'people_shortcode_settings', array(), array('O3PO_PeopleShortcodes', 'validate_array_of_at_most_1000_urls'), array(''));
-        $settings->specify_field('editor_affiliation', Null, Null, 'people_shortcode_settings', 'people_shortcode_settings', array(), array('O3PO_PeopleShortcodes', 'validate_array_of_at_most_1000_names'), array(''));
-        $settings->specify_field('editor_country', Null, Null, 'people_shortcode_settings', 'people_shortcode_settings', array(), array('O3PO_PeopleShortcodes', 'validate_array_of_at_most_1000_names'), array(''));
-        $settings->specify_field('editor_coordinator', Null, Null, 'people_shortcode_settings', 'people_shortcode_settings', array(), array('O3PO_PeopleShortcodes', 'validate_array_of_at_most_1000_checked_or_unchecked'), array('unchecked'));
-        $settings->specify_field('editor_retired', Null, Null, 'people_shortcode_settings', 'people_shortcode_settings', array(), array('O3PO_PeopleShortcodes', 'validate_array_of_at_most_1000_checked_or_unchecked'), array('unchecked'));
+        $settings->specify_field('editor_first_names', Null, Null, 'people_shortcode_settings', 'people_shortcode_settings', array(), array('O3PO_Settings', 'validate_array_of_at_most_1000_names'), array(''));
+        $settings->specify_field('editor_last_names', Null, Null, 'people_shortcode_settings', 'people_shortcode_settings', array(), array('O3PO_Settings', 'validate_array_of_at_most_1000_names'), array(''));
+        $settings->specify_field('editor_since_year', Null, Null, 'people_shortcode_settings', 'people_shortcode_settings', array(), array('O3PO_Settings', 'validate_array_of_at_most_1000_years'), array(date('Y')));
+        $settings->specify_field('editor_url', Null, Null, 'people_shortcode_settings', 'people_shortcode_settings', array(), array('O3PO_Settings', 'validate_array_of_at_most_1000_urls'), array(''));
+        $settings->specify_field('editor_affiliation', Null, Null, 'people_shortcode_settings', 'people_shortcode_settings', array(), array('O3PO_Settings', 'validate_array_of_at_most_1000_names'), array(''));
+        $settings->specify_field('editor_country', Null, Null, 'people_shortcode_settings', 'people_shortcode_settings', array(), array('O3PO_Settings', 'validate_array_of_at_most_1000_names'), array(''));
+        $settings->specify_field('editor_coordinator', Null, Null, 'people_shortcode_settings', 'people_shortcode_settings', array(), array('O3PO_Settings', 'validate_array_of_at_most_1000_checked_or_unchecked'), array('unchecked'));
+        $settings->specify_field('editor_retired', Null, Null, 'people_shortcode_settings', 'people_shortcode_settings', array(), array('O3PO_Settings', 'validate_array_of_at_most_1000_checked_or_unchecked'), array('unchecked'));
 
     }
 
@@ -61,6 +61,7 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
         echo '<li>[editors-ul] unordered list of all editors</li>';
         echo '<li>...</li>';
         echo '</ul>';
+        echo '<h3>Editors</h3>';
         echo '<div id="' . $slug . '-editor-list">';
         foreach($editor_first_names as $x => $foo)
         {
@@ -75,28 +76,32 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
             echo '</div>';
 
             echo '<div style="float:left;">';
-            $settings->render_single_line_field('editor_since_year[' . $x . ']', '', 'on', 'width:20em;max-width:100%;', 'Since year', true, 'display:block;');
+            $settings->render_single_line_field('editor_since_year[' . $x . ']', '', 'on', 'width:5em;max-width:100%;', 'Since year', true, 'display:block;');
             echo '</div>';
 
             echo '<div style="float:left;">';
-            $settings->render_single_line_field('editor_url[' . $x . ']', '', 'on', 'width:20em;max-width:100%;', 'Last name(s)', true, 'display:block;');
+            $settings->render_single_line_field('editor_url[' . $x . ']', '', 'on', 'width:35em;max-width:100%;', 'URL', true, 'display:block;');
             echo '</div>';
 
             echo '<div style="float:left;">';
-            $settings->render_single_line_field('editor_affiliation[' . $x . ']', '', 'on', 'width:20em;max-width:100%;', 'Affiliation', true, 'display:block;');
+            $settings->render_single_line_field('editor_affiliation[' . $x . ']', '', 'on', 'width:40em;max-width:100%;', 'Affiliation', true, 'display:block;');
             echo '</div>';
 
             echo '<div style="float:left;">';
-            $settings->render_single_line_field('editor_country[' . $x . ']', '', 'on', 'width:20em;max-width:100%;', 'Country', true, 'display:block;');
-            echo '</div>';
-
-
-            echo '<div style="float:left;">';
-            $settings->render_checkbox_field('editor_coordinator[' . $x . ']', '', 'on', 'width:20em;max-width:100%;', 'Coordinator', true, 'display:block;');
+            $settings->render_single_line_field('editor_country[' . $x . ']', '', 'on', 'width:15em;max-width:100%;', 'Country', true, 'display:block;');
             echo '</div>';
 
             echo '<div style="float:left;">';
-            $settings->render_checkbox_field('editor_retired[' . $x . ']', '', 'on', 'width:20em;max-width:100%;', 'Retired', true, 'display:block;');
+            $settings->render_checkbox_field('editor_coordinator[' . $x . ']', 'Coordinator');
+            echo '</div>';
+
+            echo '<div style="float:left;">';
+            $settings->render_checkbox_field('editor_retired[' . $x . ']', 'Retired');
+            echo '</div>';
+
+            echo '<button style="float:left;" type="button" onclick="removeEditor(this)">Remove editor</button></p>';
+
+            echo '<div style="clear:both"></div>';
             echo '</div>';
 
             echo '</div>';
@@ -126,16 +131,23 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
             }
             document.getElementById("' . $slug . '-editor-list").appendChild(clone);
         }
-        function removeEditor() {
+        function removeEditor(elem) {
+            var select = document.getElementById("' . $slug . '-editor-list");
+            if(select.childElementCount > 1) {
+                elem.parentElement.remove();
+            }
+        }
+        function removeLastEditor() {
             var select = document.getElementById("' . $slug . '-editor-list");
             if(select.childElementCount > 1) {
                 select.removeChild(select.lastElementChild);
             }
         }
         </script>';
+        echo '<div>';
         echo '<p><button type="button" onclick="addEditor()">Add editor</button>';
-        echo '<button type="button" onclick="removeEditor()">Remove last editor</button></p>';
-
+        echo '<button type="button" onclick="removeLastEditor()">Remove last editor</button></p>';
+        echo '</div>';
     }
 
         /**
