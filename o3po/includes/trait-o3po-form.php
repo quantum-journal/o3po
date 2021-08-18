@@ -324,7 +324,12 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
 
         if(isset($this->fields[$id]) and isset($this->fields[$id]['default']))
             return $this->fields[$id]['default'];
-
+        if(preg_match('#(.*)\[(.*)\]#u', $id, $matches) === 1)
+        {
+            $array = $matches[1];
+            $key = $matches[2];
+            return $this->get_field_default($array)[$key];
+        }
         throw new Exception('Field '. $id . ' is not known or has no default value.');
     }
 
@@ -341,7 +346,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         $return = array();
         foreach($this->fields as $id => $specification)
             if($include_fake_fields or isset($specification['title'])) # fake fields do not have titles
-                $return[$id] = $specification['default'];
+                $return[$id] = $this->get_field_default( $id );
 
         return $return;
     }
@@ -635,6 +640,107 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         $this->add_error($id, 'not-a-non-negative-float', "The input '" . $input . "' given in '" . $this->fields[$id]['title'] . "' was not a non-negative floating point number. Field reset.", 'error');
         return $this->get_field_default($id);
     }
+
+        /**
+         * Validate that an array of at most 1000 names
+         *
+         * @since  0.4.1
+         * @access private
+         * @param  string  $id    The id of the field whose input is validated.
+         * @param  array   $input The input.
+         */
+    public function validate_array_of_at_most_1000_names( $id, $input ) {
+
+        if(!is_array($input))
+        {
+            $this->add_error( $id, 'not-array', "The input to field " . $id . " must be an array but was of type " . gettype($input) . ".", 'error');
+            return array();
+        }
+
+        $input = array_slice($input, 0, 1000);
+        $result = array();
+        foreach($input as $key => $name)
+        {
+            if($this->fields[$id]['max_length'] !== false)
+                $this_name = substr($name, 0, $this->fields[$id]['max_length']);
+            else
+                $this_name = $name;
+            $this_name = strip_tags($this_name);
+            $result[$key] = $this_name;
+        }
+
+        return $result;
+    }
+
+        /**
+         * Validate that an array of at most 1000 names
+         *
+         * @since  0.4.1
+         * @access private
+         * @param  string  $id    The id of the field whose input is validated.
+         * @param  array   $input The input.
+         */
+    public function validate_array_of_at_most_1000_years( $id, $input ) {
+
+        if(!is_array($input))
+        {
+            $this->add_error( $id, 'not-array', "The input to field " . $id . " must be an array but was of type " . gettype($input) . ".", 'error');
+            return array();
+        }
+
+        $input = array_slice($input, 0, 1000);
+        $result = array();
+        foreach($input as $key => $input)
+        {
+            if(preg_match('/^[0-9]{4}$/u', $input))
+                $result[] = $input;
+            else
+            {
+                $this->add_error($id, 'not-a-year', "The input '" . $input . "' given in '" . $this->fields[$id]['title'] . "' was not a year. Field reset.", 'error');
+                $result[] = '';
+            }
+
+        }
+
+        return $result;
+    }
+
+    public function validate_array_of_at_most_1000_urls( $id, $input ) {
+
+        if(!is_array($input))
+        {
+            $this->add_error( $id, 'not-array', "The input to field " . $id . " must be an array but was of type " . gettype($input) . ".", 'error');
+            return array();
+        }
+
+        $input = array_slice($input, 0, 1000);
+        $result = array();
+        foreach($input as $key => $input)
+        {
+            $result = $this->validate_url($id, $input);
+        }
+
+        return $result;
+    }
+
+    public function validate_array_of_at_most_1000_checked_or_unchecked( $id, $input ) {
+
+        if(!is_array($input))
+        {
+            $this->add_error( $id, 'not-array', "The input to field " . $id . " must be an array but was of type " . gettype($input) . ".", 'error');
+            return array();
+        }
+
+        $input = array_slice($input, 0, 1000);
+        $result = array();
+        foreach($input as $key => $input)
+        {
+            $result = $this->checked_or_unchecked($id, $input);
+        }
+
+        return $result;
+    }
+
 
         /**
          * Restrict input to checked or unchecked fields
