@@ -1412,3 +1412,10 @@ function get_current_user_id() {
 
     return 478567245;
 }
+
+$shortcodes = array();
+function add_shortcode( $tag, $callback ) {
+    global $shortcodes;
+
+    $shortcodes[$tag] = $callback;
+}
