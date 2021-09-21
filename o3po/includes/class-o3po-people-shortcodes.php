@@ -99,11 +99,9 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
             $settings->render_checkbox_field('editor_retired[' . $x . ']', 'Retired');
             echo '</div>';
 
-            echo '<button style="float:left;" type="button" onclick="removeEditor(this)">Remove editor</button></p>';
+            echo '<button style="float:left;" type="button" onclick="removeEditor(this)">Remove editor</button>';
 
             echo '<div style="clear:both"></div>';
-            echo '</div>';
-
             echo '</div>';
         }
         echo '</div>';
