@@ -261,8 +261,12 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
 
         $value = $this->get_field_value($id);
 
-        echo '<input type="hidden" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="unchecked">'; //To have a 0 in POST when the checkbox is unticked
-        echo '<input class="o3po-' . $this->slug . ' o3po-' . $this->slug . '-checkbox" type="checkbox" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="checked"' . checked( 'checked', $value, false ) . '/>';
+        if(preg_match('#(.*)\[(.*)\]#u', $id, $matches) === 1)
+            $name_end = '[' . $matches[1] . '][' . $matches[2] . ']';
+        else
+            $name_end = '[' . $id . ']';
+        echo '<input type="hidden" name="' . $this->plugin_name . '-' . $this->slug . $name_end . '" value="unchecked">'; //To have a value in POST when the checkbox is unchecked
+        echo '<input class="o3po-' . $this->slug . ' o3po-' . $this->slug . '-checkbox" type="checkbox" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . $name_end . '" value="checked"' . checked( 'checked', $value, false ) . '/>';
         if(!empty($label))
             echo '<label for="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '">' . ($esc_label ? esc_html($label) : $label) . '</label>';
 
@@ -728,14 +732,14 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         if(!is_array($input))
         {
             $this->add_error( $id, 'not-array', "The input to field " . $id . " must be an array but was of type " . gettype($input) . ".", 'error');
-            return array();
+            return $this->get_field_default($id);
         }
 
         $input = array_slice($input, 0, 1000);
         $result = array();
         foreach($input as $key => $input)
         {
-            $result = $this->checked_or_unchecked($id, $input);
+            $result[] = $this->checked_or_unchecked($id, $input);
         }
 
         return $result;

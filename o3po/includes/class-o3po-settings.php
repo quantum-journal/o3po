@@ -166,6 +166,9 @@ class O3PO_Settings extends O3PO_Singleton {
             {
                 $array = $matches[1];
                 $key = $matches[2];
+                if(!isset($this->get_field_value($array)[$key]))
+                    throw new Exception('Looking for field ' . $id . ' which was interpreted as ' . $array . ' plus ' . $key . ' but get_field_value(' . $array . ')=' . json_encode($this->get_field_value($array)));
+
                 return $this->get_field_value($array)[$key];
             }
             else
