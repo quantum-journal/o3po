@@ -94,7 +94,7 @@ class O3PO_Crossref {
          * @param    int      $timeout         Maximum time to wait for a response (default 6 seconds).
          * @return   mixed    Response of wp_remote_get() from Crossref or WP_Error.
          */
-    private static function remote_get_cited_by( $crossref_url, $crossref_id, $crossref_pw, $doi, $storage_time=60*10, $timeout=6 ) {
+    private static function remote_get_cited_by( $crossref_url, $crossref_id, $crossref_pw, $doi, $storage_time=60*10, $timeout=10 ) {
 
         $request_url = $crossref_url . '?usr=' . urlencode($crossref_id).  '&pwd=' . urlencode($crossref_pw) . '&doi=' . urlencode($doi) . '&include_postedcontent=true';
 
@@ -202,7 +202,7 @@ class O3PO_Crossref {
                 elseif(!empty($f_link->database_cite))
                     $cite = $f_link->database_cite;
                 else
-                    throw new Exception("Encountered an unhandled forward link type.");
+                    throw new Exception("Encountered the unhandled forward link type " . $f_link->children()[0]->getName() . " while looking for citations to DOI " . $doi . ".");
 
                 $authors = array();
                 if(!empty($cite->contributors->contributor))
