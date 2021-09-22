@@ -1413,9 +1413,60 @@ function get_current_user_id() {
     return 478567245;
 }
 
+
 $shortcodes = array();
 function add_shortcode( $tag, $callback ) {
     global $shortcodes;
 
     $shortcodes[$tag] = $callback;
+}
+
+
+function esc_xml( $text ) {
+    $safe_text = wp_check_invalid_utf8( $text );
+
+    $cdata_regex = '\<\!\[CDATA\[.*?\]\]\>';
+    $regex       = <<<EOF
+/
+    (?=.*?{$cdata_regex})                 # lookahead that will match anything followed by a CDATA Section
+    (?<non_cdata_followed_by_cdata>(.*?)) # the "anything" matched by the lookahead
+    (?<cdata>({$cdata_regex}))            # the CDATA Section matched by the lookahead
+
+|                                         # alternative
+
+    (?<non_cdata>(.*))                    # non-CDATA Section
+/sx
+EOF;
+
+    $safe_text = (string) preg_replace_callback(
+        $regex,
+        static function( $matches ) {
+            if ( ! $matches[0] ) {
+                return '';
+            }
+
+            if ( ! empty( $matches['non_cdata'] ) ) {
+                // escape HTML entities in the non-CDATA Section.
+                return _wp_specialchars( $matches['non_cdata'], ENT_XML1 );
+            }
+
+            // Return the CDATA Section unchanged, escape HTML entities in the rest.
+            return _wp_specialchars( $matches['non_cdata_followed_by_cdata'], ENT_XML1 ) . $matches['cdata'];
+        },
+        $safe_text
+    );
+
+    /**
+     * Filters a string cleaned and escaped for output in XML.
+     *
+     * Text passed to esc_xml() is stripped of invalid or special characters
+     * before output. HTML named character references are converted to their
+     * equivalent code points.
+     *
+     * @since 5.5.0
+     *
+     * @param string $safe_text The text after it has been escaped.
+     * @param string $text      The text prior to being escaped.
+     */
+    return apply_filters( 'esc_xml', $safe_text, $text );
 }
