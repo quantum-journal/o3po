@@ -281,7 +281,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @param    array   $options  The options between which to select
          * @param    string  $onchange The HTML onchange parameter
          */
-    public function render_select_field( $id, $options, $onchange=false ) {
+    public function render_select_field( $id, $options, $onchange=false, $label='', $esc_label=true ) {
 
         $value = $this->get_field_value($id);
 
@@ -294,6 +294,9 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         foreach($options as $option)
             echo '<option value="' . $option['value'] . '"' . ($value == $option['value'] ? 'selected': '' ) . '>' . $option['description'] . '</option>';
         echo '</select>';
+
+        if(!empty($label))
+            echo '<label for="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" style="display:block;">' . ($esc_label ? esc_html($label) : $label) . '</label>';
     }
 
         /**
@@ -676,6 +679,36 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         return $result;
     }
 
+
+        /**
+         * Validate an array of at most 1000 editor coordinator or steering board entries
+         *
+         * @since  0.4.1
+         * @access private
+         * @param  string  $id    The id of the field whose input is validated.
+         * @param  array   $input The input.
+         */
+    public function validate_array_of_at_most_1000_editor_coordinator_or_steering_board( $id, $input ) {
+
+        if(!is_array($input))
+        {
+            $this->add_error( $id, 'not-array', "The input to field " . $id . " must be an array but was of type " . gettype($input) . ".", 'error');
+            return array();
+        }
+
+        $input = array_slice($input, 0, 1000);
+        $result = array();
+        foreach($input as $key => $role)
+        {
+            $result[] = $this->editor_coordinator_or_steering_board($id, $role);
+        }
+
+        return $result;
+    }
+
+
+
+
         /**
          * Validate that an array of at most 1000 names
          *
@@ -760,6 +793,23 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
             return $input;
 
         $this->add_error($id, 'not-checked-or-unchecked', "The box '" . $this->fields[$id]['title'] . "' must be either checked or unchecked. Box reset.", 'error');
+        return $this->get_field_default($id);
+    }
+
+        /**
+         * Restrict input to editor, coordinator, or steering board
+         *
+         * @since    0.3.0
+         * @access   private
+         * @param    string   $id    The field this was input to.
+         * @param    string   $input    User input.
+         */
+    public function editor_coordinator_or_steering_board( $id, $input ) {
+
+        if($input === "editor" or $input === "coordinator" or $input === "steering board")
+            return $input;
+
+        $this->add_error($id, 'not-checked-or-unchecked', "The field '" . $this->fields[$id]['title'] . "' must be either editor, coordinator, or steering board. Field reset.", 'error');
         return $this->get_field_default($id);
     }
 
