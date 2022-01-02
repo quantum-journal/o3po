@@ -199,14 +199,29 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
     }
 
 
+    public static function compate_names($name_a, $name_b) {
+        $name_a = trim($name_a);
+        $name_b = trim($name_b);
+
+        if($name_a === $name_b)
+            return 0;
+
+        $prefix_regex = '#^([aA][pflb]|[dD]el|[dD][ea]|[dD]i|[dD]os|[dD]u|[lL]a|[lL]e|[vV]an ([dD]e|[dD]en|[dD]er|[hH]et|)|[vV]on|[zZ]u) #u';
+
+        $name_a_without_prefix = preg_replace($prefix_regex, '', $name_a);
+        $name_b_without_prefix = preg_replace($prefix_regex, '', $name_b);
+
+        return strnatcmp($name_a_without_prefix, $name_b_without_prefix);
+    }
+
     public static function sort_by_last_names($person_a, $person_b) {
 
-        return strnatcmp($person_a['last_names'], $person_b['last_names']);
+        return static::compate_names($person_a['last_names'], $person_b['last_names']);
     }
 
     public static function sort_by_first_names($person_a, $person_b) {
 
-        return strnatcmp($person_a['first_names'], $person_b['first_names']);
+        return static::compate_names($person_a['first_names'], $person_b['first_names']);
     }
 
         /**
@@ -257,7 +272,7 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
                 if(empty($person['until_year']) or $current_year < $person['until_year'])
                     continue;
 
-            if(empty($atts['role']) or $atts['role'] === $person['role'] or in_array($person['role'], preg_split('/\s*,\s*/', $atts['role'])))
+            if(empty($atts['role']) or $atts['role'] === $person['role'] or in_array($person['role'], preg_split('/\s*,\s*/u', $atts['role'])))
             {
                 $result .= '<li>';
                 $person_name = $person['first_names'] . ' ' . $person['last_names'];
