@@ -489,11 +489,17 @@ class O3PO_Admin {
                                     output = output.replace(/\r?\n|\r/g, '');//remove newlines
                                     output = output.replace(/>\s*[<]/g, '><');//remove superflous whitespace (Warning: we must use [<] here instead of just <, as </ is interpreted as the beginning of a html closing tag)
                                     output = output.replace(/<!--.*?-->/g, '');//remove commets
-                                    output = output.replace(/<([\/]?)/g, '<$1mml:');//Add the mml: namespace because crossref wants it like that
+                                    output = output.replace(/<([\/]?)([a-zA-Z]+[^>]*)>/g, '<$1mml:$2>');//Add the mml: namespace to all tags because crossref wants it like that
                                     output = output.replace(/xmlns=/g, 'xmlns:mml=');
+                                    output = output.replace(/&/g, '&#038;');//while putting & symbols into mathml.value is ok and leads to valid html in the browser displaying the mathml element, when this elements content is later grabbed from $_POST in PHP, one gets unescaped & symbols and thus is left with a string that is not valid xml/html (because it contains & symbols) but also already contains MathML xml tags, which is hard/impossible to fix. So we are nice and replace all & symbols with a xml/html compatible escape sequence. The also problematic < and > signs are taken care of by means of an error message prompting the user to put them into formulas and us the respective LaTeX escape sequences a few lines below.
                                     mathml.value = output;
                                 }
                             }, formula, mathml ]);
+
+                    if(tex.includes('<') || tex.includes('>'))
+                    {
+                        formula.textContent = "ERROR: The field contains < or > signs. If they are meant to represent math, the formulas must be enclosed in dollar signs and they must be replaced with \\lt and \\gt, similarly <= and >= must be replaced by \\leq and \\geq.";
+                    }
                 } else if(element) {
                     if(formula)
                         element.parentNode.removeChild(formula);

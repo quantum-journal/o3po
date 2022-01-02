@@ -261,8 +261,12 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
 
         $value = $this->get_field_value($id);
 
-        echo '<input type="hidden" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="unchecked">'; //To have a 0 in POST when the checkbox is unticked
-        echo '<input class="o3po-' . $this->slug . ' o3po-' . $this->slug . '-checkbox" type="checkbox" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="checked"' . checked( 'checked', $value, false ) . '/>';
+        if(preg_match('#(.*)\[(.*)\]#u', $id, $matches) === 1)
+            $name_end = '[' . $matches[1] . '][' . $matches[2] . ']';
+        else
+            $name_end = '[' . $id . ']';
+        echo '<input type="hidden" name="' . $this->plugin_name . '-' . $this->slug . $name_end . '" value="unchecked">'; //To have a value in POST when the checkbox is unchecked
+        echo '<input class="o3po-' . $this->slug . ' o3po-' . $this->slug . '-checkbox" type="checkbox" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . $name_end . '" value="checked"' . checked( 'checked', $value, false ) . '/>';
         if(!empty($label))
             echo '<label for="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '">' . ($esc_label ? esc_html($label) : $label) . '</label>';
 
@@ -277,7 +281,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @param    array   $options  The options between which to select
          * @param    string  $onchange The HTML onchange parameter
          */
-    public function render_select_field( $id, $options, $onchange=false ) {
+    public function render_select_field( $id, $options, $onchange=false, $label='', $esc_label=true ) {
 
         $value = $this->get_field_value($id);
 
@@ -290,6 +294,9 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         foreach($options as $option)
             echo '<option value="' . $option['value'] . '"' . ($value == $option['value'] ? 'selected': '' ) . '>' . $option['description'] . '</option>';
         echo '</select>';
+
+        if(!empty($label))
+            echo '<label for="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" style="display:block;">' . ($esc_label ? esc_html($label) : $label) . '</label>';
     }
 
         /**
@@ -324,12 +331,17 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
 
         if(isset($this->fields[$id]) and isset($this->fields[$id]['default']))
             return $this->fields[$id]['default'];
-
+        if(preg_match('#(.*)\[(.*)\]#u', $id, $matches) === 1)
+        {
+            $array = $matches[1];
+            $key = $matches[2];
+            return $this->get_field_default($array)[$key];
+        }
         throw new Exception('Field '. $id . ' is not known or has no default value.');
     }
 
         /**
-         * Get the default value of all fields.
+         * Get the default values of all fields.
          *
          *
          * @since   0.4.0
@@ -341,7 +353,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         $return = array();
         foreach($this->fields as $id => $specification)
             if($include_fake_fields or isset($specification['title'])) # fake fields do not have titles
-                $return[$id] = $specification['default'];
+                $return[$id] = $this->get_field_default( $id );
 
         return $return;
     }
@@ -519,6 +531,12 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          */
     public function validate_url( $id, $input ) {
 
+        if(empty($input))
+        {
+            $this->add_error($id, 'url-validated', "The URL '" . $input . "' given in '" . $this->fields[$id]['title'] . "' was empty. Field reset.", 'error');
+            return $this->get_field_default($id);
+        }
+
         $input_trimmed = trim($input);
         $url = esc_url_raw(strip_tags(stripslashes($input_trimmed)));
 
@@ -637,6 +655,217 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
     }
 
         /**
+         * Validate that an array of at most 1000 names
+         *
+         * @since  0.4.1
+         * @access private
+         * @param  string  $id    The id of the field whose input is validated.
+         * @param  array   $input The input.
+         */
+    public function validate_array_of_at_most_1000_names( $id, $input ) {
+
+        if(!is_array($input))
+        {
+            $this->add_error( $id, 'not-array', "The input to field " . $id . " must be an array but was of type " . gettype($input) . ".", 'error');
+            return array();
+        }
+
+        $input = array_slice($input, 0, 1000);
+        $result = array();
+        foreach($input as $key => $name)
+        {
+            if($this->fields[$id]['max_length'] !== false)
+                $this_name = substr($name, 0, $this->fields[$id]['max_length']);
+            else
+                $this_name = $name;
+            $this_name = strip_tags($this_name);
+            $result[$key] = $this_name;
+        }
+
+        return $result;
+    }
+
+
+        /**
+         * Validate an array of at most 1000 editor coordinator or steering board entries
+         *
+         * @since  0.4.1
+         * @access private
+         * @param  string  $id    The id of the field whose input is validated.
+         * @param  array   $input The input.
+         */
+    public function validate_array_of_at_most_1000_roles( $id, $input ) {
+
+        if(!is_array($input))
+        {
+            $this->add_error( $id, 'not-array', "The input to field " . $id . " must be an array but was of type " . gettype($input) . ".", 'error');
+            return array();
+        }
+
+        $input = array_slice($input, 0, 1000);
+        $result = array();
+        foreach($input as $key => $role)
+        {
+            $result[] = $this->validate_role($id, $role);
+        }
+
+        return $result;
+    }
+
+
+        /**
+         * Validate that an array of at most 1000 years
+         *
+         * @since  0.4.1
+         * @access private
+         * @param  string  $id    The id of the field whose input is validated.
+         * @param  array   $input The input.
+         */
+    public function validate_array_of_at_most_1000_years( $id, $input ) {
+
+        if(!is_array($input))
+        {
+            $this->add_error( $id, 'not-array', "The input to field " . $id . " must be an array but was of type " . gettype($input) . ".", 'error');
+            return array();
+        }
+
+        $input = array_slice($input, 0, 1000);
+        $result = array();
+        foreach($input as $key => $input)
+        {
+            if(preg_match('/^[0-9]{4}$/u', $input))
+                $result[] = $input;
+            else
+            {
+                $this->add_error($id, 'not-a-year', "The input '" . $input . "' given in '" . $this->fields[$id]['title'] . "' was not a year. Field reset.", 'error');
+                $result[] = '';
+            }
+
+        }
+
+        return $result;
+    }
+
+
+        /**
+         * Validate that an array of at most 1000 years or empty
+         *
+         * @since  0.4.1
+         * @access private
+         * @param  string  $id    The id of the field whose input is validated.
+         * @param  array   $input The input.
+         */
+    public function validate_array_of_at_most_1000_years_or_empty( $id, $input ) {
+
+        if(!is_array($input))
+        {
+            $this->add_error( $id, 'not-array', "The input to field " . $id . " must be an array but was of type " . gettype($input) . ".", 'error');
+            return array();
+        }
+
+        $input = array_slice($input, 0, 1000);
+        $result = array();
+        foreach($input as $key => $input)
+        {
+            if(empty($input) or preg_match('/^[0-9]{4}$/u', $input))
+                $result[] = $input;
+            else
+            {
+                $this->add_error($id, 'not-a-year', "The input '" . $input . "' given in '" . $this->fields[$id]['title'] . "' was not a year. Field reset.", 'error');
+                $result[] = '';
+            }
+
+        }
+
+        return $result;
+    }
+
+
+        /**
+         * Validate an array of at most 1000 urls
+         *
+         * @since  0.4.1
+         * @access private
+         * @param  string  $id    The id of the field whose input is validated.
+         * @param  array   $input The input.
+         */
+    public function validate_array_of_at_most_1000_urls( $id, $input ) {
+
+        if(!is_array($input))
+        {
+            $this->add_error( $id, 'not-array', "The input to field " . $id . " must be an array but was of type " . gettype($input) . ".", 'error');
+            return array();
+        }
+
+        $input = array_slice($input, 0, 1000);
+        $result = array();
+        foreach($input as $key => $input)
+        {
+            $result[] = $this->validate_url($id, $input);
+        }
+
+        return $result;
+    }
+
+
+        /**
+         * Validate an array of at most 1000 urls or empty fields
+         *
+         * @since  0.4.1
+         * @access private
+         * @param  string  $id    The id of the field whose input is validated.
+         * @param  array   $input The input.
+         */
+    public function validate_array_of_at_most_1000_urls_or_empty( $id, $input ) {
+
+        if(!is_array($input))
+        {
+            $this->add_error( $id, 'not-array', "The input to field " . $id . " must be an array but was of type " . gettype($input) . ".", 'error');
+            return array();
+        }
+
+        $input = array_slice($input, 0, 1000);
+        $result = array();
+        foreach($input as $key => $input)
+        {
+            if(!empty($input))
+                $result[] = $this->validate_url($id, $input);
+            else
+                $result[] = '';
+        }
+
+        return $result;
+    }
+
+
+        /**
+         * Validate an array of at most 1000 values of checked or unchecked
+         *
+         * @since  0.4.1
+         * @access private
+         * @param  string  $id    The id of the field whose input is validated.
+         * @param  array   $input The input.
+         */
+    public function validate_array_of_at_most_1000_checked_or_unchecked( $id, $input ) {
+
+        if(!is_array($input))
+        {
+            $this->add_error( $id, 'not-array', "The input to field " . $id . " must be an array but was of type " . gettype($input) . ".", 'error');
+            return $this->get_field_default($id);
+        }
+
+        $input = array_slice($input, 0, 1000);
+        $result = array();
+        foreach($input as $key => $input)
+        {
+            $result[] = $this->checked_or_unchecked($id, $input);
+        }
+
+        return $result;
+    }
+
+
+        /**
          * Restrict input to checked or unchecked fields
          *
          * @since    0.3.0
@@ -650,6 +879,30 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
             return $input;
 
         $this->add_error($id, 'not-checked-or-unchecked', "The box '" . $this->fields[$id]['title'] . "' must be either checked or unchecked. Box reset.", 'error');
+        return $this->get_field_default($id);
+    }
+
+        /**
+         * Restrict input to valid roles of people working for the journal
+         *
+         * @since    0.4.1
+         * @access   private
+         * @param    string   $id    The field this was input to.
+         * @param    string   $input    User input.
+         */
+    public function validate_role( $id, $input ) {
+
+        $valid_roles = [
+            'editor',
+            'coordinator',
+            'steering board',
+            'admin',
+            'executive board',
+                        ];
+        if(in_array($input, $valid_roles))
+            return $input;
+
+        $this->add_error($id, 'not-a-role', "The field '" . $this->fields[$id]['title'] . "' must be one of " . implode(", ", $valid_roles) . ". Field reset.", 'error');
         return $this->get_field_default($id);
     }
 

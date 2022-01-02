@@ -158,7 +158,7 @@ class O3PO_Clockss {
         {
             $xml .= '      <abstract>' . "\n";
             $xml .= '        <p>' . "\n";
-            $xml .= '          ' . esc_xml(!empty($abstract_mathml) ? $abstract_mathml : $abstract) . "\n";
+            $xml .= '          ' . (!empty($abstract_mathml) ? $abstract_mathml : esc_xml($abstract)) . "\n";
             $xml .= '        </p>' . "\n";
             $xml .= '      </abstract>' . "\n";
         }

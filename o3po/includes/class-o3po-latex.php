@@ -86,6 +86,22 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
 
 
         /**
+         * Preg match LaTeX math mode delimters.
+         *
+         * @since    0.4.1
+         * @access   public
+         * @param    string    $text    Text to be split at LaTeX math mode delimiters such as $...$ \[...\] \(...\).
+         * @param array &$matches If provided is filled with matches.
+         * @param int $flags Flags can be any combination of valid preg_match flags. Defaults to 0.
+         * @pram int $offset Start search at given offset. Defaults to 0.
+         */
+    static public function preg_match_latex_math_mode_delimters( $text, &$matches = null, $flags = 0, $offset = 0 ) {
+
+        return preg_match('#(?<!\\\\)([\$]{1,2}|\\\\\[|\\\\\]|\\\\\(|\\\\\)|\\\\(?:begin|end)\s*{(?:equation|align|eqarray|gather|displaymath)\**})#u', $text, $matches, $flags, $offset);
+    }
+
+
+        /**
          * Strpos in latex code, but only taking into account the part of
          * code that is not in math mode. This function uses the multi byte
          * safe mb_str_pos() function.
@@ -979,6 +995,8 @@ class O3PO_Latex_Dictionary_Provider
                 '\\\\enspace' => ' ',
                 '\\\\quad' => ' ',
                 '\\\\qquad' => ' ',
+                '\\\\noindent' => '',
+                '\\\\unpenalty' => '',
                 '\\\\ss(\s*\{\s*\}|\s+|(?![a-zA-Z]))' => 'ß',
                 '\\\\L(\s*\{\s*\}|\s+|(?![a-zA-Z]))' => 'Ł',
                 '\\\\l(\s*\{\s*\}|\s+|(?![a-zA-Z]))' => 'ł',

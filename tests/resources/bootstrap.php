@@ -1413,6 +1413,15 @@ function get_current_user_id() {
     return 478567245;
 }
 
+
+$shortcodes = array();
+function add_shortcode( $tag, $callback ) {
+    global $shortcodes;
+
+    $shortcodes[$tag] = $callback;
+}
+
+
 function esc_xml( $text ) {
     $safe_text = wp_check_invalid_utf8( $text );
 
