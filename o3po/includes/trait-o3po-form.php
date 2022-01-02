@@ -780,6 +780,15 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         return $result;
     }
 
+
+        /**
+         * Validate an array of at most 1000 urls
+         *
+         * @since  0.4.1
+         * @access private
+         * @param  string  $id    The id of the field whose input is validated.
+         * @param  array   $input The input.
+         */
     public function validate_array_of_at_most_1000_urls( $id, $input ) {
 
         if(!is_array($input))
@@ -799,6 +808,14 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
     }
 
 
+        /**
+         * Validate an array of at most 1000 urls or empty fields
+         *
+         * @since  0.4.1
+         * @access private
+         * @param  string  $id    The id of the field whose input is validated.
+         * @param  array   $input The input.
+         */
     public function validate_array_of_at_most_1000_urls_or_empty( $id, $input ) {
 
         if(!is_array($input))
@@ -820,6 +837,15 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         return $result;
     }
 
+
+        /**
+         * Validate an array of at most 1000 values of checked or unchecked
+         *
+         * @since  0.4.1
+         * @access private
+         * @param  string  $id    The id of the field whose input is validated.
+         * @param  array   $input The input.
+         */
     public function validate_array_of_at_most_1000_checked_or_unchecked( $id, $input ) {
 
         if(!is_array($input))
@@ -857,9 +883,9 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
     }
 
         /**
-         * Restrict input to editor, coordinator, or steering board
+         * Restrict input to valid roles of people working for the journal
          *
-         * @since    0.3.0
+         * @since    0.4.1
          * @access   private
          * @param    string   $id    The field this was input to.
          * @param    string   $input    User input.
