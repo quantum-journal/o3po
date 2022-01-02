@@ -995,6 +995,8 @@ class O3PO_Latex_Dictionary_Provider
                 '\\\\enspace' => ' ',
                 '\\\\quad' => ' ',
                 '\\\\qquad' => ' ',
+                '\\\\noindent' => '',
+                '\\\\unpenalty' => '',
                 '\\\\ss(\s*\{\s*\}|\s+|(?![a-zA-Z]))' => 'ß',
                 '\\\\L(\s*\{\s*\}|\s+|(?![a-zA-Z]))' => 'Ł',
                 '\\\\l(\s*\{\s*\}|\s+|(?![a-zA-Z]))' => 'ł',
