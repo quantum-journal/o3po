@@ -254,7 +254,7 @@ class O3PO {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-relevanssi.php';
 
             /**
-             * The class providing the interface to relevanssi.
+             * The class providing the people shortcodes.
              */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-people-shortcodes.php';
 
