@@ -53,6 +53,11 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
                 'allowed' => ['True', 'False'],
                 'description' => 'Whether include the date(s) the persons joined or and/or left their position.',
                             ),
+            'former' => array(
+                'default' => 'False',
+                'allowed' => ['False', 'True', 'Only'],
+                'description' => 'Whether include (or only include) people who have left their role fore the current year',
+                            ),
                               ),
                                           );
 
@@ -241,9 +246,17 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
         elseif($atts['sort'] === 'first_names')
             uasort($person_data, array('self', 'sort_by_first_names'));
 
+        $current_year = date('Y');
         $result = '<ul>';
         foreach($person_data as $x => $person)
         {
+            if($atts['former'] === 'False')
+                if(!empty($person['until_year']) and $current_year > $person['until_year'])
+                    continue;
+            if($atts['former'] === 'Only')
+                if(empty($person['until_year']) or $current_year < $person['until_year'])
+                    continue;
+
             if(empty($atts['role']) or $atts['role'] === $person['role'] or in_array($person['role'], preg_split('/\s*,\s*/', $atts['role'])))
             {
                 $result .= '<li>';
@@ -258,7 +271,6 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
                     $result .= ', ' . esc_html($person['country']);
                 if($atts['date'] !== 'False')
                 {
-                    $current_year = date('Y');
                     if(empty($person['until_year']))
                     {
                         if(!empty($person['since_year']))
