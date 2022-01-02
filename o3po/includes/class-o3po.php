@@ -253,6 +253,11 @@ class O3PO {
              */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-relevanssi.php';
 
+            /**
+             * The class providing the people shortcodes.
+             */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-people-shortcodes.php';
+
         $this->loader = new O3PO_Loader();
 
         $settings = O3PO_Settings::instance($this->plugin_name, $this->get_plugin_pretty_name(), $this->version, 'O3PO_PublicationType::get_active_publication_type_names'); # configure settings singleton during first initialization
@@ -423,6 +428,10 @@ class O3PO {
         $this->loader->add_filter('transition_post_status', $this->secondary_publication_type, 'on_transition_post_status', 10, 3);
         if($settings->get_field_value('page_template_for_publication_posts')==='checked')
             $this->loader->add_filter('template_include', $this->secondary_publication_type, 'use_page_template');
+
+        $this->loader->add_action('init', 'O3PO_PeopleShortcodes', 'add_shortcodes');
+
+
 
 	}
 

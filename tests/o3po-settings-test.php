@@ -118,7 +118,7 @@ class O3PO_SettingsTest extends O3PO_TestCase
         preg_match_all('#id="' . $settings->get_plugin_name() . '-settings-(.*?)"#', $combined_output, $matches);
         foreach($matches[1] as $id)
         {
-            $this->assertContains($id, array_keys($settings->get_field_defaults()), 'Option ' . $id . ' was found in the settings page html but not in the all_settings_fields_map. Only settings with an entry in that map are actually saved, when the settings are saved.');
+            $settings->get_field_default($id); # check whether there is a default for every field in the html
         }
     }
 

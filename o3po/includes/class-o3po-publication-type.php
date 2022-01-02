@@ -670,8 +670,33 @@ abstract class O3PO_PublicationType {
             $validation_result .= "ERROR: Title is empty.\n";
         else if ( preg_match('/[<>]/u', $title ) )
             $validation_result .= "WARNING: Title contains < or > signs. If they are meant to represent math, the formulas should be enclosed in dollar signs and they should be replaced with \\\\lt and \\\\gt respectively (similarly <= and >= should be replaced by \\\\leq and \\\\geq).\n" ;
-        if ( empty($title_mathml) && preg_match('/[^\\\\]\$.*[^\\\\]\$/u' , $title ) )
-            $validation_result .= "ERROR: Title contains math but no MathML variant was saved so far.\n";
+        if(empty($title_mathml))
+        {
+            if(O3PO_Latex::preg_match_latex_math_mode_delimters($title))
+                $validation_result .= "ERROR: The titel appears to contains LaTeX formulas, but no MathML version of it was saved so far. This is normal if meta-data has only just been fetched. If this error does not disappear, please check that all formulas have appropriate LaTeX math mode delimiters.\n";
+        }
+        else
+        {
+            try
+            {
+                $dom = new DOMDocument;
+                $use_errors = libxml_use_internal_errors(true);
+                $xml = $dom->loadXML('<div>' . $title_mathml . '</div>');
+                if ($xml === false) {
+                    $error = "loadXML() failed";
+                    foreach(libxml_get_errors() as $e) {
+                        $error .= " " . trim($e->message);
+                    }
+                    libxml_clear_errors();
+                    throw new Exception($error);
+                }
+            } catch(Throwable $e) {
+                $validation_result .= "ERROR: The MathML version of the title is not valid xml:" . $e->getMessage() . "\n";
+            } finally {
+                libxml_use_internal_errors($use_errors);
+            }
+        }
+
         if ( empty( $pages ) or $pages < 0 )
             $validation_result .= "ERROR: Pages is invalid. Maybe you are trying to publish something that would break lexicographic ordering of DOIs?\n";
         if ( empty( $doi_prefix ) )
@@ -739,22 +764,35 @@ abstract class O3PO_PublicationType {
         $timestamp = time();
         $crossref_xml_doi_batch_id = $this->generate_crossref_xml_doi_batch_id($post_id, $timestamp);
         $crossref_xml = $this->generate_crossref_xml($post_id, $crossref_xml_doi_batch_id, $timestamp);
+
+        if(is_wp_error($crossref_xml))
+        {
+            $validation_result .= "ERROR: " . $crossref_xml->get_error_message();
+            $crossref_xml = "";
+        }
+
         update_post_meta( $post_id, $post_type . '_crossref_xml', wp_slash($crossref_xml) ); // see https://codex.wordpress.org/Function_Reference/update_post_meta for why we have to used wp_slash() here and not addslashes()
         update_post_meta( $post_id, $post_type . '_crossref_xml_doi_batch_id', wp_slash($crossref_xml_doi_batch_id) ); // see https://codex.wordpress.org/Function_Reference/update_post_meta for why we have to used wp_slash() here and not addslashes()
-        if(strpos($crossref_xml, 'ERROR') !== false)
-            $validation_result .= $crossref_xml . "\n";
 
             // Generate DOAJ json
         $doaj_json = $this->generate_doaj_json($post_id);
+        if(is_wp_error($doaj_json))
+        {
+            $validation_result .= "ERROR: " . $doaj_json->get_error_message();
+            $doaj_json = "";
+        }
+
         update_post_meta( $post_id, $post_type . '_doaj_json', wp_slash($doaj_json) ); // see https://codex.wordpress.org/Function_Reference/update_post_meta for why we have to used wp_slash() here and not addslashes()
-        if(strpos($doaj_json, 'ERROR') !== false)
-            $validation_result .= $doaj_json . "\n";
 
             // Generate CLOCKSS xml
         $clockss_xml = $this->generate_clockss_xml($post_id);
+        if(is_wp_error($clockss_xml))
+        {
+            $validation_result .= "ERROR: " . $clockss_xml->get_error_message();
+            $clockss_xml = "";
+        }
+
         update_post_meta( $post_id, $post_type . '_clockss_xml', wp_slash($clockss_xml) ); // see https://codex.wordpress.org/Function_Reference/update_post_meta for why we have to used wp_slash() here and not addslashes()
-        if(strpos($clockss_xml, 'ERROR') !== false)
-            $validation_result .= $clockss_xml . "\n";
 
             /*
              * Now we start interfacing with external services.
@@ -1224,245 +1262,60 @@ abstract class O3PO_PublicationType {
 
         $post_type = get_post_type($post_id);
 
-        if(empty($post_type)) return 'ERROR: Unable to generate XML for Crossref, post_type is empty';
+        if(empty($post_type)) return new WP_Error('missing_input', 'Unable to generate XML for Crossref, post_type is empty');
         $title = get_post_meta( $post_id, $post_type . '_title', true );
-        if(empty($title)) return 'ERROR: Unable to generate XML for Crossref, title is empty';
+        if(empty($title)) return new WP_Error('missing_input', 'Unable to generate XML for Crossref, title is empty');
         $title_mathml = get_post_meta( $post_id, $post_type . '_title_mathml', true );
         $abstract = get_post_meta( $post_id, $post_type . '_abstract', true );
         $abstract_mathml = get_post_meta( $post_id, $post_type . '_abstract_mathml', true );
         $number_authors = get_post_meta( $post_id, $post_type . '_number_authors', true );
-        if(empty($number_authors)) return 'ERROR: Unable to generate XML for Crossref, number_authors is empty';
+        if(empty($number_authors)) return new WP_Error('missing_input', 'Unable to generate XML for Crossref, number_authors is empty');
         $author_given_names = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_given_names');
-        if(empty($author_given_names)) return 'ERROR: Unable to generate XML for Crossref, author_given_names is empty';
+        if(empty($author_given_names)) return new WP_Error('missing_input', 'Unable to generate XML for Crossref, author_given_names is empty');
         $author_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
-        if(empty($author_surnames)) return 'ERROR: Unable to generate XML for Crossref, author_surnames is empty';
+        if(empty($author_surnames)) return new WP_Error('missing_input', 'Unable to generate XML for Crossref, author_surnames is empty');
         $author_name_styles = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_name_styles');
-        if(empty($author_name_styles)) return 'ERROR: Unable to generate XML for Crossref, author_name_styles is empty';
+        if(empty($author_name_styles)) return new WP_Error('missing_input', 'Unable to generate XML for Crossref, author_name_styles is empty');
         $author_orcids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_orcids');
         $author_affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_affiliations');
         $date_published = get_post_meta( $post_id, $post_type . '_date_published', true );
-        if(empty($date_published)) return 'ERROR: Unable to generate XML for Crossref, date_published is empty';
+        if(empty($date_published)) return new WP_Error('missing_input', 'Unable to generate XML for Crossref, date_published is empty');
         $pages = get_post_meta( $post_id, $post_type . '_pages', true );
-        if(empty($pages)) return 'ERROR: Unable to generate XML for Crossref, pages is empty';
+        if(empty($pages)) return new WP_Error('missing_input', 'Unable to generate XML for Crossref, pages is empty');
         $doi = static::get_doi($post_id);
-        if(empty($doi)) return 'ERROR: Unable to generate XML for Crossref, doi is empty';
+        if(empty($doi)) return new WP_Error('missing_input', 'Unable to generate XML for Crossref, doi is empty');
         $affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_affiliations');
         $journal = get_post_meta( $post_id, $post_type . '_journal', true );
-        if(empty($journal)) return 'ERROR: Unable to generate XML for Crossref, journal is empty';
-        if($journal !== $this->get_journal_property('journal_title')) return 'ERROR: Unable to generate XML for Crossref, journal of the post and publication type do not match';
+        if(empty($journal)) return new WP_Error('missing_input', 'Unable to generate XML for Crossref, journal is empty');
+        if($journal !== $this->get_journal_property('journal_title')) return new WP_Error('missing_input', 'Unable to generate XML for Crossref, journal of the post and publication type do not match');
         $volume = get_post_meta( $post_id, $post_type . '_volume', true );
-        if(empty($volume)) return 'ERROR: Unable to generate XML for Crossref, volume is empty';
+        if(empty($volume)) return new WP_Error('missing_input', 'Unable to generate XML for Crossref, volume is empty');
         $bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
+        if(!empty($bbl))
+            $parsed_bbl = O3PO_Latex::parse_bbl($bbl);
+        else
+            $parsed_bbl = array();
         $post_url = get_permalink( $post_id );
-        if(empty($post_url)) return 'ERROR: Unable to generate XML for Crossref, url is empty';
+        if(empty($post_url)) return new WP_Error('missing_input', 'Unable to generate XML for Crossref, url is empty');
         $pdf_pretty_permalink = $this->get_pdf_pretty_permalink($post_id);
         $number_award_numbers = get_post_meta( $post_id, $post_type . '_number_award_numbers', true );
         $award_numbers = get_post_meta( $post_id, $post_type . '_award_numbers', true );
         $funder_identifiers = get_post_meta( $post_id, $post_type . '_funder_identifiers', true );
         $funder_names = get_post_meta( $post_id, $post_type . '_funder_names', true );
         $crossref_crossmark_policy_page_doi = $this->get_journal_property('crossref_crossmark_policy_page_doi');
+        $email_address = $this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('crossref_email');
+        $publisher = $this->get_journal_property('publisher');
+        $eissn = $this->get_journal_property('eissn');
+        $crossref_archive_locations = $this->get_journal_property('crossref_archive_locations');
+        $journal_title = $this->get_journal_property('journal_title');
 
-        $xml  = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        $xml .= '<doi_batch version="4.4.2" xmlns="http://www.crossref.org/schema/4.4.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.crossref.org/schema/4.4.2 http://data.crossref.org/schemas/crossref4.4.2.xsd" xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:jats="http://www.ncbi.nlm.nih.gov/JATS1" xmlns:ai="http://www.crossref.org/AccessIndicators.xsd" xmlns:fr="http://www.crossref.org/fundref.xsd">' . "\n";
-        $xml .= '  <head>' . "\n";
-            //a unique id for each batch
-        $xml .= '    <doi_batch_id>' . $doi_batch_id . '</doi_batch_id>' . "\n";
-            /* timestamp for batch integer representation of date and time that serves as a
-             * version number for the record that is being deposited. Because CrossRef uses it as a
-             * version number, the format need not follow any public standard and therefore the
-             * publisher can determine the internal format. The schema format is a double of at
-             * least 64 bits */
-        $xml .= '    <timestamp>' . $timestamp . '</timestamp>' . "\n";
-        $xml .= '    <depositor>' . "\n";
+        $journal_level_doi_suffix = $this->get_journal_property('journal_level_doi_suffix');
+        $doi_prefix = $this->get_journal_property('doi_prefix');
+        $site_url = get_site_url(null, '', 'https');
+        $orcid_url_prefix = $this->get_journal_property('orcid_url_prefix');
+        $license_url = $this->get_journal_property('license_url');
 
-        #Test for test environment should not be done here but futher up the class hierarchy!
-
-        $xml .= '      <depositor_name>' . esc_html($this->get_journal_property('publisher')) . '</depositor_name>' . "\n";
-        $xml .= '      <email_address>' . esc_html($this->environment->is_test_environment() ? $this->get_journal_property('developer_email') : $this->get_journal_property('crossref_email') ) . '</email_address>' . "\n";
-        $xml .= '    </depositor>' . "\n";
-        $xml .= '    <registrant>' . esc_html($this->get_journal_property('publisher')) . '</registrant>' . "\n";
-        $xml .= '  </head>' . "\n";
-        $xml .= '  <body>' . "\n";
-        $xml .= '    <journal>' . "\n";
-        $xml .= '      <journal_metadata language="en" reference_distribution_opts="any">' . "\n";
-        $xml .= '	<full_title>' . esc_html($journal) . '</full_title>' . "\n";
-        $xml .= '	<abbrev_title>' . esc_html($journal) . '</abbrev_title>' . "\n";
-        if(!empty($this->get_journal_property('eissn')))
-            $xml .= '	<issn media_type="electronic">' . $this->get_journal_property('eissn') . '</issn>' . "\n";
-            // we don't have a coden
-            // $xml .= '	<coden></coden>' . "\n";
-            // Options for archive names are: CLOCKSS, LOCKSS Portico, KB, DWT, Internet Archive.
-        if(!empty($this->get_journal_property('crossref_archive_locations')) && $journal === $this->get_journal_property('journal_title'))
-        {
-            $xml .= '	<archive_locations>' . "\n";
-            foreach(preg_split('/\s*,\s*/u', $this->get_journal_property('crossref_archive_locations'))  as $archive_name)
-                $xml .= '	  <archive name="' . esc_attr(trim($archive_name)) . '"></archive>' . "\n";
-            $xml .= '	</archive_locations>' . "\n";
-        }
-        $xml .= '	<doi_data>' . "\n";
-            // Add the journal level DOI of the journal
-        if( !empty($this->get_journal_property('doi_prefix')) && !empty($this->get_journal_property('journal_level_doi_suffix')) )
-            $xml .= '	  <doi>' . $this->get_journal_property('doi_prefix') .'/' . $this->get_journal_property('journal_level_doi_suffix') . '</doi>' . "\n";
-            // timestamp for journal level doi data, not mandatory if already given in head
-            // $xml .= '	  <timestamp></timestamp>' . "\n";
-        $xml .= '	  <resource mime_type="text/html">' . get_site_url() . '</resource>' . "\n";
-        $xml .= '	</doi_data>' . "\n";
-        $xml .= '      </journal_metadata>' . "\n";
-            // We don't have issues but volumes
-        $xml .= '      <journal_issue>' . "\n";
-        $xml .= '	     <publication_date media_type="online">' . "\n";
-        $xml .= '	       <month>' . mb_substr($date_published, 5, 2) . '</month>' . "\n";
-        $xml .= '	       <day>' . mb_substr($date_published, 8, 2) .'</day>' . "\n";
-        $xml .= '	       <year>' . mb_substr($date_published, 0, 4) . '</year>' . "\n";
-        $xml .= '	     </publication_date>' . "\n";
-        $xml .= '	     <journal_volume>' . "\n";
-        $xml .= '	       <volume>' . $volume . '</volume>' . "\n";
-            //$xml .= '	         <publisher_item>{0,1}</publisher_item>' . "\n";
-            //$xml .= '	         <archive_locations>{0,1}</archive_locations>' . "\n";
-            //$xml .= '	         <doi_data>{0,1}</doi_data>' . "\n";
-        $xml .= '	     </journal_volume>' . "\n";
-        $xml .= '      </journal_issue>' . "\n";
-        $xml .= '      <journal_article language="en" publication_type="full_text" reference_distribution_opts="any">' . "\n";
-        $xml .= '	<titles>' . "\n";
-            // Minimal face markup and MathML are supported in the title
-        $xml .= '	  <title>' . (!empty($title_mathml) ? $title_mathml : esc_html($title)) . '</title>' . "\n";
-            // $xml .= '	  <subtitle>{0,1}</subtitle>' . "\n";
-            // $xml .= '	  <original_language_title language="">{1,1}</original_language_title>' . "\n";
-            // $xml .= '	  <subtitle>{0,1}</subtitle>' . "\n";
-        $xml .= '	</titles>' . "\n";
-        $xml .= '	<contributors>' . "\n";
-            // we only have authors
-            // $xml .= '	  <organization contributor_role="" language="" name-style="" sequence="">{1,1}</organization>' . "\n";
-        for ($x = 0; $x < $number_authors; $x++) {
-            $xml .= '	  <person_name contributor_role="author" sequence="' . ($x === 0 ? "first" : "additional") . '"';
-            if ( !empty($author_name_styles[$x]) )
-                $xml .= ' name-style="' . $author_name_styles[$x] . '"';
-            $xml .= '>' . "\n";
-            if ( !empty($author_given_names[$x]) )
-                $xml .= '	    <given_name>' . esc_html($author_given_names[$x]) . '</given_name>' . "\n";
-            $xml .= '	    <surname>' . esc_html($author_surnames[$x]) . '</surname>' . "\n";
-                // $xml .= '	    <suffix>{0,1}</suffix>' . "\n";
-            if ( !empty($author_affiliations) && !empty($author_affiliations[$x]) ) {
-                foreach(preg_split('/\s*,\s*/u', $author_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY) as $affiliation_num) {
-                    if ( !empty($affiliations[$affiliation_num-1]) )
-				     	$xml .= '	    <affiliation>' . esc_html($affiliations[$affiliation_num-1]) . '</affiliation>' . "\n";
-                }
-            }
-            if ( !empty($author_orcids) && !empty($author_orcids[$x]) )
-                $xml .= '	    <ORCID authenticated="false">' . $this->get_journal_property('orcid_url_prefix') . $author_orcids[$x] . '</ORCID>' . "\n";
-                // $xml .= '	    <alt-name>{0,1}</alt-name>' . "\n";
-            $xml .= '	  </person_name>' . "\n";
-        }
-        $xml .= '	</contributors>' . "\n";
-        if( !empty($abstract) || !empty($abstract_mathml) )
-        {
-            $xml .= '	<jats:abstract xml:lang="en">' . "\n";
-            $xml .= '	  <jats:p>' . (!empty($abstract_mathml) ? $abstract_mathml : esc_html($abstract)) . '</jats:p>' . "\n";
-            $xml .= '	</jats:abstract>' . "\n";
-        }
-        $xml .= '	<publication_date media_type="online">' . "\n";
-        $xml .= '	    <month>' . mb_substr($date_published, 5, 2) . '</month>' . "\n";
-        $xml .= '	    <day>' . mb_substr($date_published, 8, 2) .'</day>' . "\n";
-        $xml .= '	    <year>' . mb_substr($date_published, 0, 4) . '</year>' . "\n";
-        $xml .= '	</publication_date>' . "\n";
-            // we only have article numbers which should go into the publisher_item  below, but despite what Crossref says in their documentation they don't handle this propperly so we have to add it also here
-        $xml .= '	<pages>' . "\n";
-        $xml .= '	  <first_page>' . $pages . '</first_page>' . "\n";
-            // $xml .= '	  <last_page>...</last_page>' . "\n";
-        $xml .= '	</pages>' . "\n";
-        $xml .= '	<publisher_item>' . "\n";
-        $xml .= '	  <item_number item_number_type="article-number">' . $pages . '</item_number>' . "\n";
-        $xml .= '	</publisher_item>' . "\n";
-            // Now comes the Crossmark/Fundref funder information
-        if(!empty($crossref_crossmark_policy_page_doi))
-        {
-            $xml .= '	<crossmark>' . "\n";
-            $xml .= '	  <crossmark_version>1</crossmark_version>' . "\n";
-            $xml .= '	  <crossmark_policy>' . esc_html($crossref_crossmark_policy_page_doi) . '</crossmark_policy>' . "\n";
-            $xml .= '	  <crossmark_domains>' . "\n";
-            $xml .= '	    <crossmark_domain>' . "\n";
-            $xml .= '	      <domain>' . substr(get_site_url(null, '', 'https'), 8) . '</domain>' . "\n";
-            $xml .= '	    </crossmark_domain>' . "\n";
-            $xml .= '	  </crossmark_domains>' . "\n";
-            $xml .= '	  <crossmark_domain_exclusive>false</crossmark_domain_exclusive>' . "\n";
-            $xml .= '	  <custom_metadata>' . "\n";
-            if($number_award_numbers > 0)
-            {
-                $xml .= '	    <fr:program name="fundref">' . "\n";
-                for ($x = 0; $x < $number_award_numbers; $x++)
-                {
-                    if(!empty($award_numbers[$x]))
-                    {
-                        $xml .= '	      <fr:assertion name="fundgroup">' . "\n";
-                        if(!empty($funder_names[$x]))
-                        {
-                            $xml .= '	        <fr:assertion name="funder_name">' . esc_html($funder_names[$x]) . "\n";
-                            if(!empty($funder_identifiers[$x]))
-                                $xml .= '	          <fr:assertion name="funder_identifier">' . esc_html($funder_identifiers[$x]) .'</fr:assertion>' . "\n";
-                            $xml .= '	        </fr:assertion>' . "\n";
-                        }
-                        $xml .= '	        <fr:assertion name="award_number">' . esc_html($award_numbers[$x]) .'</fr:assertion>' . "\n";
-                        $xml .= '	      </fr:assertion>' . "\n";
-                    }
-                }
-                $xml .= '	    </fr:program>' . "\n";
-            }
-                // access indications
-            $xml .= '	    <ai:program name="AccessIndicators">' . "\n";
-            $xml .= '	      <ai:free_to_read></ai:free_to_read>' . "\n";
-            $xml .= '	      <ai:license_ref start_date="' . $date_published . '">' . esc_html($this->get_journal_property('license_url')) . '</ai:license_ref>' . "\n";
-            $xml .= '	    </ai:program>' . "\n";
-            $xml .= '	  </custom_metadata>' . "\n";
-            $xml .= '	</crossmark>' . "\n";
-        }
-            // for clinical trials, we don't have that
-            // $xml .= '	<ct:program>{0,1}</ct:program>' . "\n";
-            // for relations between programs
-            // $xml .= '	<rel:program name="relations">{0,1}</rel:program>' . "\n";
-            // we archive on the arXiv and not here
-            // $xml .= '	<archive_locations><archive></archive></archive_locations>' . "\n";
-        $xml .= '	<doi_data>' . "\n";
-        $xml .= '	  <doi>' . esc_html($doi) . '</doi>' . "\n";
-            // not mandatory if already given in head
-            // $xml .= '	  <timestamp>...</timestamp>' . "\n";
-            // URL to landing page, content_version can be vor (version of record) or am (advance manuscript).
-        $xml .= '	  <resource content_version="am" mime_type="text/html">' . esc_url($post_url) . '</resource>' . "\n";
-            // think we don't need this
-            // $xml .= '	  <collection multi-resolution="" property="">{0,unbounded}</collection>' . "\n";
-            // add full text link for text-mining
-        if(!empty($pdf_pretty_permalink))
-        {
-            $xml .= '<collection property="text-mining">' . "\n";
-            $xml .= '<item>' . "\n";
-            $xml .= '<resource>' . "\n";
-            $xml .= esc_url($pdf_pretty_permalink) . "\n";
-            $xml .= '</resource>' . "\n";
-            $xml .= '</item>' . "\n";
-            $xml .= '</collection>' . "\n";
-        }
-        $xml .= '	</doi_data>' . "\n";
-            // the references
-        if( !empty($bbl) ) {
-            $parsed_bbl = O3PO_Latex::parse_bbl($bbl);
-            if( !empty($parsed_bbl) ) {
-
-                $xml .= '	<citation_list>' . "\n";
-                foreach($parsed_bbl as $n => $entry) {
-                    $xml .= '	  <citation key="' . $n . '">' . "\n";
-                    if( !empty($entry['doi']) )
-                        $xml .= '	    <doi>' . esc_html($entry['doi']) . '</doi>' . "\n";
-                    $xml .= '	    <unstructured_citation>' . esc_html($entry['text']) . '</unstructured_citation>' . "\n";
-                    $xml .= '	  </citation>' . "\n";
-                }
-                $xml .= '	</citation_list>' . "\n";
-            }
-        }
-            // we don't usually have components, just single articles
-            // $xml .= '	<component_list>{0,1}</component_list>' . "\n";
-        $xml .= '      </journal_article>' . "\n";
-        $xml .= '    </journal>' . "\n";
-        $xml .= '  </body>' . "\n";
-        $xml .= '</doi_batch>' . "\n";
+        $xml = O3PO_Crossref::generate_crossref_xml($doi_batch_id, $timestamp, $title, $title_mathml, $abstract, $abstract_mathml, $number_authors, $author_given_names, $author_surnames, $author_name_styles, $author_orcids, $author_affiliations, $date_published, $pages, $doi, $affiliations, $journal, $volume, $parsed_bbl, $post_url, $pdf_pretty_permalink, $number_award_numbers, $award_numbers, $funder_identifiers, $funder_names, $crossref_crossmark_policy_page_doi, $email_address, $publisher, $eissn, $crossref_archive_locations, $journal_title, $journal_level_doi_suffix, $doi_prefix, $site_url, $orcid_url_prefix, $license_url);
 
         return $xml;
     }
@@ -1580,108 +1433,43 @@ abstract class O3PO_PublicationType {
 
         $post_type = get_post_type($post_id);
 
-        if(empty($post_type)) return 'ERROR: Unable to generate XML for CLOCKSS, post_type is empty';
+        if(empty($post_type)) return new WP_Error('missing_input', 'Unable to generate XML for CLOCKSS, post_type is empty');
         $title = get_post_meta( $post_id, $post_type . '_title', true );
-        if(empty($title)) return 'ERROR: Unable to generate XML for CLOCKSS, title is empty';
+        if(empty($title)) return new WP_Error('missing_input', 'Unable to generate XML for CLOCKSS, title is empty');
         $title_mathml = get_post_meta( $post_id, $post_type . '_title_mathml', true );
         $abstract = get_post_meta( $post_id, $post_type . '_abstract', true );
         $abstract_mathml = get_post_meta( $post_id, $post_type . '_abstract_mathml', true );
         $number_authors = get_post_meta( $post_id, $post_type . '_number_authors', true );
-        if(empty($number_authors)) return 'ERROR: Unable to generate XML for CLOCKSS, number_authors is empty';
+        if(empty($number_authors)) return new WP_Error('missing_input', 'Unable to generate XML for CLOCKSS, number_authors is empty');
         $author_given_names = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_given_names');
-        if(empty($author_given_names)) return 'ERROR: Unable to generate XML for CLOCKSS, author_given_names is empty';
+        if(empty($author_given_names)) return new WP_Error('missing_input', 'Unable to generate XML for CLOCKSS, author_given_names is empty');
         $author_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
-        if(empty($author_surnames)) return 'ERROR: Unable to generate XML for CLOCKSS, author_surnames is empty';
+        if(empty($author_surnames)) return new WP_Error('missing_input', 'Unable to generate XML for CLOCKSS, author_surnames is empty');
         $author_name_styles = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_name_styles');
-        if(empty($author_name_styles)) return 'ERROR: Unable to generate XML for CLOCKSS, author_name_styles is empty';
+        if(empty($author_name_styles)) return new WP_Error('missing_input', 'Unable to generate XML for CLOCKSS, author_name_styles is empty');
         $author_orcids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_orcids');
         $author_affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_affiliations');
         $date_published = get_post_meta( $post_id, $post_type . '_date_published', true );
-        if(empty($date_published)) return 'ERROR: Unable to generate XML for CLOCKSS, date_published is empty';
+        if(empty($date_published)) return new WP_Error('missing_input', 'Unable to generate XML for CLOCKSS, date_published is empty');
         $pages = get_post_meta( $post_id, $post_type . '_pages', true );
-        if(empty($pages)) return 'ERROR: Unable to generate XML for CLOCKSS, pages is empty';
+        if(empty($pages)) return new WP_Error('missing_input', 'Unable to generate XML for CLOCKSS, pages is empty');
         $doi = static::get_doi($post_id);
-        if(empty($doi)) return 'ERROR: Unable to generate XML for CLOCKSS, doi is empty';
+        if(empty($doi)) return new WP_Error('missing_input', 'Unable to generate XML for CLOCKSS, doi is empty');
         $affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_affiliations');
         $journal = get_post_meta( $post_id, $post_type . '_journal', true );
-        if(empty($journal)) return 'ERROR: Unable to generate XML for CLOCKSS, journal is empty';
-        if($journal !== $this->get_journal_property('journal_title')) return 'ERROR: Unable to generate XML for CLOCKSS, journal of the post and publication type do not match';
+        if(empty($journal)) return new WP_Error('missing_input', 'Unable to generate XML for CLOCKSS, journal is empty');
+        if($journal !== $this->get_journal_property('journal_title')) return new WP_Error('missing_input', 'Unable to generate XML for CLOCKSS, journal of the post and publication type do not match');
         $volume = get_post_meta( $post_id, $post_type . '_volume', true );
-        if(empty($volume)) return 'ERROR: Unable to generate XML for CLOCKSS, volume is empty';
+        if(empty($volume)) return new WP_Error('missing_input', 'Unable to generate XML for CLOCKSS, volume is empty');
         $bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
         $post_url = get_permalink( $post_id );
-        if(empty($post_url)) return 'ERROR: Unable to generate XML for CLOCKSS, url is empty';
+        if(empty($post_url)) return new WP_Error('missing_input', 'Unable to generate XML for CLOCKSS, url is empty');
 
-        $xml  = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        $xml .= '<article xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" article-type="research-article" dtd-version="1.1" xml:lang="en">' . "\n";
-        $xml .= '  <front>' . "\n";
+        $eissn = $this->get_journal_property('eissn');
+        $journal_title = $this->get_journal_property('journal_title');
+        $publisher = $this->get_journal_property('publisher');
 
-        $xml .= '    <journal-meta>' . "\n";
-        $xml .= '      <journal-id journal-id-type="publisher">' . esc_html($journal) . '</journal-id>' . "\n";
-        if(!empty($this->get_journal_property('eissn')) && $journal === $this->get_journal_property('journal_title'))
-            $xml .= '      <issn>' . $this->get_journal_property('eissn') . '</issn>' . "\n";
-        /* elseif(!empty($this->get_journal_property('secondary_journal_eissn')) && $journal === $this->get_journal_property('secondary_journal_title')) */
-        /*     $xml .= '      <issn>' . $this->get_journal_property('secondary_journal_eissn') . '</issn>' . "\n"; */
-
-        $xml .= '      <publisher>' . "\n";
-        $xml .= '        <publisher-name>' . esc_html( $this->get_journal_property('publisher')) . '</publisher-name>' . "\n";
-        $xml .= '      </publisher>' . "\n";
-        $xml .= '    </journal-meta>' . "\n";
-
-        $xml .= '    <article-meta>' . "\n";
-        $xml .= '      <article-id pub-id-type="doi">' . esc_html($doi) . '</article-id>' . "\n";
-        $xml .= '      <title-group>' . "\n";
-        $xml .= '        <article-title>' . "\n";
-        $xml .= '          ' . (!empty($title_mathml) ? $title_mathml : esc_html($title)) . "\n";
-        $xml .= '        </article-title>' . "\n";
-        $xml .= '      </title-group>' . "\n";
-
-        $xml .= '      <contrib-group>' . "\n";
-        for ($x = 0; $x < $number_authors; $x++) {
-            $xml .= '        <contrib contrib-type="author">' . "\n";
-            $xml .= '          <name>' . "\n";
-            $xml .= '            <surname>' . esc_html($author_surnames[$x]) . '</surname>' . "\n";
-            $xml .= '            <given-names>' . esc_html($author_given_names[$x]) . '</given-names>' . "\n";
-            $xml .= '          </name>' . "\n";
-            if ( !empty($author_affiliations) && !empty($author_affiliations[$x]) ) {
-                foreach(preg_split('/\s*,\s*/u', $author_affiliations[$x], -1, PREG_SPLIT_NO_EMPTY) as $affiliation_num) {
-                    $xml .= '          <xref ref-type="aff" rid="aff-' . $affiliation_num . '"/>' . "\n";
-                }
-            }
-            $xml .= '        </contrib>' . "\n";
-        }
-        $xml .= '      </contrib-group>' . "\n";
-        foreach($affiliations as $n => $affiliation)
-            $xml .= '      <aff id="aff-' . ($n+1) . '">' . esc_html($affiliation) . '</aff>' . "\n";
-
-        $xml .= '      <pub-date date-type="pub" publication-format="electronic" iso-8601-date="' . $date_published . '">' . "\n";
-        $xml .= '        <day>' . mb_substr($date_published, 8, 2) . '</day>' . "\n";
-        $xml .= '        <month>' . mb_substr($date_published, 5, 2) . '</month>' . "\n";
-        $xml .= '        <year>' . mb_substr($date_published, 0, 4) . '</year>' . "\n";
-        $xml .= '      </pub-date>' . "\n";
-        $xml .= '      <volume>' . $volume . '</volume>' . "\n";
-//        $xml .= '  <issue>18</issue>' . "\n";
-        $xml .= '      <fpage>' . $pages . '</fpage>' . "\n";
-//        $xml .= '  <lpage>10219</lpage>' . "\n";
-        $xml .= '      <permissions>' . "\n";
-        $xml .= '        <copyright-statement>' . 'This work is published under the ' . esc_html($this->get_journal_property('license_name')) . ' license ' . esc_html($this->get_journal_property('license_url')) . '.' . '</copyright-statement>' . "\n";
-        $xml .= '        <copyright-year>' . mb_substr($date_published, 0, 4) .'</copyright-year>' . "\n";
-        $xml .= '      </permissions>' . "\n";
-        if( !empty($abstract) || !empty($abstract_mathml) )
-        {
-            $xml .= '      <abstract>' . "\n";
-            $xml .= '        <p>' . "\n";
-            $xml .= '          ' . (!empty($abstract_mathml) ? $abstract_mathml : esc_html($abstract)) . "\n";
-            $xml .= '        </p>' . "\n";
-            $xml .= '      </abstract>' . "\n";
-        }
-        $xml .= '    </article-meta>' . "\n";
-
-        $xml .= '  </front>' . "\n";
-
-        $xml .= '  <body></body>' . "\n";
-        $xml .= '  <back></back>' . "\n";
-        $xml .= '</article>' . "\n";
+        $xml = O3PO_Clockss::generate_clockss_xml($eissn, $journal, $journal_title, $publisher, $title, $title_mathml, $doi, $number_authors, $author_surnames, $author_given_names, $author_affiliations, $affiliations, $date_published, $volume, $pages, $this->get_journal_property('license_name'), $this->get_journal_property('license_url'), $abstract_mathml, $abstract);
 
         return $xml;
     }
@@ -1703,37 +1491,35 @@ abstract class O3PO_PublicationType {
 
         $post_type = get_post_type($post_id);
 
-        if(empty($post_type)) return 'ERROR: Unable to generate JSON for DOAJ, post_type is empty';
+        if(empty($post_type)) return new WP_Error('missing_input', 'Unable to generate JSON for DOAJ, post_type is empty');
         $title = get_post_meta( $post_id, $post_type . '_title', true );
-        if(empty($title)) return 'ERROR: Unable to generate JSON for DOAJ, title is empty';
-        $title_mathml = get_post_meta( $post_id, $post_type . '_title_mathml', true );
+        if(empty($title)) return new WP_Error('missing_input', 'Unable to generate JSON for DOAJ, title is empty');
         $abstract = get_post_meta( $post_id, $post_type . '_abstract', true );
-        $abstract_mathml = get_post_meta( $post_id, $post_type . '_abstract_mathml', true );
         $number_authors = get_post_meta( $post_id, $post_type . '_number_authors', true );
-        if(empty($number_authors)) return 'ERROR: Unable to generate JSON for DOAJ, number_authors is empty';
+        if(empty($number_authors)) return new WP_Error('missing_input', 'Unable to generate JSON for DOAJ, number_authors is empty');
         $author_given_names = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_given_names');
-        if(empty($author_given_names)) return 'ERROR: Unable to generate JSON for DOAJ, author_given_names is empty';
+        if(empty($author_given_names)) return new WP_Error('missing_input', 'Unable to generate JSON for DOAJ, author_given_names is empty');
         $author_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
-        if(empty($author_surnames)) return 'ERROR: Unable to generate JSON for DOAJ, author_surnames is empty';
+        if(empty($author_surnames)) return new WP_Error('missing_input', 'Unable to generate JSON for DOAJ, author_surnames is empty');
         $author_name_styles = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_name_styles');
-        if(empty($author_name_styles)) return 'ERROR: Unable to generate JSON for DOAJ, author_name_styles is empty';
+        if(empty($author_name_styles)) return new WP_Error('missing_input', 'Unable to generate JSON for DOAJ, author_name_styles is empty');
         $author_orcids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_orcids');
         $author_affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_affiliations');
         $date_published = get_post_meta( $post_id, $post_type . '_date_published', true );
-        if(empty($date_published)) return 'ERROR: Unable to generate JSON for DOAJ, date_published is empty';
+        if(empty($date_published)) return new WP_Error('missing_input', 'Unable to generate JSON for DOAJ, date_published is empty');
         $pages = get_post_meta( $post_id, $post_type . '_pages', true );
-        if(empty($pages)) return 'ERROR: Unable to generate JSON for DOAJ, pages is empty';
+        if(empty($pages)) return new WP_Error('missing_input', 'Unable to generate JSON for DOAJ, pages is empty');
         $doi = static::get_doi($post_id);
-        if(empty($doi)) return 'ERROR: Unable to generate JSON for DOAJ, doi is empty';
+        if(empty($doi)) return new WP_Error('missing_input', 'Unable to generate JSON for DOAJ, doi is empty');
         $affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_affiliations');
         $journal = get_post_meta( $post_id, $post_type . '_journal', true );
-        if(empty($journal)) return 'ERROR: Unable to generate JSON for DOAJ, journal is empty';
-        if($journal !== $this->get_journal_property('journal_title')) return 'ERROR: Unable to generate JSON for DOAJ, journal of the post and publication type do not match';
+        if(empty($journal)) return new WP_Error('missing_input', 'Unable to generate JSON for DOAJ, journal is empty');
+        if($journal !== $this->get_journal_property('journal_title')) return new WP_Error('missing_input', 'Unable to generate JSON for DOAJ, journal of the post and publication type do not match');
         $volume = get_post_meta( $post_id, $post_type . '_volume', true );
-        if(empty($volume)) return 'ERROR: Unable to generate JSON for DOAJ, volume is empty';
+        if(empty($volume)) return new WP_Error('missing_input', 'Unable to generate JSON for DOAJ, volume is empty');
         $bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
         $post_url = get_permalink( $post_id );
-        if(empty($post_url)) return 'ERROR: Unable to generate JSON for DOAJ, url is empty';
+        if(empty($post_url)) return new WP_Error('missing_input', 'Unable to generate JSON for DOAJ, url is empty');
 
         $json_array = array();
 

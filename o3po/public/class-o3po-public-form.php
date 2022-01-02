@@ -824,37 +824,6 @@ abstract class O3PO_PublicForm {
     }
 
         /**
-         * Validate that an array of at most 1000 names
-         *
-         * @since  0.4.0
-         * @access private
-         * @param  string  $id    The id of the field whose input is validated.
-         * @param  array   $input The input.
-         */
-    public function validate_array_of_at_most_1000_names( $id, $input ) {
-
-        if(!is_array($input))
-        {
-            $this->add_error( $id, 'not-array', "The input to field " . $id . " must be an array but was of type " . gettype($input) . ".", 'error');
-            return array();
-        }
-
-        $input = array_slice($input, 0, 1000);
-        $result = array();
-        foreach($input as $key => $name)
-        {
-            if($this->fields[$id]['max_length'] !== false)
-                $this_name = substr($name, 0, $this->fields[$id]['max_length']);
-            else
-                $this_name = $name;
-            $this_name = strip_tags($this_name);
-            $result[$key] = $this_name;
-        }
-
-        return $result;
-    }
-
-        /**
          * Validate that an array of at most 1000 name styles
          *
          * @since  0.4.0

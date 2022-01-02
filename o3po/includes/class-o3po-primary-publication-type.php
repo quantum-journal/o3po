@@ -306,10 +306,37 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 
         if ( empty($abstract) )
             $validation_result .= "ERROR: Abstract is empty.\n" ;
-        else if ( preg_match('/[<>]/u', $abstract ) )
-            $validation_result .= "WARNING: Abstract contains < or > signs. If they are meant to represent math, the formulas should be enclosed in dollar signs and they should be replaced with \\\\lt and \\\\gt respectively (similarly <= and >= should be replaced by \\\\leq and \\\\geq).\n" ;
-        if ( empty($abstract_mathml) && preg_match('/[^\\\\]\$.*[^\\\\]\$/u' , $abstract ) )
-            $validation_result .= "ERROR: Special characters in the abstract indicate that it contains formulas, but no MathML variant was saved so far. This is normal if meta-data has only just been fetched. If this error does not disappear, please check that all formulas have appropriate LaTeX math mode delimiters.\n";
+        else if(preg_match('/[<>]/u', $abstract ))
+            $validation_result .= "WARNING: Abstract contains < or > signs. If they are meant to be part of formulas, the formulas must be enclosed in dollar signs and they must be replaced with \\\\lt and \\\\gt, similarly <= and >= must be replaced by \\\\leq and \\\\geq.\n" ;
+        if(empty($abstract_mathml))
+        {
+            if(O3PO_Latex::preg_match_latex_math_mode_delimters($abstract))
+                $validation_result .= "ERROR: The abstract appears to contains LaTeX formulas, but no MathML version of it was saved so far. This is normal if meta-data has only just been fetched. If this error does not disappear, please check that all formulas have appropriate LaTeX math mode delimiters.\n";
+        }
+        else
+        {
+            $error_str = 'ERROR:';
+            if(mb_substr($abstract_mathml, 0, mb_strlen($error_str)) === $error_str )
+                $validation_result .= "ERROR: The MathML version of the abstract contains an error.\n";
+            try
+            {
+                $dom = new DOMDocument;
+                $use_errors = libxml_use_internal_errors(true);
+                $xml = $dom->loadXML('<div>' . $abstract_mathml . '</div>');
+                if ($xml === false) {
+                    $error = "loadXML() failed";
+                    foreach(libxml_get_errors() as $e) {
+                        $error .= " " . trim($e->message);
+                    }
+                    libxml_clear_errors();
+                    throw new Exception($error);
+                }
+            } catch(Throwable $e) {
+                $validation_result .= "ERROR: The MathML version of the abstract is not valid xml:" . $e->getMessage() . "\n";
+            } finally {
+                libxml_use_internal_errors($use_errors);
+            }
+        }
 
         $add_licensing_information_result = static::add_licensing_information_to_last_pdf_from_arxiv($post_id);
         if(!empty($add_licensing_information_result))
@@ -1430,6 +1457,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                                     if(!empty($affiliations_from_optional_argument[1][0]))
                                         $new_author_affiliations[$author_number] = $affiliations_from_optional_argument[1][0];
                                 }
+                                $was_affiliation_since_last_author = False;
                             }
                             else if( $author_info[1][$x] === 'orcid' and !empty($author_info[3][$x]))
                                 $new_author_orcids[$author_number] = $author_info[3][$x];

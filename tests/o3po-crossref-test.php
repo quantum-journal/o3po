@@ -528,7 +528,7 @@ class O3PO_CrossrefTest extends O3PO_TestCase
                 'crossref_id' => get_option('o3po-settings')['crossref_id'],
                 'crossref_pw' => get_option('o3po-settings')['crossref_pw'],
                 'doi' => 'unhandled_forward_link_type',
-                'expected' => new WP_Error('exception', 'Encountered an unhandled forward link type.'),
+                'expected' => new WP_Error('exception', 'Encountered the unhandled forward link type unhandled_cite while looking for citations to DOI unhandled_forward_link_type.'),
                   ),
                 ];
     }
