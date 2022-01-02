@@ -670,8 +670,33 @@ abstract class O3PO_PublicationType {
             $validation_result .= "ERROR: Title is empty.\n";
         else if ( preg_match('/[<>]/u', $title ) )
             $validation_result .= "WARNING: Title contains < or > signs. If they are meant to represent math, the formulas should be enclosed in dollar signs and they should be replaced with \\\\lt and \\\\gt respectively (similarly <= and >= should be replaced by \\\\leq and \\\\geq).\n" ;
-        if ( empty($title_mathml) && preg_match('/[^\\\\]\$.*[^\\\\]\$/u' , $title ) )
-            $validation_result .= "ERROR: Title contains math but no MathML variant was saved so far.\n";
+        if(empty($title_mathml))
+        {
+            if(O3PO_Latex::preg_match_latex_math_mode_delimters($title))
+                $validation_result .= "ERROR: The titel appears to contains LaTeX formulas, but no MathML version of it was saved so far. This is normal if meta-data has only just been fetched. If this error does not disappear, please check that all formulas have appropriate LaTeX math mode delimiters.\n";
+        }
+        else
+        {
+            try
+            {
+                $dom = new DOMDocument;
+                $use_errors = libxml_use_internal_errors(true);
+                $xml = $dom->loadXML('<div>' . $title_mathml . '</div>');
+                if ($xml === false) {
+                    $error = "loadXML() failed";
+                    foreach(libxml_get_errors() as $e) {
+                        $error .= " " . trim($e->message);
+                    }
+                    libxml_clear_errors();
+                    throw new Exception($error);
+                }
+            } catch(Throwable $e) {
+                $validation_result .= "ERROR: The MathML version of the title is not valid xml:" . $e->getMessage() . "\n";
+            } finally {
+                libxml_use_internal_errors($use_errors);
+            }
+        }
+
         if ( empty( $pages ) or $pages < 0 )
             $validation_result .= "ERROR: Pages is invalid. Maybe you are trying to publish something that would break lexicographic ordering of DOIs?\n";
         if ( empty( $doi_prefix ) )
@@ -739,22 +764,35 @@ abstract class O3PO_PublicationType {
         $timestamp = time();
         $crossref_xml_doi_batch_id = $this->generate_crossref_xml_doi_batch_id($post_id, $timestamp);
         $crossref_xml = $this->generate_crossref_xml($post_id, $crossref_xml_doi_batch_id, $timestamp);
+
+        if(is_wp_error($crossref_xml))
+        {
+            $validation_result .= "ERROR: " . $crossref_xml->get_error_message();
+            $crossref_xml = "";
+        }
+
         update_post_meta( $post_id, $post_type . '_crossref_xml', wp_slash($crossref_xml) ); // see https://codex.wordpress.org/Function_Reference/update_post_meta for why we have to used wp_slash() here and not addslashes()
         update_post_meta( $post_id, $post_type . '_crossref_xml_doi_batch_id', wp_slash($crossref_xml_doi_batch_id) ); // see https://codex.wordpress.org/Function_Reference/update_post_meta for why we have to used wp_slash() here and not addslashes()
-        if(strpos($crossref_xml, 'ERROR') !== false)
-            $validation_result .= $crossref_xml . "\n";
 
             // Generate DOAJ json
         $doaj_json = $this->generate_doaj_json($post_id);
+        if(is_wp_error($doaj_json))
+        {
+            $validation_result .= "ERROR: " . $doaj_json->get_error_message();
+            $doaj_json = "";
+        }
+
         update_post_meta( $post_id, $post_type . '_doaj_json', wp_slash($doaj_json) ); // see https://codex.wordpress.org/Function_Reference/update_post_meta for why we have to used wp_slash() here and not addslashes()
-        if(strpos($doaj_json, 'ERROR') !== false)
-            $validation_result .= $doaj_json . "\n";
 
             // Generate CLOCKSS xml
         $clockss_xml = $this->generate_clockss_xml($post_id);
+        if(is_wp_error($clockss_xml))
+        {
+            $validation_result .= "ERROR: " . $clockss_xml->get_error_message();
+            $clockss_xml = "";
+        }
+
         update_post_meta( $post_id, $post_type . '_clockss_xml', wp_slash($clockss_xml) ); // see https://codex.wordpress.org/Function_Reference/update_post_meta for why we have to used wp_slash() here and not addslashes()
-        if(strpos($clockss_xml, 'ERROR') !== false)
-            $validation_result .= $clockss_xml . "\n";
 
             /*
              * Now we start interfacing with external services.
@@ -1224,41 +1262,41 @@ abstract class O3PO_PublicationType {
 
         $post_type = get_post_type($post_id);
 
-        if(empty($post_type)) return 'ERROR: Unable to generate XML for Crossref, post_type is empty';
+        if(empty($post_type)) return new WP_Error('missing_input', 'Unable to generate XML for Crossref, post_type is empty');
         $title = get_post_meta( $post_id, $post_type . '_title', true );
-        if(empty($title)) return 'ERROR: Unable to generate XML for Crossref, title is empty';
+        if(empty($title)) return new WP_Error('missing_input', 'Unable to generate XML for Crossref, title is empty');
         $title_mathml = get_post_meta( $post_id, $post_type . '_title_mathml', true );
         $abstract = get_post_meta( $post_id, $post_type . '_abstract', true );
         $abstract_mathml = get_post_meta( $post_id, $post_type . '_abstract_mathml', true );
         $number_authors = get_post_meta( $post_id, $post_type . '_number_authors', true );
-        if(empty($number_authors)) return 'ERROR: Unable to generate XML for Crossref, number_authors is empty';
+        if(empty($number_authors)) return new WP_Error('missing_input', 'Unable to generate XML for Crossref, number_authors is empty');
         $author_given_names = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_given_names');
-        if(empty($author_given_names)) return 'ERROR: Unable to generate XML for Crossref, author_given_names is empty';
+        if(empty($author_given_names)) return new WP_Error('missing_input', 'Unable to generate XML for Crossref, author_given_names is empty');
         $author_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
-        if(empty($author_surnames)) return 'ERROR: Unable to generate XML for Crossref, author_surnames is empty';
+        if(empty($author_surnames)) return new WP_Error('missing_input', 'Unable to generate XML for Crossref, author_surnames is empty');
         $author_name_styles = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_name_styles');
-        if(empty($author_name_styles)) return 'ERROR: Unable to generate XML for Crossref, author_name_styles is empty';
+        if(empty($author_name_styles)) return new WP_Error('missing_input', 'Unable to generate XML for Crossref, author_name_styles is empty');
         $author_orcids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_orcids');
         $author_affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_affiliations');
         $date_published = get_post_meta( $post_id, $post_type . '_date_published', true );
-        if(empty($date_published)) return 'ERROR: Unable to generate XML for Crossref, date_published is empty';
+        if(empty($date_published)) return new WP_Error('missing_input', 'Unable to generate XML for Crossref, date_published is empty');
         $pages = get_post_meta( $post_id, $post_type . '_pages', true );
-        if(empty($pages)) return 'ERROR: Unable to generate XML for Crossref, pages is empty';
+        if(empty($pages)) return new WP_Error('missing_input', 'Unable to generate XML for Crossref, pages is empty');
         $doi = static::get_doi($post_id);
-        if(empty($doi)) return 'ERROR: Unable to generate XML for Crossref, doi is empty';
+        if(empty($doi)) return new WP_Error('missing_input', 'Unable to generate XML for Crossref, doi is empty');
         $affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_affiliations');
         $journal = get_post_meta( $post_id, $post_type . '_journal', true );
-        if(empty($journal)) return 'ERROR: Unable to generate XML for Crossref, journal is empty';
-        if($journal !== $this->get_journal_property('journal_title')) return 'ERROR: Unable to generate XML for Crossref, journal of the post and publication type do not match';
+        if(empty($journal)) return new WP_Error('missing_input', 'Unable to generate XML for Crossref, journal is empty');
+        if($journal !== $this->get_journal_property('journal_title')) return new WP_Error('missing_input', 'Unable to generate XML for Crossref, journal of the post and publication type do not match');
         $volume = get_post_meta( $post_id, $post_type . '_volume', true );
-        if(empty($volume)) return 'ERROR: Unable to generate XML for Crossref, volume is empty';
+        if(empty($volume)) return new WP_Error('missing_input', 'Unable to generate XML for Crossref, volume is empty');
         $bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
         if(!empty($bbl))
             $parsed_bbl = O3PO_Latex::parse_bbl($bbl);
         else
             $parsed_bbl = array();
         $post_url = get_permalink( $post_id );
-        if(empty($post_url)) return 'ERROR: Unable to generate XML for Crossref, url is empty';
+        if(empty($post_url)) return new WP_Error('missing_input', 'Unable to generate XML for Crossref, url is empty');
         $pdf_pretty_permalink = $this->get_pdf_pretty_permalink($post_id);
         $number_award_numbers = get_post_meta( $post_id, $post_type . '_number_award_numbers', true );
         $award_numbers = get_post_meta( $post_id, $post_type . '_award_numbers', true );
@@ -1276,7 +1314,6 @@ abstract class O3PO_PublicationType {
         $site_url = get_site_url(null, '', 'https');
         $orcid_url_prefix = $this->get_journal_property('orcid_url_prefix');
         $license_url = $this->get_journal_property('license_url');
-
 
         $xml = O3PO_Crossref::generate_crossref_xml($doi_batch_id, $timestamp, $title, $title_mathml, $abstract, $abstract_mathml, $number_authors, $author_given_names, $author_surnames, $author_name_styles, $author_orcids, $author_affiliations, $date_published, $pages, $doi, $affiliations, $journal, $volume, $parsed_bbl, $post_url, $pdf_pretty_permalink, $number_award_numbers, $award_numbers, $funder_identifiers, $funder_names, $crossref_crossmark_policy_page_doi, $email_address, $publisher, $eissn, $crossref_archive_locations, $journal_title, $journal_level_doi_suffix, $doi_prefix, $site_url, $orcid_url_prefix, $license_url);
 
@@ -1396,37 +1433,37 @@ abstract class O3PO_PublicationType {
 
         $post_type = get_post_type($post_id);
 
-        if(empty($post_type)) return 'ERROR: Unable to generate XML for CLOCKSS, post_type is empty';
+        if(empty($post_type)) return new WP_Error('missing_input', 'Unable to generate XML for CLOCKSS, post_type is empty');
         $title = get_post_meta( $post_id, $post_type . '_title', true );
-        if(empty($title)) return 'ERROR: Unable to generate XML for CLOCKSS, title is empty';
+        if(empty($title)) return new WP_Error('missing_input', 'Unable to generate XML for CLOCKSS, title is empty');
         $title_mathml = get_post_meta( $post_id, $post_type . '_title_mathml', true );
         $abstract = get_post_meta( $post_id, $post_type . '_abstract', true );
         $abstract_mathml = get_post_meta( $post_id, $post_type . '_abstract_mathml', true );
         $number_authors = get_post_meta( $post_id, $post_type . '_number_authors', true );
-        if(empty($number_authors)) return 'ERROR: Unable to generate XML for CLOCKSS, number_authors is empty';
+        if(empty($number_authors)) return new WP_Error('missing_input', 'Unable to generate XML for CLOCKSS, number_authors is empty');
         $author_given_names = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_given_names');
-        if(empty($author_given_names)) return 'ERROR: Unable to generate XML for CLOCKSS, author_given_names is empty';
+        if(empty($author_given_names)) return new WP_Error('missing_input', 'Unable to generate XML for CLOCKSS, author_given_names is empty');
         $author_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
-        if(empty($author_surnames)) return 'ERROR: Unable to generate XML for CLOCKSS, author_surnames is empty';
+        if(empty($author_surnames)) return new WP_Error('missing_input', 'Unable to generate XML for CLOCKSS, author_surnames is empty');
         $author_name_styles = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_name_styles');
-        if(empty($author_name_styles)) return 'ERROR: Unable to generate XML for CLOCKSS, author_name_styles is empty';
+        if(empty($author_name_styles)) return new WP_Error('missing_input', 'Unable to generate XML for CLOCKSS, author_name_styles is empty');
         $author_orcids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_orcids');
         $author_affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_affiliations');
         $date_published = get_post_meta( $post_id, $post_type . '_date_published', true );
-        if(empty($date_published)) return 'ERROR: Unable to generate XML for CLOCKSS, date_published is empty';
+        if(empty($date_published)) return new WP_Error('missing_input', 'Unable to generate XML for CLOCKSS, date_published is empty');
         $pages = get_post_meta( $post_id, $post_type . '_pages', true );
-        if(empty($pages)) return 'ERROR: Unable to generate XML for CLOCKSS, pages is empty';
+        if(empty($pages)) return new WP_Error('missing_input', 'Unable to generate XML for CLOCKSS, pages is empty');
         $doi = static::get_doi($post_id);
-        if(empty($doi)) return 'ERROR: Unable to generate XML for CLOCKSS, doi is empty';
+        if(empty($doi)) return new WP_Error('missing_input', 'Unable to generate XML for CLOCKSS, doi is empty');
         $affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_affiliations');
         $journal = get_post_meta( $post_id, $post_type . '_journal', true );
-        if(empty($journal)) return 'ERROR: Unable to generate XML for CLOCKSS, journal is empty';
-        if($journal !== $this->get_journal_property('journal_title')) return 'ERROR: Unable to generate XML for CLOCKSS, journal of the post and publication type do not match';
+        if(empty($journal)) return new WP_Error('missing_input', 'Unable to generate XML for CLOCKSS, journal is empty');
+        if($journal !== $this->get_journal_property('journal_title')) return new WP_Error('missing_input', 'Unable to generate XML for CLOCKSS, journal of the post and publication type do not match');
         $volume = get_post_meta( $post_id, $post_type . '_volume', true );
-        if(empty($volume)) return 'ERROR: Unable to generate XML for CLOCKSS, volume is empty';
+        if(empty($volume)) return new WP_Error('missing_input', 'Unable to generate XML for CLOCKSS, volume is empty');
         $bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
         $post_url = get_permalink( $post_id );
-        if(empty($post_url)) return 'ERROR: Unable to generate XML for CLOCKSS, url is empty';
+        if(empty($post_url)) return new WP_Error('missing_input', 'Unable to generate XML for CLOCKSS, url is empty');
 
         $eissn = $this->get_journal_property('eissn');
         $journal_title = $this->get_journal_property('journal_title');
@@ -1454,37 +1491,35 @@ abstract class O3PO_PublicationType {
 
         $post_type = get_post_type($post_id);
 
-        if(empty($post_type)) return 'ERROR: Unable to generate JSON for DOAJ, post_type is empty';
+        if(empty($post_type)) return new WP_Error('missing_input', 'Unable to generate JSON for DOAJ, post_type is empty');
         $title = get_post_meta( $post_id, $post_type . '_title', true );
-        if(empty($title)) return 'ERROR: Unable to generate JSON for DOAJ, title is empty';
-        $title_mathml = get_post_meta( $post_id, $post_type . '_title_mathml', true );
+        if(empty($title)) return new WP_Error('missing_input', 'Unable to generate JSON for DOAJ, title is empty');
         $abstract = get_post_meta( $post_id, $post_type . '_abstract', true );
-        $abstract_mathml = get_post_meta( $post_id, $post_type . '_abstract_mathml', true );
         $number_authors = get_post_meta( $post_id, $post_type . '_number_authors', true );
-        if(empty($number_authors)) return 'ERROR: Unable to generate JSON for DOAJ, number_authors is empty';
+        if(empty($number_authors)) return new WP_Error('missing_input', 'Unable to generate JSON for DOAJ, number_authors is empty');
         $author_given_names = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_given_names');
-        if(empty($author_given_names)) return 'ERROR: Unable to generate JSON for DOAJ, author_given_names is empty';
+        if(empty($author_given_names)) return new WP_Error('missing_input', 'Unable to generate JSON for DOAJ, author_given_names is empty');
         $author_surnames = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_surnames');
-        if(empty($author_surnames)) return 'ERROR: Unable to generate JSON for DOAJ, author_surnames is empty';
+        if(empty($author_surnames)) return new WP_Error('missing_input', 'Unable to generate JSON for DOAJ, author_surnames is empty');
         $author_name_styles = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_name_styles');
-        if(empty($author_name_styles)) return 'ERROR: Unable to generate JSON for DOAJ, author_name_styles is empty';
+        if(empty($author_name_styles)) return new WP_Error('missing_input', 'Unable to generate JSON for DOAJ, author_name_styles is empty');
         $author_orcids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_orcids');
         $author_affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_affiliations');
         $date_published = get_post_meta( $post_id, $post_type . '_date_published', true );
-        if(empty($date_published)) return 'ERROR: Unable to generate JSON for DOAJ, date_published is empty';
+        if(empty($date_published)) return new WP_Error('missing_input', 'Unable to generate JSON for DOAJ, date_published is empty');
         $pages = get_post_meta( $post_id, $post_type . '_pages', true );
-        if(empty($pages)) return 'ERROR: Unable to generate JSON for DOAJ, pages is empty';
+        if(empty($pages)) return new WP_Error('missing_input', 'Unable to generate JSON for DOAJ, pages is empty');
         $doi = static::get_doi($post_id);
-        if(empty($doi)) return 'ERROR: Unable to generate JSON for DOAJ, doi is empty';
+        if(empty($doi)) return new WP_Error('missing_input', 'Unable to generate JSON for DOAJ, doi is empty');
         $affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_affiliations');
         $journal = get_post_meta( $post_id, $post_type . '_journal', true );
-        if(empty($journal)) return 'ERROR: Unable to generate JSON for DOAJ, journal is empty';
-        if($journal !== $this->get_journal_property('journal_title')) return 'ERROR: Unable to generate JSON for DOAJ, journal of the post and publication type do not match';
+        if(empty($journal)) return new WP_Error('missing_input', 'Unable to generate JSON for DOAJ, journal is empty');
+        if($journal !== $this->get_journal_property('journal_title')) return new WP_Error('missing_input', 'Unable to generate JSON for DOAJ, journal of the post and publication type do not match');
         $volume = get_post_meta( $post_id, $post_type . '_volume', true );
-        if(empty($volume)) return 'ERROR: Unable to generate JSON for DOAJ, volume is empty';
+        if(empty($volume)) return new WP_Error('missing_input', 'Unable to generate JSON for DOAJ, volume is empty');
         $bbl = get_post_meta( $post_id, $post_type . '_bbl', true );
         $post_url = get_permalink( $post_id );
-        if(empty($post_url)) return 'ERROR: Unable to generate JSON for DOAJ, url is empty';
+        if(empty($post_url)) return new WP_Error('missing_input', 'Unable to generate JSON for DOAJ, url is empty');
 
         $json_array = array();
 
