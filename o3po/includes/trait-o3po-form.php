@@ -341,7 +341,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
     }
 
         /**
-         * Get the default value of all fields.
+         * Get the default values of all fields.
          *
          *
          * @since   0.4.0
@@ -531,6 +531,12 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          */
     public function validate_url( $id, $input ) {
 
+        if(empty($input))
+        {
+            $this->add_error($id, 'url-validated', "The URL '" . $input . "' given in '" . $this->fields[$id]['title'] . "' was empty. Field reset.", 'error');
+            return $this->get_field_default($id);
+        }
+
         $input_trimmed = trim($input);
         $url = esc_url_raw(strip_tags(stripslashes($input_trimmed)));
 
@@ -688,7 +694,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @param  string  $id    The id of the field whose input is validated.
          * @param  array   $input The input.
          */
-    public function validate_array_of_at_most_1000_editor_coordinator_or_steering_board( $id, $input ) {
+    public function validate_array_of_at_most_1000_roles( $id, $input ) {
 
         if(!is_array($input))
         {
@@ -700,17 +706,15 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         $result = array();
         foreach($input as $key => $role)
         {
-            $result[] = $this->editor_coordinator_or_steering_board($id, $role);
+            $result[] = $this->validate_role($id, $role);
         }
 
         return $result;
     }
 
 
-
-
         /**
-         * Validate that an array of at most 1000 names
+         * Validate that an array of at most 1000 years
          *
          * @since  0.4.1
          * @access private
@@ -742,6 +746,40 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         return $result;
     }
 
+
+        /**
+         * Validate that an array of at most 1000 years or empty
+         *
+         * @since  0.4.1
+         * @access private
+         * @param  string  $id    The id of the field whose input is validated.
+         * @param  array   $input The input.
+         */
+    public function validate_array_of_at_most_1000_years_or_empty( $id, $input ) {
+
+        if(!is_array($input))
+        {
+            $this->add_error( $id, 'not-array', "The input to field " . $id . " must be an array but was of type " . gettype($input) . ".", 'error');
+            return array();
+        }
+
+        $input = array_slice($input, 0, 1000);
+        $result = array();
+        foreach($input as $key => $input)
+        {
+            if(empty($input) or preg_match('/^[0-9]{4}$/u', $input))
+                $result[] = $input;
+            else
+            {
+                $this->add_error($id, 'not-a-year', "The input '" . $input . "' given in '" . $this->fields[$id]['title'] . "' was not a year. Field reset.", 'error');
+                $result[] = '';
+            }
+
+        }
+
+        return $result;
+    }
+
     public function validate_array_of_at_most_1000_urls( $id, $input ) {
 
         if(!is_array($input))
@@ -755,6 +793,28 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         foreach($input as $key => $input)
         {
             $result[] = $this->validate_url($id, $input);
+        }
+
+        return $result;
+    }
+
+
+    public function validate_array_of_at_most_1000_urls_or_empty( $id, $input ) {
+
+        if(!is_array($input))
+        {
+            $this->add_error( $id, 'not-array', "The input to field " . $id . " must be an array but was of type " . gettype($input) . ".", 'error');
+            return array();
+        }
+
+        $input = array_slice($input, 0, 1000);
+        $result = array();
+        foreach($input as $key => $input)
+        {
+            if(!empty($input))
+                $result[] = $this->validate_url($id, $input);
+            else
+                $result[] = '';
         }
 
         return $result;
@@ -804,12 +864,19 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @param    string   $id    The field this was input to.
          * @param    string   $input    User input.
          */
-    public function editor_coordinator_or_steering_board( $id, $input ) {
+    public function validate_role( $id, $input ) {
 
-        if($input === "editor" or $input === "coordinator" or $input === "steering board")
+        $valid_roles = [
+            'editor',
+            'coordinator',
+            'steering board',
+            'admin',
+            'executive board',
+                        ];
+        if(in_array($input, $valid_roles))
             return $input;
 
-        $this->add_error($id, 'not-checked-or-unchecked', "The field '" . $this->fields[$id]['title'] . "' must be either editor, coordinator, or steering board. Field reset.", 'error');
+        $this->add_error($id, 'not-a-role', "The field '" . $this->fields[$id]['title'] . "' must be one of " . implode(", ", $valid_roles) . ". Field reset.", 'error');
         return $this->get_field_default($id);
     }
 
