@@ -181,9 +181,20 @@ trait O3PO_Form {
          * @param  boolean     $esc_label    Whether to escape the content of label.
          * @param  string      $label_style  CSS style for the label.
          */
-    public function render_single_line_field( $id , $placeholder=null, $autocomplete='on', $style=false, $label=false, $esc_label=true, $label_style=false) {
+    public function render_single_line_field( $id , $placeholder=null, $autocomplete='on', $style=false, $label=false, $esc_label=true, $label_style=false, $fallback_value=False) {
 
-        $value = $this->get_field_value($id);
+        if($fallback_value === False)
+            $value = $this->get_field_value($id);
+        else
+        {
+            try
+            {
+                $value = $this->get_field_value($id);
+            } catch(Throwable $e) {
+                $value = $fallback_value;
+            }
+        }
+
 
         if(preg_match('#(.*)\[(.*)\]#u', $id, $matches) === 1)
             $name_end = '[' . $matches[1] . '][' . $matches[2] . ']';

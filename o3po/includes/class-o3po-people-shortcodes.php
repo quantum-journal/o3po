@@ -53,6 +53,16 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
                 'allowed' => ['True', 'False'],
                 'description' => 'Whether include the date(s) the persons joined or and/or left their position.',
                             ),
+            'former' => array(
+                'default' => 'False',
+                'allowed' => ['False', 'True', 'Only'],
+                'description' => 'Whether to include (or only include) people who have left their role fore the current year.',
+                            ),
+            'extra' => array(
+                'default' => 'True',
+                'allowed' => ['False', 'True'],
+                'description' => 'Whether to print the persons extra in brackets.',
+                            ),
                               ),
                                           );
 
@@ -76,6 +86,7 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
         $settings->specify_field('person_url', Null, Null, 'people_shortcode_settings', 'people_shortcode_settings', array(), array('O3PO_Settings', 'validate_array_of_at_most_1000_urls_or_empty'), array(''));
         $settings->specify_field('person_affiliation', Null, Null, 'people_shortcode_settings', 'people_shortcode_settings', array(), array('O3PO_Settings', 'validate_array_of_at_most_1000_names'), array(''));
         $settings->specify_field('person_country', Null, Null, 'people_shortcode_settings', 'people_shortcode_settings', array(), array('O3PO_Settings', 'validate_array_of_at_most_1000_names'), array(''));
+        $settings->specify_field('person_extra', Null, Null, 'people_shortcode_settings', 'people_shortcode_settings', array(), array('O3PO_Settings', 'validate_array_of_at_most_1000_names'), array(''));
 
 
     }
@@ -99,7 +110,7 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
             echo '<dt>[' . $shortcode . ']</dt>';
             echo '<dd>With optional attributes:<dl>';
             foreach($atts as $att => $att_property)
-                echo "<dt>" . $att . "='" . implode('|', $att_property['allowed']) . "'</dt><dd>" . $att_property['description'] . "Default is '" . $att_property['default'] . "'</dd>";
+                echo "<dt>" . $att . "='" . implode('|', $att_property['allowed']) . "'</dt><dd>" . $att_property['description'] . " Default is '" . $att_property['default'] . "'</dd>";
             echo '</dl></dd>';
         }
         echo '</dl>';
@@ -125,28 +136,32 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
             echo '</div>';
 
             echo '<div style="float:left;">';
-            $settings->render_single_line_field('person_since_year[' . $x . ']', '', 'on', 'width:5em;max-width:100%;', 'Since year', true, 'display:block;');
+            $settings->render_single_line_field('person_since_year[' . $x . ']', '', 'on', 'width:5em;max-width:100%;', 'Since year', true, 'display:block;', '');
             echo '</div>';
 
             echo '<div style="float:left;">';
-            $settings->render_single_line_field('person_until_year[' . $x . ']', '', 'on', 'width:5em;max-width:100%;', 'Until year', true, 'display:block;');
+            $settings->render_single_line_field('person_until_year[' . $x . ']', '', 'on', 'width:5em;max-width:100%;', 'Until year', true, 'display:block;', '');
             echo '</div>';
 
             echo '<div style="float:left;">';
-            $settings->render_single_line_field('person_url[' . $x . ']', '', 'on', 'width:35em;max-width:100%;', 'URL', true, 'display:block;');
+            $settings->render_single_line_field('person_url[' . $x . ']', '', 'on', 'width:35em;max-width:100%;', 'URL', true, 'display:block;', '');
             echo '</div>';
 
             echo '<div style="float:left;">';
-            $settings->render_single_line_field('person_affiliation[' . $x . ']', '', 'on', 'width:40em;max-width:100%;', 'Affiliation', true, 'display:block;');
+            $settings->render_single_line_field('person_affiliation[' . $x . ']', '', 'on', 'width:40em;max-width:100%;', 'Affiliation', true, 'display:block;', '');
             echo '</div>';
 
             echo '<div style="float:left;">';
-            $settings->render_single_line_field('person_country[' . $x . ']', '', 'on', 'width:15em;max-width:100%;', 'Country', true, 'display:block;');
+            $settings->render_single_line_field('person_country[' . $x . ']', '', 'on', 'width:15em;max-width:100%;', 'Country', true, 'display:block;', '');
             echo '</div>';
 
-            echo '<button style="float:left;" type="button" onclick="removePerson(this)">Remove person</button>';
+            echo '<div style="float:left;">';
+            $settings->render_single_line_field('person_extra[' . $x . ']', '', 'on', 'width:15em;max-width:100%;', 'Extra', true, 'display:block;', '');
+            echo '</div>';
 
-            echo '<div style="clear:both"></div>';
+            echo '<button style="float:right;" type="button" onclick="removePerson(this)">Remove person</button>';
+
+            echo '<div style="clear:both;margin-bottom:1em;"></div>';
             echo '</div>';
         }
         echo '</div>';
@@ -194,14 +209,29 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
     }
 
 
+    public static function compate_names($name_a, $name_b) {
+        $name_a = trim($name_a);
+        $name_b = trim($name_b);
+
+        if($name_a === $name_b)
+            return 0;
+
+        $prefix_regex = '#^([aA][pflb]|[dD]el|[dD][ea]|[dD]i|[dD]os|[dD]u|[lL]a|[lL]e|[vV]an ([dD]e|[dD]en|[dD]er|[hH]et|)|[vV]on|[zZ]u) #u';
+
+        $name_a_without_prefix = preg_replace($prefix_regex, '', $name_a);
+        $name_b_without_prefix = preg_replace($prefix_regex, '', $name_b);
+
+        return strnatcmp($name_a_without_prefix, $name_b_without_prefix);
+    }
+
     public static function sort_by_last_names($person_a, $person_b) {
 
-        return strnatcmp($person_a['last_names'], $person_b['last_names']);
+        return static::compate_names($person_a['last_names'], $person_b['last_names']);
     }
 
     public static function sort_by_first_names($person_a, $person_b) {
 
-        return strnatcmp($person_a['first_names'], $person_b['first_names']);
+        return static::compate_names($person_a['first_names'], $person_b['first_names']);
     }
 
         /**
@@ -223,6 +253,7 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
         $person_url = $settings->get_field_value('person_url');
         $person_affiliation = $settings->get_field_value('person_affiliation');
         $person_country = $settings->get_field_value('person_country');
+        $person_extra = $settings->get_field_value('person_extra');
 
         $person_data = array();
         foreach($person_first_names as $x => $foo)
@@ -235,16 +266,25 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
                 'url' => $person_url[$x],
                 'affiliation' => $person_affiliation[$x],
                 'country' => $person_country[$x],
+                'extra' => $person_extra[$x],
                                    );
         if($atts['sort'] === 'last_names')
             uasort($person_data, array('self', 'sort_by_last_names'));
         elseif($atts['sort'] === 'first_names')
             uasort($person_data, array('self', 'sort_by_first_names'));
 
+        $current_year = date('Y');
         $result = '<ul>';
         foreach($person_data as $x => $person)
         {
-            if(empty($atts['role']) or $atts['role'] === $person['role'] or in_array($person['role'], preg_split('/\s*,\s*/', $atts['role'])))
+            if($atts['former'] === 'False')
+                if(!empty($person['until_year']) and $current_year > $person['until_year'])
+                    continue;
+            if($atts['former'] === 'Only')
+                if(empty($person['until_year']) or $current_year < $person['until_year'])
+                    continue;
+
+            if(empty($atts['role']) or $atts['role'] === $person['role'] or in_array($person['role'], preg_split('/\s*,\s*/u', $atts['role'])))
             {
                 $result .= '<li>';
                 $person_name = $person['first_names'] . ' ' . $person['last_names'];
@@ -258,7 +298,6 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
                     $result .= ', ' . esc_html($person['country']);
                 if($atts['date'] !== 'False')
                 {
-                    $current_year = date('Y');
                     if(empty($person['until_year']))
                     {
                         if(!empty($person['since_year']))
@@ -271,6 +310,10 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
                         else
                             $result .= ' (until ' . esc_html($person['until_year']) . ')';
                     }
+                }
+                if($atts['extra'] !== 'False' and !empty($person['extra']))
+                {
+                    $result .= ' (' . esc_html($person['extra']) . ')';
                 }
                 $result .= '</li>';
             }
