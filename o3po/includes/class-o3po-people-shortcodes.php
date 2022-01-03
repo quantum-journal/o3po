@@ -63,6 +63,11 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
                 'allowed' => ['False', 'True'],
                 'description' => 'Whether to print the persons extra in brackets.',
                             ),
+            'li-style' => array(
+                'default' => '',
+                'allowed' => ['', 'css'],
+                'description' => 'Style to apply to every li element.',
+                            ),
                               ),
                                           );
 
@@ -107,14 +112,14 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
         echo '<dl>';
         foreach(static::$shortcode_atts as $shortcode => $atts)
         {
-            echo '<dt>[' . $shortcode . ']</dt>';
+            echo '<dt>[' . esc_html($shortcode) . ']</dt>';
             echo '<dd>With optional attributes:<dl>';
             foreach($atts as $att => $att_property)
-                echo "<dt>" . $att . "='" . implode('|', $att_property['allowed']) . "'</dt><dd>" . $att_property['description'] . " Default is '" . $att_property['default'] . "'</dd>";
+                echo "<dt>" . esc_html($att) . "='" . esc_html(implode('|', $att_property['allowed'])) . "'</dt><dd>" . esc_html($att_property['description']) . " Default is '" . esc_html($att_property['default']) . "'</dd>";
             echo '</dl></dd>';
         }
         echo '</dl>';
-        echo '<h3>Persons</h3>';
+        echo '<h3>' . esc_html(count($person_first_names)) . ' persons</h3>';
         echo '<div id="' . $slug . '-person-list">';
         foreach($person_first_names as $x => $foo)
         {
@@ -286,7 +291,10 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
 
             if(empty($atts['role']) or $atts['role'] === $person['role'] or in_array($person['role'], preg_split('/\s*,\s*/u', $atts['role'])))
             {
-                $result .= '<li>';
+                if(!empty($atts['li-style']))
+                    $result .= '<li style="' . esc_attr($atts['li-style']) . '">';
+                else
+                    $result .= '<li>';
                 $person_name = $person['first_names'] . ' ' . $person['last_names'];
                 if($atts['link'] !== 'False' and !empty($person['url']))
                     $result .= '<a href="' . esc_attr($person['url']) . '" target="_blank">' . esc_html($person_name) . '</a>';
@@ -305,7 +313,7 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
                     }
                     else
                     {
-                        if($person['until_year'] >= $current_year and !empty($person['since_year']))
+                        if(!empty($person['since_year']))
                             $result .= ' (' . esc_html($person['since_year']) . ' - ' . esc_html($person['until_year']) . ')';
                         else
                             $result .= ' (until ' . esc_html($person['until_year']) . ')';
