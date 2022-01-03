@@ -92,7 +92,7 @@ It is obviously a play on the name of humanoid robot character from a series of 
 ## Changelog
 
 ### 0.4.2
-* ...
+* More robust error handling for the case of pdf-only arXiv manuscripts
 
 ### 0.4.1
 * Added shortcodes to generate various lists of contributing people from data that can be specified in the plugin settings

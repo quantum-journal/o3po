@@ -1366,8 +1366,14 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                 }
 
                 $source_files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator($path_folder, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
-            } else {
-                $validation_result .= "ERROR: Extension of source file " . $path_source . " and mime-type " . $mime_type . " do not match or are neither .tex nor .tar.gz.\n";
+            }
+            elseif($mime_type == "application/pdf" or mb_substr($path_source, -4) === ".pdf")
+            {
+                throw new Exception("The arXiv returned a pdf as source. Probably this means the manuscript was uploaded by the authors as a pdf only submission, which means we have no source to extract meta-data from. Please ask the authors to upload the LaTeX source code to the arXiv or ask them to provide a .bbl file for the bibliography and enter the meta-data manually. This error will disappear when you press Publish one more time but.");
+            }
+            else
+            {
+                throw new Exception("Extension of source file " . $path_source . " and mime-type " . $mime_type . " do not match or are neither .tex nor .tar.gz. This should not have happened. Something about the arXiv must have changed.\n");
             }
 
                 //Loop over the source files
