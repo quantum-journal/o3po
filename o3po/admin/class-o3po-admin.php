@@ -395,7 +395,7 @@ class O3PO_Admin {
             wp_reset_postdata();
 
             $html .= '<h4>Why is the data not always up to date?</h4>';
-            $html .= '<p>Fetching cited-by data is a time consuming operation for which external services need to be queried. Fresh cited-by data is thus fetched when the page of a publication is visited and the last time cited-by data for that publication was fetched lies more than ' . $cited_by_refresh_seconds . ' seconds in the past. This balances the load and makes sure that cited by data is always reasonably up to date. If, for some reason, you want to fetch fresh cited-by data for all publications with cited-by data older ' . $cited_by_refresh_seconds . ' seconds you can press the fetch fresh data button below. Beware that this might be a very long operation that can easily time out depending on your server setup and the number of publications.</p>';
+            $html .= '<p>Fetching cited-by data is a time consuming operation for which external services need to be queried. Fresh cited-by data is thus fetched when the page of a publication is visited and the last time cited-by data for that publication was fetched lies more than ' . esc_html($cited_by_refresh_seconds) . ' seconds in the past. This balances the load and makes sure that cited by data is always reasonably up to date. If, for some reason, you want to fetch fresh cited-by data for all publications with cited-by data older than ' . esc_html($cited_by_refresh_seconds) . ' seconds you can press the fetch fresh data button below. Beware that this might be a very long operation that can easily time out depending on your server setup and the number of publications.</p>';
             $html .= '<form method="post" action="' . esc_url('?page=' . $this->get_plugin_name() . '-meta-data-explorer' . '&amp;tab=' . $tab_slug) . '"><input type="checkbox" id="refresh" name="refresh" value="checked" /><label for="refresh">I have read the above text on refreshing cited-by data.</label><input id="submit" type="submit" value="Refresh cited-by data"></form>';
         }
         elseif($active_tab === 'updated-after-publication')
@@ -436,10 +436,16 @@ class O3PO_Admin {
                 if($latest_version_number > $published_version_number)
                 {
                     $doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
-                    $html .= '<li>' . esc_html(ucfirst($post_type_singular_name)) . ' ' . esc_html($doi_suffix) . ' <a href="' . esc_attr('/' . $post_type . '/' . $doi_suffix) .  '" target=_blank>published version is ' . esc_html($published_version) . '</a> but latest <a href="' . esc_attr($arxiv_url_abs_prefix . '/' . $eprint_without_version . $latest_versiom). '" target=_blank>arXiv version is ' . esc_html($latest_versiom) . '</a></li>';
+                    $html .= '<li>' . ' <a href="' . esc_attr('/' . $post_type . '/' . $doi_suffix) .  '" target=_blank>' . esc_html(ucfirst($post_type_singular_name)) . ' ' . esc_html($doi_suffix) . ': published version is ' . esc_html($published_version) . '</a> but the <a href="' . esc_attr($arxiv_url_abs_prefix . '/' . $eprint_without_version . $latest_versiom). '" target=_blank>latest arXiv version is ' . esc_html($latest_versiom) . '</a>.<br />ArXiv comment on ' . esc_html($latest_versiom) . ':"' . esc_html($arxiv_submission_history[$latest_versiom]['comment']) . '"</li>';
                 }
             }
             $html .= '</ul>';
+
+            $arxiv_submission_history_refresh_seconds = $settings->get_field_value('arxiv_submission_history_refresh_seconds');
+
+            $html .= '<h4>Why is the data not always up to date?</h4>';
+            $html .= '<p>Updating submission history data requires fetching the abstract page from the arXiv. Fresh submission history data is thus fetched when the page of a publication is visited and the last time submission history data for that publication was fetched lies more than ' . esc_html($arxiv_submission_history_refresh_seconds) . ' seconds in the past. This balances the load and makes sure that submission history data is always reasonably up to date. If, for some reason, you want to fetch fresh submission history data for all publications with data older than ' . esc_html($arxiv_submission_history_refresh_seconds) . ' seconds you can press the fetch fresh data button below. Beware that this might be a very long operation that can easily time out depending on your server setup and the number of publications.</p>';
+            $html .= '<form method="post" action="' . esc_url('?page=' . $this->get_plugin_name() . '-meta-data-explorer' . '&amp;tab=' . $tab_slug) . '"><input type="checkbox" id="refresh" name="refresh" value="checked" /><label for="refresh">I have read the above text on refreshing submission history data.</label><input id="submit" type="submit" value="Refresh submission history data"></form>';
         }
 
         echo $html;

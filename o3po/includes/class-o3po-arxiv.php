@@ -175,7 +175,7 @@ class O3PO_Arxiv {
             $arxiv_fetch_results = '';
             $versions = array();
 
-            $submission_history_node = $x_path->query("/html/body//div[@class='submission-history']")[0];
+            $submission_history_node = $x_path->query("/html/body//div[contains(@class, 'submission-history')]")[0];
             $submission_history_text = $submission_history_node->nodeValue;
             preg_match_all('#\[(?<version>v[0-9]+)\]\s*(?<date>[^[(]*) \((?<size>[0-9]* [a-zA-Z]*)\)#u', $submission_history_text, $matches, PREG_SET_ORDER);
 
@@ -185,7 +185,15 @@ class O3PO_Arxiv {
                 $submission_history[$match['version']] = array(
                     'date' => strtotime($match['date']),
                     'size' => $match['size'],
+                    'comment' => '', # we currently only fetch and add the comment of the latest version below
                 );
+            }
+
+            $comments_node = $x_path->query("/html/body//td[contains(@class, 'comments')]")[0];
+            if($comments_node)
+            {
+                $comments_last_version = $comments_node->textContent;
+                $submission_history[array_key_last($submission_history)]['comment'] = $comments_last_version;
             }
 
             return $submission_history;
