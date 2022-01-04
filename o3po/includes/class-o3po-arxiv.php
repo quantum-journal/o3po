@@ -25,6 +25,27 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-envir
 class O3PO_Arxiv {
 
         /**
+         * Get the html of the abstract page
+         *
+         * @since 0.4.1+
+         * @access public
+         * @param  string  $arxiv_url_abs_prefix The url prefix under which arXiv abstracts can be found.
+         * @param  string  $eprint The eprint for which to fetch the meta-data.
+         * @param  int     $timeout An optional timeout.
+         * @return string  The html
+         */
+    public static function get_abstract_page_html( $arxiv_url_abs_prefix, $eprint, $timeout=10 ) {
+
+        $arxiv_abs_page_url = $arxiv_url_abs_prefix . $eprint;
+        $response = wp_remote_get( $arxiv_abs_page_url, array('timeout'=> $timeout) );
+        if(is_wp_error($response))
+            throw new Exception($response->get_error_message());
+
+        return $response['body'];
+    }
+
+
+        /**
          * Fetch meta-data from the abstract page of an eprint on the arXiv.
          *
          * Extracts the abstract, number_authors, author_first_names,
@@ -44,81 +65,78 @@ class O3PO_Arxiv {
 
         try
         {
+            $html = static::get_abstract_page_html( $arxiv_url_abs_prefix, $eprint, $timeout );
+
+            $dom = new DOMDocument;
+            @$dom->loadHTML($html);
+            $x_path = new DOMXPath($dom);
+
             $arxiv_abs_page_url = $arxiv_url_abs_prefix . $eprint;
             $arxiv_fetch_results = '';
-            $response = wp_remote_get( $arxiv_abs_page_url, array('timeout'=> $timeout) );
-            if(!is_wp_error($response)) {
-                $html = $response['body'];
-                $dom = new DOMDocument;
-                @$dom->loadHTML($html);
-                $x_path = new DOMXPath($dom);
 
-                $number_authors = 0;
-                $author_first_names = array();
-                $author_last_names = array();
-                $title = '';
-                $arxiv_license = '';
-                $arxiv_author_links = $x_path->query("/html/body//div[@class='authors']/a");
-                if(isset($arxiv_author_links[0]))
-                {
-                    foreach($arxiv_author_links as $x => $arxiv_author_link) {
-                        $arxiv_author_names = preg_split('/\s+(?=\S+$)/u', $arxiv_author_link->nodeValue, -1, PREG_SPLIT_NO_EMPTY);
-                        $author_first_names[$x] = empty($arxiv_author_names[0]) ? '' : $arxiv_author_names[0];
-                        $author_last_names[$x] = empty($arxiv_author_names[1]) ? '' : $arxiv_author_names[1];
-                        $number_authors = $x+1;
-                    }
+            $number_authors = 0;
+            $author_first_names = array();
+            $author_last_names = array();
+            $title = '';
+            $arxiv_license = '';
+            $arxiv_author_links = $x_path->query("/html/body//div[@class='authors']/a");
+            if(isset($arxiv_author_links[0]))
+            {
+                foreach($arxiv_author_links as $x => $arxiv_author_link) {
+                    $arxiv_author_names = preg_split('/\s+(?=\S+$)/u', $arxiv_author_link->nodeValue, -1, PREG_SPLIT_NO_EMPTY);
+                    $author_first_names[$x] = empty($arxiv_author_names[0]) ? '' : $arxiv_author_names[0];
+                    $author_last_names[$x] = empty($arxiv_author_names[1]) ? '' : $arxiv_author_names[1];
+                    $number_authors = $x+1;
                 }
-                else
-                    $arxiv_fetch_results .= "WARNING: Failed to fetch author information from " . $arxiv_abs_page_url . ".\n";
-
-                $arxiv_titles = $x_path->query("/html/body//h1[contains(@class, 'title')]/text()[last()]");
-                if(!empty($arxiv_titles->item(0)->nodeValue))
-                    $arxiv_title_text = preg_replace("/[\r\n\s]+/u", " ", trim( $arxiv_titles->item(0)->nodeValue ) );
-                if(!empty($arxiv_title_text) ) {
-                    $title = O3PO_Latex::latex_to_utf8_outside_math_mode($arxiv_title_text);
-                }
-                else
-                    $arxiv_fetch_results .= "WARNING: Failed to fetch title from " . $arxiv_abs_page_url . ".\n";
-
-                $arxiv_abstracts = $x_path->query("/html/body//blockquote[contains(@class, 'abstract')]/text()[position()>0]");
-                $arxiv_abstract_text = "";
-                foreach($arxiv_abstracts as $arxiv_abstract_par)
-                    $arxiv_abstract_text .= preg_replace('#\s+#u', ' ', trim($arxiv_abstract_par->nodeValue)) . "\n";
-                $arxiv_abstract_text = trim($arxiv_abstract_text);
-
-                $abstract = '';
-                if (!empty($arxiv_abstract_text))
-                    $abstract =O3PO_Latex::latex_to_utf8_outside_math_mode($arxiv_abstract_text);
-                else
-                    $arxiv_fetch_results .= "WARNING: Failed to fetch abstract from " . $arxiv_abs_page_url . ".\n";
-
-                $arxiv_license_urls = $x_path->query("/html/body//div[contains(@class, 'abs-license')]/a/@href");
-                if(isset($arxiv_license_urls[0]))
-                {
-                    foreach ($arxiv_license_urls as $x => $arxiv_license_url) {
-                        $arxiv_license = $arxiv_license_url->nodeValue;
-                        if($check_license and !static::is_cc_by_license_url($arxiv_license))
-                            $arxiv_fetch_results .= "ERROR: It seems like " . $arxiv_abs_page_url . " is not published under one of the creative commons licenses (CC BY 4.0, CC BY-SA 4.0, CC BY-NC-SA 4.0, or CC BY-NC-ND 4.0). Please inform the authors that they must put the paper on the arXiv under CC BY 4.0 and remind them that we will publish under CC BY 4.0 and that, by our terms and conditions, they grant us the right to do so.\n";
-                    }
-                }
-                else
-                    $arxiv_fetch_results .= "ERROR: No license informatin found on " . $arxiv_abs_page_url . ".\n";
-
-                if (empty($arxiv_fetch_results))
-                    $arxiv_fetch_results .= "SUCCESS: Fetched meta-data from " . $arxiv_abs_page_url . "\n";
-
-                return array(
-                    'arxiv_fetch_results' => $arxiv_fetch_results,
-                    'abstract' => $abstract,
-                    'number_authors' => $number_authors,
-                    'author_first_names' => $author_first_names,
-                    'author_last_names' => $author_last_names,
-                    'title' => $title,
-                    'arxiv_license' => $arxiv_license,
-                             );
             }
             else
-                throw new Exception($response->get_error_message());
+                $arxiv_fetch_results .= "WARNING: Failed to fetch author information from " . $arxiv_abs_page_url . ".\n";
+
+            $arxiv_titles = $x_path->query("/html/body//h1[contains(@class, 'title')]/text()[last()]");
+            if(!empty($arxiv_titles->item(0)->nodeValue))
+                $arxiv_title_text = preg_replace("/[\r\n\s]+/u", " ", trim( $arxiv_titles->item(0)->nodeValue ) );
+            if(!empty($arxiv_title_text) ) {
+                $title = O3PO_Latex::latex_to_utf8_outside_math_mode($arxiv_title_text);
+            }
+            else
+                $arxiv_fetch_results .= "WARNING: Failed to fetch title from " . $arxiv_abs_page_url . ".\n";
+
+            $arxiv_abstracts = $x_path->query("/html/body//blockquote[contains(@class, 'abstract')]/text()[position()>0]");
+            $arxiv_abstract_text = "";
+            foreach($arxiv_abstracts as $arxiv_abstract_par)
+                $arxiv_abstract_text .= preg_replace('#\s+#u', ' ', trim($arxiv_abstract_par->nodeValue)) . "\n";
+            $arxiv_abstract_text = trim($arxiv_abstract_text);
+
+            $abstract = '';
+            if (!empty($arxiv_abstract_text))
+                $abstract =O3PO_Latex::latex_to_utf8_outside_math_mode($arxiv_abstract_text);
+            else
+                $arxiv_fetch_results .= "WARNING: Failed to fetch abstract from " . $arxiv_abs_page_url . ".\n";
+
+            $arxiv_license_urls = $x_path->query("/html/body//div[contains(@class, 'abs-license')]/a/@href");
+            if(isset($arxiv_license_urls[0]))
+            {
+                foreach ($arxiv_license_urls as $x => $arxiv_license_url) {
+                    $arxiv_license = $arxiv_license_url->nodeValue;
+                    if($check_license and !static::is_cc_by_license_url($arxiv_license))
+                        $arxiv_fetch_results .= "ERROR: It seems like " . $arxiv_abs_page_url . " is not published under one of the creative commons licenses (CC BY 4.0, CC BY-SA 4.0, CC BY-NC-SA 4.0, or CC BY-NC-ND 4.0). Please inform the authors that they must put the paper on the arXiv under CC BY 4.0 and remind them that we will publish under CC BY 4.0 and that, by our terms and conditions, they grant us the right to do so.\n";
+                }
+            }
+            else
+                $arxiv_fetch_results .= "ERROR: No license informatin found on " . $arxiv_abs_page_url . ".\n";
+
+            if (empty($arxiv_fetch_results))
+                $arxiv_fetch_results .= "SUCCESS: Fetched meta-data from " . $arxiv_abs_page_url . "\n";
+
+            return array(
+                'arxiv_fetch_results' => $arxiv_fetch_results,
+                'abstract' => $abstract,
+                'number_authors' => $number_authors,
+                'author_first_names' => $author_first_names,
+                'author_last_names' => $author_last_names,
+                'title' => $title,
+                'arxiv_license' => $arxiv_license,
+                         );
         }
         catch(Throwable $e) {
             return array(
@@ -127,6 +145,56 @@ class O3PO_Arxiv {
         }
 
     }
+
+
+        /**
+         * Get the submission history from the abstract page of an eprint on the arXiv.
+         *
+         * Extracts the submission history.
+         *
+         * @since  0.4.1+
+         * @access public
+         * @param  string  $arxiv_url_abs_prefix The url prefix under which arXiv abstracts can be found.
+         * @param  string  $eprint The eprint for which to fetch the meta-data.
+         * @param  int     $timeout An optional timeout.
+         * @param  bool    $check_license Whether to fetch and check the license.
+         * @return array|WP_Error An array describing the submission history with the versions being
+         *                        the keys and each element an array containing the submission time
+         *                        stamp and size.
+         */
+    public static function get_submission_history_from_abstract_page( $arxiv_url_abs_prefix, $eprint, $timeout=10 ) {
+
+        try
+        {
+            $html = static::get_abstract_page_html( $arxiv_url_abs_prefix, $eprint, $timeout );
+
+            $dom = new DOMDocument;
+            @$dom->loadHTML($html);
+            $x_path = new DOMXPath($dom);
+
+            $arxiv_fetch_results = '';
+            $versions = array();
+
+            $submission_history_node = $x_path->query("/html/body//div[@class='submission-history']")[0];
+            $submission_history_text = $submission_history_node->nodeValue;
+            preg_match_all('#\[(?<version>v[0-9]+)\]\s*(?<date>[^[(]*) \((?<size>[0-9]* [a-zA-Z]*)\)#u', $submission_history_text, $matches, PREG_SET_ORDER);
+
+            $submission_history = array();
+            foreach($matches as $match)
+            {
+                $submission_history[$match['version']] = array(
+                    'date' => strtotime($match['date']),
+                    'size' => $match['size'],
+                );
+            }
+
+            return $submission_history;
+        }
+        catch(Throwable $e) {
+            return new WP_Error('exception', "ERROR: Failed to fetch arXiv abstract page html or could not extract submission history for " . $eprint . " " . $e->getMessage() . "\n");
+        }
+    }
+
 
         /**
          * Download the source of an eprint from the arXiv.
