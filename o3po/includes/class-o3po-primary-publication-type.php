@@ -1699,6 +1699,36 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         return $arxiv_submission_history;
     }
 
+
+    public function get_all_arxiv_submission_histories($fetch_if_outdated = false) {
+
+        $post_type = $this->get_publication_type_name();
+
+        $query = array(
+            'post_type' => $post_type,
+            'post_status' => array('publish'),
+            'posts_per_page' => -1,
+                       );
+
+        $arxiv_submission_histories = array();
+
+        $my_query = new WP_Query($query);
+
+        if ( $my_query->have_posts() ) {
+            $num = 0;
+            while ( $my_query->have_posts() ) {
+                $num++;
+                $my_query->the_post();
+
+                $post_id = get_the_ID();
+                $arxiv_submission_histories[$post_id] = $this->get_arxiv_submission_history($post_id, $fetch_if_outdated=$fetch_if_outdated);
+            }
+        }
+
+        return $arxiv_submission_histories;
+    }
+
+
         /**
          * Get the the html of the warning in case a newer arxiv version exists
          *
