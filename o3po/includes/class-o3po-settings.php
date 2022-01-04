@@ -348,6 +348,7 @@ class O3PO_Settings extends O3PO_Singleton {
         $this->specify_field('arxiv_doi_feed_identifier', 'Indentifier for the DOI feed', array( $this, 'render_arxiv_doi_feed_identifier_setting' ), 'arxiv_settings', 'arxiv_settings', array(), array($this, 'trim'), '');
         $this->specify_field('arxiv_paper_doi_feed_endpoint', 'Endpoint for the arXiv DOI feed', array( $this, 'render_arxiv_paper_doi_feed_endpoint_setting' ), 'arxiv_settings', 'arxiv_settings', array(), array($this, 'trim_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed'), 'arxiv_paper_doi_feed');
         $this->specify_field('arxiv_paper_doi_feed_days', 'Number of days in arXiv DOI feed', array( $this, 'render_arxiv_paper_doi_feed_days_setting' ), 'arxiv_settings', 'arxiv_settings', array(), array($this, 'validate_positive_integer'), '365');
+        $this->specify_field('arxiv_submission_history_refresh_seconds', 'Refresh submission history time', array( $this, 'render_arxiv_submission_history_refresh_seconds_setting' ), 'arxiv_settings', 'arxiv_settings', array(), array($this, 'validate_positive_integer'), '43200');#=60*60*12
 
         $this->specify_section('buffer_settings', 'Buffer.com', array( $this, 'render_buffer_settings' ), 'buffer_settings');
         $this->specify_field('buffer_api_url', 'Url of the buffer.com api', array( $this, 'render_buffer_api_url_setting' ), 'buffer_settings', 'buffer_settings', array(), array($this, 'validate_url'), 'https://api.bufferapp.com/1');
@@ -1197,6 +1198,14 @@ class O3PO_Settings extends O3PO_Singleton {
         echo '<p>(Show publications up to this many days in the past in the doi feed.)</p>';
 
     }
+
+    public function render_arxiv_submission_history_refresh_seconds_setting() {
+
+        $this->render_single_line_field('arxiv_submission_history_refresh_seconds');
+        echo '<p>(Refresh the cached information about the arXiv submission history that is used to add a warning on publication pages in case a newer version that the published one is available at most every this many seconds.)</p>';
+
+    }
+
 
         /**
          * Render the setting for the CrossRef DOI resolution url prefix.
