@@ -166,7 +166,8 @@ class O3PO_Arxiv {
 
         try
         {
-            $html = static::get_abstract_page_html( $arxiv_url_abs_prefix, $eprint, $timeout );
+            $eprint_without_version = preg_replace('#v[0-9]+$#u', '', $eprint);
+            $html = static::get_abstract_page_html($arxiv_url_abs_prefix, $eprint_without_version, $timeout);
 
             $dom = new DOMDocument;
             @$dom->loadHTML($html);
