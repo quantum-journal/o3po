@@ -1614,6 +1614,8 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             $content .= '</header>';
             $content .= '<div class="entry-content">';
 
+            $content .= $this->get_newer_arxiv_version_warning($post_id);
+
             $abstract_header = $settings->get_field_value('page_template_abstract_header');
             if(!empty($abstract_header)) {
                 $content .= '<h3 class="abstract-header" >' . esc_html($abstract_header) . '</h3>';
@@ -1637,7 +1639,6 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             }
 
             $content .= $old_content;
-            $content .= $this->get_newer_arxiv_version_warning($post_id);
             $content .= $this->get_popular_summary($post_id);
             $content .= $this->get_bibtex_html($post_id);
             $content .= $this->get_bibliography_html($post_id);
@@ -1741,6 +1742,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $settings = O3PO_Settings::instance();
 
         $post_type = get_post_type($post_id);
+        $date_published = get_post_meta( $post_id, $post_type . '_date_published', true );
         $eprint = get_post_meta( $post_id, $post_type . '_eprint', true );
         $eprint_without_version = preg_replace('#v[0-9]+$#u', '', $eprint);
         preg_match('#(v[0-9]+)$#u', $eprint, $matches);
@@ -1748,23 +1750,35 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $published_version_number = mb_substr($published_version, 1);
         $arxiv_url_abs_prefix = $settings->get_field_value('arxiv_url_abs_prefix');
 
-        $submission_history = $this->get_arxiv_submission_history($post_id);
-        if(is_wp_error($submission_history))
-            return '';
-
-        $latest_versiom = array_key_last($submission_history);
-        $latest_version_number = mb_substr($latest_versiom, 1);
-
         $newer_arxiv_version_warning = '';
-        if($latest_version_number > $published_version_number)
+
+        $submission_history = $this->get_arxiv_submission_history($post_id);
+        if(!is_wp_error($submission_history))
         {
-            $newer_arxiv_version_warning .= '<div class="important-box">';
-            $newer_arxiv_version_warning .= '<strong>Updated version:</strong> ';
-            $newer_arxiv_version_warning .= 'The authors have uploaded <a href="' . esc_attr($arxiv_url_abs_prefix . '/' . $eprint_without_version . $latest_versiom) . '" target=_blank>version ' . esc_html($latest_versiom) . '</a> of this work to the arXiv which may contain updates or corrections not contained in the published version ' . esc_html($published_version) . '.';
-            $arxiv_comment = $submission_history[$latest_versiom]['comment'];
-            if(!empty($arxiv_comment))
-                $newer_arxiv_version_warning .= ' The authors left the following comment on the arXiv:<div class="author-arxiv-comment">' . esc_html($arxiv_comment) . '</div>';
-            $newer_arxiv_version_warning .= '</div>';
+            $latest_versiom = array_key_last($submission_history);
+            $latest_version_number = mb_substr($latest_versiom, 1);
+
+            if($latest_version_number > $published_version_number)
+            {
+                $newer_arxiv_version_warning .= '<div class="important-box">';
+                $newer_arxiv_version_warning .= '<strong>Updated version:</strong> ';
+                $newer_arxiv_version_warning .= 'The authors have uploaded <a href="' . esc_attr($arxiv_url_abs_prefix . '/' . $eprint_without_version . $latest_versiom) . '" target=_blank>version ' . esc_html($latest_versiom) . '</a> of this work to the arXiv which may contain updates or corrections not contained in the published version ' . esc_html($published_version) . '.';
+                $arxiv_comment = $submission_history[$latest_versiom]['comment'];
+                if(!empty($arxiv_comment))
+                    $newer_arxiv_version_warning .= ' The authors left the following comment on the arXiv:<div class="author-arxiv-comment">' . esc_html($arxiv_comment) . '</div>';
+                $newer_arxiv_version_warning .= '</div>';
+            }
+
+            if(isset($submission_history[$latest_versiom]) && isset($submission_history[$latest_versiom]['date']) && $submission_history[$latest_versiom]['date'] > strtotime($date_published))
+            {
+                $newer_arxiv_version_warning .= '<div class="important-box">';
+                $newer_arxiv_version_warning .= '<strong>Updated after initial publication:</strong> ';
+                $newer_arxiv_version_warning .= 'This publication was updated to version ' . esc_html($published_version) . ' after the initial publication.';
+                $arxiv_comment = $submission_history[$published_version]['comment'];
+                if(!empty($arxiv_comment))
+                    $newer_arxiv_version_warning .= ' The authors left the following comment on the arXiv:<div class="author-arxiv-comment">' . esc_html($arxiv_comment) . '</div>';
+                $newer_arxiv_version_warning .= '</div>';
+            }
         }
 
         return $newer_arxiv_version_warning;
