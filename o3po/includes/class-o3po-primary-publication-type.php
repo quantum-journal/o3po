@@ -1769,7 +1769,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                 $newer_arxiv_version_warning .= '</div>';
             }
 
-            if(isset($submission_history[$latest_versiom]) && isset($submission_history[$latest_versiom]['date']) && $submission_history[$latest_versiom]['date'] > strtotime($date_published))
+            if(isset($submission_history[$published_version]) && isset($submission_history[$published_version]['date']) && $submission_history[$published_version]['date'] > strtotime($date_published))
             {
                 $newer_arxiv_version_warning .= '<div class="important-box">';
                 $newer_arxiv_version_warning .= '<strong>Updated after initial publication:</strong> ';
