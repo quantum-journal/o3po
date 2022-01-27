@@ -178,7 +178,7 @@ class O3PO_Arxiv {
 
             $submission_history_node = $x_path->query("/html/body//div[contains(@class, 'submission-history')]")[0];
             $submission_history_text = $submission_history_node->nodeValue;
-            preg_match_all('#\[(?<version>v[0-9]+)\]\s*(?<date>[^[(]*) \((?<size>[0-9]* [a-zA-Z]*)\)#u', $submission_history_text, $matches, PREG_SET_ORDER);
+            preg_match_all('#\[(?<version>v[0-9]+)\]\s*(?<date>[^[(]*) \((?<size>[0-9,.]* [a-zA-Z]*)\)#u', $submission_history_text, $matches, PREG_SET_ORDER);
 
             $submission_history = array();
             foreach($matches as $match)
