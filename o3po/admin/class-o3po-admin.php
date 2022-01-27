@@ -440,9 +440,7 @@ class O3PO_Admin {
                     $html .= '<li>' . ' <a href="' . esc_attr('/' . $post_type . '/' . $doi_suffix) .  '" target=_blank>' . esc_html(ucfirst($post_type_singular_name)) . ' ' . esc_html($doi_suffix) . ': published version is ' . esc_html($published_version) . '</a> but the <a href="' . esc_attr($arxiv_url_abs_prefix . '/' . $eprint_without_version . $latest_versiom). '" target=_blank>latest arXiv version is ' . esc_html($latest_versiom) . '</a>.<br />ArXiv comment on ' . esc_html($latest_versiom) . ':"' . esc_html($arxiv_submission_history[$latest_versiom]['comment']) . '"</li>';
                 }
 
-                if(!isset($arxiv_submission_history[$published_version]))
-                    $html .= '<li>' . $published_version . 'not contained in ' . json_encode($arxiv_submission_history) . 'for ' . $eprint . '</li>';
-                elseif($arxiv_submission_history[$published_version]['date'] > strtotime($date_published))
+                if(isset($arxiv_submission_history[$published_version]) && $arxiv_submission_history[$published_version]['date'] && $arxiv_submission_history[$published_version]['date'] > strtotime($date_published))
                 {
                     $doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
                     $html .= '<li>' . ' <a href="' . esc_attr('/' . $post_type . '/' . $doi_suffix) .  '" target=_blank>' . esc_html(ucfirst($post_type_singular_name)) . ' ' . esc_html($doi_suffix) . ': published version is ' . esc_html($published_version) . '</a> which appeared on the arXiv after this work was first published, which indicates that the publication was updated post publication.</li>';
