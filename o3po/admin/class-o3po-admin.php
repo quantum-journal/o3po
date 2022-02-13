@@ -143,14 +143,19 @@ class O3PO_Admin {
          * @since 0.3.0
          */
     public function add_meta_data_explorer_page_to_menu() {
-        add_menu_page(
-            $this->get_plugin_pretty_name() . ' meta-data explorer',
-            $this->get_plugin_pretty_name() . ' meta-data',
-            'administrator',
-            $this->get_plugin_name() . '-meta-data-explorer',
-            array($this, 'render_meta_data_explorer'),
-            'dashicons-chart-pie'
-                      );
+
+        foreach(['editor', 'administrator'] as $role)
+        {
+            if(current_user_can($role))
+                add_menu_page(
+                    $this->get_plugin_pretty_name() . ' meta-data explorer',
+                    $this->get_plugin_pretty_name() . ' meta-data',
+                    $role,
+                    $this->get_plugin_name() . '-meta-data-explorer',
+                    array($this, 'render_meta_data_explorer'),
+                    'dashicons-chart-pie'
+                              );
+        }
     }
 
         /**
@@ -160,6 +165,10 @@ class O3PO_Admin {
          * @sinde 0.3.0
          */
     public function render_meta_data_explorer() {
+
+        if( !current_user_can('editor') && !current_user_can('administrator') )
+            return "<p>You are not allowed to access this page.</p>";
+
         $html = '<div class="wrap">';
         $html .= '<h2>' . $this->get_plugin_pretty_name() .' meta-data explorer</h2>';
         $html .= '</div>';
