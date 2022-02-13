@@ -431,6 +431,7 @@ class O3PO_Admin {
             foreach($arxiv_submission_histories as $post_id => $arxiv_submission_history)
             {
                 if(is_wp_error($arxiv_submission_history))
+                    $html .= '<li>' . ' <a href="' . esc_attr('/' . $post_type . '/' . $doi_suffix) .  '" target=_blank>' . esc_html(ucfirst($post_type_singular_name)) . ' ' . esc_html($doi_suffix) . ': version history could not be fetched from the arXiv: ' . esc_html($arxiv_submission_history->get_error_message()) . '</li>';
                     continue;
 
                 $date_published = get_post_meta( $post_id, $post_type . '_date_published', true );
