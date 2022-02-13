@@ -1755,7 +1755,8 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $submission_history = $this->get_arxiv_submission_history($post_id);
         if(!is_wp_error($submission_history))
         {
-            $latest_versiom = array_key_last($submission_history);
+            end($submission_history);
+            $latest_versiom = key($submission_history);
             $latest_version_number = mb_substr($latest_versiom, 1);
 
             if($latest_version_number > $published_version_number)

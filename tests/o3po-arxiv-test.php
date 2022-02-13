@@ -80,6 +80,105 @@ ERROR: No license informatin found on https://arxiv.org/abs/0809.2542v5.
     }
 
 
+
+    public function eprint_submission_history_provider() {
+        return [
+            array(
+                'eprint' => '1609.09584',
+                'expected' => array(
+                    'v1' => array(
+                        "date" => 1475207010,
+                        'size' => '12 KB',
+                        'comment' => '',
+                                  ),
+                    'v2' => array(
+                        "date" => 1476921373,
+                        'size' => '12 KB',
+                        'comment' => '',
+                                  ),
+                    'v3' => array(
+                        "date" => 1480549524,
+                        'size' => '23 KB',
+                        'comment' => '',
+                    ),
+                    'v4' => array(
+                        "date" => 1486681146,
+                        'size' => '24 KB',
+                        'comment' => 'Changes from anonymous referee comments',
+                                  ),
+                                    ),
+                  ),
+            array(
+                'eprint' => '2006.01273',
+                'expected' => array(
+                    'v1' => array(
+                        "date" => 1591046493,
+                        'size' => '1,047 KB',
+                        'comment' => '',
+                                  ),
+                    'v2' => array(
+                        "date" => 1593627487,
+                        'size' => '1,046 KB',
+                        'comment' => '',
+                                  ),
+                    'v3' => array(
+                        "date" => 1615899981,
+                        'size' => '386 KB',
+                        'comment' => '33 pages, 17 figures; v2 - typos corrected; v3 - rearrangements and compression for clarity, reformatted for publication',
+                    ),
+                                    ),
+                  ),
+            array(
+                'eprint' => '2004.04173v4',
+                'expected' => array(
+                    'v1' => array(
+                        "date" => 1586368805,
+                        'size' => '878 KB',
+                        'comment' => '',
+                                  ),
+                    'v2' => array(
+                        "date" => 1607105669,
+                        'size' => '1,621 KB',
+                        'comment' => '',
+                                  ),
+                    'v3' => array(
+                        "date" => 1628010357,
+                        'size' => '2,466 KB',
+                        'comment' => '',
+                                  ),
+                    'v4' => array(
+                        "date" => 1643700249,
+                        'size' => '2,244 KB',
+                        'comment' => '12 pages, 8 figures (journal version)',
+                                  ),
+                                    ),
+                  ),
+            array(
+                'eprint' => 'not-a-valid-eprint',
+                'expected' => new WP_Error('exception', 'ERROR: Failed to fetch arXiv abstract page html or could not extract submission history for not-a-valid-eprint Fake wp_remote_get() does not know how to handle https://arxiv.org/abs/not-a-valid-eprint
+'), #check that this function fails silently and returns a WP_Error in case the history could not be retrieved, we don't want users to see this error and rather disply it on the admin panel
+                  ),
+                ];
+    }
+
+        /**
+         * @dataProvider eprint_submission_history_provider
+         */
+    public function test_get_submission_history_from_abstract_page( $eprint, $expected ) {
+
+        $submission_history = O3PO_Arxiv::get_submission_history_from_abstract_page('https://arxiv.org/abs/', $eprint);
+
+        if(is_wp_error($expected))
+            $this->assertEquals($expected, $submission_history);
+        else
+        {
+            $this->assertEquals(array_keys($expected), array_keys($submission_history));
+
+            $this->assertEquals($expected, $submission_history);
+        }
+    }
+
+
     public function eprint_upload_date_provider() {
         return [
             array(
