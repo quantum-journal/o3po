@@ -1614,6 +1614,8 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             $content .= '</header>';
             $content .= '<div class="entry-content">';
 
+            $content .= $this->get_newer_arxiv_version_warning($post_id);
+
             $abstract_header = $settings->get_field_value('page_template_abstract_header');
             if(!empty($abstract_header)) {
                 $content .= '<h3 class="abstract-header" >' . esc_html($abstract_header) . '</h3>';
@@ -1643,10 +1645,143 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             $content .= $this->get_cited_by($post_id);
             $content .= $this->get_license_information($post_id);
             $content .= '</div>';
+
             return $content;
         }
         else
             return $content;
+    }
+
+
+        /**
+         * Get the arXiv submission history
+         *
+         * Gets the submission history from cache if present, otherwise fetches
+         * and updates the cache.
+         *
+         * @since    0.4.1+
+         * @access   public
+         * @param    int    $post_id     Id of the post.
+         * @param    int    $fetch_if_outdated Whether to fetch a new version if the
+         *                                     cached version is outdated.
+         * @return   array Submission history. See O3PO_Arxiv for more details.
+         */
+    public function get_arxiv_submission_history( $post_id, $fetch_if_outdated=True ) {
+
+        $settings = O3PO_Settings::instance();
+
+        $arxiv_submission_history_refresh_seconds = $settings->get_field_value('arxiv_submission_history_refresh_seconds');
+        $arxiv_url_abs_prefix = $settings->get_field_value('arxiv_url_abs_prefix');
+
+        $post_type = get_post_type($post_id);
+        $eprint = get_post_meta( $post_id, $post_type . '_eprint', true );
+
+        $arxiv_submission_history = get_post_meta( $post_id, $post_type . '_arxiv_submission_history', true );
+        $arxiv_submission_history_timestamp = get_post_meta( $post_id, $post_type . '_arxiv_submission_history_timestamp', true );
+        $arxiv_submission_history_last_fetch_attempt_timestamp = get_post_meta( $post_id, $post_type . '_arxiv_submission_history_last_fetch_attempt_timestamp', true );
+        if(empty($arxiv_submission_history_last_fetch_attempt_timestamp) or ($fetch_if_outdated and time() - $arxiv_submission_history_last_fetch_attempt_timestamp > $arxiv_submission_history_refresh_seconds))
+        {
+            $arxiv_submission_history_last_fetch_attempt_timestamp = time();
+            update_post_meta( $post_id, $post_type . '_arxiv_submission_history_last_fetch_attempt_timestamp', $arxiv_submission_history_last_fetch_attempt_timestamp);
+            $arxiv_fetch_result = O3PO_Arxiv::get_submission_history_from_abstract_page($arxiv_url_abs_prefix, $eprint);
+            if(is_wp_error($arxiv_fetch_result))
+            {
+                update_post_meta( $post_id, $post_type . '_arxiv_submission_history_last_fetch_attempt_error', $arxiv_fetch_result);
+                return $arxiv_fetch_result;
+            }
+
+            $arxiv_submission_history = $arxiv_fetch_result;
+            update_post_meta( $post_id, $post_type . '_arxiv_submission_history', $arxiv_submission_history );
+            $arxiv_submission_history_timestamp = time();
+            update_post_meta( $post_id, $post_type . '_arxiv_submission_history_timestamp', $arxiv_submission_history_timestamp);
+            update_post_meta( $post_id, $post_type . '_arxiv_submission_history_last_fetch_attempt_error', null);
+        }
+
+        return $arxiv_submission_history;
+    }
+
+
+    public function get_all_arxiv_submission_histories($fetch_if_outdated = false) {
+
+        $post_type = $this->get_publication_type_name();
+
+        $query = array(
+            'post_type' => $post_type,
+            'post_status' => array('publish'),
+            'posts_per_page' => -1,
+                       );
+
+        $arxiv_submission_histories = array();
+
+        $my_query = new WP_Query($query);
+
+        if ( $my_query->have_posts() ) {
+            $num = 0;
+            while ( $my_query->have_posts() ) {
+                $num++;
+                $my_query->the_post();
+
+                $post_id = get_the_ID();
+                $arxiv_submission_histories[$post_id] = $this->get_arxiv_submission_history($post_id, $fetch_if_outdated=$fetch_if_outdated);
+            }
+        }
+
+        return $arxiv_submission_histories;
+    }
+
+
+        /**
+         * Get the the html of the warning in case a newer arxiv version exists
+         *
+         * @since    0.4.1+
+         * @access   public
+         * @param    int    $post_id     Id of the post.
+         */
+    public function get_newer_arxiv_version_warning( $post_id ) {
+
+        $settings = O3PO_Settings::instance();
+
+        $post_type = get_post_type($post_id);
+        $date_published = get_post_meta( $post_id, $post_type . '_date_published', true );
+        $eprint = get_post_meta( $post_id, $post_type . '_eprint', true );
+        $eprint_without_version = preg_replace('#v[0-9]+$#u', '', $eprint);
+        preg_match('#(v[0-9]+)$#u', $eprint, $matches);
+        $published_version = $matches[1];
+        $published_version_number = mb_substr($published_version, 1);
+        $arxiv_url_abs_prefix = $settings->get_field_value('arxiv_url_abs_prefix');
+
+        $newer_arxiv_version_warning = '';
+
+        $submission_history = $this->get_arxiv_submission_history($post_id);
+        if(!is_wp_error($submission_history))
+        {
+            $latest_versiom = array_key_last($submission_history);
+            $latest_version_number = mb_substr($latest_versiom, 1);
+
+            if($latest_version_number > $published_version_number)
+            {
+                $newer_arxiv_version_warning .= '<div class="important-box">';
+                $newer_arxiv_version_warning .= '<strong>Updated version:</strong> ';
+                $newer_arxiv_version_warning .= 'The authors have uploaded <a href="' . esc_attr($arxiv_url_abs_prefix . '/' . $eprint_without_version . $latest_versiom) . '" target=_blank>version ' . esc_html($latest_versiom) . '</a> of this work to the arXiv which may contain updates or corrections not contained in the published version ' . esc_html($published_version) . '.';
+                $arxiv_comment = $submission_history[$latest_versiom]['comment'];
+                if(!empty($arxiv_comment))
+                    $newer_arxiv_version_warning .= ' The authors left the following comment on the arXiv:<div class="author-arxiv-comment">' . esc_html($arxiv_comment) . '</div>';
+                $newer_arxiv_version_warning .= '</div>';
+            }
+
+            if(isset($submission_history[$published_version]) && isset($submission_history[$published_version]['date']) && $submission_history[$published_version]['date'] > strtotime($date_published))
+            {
+                $newer_arxiv_version_warning .= '<div class="important-box">';
+                $newer_arxiv_version_warning .= '<strong>Updated after initial publication:</strong> ';
+                $newer_arxiv_version_warning .= 'This publication was updated to version ' . esc_html($published_version) . ' after the initial publication.';
+                $arxiv_comment = $submission_history[$published_version]['comment'];
+                if(!empty($arxiv_comment))
+                    $newer_arxiv_version_warning .= ' The authors left the following comment on the arXiv:<div class="author-arxiv-comment">' . esc_html($arxiv_comment) . '</div>';
+                $newer_arxiv_version_warning .= '</div>';
+            }
+        }
+
+        return $newer_arxiv_version_warning;
     }
 
 
