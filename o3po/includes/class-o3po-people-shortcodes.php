@@ -21,6 +21,11 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-setti
  */
 class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
 
+    public static $shortcode_descriptions = array(
+        'persons-ul' => "An itemized (i.e. not numbered but unordered) list of people.",
+        'persons-count' => "The number of people matching the given criteria.",
+                                                  );
+
     public static $shortcode_atts = array(
         'persons-ul' => array(
             'sort' => array(
@@ -56,7 +61,7 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
             'former' => array(
                 'default' => 'False',
                 'allowed' => ['False', 'True', 'Only'],
-                'description' => 'Whether to include (or only include) people who have left their role fore the current year.',
+                'description' => 'Whether to include (or only include) people who have left their role before the current year.',
                             ),
             'extra' => array(
                 'default' => 'True',
@@ -69,6 +74,18 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
                 'description' => 'Style to apply to every li element.',
                             ),
                               ),
+        'persons-count' => array(
+            'role' => array(
+                'default' => '',
+                'allowed' => ['', 'editor', 'coordinator', 'steering board', 'admin', 'executive board'],
+                'description' => 'If provided only persons with the given role are included. Multiple roles can be given as a comma separated list.',
+                            ),
+            'former' => array(
+                'default' => 'False',
+                'allowed' => ['False', 'True', 'Only'],
+                'description' => 'Whether to include (or only include) people who have left their role before the current year.',
+                              ),
+                                 ),
                                           );
 
         /**
@@ -99,7 +116,7 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
         /**
          * Render the person data field(s)
          *
-         * @since    0.4.1
+         * @since    0.4.1+
          * @access   public
          */
     public static function render_people_shortcode_settings() {
@@ -108,11 +125,11 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
         $person_first_names = $settings->get_field_value('person_first_names');
         $slug = 'people-shortcodes';
 
-        echo '<p>You can use the following shortcodes to generate various lists of persons from the data below anywhere in WordPress:</p>';
+        echo '<p>You can use the following shortcodes to output various information about the people listed below anywhere in WordPress:</p>';
         echo '<dl>';
         foreach(static::$shortcode_atts as $shortcode => $atts)
         {
-            echo '<dt>[' . esc_html($shortcode) . ']</dt>';
+            echo '<dt>[' . esc_html($shortcode) . '] ' . esc_html(static::$shortcode_descriptions[$shortcode]) . '</dt>';
             echo '<dd>With optional attributes:<dl>';
             foreach($atts as $att => $att_property)
                 echo "<dt>" . esc_html($att) . "='" . esc_html(implode('|', $att_property['allowed'])) . "'</dt><dd>" . esc_html($att_property['description']) . " Default is '" . esc_html($att_property['default']) . "'</dd>";
@@ -213,8 +230,15 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
         echo '</div>';
     }
 
-
-    public static function compate_names($name_a, $name_b) {
+        /**
+         * Compare names
+         *
+         * Tries to takes into account name prefixes.
+         *
+         * @since    0.4.1+
+         * @access   public
+         */
+    public static function compare_names($name_a, $name_b) {
         $name_a = trim($name_a);
         $name_b = trim($name_b);
 
@@ -229,25 +253,38 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
         return strnatcmp($name_a_without_prefix, $name_b_without_prefix);
     }
 
+        /**
+         * Sort by last names
+         *
+         * @since    0.4.1+
+         * @access   public
+         */
     public static function sort_by_last_names($person_a, $person_b) {
 
-        return static::compate_names($person_a['last_names'], $person_b['last_names']);
-    }
-
-    public static function sort_by_first_names($person_a, $person_b) {
-
-        return static::compate_names($person_a['first_names'], $person_b['first_names']);
+        return static::compare_names($person_a['last_names'], $person_b['last_names']);
     }
 
         /**
+         * Sort by first names
          *
-         * To be added as a shortcode via add_shortcode()
-         *
+         * @since    0.4.1+
+         * @access   public
          */
-    public static function persons_ul_shortcode( $atts, $content, $tag ) {
+    public static function sort_by_first_names($person_a, $person_b) {
 
-        foreach(static::$shortcode_atts['persons-ul'] as $key => $value)
-            if(empty($atts[$key])) $atts[$key] = $value['default'];
+        return static::compare_names($person_a['first_names'], $person_b['first_names']);
+    }
+
+
+        /**
+         * Get person data from settings storage in a convenient array structure
+         *
+         * @since  0.4.1+
+         * @access public
+         * @return array Array with of arrays, one per person, containing that
+         *               persons data.
+         */
+    public static function get_person_data() {
 
         $settings = O3PO_Settings::instance();
         $person_first_names = $settings->get_field_value('person_first_names');
@@ -273,6 +310,33 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
                 'country' => $person_country[$x],
                 'extra' => $person_extra[$x],
                                    );
+
+        return $person_data;
+    }
+
+
+        /**
+         * Function generating the person-ul shotcode
+         *
+         * To be added as a shortcode via add_shortcode()
+         *
+         * @since  0.4.1+
+         * @access public
+         * @param  array  $atts Array of attributes
+         * @param  string $content Content of the shortcode (is ignored)
+         * @param  string $tag Ignored
+         * @return string The html formated list
+         */
+    public static function persons_ul_shortcode( $atts, $content, $tag ) {
+
+        if(empty($atts))
+            $atts = array();
+
+        foreach(static::$shortcode_atts['persons-ul'] as $key => $value)
+            if(empty($atts[$key])) $atts[$key] = $value['default'];
+
+        $person_data = static::get_person_data();
+
         if($atts['sort'] === 'last_names')
             uasort($person_data, array('self', 'sort_by_last_names'));
         elseif($atts['sort'] === 'first_names')
@@ -331,9 +395,60 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
         return $result;
     }
 
+
+        /**
+         * Function generating the person-count shotcode
+         *
+         * To be added as a shortcode via add_shortcode()
+         *
+         * @since  0.4.1+
+         * @access public
+         * @param  array  $atts Array of attributes
+         * @param  string $content Content of the shortcode (is ignored)
+         * @param  string $tag Ignored
+         * @return int The count
+         */
+    public static function persons_count_shortcode( $atts, $content, $tag ) {
+
+        if(empty($atts))
+            $atts = array();
+
+        foreach(static::$shortcode_atts['persons-count'] as $key => $value)
+            if(empty($atts[$key])) $atts[$key] = $value['default'];
+
+        $person_data = static::get_person_data();
+
+        $current_year = date('Y');
+        $count = 0;
+        foreach($person_data as $x => $person)
+        {
+            if($atts['former'] === 'False')
+                if(!empty($person['until_year']) and $current_year > $person['until_year'])
+                    continue;
+            if($atts['former'] === 'Only')
+                if(empty($person['until_year']) or $current_year < $person['until_year'])
+                    continue;
+
+            if(empty($atts['role']) or $atts['role'] === $person['role'] or in_array($person['role'], preg_split('/\s*,\s*/u', $atts['role'])))
+                $count += 1;
+        }
+
+        return $count;
+    }
+
+
+        /**
+         * Add shortcodes of this class
+         *
+         * To be added to the init hook.
+         *
+         * @since  0.4.1+
+         * @access public
+         */
     public static function add_shortcodes() {
 
         add_shortcode('persons-ul', array('O3PO_PeopleShortcodes', 'persons_ul_shortcode'));
+        add_shortcode('persons-count', array('O3PO_PeopleShortcodes', 'persons_count_shortcode'));
 
     }
 }
