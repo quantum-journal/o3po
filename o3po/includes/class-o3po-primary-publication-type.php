@@ -1676,7 +1676,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $post_type = get_post_type($post_id);
         $eprint = get_post_meta( $post_id, $post_type . '_eprint', true );
 
-        $arxiv_submission_history = get_post_meta( $post_id, $post_type . '_arxiv_submission_history', true );
+        $arxiv_submission_history = static::get_post_meta_field_containing_array( $post_id, $post_type . '_arxiv_submission_history', true );
         $arxiv_submission_history_timestamp = get_post_meta( $post_id, $post_type . '_arxiv_submission_history_timestamp', true );
         $arxiv_submission_history_last_fetch_attempt_timestamp = get_post_meta( $post_id, $post_type . '_arxiv_submission_history_last_fetch_attempt_timestamp', true );
         if(empty($arxiv_submission_history_last_fetch_attempt_timestamp) or ($fetch_if_outdated and time() - $arxiv_submission_history_last_fetch_attempt_timestamp > $arxiv_submission_history_refresh_seconds))
