@@ -3237,4 +3237,55 @@ abstract class O3PO_PublicationType {
         return $default_image_url;
     }
 
+
+        /**
+         * Return false for posts of this type when they are already published
+         *
+         * @since  0.4.2
+         * @access public
+         * @param  bool    $delete   Whether this post is supposed to be trashed/deleted
+         * @param  WP_Post $post     Post
+         */
+    function prevent_deletion($delete, $post) {
+        $post_id = $post->ID;
+        $post_type = $post->post_type;
+
+        if($this->get_publication_type_name() === $post_type && get_post_status($post_id) === 'publish')
+            return False;
+
+        return $delete;
+    }
+
+
+        /**
+         * Check whether this post can be deleted
+         *
+         * To be added to the 'pre_delete_post' filter.
+         *
+         * @since  0.4.2
+         * @access public
+         * @param  bool    $delete       Whether this post is supposed to be deleted
+         * @param  WP_Post $post         Post
+         * @param  bool    $force_delete Whether this is a force delete
+         */
+    function pre_delete_post( $delete, $post, $force_delete ) {
+        return $this->prevent_deletion($delete, $post);
+    }
+
+
+        /**
+         * Check whether this post can be trashed
+         *
+         * To be added to the 'pre_trash_post' filter.
+         *
+         * @since  0.4.2
+         * @access public
+         * @param  bool    $delete       Whether this post is supposed to be trashed
+         * @param  WP_Post $post         Post
+         */
+    function pre_trash_post( $trash, $post ) {
+        return $this->prevent_deletion($trash, $post);
+    }
+
+
 }
