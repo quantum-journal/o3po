@@ -331,6 +331,12 @@ class O3PO {
         if(!empty($settings->get_field_value('relevanssi_mime_types_to_exclude')))
             $this->loader->add_filter( 'relevanssi_do_not_index', null, 'O3PO_Relevanssi::exclude_mime_types_by_regexp', 10, 2 );
 
+            //add hooks for the publication types
+        $this->loader->add_filter('pre_delete_post', $this->primary_publication_type, 'pre_delete_post', 10, 3);
+        $this->loader->add_filter('pre_trash_post', $this->primary_publication_type, 'pre_trash_post', 10, 2);
+        $this->loader->add_filter('pre_delete_post', $this->secondary_publication_type, 'pre_delete_post', 10, 3);
+        $this->loader->add_filter('pre_trash_post', $this->secondary_publication_type, 'pre_trash_post', 10, 2);
+
 	}
 
         /**
