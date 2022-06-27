@@ -93,13 +93,12 @@ It is obviously a play on the name of humanoid robot character from a series of 
 
 ### 0.4.2
 * More robust error handling for the case of pdf-only arXiv manuscripts
-
+* Support for ShortDOIs https://shortdoi.org/
 ### 0.4.1
 * Added shortcodes to generate various lists of contributing people from data that can be specified in the plugin settings
 * Support database cites in cited by data
 * Fix for recognizing certain ways of specifying affiliations from latex source code
 * Ensure that MathML title and absctract are always valid xml
-
 ### 0.4.0
 * Compatibility with PHP 8.0
 * Added form for submission to works ready to publish
