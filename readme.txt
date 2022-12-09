@@ -92,7 +92,7 @@ It is obviously a play on the name of humanoid robot character from a series of 
 ## Changelog
 
 ### 0.4.2
-* Threat .txt files like LaTeX source files because this is what the arXiv seems to be doing
+* Treat .txt files like LaTeX source files because this is what the arXiv seems to be doing
 * More robust error handling for the case of pdf-only arXiv manuscripts
 * Support for ShortDOIs https://shortdoi.org/
 * Prevent accidental trashing or deletion of publication posts after public publishing
