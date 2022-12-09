@@ -1377,8 +1377,8 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             }
 
                 //Loop over the source files
-            foreach($source_files as $entry ) {
-                if($entry->isFile() && ( mb_substr($entry->getPathname(), -4) === '.bbl' || mb_substr($entry->getPathname(), -4) === '.tex' ) )
+            foreach($source_files as $entry) {
+                if($entry->isFile() && preg_match('#\.(bbl|tex|txt)$#u', $entry->getPathname()))
                 {
                     $filecontents = $this->environment->file_get_contents_utf8($entry->getPathname());
                     $filecontents_without_comments = preg_replace('#(?<!\\\\)%.*#u', '', $filecontents);//remove all comments
@@ -1392,13 +1392,14 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                 }
             }
             foreach($source_files as $entry ) {
-                if($entry->isFile() && ( mb_substr($entry->getPathname(), -4) === '.bbl' || mb_substr($entry->getPathname(), -4) === '.tex' ) )
+                if($entry->isFile() && preg_match('#\.(bbl|tex|txt)$#u', $entry->getPathname()))
                 {
                     $filecontents = $this->environment->file_get_contents_utf8($entry->getPathname());
                     $filecontents_without_comments = preg_replace('#(?<!\\\\)%.*#u', '', $filecontents);//remove all comments
 
                         //Look for bibliographies and extract them
                     $thisbbl = O3PO_Latex::extract_bibliographies($filecontents_without_comments);//we search the file with comments removed to not accidentially pic up a commented out bibliography
+
                     if(!empty($thisbbl)) {
                         $validation_result .= "REVIEW: Found BibTeX or manually formated bibliographic information in " . $entry->getPathname() . ".\n";
                         if(!empty($bbl))
@@ -1421,7 +1422,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             $authors_since_last_affiliation = array();
 
             foreach($source_files as $entry ) {
-                if($entry->isFile() && ( mb_substr($entry->getPathname(), -4) === '.tex' ) )
+                if($entry->isFile() && preg_match('#\.(tex|txt)$#u', $entry->getPathname()))
                 {
                     $filecontents = $this->environment->file_get_contents_utf8($entry->getPathname());
                     $filecontents_without_comments = preg_replace('#(?<!\\\\)%.*#u', '', $filecontents);//remove all comments
