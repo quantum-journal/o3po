@@ -322,7 +322,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
                 if(!empty($citations[$n]['doi']))
                 {
                     $citations[$n]['doi'] = preg_replace('#(http://|https://|)(doi\.org/|dx\.doi.org/)#u', '', $citations[$n]['doi']);
-                    if(!preg_match('#^10\.[0-9]{4,9}/.{1,200}$#u', $citations[$n]['doi']))
+                    if(!preg_match('#^(10\.[0-9.]{4,9}/.{1,200}|10/[0-9a-z]+)$#u', $citations[$n]['doi']))
                         unset($citations[$n]['doi']);
                 }
 
@@ -534,7 +534,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
             if(!empty($citations[$n]['doi']))
             {
                 $citations[$n]['doi'] = preg_replace('#(http://|https://|)(doi\.org/|dx\.doi.org/)#u', '', $citations[$n]['doi']);
-                if(!preg_match('#^10\.[0-9]{4,9}/.{1,200}$#u', $citations[$n]['doi']))
+                if(!preg_match('#^(10\.[0-9.]{4,9}/.{1,200}|10/[0-9a-z]+)$#u', $citations[$n]['doi']))
                     unset($citations[$n]['doi']);
             }
 

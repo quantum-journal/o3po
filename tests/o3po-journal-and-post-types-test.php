@@ -404,6 +404,13 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         $settings = O3PO_SettingsTest::get_settings();
 
         return [
+            [dirname(__FILE__) . '/resources/arxiv/2202.11338v4.tar.gz', "application/x-tar", array(
+                    "affiliations" => array("#Hon Hai Quantum Computing Research Center, Taipei, Taiwan#"),
+                    "author_affiliations" => '/1###2,3###1/u',
+                    "validation_result" => array("#REVIEW: Found BibTeX or manually formated bibliographic information#"),
+                    "bbl" => array('#PhysRevA\.85\.042311#'),
+                    'num_dois' => 70,
+                                                                                                   )],
             [dirname(__FILE__) . '/resources/arxiv/1711.04662v3.tar.gz', "application/gzip", array(
                     "affiliations" => array('#Aix-Marseille Univ, Université de Toulon, CNRS, LIS, Marseille, and IXXI, Lyon, France#', '#Aix-Marseille Univ, Université de Toulon, CNRS, LIS, Marseille, France and Departamento de Física Teórica and IFIC, Universidad de Valencia-CSIC, Dr. Moliner 50, 46100-Burjassot, Spain#', '#Aix-Marseille Univ, Université de Toulon, CNRS, LIS, Marseille, France#'),
                     "author_affiliations" => '/1###2###3/u',

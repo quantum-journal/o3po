@@ -891,12 +891,17 @@ function wp_remote_get( $url, $args=array() ) {
         //return http_get( $url, $args );
 
     $local_file_urls = array(
+        'https://arxiv.org/abs/2004.04173' => dirname(__FILE__) . '/arxiv/2004.04173v4.html',
         'https://arxiv.org/abs/0809.2542v4' => dirname(__FILE__) . '/arxiv/0809.2542v4.html',
+        'https://arxiv.org/abs/1609.09584v4' => dirname(__FILE__) . '/arxiv/1609.09584v4.html',
+        'https://arxiv.org/abs/1609.09584' => dirname(__FILE__) . '/arxiv/1609.09584v4.html',
         'https://arxiv.org/abs/0809.2542v5' => dirname(__FILE__) . '/arxiv/0809.2542v5.html',
+        'https://arxiv.org/abs/0809.2542' => dirname(__FILE__) . '/arxiv/0809.2542v5.html',
         'https://arxiv.org/abs/1609.09584v4' => dirname(__FILE__) . '/arxiv/1609.09584v4.html',
         'https://arxiv.org/abs/0908.2921v2' => dirname(__FILE__) . '/arxiv/0908.2921v2.html',
         'https://arxiv.org/abs/1806.02820v3' => dirname(__FILE__) . '/arxiv/1806.02820v3.html',
         'https://arxiv.org/abs/2006.01273v3' => dirname(__FILE__) . '/arxiv/2006.01273v3.html',
+        'https://arxiv.org/abs/2006.01273' => dirname(__FILE__) . '/arxiv/2006.01273v3.html',
          'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0908.2921&fl=citation' => dirname(__FILE__) . '/ads/0908.2921.json',
         'https://api.adsabs.harvard.edu/v1/search/query?q=arxiv:0809.2542&fl=citation' => dirname(__FILE__) . '/ads/0809.2542.json',
         'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2010CoTPh..54.1023Z+OR+bibcode:2011EPJB...81..155H+OR+bibcode:2011JSMTE..05..023Z+OR+bibcode:2014PhyA..414..240P&fl=doi,title,author,page,issue,volume,year,pub,pubdate&rows=1000' => dirname(__FILE__) . '/ads/0809.2542_citations.json',

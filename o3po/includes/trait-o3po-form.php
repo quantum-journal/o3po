@@ -690,7 +690,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
             else
                 $this_name = $name;
             $this_name = strip_tags($this_name);
-            $result[$key] = $this_name;
+            $result[$key] = trim($this_name);
         }
 
         return $result;
@@ -744,6 +744,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         $result = array();
         foreach($input as $key => $input)
         {
+            $input = trim($input);
             if(preg_match('/^[0-9]{4}$/u', $input))
                 $result[] = $input;
             else
@@ -778,6 +779,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         $result = array();
         foreach($input as $key => $input)
         {
+            $input = trim($input);
             if(empty($input) or preg_match('/^[0-9]{4}$/u', $input))
                 $result[] = $input;
             else

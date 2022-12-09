@@ -12,6 +12,9 @@
 
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-plotter.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-publication-type.php';
+
+
 
 /**
  * The admin-specific functionality of the plugin.
@@ -140,14 +143,19 @@ class O3PO_Admin {
          * @since 0.3.0
          */
     public function add_meta_data_explorer_page_to_menu() {
-        add_menu_page(
-            $this->get_plugin_pretty_name() . ' meta-data explorer',
-            $this->get_plugin_pretty_name() . ' meta-data',
-            'administrator',
-            $this->get_plugin_name() . '-meta-data-explorer',
-            array($this, 'render_meta_data_explorer'),
-            'dashicons-chart-pie'
-                      );
+
+        foreach(['editor', 'administrator'] as $role)
+        {
+            if(current_user_can($role))
+                add_menu_page(
+                    $this->get_plugin_pretty_name() . ' meta-data explorer',
+                    $this->get_plugin_pretty_name() . ' meta-data',
+                    $role,
+                    $this->get_plugin_name() . '-meta-data-explorer',
+                    array($this, 'render_meta_data_explorer'),
+                    'dashicons-chart-pie'
+                              );
+        }
     }
 
         /**
@@ -157,6 +165,10 @@ class O3PO_Admin {
          * @sinde 0.3.0
          */
     public function render_meta_data_explorer() {
+
+        if( !current_user_can('editor') && !current_user_can('administrator') )
+            return "<p>You are not allowed to access this page.</p>";
+
         $html = '<div class="wrap">';
         $html .= '<h2>' . $this->get_plugin_pretty_name() .' meta-data explorer</h2>';
         $html .= '</div>';
@@ -185,8 +197,8 @@ class O3PO_Admin {
 
         if($active_tab === 'meta-data')
         {
-
-            $html .= '<p>This is only a very basic summary of some of the meta-data fields of the published publications. In the future this page will allow a more customizable display and export of that meta-data.</p>';
+            $html .= '<h3>Meta-data export</h3>';
+            $html .= '<p>Here you can display and export some of the stored meta-data.</p>';
 
             $post_type_names = O3PO_PublicationType::get_active_publication_type_names();
             if(isset( $_GET['post_type'] ))
@@ -384,7 +396,7 @@ class O3PO_Admin {
                 sort($citations_data['all_citing_dois_in_two_years_preceeding'][$year_to_display]);
                 foreach($citations_data['all_citing_dois_in_two_years_preceeding'][$year_to_display] as $doi)
                     $html .= '<div><a href="' . esc_attr($doi_url_prefix . $doi) . '">' . esc_html($doi) . '</a></div>';
-        }
+                }
 
             }
 
@@ -392,8 +404,67 @@ class O3PO_Admin {
             wp_reset_postdata();
 
             $html .= '<h4>Why is the data not always up to date?</h4>';
-            $html .= '<p>Fetching cited-by data is a time consuming operation for which external services need to be queried. Fresh cited-by data is thus fetched when the page of a publication is visited and the last time cited-by data for that publication was fetched lies more than ' . $cited_by_refresh_seconds . ' seconds in the past. This balances the load and makes sure that cited by data is always reasonably up to date. If, for some reason, you want to fetch fresh cited-by data for all publications with cited-by data older ' . $cited_by_refresh_seconds . ' seconds you can press the fetch fresh data button below. Beware that this might be a very long operation that can easily time out depending on your server setup and the number of publications.</p>';
+            $html .= '<p>Fetching cited-by data is a time consuming operation for which external services need to be queried. Fresh cited-by data is thus fetched when the page of a publication is visited and the last time cited-by data for that publication was fetched lies more than ' . esc_html($cited_by_refresh_seconds) . ' seconds in the past. This balances the load and makes sure that cited by data is always reasonably up to date. If, for some reason, you want to fetch fresh cited-by data for all publications with cited-by data older than ' . esc_html($cited_by_refresh_seconds) . ' seconds you can press the fetch fresh data button below. Beware that this might be a very long operation that can easily time out depending on your server setup and the number of publications.</p>';
             $html .= '<form method="post" action="' . esc_url('?page=' . $this->get_plugin_name() . '-meta-data-explorer' . '&amp;tab=' . $tab_slug) . '"><input type="checkbox" id="refresh" name="refresh" value="checked" /><label for="refresh">I have read the above text on refreshing cited-by data.</label><input id="submit" type="submit" value="Refresh cited-by data"></form>';
+        }
+        elseif($active_tab === 'updated-after-publication')
+        {
+            $html .= '<h3>Updated on the arXiv</h3>';
+
+            $settings = O3PO_Settings::instance();
+            $arxiv_url_abs_prefix = $settings->get_field_value('arxiv_url_abs_prefix');
+
+            $fetch_if_outdated = false;
+            if(isset($_POST['refresh']) and $_POST['refresh'] === 'checked')
+                $fetch_if_outdated = true;
+
+            $post_type = $settings->get_field_value('primary_publication_type_name');
+            $post_type_instance = O3PO_PublicationType::get_active_publication_types($post_type);
+
+            $post_type_singular_name = $post_type_instance->get_publication_type_name();
+            $post_type_plural_name = $post_type_instance->get_publication_type_name_plural();
+
+            $html .= '<p>The following ' . $post_type_plural_name . ' have been updated on the arXiv to a version newer than the published version:</p>';
+
+            $arxiv_submission_histories = $post_type_instance->get_all_arxiv_submission_histories($fetch_if_outdated);
+            $html .= '<ul>';
+            foreach($arxiv_submission_histories as $post_id => $arxiv_submission_history)
+            {
+                if(is_wp_error($arxiv_submission_history))
+                {
+                    $html .= '<li>' . ' <a href="' . esc_attr('/' . $post_type . '/' . $doi_suffix) .  '" target=_blank>' . esc_html(ucfirst($post_type_singular_name)) . ' ' . esc_html($doi_suffix) . ': version history could not be fetched from the arXiv: ' . esc_html($arxiv_submission_history->get_error_message()) . '</li>';
+                    continue;
+                }
+
+                $date_published = get_post_meta( $post_id, $post_type . '_date_published', true );
+                $eprint = get_post_meta( $post_id, $post_type . '_eprint', true );
+                $eprint_without_version = preg_replace('#v[0-9]+$#u', '', $eprint);
+                preg_match('#(v[0-9]+)$#u', $eprint, $matches);
+                $published_version = $matches[1];
+                $published_version_number = mb_substr($published_version, 1);
+
+                $latest_versiom = array_key_last($arxiv_submission_history);
+                $latest_version_number = mb_substr($latest_versiom, 1);
+
+                if($latest_version_number > $published_version_number)
+                {
+                    $doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
+                    $html .= '<li>' . ' <a href="' . esc_attr('/' . $post_type . '/' . $doi_suffix) .  '" target=_blank>' . esc_html(ucfirst($post_type_singular_name)) . ' ' . esc_html($doi_suffix) . ': published version is ' . esc_html($published_version) . '</a> but the <a href="' . esc_attr($arxiv_url_abs_prefix . '/' . $eprint_without_version . $latest_versiom). '" target=_blank>latest arXiv version is ' . esc_html($latest_versiom) . '</a>.<br />ArXiv comment on ' . esc_html($latest_versiom) . ':"' . esc_html($arxiv_submission_history[$latest_versiom]['comment']) . '"</li>';
+                }
+
+                if(isset($arxiv_submission_history[$published_version]) && $arxiv_submission_history[$published_version]['date'] && $arxiv_submission_history[$published_version]['date'] > strtotime($date_published))
+                {
+                    $doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
+                    $html .= '<li>' . ' <a href="' . esc_attr('/' . $post_type . '/' . $doi_suffix) .  '" target=_blank>' . esc_html(ucfirst($post_type_singular_name)) . ' ' . esc_html($doi_suffix) . ': published version is ' . esc_html($published_version) . '</a> which appeared on the arXiv after this work was first published, which indicates that the publication was updated post publication.</li>';
+                }
+            }
+            $html .= '</ul>';
+
+            $arxiv_submission_history_refresh_seconds = $settings->get_field_value('arxiv_submission_history_refresh_seconds');
+
+            $html .= '<h4>Why is the data not always up to date?</h4>';
+            $html .= '<p>Updating submission history data requires fetching the abstract page from the arXiv. Fresh submission history data is thus fetched when the page of a publication is visited and the last time submission history data for that publication was fetched lies more than ' . esc_html($arxiv_submission_history_refresh_seconds) . ' seconds in the past. This balances the load and makes sure that submission history data is always reasonably up to date. If, for some reason, you want to fetch fresh submission history data for all publications with data older than ' . esc_html($arxiv_submission_history_refresh_seconds) . ' seconds you can press the fetch fresh data button below. Beware that this might be a very long operation that can easily time out depending on your server setup and the number of publications.</p>';
+            $html .= '<form method="post" action="' . esc_url('?page=' . $this->get_plugin_name() . '-meta-data-explorer' . '&amp;tab=' . $tab_slug) . '"><input type="checkbox" id="refresh" name="refresh" value="checked" /><label for="refresh">I have read the above text on refreshing submission history data.</label><input id="submit" type="submit" value="Refresh submission history data"></form>';
         }
 
         echo $html;
@@ -408,7 +479,8 @@ class O3PO_Admin {
          */
     private $meta_data_explorer_tabs = [
         'meta-data' => 'Meta-data',
-        'citation-metrics' => 'Citation metrics'
+        'citation-metrics' => 'Citation metrics',
+        'updated-after-publication' => 'Updated after publication',
                                              ];
 
 

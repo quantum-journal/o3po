@@ -450,6 +450,9 @@ class O3PO_Crossref {
                 return htmlentities(html_entity_decode($matches[0]), ENT_XML1);
             }, $xml);
 
+        # Crossref wants & encoded as amp and not as the equally valid &#038;
+        $xml = str_replace('&#038;', '&amp;', $xml);
+
         return $xml;
     }
 }
