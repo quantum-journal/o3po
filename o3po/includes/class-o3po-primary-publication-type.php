@@ -1419,16 +1419,21 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             $new_author_affiliations = array();
             $new_affiliations = array();
             $author_number = -1;
-            $authors_since_last_affiliation = array();
+            $author_names = array();
 
             foreach($source_files as $entry ) {
+                $authors_since_last_affiliation = array();
                 if($entry->isFile() && preg_match('#\.(tex|txt)$#u', $entry->getPathname()))
                 {
                     $filecontents = $this->environment->file_get_contents_utf8($entry->getPathname());
                     $filecontents_without_comments = preg_replace('#(?<!\\\\)%.*#u', '', $filecontents);//remove all comments
+                    if(preg_match('#\\\\maketitle#u', $filecontents_without_comments))
+                        $until_maketitle_contents_without_comments = preg_replace('#(\\\\maketitle).*#us', '', $filecontents_without_comments);
+                    else # if there is no \maketitle quantumarticle will call \maketitle in \begin{abstract}
+                        $until_maketitle_contents_without_comments = preg_replace('#(\\\\begin{abstract}).*#us', '', $filecontents_without_comments);
 
                         // Extract author, affiliation and similar information from the source
-                    preg_match_all('#\\\\(author|affiliation|affil|address|orcid|homepage)\s*([^{]*)\s*(?=\{((?:[^{}]++|\{(?3)\})*)\})#u', $filecontents_without_comments, $author_info);//matches balanced parenthesis (Note the use of (?3) here!) to test changes go here https://regex101.com/r/bVHadc/1
+                    preg_match_all('#\\\\(author|affiliation|affil|address|orcid|homepage)\s*([^{]*)\s*(?=\{((?:[^{}]++|\{(?3)\})*)\})#u', $until_maketitle_contents_without_comments, $author_info);//matches balanced parenthesis (Note the use of (?3) here!) to test changes go here https://regex101.com/r/bVHadc/1
                     if(!empty($author_info[0]) && !empty($author_info[1]))
                     {
                         if($author_number !== -1)
@@ -1445,8 +1450,13 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                         for($x = 0; $x < count($author_info[1]) ; $x++) {
                             if( $author_info[1][$x] === 'author')
                             {
-                                $author_number += 1;
-
+                                $author_name = $author_info[3][$x];
+                                $author_number = array_search($author_name, $author_names, True);
+                                if($author_number === false)
+                                {
+                                    $author_number = count($author_names);
+                                    $author_names[] = $author_name;
+                                }
                                     /* It is difficult to extract the author name from the source
                                      * as the LaTeX \author macro gives no clue about what is the
                                      * given name and what is the surname. We hence ignore
@@ -1488,11 +1498,16 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                                     {
                                         foreach($authors_since_last_affiliation as $author_number_since_last_affiliation)
                                         {
+                                            $current_affiliation_num = (array_search($current_affiliation, $new_affiliations , true)+1);
                                             if(empty($new_author_affiliations[$author_number_since_last_affiliation]))
                                                 $new_author_affiliations[$author_number_since_last_affiliation] = '';
-                                            else
+                                            $already_affiliation_nums = preg_split("#,#u", $new_author_affiliations[$author_number_since_last_affiliation]);
+                                            if(!empty($already_affiliation_nums) && array_search($current_affiliation_num, $already_affiliation_nums) !== false)
+                                                continue;
+
+                                            if(!empty($new_author_affiliations[$author_number_since_last_affiliation]))
                                                 $new_author_affiliations[$author_number_since_last_affiliation] .= ',';
-                                            $new_author_affiliations[$author_number_since_last_affiliation] .= (array_search($current_affiliation, $new_affiliations , true)+1);
+                                            $new_author_affiliations[$author_number_since_last_affiliation] .= $current_affiliation_num;
                                         }
                                         $was_affiliation_since_last_author = true;
                                     }
