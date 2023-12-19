@@ -91,6 +91,8 @@ It is obviously a play on the name of humanoid robot character from a series of 
 
 ## Changelog
 
+### 0.4.3
+* Unpack tar.gz files in one go to avoid problems with long file names (see https://stackoverflow.com/questions/24800217/phardata-limitation-of-file-name-length)
 ### 0.4.2
 * Treat .txt files like LaTeX source files because this is what the arXiv seems to be doing
 * More robust error handling for the case of pdf-only arXiv manuscripts
