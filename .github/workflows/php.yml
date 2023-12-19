@@ -18,10 +18,21 @@ jobs:
       matrix:
         php-versions: ['7.4', '8.0']
         phpunit-versions: ['latest']
-                  
-    steps:
-    - uses: actions/checkout@v3
 
+    steps:
+    
+    - name: Checkout
+      uses: actions/checkout@v3
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@verbose
+      with:
+        php-version: ${{ matrix.php-versions }}
+        ini-values: post_max_size=256M, max_execution_time=180
+        tools: phpunit:${{ matrix.phpunit-versions }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
     # - name: Validate composer.json and composer.lock
     #   run: composer validate --strict
 
@@ -37,5 +48,5 @@ jobs:
     # - name: Install dependencies
     #   run: composer install --prefer-dist --no-progress --no-interaction --ignore-platform-reqs
     
-    - name: Run test suite
+    - name: Run tests
       run: make test
