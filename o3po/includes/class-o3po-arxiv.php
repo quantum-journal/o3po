@@ -183,6 +183,8 @@ class O3PO_Arxiv {
             $submission_history = array();
             foreach($submission_history_version_nodes as $idx => $version_node)
             {
+                if(empty($submission_history_date_size_info_nodes[$idx]->nodeValue))
+                    continue;
                 preg_match('#\s*(?<date>[^[(]*) \((?<size>[0-9,.]* [kKmMgGbB]*)\)#u', $submission_history_date_size_info_nodes[$idx]->nodeValue, $match);
 
                 if(!array_key_exists('date', $match) || !array_key_exists('size', $match))
@@ -194,6 +196,7 @@ class O3PO_Arxiv {
                     'comment' => '', # we currently only fetch and add the comment of the latest version below
                                                                                         );
             }
+            return new WP_Error('exception', "faefaef" . json_encode($submission_history));
 
             $comments_node = $x_path->query("/html/body//div[contains(@class, 'metatable')]//td[contains(@class, 'comments')]")[0];
             if($comments_node)
