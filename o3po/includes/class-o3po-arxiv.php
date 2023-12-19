@@ -185,6 +185,9 @@ class O3PO_Arxiv {
             {
                 preg_match('#\s*(?<date>[^[(]*) \((?<size>[0-9,.]* [kKmMgGbB]*)\)#u', $submission_history_date_size_info_nodes[$idx]->nodeValue, $match);
 
+                if(!in_array('date', $match))
+                    return new WP_Error('exception', "ERROR: did not find date in match " . json_encode($match) . " from " . $submission_history_date_size_info_nodes[$idx]->nodeValue . " with id" . $id);
+
                 $submission_history[mb_substr($version_node->nodeValue, 1, -1)] = array(
                     'date' => strtotime($match['date']),
                     'size' => $match['size'],
