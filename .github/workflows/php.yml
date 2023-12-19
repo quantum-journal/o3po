@@ -1,4 +1,4 @@
-name: PHP Composer
+name: PHPUnit
 
 on:
   push:
@@ -10,10 +10,15 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  unittest:
 
     runs-on: ubuntu-latest
-
+    
+    strategy:
+      matrix:
+        php-versions: ['7.4', '8.0']
+        phpunit-versions: ['latest']
+                  
     steps:
     - uses: actions/checkout@v3
 
