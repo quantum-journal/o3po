@@ -13,17 +13,20 @@ jobs:
   unittest:
 
     runs-on: ubuntu-latest
-    
+
     strategy:
       matrix:
         php-versions: ['7.4', '8.0']
         phpunit-versions: ['latest']
 
     steps:
-    
+
+    - name: Install exiftool
+      run: apt-get install libimage-exiftool-perl
+
     - name: Checkout
       uses: actions/checkout@v3
-    
+
     - name: Setup PHP
       uses: shivammathur/setup-php@verbose
       with:
@@ -32,7 +35,7 @@ jobs:
         tools: phpunit:${{ matrix.phpunit-versions }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    
+
     # - name: Validate composer.json and composer.lock
     #   run: composer validate --strict
 
@@ -47,6 +50,6 @@ jobs:
 
     # - name: Install dependencies
     #   run: composer install --prefer-dist --no-progress --no-interaction --ignore-platform-reqs
-    
+
     - name: Run tests
       run: make test
