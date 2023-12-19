@@ -183,7 +183,12 @@ class O3PO_Arxiv {
             $submission_history = array();
             foreach($submission_history_version_nodes as $idx => $version_node)
             {
+                if(strlen(trim($submission_history_date_size_info_nodes[$idx]->nodeValue)) == 0)
+                    continue;
                 preg_match('#\s*(?<date>[^[(]*) \((?<size>[0-9,.]* [kKmMgGbB]*)\)#u', $submission_history_date_size_info_nodes[$idx]->nodeValue, $match);
+
+                if(!array_key_exists('date', $match) || !array_key_exists('size', $match))
+                    return new WP_Error('exception', "ERROR: did not find date in match " . json_encode($match) . " from " . $submission_history_date_size_info_nodes[$idx]->nodeValue . " with id" . $idx . " history so far is: " . json_encode($submission_history));
 
                 $submission_history[mb_substr($version_node->nodeValue, 1, -1)] = array(
                     'date' => strtotime($match['date']),
@@ -191,6 +196,7 @@ class O3PO_Arxiv {
                     'comment' => '', # we currently only fetch and add the comment of the latest version below
                                                                                         );
             }
+            return new WP_Error('exception', "faefaef" . json_encode($submission_history));
 
             $comments_node = $x_path->query("/html/body//div[contains(@class, 'metatable')]//td[contains(@class, 'comments')]")[0];
             if($comments_node)
