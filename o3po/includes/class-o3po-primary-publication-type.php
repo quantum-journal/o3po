@@ -1352,13 +1352,9 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                     }
 
                         //Unpack
-                    $path_tar = preg_replace('/\.gz$/u', '', $path_source);
-                    $path_folder = preg_replace('/\.tar$/u', '', $path_tar) . '_extracted/';
-
+                    $path_folder = preg_replace('/\.tar\.gz$/u', '', $path_source) . '_extracted/';
                     $phar_gz = new PharData($path_source);
-                    $phar_gz->decompress(); // *.tar.gz -> *.tar
-                    $phar_tar = new PharData($path_tar);
-                    $phar_tar->extractTo($path_folder);
+                    $phar_gz->extractTo($path_folder);
 
                 } finally {
                     if(!empty($path_source_copy_to_unlik_later))
