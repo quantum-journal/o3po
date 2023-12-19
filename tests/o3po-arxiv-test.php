@@ -172,7 +172,7 @@ ERROR: No license informatin found on https://arxiv.org/abs/0809.2542v5.
             $this->assertEquals($expected, $submission_history);
         else
         {
-            $this->assertTrue(is_array($submission_history), "submission_history is not an array but of type " . gettype($submission_history));
+            $this->assertTrue(is_array($submission_history), "submission_history is not an array but has class " . get_class($submission_history));
             $this->assertEquals(
                 array_keys($expected),
                 array_keys($submission_history)
