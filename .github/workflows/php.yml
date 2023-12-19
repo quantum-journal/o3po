@@ -10,14 +10,14 @@ permissions:
   contents: read
 
 jobs:
-  unittest:
+  PHPUnit tests:
 
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
-        php-versions: ['7.4', '8.0']
+        php-versions: ['7.4', '8.0', '8.1', '8.2', '8.3']
         phpunit-versions: ['latest']
 
     steps:
@@ -36,6 +36,9 @@ jobs:
         tools: phpunit:${{ matrix.phpunit-versions }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Check PHP
+      run: php -i
 
     # - name: Validate composer.json and composer.lock
     #   run: composer validate --strict
