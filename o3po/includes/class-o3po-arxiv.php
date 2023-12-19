@@ -183,7 +183,7 @@ class O3PO_Arxiv {
             $submission_history = array();
             foreach($submission_history_version_nodes as $idx => $version_node)
             {
-                if(empty($submission_history_date_size_info_nodes[$idx]->nodeValue))
+                if(strlen(trim($submission_history_date_size_info_nodes[$idx]->nodeValue)) == 0)
                     continue;
                 preg_match('#\s*(?<date>[^[(]*) \((?<size>[0-9,.]* [kKmMgGbB]*)\)#u', $submission_history_date_size_info_nodes[$idx]->nodeValue, $match);
 
