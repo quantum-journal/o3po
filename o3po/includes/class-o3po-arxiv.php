@@ -178,13 +178,16 @@ class O3PO_Arxiv {
 
             $submission_history_node = $x_path->query("/html/body//div[contains(@class, 'submission-history')]")[0];
             $submission_history_version_nodes = $x_path->query("/html/body//div[contains(@class, 'submission-history')]/strong");
-            $submission_history_date_size_info_nodes = $x_path->query("/html/body//div[contains(@class, 'submission-history')]/strong/following-sibling::text()");
+            $submission_history_date_size_info_nodes = $x_path->query("/html/body//div[contains(@class, 'submission-history')]/strong/following-sibling::text()[normalize-space()]");
+
+            if(count($submission_history_version_nodes) != count($submission_history_date_size_info_nodes))
+                return new WP_Error('exception', "lengths do not match! " . json_encode($submission_history_version_nodes) . " " . json_encode($submission_history_date_size_info_nodes));
 
             $submission_history = array();
             foreach($submission_history_version_nodes as $idx => $version_node)
             {
-                if(strlen(trim($submission_history_date_size_info_nodes[$idx]->nodeValue)) == 0)
-                    continue;
+                /* if(strlen(trim($submission_history_date_size_info_nodes[$idx]->nodeValue)) == 0) */
+                /*     continue; */
                 preg_match('#\s*(?<date>[^[(]*) \((?<size>[0-9,.]* [kKmMgGbB]*)\)#u', $submission_history_date_size_info_nodes[$idx]->nodeValue, $match);
 
                 if(!array_key_exists('date', $match) || !array_key_exists('size', $match))
