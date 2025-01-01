@@ -2761,6 +2761,38 @@ abstract class O3PO_PublicationType {
 
 
         /**
+         * Echo the afiliations text formated.
+         *
+         * Semicolon separated list of all distinct affiliations.
+         *
+         * @since     0.4.3+
+         * @access    public
+         * @param     int       $post_id      Id of the post.
+         */
+    public static function get_formated_affiliations( $post_id ) {
+
+        $post_type = get_post_type($post_id);
+        $affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_affiliations');
+        $number_affiliations = get_post_meta( $post_id, $post_type . '_number_affiliations', true );
+        $author_affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_affiliations');
+
+        if ( empty($affiliations) ) return '';
+
+        $formated_affiliations = "";
+        $first_affiliation = True;
+        foreach ($affiliations as $x => $affiliation) {
+            if ($first_affiliation)
+                $first_affiliation = False;
+            else
+                $formated_affiliations .= "; ";
+            $formated_affiliations .= esc_html($affiliation);
+        }
+
+        return $formated_affiliations;
+    }
+
+
+        /**
          * Get publication date formated.
          *
          * Returns a nicely formted version of the publication date.
