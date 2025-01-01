@@ -404,13 +404,33 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         $settings = O3PO_SettingsTest::get_settings();
 
         return [
+            [dirname(__FILE__) . '/resources/arxiv/2006.12475v4.tar.gz', "application/x-tar", array(
+                    "affiliations" => array("#Department of Physics, University of Illinois at Urbana-Champaign, Urbana, IL 61801, USA#", "#Department of Electrical and Computer Engineering, University of Illinois at Urbana-Champaign, Urbana, IL 61801, USA#"),
+                    "author_affiliations" => '/1###2###2/u',
+                    "validation_result" => array("#REVIEW: Found BibTeX or manually formated bibliographic information#"),
+                    "bbl" => array('#Cover-2006a#', '#Giovannetti-2011#'),
+                    'num_dois' => 53,
+                                                                                                    )],
+            [dirname(__FILE__) . '/resources/arxiv/2107.12944v2.tar.gz', "application/x-tar", array(
+                    "affiliations" => array("#Department of Physics, University of Basel, Klingelbergstrasse 82, 4056 Basel, Switzerland#", "#Laboratoire Kastler Brossel, ENS-Université PSL, CNRS, Sorbonne Université, Collège de France, 24 Rue Lhomond, 75005, Paris, France#", "#Department of Physics, ETH Zürich, 8093 Zürich, Switzerland#", "#ICFO-Institut de Ciències Fotòniques, The Barcelona Institute of Science and Technology, Av. Carl Friedrich Gauss 3, 08860, Castelldefels \(Barcelona\), Spain#"),
+                    "author_affiliations" => '/1,3###2,4/u', # actually "correct" would be /1,2###3,4/u but there are inconsistent affiliations in multiple files in this submission and I have no idea how to handle this so that the "expected" result is always returned
+                    "validation_result" => array("#REVIEW: Found BibTeX or manually formated bibliographic information#"),
+                    "bbl" => array('#NielsenChuang#', '#StreltsovRMP2017#'),
+                    'num_dois' => 59,
+                                                                                                    )],
+
+
+
+
+
+
             [dirname(__FILE__) . '/resources/arxiv/2202.11338v4.tar.gz', "application/x-tar", array(
                     "affiliations" => array("#Hon Hai Quantum Computing Research Center, Taipei, Taiwan#"),
                     "author_affiliations" => '/1###2,3###1/u',
                     "validation_result" => array("#REVIEW: Found BibTeX or manually formated bibliographic information#"),
                     "bbl" => array('#PhysRevA\.85\.042311#'),
                     'num_dois' => 70,
-                                                                                                   )],
+                                                                                                    )],
             [dirname(__FILE__) . '/resources/arxiv/1711.04662v3.tar.gz', "application/gzip", array(
                     "affiliations" => array('#Aix-Marseille Univ, Université de Toulon, CNRS, LIS, Marseille, and IXXI, Lyon, France#', '#Aix-Marseille Univ, Université de Toulon, CNRS, LIS, Marseille, France and Departamento de Física Teórica and IFIC, Universidad de Valencia-CSIC, Dr. Moliner 50, 46100-Burjassot, Spain#', '#Aix-Marseille Univ, Université de Toulon, CNRS, LIS, Marseille, France#'),
                     "author_affiliations" => '/1###2###3/u',
