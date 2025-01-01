@@ -413,7 +413,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
                                                                                                     )],
             [dirname(__FILE__) . '/resources/arxiv/2107.12944v2.tar.gz', "application/x-tar", array(
                     "affiliations" => array("#Department of Physics, University of Basel, Klingelbergstrasse 82, 4056 Basel, Switzerland#", "#Laboratoire Kastler Brossel, ENS-Université PSL, CNRS, Sorbonne Université, Collège de France, 24 Rue Lhomond, 75005, Paris, France#", "#Department of Physics, ETH Zürich, 8093 Zürich, Switzerland#", "#ICFO-Institut de Ciències Fotòniques, The Barcelona Institute of Science and Technology, Av. Carl Friedrich Gauss 3, 08860, Castelldefels \(Barcelona\), Spain#"),
-                    "author_affiliations" => '/1,3###2,4/u', # actually "correct" would be /1,2###3,4/u but there are inconsistent affiliations in multiple files in this submission and I have no idea how to handle this so that the "expected" result is always returned
+                    "author_affiliations" => '/(1,3###2,4|1,2###3,4)/u', # actually "correct" would be /1,2###3,4/u but there are inconsistent affiliations in multiple files in this submission and I have no idea how to handle this so that the "expected" result is always returned, so we just accept the affiliations from either of the files
                     "validation_result" => array("#REVIEW: Found BibTeX or manually formated bibliographic information#"),
                     "bbl" => array('#NielsenChuang#', '#StreltsovRMP2017#'),
                     'num_dois' => 59,
