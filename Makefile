@@ -29,7 +29,7 @@ run-tests: test
 test: test-.
 
 test-%: $(shell find . -type f -name '*.php') setsttysizenonzero
-	@if [ "$(shell phpunit --version | head -n 1 | sed -n 's/[^0-9]*\([0-9]*\.[0-9]*\)\..*/\1/p')" -gt "8.0" ]; then\
+	@if [ "$(shell phpunit --version | head -n 1 | sed -n 's/[^0-9]*\([0-9]*\)\..*/\1/p')" -ge "10" ]; then\
 		$(PHPUNITCOMMAND) --coverage-clover=coverage.xml --coverage-html=coverage-html --coverage-filter $(SRC) --bootstrap tests/resources/bootstrap.php --test-suffix 'test.php' tests/$(subst test-,,$@);\
 	else\
 		$(PHPUNITCOMMAND) --verbose --coverage-clover=coverage.xml --coverage-html=coverage-html --whitelist $(SRC) --bootstrap tests/resources/bootstrap.php --test-suffix 'test.php' tests/$(subst test-,,$@);\
