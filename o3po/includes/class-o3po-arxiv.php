@@ -113,7 +113,7 @@ class O3PO_Arxiv {
             else
                 $arxiv_fetch_results .= "WARNING: Failed to fetch abstract from " . $arxiv_abs_page_url . ".\n";
 
-            $arxiv_license_urls = $x_path->query("/html/body//div[contains(@class, 'abs-license')]/a/@href");
+            $arxiv_license_urls = $x_path->query("/html/body//div[contains(@class, 'abs-license')]/a[1]/@href");
             if(isset($arxiv_license_urls[0]))
             {
                 foreach ($arxiv_license_urls as $x => $arxiv_license_url) {

@@ -794,7 +794,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
          */
     public function render_manuscript_data_section() {
 
-        echo '<p>The following information was fetched from the arXiv for your convenience. Please check and correct carefully. You may use standard LaTeX formulas in both title and abstract, but please remove all manual LaTeX formating commands such as \bf and do not abuse math mode to emphasize parts of your text.</p>';
+        echo '<p>The following information was fetched from the arXiv for your convenience. Please check and correct carefully. You may use standard LaTeX formulas in both title and abstract, but please remove all manual LaTeX formating commands such as \bf and <strong>do not abuse math mode to emphasize parts of your text</strong>.</p>';
     }
 
         /**

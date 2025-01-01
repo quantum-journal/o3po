@@ -983,6 +983,8 @@ class O3PO_Latex_Dictionary_Provider
                 '\\\\textendash(?![a-zA-Z])' => '–',
                 '\\\\bibrangedash(?![a-zA-Z])\s*' => '–',
                 '\\\\&' => '&',
+                '\\\\And(?![a-zA-Z])\s*' => '&',
+                '\\\\and(?![a-zA-Z])\s*' => ' ',
                 '\\\\negthinspace' => '',
                 '\\\\!' => '',
                 '\\\\,' => ' ',

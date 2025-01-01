@@ -666,6 +666,7 @@ class O3PO_Admin {
             'page' => array('callable' => array('O3PO_PublicationType', 'get_page'), 'field_type' => 'int'),
             'date_published' => array('callable' => array('O3PO_PublicationType', 'get_date_published'), 'field_type' => 'string'),
             'formated_authors' => array('callable' => array('O3PO_PublicationType', 'get_formated_authors'), 'field_type' => 'string'),
+            'formated_affiliations' => array('callable' => array('O3PO_PublicationType', 'get_formated_affiliations'), 'field_type' => 'string'),
             'number_authors' => array('callable' => array('O3PO_PublicationType', 'get_number_authors'), 'field_type' => 'int'),
             'title' => array('callable' => array('O3PO_PublicationType', 'get_title'), 'field_type' => 'string'),
             'corresponding_author_email' => array('callable' => array('O3PO_PublicationType', 'get_corresponding_author_email'), 'field_type' => 'string'),
