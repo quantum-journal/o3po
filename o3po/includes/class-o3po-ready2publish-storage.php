@@ -144,7 +144,8 @@ class O3PO_Ready2PublishStorage {
 
         $clean_manuscript_info = array();
         foreach(static::$manuscript_info_fields_to_store as $field)
-            $clean_manuscript_info[$field] = $manuscript_info[$field];
+            if (array_key_exists($field, $manuscript_info))
+                $clean_manuscript_info[$field] = $manuscript_info[$field];
 
         $manuscripts = get_option($this->plugin_name . '-' . $this->slug, array());
         $manuscripts[] = $clean_manuscript_info;
