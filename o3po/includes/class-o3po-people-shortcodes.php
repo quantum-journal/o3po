@@ -61,7 +61,7 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
             'former' => array(
                 'default' => 'False',
                 'allowed' => ['False', 'True', 'Only'],
-                'description' => 'Whether to include (or only include) people who have left their role before the current year.',
+                'description' => 'Whether to include (or only include) people who are leaving their role in the current year.',
                             ),
             'extra' => array(
                 'default' => 'True',
@@ -83,7 +83,7 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
             'former' => array(
                 'default' => 'False',
                 'allowed' => ['False', 'True', 'Only'],
-                'description' => 'Whether to include (or only include) people who have left their role before the current year.',
+                'description' => 'Whether to include (or only include) people who are leaving their role in the current year.',
                               ),
                                  ),
                                           );
@@ -347,7 +347,7 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
         foreach($person_data as $x => $person)
         {
             if($atts['former'] === 'False')
-                if(!empty($person['until_year']) and $current_year > $person['until_year'])
+                if(!empty($person['until_year']) and $current_year >= $person['until_year'])
                     continue;
             if($atts['former'] === 'Only')
                 if(empty($person['until_year']) or $current_year < $person['until_year'])
@@ -423,7 +423,7 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
         foreach($person_data as $x => $person)
         {
             if($atts['former'] === 'False')
-                if(!empty($person['until_year']) and $current_year > $person['until_year'])
+                if(!empty($person['until_year']) and $current_year >= $person['until_year'])
                     continue;
             if($atts['former'] === 'Only')
                 if(empty($person['until_year']) or $current_year < $person['until_year'])
