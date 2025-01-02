@@ -89,8 +89,8 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
         'funder_identifiers',
         'popular_summary',
         'feature_image_caption',
-        'dissemination_multimedia'
-        # 'fermats_library'
+        'dissemination_multimedia',
+        'fermats_library'
                                    ];
 
         /**
@@ -268,6 +268,9 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
             update_post_meta($post_id, $post_type . '_number_authors', count($manuscript_info['author_name_styles']));
             foreach(static::$meta_fields_to_set_when_inserting_post as $field_id)
             {
+                if (!array_key_exists($field_id, $manuscript_info))
+                    continue;
+
                 if(is_array($manuscript_info[$field_id]))
                 {
                     $field_content = array();
