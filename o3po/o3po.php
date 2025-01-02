@@ -59,6 +59,43 @@ register_deactivation_hook( __FILE__, 'deactivate_o3po' );
 require plugin_dir_path( __FILE__ ) . 'includes/class-o3po.php';
 
 
+/* function handle_404_errors_on_papers(){ */
+/*     global $wp_query; */
+
+/*     if( is_404() ){ */
+/*         if(!empty($wp_query->query_vars['paper'])) */
+/*         { */
+/*             $doi_suffix_in_404_query = $wp_query->query_vars['paper']; */
+
+/*             $query = array( */
+/*                 'post_type' => 'paper', */
+/*                 'post_status' => array('publish'), */
+/*                 'posts_per_page' => 10, */
+/*                            ); */
+/*             $my_query = new WP_Query( $query ); */
+/*             while ( $my_query->have_posts() ) { */
+/*                 $my_query->the_post(); */
+
+/*                 $post_id = get_the_ID(); */
+/*                 $post_type = get_post_type($post_id); */
+/*                 $doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true ); */
+/*                 if($doi_suffix_in_404_query == $doi_suffix) */
+/*                 { */
+/*                     $rewrite_rules_before = get_option('rewrite_rules'); */
+/*                     flush_rewrite_rules(true); */
+/*                     $rewrite_rules_after = get_option('rewrite_rules'); */
+
+/*                     # $this->get_journal_property('developer_email') */
+
+/*                     $successfully_sent = wp_mail( "cgogolin@quantum-journal.org", "404 error on quantum-journal.org", json_encode($rewrite_rules_before) . "\n\n" . json_encode($rewrite_rules_after) . "\n\n" . json_encode($wp_query->query_vars), array('From: admin@quantum-journal.org')); */
+/*                     break; */
+/*                 } */
+/*             } */
+/*             wp_reset_postdata(); */
+/*         } */
+/*     } */
+/* } */
+/* add_action( 'template_redirect', 'handle_404_errors_on_papers' ); */
 
 
 /**

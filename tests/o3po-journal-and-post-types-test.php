@@ -2055,6 +2055,34 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
     }
 
 
+        /**
+         * @depends test_create_primary_publication_type
+         * @depends test_initialize_settings
+         */
+    public function test_404_error_on_primary( $primary_publication_type, $settings ) {
+        global $posts;
+        global $post;
+
+        foreach($posts as $post_id => $post_data)
+        {
+            $post_type = get_post_type($post_id);
+            if ( $primary_publication_type->get_publication_type_name() !== $post_type )
+                continue;
+
+            $post = new WP_Post($post_id);
+            $wp_query = new WP_Query(array('ID' => $post_id, 'error' => '404', 'post_type' => get_post_type($post_id), $post_type => $primary_publication_type->get_doi($post_id)));
+            $wp_query->is_404 = true;
+            $doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
+            $wp_query->query_vars[$post_type] = $doi_suffix;
+
+            set_global_query($wp_query);
+            the_post();
+
+            $primary_publication_type->handle_404_errors();
+        }
+    }
+
+
 
         /**
          * @doesNotPerformAssertions
