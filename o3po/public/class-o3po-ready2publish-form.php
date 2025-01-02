@@ -133,7 +133,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         $this->specify_field('payment_method', Null, array($this, 'render_payment_method'), 'payment', 'payment_method', array(), array($this, 'one_of_invoice_noinvoice_waiver'), array());
 
         $this->specify_section('payment_invoice', 'Invoicing information', null, 'payment');
-        $this->specify_field('payment_amount', 'Amount', array($this, 'render_payment_amount'), 'payment', 'payment_invoice', array(), array($this, 'validate_non_negative_euros'), "450€");
+        $this->specify_field('payment_amount', 'Amount', array($this, 'render_payment_amount'), 'payment', 'payment_invoice', array(), array($this, 'validate_non_negative_euros'), "600€");
         $this->specify_field('invoice_recipient', 'Recipient', array( $this, 'render_invoice_recipient' ), 'payment', 'payment_invoice', array(), array($this, 'non_empty_if_payment_method_is_invoice_and_on_or_past_containing_page'), '');
         $this->specify_field('invoice_address', 'Address', array( $this, 'render_invoice_address' ), 'payment', 'payment_invoice', array(), array($this, 'non_empty_if_payment_method_is_invoice_and_on_or_past_containing_page'), '');
         $this->specify_field('invoice_vat_number', 'VAT number (if applicable)', array( $this, 'render_invoice_vat_number' ), 'payment', 'payment_invoice', array(), array($this, 'trim_strip_tags'), '');
@@ -564,12 +564,10 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
          */
     public function render_payment_amount() {
         $this->render_select_field('payment_amount', [
-                                       array('value' => '450€',
-                                             'description' => '450€ Regular publication fee (for manuscripts submitted from 2020-05-01 on)'),
-                                       array('value' => '225€',
-                                             'description' => '225€ Half regular publication fee (for splitting the fee)'),
-                                       array('value' => '200€',
-                                             'description' => '200€ Old publication fee (for manuscripts submitted before 2020-05-01)'),
+                                       array('value' => '600€',
+                                             'description' => '600€ Regular publication fee'),
+                                       array('value' => '300€',
+                                             'description' => '300€ Half regular publication fee (for splitting the fee)'),
                                        array('value' => '100€',
                                              'description' => '100€ Discount publication fee'),
                                                                       ]);
