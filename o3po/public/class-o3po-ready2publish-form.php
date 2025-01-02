@@ -121,8 +121,8 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         $this->specify_field('featured_image_caption', 'Featured image caption', array( $this, 'render_featured_image_caption' ), 'dissemination', 'dissemination_material', array(), array($this, 'trim_strip_tags'), '');
         $this->specify_field('dissemination_multimedia', 'Multi media', array( $this, 'render_dissemination_multimedia' ), 'dissemination', 'dissemination_material', array(), array($this, 'trim_strip_tags'), '');
 
-        $this->specify_section('dissemination_fermats_library', 'Fermat\'s library', null, 'dissemination');
-        $this->specify_field('fermats_library', 'Opt-in to Fermat\'s library', array( $this, 'render_fermats_library' ), 'dissemination', 'dissemination_fermats_library', array(), array($this, 'checked_or_unchecked'), 'unchecked');
+        /* $this->specify_section('dissemination_fermats_library', 'Fermat\'s library', null, 'dissemination'); */
+        /* $this->specify_field('fermats_library', 'Opt-in to Fermat\'s library', array( $this, 'render_fermats_library' ), 'dissemination', 'dissemination_fermats_library', array(), array($this, 'checked_or_unchecked'), 'unchecked'); */
 
         $this->specify_section('dissemination_copyright_confirmation', 'License and copyright', null, 'dissemination');
         $this->specify_field('copyright_confirmation', 'Confirm copyright', array( $this, 'render_copyright_confirmation' ), 'dissemination', 'dissemination_copyright_confirmation', array(), array($this, 'checked_if_on_or_past_containing_page_unless_back_or_upload'), 'unchecked');

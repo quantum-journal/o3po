@@ -89,8 +89,8 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
         'funder_identifiers',
         'popular_summary',
         'feature_image_caption',
-        'dissemination_multimedia',
-        'fermats_library'
+        'dissemination_multimedia'
+        # 'fermats_library'
                                    ];
 
         /**
