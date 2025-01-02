@@ -1600,6 +1600,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             $formated_handling_editor_html = $this->get_formated_handling_editor( $post_id );
             if(!empty($formated_handling_editor_html))
                 $content .= '<tr><td>Editor:</td><td>' . $formated_handling_editor_html . '</td></tr>';
+
             $content .= '<tr><td>Eprint:</td><td><a href="' . esc_attr($settings->get_field_value('arxiv_url_abs_prefix') . get_post_meta( $post_id, $post_type . '_eprint', true ) ) . '">arXiv:' . esc_html(get_post_meta( $post_id, $post_type . '_eprint', true )) . '</a></td></tr>';
             $doi = get_post_meta( $post_id, $post_type . '_doi_prefix', true ) . '/' .  get_post_meta( $post_id, $post_type . '_doi_suffix', true );
             $content .= '<tr><td>Doi:</td><td><a href="' . esc_attr($settings->get_field_value('doi_url_prefix') . $doi) . '">' . esc_html($settings->get_field_value('doi_url_prefix') . $doi ) . '</a></td></tr>';
