@@ -396,6 +396,7 @@ class O3PO {
         $this->loader->add_action('admin_head', $this->primary_publication_type, 'admin_page_extra_css');
         $this->loader->add_filter('request', $this->primary_publication_type, 'add_custom_post_types_to_rss_feed');
         $this->loader->add_filter('the_author', $this->primary_publication_type, 'the_author_feed', PHP_INT_MAX, 1);
+
             //...and those inherited from publicationtype
         $this->loader->add_action('init', $this->primary_publication_type, 'register_as_custom_post_type' );
         $this->loader->add_action('init', $this->primary_publication_type, 'add_pdf_endpoint' , 0 );
@@ -406,6 +407,7 @@ class O3PO {
         $this->loader->add_action('parse_request', $this->primary_publication_type, 'handle_arxiv_paper_doi_feed_endpoint_request' , 1 );
         $this->loader->add_filter('the_content', $this->primary_publication_type, 'get_the_content');
         $this->loader->add_filter('get_the_excerpt', $this->primary_publication_type, 'get_the_excerpt', 1) ;//Use get_the_excerpt instead of 'the_excerpt' to also affect get_the_excerpt(). The low priority number is crucial to ensure early execution and prevent (expensive) auto generation of excerpt from content via wp_trim_excerpt() (see default-filters.php in WP)
+        $this->loader->add_action('template_redirect', $this->primary_publication_type, 'handle_404_errors');
 
         # For RSS feed testing the WP caching mechanism can be disabled by commenting in the following
         /* $callback = function() { */
@@ -436,8 +438,7 @@ class O3PO {
             $this->loader->add_filter('template_include', $this->secondary_publication_type, 'use_page_template');
 
         $this->loader->add_action('init', 'O3PO_PeopleShortcodes', 'add_shortcodes');
-
-
+        $this->loader->add_action('template_redirect', $this->secondary_publication_type, 'handle_404_errors');
 
 	}
 

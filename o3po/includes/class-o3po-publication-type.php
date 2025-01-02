@@ -3271,6 +3271,55 @@ abstract class O3PO_PublicationType {
 
 
         /**
+         * Handle 404 errors on queries that should return a publication page
+         *
+         * Flush rewrite_rules if the query should not have been an error.
+         *
+         * @since  0.4.3
+         * @access public
+         */
+    public function handle_404_errors() {
+        global $wp_query;
+
+        if( is_404() ){
+
+            $post_type = $this->get_publication_type_name();
+
+            if(!empty($wp_query->query_vars[$post_type]))
+            {
+                $doi_suffix_in_404_query = $wp_query->query_vars[$post_type];
+
+                $query = array(
+                    'post_type' => $post_type,
+                    'post_status' => array('publish'),
+                    'posts_per_page' => 10,
+                               );
+                $my_query = new WP_Query( $query );
+                while ( $my_query->have_posts() ) {
+                    $my_query->the_post();
+
+                    $post_id = get_the_ID();
+                    $post_type = get_post_type($post_id);
+                    $doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
+                    if($doi_suffix_in_404_query == $doi_suffix)
+                    {
+                        $rewrite_rules_before = get_option('rewrite_rules');
+                        flush_rewrite_rules(true);
+                        $rewrite_rules_after = get_option('rewrite_rules');
+
+                        $developer_email = $this->get_journal_property('developer_email');
+
+                        $successfully_sent = wp_mail( $developer_email, "404 error on quantum-journal.org", json_encode($rewrite_rules_before) . "\n\n" . json_encode($rewrite_rules_after) . "\n\n" . json_encode($wp_query->query_vars), array('From: ' . $developer_email));
+                        break;
+                    }
+                }
+                wp_reset_postdata();
+            }
+        }
+    }
+
+
+        /**
          * Return false for posts of this type when they are already published
          *
          * @since  0.4.2

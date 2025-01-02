@@ -92,6 +92,7 @@ It is obviously a play on the name of humanoid robot character from a series of 
 ## Changelog
 
 ### 0.4.3
+* Handle 404 errors for queries to publication pages that are sometimes caused when other plugins flush rewrite rules without loading O-3PO
 * Unpack tar.gz files in one go to avoid problems with long file names (see https://stackoverflow.com/questions/24800217/phardata-limitation-of-file-name-length)
 * Include formated affiliations in meta-data.
 * Fixed detection of license information from arXiv abstract page.

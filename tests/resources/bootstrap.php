@@ -515,6 +515,13 @@ function is_search() {
 }
 
 
+function is_404() {
+    global $wp_query;
+
+    return $wp_query->is_404;
+}
+
+
 $global_search_query = '';
 function set_global_search_query( $string ) {
     global $global_search_query;
