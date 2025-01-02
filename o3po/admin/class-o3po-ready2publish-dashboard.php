@@ -185,8 +185,8 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
             $out .= '<div>Invoice: ' . "An invoice was requested!" . '</div>';
         $out .= '<div style="float:right">';
         $out .= '<span><a class="button-secondary" href="mailto:' . esc_attr($manuscript_info['corresponding_author_email']) . '">Email ' . esc_html($manuscript_info['corresponding_author_email']) . '</a></span>';
-        $out .= '<span class=""><a class="button-secondary" target="_blank" href="/' . $this->slug . '?action=' . 'show_invoice' . '&id=' . urlencode($id) . '">' . "Create invoice" .  '</a></span>';
-        $out .= '<span class=""><a class="button-secondary" href="/' . $this->slug . '?action=' . $action . '&id=' . urlencode($id) . '">' . ($action === 'continue' ? "Go to post" : "Begin publishing") .  '</a></span>';
+        $out .= '<span class=""><a class="button-secondary" target="_blank" href="/' . esc_attr($this->slug . '?action=' . 'show_invoice' . '&id=' . urlencode($id)) . '">' . "Create invoice" .  '</a></span>';
+        $out .= '<span class=""><a class="button-secondary" href="/' . esc_attr($this->slug . '?action=' . $action . '&id=' . urlencode($id)) . '">' . ($action === 'continue' ? "Go to post" : "Begin publishing") .  '</a></span>';
         $out .= '</div>';
         $out .= '<div style="clear:both"></div>';
         $out .= '</div>';

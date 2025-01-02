@@ -1,6 +1,7 @@
 <?php
 
 require_once(dirname( __FILE__ ) . '/../o3po/public/class-o3po-ready2publish-form.php');
+require_once(dirname( __FILE__ ) . '/../o3po/admin/class-o3po-ready2publish-dashboard.php');
 require_once(dirname( __FILE__ ) . '/o3po-settings-test.php');
 
 class O3PO_Ready2PublishTest extends O3PO_TestCase
@@ -371,6 +372,57 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
             $this->assertSame(count($form->get_errors()), 0);
         else
             $this->assertSame(count($form->get_errors()), 1);
+    }
+
+        /**
+         * @depends test_initialize_settings
+         * @depends test_setup_environment
+         * @depends test_initialize_ready2publish_storage
+         */
+    public function test_render_dashboard_widget( $settings, $environment, $storage ) {
+
+        $manuscript_info = array(
+            'abstract' => "This is a paper by very smart authors.",
+            'acceptance_code' => "AAABBB",
+            'agree_to_publish' => "checked",
+            'author_first_names' => ['Foo', 'Bar'],
+            'author_name_styles' => ['western', 'eastern'],
+            'author_last_names' => ['Ffo', 'Bbr'],
+            'award_numbers' => ['52562351'],
+            'comments' => 'hweg',
+            'copyright_confirmation',
+            'corresponding_author_email' => "foo@bar.com",
+            'dissemination_multimedia',
+            'eprint' => "0819.7347v4",
+            'feature_image_attachment_id', // due to compatibility with the publication type class we call these fields feature_image_... and not featured_image_... as in the form
+            'feature_image_caption',
+            'featured_image_attachment_id' => 'foo',
+            'featured_image_caption' => 'awfea',
+            'fermats_library',
+            'funder_identifiers' => ['id6214124'],
+            'funder_names' => ['Awesome Funder'],
+            'invoice_address',
+            'invoice_recipient',
+            'invoice_vat_number',
+            'number_award_numbers',
+            'payment_amount',
+            'payment_method' => "invoice",
+            'popular_summary',
+            'ready2publish_comments',
+            'title' => "Newest paper",
+            'time_submitted'
+                                 );
+        $storage->store_manuscript($manuscript_info);
+        #echo json_encode($storage->get_all_manuscripts()[0]);
+
+        $dashboard = new O3PO_Ready2PublishDashboard('o3po', 'O-3PO', $settings->get_field_value("ready2publish_slug"), "Dashboard Title", $storage);
+
+        ob_start();
+        $dashboard->render_dashboard_widget();
+        $content = ob_get_contents();
+        ob_end_clean();
+
+        $this->assertValidHTMLFragment($content);
     }
 
 }
