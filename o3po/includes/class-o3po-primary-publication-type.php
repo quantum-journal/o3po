@@ -600,26 +600,6 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
     }
 
         /**
-         * Outptus the html formated handling editor of this publication
-         * type.
-         *
-         * @since     0.4.3
-         * @access    public
-         * @param     int     $post_id     Id of the post.
-         */
-    public static function get_formated_handling_editor( $post_id ) {
-
-        $post_type = get_post_type($post_id);
-        $handling_editor_uuidv4 = get_post_meta( $post_id, $post_type . '_handling_editor_uuidv4', true );
-        if(empty($handling_editor_uuidv4))
-            return '';
-
-        $handling_editor_name = O3PO_PeopleShortcodes::get_formated_name_from_uuidv4($handling_editor_uuidv4);
-
-        return '<a href="/people/#person-' . esc_attr($handling_editor_uuidv4) . '">' . esc_html($handling_editor_name) . '</a>';
-    }
-
-        /**
          * Echo a howto for the admin panel.
          *
          * @since     0.1.0
