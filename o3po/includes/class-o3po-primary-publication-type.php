@@ -616,7 +616,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
 
         $handling_editor_name = O3PO_PeopleShortcodes::get_formated_name_from_uuidv4($handling_editor_uuidv4);
 
-        return '<a href="/people/' . '">' . esc_html($handling_editor_name) . '</a>';
+        return '<a href="/people/#person-' . esc_attr($handling_editor_uuidv4) . '">' . esc_html($handling_editor_name) . '</a>';
     }
 
         /**
