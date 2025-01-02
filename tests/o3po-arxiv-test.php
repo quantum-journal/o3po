@@ -172,7 +172,12 @@ ERROR: No license informatin found on https://arxiv.org/abs/0809.2542v5.
             $this->assertEquals($expected, $submission_history);
         else
         {
-            $this->assertEquals(array_keys($expected), array_keys($submission_history));
+            if(is_wp_error($submission_history))
+                $this->assertTrue(False, $submission_history->get_error_message());
+            $this->assertEquals(
+                array_keys($expected),
+                array_keys($submission_history)
+                                );
 
             $this->assertEquals($expected, $submission_history);
         }

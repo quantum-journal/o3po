@@ -1,0 +1,59 @@
+name: PHPUnit
+
+on:
+  push:
+    branches: [ "master", "develop" ]
+  pull_request:
+    branches: [ "master", "develop" ]
+
+permissions:
+  contents: read
+
+jobs:
+  PHPUnit:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php-versions: ['7.4', '8.0', '8.1', '8.2', '8.3']
+        phpunit-versions: ['latest']
+
+    steps:
+
+    - name: Install exiftool
+      run: sudo apt-get install -y libimage-exiftool-perl
+
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@verbose
+      with:
+        php-version: ${{ matrix.php-versions }}
+        ini-values: post_max_size=256M, max_execution_time=180
+        tools: phpunit:${{ matrix.phpunit-versions }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Check PHP
+      run: php -i
+
+    # - name: Validate composer.json and composer.lock
+    #   run: composer validate --strict
+
+    # - name: Cache Composer packages
+    #   id: composer-cache
+    #   uses: actions/cache@v3
+    #   with:
+    #     path: vendor
+    #     key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+    #     restore-keys: |
+    #       ${{ runner.os }}-php-
+
+    # - name: Install dependencies
+    #   run: composer install --prefer-dist --no-progress --no-interaction --ignore-platform-reqs
+
+    - name: Run tests
+      run: make test
