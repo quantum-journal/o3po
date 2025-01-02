@@ -290,6 +290,29 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
          * @return array Array with of arrays, one per person, containing that
          *               persons data.
          */
+    public static function get_formated_name_from_uuidv4($uuidv4) {
+
+        $settings = O3PO_Settings::instance();
+        $person_first_names = $settings->get_field_value('person_first_names');
+        $person_last_names = $settings->get_field_value('person_last_names');
+        $person_uuidv4 = $settings->get_field_value('person_uuidv4');
+
+        $key = array_search($uuidv4, $person_uuidv4, true);
+
+        if($key === false)
+            return "";
+
+        return  $person_first_names[$key] . " " . $person_last_names[$key];
+    }
+
+        /**
+         * Get person data from settings storage in a convenient array structure
+         *
+         * @since  0.4.1+
+         * @access public
+         * @return array Array with of arrays, one per person, containing that
+         *               persons data.
+         */
     public static function get_person_data() {
 
         $settings = O3PO_Settings::instance();

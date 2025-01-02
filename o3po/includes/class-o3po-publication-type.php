@@ -25,6 +25,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-latex
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-utility.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-shortcode-template.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-people-shortcodes.php';
 
 
 /**
@@ -523,6 +524,8 @@ abstract class O3PO_PublicationType {
         $new_buffer_email = isset($_POST[ $post_type . '_buffer_email' ]) ? sanitize_text_field( $_POST[ $post_type . '_buffer_email' ]) : ''; #we keep using the buffer_email and buffer_email_xxx fields for compatibility, even though the new buffer.com interface does no longer send emails but uses the buffer.com api
         $new_buffer_special_text = isset($_POST[ $post_type . '_buffer_special_text' ]) ? sanitize_text_field( $_POST[ $post_type . '_buffer_special_text' ]) : '';
 
+        $new_handling_editor_uuidv4 = isset( $_POST[ $post_type . '_handling_editor_uuidv4' ] ) ? sanitize_text_field( $_POST[ $post_type . '_handling_editor_uuidv4' ] ) : '';
+
         $new_bbl = isset( $_POST[ $post_type . '_bbl' ] ) ? $_POST[ $post_type . '_bbl' ] : '';
         delete_transient($post_id . '_bibliography_html'); //Delete cached version of the bibliography html
 
@@ -557,10 +560,11 @@ abstract class O3PO_PublicationType {
         update_post_meta( $post_id, $post_type . '_bbl', $new_bbl );
         update_post_meta( $post_id, $post_type . '_buffer_email', $new_buffer_email ); #we keep using the buffer_email and buffer_email_xxx fields for compatibility, even though the new buffer.com interface does no longer send emails but uses the buffer.com api
         update_post_meta( $post_id, $post_type . '_buffer_special_text', $new_buffer_special_text );
-        update_post_meta($post_id, $post_type . '_number_award_numbers', $new_number_award_numbers);
-        update_post_meta($post_id, $post_type . '_award_numbers', $new_award_numbers);
-        update_post_meta($post_id, $post_type . '_funder_identifiers', $new_funder_identifiers);
-        update_post_meta($post_id, $post_type . '_funder_names', $new_funder_names);
+        update_post_meta( $post_id, $post_type . '_handling_editor_uuidv4', $new_handling_editor_uuidv4 );
+        update_post_meta( $post_id, $post_type . '_number_award_numbers', $new_number_award_numbers );
+        update_post_meta( $post_id, $post_type . '_award_numbers', $new_award_numbers );
+        update_post_meta( $post_id, $post_type . '_funder_identifiers', $new_funder_identifiers );
+        update_post_meta( $post_id, $post_type . '_funder_names', $new_funder_names );
 
     }
 
@@ -1717,6 +1721,38 @@ abstract class O3PO_PublicationType {
         }
         else
             echo '		  An update with a link to this ' . $post_type . ' was put into the buffer.com queue on ' . $buffer_email_was_sent_date . '.';
+        echo '		</td>';
+		echo '	</tr>';
+
+    }
+
+        /**
+         * Echo an controls for choosing the handling editor on the admin panel.
+         *
+         * @since    0.3.0
+         * @access   proteted
+         * @param    int         $post_id    Id of the post.
+         */
+    protected function the_admin_panel_handling_editor( $post_id ) {
+
+        $post_type = get_post_type($post_id);
+        $handling_editor_uuidv4 = get_post_meta( $post_id, $post_type . '_handling_editor_uuidv4', true );
+
+        $current_year = date('Y');
+        $person_data = O3PO_PeopleShortcodes::get_person_data();
+        uasort($person_data, array('O3PO_PeopleShortcodes', 'sort_by_first_names'));
+
+		echo '	<tr>';
+		echo '		<th><label for="' . $post_type . '_handling_editor_uuidv4" class="' . $post_type .'_handling_editor_uuidv4_label">' . 'Handling Editor' . '</label></th>';
+        echo '		<td>';
+
+        echo '        <select name="' . $post_type . '_handling_editor_uuidv4" style="width:100%">';
+        echo '        <option value=""' . (empty($handling_editor_uuidv4)? 'selected' : '') . '>' . "No handling editor" . '</option>';
+        foreach($person_data as $x => $person)
+            if(($person["role"] === "editor" || $person["role"] === "coordinator") && !empty($person["uuidv4"]) && (empty($person["since_year"]) || $current_year >= $person['since_year']) && (empty($person["until_year"]) || $current_year <= $person['until_year'] + 1))
+                echo '        <option value="' . esc_attr($person["uuidv4"]) . '"' . ($person["uuidv4"] == $handling_editor_uuidv4 ? 'selected' : '') . '>' . esc_html($person["first_names"]) . " " . esc_html($person["last_names"]) . ' (' . esc_html($person["role"]) . ') ID=' . esc_html($person["uuidv4"]) . '</option>';
+        echo '        </select>';
+
         echo '		</td>';
 		echo '	</tr>';
 
