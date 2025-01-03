@@ -401,16 +401,16 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
             'fermats_library',
             'funder_identifiers' => ['id6214124'],
             'funder_names' => ['Awesome Funder'],
-            'invoice_address',
-            'invoice_recipient',
+            'invoice_address' => "Foo City",
+            'invoice_recipient' => "Foo Universtiy",
             'invoice_vat_number',
             'number_award_numbers',
-            'payment_amount',
+            'payment_amount' => "200€",
             'payment_method' => "invoice",
             'popular_summary',
             'ready2publish_comments',
             'title' => "Newest paper",
-            'time_submitted'
+            'time_submitted' => 1735856642,
                                  );
         $storage->store_manuscript($manuscript_info);
         #echo json_encode($storage->get_all_manuscripts()[0]);
@@ -423,6 +423,15 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
         ob_end_clean();
 
         $this->assertValidHTMLFragment($content);
+
+        ob_start();
+        $dashboard->show_invoice(0);
+        $content = ob_get_contents();
+        ob_end_clean();
+
+        $this->assertValidHTMLFragment($content, false);
+
+        $dashboard->insert_post(0);
     }
 
 }

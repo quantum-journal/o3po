@@ -59,18 +59,27 @@ class O3PO_TestCase extends PHPUnit_Framework_TestCase
             parent::assertRegexp($pattern, $string, $message = $message);
     }
 
-    public function assertValidHTMLFragment( $html ) {
+    public function assertValidHTMLFragment( $html, $is_fragment=true ) {
 
         $dom = new DOMDocument;
         try
         {
-            $result = $dom->loadHTML('<div>' . $html . '</div>');
+            if($is_fragment === true)
+                $result = $dom->loadHTML('<div>' . $html . '</div>');
+            else
+            {
+                $lines = explode("\n", $html);
+                # if(strpos($lines[0], "DOCTYPE") !== false)
+                #     array_shift($lines);
+                $html = implode("\n", $lines);
+                $result = $dom->loadHTML($html);
+            }
             $this->assertNotFalse($result);
             //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
         }
         catch(Exception $e)
         {
-            $this->assertNotFalse(false, "The following html caused the error " . $e->getMessage() . "\n" . $html);
+            $this->assertNotFalse(false, "The following html caused the error " . $e->getMessage() . ":\n" . $html);
         }
 
         return($result);
