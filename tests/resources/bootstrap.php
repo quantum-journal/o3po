@@ -100,6 +100,7 @@ function wp_upload_dir( $time = null, $create_dir = true, $refresh_cache = false
                  );
 }
 
+global $hooks;
 $hooks = array();
 function add_action( $hook, $callable ) {
     global $hooks;
@@ -122,6 +123,7 @@ function trigger_hook( $hook ) {
         call_user_func($callable);
 }
 
+global $filteres;
 $filteres = array();
 function add_filter( $hook, $callable ) {
     global $filters;
@@ -161,6 +163,7 @@ function get_site_url() {
     return 'https://foo.bar.com';
 }
 
+global $options;
 $options = array();
 $options['o3po-settings'] = array(
             'production_site_url' => get_site_url(),#we test as if this were the production system
@@ -225,6 +228,9 @@ $options['o3po-ready2publish-storage'] = array();
 function get_option( $option, $default = false ) {
     global $options;
 
+    if(is_null($options))
+        throw(new Exception("Global options array is null."));
+
     if($option === 'o3po-settings')
         return $options['o3po-settings'];
     elseif($option === 'blog_charset')
@@ -262,7 +268,7 @@ function get_file_data( $file, $options ) {
     return $matches;
 }
 
-
+global $flush_rewrite_rules_call_counter;
 $flush_rewrite_rules_call_counter = 0;
 function flush_rewrite_rules( $hard=false ) {
     global $flush_rewrite_rules_call_counter;
@@ -280,6 +286,7 @@ function get_flush_rewrite_rules_call_counter() {
 
 function add_rewrite_endpoint( $a, $b=Null ) {}
 
+global $post_data;
 $post_data = array();
 
 function get_post_type( $post_id ) {
@@ -500,6 +507,8 @@ function is_category( $category_name ) {
 }
 
 
+global $wp_query;
+global $old_wp_query;
 $wp_query = new WP_Query();
 $old_wp_query = new WP_Query();
 function set_global_query( $query ) {
@@ -544,7 +553,7 @@ function is_404() {
     return $wp_query->is_404;
 }
 
-
+global $global_search_query;
 $global_search_query = '';
 function set_global_search_query( $string ) {
     global $global_search_query;
@@ -925,6 +934,7 @@ function wp_mail( $to, $subject, $body, $headers, $attach=null) {
 
 function delete_transient() {}
 
+global $get_transient_returns;
 $get_transient_returns = false;
 function get_transient( $transient ) {
     global $get_transient_returns;
@@ -1069,6 +1079,7 @@ function register_post_type( $post_type, $args ) {}
 function add_meta_box( $id, $title, $callback, $screen = null, $context = 'advanced', $priority = 'default', $callback_args = null ) {}
 
 
+global $is_home;
 $is_home = false;
 function is_home() {
     global $is_home;
@@ -1119,8 +1130,11 @@ function the_posts_navigation() {
     echo '';
 }
 
+global $global_settings;
 $global_settings = array();
+global $wp_settings_fields;
 $wp_settings_fields = array();
+global $wp_settings_sections;
 $wp_settings_sections = array();
 
 function register_setting( $option_group, $option_name, $args = array() ) {
@@ -1168,6 +1182,7 @@ function add_settings_field( $id, $title, $callback, $page, $section = 'default'
     $wp_settings_fields[$page][$section][$id] = array('id' => $id, 'title' => $title, 'callback' => $callback, 'args' => $args);
 }
 
+global $global_setting_errors;
 $global_setting_errors = array();
 
 function settings_errors( $setting = '', $sanitize = false, $hide_on_update = false ) {
@@ -1345,6 +1360,7 @@ function wp_get_theme( $stylesheet=null, $theme_root=null ) {
     return new WP_Theme('OnePress');
 }
 
+global $is_single;
 $is_single = false;
 function is_single() {
     global $is_single;
@@ -1466,6 +1482,7 @@ function get_current_user_id() {
 }
 
 
+global $shortcodes;
 $shortcodes = array();
 function add_shortcode( $tag, $callback ) {
     global $shortcodes;
