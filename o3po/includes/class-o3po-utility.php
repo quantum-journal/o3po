@@ -283,11 +283,47 @@ class O3PO_Utility
          * Test whether an array is associative or enumerated.
          *
          * @param array $a Array to test.
-         * @return Whether the array is associative or not.
+         * @return bool Whether the array is associative or not.
          */
     public static function is_assoc( $a ) {
 
         if (array() === $a) return false;
         return array_keys($a) !== range(0, count($a) - 1);
     }
+
+        /**
+         * Generate a UUIDv4
+         *
+         * Code is taken from https://stackoverflow.com/a/15875555
+         *
+         * @since  0.4.3
+         * @return string A v4 UUID
+         */
+    public static function uuidv4() {
+        $data = random_bytes(16);
+
+        $data[6] = chr(ord($data[6]) & 0x0f | 0x40); // set version to 0100
+        $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
+
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+    }
+
+        /**
+         * Validate v4 UUID
+         *
+         * @since  0.4.3
+         * @return string A v4 UUID
+         */
+    public static function valid_uuidv4($uuid) {
+        if (!preg_match('/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[0-9a-f]{4}-[0-9a-f]{12}/u', $uuid))
+            return false;
+
+        foreach(["8", "9", "a", "b"] as $char)
+            if($uuid[19] == $char)
+                return true;
+
+        return false;
+    }
+
+
 }

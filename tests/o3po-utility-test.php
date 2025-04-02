@@ -227,5 +227,14 @@ class O3PO_UtilityTest extends O3PO_TestCase
         $this->assertSame($expected, O3PO_Utility::array_median($array));
     }
 
+    public function test_uuidv4() {
+
+        $uuidv4 = O3PO_Utility::uuidv4();
+        $this->assertTrue(O3PO_Utility::valid_uuidv4($uuidv4));
+
+        $this->assertFalse(O3PO_Utility::valid_uuidv4("c0a062b7-b225-c294-b8a0-06b98931a45b"));
+        $this->assertFalse(O3PO_Utility::valid_uuidv4("abc"));
+
+    }
 
 }

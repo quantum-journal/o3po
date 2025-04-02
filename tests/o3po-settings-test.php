@@ -173,6 +173,34 @@ class O3PO_SettingsTest extends O3PO_TestCase
     }
 
 
+    public function validate_uuid4_array_provider() {
+        return [
+            [[
+                    "c7f6a320-f885-4490-9328-dca2d38e2e02",
+                    "c0a062b7-b225-c294-b8a0-06b98931a45b"
+              ], array()],
+            [[
+                    "61a58838-3750-403e-a653-22028e914510",
+                    "761c72aa-f4bb-48ac-b09b-69fcaac653c0",
+                    "d6a7f885-1a2e-4463-b12c-004c7a60dd9c",
+              ], [
+                    "61a58838-3750-403e-a653-22028e914510",
+                    "761c72aa-f4bb-48ac-b09b-69fcaac653c0",
+                    "d6a7f885-1a2e-4463-b12c-004c7a60dd9c",
+              ]],
+                ];
+    }
+
+        /**
+         * @dataProvider validate_uuid4_array_provider
+         * @depends test_initialize_settings
+         */
+    public function test_validate_array_of_at_most_1000_uuidv4s( $uuid4_array, $expected, $setting ) {
+
+        $this->assertSame($setting->validate_array_of_at_most_1000_uuidv4s('uuidv4', $uuid4_array), $expected);
+    }
+
+
     public function validate_issn_provider() {
         return [
             ['0378-5955', '0378-5955', true],

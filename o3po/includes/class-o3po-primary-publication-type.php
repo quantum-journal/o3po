@@ -75,6 +75,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $this->the_admin_panel_title($post_id);
         $this->the_admin_panel_corresponding_author_email($post_id);
         $this->the_admin_panel_buffer($post_id);
+        $this->the_admin_panel_handling_editor($post_id);
         $this->the_admin_panel_fermats_library($post_id);
         $this->the_admin_panel_authors($post_id);
         $this->the_admin_panel_affiliations($post_id);
@@ -1595,6 +1596,11 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             $content .= '</p>';
             $content .= '<table class="meta-data-table">';
             $content .= '<tr><td>Published:</td><td>' . esc_html($this->get_formated_date_published( $post_id )) .  ', ' . $this->get_formated_volume_html($post_id) . ', page ' . esc_html(get_post_meta( $post_id, $post_type . '_pages', true )) . '</td></tr>';
+
+            $formated_handling_editor_html = $this->get_formated_handling_editor( $post_id );
+            if(!empty($formated_handling_editor_html))
+                $content .= '<tr><td>Editor:</td><td>' . $formated_handling_editor_html . '</td></tr>';
+
             $content .= '<tr><td>Eprint:</td><td><a href="' . esc_attr($settings->get_field_value('arxiv_url_abs_prefix') . get_post_meta( $post_id, $post_type . '_eprint', true ) ) . '">arXiv:' . esc_html(get_post_meta( $post_id, $post_type . '_eprint', true )) . '</a></td></tr>';
             $doi = get_post_meta( $post_id, $post_type . '_doi_prefix', true ) . '/' .  get_post_meta( $post_id, $post_type . '_doi_suffix', true );
             $content .= '<tr><td>Doi:</td><td><a href="' . esc_attr($settings->get_field_value('doi_url_prefix') . $doi) . '">' . esc_html($settings->get_field_value('doi_url_prefix') . $doi ) . '</a></td></tr>';

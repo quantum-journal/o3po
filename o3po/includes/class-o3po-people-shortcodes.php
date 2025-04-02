@@ -11,6 +11,7 @@
  */
 
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-utility.php';
 
 /**
  * Class representing the shortcodes generating various lists of people
@@ -109,6 +110,7 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
         $settings->specify_field('person_affiliation', Null, Null, 'people_shortcode_settings', 'people_shortcode_settings', array(), array('O3PO_Settings', 'validate_array_of_at_most_1000_names'), array(''));
         $settings->specify_field('person_country', Null, Null, 'people_shortcode_settings', 'people_shortcode_settings', array(), array('O3PO_Settings', 'validate_array_of_at_most_1000_names'), array(''));
         $settings->specify_field('person_extra', Null, Null, 'people_shortcode_settings', 'people_shortcode_settings', array(), array('O3PO_Settings', 'validate_array_of_at_most_1000_names'), array(''));
+        $settings->specify_field('person_uuidv4', Null, Null, 'people_shortcode_settings', 'people_shortcode_settings', array(), array('O3PO_Settings', 'validate_array_of_at_most_1000_uuidv4s'), array(''));
 
 
     }
@@ -179,6 +181,10 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
 
             echo '<div style="float:left;">';
             $settings->render_single_line_field('person_extra[' . $x . ']', '', 'on', 'width:15em;max-width:100%;', 'Extra', true, 'display:block;', '');
+            echo '</div>';
+
+            echo '<div style="float:left;">';
+            $settings->render_single_line_field('person_uuidv4[' . $x . ']', '', 'on', 'width:21em;max-width:100%;', 'Person ID', true, 'display:block;', '', true, array("O3PO_Utility", "uuidv4"));
             echo '</div>';
 
             echo '<button style="float:right;" type="button" onclick="removePerson(this)">Remove person</button>';
@@ -284,6 +290,29 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
          * @return array Array with of arrays, one per person, containing that
          *               persons data.
          */
+    public static function get_formated_name_from_uuidv4($uuidv4) {
+
+        $settings = O3PO_Settings::instance();
+        $person_first_names = $settings->get_field_value('person_first_names');
+        $person_last_names = $settings->get_field_value('person_last_names');
+        $person_uuidv4 = $settings->get_field_value('person_uuidv4');
+
+        $key = array_search($uuidv4, $person_uuidv4, true);
+
+        if($key === false)
+            return "";
+
+        return  $person_first_names[$key] . " " . $person_last_names[$key];
+    }
+
+        /**
+         * Get person data from settings storage in a convenient array structure
+         *
+         * @since  0.4.1+
+         * @access public
+         * @return array Array with of arrays, one per person, containing that
+         *               persons data.
+         */
     public static function get_person_data() {
 
         $settings = O3PO_Settings::instance();
@@ -296,6 +325,7 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
         $person_affiliation = $settings->get_field_value('person_affiliation');
         $person_country = $settings->get_field_value('person_country');
         $person_extra = $settings->get_field_value('person_extra');
+        $person_uuidv4 = $settings->get_field_value('person_uuidv4');
 
         $person_data = array();
         foreach($person_first_names as $x => $foo)
@@ -309,6 +339,7 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
                 'affiliation' => $person_affiliation[$x],
                 'country' => $person_country[$x],
                 'extra' => $person_extra[$x],
+                'uuidv4' => $person_uuidv4[$x],
                                    );
 
         return $person_data;
@@ -355,10 +386,9 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
 
             if(empty($atts['role']) or $atts['role'] === $person['role'] or in_array($person['role'], preg_split('/\s*,\s*/u', $atts['role'])))
             {
-                if(!empty($atts['li-style']))
-                    $result .= '<li style="' . esc_attr($atts['li-style']) . '">';
-                else
-                    $result .= '<li>';
+
+                $result .= '<li' . (!empty($atts['li-style']) ? ' style="' . esc_attr($atts['li-style']) : '') . (!empty($person['uuidv4']) ? ' id="person-' . esc_attr($person['uuidv4']) : '') . '">';
+
                 $person_name = $person['first_names'] . ' ' . $person['last_names'];
                 if($atts['link'] !== 'False' and !empty($person['url']))
                     $result .= '<a href="' . esc_attr($person['url']) . '" target="_blank">' . esc_html($person_name) . '</a>';
