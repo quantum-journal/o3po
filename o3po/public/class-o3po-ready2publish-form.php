@@ -869,7 +869,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
          * @access   public
          */
     public function render_payment_method() {
-        echo '<p>Quantum is a non-profit journal, supported by voluntary publication fees - for a full explanation and break-down of running costs see <a href="https://quantum-journal.org/update-on-quantums-publication-fees/">this blog post</a>. If you are able to afford the publication fee (for example through your funding agency), we thank you for your support.</p>';
+        echo '<p>Quantum is a non-profit journal, supported by voluntary publication fees. If you are able to afford the publication fee (for example through your funding agency), we thank you for your support.</p>';
 
         $this->render_select_field('payment_method', [
                                        array('value' => 'invoice',
