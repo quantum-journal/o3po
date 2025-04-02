@@ -2070,7 +2070,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
                 continue;
 
             $post = new WP_Post($post_id);
-            $wp_query = new WP_Query(array('ID' => $post_id, 'error' => '404', 'post_type' => get_post_type($post_id), $post_type => $primary_publication_type->get_doi($post_id)));
+            $wp_query = new WP_Query(array('ID' => $post_id, 'error' => '404', 'post_type' => get_post_type($post_id)));
             $wp_query->is_404 = true;
             $doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
             $wp_query->query_vars[$post_type] = $doi_suffix;
@@ -2078,7 +2078,14 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
             set_global_query($wp_query);
             the_post();
 
+            $counter_before = get_flush_rewrite_rules_call_counter();
             $primary_publication_type->handle_404_errors();
+            $counter_after = get_flush_rewrite_rules_call_counter();
+
+            if (get_post_status($post_id) == "publish")
+                $this->assertSame($counter_before + 1, $counter_after);
+            else
+                $this->assertSame($counter_before, $counter_after);
         }
     }
 

@@ -262,7 +262,21 @@ function get_file_data( $file, $options ) {
     return $matches;
 }
 
-function flush_rewrite_rules( $hard=false ) {}
+
+$flush_rewrite_rules_call_counter = 0;
+function flush_rewrite_rules( $hard=false ) {
+    global $flush_rewrite_rules_call_counter;
+
+    $flush_rewrite_rules_call_counter += 1;
+}
+
+
+function get_flush_rewrite_rules_call_counter() {
+    global $flush_rewrite_rules_call_counter;
+
+    return $flush_rewrite_rules_call_counter;
+}
+
 
 function add_rewrite_endpoint( $a, $b=Null ) {}
 
