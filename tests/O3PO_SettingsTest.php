@@ -13,7 +13,7 @@ class O3PO_SettingsTest extends O3PO_TestCase
     public static function get_settings()
     {
 
-        $settings_test = new O3PO_SettingsTest();
+        $settings_test = new O3PO_SettingsTest("O3PO_SettingsTest");
         return $settings_test->test_initialize_settings();
     }
 
