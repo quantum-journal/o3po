@@ -563,6 +563,23 @@ function the_post() {
 }
 
 
+function wp_insert_post($postarr, $wp_error = false, $fire_after_hooks = true ) {
+    global $posts;
+    $post_id = 0;
+    while(isset($array[$post_id])) $post_id++;
+    $posts[$post_id] = $postarr;
+
+    return $post_id;
+}
+
+
+function set_post_thumbnail( $post_id, $thumbnail_id ) {
+    global $posts;
+
+    $posts[$post_id]["thumbnail_id"] = $thumbnail_id;
+}
+
+
 function set_query_var( $var, $val ) {
     global $wp_query;
 
