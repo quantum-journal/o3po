@@ -2,7 +2,7 @@
 
 require_once(dirname( __FILE__ ) . '/../o3po/public/class-o3po-ready2publish-form.php');
 require_once(dirname( __FILE__ ) . '/../o3po/admin/class-o3po-ready2publish-dashboard.php');
-require_once(dirname( __FILE__ ) . '/o3po-settings-test.php');
+require_once(dirname( __FILE__ ) . '/O3PO_SettingsTest.php');
 
 class O3PO_Ready2PublishTest extends O3PO_TestCase
 {

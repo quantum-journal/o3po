@@ -8,7 +8,7 @@ require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-primary-publica
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-secondary-publication-type.php');
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-latex.php');
 require_once(dirname( __FILE__ ) . '/../o3po/admin/class-o3po-admin.php');
-require_once(dirname( __FILE__ ) . '/o3po-settings-test.php');
+require_once(dirname( __FILE__ ) . '/O3PO_SettingsTest.php');
 
 class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
 {

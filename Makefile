@@ -30,9 +30,9 @@ test: test-.
 
 test-%: $(shell find . -type f -name '*.php') setsttysizenonzero
 	@if [ "$(shell phpunit --version | head -n 1 | sed -n 's/[^0-9]*\([0-9]*\)\..*/\1/p')" -ge "10" ]; then\
-		$(PHPUNITCOMMAND) --coverage-clover=coverage.xml --coverage-html=coverage-html --bootstrap tests/resources/bootstrap.php --test-suffix 'test.php' tests/;\
+		$(PHPUNITCOMMAND) --coverage-clover=coverage.xml --coverage-html=coverage-html --bootstrap tests/resources/bootstrap.php --test-suffix 'est.php' tests/;\
 	else\
-		$(PHPUNITCOMMAND) --verbose --coverage-clover=coverage.xml --coverage-html=coverage-html --whitelist $(SRC) --bootstrap tests/resources/bootstrap.php --test-suffix 'test.php' tests/$(subst test-,,$@);\
+		$(PHPUNITCOMMAND) --verbose --coverage-clover=coverage.xml --coverage-html=coverage-html --whitelist $(SRC) --bootstrap tests/resources/bootstrap.php --test-suffix 'est.php' tests/$(subst test-,,$@);\
 	fi
 
 

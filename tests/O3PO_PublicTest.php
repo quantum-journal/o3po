@@ -1,7 +1,7 @@
 <?php
 
 require_once(dirname( __FILE__ ) . '/../o3po/public/class-o3po-public.php');
-require_once(dirname( __FILE__ ) . '/o3po-settings-test.php');
+require_once(dirname( __FILE__ ) . '/O3PO_SettingsTest.php');
 
 class O3PO_PublicTest extends O3PO_TestCase
 {

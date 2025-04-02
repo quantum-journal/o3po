@@ -47,7 +47,7 @@ class O3PO_Environment_Test extends O3PO_TestCase
          */
     public function test_unique_filename_callback( $environment ) {
 
-        $this->assertSame('o3po-environment-test-1.php', $environment->unique_filename_callback( dirname( __FILE__ ), 'o3po-environment-test.php', '.php' ));
+        $this->assertSame('O3PO_Environment_Test-1.php', $environment->unique_filename_callback( dirname( __FILE__ ), 'O3PO_Environment_Test.php', '.php' ));
         $this->assertSame('file-that-does-not-yet-exist.txt', $environment->unique_filename_callback( dirname( __FILE__ ), 'file-that-does-not-yet-exist.txt', '.txt' ));
         $this->assertSame('0809.2542v4-1.tar.gz', $environment->unique_filename_callback( dirname( __FILE__ ) . '/resources/arxiv', '0809.2542v4.tar.gz', '.tar.gz' ));
         $this->assertSame('file-with-number-3.txt', $environment->unique_filename_callback( dirname( __FILE__ ) . '/resources', 'file-with-number.txt', '.txt' ));
