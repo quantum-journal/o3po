@@ -5,7 +5,7 @@ require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-buffer.php';
 class O3PO_BufferTest extends O3PO_TestCase
 {
 
-    public function create_update_provider() {
+    public static function create_update_provider() {
 
         return [
             array(
@@ -128,7 +128,7 @@ class O3PO_BufferTest extends O3PO_TestCase
 
 
 
-    function get_profile_information_provider() {
+    public static function get_profile_information_provider() {
         return [
             array(
                 'https://api.bufferapp.com/1',

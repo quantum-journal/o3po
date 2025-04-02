@@ -38,18 +38,18 @@ if(!class_exists('PHPUnit_Framework_TestCase')){
 class O3PO_TestCase extends PHPUnit_Framework_TestCase
 {
 
-    public function assertStringContains( $needle, $haystack ) {
-        if(method_exists($this, 'assertStringContainsString'))
-            $this->assertStringContainsString($needle, $haystack);
+    public static function assertStringContains( $needle, $haystack ) {
+        if(method_exists('PHPUnit_Framework_TestCase', 'assertStringContainsString'))
+            static::assertStringContainsString($needle, $haystack);
         else
-            $this->assertContains($needle, $haystack);
+            static::assertContains($needle, $haystack);
     }
 
-    public function assertStringNotContains( $needle, $haystack ) {
-        if(method_exists($this, 'assertStringNotContainsString'))
-            $this->assertStringNotContainsString($needle, $haystack);
+    public static function assertStringNotContains( $needle, $haystack ) {
+        if(method_exists('PHPUnit_Framework_TestCase', 'assertStringNotContainsString'))
+            static::assertStringNotContainsString($needle, $haystack);
         else
-            $this->assertNotContains($needle, $haystack);
+            static::assertNotContains($needle, $haystack);
     }
 
     public static function assertRegexpCompat($pattern, $string, $message = '' ) {
@@ -59,7 +59,7 @@ class O3PO_TestCase extends PHPUnit_Framework_TestCase
             parent::assertRegexp($pattern, $string, $message = $message);
     }
 
-    public function assertValidHTMLFragment( $html, $is_fragment=true ) {
+    public static function assertValidHTMLFragment( $html, $is_fragment=true ) {
 
         $dom = new DOMDocument;
         try
@@ -74,12 +74,12 @@ class O3PO_TestCase extends PHPUnit_Framework_TestCase
                 $html = implode("\n", $lines);
                 $result = $dom->loadHTML($html);
             }
-            $this->assertNotFalse($result);
+            O3PO_TestCase::assertNotFalse($result);
             //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
         }
         catch(Exception $e)
         {
-            $this->assertNotFalse(false, "The following html caused the error " . $e->getMessage() . ":\n" . $html);
+            O3PO_TestCase::assertNotFalse(false, "The following html caused the error " . $e->getMessage() . ":\n" . $html);
         }
 
         return($result);

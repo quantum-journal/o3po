@@ -5,7 +5,7 @@ require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-arxiv.php';
 class O3PO_ArxivTest extends O3PO_TestCase
 {
 
-    public function eprint_provider() {
+    public static function eprint_provider() {
         return [
             array(
                 'eprint' => '1609.09584v4',
@@ -81,7 +81,7 @@ ERROR: No license informatin found on https://arxiv.org/abs/0809.2542v5.
 
 
 
-    public function eprint_submission_history_provider() {
+    public static function eprint_submission_history_provider() {
         return [
             array(
                 'eprint' => '1609.09584',
@@ -184,7 +184,7 @@ ERROR: No license informatin found on https://arxiv.org/abs/0809.2542v5.
     }
 
 
-    public function eprint_upload_date_provider() {
+    public static function eprint_upload_date_provider() {
         return [
             array(
                 'eprint' => '1609.09584v4',

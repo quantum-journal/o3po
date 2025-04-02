@@ -5,7 +5,7 @@ require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-crossref.php';
 class O3PO_CrossrefTest extends O3PO_TestCase
 {
 
-    public function get_cited_by_xml_body_provider() {
+    public static function get_cited_by_xml_body_provider() {
         return [
             array(
                 'crossref_url' => get_option('o3po-settings')['crossref_get_forward_links_url'],
@@ -56,7 +56,7 @@ class O3PO_CrossrefTest extends O3PO_TestCase
 
 
 
-    public function get_cited_by_bibentries_provider() {
+    public static function get_cited_by_bibentries_provider() {
         return [
             array(
                 'crossref_url' => get_option('o3po-settings')['crossref_get_forward_links_url'],

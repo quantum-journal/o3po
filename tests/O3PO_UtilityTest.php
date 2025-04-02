@@ -12,7 +12,7 @@ class O3PO_UtilityTest extends O3PO_TestCase
         $this->assertSame($expected, O3PO_Utility::check_orcid($orcid));
     }
 
-    public function orcid_provider() {
+    public static function orcid_provider() {
 
         return [
             ["0000-0002-1483-5661", true],
@@ -35,7 +35,7 @@ class O3PO_UtilityTest extends O3PO_TestCase
 
     }
 
-    public function base_convert_arbitrary_precision_provider() {
+    public static function base_convert_arbitrary_precision_provider() {
 
         return [
             ["0", 10, 10, "0"],
@@ -58,7 +58,7 @@ class O3PO_UtilityTest extends O3PO_TestCase
 
     }
 
-    public function remove_stopwords_provider() {
+    public static function remove_stopwords_provider() {
 
          return [
              ["The big ground fox jumps over the lazy cat.", "big ground fox jumps over lazy cat."],
@@ -76,7 +76,7 @@ class O3PO_UtilityTest extends O3PO_TestCase
 
     }
 
-    public function oxford_comma_implode_provider() {
+    public static function oxford_comma_implode_provider() {
 
          return [
              [["Foo"], "Foo"],
@@ -95,7 +95,7 @@ class O3PO_UtilityTest extends O3PO_TestCase
         $this->assertSame($expected, O3PO_Utility::make_slash_breakable_html($str));
     }
 
-    public function make_slash_breakable_html_provider() {
+    public static function make_slash_breakable_html_provider() {
 
          return [
              ["/home/www/test", "/​home/​www/​test"],
@@ -105,7 +105,7 @@ class O3PO_UtilityTest extends O3PO_TestCase
 
 
 
-    public function valid_issn_provider() {
+    public static function valid_issn_provider() {
         return [
             ['0378-5955', true],
             ['0378-5954', false],
@@ -124,7 +124,7 @@ class O3PO_UtilityTest extends O3PO_TestCase
     }
 
 
-    public function valid_email_provider() {
+    public static function valid_email_provider() {
         return [
             ['info@foo.org', true],
             ['info@foo-bar.org', true],
@@ -159,7 +159,7 @@ class O3PO_UtilityTest extends O3PO_TestCase
     }
 
 
-    public function array_mean_provider() {
+    public static function array_mean_provider() {
         return [
             [[1,1,1,1], 1],
             [[1,2,3], 2],
@@ -181,7 +181,7 @@ class O3PO_UtilityTest extends O3PO_TestCase
     }
 
 
-    public function array_stddev_provider() {
+    public static function array_stddev_provider() {
         return [
             [[1,1,1,1], 0.0],
             [[1,2,3], 1.0],
@@ -204,7 +204,7 @@ class O3PO_UtilityTest extends O3PO_TestCase
     }
 
 
-    public function array_median_provider() {
+    public static function array_median_provider() {
         return [
             [[1,1,1,1], 1],
             [[1,2,3], 2],

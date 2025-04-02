@@ -5,7 +5,7 @@ require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-bibentry.php';
 class O3PO_BibentryTest extends O3PO_TestCase
 {
 
-    public function match_provider() {
+    public static function match_provider() {
         return [
             [
                 [new O3PO_Bibentry(array('authors' => array(new O3PO_Author('Jiang', 'Zhang')), 'title' => 'Quantum algorithms to simulate many-body physics of correlated fermions', 'year' => 2017 )),
@@ -62,7 +62,7 @@ class O3PO_BibentryTest extends O3PO_TestCase
 
 
 
-    public function merge_bibitem_arrays_provider() {
+    public static function merge_bibitem_arrays_provider() {
         return [
             [
                 array(new O3PO_Bibentry(array('authors' => array(new O3PO_Author('Foo', 'Bar')), 'title' => 'Reasonable tile 1', 'year' => 2015 ))),
@@ -181,7 +181,7 @@ class O3PO_BibentryTest extends O3PO_TestCase
     }
 
 
-    public function bibentry_provider() {
+    public static function bibentry_provider() {
         return [
             [new O3PO_Bibentry(
                     array(

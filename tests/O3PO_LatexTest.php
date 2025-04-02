@@ -125,7 +125,7 @@ class O3PO_LatexTest extends O3PO_TestCase
         return $parsed_bbl;
     }
 
-    public function get_month_string_provider() {
+    public static function get_month_string_provider() {
         return [
             [0, null],
             [1 , 'jan'],
@@ -205,7 +205,7 @@ class O3PO_LatexTest extends O3PO_TestCase
 
 
 
-    public function expand_latex_macros_provider() {
+    public static function expand_latex_macros_provider() {
 
         return [
             array(
@@ -241,7 +241,7 @@ class O3PO_LatexTest extends O3PO_TestCase
 
 
 
-    public function latex_to_utf8_outside_math_mode_test_case_provider() {
+    public static function latex_to_utf8_outside_math_mode_test_case_provider() {
         return [
             ["\\'  \n a" , "á"],
             ["\\'  \n ab" , "áb"],
@@ -315,7 +315,7 @@ ab' , 'äb'],
     }
 
 
-    public function utf8_to_closest_latin_letter_string_provider() {
+    public static function utf8_to_closest_latin_letter_string_provider() {
         return [
             ['foo' , 'foo'],
             ['ä' , 'a'],
@@ -334,7 +334,7 @@ ab' , 'äb'],
 
 
 
-    public function preg_split_at_latex_math_mode_delimters_provider() {
+    public static function preg_split_at_latex_math_mode_delimters_provider() {
         return [
             ['foo' , ['foo']],
             ['foo \\$ bar' , ['foo \\$ bar']],
@@ -369,7 +369,7 @@ ab' , 'äb'],
         $this->assertSame($input[0], implode(O3PO_Latex::preg_split_at_latex_math_mode_delimters($input[0], -1, PREG_SPLIT_DELIM_CAPTURE)));
     }
 
-    public function strpos_outside_math_mode_provider() {
+    public static function strpos_outside_math_mode_provider() {
         return [
             [['foo', 'o'] , 1],
             [['foo', 'x'] , false],
@@ -390,7 +390,7 @@ ab' , 'äb'],
         $this->assertSame($expected, O3PO_Latex::strpos_outside_math_mode($input[0], $input[1]));
     }
 
-    public function utf8_to_latex_provider() {
+    public static function utf8_to_latex_provider() {
         return [
             ['foo', 'foo'],
             ['ô', '{\\^{o}}'],
@@ -407,7 +407,7 @@ ab' , 'äb'],
 
 
 
-    public function utf8_to_bibtex_provider() {
+    public static function utf8_to_bibtex_provider() {
         return [
             ['foo', 'foo'],
             ['ô', '{\\^{o}}'],
@@ -424,7 +424,7 @@ ab' , 'äb'],
     }
 
 
-    public function preg_match_outside_math_mode_provider() {
+    public static function preg_match_outside_math_mode_provider() {
         return [
             [['#o#', 'foo'] , 1],
             [['#x#', 'foo'] , 0],
@@ -449,7 +449,7 @@ ab' , 'äb'],
     }
 
 
-    public function normalize_whitespace_and_linebreak_characters_provider() {
+    public static function normalize_whitespace_and_linebreak_characters_provider() {
         return [
             [["abc", True, False] , "abc"],
             [["a \t c", True, False] , "a c"],
@@ -496,7 +496,7 @@ ab' , 'äb'],
     }
 
 
-    public function expand_cite_to_html_provider() {
+    public static function expand_cite_to_html_provider() {
         return [
             ["abc", "abc"],
             ['\cite{CampisiRMP}', '[<a onclick="document.getElementById(\'references\').style.display=\'block\';" href="#CampisiRMP">2</a>]'],

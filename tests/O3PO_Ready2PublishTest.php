@@ -289,7 +289,7 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
 
     }
 
-    public function validate_featured_image_upload_provider() {
+    public static function validate_featured_image_upload_provider() {
 
         return [
             [array(
@@ -347,7 +347,7 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
     }
 
 
-    public function acceptance_code_provider() {
+    public static function acceptance_code_provider() {
 
         return [
             ['AAA', 'AAA', True],

@@ -43,7 +43,7 @@ class O3PO_PublicTest extends O3PO_TestCase
     }
 
 
-    public function id_provider() {
+    public static function id_provider() {
 
         return [[1],[5]];
     }
@@ -134,7 +134,7 @@ class O3PO_PublicTest extends O3PO_TestCase
     }
 
 
-    public function secondary_journal_help_text_query_provider() {
+    public static function secondary_journal_help_text_query_provider() {
 
         $settings = O3PO_SettingsTest::get_settings();
 

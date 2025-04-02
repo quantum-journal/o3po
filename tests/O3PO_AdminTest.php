@@ -75,7 +75,7 @@ class O3PO_AdminTest extends O3PO_TestCase
         $admin->enable_mathjax();
         $output = ob_get_contents();
         ob_end_clean();
-        $this->assertValidHTMLFragment($output);
+        O3PO_SettingsTest::assertValidHTMLFragment($output);
 
     }
 

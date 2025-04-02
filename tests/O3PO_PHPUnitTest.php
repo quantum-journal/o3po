@@ -2,7 +2,7 @@
 
 class O3PO_PHPUnitTest extends O3PO_TestCase
 {
-    public function date_provider() {
+    public static function date_provider() {
         return array([date("Y-m-d")]);
     }
 

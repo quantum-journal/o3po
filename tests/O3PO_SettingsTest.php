@@ -5,7 +5,7 @@ require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-settings.php');
 class O3PO_SettingsTest extends O3PO_TestCase
 {
 
-    public function fake_get_active_publication_type_names() {
+    public static function fake_get_active_publication_type_names() {
 
         return array("fake_publication_type_name_1", "fake_publication_type_name_2");
     }
@@ -17,7 +17,7 @@ class O3PO_SettingsTest extends O3PO_TestCase
         return $settings_test->test_initialize_settings();
     }
 
-    public function test_initialize_settings()
+    public static function test_initialize_settings()
     {
         $file_data = get_file_data(dirname( __FILE__ ) . '/../o3po/o3po.php', array(
                                        'Version' => 'Version',
@@ -29,25 +29,25 @@ class O3PO_SettingsTest extends O3PO_TestCase
             try
             {
                 O3PO_Settings::instance();
-                $this->assertTrue(false, 'An exception should have been thrown on first initialization without parameters');
+                O3PO_SettingsTest::assertTrue(false, 'An exception should have been thrown on first initialization without parameters');
             } catch (Exception $e) {
-                $this->assertEquals($e->getMessage(), "Settings object must be configured on first initialization. No configuration given.");
+                O3PO_SettingsTest::assertEquals($e->getMessage(), "Settings object must be configured on first initialization. No configuration given.");
             }
-            $settings = O3PO_Settings::instance($file_data['Text Domain'], $file_data['Plugin Name'], $file_data['Version'], array( $this, 'fake_get_active_publication_type_names'));
+            $settings = O3PO_Settings::instance($file_data['Text Domain'], $file_data['Plugin Name'], $file_data['Version'], array("O3PO_SettingsTest", "fake_get_active_publication_type_names"));
 
             try
             {
                 $settings = O3PO_Settings::instance('bogus', 'input', 'to', 'initialization');
-                $this->assertTrue(false, 'An exception should have been thrown when initializing again with different parameters');
+                O3PO_SettingsTest::assertTrue(false, 'An exception should have been thrown when initializing again with different parameters');
             } catch (Exception $e) {
-                $this->assertEquals($e->getMessage(), "Settings object must be configured on first initialization. Already configured.");
+                O3PO_SettingsTest::assertEquals($e->getMessage(), "Settings object must be configured on first initialization. Already configured.");
             }
 
         }
         else
             $settings = O3PO_Settings::instance();
 
-        $this->assertInstanceOf(O3PO_Settings::class, $settings);
+        O3PO_SettingsTest::assertInstanceOf(O3PO_Settings::class, $settings);
 
         return $settings;
     }
@@ -136,7 +136,7 @@ class O3PO_SettingsTest extends O3PO_TestCase
     }
 
 
-    public function validate_doi_prefix_provider() {
+    public static function validate_doi_prefix_provider() {
         return [
             ['1234567890.-', '1234567890.-'],
             ['@', ''],
@@ -155,7 +155,7 @@ class O3PO_SettingsTest extends O3PO_TestCase
 
 
 
-    public function validate_doi_suffix_provider() {
+    public static function validate_doi_suffix_provider() {
         return [
             ['abcdkrwrfdxyzABCDEZUHAZ0123456789.-', 'abcdkrwrfdxyzABCDEZUHAZ0123456789.-'],
             ['@', ''],
@@ -173,7 +173,7 @@ class O3PO_SettingsTest extends O3PO_TestCase
     }
 
 
-    public function validate_uuid4_array_provider() {
+    public static function validate_uuid4_array_provider() {
         return [
             [[
                     "c7f6a320-f885-4490-9328-dca2d38e2e02",
@@ -201,7 +201,7 @@ class O3PO_SettingsTest extends O3PO_TestCase
     }
 
 
-    public function validate_issn_provider() {
+    public static function validate_issn_provider() {
         return [
             ['0378-5955', '0378-5955', true],
             ['2521-327X', '2521-327X', true],
@@ -236,9 +236,9 @@ class O3PO_SettingsTest extends O3PO_TestCase
 
 
 
-    public function validate_four_digit_year_provider() {
+    public static function validate_four_digit_year_provider() {
 
-        $settings = $this->test_initialize_settings();
+        $settings = O3PO_SettingsTest::test_initialize_settings();
 
         return [
             ['2017', '2017'],
@@ -255,15 +255,15 @@ class O3PO_SettingsTest extends O3PO_TestCase
          * @dataProvider validate_four_digit_year_provider
          * @depends test_initialize_settings
          */
-    public function test_validate_four_digit__year( $first_volume_year, $expected, $setting ) {
+    public function test_validate_four_digit_year( $first_volume_year, $expected, $setting ) {
 
         $this->assertSame($setting->validate_four_digit_year('first_volume_year', $first_volume_year), $expected);
     }
 
 
-    public function validate_url_provider() {
+    public static function validate_url_provider() {
 
-        $this->test_initialize_settings();
+        O3PO_SettingsTest::test_initialize_settings();
         $settings = O3PO_Settings::instance();
 
         return [
@@ -287,7 +287,7 @@ class O3PO_SettingsTest extends O3PO_TestCase
 
 
 
-public function validate_array_as_comma_separated_list_provider() {
+public static function validate_array_as_comma_separated_list_provider() {
         return [
             ['a, b, c,d', array('a', 'b', 'c', 'd')],
             ['   a, b, ', array('a', 'b')],
@@ -312,7 +312,7 @@ public function validate_array_as_comma_separated_list_provider() {
     }
 
 
-    public function validate_two_letter_country_code_provider() {
+    public static function validate_two_letter_country_code_provider() {
         return [
             ['DE', 'DE'],
             ['ES', 'ES'],
@@ -332,9 +332,9 @@ public function validate_array_as_comma_separated_list_provider() {
 
 
 
-    public function validate_positive_integer_provider() {
+    public static function validate_positive_integer_provider() {
 
-        $this->test_initialize_settings();
+        O3PO_SettingsTest::test_initialize_settings();
         $settings = O3PO_Settings::instance();
 
         return [
@@ -358,9 +358,9 @@ public function validate_array_as_comma_separated_list_provider() {
     }
 
 
-    public function checked_or_unchecked_provider() {
+    public static function checked_or_unchecked_provider() {
 
-        $this->test_initialize_settings();
+        O3PO_SettingsTest::test_initialize_settings();
         $settings = O3PO_Settings::instance();
 
         return [
@@ -382,7 +382,7 @@ public function validate_array_as_comma_separated_list_provider() {
 
 
 
-    public function trim_settings_field_provider() {
+    public static function trim_settings_field_provider() {
         return [
             ['a nice text', 'a nice text'],
             ['a nice text ', 'a nice text'],
@@ -403,7 +403,7 @@ public function validate_array_as_comma_separated_list_provider() {
 
     public function trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed_provider( $settings ) {
 
-        $this->test_initialize_settings();
+        O3PO_SettingsTest::test_initialize_settings();
         $settings = O3PO_Settings::instance();
         $previous_value = $settings->get_field_value('arxiv_paper_doi_feed_endpoint');
 
@@ -446,8 +446,8 @@ public function validate_array_as_comma_separated_list_provider() {
     }
 
 
-    public function validate_settings_provider() {
-        $this->test_initialize_settings();
+    public static function validate_settings_provider() {
+        O3PO_SettingsTest::test_initialize_settings();
         $settings = O3PO_Settings::instance();
 
         return [

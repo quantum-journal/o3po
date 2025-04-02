@@ -73,7 +73,7 @@ class O3PO_Environment_Test extends O3PO_TestCase
     }
 
 
-    public function mime_check_data_provider() {
+    public static function mime_check_data_provider() {
 
         return [
             array(

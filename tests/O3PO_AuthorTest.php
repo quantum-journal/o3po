@@ -5,7 +5,7 @@ require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-author.php';
 class O3PO_AuthorTest extends O3PO_TestCase
 {
 
-    public function author_provider() {
+    public static function author_provider() {
         return [
             array(
                 'given_name' => 'Foo',

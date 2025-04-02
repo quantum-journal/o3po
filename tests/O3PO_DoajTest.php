@@ -5,7 +5,7 @@ require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-doaj.php';
 class O3PO_DoajTest extends O3PO_TestCase
 {
 
-    public function remote_post_meta_data_to_doaj_provider() {
+    public static function remote_post_meta_data_to_doaj_provider() {
         return [
             array(
                 'doaj_json' => json_encode('foo'),

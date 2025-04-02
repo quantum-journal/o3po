@@ -13,7 +13,7 @@ require_once(dirname( __FILE__ ) . '/O3PO_SettingsTest.php');
 class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
 {
 
-    public function test_initialize_settings() {
+    public static function test_initialize_settings() {
 
         $settings = O3PO_SettingsTest::get_settings();
 
@@ -82,7 +82,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         return $secondary_publication_type;
     }
 
-    public function single_paper_template_provider() {
+    public static function single_paper_template_provider() {
 
         return [
             [1],
@@ -90,7 +90,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         ];
     }
 
-    public function primary_the_admin_components_provider() {
+    public static function primary_the_admin_components_provider() {
 
         return [
             ['the_admin_panel_intro_text'],
@@ -143,7 +143,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         }
     }
 
-    public function secondary_the_admin_components_provider() {
+    public static function secondary_the_admin_components_provider() {
 
         return [
             ['the_admin_panel_intro_text'],
@@ -310,7 +310,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
     }
 
 
-    public function download_to_media_library_provider() {
+    public static function download_to_media_library_provider() {
 
         return [
             ['https://arxiv.org/pdf/0908.2921v2', 'q-1234-07-11-14', 'pdf', 'application/pdf', '1', false],
@@ -359,7 +359,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
 
 
 
-    function doi_suffix_still_free_provider() {
+    public static function doi_suffix_still_free_provider() {
 
         return [
             ['unused_prefix', true],
@@ -383,7 +383,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
     }
 
 
-    function pages_still_free_info_provider() {
+    public static function pages_still_free_info_provider() {
         return [
             [null, 1234, array('still_free' => true, 'title' => '')],
             [null, 1, array('still_free' => false, 'title' => 'Fake title')],
@@ -399,7 +399,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         $this->assertSame($expected, $journal->pages_still_free_info( $post_id_to_exclude, $pages, array($primary_publication_type->get_publication_type_name()) ));
     }
 
-    public function parse_publication_source_provider() {
+    public static function parse_publication_source_provider() {
 
         $settings = O3PO_SettingsTest::get_settings();
 
@@ -563,7 +563,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         }
     }
 
-    public function posts_for_validate_and_process_data_provider() {
+    public static function posts_for_validate_and_process_data_provider() {
         global $posts;
 
         return [
@@ -653,7 +653,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
     }
 
 
-    public function on_post_actually_published_provider() {
+    public static function on_post_actually_published_provider() {
 
         return [
             [1],
@@ -721,7 +721,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
     }
 
 
-    public function save_meta_data_provider() {
+    public static function save_meta_data_provider() {
 
         return [
             [1,
@@ -895,9 +895,9 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @runInSeparateProcess
          * @preserveGlobalState disabled
          */
-    public function save_metabox_provider() {
+    public static function save_metabox_provider() {
         #init settings here instead of depending on test_initialize_settings because O3PO_Settings is a singleton
-        $this->test_initialize_settings();
+        O3PO_JournalAndPublicationTypesTest::test_initialize_settings();
         $settings = O3PO_SettingsTest::get_settings();
 
         return [
@@ -1553,7 +1553,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
     }
 
 
-    public function pdf_endpoint_request_query_provider() {
+    public static function pdf_endpoint_request_query_provider() {
 
         $paper = 'paper'; # 'paper' should ideally be $primary_publication_type->get_publication_type_name()
 
@@ -1598,7 +1598,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
     }
 
 
-    public function web_statement_endpoint_request_query_provider() {
+    public static function web_statement_endpoint_request_query_provider() {
 
         $paper = 'paper'; # 'paper' should ideally be $primary_publication_type->get_publication_type_name()
 
@@ -1656,10 +1656,10 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
 
 
 
-    public function axiv_paper_doi_feed_endpoint_request_query_provider() {
+    public static function axiv_paper_doi_feed_endpoint_request_query_provider() {
 
         $paper = 'paper'; # 'paper' should ideally be $primary_publication_type->get_publication_type_name()
-        $settings = $this->test_initialize_settings();
+        $settings = O3PO_JournalAndPublicationTypesTest::test_initialize_settings();
         $endpoint_suffix = $settings->get_field_value('arxiv_paper_doi_feed_endpoint');
 
 
@@ -1690,10 +1690,6 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         if(!empty($expected))
             $this->assertRegExpCompat('#'.$expected.'#', $output);
     }
-
-
-
-
 
 
         /**
@@ -1804,7 +1800,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
     }
 
 
-    function volumes_endpoint_volume_1_provider() {
+    public static function volumes_endpoint_volume_1_provider() {
 
         return [
             ["1/" ],
@@ -2000,7 +1996,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
 
 
 
-    function html_latex_excerpt_provider() {
+    public static function html_latex_excerpt_provider() {
 
         return [
             ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", 190, "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris"],
@@ -2035,7 +2031,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
 
 
 
-    public function validate_doi_suffix_template_provider() {
+    public static function validate_doi_suffix_template_provider() {
 
         $settings = O3PO_SettingsTest::get_settings();
 

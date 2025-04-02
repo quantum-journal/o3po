@@ -5,7 +5,7 @@ require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-clockss.php';
 class O3PO_ClockssTest extends O3PO_TestCase
 {
 
-    public function ftp_upload_meta_data_and_pdf_to_clockss_provider() {
+    public static function ftp_upload_meta_data_and_pdf_to_clockss_provider() {
         return [
             array(
                 'clockss_xml' => 'doesn\'t matter',

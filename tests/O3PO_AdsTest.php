@@ -5,7 +5,7 @@ require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-ads.php';
 class O3PO_AdsTest extends O3PO_TestCase
 {
 
-    public function ads_provider() {
+    public static function ads_provider() {
         return [
             array(
                 'ads_api_search_url' => 'https://api.adsabs.harvard.edu/v1/search/query',
