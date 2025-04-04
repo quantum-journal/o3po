@@ -12,6 +12,7 @@ class DebugTest extends PHPUnit\Framework\TestCase # extends O3PO_TestCase
         /**
          * @doesNotPerformAssertions
          */
+    #[DoesNotPerformAssertions]
     public function test_construct() {
         return "foo";
     }
@@ -19,6 +20,7 @@ class DebugTest extends PHPUnit\Framework\TestCase # extends O3PO_TestCase
         /**
          * @depends test_construct
          */
+    #[Depends('test_construct')]
     public function test_get_plugin_name( $admin ) {
 
         $this->assertEquals($admin, 'foo');
