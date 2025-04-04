@@ -56,7 +56,7 @@ jobs:
     #   run: composer install --prefer-dist --no-progress --no-interaction --ignore-platform-reqs
 
     - name: Debug PHPUnit
-      run: for filename in tests/*Test.php; do phpunit --bootstrap tests/resources/bootstrap.php --test-suffix 'est.php' $filename; done
+      run: for filename in tests/*Test.php; do echo $filename && phpunit --bootstrap tests/resources/bootstrap.php --test-suffix 'est.php' $filename; done
 
     - name: Run tests
       run: make test
