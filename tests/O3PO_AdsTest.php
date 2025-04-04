@@ -121,7 +121,7 @@ class O3PO_AdsTest extends O3PO_TestCase
                 'ads_api_search_url' => 'https://api.adsabs.harvard.edu/v1/search/query',
                 'api_token' => '',
                 'eprint' => '0000.0008',
-                'expected' => new WP_Error('exception', 'There was an error parsing the data received from ADS:'), # The precise error message depends on the PHP version which is why we test this via assertStringContainsString() below
+                'expected' => new WP_Error('exception', 'unable to decode the received json data'), # The precise error message depends on the PHP version which is why we test this via assertStringContainsString() below
                   ),
                 ];
     }
@@ -130,9 +130,15 @@ class O3PO_AdsTest extends O3PO_TestCase
          * @dataProvider ads_provider
          */
     public function test_get_cited_by_bibentries( $ads_api_search_url, $api_token, $eprint, $expected ) {
+        fwrite(STDERR, print_r("eprint: ". $eprint . "\n", TRUE));
+
         if(is_wp_error($expected))
         {
             $error = O3PO_Ads::get_cited_by_bibentries($ads_api_search_url, $api_token, $eprint);
+
+            fwrite(STDERR, print_r("got error: ". gettype($error) . " " . get_class($error) . "  " . is_wp_error($error) . "\n", TRUE));
+            fwrite(STDERR, print_r("message:" . $error->get_error_message() . "\n", TRUE));
+
             $this->assertTrue(is_wp_error($error));
             $this->assertStringContains($expected->get_error_message(), $error->get_error_message());
         }

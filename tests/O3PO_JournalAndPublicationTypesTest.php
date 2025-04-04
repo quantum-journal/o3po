@@ -564,8 +564,6 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
     }
 
     public static function posts_for_validate_and_process_data_provider() {
-        global $posts;
-
         return [
             [1, array(
                     '#REVIEW: The pdf was downloaded successfully from the arXiv#',
