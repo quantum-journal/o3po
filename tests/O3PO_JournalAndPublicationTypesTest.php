@@ -1682,7 +1682,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
     #[RunInSeparateProcess]
     #[PreserveGlobalState('disabled')]
     #[DataProvider('pdf_endpoint_request_query_provider')]
-    #[Depends(test_create_primary_publication_type')]
+    #[Depends('test_create_primary_publication_type')]
     public function test_handle_pdf_endpoint_request( $wp_query, $expected, $primary_publication_type ) {
 
             /* We must initialize a settings object for handle_pdf_endpoint_request() to work, but we also must runInSeparateProcess with preserveGlobalState disabled because we modify the headers in handle_pdf_endpoint_request(). Because O3PO_Settings is a singleton, we therefore cannot depend on test_initialize_settings(), but must run it here.
