@@ -1244,6 +1244,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
+    #[Depends('test_create_primary_publication_type')]
+    #[Depends('test_create_secondary_publication_type')]
     public function test_add_metabox( $primary_publication_type, $secondary_publication_type) {
         $primary_publication_type->add_metabox();
         $secondary_publication_type->add_metabox();
@@ -1254,8 +1256,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
-         #[Depends('test_create_primary_publication_type')]
-         #[Depends('test_create_secondary_publication_type')]
+    #[Depends('test_create_primary_publication_type')]
+    #[Depends('test_create_secondary_publication_type')]
     public function test_add_custom_post_types_to_query( $primary_publication_type, $secondary_publication_type) {
 
         global $is_home;

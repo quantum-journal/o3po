@@ -43,6 +43,7 @@ class O3PO_AdminTest extends O3PO_TestCase
          * @doesNotPerformAssertions
          */
     #[Depends('test_construct')]
+    #[DoesNotPerformAssertions]
     public function test_enqueue_styles( $admin ) {
 
         $admin->enqueue_styles();
