@@ -52,7 +52,7 @@ class O3PO_Admin {
          * @access   private
          * @var      string    $plugin_pretty_name    The pretty name of this plugin.
          */
-	private $plugin__pretty_name;
+	private $plugin_pretty_name;
 
         /**
          * Initialize the class and set its properties.

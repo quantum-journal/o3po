@@ -23,7 +23,7 @@ class O3PO_RelevanssiTest extends O3PO_TestCase
 
             global $posts;
 
-            if( $posts[$post_id]['post_type'] !== 'attachment' or $posts[$post_id]['mime_type'] !== 'application/pdf' )
+            if( !isset($posts[$post_id]['mime_type']) or $posts[$post_id]['post_type'] !== 'attachment'or $posts[$post_id]['mime_type'] !== 'application/pdf' )
                 return array('success' => false);
 
             update_post_meta($post_id, '_relevanssi_pdf_content', "this is the fake pdf content");
