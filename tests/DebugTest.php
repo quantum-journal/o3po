@@ -3,6 +3,9 @@
 /* require_once(dirname( __FILE__ ) . '/../o3po/admin/class-o3po-admin.php'); */
 /* require_once(dirname( __FILE__ ) . '/O3PO_SettingsTest.php'); */
 
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions
+use PHPUnit\Framework\Attributes\Depends
+
 class DebugTest extends PHPUnit\Framework\TestCase # extends O3PO_TestCase
 {
 
