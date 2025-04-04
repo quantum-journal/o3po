@@ -2,6 +2,8 @@
 
 require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-arxiv.php';
 
+use PHPUnit\Framework\Attributes\DataProvider;
+
 class O3PO_ArxivTest extends O3PO_TestCase
 {
 
@@ -73,6 +75,7 @@ ERROR: No license informatin found on https://arxiv.org/abs/0809.2542v5.
         /**
          * @dataProvider eprint_provider
          */
+    #[DataProvider(eprint_provider)]
     public function test_fetch_meta_data_from_abstract_page( $eprint, $expected ) {
 
         $this->assertSame($expected, O3PO_Arxiv::fetch_meta_data_from_abstract_page('https://arxiv.org/abs/', $eprint));
@@ -164,6 +167,7 @@ ERROR: No license informatin found on https://arxiv.org/abs/0809.2542v5.
         /**
          * @dataProvider eprint_submission_history_provider
          */
+    #[DataProvider(eprint_submission_history_provider)]
     public function test_get_submission_history_from_abstract_page( $eprint, $expected ) {
 
         $submission_history = O3PO_Arxiv::get_submission_history_from_abstract_page('https://arxiv.org/abs/', $eprint);
@@ -205,6 +209,7 @@ ERROR: No license informatin found on https://arxiv.org/abs/0809.2542v5.
         /**
          * @dataProvider eprint_upload_date_provider
          */
+    #[DataProvider(eprint_upload_date_provider)]
     public function test_get_arxiv_upload_date( $eprint, $expected ) {
 
         $this->assertEquals($expected, O3PO_Arxiv::get_arxiv_upload_date('https://arxiv.org/abs/', $eprint));

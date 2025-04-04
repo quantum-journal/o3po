@@ -2,6 +2,10 @@
 
 require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-clockss.php';
 
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\DataProvider;
+
 class O3PO_ClockssTest extends O3PO_TestCase
 {
 
@@ -24,6 +28,9 @@ class O3PO_ClockssTest extends O3PO_TestCase
          * @preserveGlobalState disabled
          * @dataProvider ftp_upload_meta_data_and_pdf_to_clockss_provider
          */
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState('disabled')]
+    #[DataProvider('ftp_upload_meta_data_and_pdf_to_clockss_provider')]
     public function test_ftp_upload_meta_data_and_pdf_to_clockss( $clockss_xml, $pdf_path, $remote_filename_without_extension, $clockss_ftp_url, $clockss_username, $clockss_password, $expected ) {
 
         $this->assertRegExpCompat($expected, O3PO_Clockss::ftp_upload_meta_data_and_pdf_to_clockss($clockss_xml, $pdf_path, $remote_filename_without_extension, $clockss_ftp_url, $clockss_username, $clockss_password));

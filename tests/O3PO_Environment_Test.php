@@ -26,6 +26,7 @@ class O3PO_Environment_Test extends O3PO_TestCase
          * @depends test_construct_production_environment
          * @depends test_construct_test_environment
          */
+    #[Depends('test_construct_production_environment')]
     public function test_get_plugin_pretty_name( $production_environment, $test_environment ) {
         ob_start();
         $production_environment->modify_css_if_in_test_environment();
