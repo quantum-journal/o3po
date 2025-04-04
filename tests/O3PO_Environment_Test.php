@@ -51,7 +51,7 @@ class O3PO_Environment_Test extends O3PO_TestCase
         /**
          * @depends test_construct_production_environment
          */
-    #[Depemds('test_construct_production_environment')]
+    #[Depends('test_construct_production_environment')]
     public function test_unique_filename_callback( $environment ) {
 
         $this->assertSame('O3PO_Environment_Test-1.php', $environment->unique_filename_callback( dirname( __FILE__ ), 'O3PO_Environment_Test.php', '.php' ));
@@ -207,7 +207,7 @@ class O3PO_Environment_Test extends O3PO_TestCase
         /**
          * @depends test_construct_production_environment
          */
-    #[Depemds('test_construct_production_environment')]
+    #[Depends('test_construct_production_environment')]
     public function test_file_get_contents_utf8( $environment ) {
 
         $content = $environment->file_get_contents_utf8(dirname( __FILE__ ) . '/resources/file-with-uft8-chars.tex');
