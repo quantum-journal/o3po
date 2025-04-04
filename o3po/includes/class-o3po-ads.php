@@ -60,12 +60,7 @@ class O3PO_Ads {
             set_transient('get_ads_cited_by_json_' . $url, $response, $storage_time);
         }
 
-
-        fwrite(STDERR, print_r("got json1: ". $response['body'] . "\n", TRUE));
-
         $json = json_decode($response['body']);
-
-        fwrite(STDERR, print_r("got json2: ". json_encode($json)  . "\n", TRUE));
 
         if($json === Null)
             return new WP_Error("json_decode_failed", "No response from ADS or unable to decode the received json data when getting the list of citing works.");
@@ -214,7 +209,7 @@ class O3PO_Ads {
             }
         }
         catch(Throwable $e) {
-            return new WP_Error('exception', 'There was an error parsing the data received from ADS: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            return new WP_Error('exception', 'There was an error parsing the data received from ADS: ' . $e->getMessage());
         }
 
         return $all_bibentries;
