@@ -6,6 +6,12 @@ require_once(dirname( __FILE__ ) . '/O3PO_SettingsTest.php');
 class O3PO_RelevanssiTest extends O3PO_TestCase
 {
 
+    public static function test_initialize_settings() {
+
+        $settings = O3PO_SettingsTest::get_settings();
+
+        return $settings;
+    }
 
         /**
          * @depends test_initialize_settings
