@@ -324,7 +324,7 @@ public static function validate_array_as_comma_separated_list_provider() {
          * @dataProvider validate_array_as_comma_separated_list_provider
          * @depends test_initialize_settings
          */
-    #[DataProvider validate_array_as_comma_separated_list_provider')]
+    #[DataProvider('validate_array_as_comma_separated_list_provider')]
     #[Depends('test_initialize_settings')]
     public function test_validate_array_as_comma_separated_list( $array_as_comma_separated_list, $expected, $setting ) {
 
