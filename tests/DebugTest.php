@@ -3,7 +3,7 @@
 /* require_once(dirname( __FILE__ ) . '/../o3po/admin/class-o3po-admin.php'); */
 /* require_once(dirname( __FILE__ ) . '/O3PO_SettingsTest.php'); */
 
-class DebugTest # extends O3PO_TestCase
+class DebugTest extends PHPUnit\Framework\TestCase # extends O3PO_TestCase
 {
 
     private $admin;
