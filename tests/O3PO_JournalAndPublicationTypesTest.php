@@ -1244,6 +1244,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
+    #[DoesNotPerformAssertions]
     #[Depends('test_create_primary_publication_type')]
     #[Depends('test_create_secondary_publication_type')]
     public function test_add_metabox( $primary_publication_type, $secondary_publication_type) {
