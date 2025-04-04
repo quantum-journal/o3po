@@ -471,7 +471,7 @@ public static function validate_array_as_comma_separated_list_provider() {
          * @depends test_initialize_settings
          * @doesNotPerformAssertions
          */
-    #[Depends('test_initialize_settings')
+    #[Depends('test_initialize_settings')]
     #[DoesNotPerformAssertions]
     public function test_execute_add_settings_page_to_menu( $settings ) {
 
