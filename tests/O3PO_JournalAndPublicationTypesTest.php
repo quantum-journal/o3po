@@ -1811,8 +1811,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
-    #[Depends('test_create_primary_publication_type')
-    #[Depends('test_create_secondary_publication_type')
+    #[Depends('test_create_primary_publication_type')]
+    #[Depends('test_create_secondary_publication_type')]
     public function test_add_dublin_core_and_highwire_press_meta_tags( $primary_publication_type, $secondary_publication_type ) {
         global $posts;
         global $post;
@@ -1854,8 +1854,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
-    #[Depends('test_create_primary_publication_type')
-    #[Depends('test_create_secondary_publication_type')
+    #[Depends('test_create_primary_publication_type')]
+    #[Depends('test_create_secondary_publication_type')]
     public function test_the_java_script_single_page( $primary_publication_type, $secondary_publication_type ) {
         global $posts;
         global $post;
