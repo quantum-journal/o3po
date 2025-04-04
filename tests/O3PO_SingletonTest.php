@@ -23,7 +23,7 @@ class O3PO_SingletonTest extends O3PO_TestCase
 
     }
 
-    public function test___clone() {
+    /* public function test___clone() { */
 
     /*     $reflection = new ReflectionClass('O3PO_Singleton'); */
     /*     $this->assertTrue($reflection->getMethod('__clone')->isPrivate()); */
