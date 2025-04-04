@@ -3,6 +3,9 @@
 require_once(dirname( __FILE__ ) . '/../o3po/admin/class-o3po-admin.php');
 require_once(dirname( __FILE__ ) . '/O3PO_SettingsTest.php');
 
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
+use PHPUnit\Framework\Attributes\Depends;
+
 class O3PO_AdminTest extends O3PO_TestCase
 {
 
@@ -12,6 +15,7 @@ class O3PO_AdminTest extends O3PO_TestCase
         /**
          * @doesNotPerformAssertions
          */
+    #[DoesNotPerformAssertions]
     public function test_construct() {
         return new O3PO_Admin( 'o3po', '0.3.0', 'O-3PO' );
     }
@@ -19,6 +23,7 @@ class O3PO_AdminTest extends O3PO_TestCase
         /**
          * @depends test_construct
          */
+    #[Depends('test_construct')]
     public function test_get_plugin_name( $admin ) {
 
         $this->assertEquals($admin->get_plugin_name(), 'o3po');
@@ -27,6 +32,7 @@ class O3PO_AdminTest extends O3PO_TestCase
         /**
          * @depends test_construct
          */
+    #[Depends('test_construct')]
     public function test_get_plugin_pretty_name( $admin ) {
 
         $this->assertEquals($admin->get_plugin_pretty_name(), 'O-3PO');
@@ -36,6 +42,7 @@ class O3PO_AdminTest extends O3PO_TestCase
          * @depends test_construct
          * @doesNotPerformAssertions
          */
+    #[Depends('test_construct')]
     public function test_enqueue_styles( $admin ) {
 
         $admin->enqueue_styles();
@@ -45,6 +52,8 @@ class O3PO_AdminTest extends O3PO_TestCase
          * @depends test_construct
          * @doesNotPerformAssertions
          */
+    #[Depends('test_construct')]
+    #[DoesNotPerformAssertions]
     public function test_enqueue_scripts( $admin ) {
 
         $admin->enqueue_scripts();
@@ -53,6 +62,7 @@ class O3PO_AdminTest extends O3PO_TestCase
         /**
          * @depends test_construct
          */
+    #[Depends('test_construct')]
     public function test_add_plugin_action_links( $admin ) {
 
         ob_start();
@@ -67,6 +77,7 @@ class O3PO_AdminTest extends O3PO_TestCase
         /**
          * @depends test_construct
          */
+    #[Depends('test_construct')]
     public function test_enable_mathjax( $admin ) {
 
         $settings = O3PO_SettingsTest::get_settings();
@@ -83,6 +94,8 @@ class O3PO_AdminTest extends O3PO_TestCase
          * @depends test_construct
          * @doesNotPerformAssertions
          */
+    #[Depends('test_construct')]
+    #[DoesNotPerformAssertions]
     public function test_add_meta_data_explorer_page_to_menu( $admin ) {
 
         $admin->add_meta_data_explorer_page_to_menu();
@@ -93,6 +106,8 @@ class O3PO_AdminTest extends O3PO_TestCase
          * @depends test_construct
          * @doesNotPerformAssertions
          */
+    #[Depends('test_construct')]
+    #[DoesNotPerformAssertions]
     public function test_get_meta_data_explorer_tabs( $admin ) {
 
         $admin->get_meta_data_explorer_tabs();
