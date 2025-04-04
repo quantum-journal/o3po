@@ -401,7 +401,7 @@ public static function validate_array_as_comma_separated_list_provider() {
     }
 
 
-    public static function trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed_provider( $settings ) {
+    public static function trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed_provider() {
 
         O3PO_SettingsTest::test_initialize_settings();
         $settings = O3PO_Settings::instance();
