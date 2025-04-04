@@ -234,8 +234,8 @@ class O3PO_SettingsTest extends O3PO_TestCase
          * @dataProvider validate_issn_provider
          * @depends test_initialize_settings
          */
-    #[DataProvider('validate_issn_provider')
-    #[Depends('test_initialize_settings')
+    #[DataProvider('validate_issn_provider')]
+    #[Depends('test_initialize_settings')]
     public function test_validate_issn_or_empty( $issn, $expected, $valid, $setting ) {
         global $global_setting_errors;
 

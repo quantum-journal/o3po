@@ -204,8 +204,8 @@ class O3PO_LatexTest extends O3PO_TestCase
          * @depends test_extract_latex_macros_latex
          * @depends test_get_latex_file
          */
-    #[Depends('test_extract_latex_macros_latex')
-    #[Depends('test_get_latex_file')
+    #[Depends('test_extract_latex_macros_latex')]
+    #[Depends('test_get_latex_file')]
     public function test_expand_latex_macros_latex( $macro_definitions, $text ) {
 
         $text_expanded = O3PO_Latex::expand_latex_macros( $macro_definitions, $text );
