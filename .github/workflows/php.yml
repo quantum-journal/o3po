@@ -55,5 +55,8 @@ jobs:
     # - name: Install dependencies
     #   run: composer install --prefer-dist --no-progress --no-interaction --ignore-platform-reqs
 
+    - name: Debug PHPUnit
+      run: phpunit --coverage-clover=coverage.xml --display-deprecations --display-warnings --display-errors --display-phpunit-deprecations --coverage-filter o3po --coverage-html=coverage-html --bootstrap tests/resources/bootstrap.php --test-suffix 'est.php' tests/DebugTest.php;
+
     - name: Run tests
       run: make test
