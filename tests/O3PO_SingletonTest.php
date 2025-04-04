@@ -2,12 +2,17 @@
 
 require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-singleton.php';
 
+use PHPUnit\Framework\Attributes\RunInSeparateProcess
+use PHPUnit\Framework\Attributes\PreserveGlobalState
+
 class O3PO_SingletonTest extends O3PO_TestCase
 {
         /**
          * @runInSeparateProcess
          * @preserveGlobalState disabled
          */
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState('disabled')]
     public function test___construct() {
 
         $reflection = new ReflectionClass('O3PO_Singleton');

@@ -348,7 +348,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_setup_environment
          */
     #[RunInSeparateProcess]
-    #[PreserveGlobalState]
+    #[PreserveGlobalState('disabled')]
     #[DataProvider('download_to_media_library_provider')]
     #[Depends('test_setup_environment')]
     public function test_download_to_media_library( $url, $filename, $extension, $mime_type, $parent_post_id, $expected_error, $environment ) {

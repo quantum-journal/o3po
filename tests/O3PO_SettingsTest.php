@@ -2,6 +2,10 @@
 
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-settings.php');
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
+
 class O3PO_SettingsTest extends O3PO_TestCase
 {
 
@@ -56,6 +60,7 @@ class O3PO_SettingsTest extends O3PO_TestCase
         /**
          * @depends test_initialize_settings
          */
+    #[Depends('test_initialize_settings')]
     public function test_register_and_render_settings_page( $settings ) {
 
         global $_GET;
@@ -126,6 +131,7 @@ class O3PO_SettingsTest extends O3PO_TestCase
         /**
          * @depends test_initialize_settings
          */
+    #[Depends('test_initialize_settings')]
     public function test_render_array_as_comma_separated_list_field( $settings ) {
 
         ob_start();
@@ -148,6 +154,8 @@ class O3PO_SettingsTest extends O3PO_TestCase
          * @dataProvider validate_doi_prefix_provider
          * @depends test_initialize_settings
          */
+    #[DataProvider('validate_doi_prefix_provider')]
+    #[Depends('test_initialize_settings')]
     public function test_validate_doi_prefix( $doi_prefix, $expected, $setting ) {
 
         $this->assertSame($setting->validate_doi_prefix('doi_prefix', $doi_prefix), $expected);
@@ -167,6 +175,8 @@ class O3PO_SettingsTest extends O3PO_TestCase
          * @dataProvider validate_doi_suffix_provider
          * @depends test_initialize_settings
          */
+    #[DataProvider('validate_doi_suffix_provider')]
+    #[Depends('test_initialize_settings')]
     public function test_validate_doi_suffix( $doi_suffix, $expected, $setting ) {
 
         $this->assertSame($setting->validate_doi_suffix('journal_level_doi_suffix', $doi_suffix), $expected);
@@ -195,6 +205,8 @@ class O3PO_SettingsTest extends O3PO_TestCase
          * @dataProvider validate_uuid4_array_provider
          * @depends test_initialize_settings
          */
+    #[DataProvider('validate_uuid4_array_provider')]
+    #[Depends('test_initialize_settings')]
     public function test_validate_array_of_at_most_1000_uuidv4s( $uuid4_array, $expected, $setting ) {
 
         $this->assertSame($setting->validate_array_of_at_most_1000_uuidv4s('uuidv4', $uuid4_array), $expected);
@@ -222,6 +234,8 @@ class O3PO_SettingsTest extends O3PO_TestCase
          * @dataProvider validate_issn_provider
          * @depends test_initialize_settings
          */
+    #[DataProvider('validate_issn_provider')
+    #[Depends('test_initialize_settings')
     public function test_validate_issn_or_empty( $issn, $expected, $valid, $setting ) {
         global $global_setting_errors;
 
@@ -255,6 +269,8 @@ class O3PO_SettingsTest extends O3PO_TestCase
          * @dataProvider validate_four_digit_year_provider
          * @depends test_initialize_settings
          */
+    #[DataProvider('validate_four_digit_year_provider')]
+    #[Depends('test_initialize_settings')]
     public function test_validate_four_digit_year( $first_volume_year, $expected, $setting ) {
 
         $this->assertSame($setting->validate_four_digit_year('first_volume_year', $first_volume_year), $expected);
@@ -280,6 +296,8 @@ class O3PO_SettingsTest extends O3PO_TestCase
          * @dataProvider validate_url_provider
          * @depends test_initialize_settings
          */
+    #[DataProvider('validate_url_provider')]
+    #[Depends('test_initialize_settings')]
     public function test_validate_url( $url, $expected, $setting ) {
 
         $this->assertSame($setting->validate_url('license_url', $url), $expected);
@@ -306,6 +324,8 @@ public static function validate_array_as_comma_separated_list_provider() {
          * @dataProvider validate_array_as_comma_separated_list_provider
          * @depends test_initialize_settings
          */
+    #[DataProvider validate_array_as_comma_separated_list_provider')]
+    #[Depends('test_initialize_settings')]
     public function test_validate_array_as_comma_separated_list( $array_as_comma_separated_list, $expected, $setting ) {
 
         $this->assertSame($setting->validate_array_as_comma_separated_list('buffer_profile_ids', $array_as_comma_separated_list), $expected);
@@ -325,6 +345,8 @@ public static function validate_array_as_comma_separated_list_provider() {
          * @dataProvider validate_two_letter_country_code_provider
          * @depends test_initialize_settings
          */
+    #[DataProvider('validate_two_letter_country_code_provider')]
+    #[Depends('test_initialize_settings')]
     public function test_validate_two_letter_country_code( $two_letter_country_code, $expected, $setting ) {
 
         $this->assertSame($setting->validate_two_letter_country_code('doaj_language_code', $two_letter_country_code), $expected);
@@ -352,6 +374,8 @@ public static function validate_array_as_comma_separated_list_provider() {
          * @dataProvider validate_positive_integer_provider
          * @depends test_initialize_settings
          */
+    #[DataProvider('validate_positive_integer_provider')]
+    #[Depends('test_initialize_settings')]
     public function test_validate_positive_integer( $positive_integer, $expected, $setting ) {
 
         $this->assertSame($setting->validate_positive_integer('arxiv_paper_doi_feed_days', $positive_integer), $expected);
@@ -374,6 +398,8 @@ public static function validate_array_as_comma_separated_list_provider() {
          * @dataProvider checked_or_unchecked_provider
          * @depends test_initialize_settings
          */
+    #[DataProvider('checked_or_unchecked_provider')]
+    #[Depends('test_initialize_settings')]
     public function test_checked_or_unchecked( $checked_or_unchecked, $expected, $setting ) {
 
         $this->assertSame($setting->checked_or_unchecked('custom_search_page', $checked_or_unchecked), $expected);
@@ -395,6 +421,8 @@ public static function validate_array_as_comma_separated_list_provider() {
          * @dataProvider trim_settings_field_provider
          * @depends test_initialize_settings
          */
+    #[DataProvider('trim_settings_field_provider')]
+    #[Depends('test_initialize_settings')]
     public function test_trim_settings_field( $trim_settings_field, $expected, $setting ) {
 
         $this->assertSame($setting->trim('trim', $trim_settings_field), $expected);
@@ -421,6 +449,8 @@ public static function validate_array_as_comma_separated_list_provider() {
          * @dataProvider trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed_provider
          * @depends test_initialize_settings
          */
+    #[DataProvider('trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed_provider')]
+    #[Depends('test_initialize_settings')]
     public function test_trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed( $trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed, $expected, $setting ) {
 
         $this->assertSame($setting->trim_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed('arxiv_paper_doi_feed_endpoint', $trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed), $expected);
@@ -430,6 +460,7 @@ public static function validate_array_as_comma_separated_list_provider() {
         /**
          * @depends test_initialize_settings
          */
+    #[Depends('test_initialize_settings')]
     public function test_trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed_on_empty_setting( $settings ) {
 
         $this->assertSame($settings->trim_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed('arxiv_paper_doi_feed_endpoint', ''), 'arxiv_paper_doi_feed');
@@ -440,6 +471,8 @@ public static function validate_array_as_comma_separated_list_provider() {
          * @depends test_initialize_settings
          * @doesNotPerformAssertions
          */
+    #[Depends('test_initialize_settings')
+    #[DoesNotPerformAssertions]
     public function test_execute_add_settings_page_to_menu( $settings ) {
 
         $settings->add_settings_page_to_menu();
@@ -462,6 +495,8 @@ public static function validate_array_as_comma_separated_list_provider() {
          * @dataProvider validate_settings_provider
          * @depends test_initialize_settings
          */
+    #[DataProvider('validate_settings_provider')]
+    #[Depends('test_initialize_settings')]
     public function test_validate_input( $input, $expected, $settings ) {
 
         $output = $settings->validate_input($input);
@@ -474,6 +509,7 @@ public static function validate_array_as_comma_separated_list_provider() {
         /**
          * @depends test_initialize_settings
          */
+    #[Depends('test_initialize_settings')]
     public function test_get_field_value_that_does_not_exis( $settings ) {
         try{
             $settings->get_field_value('i-do-not-exist');

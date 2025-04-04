@@ -1,11 +1,17 @@
 <?php
 
+use PHPUnit\Framework\Attributes\RunInSeparateProcess
+use PHPUnit\Framework\Attributes\PreserveGlobalState
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions
+
 class O3PO_Test extends O3PO_TestCase
 {
         /**
          * @runInSeparateProcess
          * @preserveGlobalState disabled
          */
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState('disabled')]
     public function test_o3po() {
 
         define( 'WPINC', 'wp-includes' );
@@ -42,6 +48,9 @@ class O3PO_Test extends O3PO_TestCase
          * @preserveGlobalState disabled
          * @doesNotPerformAssertions
          */
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState('disabled')]
+    #[DoesNotPerformAssertions]
     public function test_uninstall_o3po() {
         define( 'WP_UNINSTALL_PLUGIN', 'true' );
         include(dirname( __FILE__ ) . '/../o3po/uninstall.php');

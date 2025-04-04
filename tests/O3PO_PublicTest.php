@@ -3,7 +3,7 @@
 require_once(dirname( __FILE__ ) . '/../o3po/public/class-o3po-public.php');
 require_once(dirname( __FILE__ ) . '/O3PO_SettingsTest.php');
 
-use PHPUnit\Framework\Attributes\DoesNotPerformAssertions
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
 
