@@ -383,6 +383,12 @@ class WP_Query
     public $query_vars;
     public $post_count;
     public $found_posts;
+    public $is_page;
+    public $is_singular;
+    public $is_home;
+    public $max_num_pages;
+    public $post;
+    public $queried_object;
 
     function __construct( $input=null, $query_vars=array() ) {
         global $posts;

@@ -56,7 +56,8 @@ jobs:
     #   run: composer install --prefer-dist --no-progress --no-interaction --ignore-platform-reqs
 
     - name: Debug PHPUnit
-      run: for filename in tests/*Test.php; do echo $filename && phpunit --coverage-clover=coverage.xml --display-deprecations --display-warnings --display-errors --display-phpunit-deprecations --coverage-filter o3po --coverage-html=coverage-html --bootstrap tests/resources/bootstrap.php --test-suffix 'est.php' $filename; done
+      # run: for filename in tests/*Test.php; do echo $filename && phpunit --coverage-clover=coverage.xml --display-deprecations --display-warnings --display-errors --display-phpunit-deprecations --coverage-filter o3po --coverage-html=coverage-html --bootstrap tests/resources/bootstrap.php --test-suffix 'est.php' $filename; done
+      run: for filename in tests/*Test.php; do echo $filename && make test-${filename:6}; done
 
     - name: Run tests
       run: make test
