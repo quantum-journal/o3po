@@ -209,7 +209,7 @@ class O3PO_LatexTest extends O3PO_TestCase
 
         return [
             array(
-                'definitions' => array(
+                'macro_definitions' => array(
             ['\newcommand{\unam}', 'newcommand', '\unam', '', '', 'Universidad Nacional Aut\'onoma de M\'exico, M\'exico, D.F., M\'exico'],
             ['\newcommand{\ifunam}', 'newcommand', '\ifunam', '', '', 'Instituto de F\'{\i}sica, \unam'],
             ['\newcommand{\ifoo}', 'newcommand', '\ifoo', '', '', 'bar']

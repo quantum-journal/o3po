@@ -76,33 +76,60 @@ class O3PO_Environment_Test extends O3PO_TestCase
     public static function mime_check_data_provider() {
 
         return [
-            array(
-                'data' => array('ext'=> 'pdf',
+            [
+                array('ext'=> 'pdf',
                                 'type'=> 'application/pdf',
                                 'proper_filename' => 'should_be_called_like_this'),
-                'file' => '/path/to/the/real/file/file.pdf',
-                'filename' => 'should_be_called_like_this.pdf',
-                'mimes' => array('pdf' => 'application/pdf'),
-                'expected' => array(
+                '/path/to/the/real/file/file.pdf',
+                'should_be_called_like_this.pdf',
+                array('pdf' => 'application/pdf'),
+                array(
                     'ext' => 'pdf',
                     'type' => 'application/pdf',
                     'proper_filename' => 'should_be_called_like_this',
                 ),
-                  ),
+                  ],
 
-            array(
-                'data' => array('ext'=> 'tar.gz',
+            [
+                array('ext'=> 'tar.gz',
                                 'type'=> 'application/gz',
                                 'proper_filename' => 'should_be_called_like_this'),
-                'file' => '/path/to/the/real/file/file.tar.gz',
-                'filename' => 'should_be_called_like_this.tar.gz',
-                'mimes' => array('tar.gz' => 'application/gz'),
-                'expected' => array(
+                '/path/to/the/real/file/file.tar.gz',
+                'should_be_called_like_this.tar.gz',
+                array('tar.gz' => 'application/gz'),
+                array(
                     'ext' => 'tar.gz',
                     'type' => 'application/gz',
                     'proper_filename' => 'should_be_called_like_this',
                 ),
-                  )
+                  ]
+            /* array( */
+            /*     'data' => array('ext'=> 'pdf', */
+            /*                     'type'=> 'application/pdf', */
+            /*                     'proper_filename' => 'should_be_called_like_this'), */
+            /*     'file' => '/path/to/the/real/file/file.pdf', */
+            /*     'filename' => 'should_be_called_like_this.pdf', */
+            /*     'mimes' => array('pdf' => 'application/pdf'), */
+            /*     'expected' => array( */
+            /*         'ext' => 'pdf', */
+            /*         'type' => 'application/pdf', */
+            /*         'proper_filename' => 'should_be_called_like_this', */
+            /*     ), */
+            /*       ), */
+
+            /* array( */
+            /*     'data' => array('ext'=> 'tar.gz', */
+            /*                     'type'=> 'application/gz', */
+            /*                     'proper_filename' => 'should_be_called_like_this'), */
+            /*     'file' => '/path/to/the/real/file/file.tar.gz', */
+            /*     'filename' => 'should_be_called_like_this.tar.gz', */
+            /*     'mimes' => array('tar.gz' => 'application/gz'), */
+            /*     'expected' => array( */
+            /*         'ext' => 'tar.gz', */
+            /*         'type' => 'application/gz', */
+            /*         'proper_filename' => 'should_be_called_like_this', */
+            /*     ), */
+            /*       ) */
                 ];
     }
 

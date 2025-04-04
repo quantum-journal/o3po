@@ -59,7 +59,10 @@ class O3PO_Ads {
             }
             set_transient('get_ads_cited_by_json_' . $url, $response, $storage_time);
         }
+
+
         $json = json_decode($response['body']);
+
         if($json === Null)
             return new WP_Error("json_decode_failed", "No response from ADS or unable to decode the received json data when getting the list of citing works.");
 
