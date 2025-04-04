@@ -635,7 +635,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          */
     #[RunInSeparateProcess]
     #[PreserveGlobalState('disabled')]
-    #[DataProvider('posts_for_validate_and_process_data_provider')
+    #[DataProvider('posts_for_validate_and_process_data_provider')]
     #[Depends('test_create_primary_publication_type')]
     public function test_primary_validate_and_process_data( $post_id, $expections, $primary_publication_type ) {
 
