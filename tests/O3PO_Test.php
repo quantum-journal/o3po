@@ -1,8 +1,8 @@
 <?php
 
-use PHPUnit\Framework\Attributes\RunInSeparateProcess
-use PHPUnit\Framework\Attributes\PreserveGlobalState
-use PHPUnit\Framework\Attributes\DoesNotPerformAssertions
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 
 class O3PO_Test extends O3PO_TestCase
 {
