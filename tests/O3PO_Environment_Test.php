@@ -2,6 +2,10 @@
 
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-environment.php');
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Depends;
+
+
 class O3PO_Environment_Test extends O3PO_TestCase
 {
 
@@ -27,6 +31,7 @@ class O3PO_Environment_Test extends O3PO_TestCase
          * @depends test_construct_test_environment
          */
     #[Depends('test_construct_production_environment')]
+    #[Depends('test_construct_test_environment')]
     public function test_get_plugin_pretty_name( $production_environment, $test_environment ) {
         ob_start();
         $production_environment->modify_css_if_in_test_environment();
@@ -46,6 +51,7 @@ class O3PO_Environment_Test extends O3PO_TestCase
         /**
          * @depends test_construct_production_environment
          */
+    #[Depemds('test_construct_production_environment')]
     public function test_unique_filename_callback( $environment ) {
 
         $this->assertSame('O3PO_Environment_Test-1.php', $environment->unique_filename_callback( dirname( __FILE__ ), 'O3PO_Environment_Test.php', '.php' ));
@@ -63,6 +69,7 @@ class O3PO_Environment_Test extends O3PO_TestCase
         /**
          * @depends test_construct_production_environment
          */
+    #[Depends('test_construct_production_environment')]
     public function test_custom_upload_mimes( $environment ) {
 
         $mimes = $environment->custom_upload_mimes();
@@ -139,6 +146,8 @@ class O3PO_Environment_Test extends O3PO_TestCase
          * @dataProvider mime_check_data_provider
          * @depends test_construct_production_environment
          */
+    #[DataProvider('mime_check_data_provider')]
+    #[Depends('test_construct_production_environment')]
     public function test_disable_real_mime_check_for_selected_extensions( $data, $file, $filename, $mimes, $expected, $environment ) {
 
         $out = $environment->disable_real_mime_check_for_selected_extensions($data, $file, $filename, $mimes );
@@ -147,33 +156,10 @@ class O3PO_Environment_Test extends O3PO_TestCase
     }
 
 
-    /* public function download_to_media_library_provider() { */
-
-    /*     return [ */
-    /*         array(), */
-    /*     ]; */
-    /* } */
-
-    /*     /\** */
-    /*      * @dataProvider download_to_media_library_provider */
-    /*      * @depends test_construct_production_environment */
-    /*      *\/ */
-    /* public function test_download_to_media_library( $url, $filename, $extension, $mime_type, $parent_post_id, $environment) {} */
-
-
-    /* public function folder_to_delete_provider() { */
-
-    /*     return [ */
-    /*         array( */
-    /*             'path' => dirname( __FILE__ ). '/tmp/foo/', */
-    /*             'root' => dirname( __FILE__ ). '/tmp/foo/' */
-    /*               ), */
-    /*     ];    */
-    /* } */
-
         /**
          * @depends test_construct_production_environment
          */
+    #[Depends('test_construct_production_environment')]
     public function test_save_recursive_remove_dir( $environment) {
 
         $tmp_dir = dirname( __FILE__ ). '/tmp';
@@ -221,6 +207,7 @@ class O3PO_Environment_Test extends O3PO_TestCase
         /**
          * @depends test_construct_production_environment
          */
+    #[Depemds('test_construct_production_environment')]
     public function test_file_get_contents_utf8( $environment ) {
 
         $content = $environment->file_get_contents_utf8(dirname( __FILE__ ) . '/resources/file-with-uft8-chars.tex');

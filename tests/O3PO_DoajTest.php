@@ -2,6 +2,8 @@
 
 require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-doaj.php';
 
+use PHPUnit\Framework\Attributes\DataProvider;
+
 class O3PO_DoajTest extends O3PO_TestCase
 {
 
@@ -24,6 +26,7 @@ class O3PO_DoajTest extends O3PO_TestCase
         /**
          * @dataProvider remote_post_meta_data_to_doaj_provider
          */
+    #[DataProvider('remote_post_meta_data_to_doaj_provider')]
     public function test_remote_post_meta_data_to_doaj( $doaj_json, $doaj_api_url, $doaj_api_key, $expected ) {
 
         $this->assertSame($expected, O3PO_Doaj::remote_post_meta_data_to_doaj($doaj_json, $doaj_api_url, $doaj_api_key));

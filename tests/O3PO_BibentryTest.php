@@ -56,7 +56,7 @@ class O3PO_BibentryTest extends O3PO_TestCase
         /**
          * @dataProvider match_provider
          */
-    #[DataProvider(match_provider)]
+    #[DataProvider('match_provider')]
     public function test_match( $bibentries, $expected ) {
 
         $this->assertSame($expected, O3PO_Bibentry::match($bibentries[0], $bibentries[1]));
@@ -177,7 +177,7 @@ class O3PO_BibentryTest extends O3PO_TestCase
         /**
          * @dataProvider merge_bibitem_arrays_provider
          */
-    #[DataProvider(merge_bibitem_arrays_provider)]
+    #[DataProvider('merge_bibitem_arrays_provider')]
     public function test_merge_bibitem_arrays( $array1, $array2, $remove_dulicates, $expected ) {
 
         $this->assertEquals($expected, O3PO_Bibentry::merge_bibitem_arrays($array1, $array2, $remove_dulicates));
@@ -279,7 +279,7 @@ class O3PO_BibentryTest extends O3PO_TestCase
         /**
          * @dataProvider bibentry_provider
          */
-    #[DataProvider(bibentry_provider)]
+    #[DataProvider('bibentry_provider')]
     public function test_get_cite_as_text( $bibentry, $expected_text, $expected_html, $expected_surnames ) {
 
         $this->assertEquals($expected_text, $bibentry->get_cite_as_text());
@@ -289,7 +289,7 @@ class O3PO_BibentryTest extends O3PO_TestCase
         /**
          * @dataProvider bibentry_provider
          */
-    #[DataProvider(bibentry_provider)]
+    #[DataProvider('bibentry_provider')]
     public function test_get_formated_html( $bibentry, $expected_text, $expected_html, $expected_surnames ) {
 
         $this->assertEquals($expected_html, $bibentry->get_formated_html('fake_doi_url_prefix/', 'fake_arxiv_abs_prefix/'));
@@ -300,7 +300,7 @@ class O3PO_BibentryTest extends O3PO_TestCase
         /**
          * @dataProvider bibentry_provider
          */
-    #[DataProvider(bibentry_provider)]
+    #[DataProvider('bibentry_provider')]
     public function test_get_surnames( $bibentry, $expected_text, $expected_html, $expected_surnames ) {
 
         $this->assertEquals($expected_surnames, $bibentry->get_surnames());
@@ -311,7 +311,7 @@ class O3PO_BibentryTest extends O3PO_TestCase
         /**
          * @dataProvider bibentry_provider
          */
-    #[DataProvider(bibentry_provider)]
+    #[DataProvider('bibentry_provider')]
     public function test_get( $bibentry, $expected_text, $expected_html, $expected_surnames ) {
 
         $this->assertEquals('', $bibentry->get('no-value-for-this-field'));

@@ -121,7 +121,7 @@ class O3PO_BufferTest extends O3PO_TestCase
         /**
          * @dataProvider create_update_provider
          */
-    #[DataProvider(create_update_provider)]
+    #[DataProvider('create_update_provider')]
     public function test_create_update( $buffer_url, $access_token, $profile_ids, $text, $media, $attachment, $shorten, $now, $top, $expected ) {
 
         $response = O3PO_Buffer::create_update($buffer_url, $access_token, $profile_ids, $text, $media, $attachment, $shorten, $now, $top);
@@ -172,7 +172,7 @@ class O3PO_BufferTest extends O3PO_TestCase
         /**
          * @dataProvider get_profile_information_provider
          */
-    #[DataProvider(get_profile_information_provider)]
+    #[DataProvider('get_profile_information_provider')]
     public function test_get_profile_information( $buffer_api_url, $access_token, $expected ){
 
         if(is_wp_error($expected))
