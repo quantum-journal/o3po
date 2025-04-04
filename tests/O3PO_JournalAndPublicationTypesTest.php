@@ -551,10 +551,10 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @dataProvider parse_publication_source_provider
          * @depends test_create_primary_publication_type
          */
-         #[RunInSeparateProcess]
-         #[PreserveGlobalState('disabled')]
-         #[DataProvider('parse_publication_source_provider')]
-         #[Depends('test_create_primary_publication_type')]
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState('disabled')]
+    #[DataProvider('parse_publication_source_provider')]
+    #[Depends('test_create_primary_publication_type')]
     public function test_parse_publication_source( $path_source, $mime_type, $expectation, $primary_publication_type ) {
 
         $class = new ReflectionClass('O3PO_PrimaryPublicationType');
@@ -670,10 +670,10 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @dataProvider posts_for_validate_and_process_data_provider
          * @depends test_create_secondary_publication_type
          */
-         #[RunInSeparateProcess]
-         #[PreserveGlobalState('disabled')]
-         #[DataProvider('posts_for_validate_and_process_data_provider')]
-         #[Depends('test_create_secondary_publication_type')]
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState('disabled')]
+    #[DataProvider('posts_for_validate_and_process_data_provider')]
+    #[Depends('test_create_secondary_publication_type')]
     public function test_secondary_validate_and_process_data( $post_id, $expections, $secondary_publication_type ) {
 
         #init settings here instead of depending on test_initialize_settings because O3PO_Settings is a singleton
@@ -717,10 +717,10 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @dataProvider on_post_actually_published_provider
          * @depends test_create_primary_publication_type
          */
-         #[RunInSeparateProcess]
-         #[PreserveGlobalState('disabled')]
-         #[DataProvider('on_post_actually_published_provider')]
-         #[Depends('test_create_primary_publication_type')]
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState('disabled')]
+    #[DataProvider('on_post_actually_published_provider')]
+    #[Depends('test_create_primary_publication_type')]
     public function test_primary_on_post_actually_published( $post_id, $primary_publication_type ) {
 
         #init settings here instead of depending on test_initialize_settings because O3PO_Settings is a singleton
@@ -750,10 +750,10 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @dataProvider on_post_actually_published_provider
          * @depends test_create_secondary_publication_type
          */
-         #[RunInSeparateProcess]
-         #[PreserveGlobalState('disabled')]
-         #[DataProvider('on_post_actually_published_provider')]
-         #[Depends('test_create_secondary_publication_type')]
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState('disabled')]
+    #[DataProvider('on_post_actually_published_provider')]
+    #[Depends('test_create_secondary_publication_type')]
     public function test_secondary_on_post_actually_published( $post_id, $secondary_publication_type ) {
 
         #init settings here instead of depending on test_initialize_settings because O3PO_Settings is a singleton
@@ -1161,11 +1161,11 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
-         #[RunInSeparateProcess]
-         #[PreserveGlobalState('disabled')]
-         #[DataProvider('save_metabox_provider')]
-         #[Depends('test_create_primary_publication_type')]
-         #[Depends('test_create_secondary_publication_type')]
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState('disabled')]
+    #[DataProvider('save_metabox_provider')]
+    #[Depends('test_create_primary_publication_type')]
+    #[Depends('test_create_secondary_publication_type')]
     public function test_on_transition_post_status( $post_id, $POST_args, $expections_first, $expections_second, $primary_publication_type, $secondary_publication_type ) {
 
         #init settings here instead of depending on test_initialize_settings because O3PO_Settings is a singleton

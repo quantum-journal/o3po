@@ -55,8 +55,5 @@ jobs:
     # - name: Install dependencies
     #   run: composer install --prefer-dist --no-progress --no-interaction --ignore-platform-reqs
 
-    - name: Debug PHPUnit
-      run: phpunit --bootstrap tests/resources/bootstrap.php --test-suffix 'est.php' tests/DebugTest.php;
-
     - name: Run tests
       run: make test
