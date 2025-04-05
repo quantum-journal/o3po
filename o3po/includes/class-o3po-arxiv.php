@@ -290,7 +290,7 @@ class O3PO_Arxiv {
                 $date_info = $entry->nodeValue;
                 preg_match('#[0-9]+ [A-Z][a-z]{2} [0-9]{4} [:0-9]+ [A-Z]+ #u', $date_info, $date);
                 if($date === -1)
-                    continue
+                    continue;
                 $date = strtotime(trim($date[0]));
             }
 
