@@ -1776,7 +1776,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             end($submission_history);
             $latest_version = key($submission_history);
             if(!isset($latest_version))
-                return ''
+                return '';
             $latest_version_number = mb_substr($latest_version, 1);
 
             if($latest_version_number > $published_version_number)
