@@ -389,6 +389,7 @@ class WP_Query
     public $max_num_pages;
     public $post;
     public $queried_object;
+    public $is_404;
 
     function __construct( $input=null, $query_vars=array() ) {
         global $posts;

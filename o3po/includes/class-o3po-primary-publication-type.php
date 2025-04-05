@@ -1774,15 +1774,17 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         if(!is_wp_error($submission_history))
         {
             end($submission_history);
-            $latest_versiom = key($submission_history);
-            $latest_version_number = mb_substr($latest_versiom, 1);
+            $latest_version = key($submission_history);
+            if(!isset($latest_version))
+                return ''
+            $latest_version_number = mb_substr($latest_version, 1);
 
             if($latest_version_number > $published_version_number)
             {
                 $newer_arxiv_version_warning .= '<div class="important-box">';
                 $newer_arxiv_version_warning .= '<strong>Updated version:</strong> ';
-                $newer_arxiv_version_warning .= 'The authors have uploaded <a href="' . esc_attr($arxiv_url_abs_prefix . '/' . $eprint_without_version . $latest_versiom) . '" target=_blank>version ' . esc_html($latest_versiom) . '</a> of this work to the arXiv which may contain updates or corrections not contained in the published version ' . esc_html($published_version) . '.';
-                $arxiv_comment = $submission_history[$latest_versiom]['comment'];
+                $newer_arxiv_version_warning .= 'The authors have uploaded <a href="' . esc_attr($arxiv_url_abs_prefix . '/' . $eprint_without_version . $latest_version) . '" target=_blank>version ' . esc_html($latest_version) . '</a> of this work to the arXiv which may contain updates or corrections not contained in the published version ' . esc_html($published_version) . '.';
+                $arxiv_comment = $submission_history[$latest_version]['comment'];
                 if(!empty($arxiv_comment))
                     $newer_arxiv_version_warning .= ' The authors left the following comment on the arXiv:<div class="author-arxiv-comment">' . esc_html($arxiv_comment) . '</div>';
                 $newer_arxiv_version_warning .= '</div>';

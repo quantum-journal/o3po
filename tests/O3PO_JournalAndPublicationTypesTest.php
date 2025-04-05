@@ -1428,9 +1428,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
 
             try
             {
-                $source_attach_ids = $post_data['meta']['paper_arxiv_source_attach_ids'];
-                if(!empty($source_attach_ids))
-                    $this->assertSame($posts[end($source_attach_ids)]['attachment_url'], $last_source_url);
+                if(!empty($post_data['meta']['paper_arxiv_source_attach_ids']))
+                    $this->assertSame($posts[end($post_data['meta']['paper_arxiv_source_attach_ids'])]['attachment_url'], $last_source_url);
                 else
                     $this->assertEmpty($last_source_url);
             }
