@@ -56,7 +56,7 @@ register_deactivation_hook( __FILE__, 'deactivate_o3po' );
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  */
-require plugin_dir_path( __FILE__ ) . 'includes/class-o3po.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-o3po.php';
 
 
 /* function handle_404_errors_on_papers(){ */

@@ -1,11 +1,23 @@
 <?php
 
 require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-email-templates.php';
-require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-settings.php';
+require_once(dirname( __FILE__ ) . '/O3PO_SettingsTest.php');
 
 class O3PO_EmailTemplatesTest extends O3PO_TestCase
 {
-  public function test_self_notification_subject(){
+
+    public static function test_initialize_settings() {
+
+        $settings = O3PO_SettingsTest::get_settings();
+
+        return $settings;
+    }
+
+        /**
+         * @depends test_initialize_settings
+         */
+    #[Depends('test_initialize_settings')]
+    public function test_self_notification_subject(){
 
       $message = O3PO_EmailTemplates::expand('self_notification_subject',
                                              array(
@@ -17,7 +29,11 @@ class O3PO_EmailTemplatesTest extends O3PO_TestCase
                           , $message);
   }
 
-  public function test_self_notification_body(){
+        /**
+         * @depends test_initialize_settings
+         */
+    #[Depends('test_initialize_settings')]
+    public function test_self_notification_body(){
       $message = O3PO_EmailTemplates::expand('self_notification_body',
                                              array(
                                                  "[journal]" => "test-journal",
@@ -37,7 +53,12 @@ class O3PO_EmailTemplatesTest extends O3PO_TestCase
                           $message);
   }
 
-  public function test_author_notification_subject() {
+
+        /**
+         * @depends test_initialize_settings
+         */
+    #[Depends('test_initialize_settings')]
+    public function test_author_notification_subject() {
       $message = O3PO_EmailTemplates::expand('author_notification_subject',
                                              array(
                                                  "[journal]" => "test-journal",
@@ -48,7 +69,11 @@ class O3PO_EmailTemplatesTest extends O3PO_TestCase
                          $message);
   }
 
-  public function test_author_notification_body(){
+        /**
+         * @depends test_initialize_settings
+         */
+    #[Depends('test_initialize_settings')]
+    public function test_author_notification_body(){
       $message = O3PO_EmailTemplates::expand('author_notification_body',
                                              array(
                                                  "[journal]" => "test-journal",
@@ -81,7 +106,12 @@ class O3PO_EmailTemplatesTest extends O3PO_TestCase
                           );
   }
 
-  public function test_author_notification_secondary_body(){
+
+        /**
+         * @depends test_initialize_settings
+         */
+    #[Depends('test_initialize_settings')]
+    public function test_author_notification_secondary_body(){
     $message = O3PO_EmailTemplates::expand('author_notification_secondary_body',
                                            array(
                                                "[journal]" => "test-journal",
@@ -113,7 +143,12 @@ class O3PO_EmailTemplatesTest extends O3PO_TestCase
                         $message
                       );
   }
-   public function test_fermats_library_notification_subject(){
+
+        /**
+         * @depends test_initialize_settings
+         */
+    #[Depends('test_initialize_settings')]
+    public function test_fermats_library_notification_subject(){
        $message = O3PO_EmailTemplates::expand('fermats_library_notification_subject',
                                               array(
                                                   "[journal]" => "test-journal",
@@ -124,6 +159,11 @@ class O3PO_EmailTemplatesTest extends O3PO_TestCase
                  $message);
    }
 
+
+        /**
+         * @depends test_initialize_settings
+         */
+    #[Depends('test_initialize_settings')]
    public function test_fermats_library_notification_body(){
        $message = O3PO_EmailTemplates::expand('fermats_library_notification_body',
                                               array(
@@ -151,6 +191,11 @@ class O3PO_EmailTemplatesTest extends O3PO_TestCase
                            $message);
    }
 
+
+       /**
+         * @depends test_initialize_settings
+         */
+   #[Depends('test_initialize_settings')]
    public function test_render_short_codes(){
      $actualDom = new DomDocument();
      $actualDom->loadHTML(O3PO_EmailTemplates::render_short_codes('self_notification_subject'));

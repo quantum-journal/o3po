@@ -1,9 +1,22 @@
 <?php
 
 require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-relevanssi.php';
+require_once(dirname( __FILE__ ) . '/O3PO_SettingsTest.php');
 
 class O3PO_RelevanssiTest extends O3PO_TestCase
 {
+
+    public static function test_initialize_settings() {
+
+        $settings = O3PO_SettingsTest::get_settings();
+
+        return $settings;
+    }
+
+        /**
+         * @depends test_initialize_settings
+         */
+    #[Depends('test_initialize_settings')]
     public function test_exclude_mime_types_by_regexp() {
 
         $this->assertFalse(O3PO_Relevanssi::exclude_mime_types_by_regexp(false, 6));
@@ -23,7 +36,7 @@ class O3PO_RelevanssiTest extends O3PO_TestCase
 
             global $posts;
 
-            if( $posts[$post_id]['post_type'] !== 'attachment' or $posts[$post_id]['mime_type'] !== 'application/pdf' )
+            if( !isset($posts[$post_id]['mime_type']) or $posts[$post_id]['post_type'] !== 'attachment'or $posts[$post_id]['mime_type'] !== 'application/pdf' )
                 return array('success' => false);
 
             update_post_meta($post_id, '_relevanssi_pdf_content', "this is the fake pdf content");

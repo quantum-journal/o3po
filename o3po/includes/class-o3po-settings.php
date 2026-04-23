@@ -1449,7 +1449,8 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function trim_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed( $id, $input ) {
 
-        $input = trim($input);
+        if(!empty($input))
+            $input = trim($input);
         if(empty($input))
         {
             $this->add_error( $id, 'must-not-be-empty', "The field '" . $this->fields[$id]['title'] . "' must not be empty. Field reset.", 'error');

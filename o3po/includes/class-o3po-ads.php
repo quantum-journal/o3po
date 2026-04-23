@@ -59,7 +59,9 @@ class O3PO_Ads {
             }
             set_transient('get_ads_cited_by_json_' . $url, $response, $storage_time);
         }
+
         $json = json_decode($response['body']);
+
         if($json === Null)
             return new WP_Error("json_decode_failed", "No response from ADS or unable to decode the received json data when getting the list of citing works.");
 
@@ -165,12 +167,15 @@ class O3PO_Ads {
                 }
 
                 $json = json_decode($response['body']);
-                if($json === Null)
+                if($json === Null || !isset($json->response->docs) || !is_array($json->response->docs))
                     return new WP_Error("json_decode_failed", "No response from ADS or unable to decode the received json data when querying for bibliographic information of citing works.");
 
                 $bibentries = array();
                 foreach($json->response->docs as $doc)
                 {
+                    if(!isset($doc->author) || !is_array($doc->author))
+                        return new WP_Error("json_decode_failed", "Unable to decode the received author information.");
+
                     $authors = array();
                     foreach($doc->author as $author)
                     {

@@ -185,8 +185,8 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
             $out .= '<div>Invoice: ' . "An invoice was requested!" . '</div>';
         $out .= '<div style="float:right">';
         $out .= '<span><a class="button-secondary" href="mailto:' . esc_attr($manuscript_info['corresponding_author_email']) . '">Email ' . esc_html($manuscript_info['corresponding_author_email']) . '</a></span>';
-        $out .= '<span class=""><a class="button-secondary" target="_blank" href="/' . $this->slug . '?action=' . 'show_invoice' . '&id=' . urlencode($id) . '">' . "Create invoice" .  '</a></span>';
-        $out .= '<span class=""><a class="button-secondary" href="/' . $this->slug . '?action=' . $action . '&id=' . urlencode($id) . '">' . ($action === 'continue' ? "Go to post" : "Begin publishing") .  '</a></span>';
+        $out .= '<span class=""><a class="button-secondary" target="_blank" href="/' . esc_attr($this->slug . '?action=' . 'show_invoice' . '&id=' . urlencode($id)) . '">' . "Create invoice" .  '</a></span>';
+        $out .= '<span class=""><a class="button-secondary" href="/' . esc_attr($this->slug . '?action=' . $action . '&id=' . urlencode($id)) . '">' . ($action === 'continue' ? "Go to post" : "Begin publishing") .  '</a></span>';
         $out .= '</div>';
         $out .= '<div style="clear:both"></div>';
         $out .= '</div>';
@@ -475,7 +475,7 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
         $invoice_html = '';
         $invoice_html .= '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">' . "\n";
         $invoice_html .= '<html xmlns="http://www.w3.org/1999/xhtml">' . "\n";
-        $invoice_html .= '<header><style type="text/css">';
+        $invoice_html .= '<head><title></title><style type="text/css">';
         $invoice_html .= '@media print {@page {size: A4;} body {margin:25mm;} input, textarea {border: none !important;box-shadow: none !important;outline: none !important;font-family: inherit;
    font-size: inherit;} a, a:visited {color: blue;}} input:required:invalid {border: 3pt solid red;}';
         $invoice_html .= '</style>';
@@ -485,12 +485,12 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
               TeX: {equationNumbers: {autoNumber: "AMS"}}
             });
         </script>';
-        $invoice_html .= '<script type="text/javascript" async src="' . esc_attr($settings->get_field_value('mathjax_url')) . '?config=TeX-AMS_CHTML"></script>';
-        $invoice_html .= '</header>';
+        $invoice_html .= '<script type="text/javascript" src="' . esc_attr($settings->get_field_value('mathjax_url')) . '?config=TeX-AMS_CHTML"></script>';
+        $invoice_html .= '</head>';
         $invoice_html .= '<body style="font-family:Sans-Serif;font-size:11pt;">';
         $invoice_html .= '<div>';
         $invoice_html .= '<div style="height:45mm;float:left">';
-        $invoice_html .= '<img src="' . esc_attr($settings->get_field_value("invoice_header_img")) . '" style="width:6cm;">';
+        $invoice_html .= '<img src="' . esc_attr($settings->get_field_value("invoice_header_img")) . '" style="width:6cm;" alt="header image">';
         $invoice_html .= '</div>';
         $invoice_html .= '<div style="width:6cm;float:right;text-align:right">' . "\n";
         $invoice_html .= '<strong>' . esc_html($settings->get_field_value('publisher')) . '</strong><br /><br />';
@@ -511,7 +511,7 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
         $invoice_html .= '<textarea style="width:85mm;height:40mm;resize: none;">' . esc_html($manuscript['invoice_recipient'] . "\n" . $manuscript['invoice_address'] . (!empty($manuscript['invoice_vat_number']) ? "\nVat-Nr: " . $manuscript['invoice_vat_number'] : '')) . '</textarea>';
         $invoice_html .= '</div>';
         $invoice_html .= '<div style="margin-bottom:2em">';
-        $invoice_html .= '<div style="float:left;font-size:16pt;">Invoice Nr. <input required style="font-size:16pt;"></input></div>';
+        $invoice_html .= '<div style="float:left;font-size:16pt;">Invoice Nr. <input required style="font-size:16pt;"></div>';
         $invoice_html .= '<div style="float:right">Invoice date: <strong>' . esc_html(date('Y-m-d')) . '</strong></div>';
         $invoice_html .= '<div style="clear:both"></div>';
         $invoice_html .= '</div>';
@@ -529,18 +529,18 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
     <th style="text-align:right;">Total price</th>
   </tr>
   <tr>
-    <td style="vertical-align: top;padding-top:1em;padding-bottom:1em">' . '<input style="width:6em;text-align:left" value="' . "1" . '" readonly></input>' . '</td>
+    <td style="vertical-align: top;padding-top:1em;padding-bottom:1em">' . '<input style="width:6em;text-align:left" value="' . "1" . '" readonly="readonly">' . '</td>
     <!--<td style="vertical-align: top;padding-top:1em;padding-bottom:1em">Publication fee for article:<br /><textarea style="font-weight: bold;width:100%;resize: none;min-height: 5em;">' . esc_html($manuscript['title']) . '</textarea></td>-->
     <td style="vertical-align: top;padding-top:1em;padding-bottom:1em">Publication fee for article:<br /><strong>' . esc_html($manuscript['title']) . '</strong></td>
-    <td style="vertical-align: bottom;text-align:right;padding-top:1em;padding-bottom:1em"><strong>' . '<input id="net-price-per-publication" class="oninput-updates-invoice" style="font-weight: bold;width:6em;text-align:right" value="' . esc_attr($manuscript['payment_amount']) . '"></input>' . '</strong></td>
-    <td style="vertical-align: bottom;text-align:right;padding-top:1em;padding-bottom:1em"><strong>' . '<input id="total-net-price" style="font-weight: bold;width:6em;text-align:right" value="' . esc_attr($manuscript['payment_amount']) . '" readonly></input>' . '</strong></td>
+    <td style="vertical-align: bottom;text-align:right;padding-top:1em;padding-bottom:1em"><strong>' . '<input id="net-price-per-publication" class="oninput-updates-invoice" style="font-weight: bold;width:6em;text-align:right" value="' . esc_attr($manuscript['payment_amount']) . '">' . '</strong></td>
+    <td style="vertical-align: bottom;text-align:right;padding-top:1em;padding-bottom:1em"><strong>' . '<input id="total-net-price" style="font-weight: bold;width:6em;text-align:right" value="' . esc_attr($manuscript['payment_amount']) . '" readonly="readonly">' . '</strong></td>
   </tr>
 
   <tr>
-    <td style="vertical-align: top;padding-top:1em;padding-bottom:1em">' . '<input style="width:6em;text-align:left" value="' . "1" . '" readonly></input>' . '</td>
-    <td style="vertical-align: top;padding-top:1em;padding-bottom:1em">Value added tax <input required id="vat-percent" class="oninput-updates-invoice" style="width:3em; text-align:right" value="' . $settings->get_field_value('default_vat_percent') . '"></input>%</td>
-    <td style="vertical-align: bottom;text-align:right;padding-top:1em;padding-bottom:1em"><strong>' . '<input id="vat-per-item" style="font-weight: bold;width:6em;text-align:right" value="' . "foo" . '" readonly></input>' . '</strong></td>
-    <td style="vertical-align: bottom;text-align:right;padding-top:1em;padding-bottom:1em"><strong>' . '<input id="vat-total" style="font-weight: bold;width:6em;text-align:right" value="' . "foo" . '" readonly></input>' . '</strong></td>
+    <td style="vertical-align: top;padding-top:1em;padding-bottom:1em">' . '<input style="width:6em;text-align:left" value="' . "1" . '" readonly="readonly">' . '</td>
+    <td style="vertical-align: top;padding-top:1em;padding-bottom:1em">Value added tax <input required id="vat-percent" class="oninput-updates-invoice" style="width:3em; text-align:right" value="' . $settings->get_field_value('default_vat_percent') . '">%</td>
+    <td style="vertical-align: bottom;text-align:right;padding-top:1em;padding-bottom:1em"><strong>' . '<input id="vat-per-item" style="font-weight: bold;width:6em;text-align:right" value="' . "foo" . '" readonly="readonly">' . '</strong></td>
+    <td style="vertical-align: bottom;text-align:right;padding-top:1em;padding-bottom:1em"><strong>' . '<input id="vat-total" style="font-weight: bold;width:6em;text-align:right" value="' . "foo" . '" readonly="readonly">' . '</strong></td>
   </tr>
 
 
@@ -548,7 +548,7 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
     <td></td>
     <td></td>
     <td style="text-align:right;padding-top:1em;padding-bottom:1em"><strong>Total</strong></td>
-    <td style="text-align:right;padding-top:1em;padding-bottom:1em">' . '<input id="invoice-total" style="font-weight: bold;width:6em;text-align:right" value="' . esc_attr($manuscript['payment_amount']) . '" readonly></input>' . '</td>
+    <td style="text-align:right;padding-top:1em;padding-bottom:1em">' . '<input id="invoice-total" style="font-weight: bold;width:6em;text-align:right" value="' . esc_attr($manuscript['payment_amount']) . '" readonly="readonly">' . '</td>
   </tr>
 </table>';
         $invoice_html .= '<div style="margin-top:2em">' . $settings->get_field_value('invoice_footer') . '</div>';

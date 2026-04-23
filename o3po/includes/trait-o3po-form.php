@@ -584,7 +584,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         try
         {
             $input = trim($input);
-            $array = preg_split('#,#u', $input, Null, PREG_SPLIT_NO_EMPTY);
+            $array = preg_split('#,#u', $input, -1, PREG_SPLIT_NO_EMPTY);
             foreach($array as $key => $id)
                 $array[$key] = trim($id);
 
