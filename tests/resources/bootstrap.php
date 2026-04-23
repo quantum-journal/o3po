@@ -1137,11 +1137,12 @@ function the_posts_navigation() {
     echo '';
 }
 
-global $global_settings;
+# do not declare global beacsus not serializable and phpunit tries to serialize all globals
+# global $global_settings;
 $global_settings = array();
-global $wp_settings_fields;
+# global $wp_settings_fields;
 $wp_settings_fields = array();
-global $wp_settings_sections;
+# global $wp_settings_sections;
 $wp_settings_sections = array();
 
 function register_setting( $option_group, $option_name, $args = array() ) {
