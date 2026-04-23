@@ -10,6 +10,7 @@ class O3PO_SingletonTest extends O3PO_TestCase
         /**
          * @runInSeparateProcess
          * @preserveGlobalState disabled
+         * @backupGlobals disabled
          */
     #[RunInSeparateProcess]
     #[PreserveGlobalState('disabled')]

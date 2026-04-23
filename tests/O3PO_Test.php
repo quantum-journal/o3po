@@ -48,6 +48,7 @@ class O3PO_Test extends O3PO_TestCase
          * @runInSeparateProcess
          * @preserveGlobalState disabled
          * @doesNotPerformAssertions
+         * @backupGlobals disabled
          */
     #[RunInSeparateProcess]
     #[PreserveGlobalState('disabled')]
