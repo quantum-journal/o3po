@@ -7,6 +7,9 @@ use PHPUnit\Framework\Attributes\PreserveGlobalState;
 
 class O3PO_SingletonTest extends O3PO_TestCase
 {
+
+    protected $backupGlobals = false;
+
         /**
          * @runInSeparateProcess
          * @preserveGlobalState disabled

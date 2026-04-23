@@ -6,6 +6,8 @@ use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 
 class O3PO_Test extends O3PO_TestCase
 {
+    protected $backupGlobals = false;
+
         /**
          * @runInSeparateProcess
          * @preserveGlobalState disabled
