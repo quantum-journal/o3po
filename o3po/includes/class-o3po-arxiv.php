@@ -288,7 +288,8 @@ class O3PO_Arxiv {
             $arxiv_submission_history = $x_path->query("(/html/body//div[@class='submission-history']/b[last()]/following-sibling::text() | /html/body//div[@class='submission-history']/strong[last()]/following-sibling::text())");
             foreach($arxiv_submission_history as $entry){
                 $date_info = $entry->nodeValue;
-                preg_match('#[0-9]+ [A-Z][a-z]{2} [0-9]{4} [:0-9]+ [A-Z]+ #u', $date_info, $date);
+                if(preg_match('#[0-9]+ [A-Z][a-z]{2} [0-9]{4} [:0-9]+ [A-Z]+ #u', $date_info, $date) !== 1)
+                    $date = -1;
                 if($date === -1)
                     continue;
                 $date = strtotime(trim($date[0]));
