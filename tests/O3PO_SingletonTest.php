@@ -7,15 +7,13 @@ use PHPUnit\Framework\Attributes\PreserveGlobalState;
 
 class O3PO_SingletonTest extends O3PO_TestCase
 {
-
-    protected $backupGlobals = false;
-
         /**
          * @runInSeparateProcess
          * @preserveGlobalState disabled
          */
     #[RunInSeparateProcess]
     #[PreserveGlobalState('disabled')]
+    #[BackupGlobals(false)]
     public function test___construct() {
 
         $reflection = new ReflectionClass('O3PO_Singleton');
