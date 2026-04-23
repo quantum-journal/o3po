@@ -75,6 +75,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         $this->the_admin_panel_title($post_id);
         $this->the_admin_panel_corresponding_author_email($post_id);
         $this->the_admin_panel_buffer($post_id);
+        $this->the_admin_panel_handling_editor($post_id);
         $this->the_admin_panel_fermats_library($post_id);
         $this->the_admin_panel_authors($post_id);
         $this->the_admin_panel_affiliations($post_id);
@@ -1352,13 +1353,9 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                     }
 
                         //Unpack
-                    $path_tar = preg_replace('/\.gz$/u', '', $path_source);
-                    $path_folder = preg_replace('/\.tar$/u', '', $path_tar) . '_extracted/';
-
+                    $path_folder = preg_replace('/\.tar\.gz$/u', '', $path_source) . '_extracted/';
                     $phar_gz = new PharData($path_source);
-                    $phar_gz->decompress(); // *.tar.gz -> *.tar
-                    $phar_tar = new PharData($path_tar);
-                    $phar_tar->extractTo($path_folder);
+                    $phar_gz->extractTo($path_folder);
 
                 } finally {
                     if(!empty($path_source_copy_to_unlik_later))
@@ -1419,16 +1416,21 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             $new_author_affiliations = array();
             $new_affiliations = array();
             $author_number = -1;
-            $authors_since_last_affiliation = array();
+            $author_names = array();
 
             foreach($source_files as $entry ) {
+                $authors_since_last_affiliation = array();
                 if($entry->isFile() && preg_match('#\.(tex|txt)$#u', $entry->getPathname()))
                 {
                     $filecontents = $this->environment->file_get_contents_utf8($entry->getPathname());
                     $filecontents_without_comments = preg_replace('#(?<!\\\\)%.*#u', '', $filecontents);//remove all comments
+                    if(preg_match('#\\\\maketitle#u', $filecontents_without_comments))
+                        $until_maketitle_contents_without_comments = preg_replace('#(\\\\maketitle).*#us', '', $filecontents_without_comments);
+                    else # if there is no \maketitle quantumarticle will call \maketitle in \begin{abstract}
+                        $until_maketitle_contents_without_comments = preg_replace('#(\\\\begin{abstract}).*#us', '', $filecontents_without_comments);
 
                         // Extract author, affiliation and similar information from the source
-                    preg_match_all('#\\\\(author|affiliation|affil|address|orcid|homepage)\s*([^{]*)\s*(?=\{((?:[^{}]++|\{(?3)\})*)\})#u', $filecontents_without_comments, $author_info);//matches balanced parenthesis (Note the use of (?3) here!) to test changes go here https://regex101.com/r/bVHadc/1
+                    preg_match_all('#\\\\(author|affiliation|affil|address|orcid|homepage)\s*([^{]*)\s*(?=\{((?:[^{}]++|\{(?3)\})*)\})#u', $until_maketitle_contents_without_comments, $author_info);//matches balanced parenthesis (Note the use of (?3) here!) to test changes go here https://regex101.com/r/bVHadc/1
                     if(!empty($author_info[0]) && !empty($author_info[1]))
                     {
                         if($author_number !== -1)
@@ -1445,8 +1447,13 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                         for($x = 0; $x < count($author_info[1]) ; $x++) {
                             if( $author_info[1][$x] === 'author')
                             {
-                                $author_number += 1;
-
+                                $author_name = $author_info[3][$x];
+                                $author_number = array_search($author_name, $author_names, True);
+                                if($author_number === false)
+                                {
+                                    $author_number = count($author_names);
+                                    $author_names[] = $author_name;
+                                }
                                     /* It is difficult to extract the author name from the source
                                      * as the LaTeX \author macro gives no clue about what is the
                                      * given name and what is the surname. We hence ignore
@@ -1488,11 +1495,16 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
                                     {
                                         foreach($authors_since_last_affiliation as $author_number_since_last_affiliation)
                                         {
+                                            $current_affiliation_num = (array_search($current_affiliation, $new_affiliations , true)+1);
                                             if(empty($new_author_affiliations[$author_number_since_last_affiliation]))
                                                 $new_author_affiliations[$author_number_since_last_affiliation] = '';
-                                            else
+                                            $already_affiliation_nums = preg_split("#,#u", $new_author_affiliations[$author_number_since_last_affiliation]);
+                                            if(!empty($already_affiliation_nums) && array_search($current_affiliation_num, $already_affiliation_nums) !== false)
+                                                continue;
+
+                                            if(!empty($new_author_affiliations[$author_number_since_last_affiliation]))
                                                 $new_author_affiliations[$author_number_since_last_affiliation] .= ',';
-                                            $new_author_affiliations[$author_number_since_last_affiliation] .= (array_search($current_affiliation, $new_affiliations , true)+1);
+                                            $new_author_affiliations[$author_number_since_last_affiliation] .= $current_affiliation_num;
                                         }
                                         $was_affiliation_since_last_author = true;
                                     }
@@ -1584,6 +1596,11 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             $content .= '</p>';
             $content .= '<table class="meta-data-table">';
             $content .= '<tr><td>Published:</td><td>' . esc_html($this->get_formated_date_published( $post_id )) .  ', ' . $this->get_formated_volume_html($post_id) . ', page ' . esc_html(get_post_meta( $post_id, $post_type . '_pages', true )) . '</td></tr>';
+
+            $formated_handling_editor_html = $this->get_formated_handling_editor( $post_id );
+            if(!empty($formated_handling_editor_html))
+                $content .= '<tr><td>Editor:</td><td>' . $formated_handling_editor_html . '</td></tr>';
+
             $content .= '<tr><td>Eprint:</td><td><a href="' . esc_attr($settings->get_field_value('arxiv_url_abs_prefix') . get_post_meta( $post_id, $post_type . '_eprint', true ) ) . '">arXiv:' . esc_html(get_post_meta( $post_id, $post_type . '_eprint', true )) . '</a></td></tr>';
             $doi = get_post_meta( $post_id, $post_type . '_doi_prefix', true ) . '/' .  get_post_meta( $post_id, $post_type . '_doi_suffix', true );
             $content .= '<tr><td>Doi:</td><td><a href="' . esc_attr($settings->get_field_value('doi_url_prefix') . $doi) . '">' . esc_html($settings->get_field_value('doi_url_prefix') . $doi ) . '</a></td></tr>';
@@ -1757,15 +1774,17 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
         if(!is_wp_error($submission_history))
         {
             end($submission_history);
-            $latest_versiom = key($submission_history);
-            $latest_version_number = mb_substr($latest_versiom, 1);
+            $latest_version = key($submission_history);
+            if(!isset($latest_version))
+                return '';
+            $latest_version_number = mb_substr($latest_version, 1);
 
             if($latest_version_number > $published_version_number)
             {
                 $newer_arxiv_version_warning .= '<div class="important-box">';
                 $newer_arxiv_version_warning .= '<strong>Updated version:</strong> ';
-                $newer_arxiv_version_warning .= 'The authors have uploaded <a href="' . esc_attr($arxiv_url_abs_prefix . '/' . $eprint_without_version . $latest_versiom) . '" target=_blank>version ' . esc_html($latest_versiom) . '</a> of this work to the arXiv which may contain updates or corrections not contained in the published version ' . esc_html($published_version) . '.';
-                $arxiv_comment = $submission_history[$latest_versiom]['comment'];
+                $newer_arxiv_version_warning .= 'The authors have uploaded <a href="' . esc_attr($arxiv_url_abs_prefix . '/' . $eprint_without_version . $latest_version) . '" target=_blank>version ' . esc_html($latest_version) . '</a> of this work to the arXiv which may contain updates or corrections not contained in the published version ' . esc_html($published_version) . '.';
+                $arxiv_comment = $submission_history[$latest_version]['comment'];
                 if(!empty($arxiv_comment))
                     $newer_arxiv_version_warning .= ' The authors left the following comment on the arXiv:<div class="author-arxiv-comment">' . esc_html($arxiv_comment) . '</div>';
                 $newer_arxiv_version_warning .= '</div>';

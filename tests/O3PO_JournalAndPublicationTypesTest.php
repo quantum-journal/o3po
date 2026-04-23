@@ -8,12 +8,18 @@ require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-primary-publica
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-secondary-publication-type.php');
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-latex.php');
 require_once(dirname( __FILE__ ) . '/../o3po/admin/class-o3po-admin.php');
-require_once(dirname( __FILE__ ) . '/o3po-settings-test.php');
+require_once(dirname( __FILE__ ) . '/O3PO_SettingsTest.php');
+
+use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 
 class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
 {
 
-    public function test_initialize_settings() {
+    public static function test_initialize_settings() {
 
         $settings = O3PO_SettingsTest::get_settings();
 
@@ -23,6 +29,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         /**
          * @depends test_initialize_settings
          */
+    #[Depends('test_initialize_settings')]
     public function test_setup_primary_journal( $settings )
     {
         $journal = O3PO::setup_primary_journal($settings);
@@ -35,6 +42,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         /**
          * @depends test_initialize_settings
          */
+    #[Depends('test_initialize_settings')]
     public function test_setup_secondary_journal( $settings )
     {
 
@@ -47,6 +55,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         /**
          * @depends test_initialize_settings
          */
+    #[Depends('test_initialize_settings')]
     public function test_setup_environment( $settings ) {
 
         $environment = new O3PO_Environment($settings->get_field_value("production_site_url"));
@@ -59,6 +68,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_setup_primary_journal
          * @depends test_setup_environment
          */
+    #[Depends('test_setup_primary_journal')]
+    #[Depends('test_setup_environment')]
     public function test_create_primary_publication_type( $journal, $environment )
     {
 
@@ -73,6 +84,9 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_setup_secondary_journal
          * @depends test_setup_environment
          */
+    #[Depends('test_create_primary_publication_type')]
+    #[Depends('test_setup_secondary_journal')]
+    #[Depends('test_setup_environment')]
     public function test_create_secondary_publication_type( $primary_publication_type, $journal, $environment )
     {
 
@@ -82,7 +96,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         return $secondary_publication_type;
     }
 
-    public function single_paper_template_provider() {
+    public static function single_paper_template_provider() {
 
         return [
             [1],
@@ -90,7 +104,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         ];
     }
 
-    public function primary_the_admin_components_provider() {
+    public static function primary_the_admin_components_provider() {
 
         return [
             ['the_admin_panel_intro_text'],
@@ -120,6 +134,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @dataProvider primary_the_admin_components_provider
          * @depends test_create_primary_publication_type
          */
+    #[DataProvider('primary_the_admin_components_provider')]
+    #[Depends('test_create_primary_publication_type')]
     public function test_primary_the_admin_components_are_well_formed_html( $function, $primary_publication_type ) {
 
         global $posts;
@@ -143,7 +159,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         }
     }
 
-    public function secondary_the_admin_components_provider() {
+    public static function secondary_the_admin_components_provider() {
 
         return [
             ['the_admin_panel_intro_text'],
@@ -168,6 +184,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @dataProvider secondary_the_admin_components_provider
          * @depends test_create_secondary_publication_type
          */
+    #[DataProvider('secondary_the_admin_components_provider')]
+    #[Depends('test_create_secondary_publication_type')]
     public function test_secondary_the_admin_components_are_well_formed_html( $function, $secondary_publication_type ) {
 
         global $posts;
@@ -194,6 +212,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         /**
          * @depends test_create_primary_publication_type
          */
+    #[Depends('test_create_primary_publication_type')]
     public function test_primary_render_metabox_is_well_formed_html( $primary_publication_type ) {
         global $posts;
 
@@ -213,6 +232,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
        /**
          * @depends test_create_secondary_publication_type
          */
+    #[Depends('test_create_secondary_publication_type')]
     public function test_secondary_render_metabox_is_well_formed_html( $secondary_publication_type ) {
         global $posts;
 
@@ -233,6 +253,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_secondary_publication_type
          * @depends test_initialize_settings
          */
+    #[Depends('test_create_secondary_publication_type')]
+    #[Depends('test_initialize_settings')]
     public function test_secondary_get_the_content( $secondary_publication_type, $settings ) {
         global $posts;
         global $post;
@@ -274,6 +296,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_primary_publication_type
          * @depends test_initialize_settings
          */
+    #[Depends('test_create_primary_publication_type')]
+    #[Depends('test_initialize_settings')]
     public function test_primary_get_the_content( $primary_publication_type, $settings ) {
         global $posts;
         global $post;
@@ -310,7 +334,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
     }
 
 
-    public function download_to_media_library_provider() {
+    public static function download_to_media_library_provider() {
 
         return [
             ['https://arxiv.org/pdf/0908.2921v2', 'q-1234-07-11-14', 'pdf', 'application/pdf', '1', false],
@@ -323,6 +347,10 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @dataProvider download_to_media_library_provider
          * @depends test_setup_environment
          */
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState('disabled')]
+    #[DataProvider('download_to_media_library_provider')]
+    #[Depends('test_setup_environment')]
     public function test_download_to_media_library( $url, $filename, $extension, $mime_type, $parent_post_id, $expected_error, $environment ) {
 
         $results = $environment->download_to_media_library($url, $filename, $extension, $mime_type, $parent_post_id);
@@ -350,6 +378,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
+    #[Depends('test_create_primary_publication_type')]
+    #[Depends('test_create_secondary_publication_type')]
     function test_get_active_publication_type_names( $primary_publication_type, $secondary_publication_type ) {
 
         $this->assertSame($primary_publication_type->get_active_publication_type_names(), array($primary_publication_type->get_publication_type_name(), $secondary_publication_type->get_publication_type_name()));
@@ -359,7 +389,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
 
 
 
-    function doi_suffix_still_free_provider() {
+    public static function doi_suffix_still_free_provider() {
 
         return [
             ['unused_prefix', true],
@@ -376,6 +406,11 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
+    #[DataProvider('doi_suffix_still_free_provider')]
+    #[Depends('test_setup_primary_journal')]
+    #[Depends('test_setup_secondary_journal')]
+    #[Depends('test_create_primary_publication_type')]
+    #[Depends('test_create_secondary_publication_type')]
     function test_doi_suffix_still_free( $prefix, $expected, $primary_journal, $setup_secondary_journal, $primary_publication_type, $secondary_publication_type ) {
 
         $this->assertSame($expected, $primary_journal->doi_suffix_still_free($prefix, $primary_publication_type->get_active_publication_type_names()));
@@ -383,7 +418,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
     }
 
 
-    function pages_still_free_info_provider() {
+    public static function pages_still_free_info_provider() {
         return [
             [null, 1234, array('still_free' => true, 'title' => '')],
             [null, 1, array('still_free' => false, 'title' => 'Fake title')],
@@ -395,22 +430,45 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_primary_publication_type
          * @depends test_setup_primary_journal
          */
+         #[DataProvider('pages_still_free_info_provider')]
+         #[Depends('test_create_primary_publication_type')]
+         #[Depends('test_setup_primary_journal')]
     public function test_pages_still_free_info( $post_id_to_exclude, $pages, $expected, $primary_publication_type, $journal ) {
         $this->assertSame($expected, $journal->pages_still_free_info( $post_id_to_exclude, $pages, array($primary_publication_type->get_publication_type_name()) ));
     }
 
-    public function parse_publication_source_provider() {
+    public static function parse_publication_source_provider() {
 
         $settings = O3PO_SettingsTest::get_settings();
 
         return [
+            [dirname(__FILE__) . '/resources/arxiv/2006.12475v4.tar.gz', "application/x-tar", array(
+                    "affiliations" => array("#Department of Physics, University of Illinois at Urbana-Champaign, Urbana, IL 61801, USA#", "#Department of Electrical and Computer Engineering, University of Illinois at Urbana-Champaign, Urbana, IL 61801, USA#"),
+                    "author_affiliations" => '/1###2###2/u',
+                    "validation_result" => array("#REVIEW: Found BibTeX or manually formated bibliographic information#"),
+                    "bbl" => array('#Cover-2006a#', '#Giovannetti-2011#'),
+                    'num_dois' => 53,
+                                                                                                    )],
+            [dirname(__FILE__) . '/resources/arxiv/2107.12944v2.tar.gz', "application/x-tar", array(
+                    "affiliations" => array("#Department of Physics, University of Basel, Klingelbergstrasse 82, 4056 Basel, Switzerland#", "#Laboratoire Kastler Brossel, ENS-Université PSL, CNRS, Sorbonne Université, Collège de France, 24 Rue Lhomond, 75005, Paris, France#", "#Department of Physics, ETH Zürich, 8093 Zürich, Switzerland#", "#ICFO-Institut de Ciències Fotòniques, The Barcelona Institute of Science and Technology, Av. Carl Friedrich Gauss 3, 08860, Castelldefels \(Barcelona\), Spain#"),
+                    "author_affiliations" => '/(1,3###2,4|1,2###3,4)/u', # actually "correct" would be /1,2###3,4/u but there are inconsistent affiliations in multiple files in this submission and I have no idea how to handle this so that the "expected" result is always returned, so we just accept the affiliations from either of the files
+                    "validation_result" => array("#REVIEW: Found BibTeX or manually formated bibliographic information#"),
+                    "bbl" => array('#NielsenChuang#', '#StreltsovRMP2017#'),
+                    'num_dois' => 59,
+                                                                                                    )],
+
+
+
+
+
+
             [dirname(__FILE__) . '/resources/arxiv/2202.11338v4.tar.gz', "application/x-tar", array(
                     "affiliations" => array("#Hon Hai Quantum Computing Research Center, Taipei, Taiwan#"),
                     "author_affiliations" => '/1###2,3###1/u',
                     "validation_result" => array("#REVIEW: Found BibTeX or manually formated bibliographic information#"),
                     "bbl" => array('#PhysRevA\.85\.042311#'),
                     'num_dois' => 70,
-                                                                                                   )],
+                                                                                                    )],
             [dirname(__FILE__) . '/resources/arxiv/1711.04662v3.tar.gz', "application/gzip", array(
                     "affiliations" => array('#Aix-Marseille Univ, Université de Toulon, CNRS, LIS, Marseille, and IXXI, Lyon, France#', '#Aix-Marseille Univ, Université de Toulon, CNRS, LIS, Marseille, France and Departamento de Física Teórica and IFIC, Universidad de Valencia-CSIC, Dr. Moliner 50, 46100-Burjassot, Spain#', '#Aix-Marseille Univ, Université de Toulon, CNRS, LIS, Marseille, France#'),
                     "author_affiliations" => '/1###2###3/u',
@@ -493,6 +551,10 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @dataProvider parse_publication_source_provider
          * @depends test_create_primary_publication_type
          */
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState('disabled')]
+    #[DataProvider('parse_publication_source_provider')]
+    #[Depends('test_create_primary_publication_type')]
     public function test_parse_publication_source( $path_source, $mime_type, $expectation, $primary_publication_type ) {
 
         $class = new ReflectionClass('O3PO_PrimaryPublicationType');
@@ -543,9 +605,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         }
     }
 
-    public function posts_for_validate_and_process_data_provider() {
-        global $posts;
-
+    public static function posts_for_validate_and_process_data_provider() {
         return [
             [1, array(
                     '#REVIEW: The pdf was downloaded successfully from the arXiv#',
@@ -573,6 +633,10 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @dataProvider posts_for_validate_and_process_data_provider
          * @depends test_create_primary_publication_type
          */
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState('disabled')]
+    #[DataProvider('posts_for_validate_and_process_data_provider')]
+    #[Depends('test_create_primary_publication_type')]
     public function test_primary_validate_and_process_data( $post_id, $expections, $primary_publication_type ) {
 
         #init settings here instead of depending on test_initialize_settings because O3PO_Settings is a singleton
@@ -606,6 +670,10 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @dataProvider posts_for_validate_and_process_data_provider
          * @depends test_create_secondary_publication_type
          */
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState('disabled')]
+    #[DataProvider('posts_for_validate_and_process_data_provider')]
+    #[Depends('test_create_secondary_publication_type')]
     public function test_secondary_validate_and_process_data( $post_id, $expections, $secondary_publication_type ) {
 
         #init settings here instead of depending on test_initialize_settings because O3PO_Settings is a singleton
@@ -633,7 +701,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
     }
 
 
-    public function on_post_actually_published_provider() {
+    public static function on_post_actually_published_provider() {
 
         return [
             [1],
@@ -649,6 +717,10 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @dataProvider on_post_actually_published_provider
          * @depends test_create_primary_publication_type
          */
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState('disabled')]
+    #[DataProvider('on_post_actually_published_provider')]
+    #[Depends('test_create_primary_publication_type')]
     public function test_primary_on_post_actually_published( $post_id, $primary_publication_type ) {
 
         #init settings here instead of depending on test_initialize_settings because O3PO_Settings is a singleton
@@ -678,6 +750,10 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @dataProvider on_post_actually_published_provider
          * @depends test_create_secondary_publication_type
          */
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState('disabled')]
+    #[DataProvider('on_post_actually_published_provider')]
+    #[Depends('test_create_secondary_publication_type')]
     public function test_secondary_on_post_actually_published( $post_id, $secondary_publication_type ) {
 
         #init settings here instead of depending on test_initialize_settings because O3PO_Settings is a singleton
@@ -701,7 +777,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
     }
 
 
-    public function save_meta_data_provider() {
+    public static function save_meta_data_provider() {
 
         return [
             [1,
@@ -776,6 +852,10 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @dataProvider save_meta_data_provider
          * @depends test_create_primary_publication_type
          */
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState('disabled')]
+    #[DataProvider('save_meta_data_provider')]
+    #[Depends('test_create_primary_publication_type')]
     public function test_primary_save_meta_data( $post_id, $POST_args, $expections, $primary_publication_type ) {
 
         #init settings here instead of depending on test_initialize_settings because O3PO_Settings is a singleton
@@ -826,6 +906,10 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @dataProvider save_meta_data_provider
          * @depends test_create_secondary_publication_type
          */
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState('disabled')]
+    #[DataProvider('save_meta_data_provider')]
+    #[Depends('test_create_secondary_publication_type')]
     public function test_secondary_save_meta_data( $post_id, $POST_args, $expections, $secondary_publication_type ) {
 
         #$settings is not used but save_meta_data() needs the settings to be initialized
@@ -875,9 +959,11 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @runInSeparateProcess
          * @preserveGlobalState disabled
          */
-    public function save_metabox_provider() {
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState('disabled')]
+    public static function save_metabox_provider() {
         #init settings here instead of depending on test_initialize_settings because O3PO_Settings is a singleton
-        $this->test_initialize_settings();
+        O3PO_JournalAndPublicationTypesTest::test_initialize_settings();
         $settings = O3PO_SettingsTest::get_settings();
 
         return [
@@ -1021,6 +1107,12 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_secondary_publication_type
          * @depends test_setup_environment
          */
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState('disabled')]
+    #[DataProvider('save_metabox_provider')]
+    #[Depends('test_create_primary_publication_type')]
+    #[Depends('test_create_secondary_publication_type')]
+    #[Depends('test_setup_environment')]
     public function test_save_metabox( $post_id, $POST_args, $expections_first, $expections_second, $primary_publication_type, $secondary_publication_type ) {
 
         #init settings here instead of depending on test_initialize_settings because O3PO_Settings is a singleton
@@ -1069,6 +1161,11 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState('disabled')]
+    #[DataProvider('save_metabox_provider')]
+    #[Depends('test_create_primary_publication_type')]
+    #[Depends('test_create_secondary_publication_type')]
     public function test_on_transition_post_status( $post_id, $POST_args, $expections_first, $expections_second, $primary_publication_type, $secondary_publication_type ) {
 
         #init settings here instead of depending on test_initialize_settings because O3PO_Settings is a singleton
@@ -1120,6 +1217,10 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_secondary_publication_type
          * @depends test_initialize_settings
          */
+         #[DoesNotPerformAssertions]
+         #[Depends('test_create_primary_publication_type')]
+         #[Depends('test_create_secondary_publication_type')]
+         #[Depends('test_initialize_settings')]
     public function test_register_as_custom_post_type( $primary_publication_type, $secondary_publication_type, $settings ) {
         $primary_publication_type->register_as_custom_post_type();
         $secondary_publication_type->register_as_custom_post_type();
@@ -1130,6 +1231,9 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
+         #[DoesNotPerformAssertions]
+         #[Depends('test_create_primary_publication_type')]
+         #[Depends('test_create_secondary_publication_type')]
     public function test_init_metabox( $primary_publication_type, $secondary_publication_type) {
         $primary_publication_type->init_metabox();
         $secondary_publication_type->init_metabox();
@@ -1140,6 +1244,9 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
+    #[DoesNotPerformAssertions]
+    #[Depends('test_create_primary_publication_type')]
+    #[Depends('test_create_secondary_publication_type')]
     public function test_add_metabox( $primary_publication_type, $secondary_publication_type) {
         $primary_publication_type->add_metabox();
         $secondary_publication_type->add_metabox();
@@ -1150,6 +1257,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
+    #[Depends('test_create_primary_publication_type')]
+    #[Depends('test_create_secondary_publication_type')]
     public function test_add_custom_post_types_to_query( $primary_publication_type, $secondary_publication_type) {
 
         global $is_home;
@@ -1170,6 +1279,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
+    #[Depends('test_create_primary_publication_type')]
+    #[Depends('test_create_secondary_publication_type')]
     public function test_add_custom_post_types_to_rss_feed( $primary_publication_type, $secondary_publication_type) {
 
         $request = array('feed' => true);
@@ -1198,6 +1309,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
+    #[Depends('test_create_primary_publication_type')]
+    #[Depends('test_create_secondary_publication_type')]
     public function test_the_author_feed( $primary_publication_type, $secondary_publication_type) {
 
         global $posts;
@@ -1244,6 +1357,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
+    #[Depends('test_create_primary_publication_type')]
+    #[Depends('test_create_secondary_publication_type')]
     public function test_get_the_author_and_get_the_author_posts_link( $primary_publication_type, $secondary_publication_type) {
 
         global $posts;
@@ -1294,6 +1409,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         /**
          * @depends test_create_primary_publication_type
          */
+    #[Depends('test_create_primary_publication_type')]
     public function test_get_last_arxiv_source_url( $primary_publication_type ) {
         global $posts;
 
@@ -1312,9 +1428,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
 
             try
             {
-                $source_attach_ids = $post_data['meta']['paper_arxiv_source_attach_ids'];
-                if(!empty($source_attach_ids))
-                    $this->assertSame($posts[end($source_attach_ids)]['attachment_url'], $last_source_url);
+                if(!empty($post_data['meta']['paper_arxiv_source_attach_ids']))
+                    $this->assertSame($posts[end($post_data['meta']['paper_arxiv_source_attach_ids'])]['attachment_url'], $last_source_url);
                 else
                     $this->assertEmpty($last_source_url);
             }
@@ -1330,6 +1445,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_primary_publication_type
          * @depends test_initialize_settings
          */
+    #[Depends('test_create_primary_publication_type')]
+    #[Depends('test_initialize_settings')]
     public function test_primary_get_feed_content( $primary_publication_type, $settings ) {
         global $posts;
         global $post;
@@ -1370,6 +1487,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_primary_publication_type
          * @depends test_initialize_settings
          */
+    #[Depends('test_create_primary_publication_type')]
+    #[Depends('test_initialize_settings')]
     public function test_primary_get_the_excerpt( $primary_publication_type, $settings ) {
         global $posts;
         global $post;
@@ -1411,6 +1530,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_secondary_publication_type
          * @depends test_initialize_settings
          */
+    #[Depends('test_create_secondary_publication_type')]
+    #[Depends('test_initialize_settings')]
     public function test_secondary_get_the_excerpt( $secondary_publication_type, $settings ) {
         global $posts;
         global $post;
@@ -1451,6 +1572,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_secondary_publication_type
          * @depends test_initialize_settings
          */
+    #[Depends('test_create_secondary_publication_type')]
+    #[Depends('test_initialize_settings')]
     public function test_get_trackback_excerpt( $secondary_publication_type, $settings ) {
         global $posts;
         global $post;
@@ -1491,6 +1614,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         /**
          * @doesNotPerformAssertions
          */
+    #[DoesNotPerformAssertions]
     public function test_get_default_number_reviews() {
 
         $class = new ReflectionClass('O3PO_SecondaryPublicationType');
@@ -1505,6 +1629,9 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
+    #[DoesNotPerformAssertions]
+    #[Depends('test_create_primary_publication_type')]
+    #[Depends('test_create_secondary_publication_type')]
     public function test_get_default_number_authors( $primary_publication_type, $secondary_publication_type) {
 
         $primary_publication_type->get_default_number_authors();
@@ -1515,6 +1642,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         /**
          * @depends test_create_secondary_publication_type
          */
+    #[Depends('test_create_secondary_publication_type')]
     public function test_get_pdf_pretty_permalink( $secondary_publication_type ) {
 
         $this->assertEmpty($secondary_publication_type->get_pdf_pretty_permalink(1));
@@ -1526,6 +1654,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @doesNotPerformAssertions
          * @depends test_create_primary_publication_type
          */
+    #[DoesNotperformAssertions]
+    #[Depends('test_create_primary_publication_type')]
     public function test_add_pdf_endpoint( $primary_publication_type ) {
 
         $primary_publication_type->add_pdf_endpoint();
@@ -1533,7 +1663,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
     }
 
 
-    public function pdf_endpoint_request_query_provider() {
+    public static function pdf_endpoint_request_query_provider() {
 
         $paper = 'paper'; # 'paper' should ideally be $primary_publication_type->get_publication_type_name()
 
@@ -1551,6 +1681,10 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @dataProvider pdf_endpoint_request_query_provider
          * @depends test_create_primary_publication_type
          */
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState('disabled')]
+    #[DataProvider('pdf_endpoint_request_query_provider')]
+    #[Depends('test_create_primary_publication_type')]
     public function test_handle_pdf_endpoint_request( $wp_query, $expected, $primary_publication_type ) {
 
             /* We must initialize a settings object for handle_pdf_endpoint_request() to work, but we also must runInSeparateProcess with preserveGlobalState disabled because we modify the headers in handle_pdf_endpoint_request(). Because O3PO_Settings is a singleton, we therefore cannot depend on test_initialize_settings(), but must run it here.
@@ -1571,6 +1705,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @doesNotPerformAssertions
          * @depends test_create_primary_publication_type
          */
+    #[DoesNotPerformAssertions]
+    #[Depends('test_create_primary_publication_type')]
     public function test_add_web_statement_endpoint( $primary_publication_type ) {
 
         $primary_publication_type->add_web_statement_endpoint();
@@ -1578,7 +1714,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
     }
 
 
-    public function web_statement_endpoint_request_query_provider() {
+    public static function web_statement_endpoint_request_query_provider() {
 
         $paper = 'paper'; # 'paper' should ideally be $primary_publication_type->get_publication_type_name()
 
@@ -1599,6 +1735,10 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @dataProvider web_statement_endpoint_request_query_provider
          * @depends test_create_primary_publication_type
          */
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState('disabled')]
+    #[DataProvider('web_statement_endpoint_request_query_provider')]
+    #[Depends('test_create_primary_publication_type')]
     public function test_handle_web_statement_endpoint_request( $wp_query, $expected, $primary_publication_type ) {
 
             /* We must initialize a settings object for handle_web_statement_endpoint_request() to work, but we also must runInSeparateProcess with preserveGlobalState disabled because we modify the headers in handle_pdf_endpoint_request(). Because O3PO_Settings is a singleton, we therefore cannot depend on test_initialize_settings(), but must run it here.
@@ -1620,6 +1760,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @doesNotPerformAssertions
          * @depends test_create_primary_publication_type
          */
+    #[DoesNotPerformAssertions]
+    #[Depends('test_create_primary_publication_type')]
     public function test_add_axiv_paper_doi_feed_endpoint( $primary_publication_type ) {
 
         $primary_publication_type->add_axiv_paper_doi_feed_endpoint();
@@ -1627,19 +1769,10 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
     }
 
 
-
-
-
-
-
-
-
-
-
-    public function axiv_paper_doi_feed_endpoint_request_query_provider() {
+    public static function axiv_paper_doi_feed_endpoint_request_query_provider() {
 
         $paper = 'paper'; # 'paper' should ideally be $primary_publication_type->get_publication_type_name()
-        $settings = $this->test_initialize_settings();
+        $settings = O3PO_JournalAndPublicationTypesTest::test_initialize_settings();
         $endpoint_suffix = $settings->get_field_value('arxiv_paper_doi_feed_endpoint');
 
 
@@ -1656,6 +1789,10 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @dataProvider axiv_paper_doi_feed_endpoint_request_query_provider
          * @depends test_create_primary_publication_type
          */
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState('disabled')]
+    #[DataProvider('axiv_paper_doi_feed_endpoint_request_query_provider')]
+    #[Depends('test_create_primary_publication_type')]
     public function test_handle_arxiv_paper_doi_feed_endpoint_request( $wp_query, $expected, $primary_publication_type ) {
 
             /* We must initialize a settings object for handle_arxiv_paper_doi_feed_endpoint_request() to work, but we also must runInSeparateProcess with preserveGlobalState disabled because we modify the headers in handle_arxiv_paper_doi_feed_endpoint_request(). Because O3PO_Settings is a singleton, we therefore cannot depend on test_initialize_settings(), but must run it here.
@@ -1672,14 +1809,12 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
     }
 
 
-
-
-
-
         /**
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
+    #[Depends('test_create_primary_publication_type')]
+    #[Depends('test_create_secondary_publication_type')]
     public function test_add_dublin_core_and_highwire_press_meta_tags( $primary_publication_type, $secondary_publication_type ) {
         global $posts;
         global $post;
@@ -1721,6 +1856,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
+    #[Depends('test_create_primary_publication_type')]
+    #[Depends('test_create_secondary_publication_type')]
     public function test_the_java_script_single_page( $primary_publication_type, $secondary_publication_type ) {
         global $posts;
         global $post;
@@ -1762,6 +1899,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_setup_primary_journal
          * @depends test_setup_environment
          */
+    #[Depends('test_setup_primary_journal')]
+    #[Depends('test_setup_environment')]
     public function test_volumes_endpoint_overview( $journal, $environment )
     {
 
@@ -1784,7 +1923,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
     }
 
 
-    function volumes_endpoint_volume_1_provider() {
+    public static function volumes_endpoint_volume_1_provider() {
 
         return [
             ["1/" ],
@@ -1798,6 +1937,9 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_setup_primary_journal
          * @depends test_setup_environment
          */
+    #[DataProvider('volumes_endpoint_volume_1_provider')]
+    #[Depends('test_setup_primary_journal')]
+    #[Depends('test_setup_environment')]
     public function test_volumes_endpoint_volume_1( $query_var_extra, $journal, $environment )
     {
         set_global_query(new WP_Query(null , null));
@@ -1832,6 +1974,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         /**
          * @depends test_setup_primary_journal
          */
+    #[Depends('test_setup_primary_journal')]
     public function test_execution_of_various_journal_functions( $journal ) {
 
         $journal->add_volumes_endpoint();
@@ -1844,6 +1987,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         /**
          * @depends test_setup_primary_journal
          */
+    #[Depends('test_setup_primary_journal')]
     public function test_search_form_additions( $journal ) {
 
         $neither_main_nor_search_query = new WP_Query('some query');
@@ -1890,6 +2034,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
+    #[Depends('test_create_primary_publication_type')]
+    #[Depends('test_create_secondary_publication_type')]
     function test_get_all_citation_counts( $primary_publication_type, $secondary_publication_type ) {
 
         $this->assertSame($primary_publication_type->get_all_citation_counts()['citation_count']['10.22331/q-2017-04-25-8'], 43);
@@ -1904,6 +2050,8 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_primary_publication_type
          * @depends test_create_secondary_publication_type
          */
+    #[Depends('test_create_primary_publication_type')]
+    #[Depends('test_create_secondary_publication_type')]
     function test_admin_render_meta_data_explorer( $primary_publication_type, $secondary_publication_type ) {
         $admin = new O3PO_Admin( 'o3po', '0.3.0', 'O-3PO' );
 
@@ -1965,6 +2113,9 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @depends test_create_secondary_publication_type
          * @depends test_initialize_settings
          */
+    #[Depends('test_create_primary_publication_type')]
+    #[Depends('test_create_secondary_publication_type')]
+    #[Depends('test_initialize_settings')]
     function test_get_social_media_thumbnail_src( $primary_publication_type, $secondary_publication_type, $settings ) {
 
         # a post with feature image
@@ -1978,9 +2129,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
     }
 
 
-
-
-    function html_latex_excerpt_provider() {
+    public static function html_latex_excerpt_provider() {
 
         return [
             ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", 190, "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris"],
@@ -2008,14 +2157,15 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          * @dataProvider html_latex_excerpt_provider
          * @depends test_create_primary_publication_type
          */
+    #[DataProvider('html_latex_excerpt_provider')]
+    #[Depends('test_create_primary_publication_type')]
     public function test_html_latex_excerpt( $text, $len, $expected, $primary_publication_type ) {
         $this->assertSame($expected, $primary_publication_type->html_latex_excerpt($text, $len));
 
     }
 
 
-
-    public function validate_doi_suffix_template_provider() {
+    public static function validate_doi_suffix_template_provider() {
 
         $settings = O3PO_SettingsTest::get_settings();
 
@@ -2029,9 +2179,47 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         /**
          * @dataProvider validate_doi_suffix_template_provider
          */
+    #[DataProvider('validate_doi_suffix_template_provider')]
     public function test_validate_doi_suffix_template( $doi_suffix_template, $expected ) {
 
         $this->assertSame(O3PO_Journal::validate_doi_suffix_template('doi_suffix_template', $doi_suffix_template), $expected);
+    }
+
+
+        /**
+         * @depends test_create_primary_publication_type
+         * @depends test_initialize_settings
+         */
+    #[Depends('test_create_primary_publication_type')]
+    #[Depends('test_initialize_settings')]
+    public function test_404_error_on_primary( $primary_publication_type, $settings ) {
+        global $posts;
+        global $post;
+
+        foreach($posts as $post_id => $post_data)
+        {
+            $post_type = get_post_type($post_id);
+            if ( $primary_publication_type->get_publication_type_name() !== $post_type )
+                continue;
+
+            $post = new WP_Post($post_id);
+            $wp_query = new WP_Query(array('ID' => $post_id, 'error' => '404', 'post_type' => get_post_type($post_id)));
+            $wp_query->is_404 = true;
+            $doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
+            $wp_query->query_vars[$post_type] = $doi_suffix;
+
+            set_global_query($wp_query);
+            the_post();
+
+            $counter_before = get_flush_rewrite_rules_call_counter();
+            $primary_publication_type->handle_404_errors();
+            $counter_after = get_flush_rewrite_rules_call_counter();
+
+            if (get_post_status($post_id) == "publish")
+                $this->assertSame($counter_before + 1, $counter_after);
+            else
+                $this->assertSame($counter_before, $counter_after);
+        }
     }
 
 
@@ -2039,6 +2227,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         /**
          * @doesNotPerformAssertions
          */
+    #[DoesNotPerformAssertions]
     public function test_cleanup_at_the_very_end() {
         exec('git checkout ' . dirname(__File__) . '/resources/arxiv/0809.2542v4.pdf > /dev/null 2>&1');
         O3PO_Environment::save_recursive_remove_dir(dirname(__File__) . "/resources/tmp/", dirname(__File__));

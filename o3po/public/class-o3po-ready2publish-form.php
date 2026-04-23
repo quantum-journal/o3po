@@ -121,8 +121,9 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         $this->specify_field('featured_image_caption', 'Featured image caption', array( $this, 'render_featured_image_caption' ), 'dissemination', 'dissemination_material', array(), array($this, 'trim_strip_tags'), '');
         $this->specify_field('dissemination_multimedia', 'Multi media', array( $this, 'render_dissemination_multimedia' ), 'dissemination', 'dissemination_material', array(), array($this, 'trim_strip_tags'), '');
 
-        $this->specify_section('dissemination_fermats_library', 'Fermat\'s library', null, 'dissemination');
-        $this->specify_field('fermats_library', 'Opt-in to Fermat\'s library', array( $this, 'render_fermats_library' ), 'dissemination', 'dissemination_fermats_library', array(), array($this, 'checked_or_unchecked'), 'unchecked');
+            /* We are phasing out support for Fermat's Libray */
+        /* $this->specify_section('dissemination_fermats_library', 'Fermat\'s library', null, 'dissemination'); */
+        /* $this->specify_field('fermats_library', 'Opt-in to Fermat\'s library', array( $this, 'render_fermats_library' ), 'dissemination', 'dissemination_fermats_library', array(), array($this, 'checked_or_unchecked'), 'unchecked'); */
 
         $this->specify_section('dissemination_copyright_confirmation', 'License and copyright', null, 'dissemination');
         $this->specify_field('copyright_confirmation', 'Confirm copyright', array( $this, 'render_copyright_confirmation' ), 'dissemination', 'dissemination_copyright_confirmation', array(), array($this, 'checked_if_on_or_past_containing_page_unless_back_or_upload'), 'unchecked');
@@ -133,7 +134,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         $this->specify_field('payment_method', Null, array($this, 'render_payment_method'), 'payment', 'payment_method', array(), array($this, 'one_of_invoice_noinvoice_waiver'), array());
 
         $this->specify_section('payment_invoice', 'Invoicing information', null, 'payment');
-        $this->specify_field('payment_amount', 'Amount', array($this, 'render_payment_amount'), 'payment', 'payment_invoice', array(), array($this, 'validate_non_negative_euros'), "450€");
+        $this->specify_field('payment_amount', 'Amount', array($this, 'render_payment_amount'), 'payment', 'payment_invoice', array(), array($this, 'validate_non_negative_euros'), "600€");
         $this->specify_field('invoice_recipient', 'Recipient', array( $this, 'render_invoice_recipient' ), 'payment', 'payment_invoice', array(), array($this, 'non_empty_if_payment_method_is_invoice_and_on_or_past_containing_page'), '');
         $this->specify_field('invoice_address', 'Address', array( $this, 'render_invoice_address' ), 'payment', 'payment_invoice', array(), array($this, 'non_empty_if_payment_method_is_invoice_and_on_or_past_containing_page'), '');
         $this->specify_field('invoice_vat_number', 'VAT number (if applicable)', array( $this, 'render_invoice_vat_number' ), 'payment', 'payment_invoice', array(), array($this, 'trim_strip_tags'), '');
@@ -564,12 +565,10 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
          */
     public function render_payment_amount() {
         $this->render_select_field('payment_amount', [
-                                       array('value' => '450€',
-                                             'description' => '450€ Regular publication fee (for manuscripts submitted from 2020-05-01 on)'),
-                                       array('value' => '225€',
-                                             'description' => '225€ Half regular publication fee (for splitting the fee)'),
-                                       array('value' => '200€',
-                                             'description' => '200€ Old publication fee (for manuscripts submitted before 2020-05-01)'),
+                                       array('value' => '600€',
+                                             'description' => '600€ Regular publication fee'),
+                                       array('value' => '300€',
+                                             'description' => '300€ Half regular publication fee (for splitting the fee)'),
                                        array('value' => '100€',
                                              'description' => '100€ Discount publication fee'),
                                                                       ]);
@@ -794,7 +793,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
          */
     public function render_manuscript_data_section() {
 
-        echo '<p>The following information was fetched from the arXiv for your convenience. Please check and correct carefully. You may use standard LaTeX formulas in both title and abstract, but please remove all manual LaTeX formating commands such as \bf and do not abuse math mode to emphasize parts of your text.</p>';
+        echo '<p>The following information was fetched from the arXiv for your convenience. Please check and correct carefully. You may use standard LaTeX formulas in both title and abstract, but please remove all manual LaTeX formating commands such as \bf and <strong>do not abuse math mode to emphasize parts of your text</strong>.</p>';
     }
 
         /**
@@ -870,7 +869,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
          * @access   public
          */
     public function render_payment_method() {
-        echo '<p>Quantum is a non-profit journal, supported by voluntary publication fees - for a full explanation and break-down of running costs see <a href="https://quantum-journal.org/update-on-quantums-publication-fees/">this blog post</a>. If you are able to afford the publication fee (for example through your funding agency), we thank you for your support.</p>';
+        echo '<p>Quantum is a non-profit journal, supported by voluntary publication fees. If you are able to afford the publication fee (for example through your funding agency), we thank you for your support.</p>';
 
         $this->render_select_field('payment_method', [
                                        array('value' => 'invoice',

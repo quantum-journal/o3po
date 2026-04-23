@@ -62,6 +62,15 @@ abstract class O3PO_PublicForm {
     protected $coming_from_page = false;
 
         /**
+         * The id of this session
+         *
+         * @since    0.4.0
+         * @access   protected
+         * @var      str     $session_id
+         */
+    protected $session_id;
+
+        /**
          * Page to display
          *
          * @since    0.4.0

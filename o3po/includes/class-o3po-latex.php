@@ -839,6 +839,8 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
     static public function get_month_string( $month ) {
 
         $month = intval($month);
+        if ($month < 1 || $month > 12)
+            throw new Exception("Month must be an integeger between 1 and 12");
         return array(
             1 => 'jan',
             2 => 'feb',
@@ -983,6 +985,8 @@ class O3PO_Latex_Dictionary_Provider
                 '\\\\textendash(?![a-zA-Z])' => '–',
                 '\\\\bibrangedash(?![a-zA-Z])\s*' => '–',
                 '\\\\&' => '&',
+                '\\\\And(?![a-zA-Z])\s*' => '&',
+                '\\\\and(?![a-zA-Z])\s*' => ' ',
                 '\\\\negthinspace' => '',
                 '\\\\!' => '',
                 '\\\\,' => ' ',

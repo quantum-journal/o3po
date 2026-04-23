@@ -2,10 +2,12 @@
 
 require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-arxiv.php';
 
+use PHPUnit\Framework\Attributes\DataProvider;
+
 class O3PO_ArxivTest extends O3PO_TestCase
 {
 
-    public function eprint_provider() {
+    public static function eprint_provider() {
         return [
             array(
                 'eprint' => '1609.09584v4',
@@ -73,6 +75,7 @@ ERROR: No license informatin found on https://arxiv.org/abs/0809.2542v5.
         /**
          * @dataProvider eprint_provider
          */
+    #[DataProvider('eprint_provider')]
     public function test_fetch_meta_data_from_abstract_page( $eprint, $expected ) {
 
         $this->assertSame($expected, O3PO_Arxiv::fetch_meta_data_from_abstract_page('https://arxiv.org/abs/', $eprint));
@@ -81,7 +84,7 @@ ERROR: No license informatin found on https://arxiv.org/abs/0809.2542v5.
 
 
 
-    public function eprint_submission_history_provider() {
+    public static function eprint_submission_history_provider() {
         return [
             array(
                 'eprint' => '1609.09584',
@@ -164,6 +167,7 @@ ERROR: No license informatin found on https://arxiv.org/abs/0809.2542v5.
         /**
          * @dataProvider eprint_submission_history_provider
          */
+    #[DataProvider('eprint_submission_history_provider')]
     public function test_get_submission_history_from_abstract_page( $eprint, $expected ) {
 
         $submission_history = O3PO_Arxiv::get_submission_history_from_abstract_page('https://arxiv.org/abs/', $eprint);
@@ -172,14 +176,19 @@ ERROR: No license informatin found on https://arxiv.org/abs/0809.2542v5.
             $this->assertEquals($expected, $submission_history);
         else
         {
-            $this->assertEquals(array_keys($expected), array_keys($submission_history));
+            if(is_wp_error($submission_history))
+                $this->assertTrue(False, $submission_history->get_error_message());
+            $this->assertEquals(
+                array_keys($expected),
+                array_keys($submission_history)
+                                );
 
             $this->assertEquals($expected, $submission_history);
         }
     }
 
 
-    public function eprint_upload_date_provider() {
+    public static function eprint_upload_date_provider() {
         return [
             array(
                 'eprint' => '1609.09584v4',
@@ -200,6 +209,7 @@ ERROR: No license informatin found on https://arxiv.org/abs/0809.2542v5.
         /**
          * @dataProvider eprint_upload_date_provider
          */
+    #[DataProvider('eprint_upload_date_provider')]
     public function test_get_arxiv_upload_date( $eprint, $expected ) {
 
         $this->assertEquals($expected, O3PO_Arxiv::get_arxiv_upload_date('https://arxiv.org/abs/', $eprint));

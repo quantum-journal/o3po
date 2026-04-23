@@ -175,15 +175,15 @@ trait O3PO_Form {
          * @access public
          * @param  string      $id           Id of the field.
          * @param  string|null $placeholder  Placeholder text (default is null).
-         * @param  string      $autocomplete Whether to auto complete 'or' (default) or 'off.
+         * @param  string      $autocomplete Whether to auto complete 'on' (default) or 'off.
          * @param  string      $style        CSS style.
          * @param  string      $label        HTML label.
          * @param  boolean     $esc_label    Whether to escape the content of label.
          * @param  string      $label_style  CSS style for the label.
          */
-    public function render_single_line_field( $id , $placeholder=null, $autocomplete='on', $style=false, $label=false, $esc_label=true, $label_style=false, $fallback_value=False) {
+    public function render_single_line_field( $id , $placeholder=null, $autocomplete='on', $style=false, $label=false, $esc_label=true, $label_style=false, $fallback_value=false, $readonly=false, $default_generator=false) {
 
-        if($fallback_value === False)
+        if($fallback_value === false && $default_generator === false)
             $value = $this->get_field_value($id);
         else
         {
@@ -191,7 +191,10 @@ trait O3PO_Form {
             {
                 $value = $this->get_field_value($id);
             } catch(Throwable $e) {
-                $value = $fallback_value;
+                if($fallback_value != false)
+                    $value = $fallback_value;
+                if($default_generator != false)
+                    $value = $default_generator($id, $placeholder, $fallback_value);
             }
         }
 
@@ -200,7 +203,7 @@ trait O3PO_Form {
             $name_end = '[' . $matches[1] . '][' . $matches[2] . ']';
         else
             $name_end = '[' . $id . ']';
-        echo '<input class="regular-text ltr ' . $this->plugin_name . '-' . $this->slug . ' ' . $this->plugin_name . '-' . $this->slug . '-text" type="text" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . $name_end . '" value="' . esc_attr($value) . '"' . ($placeholder ? ' placeholder="' . esc_attr($placeholder) . '"' : '' ) . ($style ? ' style="' . esc_attr($style). '" ': '') . ($autocomplete === 'off' ? ' autocomplete=off': '') .' />';
+        echo '<input class="regular-text ltr ' . $this->plugin_name . '-' . $this->slug . ' ' . $this->plugin_name . '-' . $this->slug . '-text" type="text" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . $name_end . '" value="' . esc_attr($value) . '"' . ($placeholder ? ' placeholder="' . esc_attr($placeholder) . '"' : '' ) . ($style ? ' style="' . esc_attr($style). '" ': '') . ($autocomplete === 'off' ? ' autocomplete=off': '') . ($readonly ? ' readonly="readonly"': '') .' />';
         if(!empty($label))
             echo '<label for="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '"' . ($label_style ? ' style="' . esc_attr($label_style). '" ': '') . '>' . ($esc_label ? esc_html($label) : $label) . '</label>';
 
@@ -581,7 +584,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         try
         {
             $input = trim($input);
-            $array = preg_split('#,#u', $input, Null, PREG_SPLIT_NO_EMPTY);
+            $array = preg_split('#,#u', $input, -1, PREG_SPLIT_NO_EMPTY);
             foreach($array as $key => $id)
                 $array[$key] = trim($id);
 
@@ -691,6 +694,43 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
                 $this_name = $name;
             $this_name = strip_tags($this_name);
             $result[$key] = trim($this_name);
+        }
+
+        return $result;
+    }
+
+
+        /**
+         * Validate that an array consists of at most 1000 UUIDv4s
+         *
+         * @since  0.4.3
+         * @access private
+         * @param  string  $id    The id of the field whose input is validated.
+         * @param  array   $input The input.
+         */
+    public function validate_array_of_at_most_1000_uuidv4s( $id, $input ) {
+
+        if(!is_array($input))
+        {
+            $this->add_error( $id, 'not-array', "The input to field " . $id . " must be an array but was of type " . gettype($input) . ".", 'error');
+            return array();
+        }
+
+        $input = array_slice($input, 0, 1000);
+        $result = array();
+        foreach($input as $key => $value)
+        {
+            if(empty($value))
+                $this_uuidv4 = O3PO_Utility::uuidv4();
+            elseif (!O3PO_Utility::valid_uuidv4($value))
+            {
+                $this->add_error( $id, 'not-uuid', "The input to field " . $id . " must be an array of UUIDv4s but entry " . $key . " was " . $value . ".", 'error');
+                return array();
+            }
+            else
+                $this_uuidv4 = $value;
+            $this_uuidv4 = strip_tags($this_uuidv4);
+            $result[$key] = trim($this_uuidv4);
         }
 
         return $result;

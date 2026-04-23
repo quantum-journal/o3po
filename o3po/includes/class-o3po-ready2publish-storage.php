@@ -10,6 +10,8 @@
  * @subpackage O3PO/includes
  */
 
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-publication-type.php';
+
 /**
  * Trait for the storage of data on manuscripts ready to publish.
  *
@@ -144,7 +146,8 @@ class O3PO_Ready2PublishStorage {
 
         $clean_manuscript_info = array();
         foreach(static::$manuscript_info_fields_to_store as $field)
-            $clean_manuscript_info[$field] = $manuscript_info[$field];
+            if (array_key_exists($field, $manuscript_info))
+                $clean_manuscript_info[$field] = $manuscript_info[$field];
 
         $manuscripts = get_option($this->plugin_name . '-' . $this->slug, array());
         $manuscripts[] = $clean_manuscript_info;

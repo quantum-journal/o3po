@@ -451,7 +451,10 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         if(preg_match('#^([-.a-zA-Z]+/[0-9]{7}|[0-9]{4}.[0-9]{4,5})v[0-9]+$#u', $eprint))
             return $eprint;
 
-        $this->add_error($id, 'malformed-eprint', "The arXiv identifier '" . $input ."' given in '" . $this->fields[$id]['title'] . "' is not valid.", 'error');
+		if(!preg_match('#^.*v[0-9]+$#u', $eprint))
+			$this->add_error($id, 'malformed-eprint', "The arXiv identifier '" . $input ."' given in '" . $this->fields[$id]['title'] . "' is not valid. Did you include the specific version, in in, e.g., 1234.56789v2?", 'error');
+		else
+        	$this->add_error($id, 'malformed-eprint', "The arXiv identifier '" . $input ."' given in '" . $this->fields[$id]['title'] . "' is not valid.", 'error');
         return $this->get_field_default($id);
     }
 

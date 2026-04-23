@@ -43,7 +43,7 @@ class O3PO_Ads {
             return array();
 
         $eprint_without_version = preg_replace('#v[0-9]+$#u', '', $eprint);
-        $headers = array( 'Authorization' => 'Bearer:' . $api_token );
+        $headers = array( 'Authorization' => 'Bearer ' . $api_token );
 
         $url = $ads_api_search_url . '?q=' . 'arxiv:' . urlencode($eprint_without_version) . '&fl=' . 'citation';
         $response = get_transient('get_ads_cited_by_json_' . $url);
@@ -59,7 +59,9 @@ class O3PO_Ads {
             }
             set_transient('get_ads_cited_by_json_' . $url, $response, $storage_time);
         }
+
         $json = json_decode($response['body']);
+
         if($json === Null)
             return new WP_Error("json_decode_failed", "No response from ADS or unable to decode the received json data when getting the list of citing works.");
 
@@ -150,7 +152,7 @@ class O3PO_Ads {
                 $url = static::bibcodes_to_query_url($ads_api_search_url, $bibcodes, $max_number_of_citations);
                 $response = get_transient('get_ads_cited_by_json_' . $url);
                 if(empty($response)) {
-                    $headers = array( 'Authorization' => 'Bearer:' . $api_token );
+                    $headers = array( 'Authorization' => 'Bearer ' . $api_token );
                     $response = wp_remote_get($url, array('headers' => $headers, 'timeout' => $timeout));
                     if(is_wp_error($response))
                         return $response;
@@ -165,12 +167,15 @@ class O3PO_Ads {
                 }
 
                 $json = json_decode($response['body']);
-                if($json === Null)
+                if($json === Null || !isset($json->response->docs) || !is_array($json->response->docs))
                     return new WP_Error("json_decode_failed", "No response from ADS or unable to decode the received json data when querying for bibliographic information of citing works.");
 
                 $bibentries = array();
                 foreach($json->response->docs as $doc)
                 {
+                    if(!isset($doc->author) || !is_array($doc->author))
+                        return new WP_Error("json_decode_failed", "Unable to decode the received author information.");
+
                     $authors = array();
                     foreach($doc->author as $author)
                     {

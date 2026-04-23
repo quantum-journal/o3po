@@ -7,7 +7,7 @@
  * fake WordPress function calls in bootstrap.php
  */
 
-
+global $posts;
 $posts = array(
     1 => array(
         'post_type' => 'paper',

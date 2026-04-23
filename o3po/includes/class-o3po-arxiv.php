@@ -113,7 +113,7 @@ class O3PO_Arxiv {
             else
                 $arxiv_fetch_results .= "WARNING: Failed to fetch abstract from " . $arxiv_abs_page_url . ".\n";
 
-            $arxiv_license_urls = $x_path->query("/html/body//div[contains(@class, 'abs-license')]/a/@href");
+            $arxiv_license_urls = $x_path->query("/html/body//div[contains(@class, 'abs-license')]/a[1]/@href");
             if(isset($arxiv_license_urls[0]))
             {
                 foreach ($arxiv_license_urls as $x => $arxiv_license_url) {
@@ -178,12 +178,20 @@ class O3PO_Arxiv {
 
             $submission_history_node = $x_path->query("/html/body//div[contains(@class, 'submission-history')]")[0];
             $submission_history_version_nodes = $x_path->query("/html/body//div[contains(@class, 'submission-history')]/strong");
-            $submission_history_date_size_info_nodes = $x_path->query("/html/body//div[contains(@class, 'submission-history')]/strong/following-sibling::text()");
+            $submission_history_date_size_info_nodes = $x_path->query("/html/body//div[contains(@class, 'submission-history')]/strong/following-sibling::text()[normalize-space()]");
+
+            if(count($submission_history_version_nodes) != count($submission_history_date_size_info_nodes))
+                return new WP_Error('exception', "lengths do not match! " . json_encode($submission_history_version_nodes) . " " . json_encode($submission_history_date_size_info_nodes));
 
             $submission_history = array();
             foreach($submission_history_version_nodes as $idx => $version_node)
             {
+                if(strlen(trim($submission_history_date_size_info_nodes[$idx]->nodeValue)) == 0)
+                    continue;
                 preg_match('#\s*(?<date>[^[(]*) \((?<size>[0-9,.]* [kKmMgGbB]*)\)#u', $submission_history_date_size_info_nodes[$idx]->nodeValue, $match);
+
+                if(!array_key_exists('date', $match) || !array_key_exists('size', $match))
+                    return new WP_Error('exception', "ERROR: did not find date in match " . json_encode($match) . " from " . $submission_history_date_size_info_nodes[$idx]->nodeValue . " with id" . $idx . " history so far is: " . json_encode($submission_history));
 
                 $submission_history[mb_substr($version_node->nodeValue, 1, -1)] = array(
                     'date' => strtotime($match['date']),
@@ -191,6 +199,7 @@ class O3PO_Arxiv {
                     'comment' => '', # we currently only fetch and add the comment of the latest version below
                                                                                         );
             }
+            # return new WP_Error('exception', "exception for debugging" . json_encode($submission_history));
 
             $comments_node = $x_path->query("/html/body//div[contains(@class, 'metatable')]//td[contains(@class, 'comments')]")[0];
             if($comments_node)
@@ -279,7 +288,10 @@ class O3PO_Arxiv {
             $arxiv_submission_history = $x_path->query("(/html/body//div[@class='submission-history']/b[last()]/following-sibling::text() | /html/body//div[@class='submission-history']/strong[last()]/following-sibling::text())");
             foreach($arxiv_submission_history as $entry){
                 $date_info = $entry->nodeValue;
-                preg_match('#[0-9]+ [A-Z][a-z]{2} [0-9]{4} [:0-9]+ [A-Z]+ #u', $date_info, $date);
+                if(preg_match('#[0-9]+ [A-Z][a-z]{2} [0-9]{4} [:0-9]+ [A-Z]+ #u', $date_info, $date) !== 1)
+                    $date = -1;
+                if($date === -1)
+                    continue;
                 $date = strtotime(trim($date[0]));
             }
 
