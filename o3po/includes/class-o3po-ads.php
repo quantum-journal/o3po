@@ -43,7 +43,7 @@ class O3PO_Ads {
             return array();
 
         $eprint_without_version = preg_replace('#v[0-9]+$#u', '', $eprint);
-        $headers = array( 'Authorization' => 'Bearer:' . $api_token );
+        $headers = array( 'Authorization' => 'Bearer ' . $api_token );
 
         $url = $ads_api_search_url . '?q=' . 'arxiv:' . urlencode($eprint_without_version) . '&fl=' . 'citation';
         $response = get_transient('get_ads_cited_by_json_' . $url);
@@ -150,7 +150,7 @@ class O3PO_Ads {
                 $url = static::bibcodes_to_query_url($ads_api_search_url, $bibcodes, $max_number_of_citations);
                 $response = get_transient('get_ads_cited_by_json_' . $url);
                 if(empty($response)) {
-                    $headers = array( 'Authorization' => 'Bearer:' . $api_token );
+                    $headers = array( 'Authorization' => 'Bearer ' . $api_token );
                     $response = wp_remote_get($url, array('headers' => $headers, 'timeout' => $timeout));
                     if(is_wp_error($response))
                         return $response;
