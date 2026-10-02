@@ -8,11 +8,14 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
     private $editor_uuid = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
     private $former_editor_uuid = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
     private $coordinator_uuid = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+    private $original_settings;
+    private $original_query;
 
     private function configure_people() {
-        O3PO_SettingsTest::get_settings();
-
         global $options;
+        $this->original_settings = $options['o3po-settings'];
+        $this->original_query = get_global_query();
+        O3PO_SettingsTest::get_settings();
         $options['o3po-settings'] = array_merge($options['o3po-settings'], array(
             'person_first_names' => array('Ada', 'Grace', 'Katherine'),
             'person_last_names' => array('Lovelace', 'Hopper', 'Johnson'),
@@ -25,6 +28,16 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
             'person_extra' => array('Editor in chief', '', ''),
             'person_uuidv4' => array($this->editor_uuid, $this->former_editor_uuid, $this->coordinator_uuid),
         ));
+    }
+
+    protected function tearDown(): void {
+        if(isset($this->original_settings))
+        {
+            global $options;
+            $options['o3po-settings'] = $this->original_settings;
+            set_global_query($this->original_query);
+        }
+        parent::tearDown();
     }
 
     public function test_editor_names_link_to_profile_pages_including_former_editors() {
@@ -47,6 +60,11 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         global $wp_query;
         $this->assertSame($this->former_editor_uuid, $wp_query->query_vars['editor_profile_uuid']);
         $this->assertTrue($wp_query->query_vars['editor_profile_add_fake_post']);
+
+        $posts = O3PO_PeopleShortcodes::add_fake_editor_post_to_query(array());
+        $this->assertCount(1, $posts);
+        $this->assertSame('page', $posts[0]->post_type);
+        $this->assertSame('page.php', O3PO_PeopleShortcodes::editor_profile_template('index.php'));
     }
 
     public function test_editor_endpoint_uses_wordpress_404_for_unknown_or_non_editor_uuid() {

@@ -445,6 +445,27 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
     }
 
         /**
+         * Use the active theme's page template for editor profiles.
+         *
+         * To be added to the 'template_include' filter.
+         *
+         * @since  0.4.4
+         * @access public
+         * @param  string $template The template that would otherwise be used.
+         * @return string The page template for editor profiles.
+         */
+    public static function editor_profile_template($template) {
+
+        global $wp_query;
+
+        if(!isset($wp_query->query_vars['editor_profile_add_fake_post']))
+            return $template;
+
+        $page_template = locate_template(array('page.php'));
+        return !empty($page_template) ? $page_template : $template;
+    }
+
+        /**
          * Render the editor profile at the start of the page template loop.
          *
          * To be added to the 'loop_start' action.
