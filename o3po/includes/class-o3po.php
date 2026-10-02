@@ -438,6 +438,10 @@ class O3PO {
             $this->loader->add_filter('template_include', $this->secondary_publication_type, 'use_page_template');
 
         $this->loader->add_action('init', 'O3PO_PeopleShortcodes', 'add_shortcodes');
+        $this->loader->add_action('init', 'O3PO_PeopleShortcodes', 'add_editor_endpoint');
+        $this->loader->add_action('parse_request', 'O3PO_PeopleShortcodes', 'handle_editor_endpoint_request');
+        $this->loader->add_filter('the_posts', 'O3PO_PeopleShortcodes', 'add_fake_editor_post_to_query');
+        $this->loader->add_action('loop_start', 'O3PO_PeopleShortcodes', 'editor_profile_at_loop_start');
         $this->loader->add_action('template_redirect', $this->secondary_publication_type, 'handle_404_errors');
 
 	}
