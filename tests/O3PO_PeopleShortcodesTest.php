@@ -30,7 +30,7 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
     public function test_editor_names_link_to_profile_pages_including_former_editors() {
         $this->configure_people();
 
-        $html = O3PO_PeopleShortcodes::persons_ul_shortcode(array(), null, 'persons-ul');
+        $html = O3PO_PeopleShortcodes::persons_ul_shortcode(array('former' => 'True'), null, 'persons-ul');
 
         $this->assertStringContains('href="https://foo.bar.com/editor/' . $this->editor_uuid . '/"', $html);
         $this->assertStringContains('href="https://foo.bar.com/editor/' . $this->former_editor_uuid . '/"', $html);
@@ -72,7 +72,7 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $this->assertValidHTMLFragment($html);
         $this->assertStringContains('Grace Hopper', $html);
         $this->assertStringContains('Navy', $html);
-        $this->assertStringContains('Until 2020', $html);
+        $this->assertStringContains('2015–2020', $html);
         $this->assertStringContains('https://grace.example', $html);
     }
 }

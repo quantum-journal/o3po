@@ -470,21 +470,21 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
         if(!empty($editor['until_year']))
             $service = (!empty($service) ? $editor['since_year'] . '–' : 'Until ') . $editor['until_year'];
 
-        echo '<div class="editor-profile">';
-        echo '<h1>' . esc_html($editor_name) . '</h1>';
-        echo '<dl>';
-        echo '<dt>Role</dt><dd>' . esc_html(ucwords($editor['role'])) . '</dd>';
+        echo '<div class="entry-header editor-profile">';
+        echo '<h1 class="entry-title title citation_title">' . esc_html($editor_name) . '</h1>';
+        echo '<p class="authors citation_author">' . esc_html(ucwords($editor['role'])) . '</p>';
+        echo '<table class="meta-data-table">';
         if(!empty($editor['affiliation']))
-            echo '<dt>Affiliation</dt><dd>' . esc_html($editor['affiliation']) . '</dd>';
+            echo '<tr><td>Affiliation:</td><td>' . esc_html($editor['affiliation']) . '</td></tr>';
         if(!empty($editor['country']))
-            echo '<dt>Country</dt><dd>' . esc_html($editor['country']) . '</dd>';
+            echo '<tr><td>Country:</td><td>' . esc_html($editor['country']) . '</td></tr>';
         if(!empty($service))
-            echo '<dt>Service</dt><dd>' . esc_html($service) . '</dd>';
+            echo '<tr><td>Service:</td><td>' . esc_html($service) . '</td></tr>';
         if(!empty($editor['extra']))
-            echo '<dt>Additional information</dt><dd>' . esc_html($editor['extra']) . '</dd>';
+            echo '<tr><td>Additional information:</td><td>' . esc_html($editor['extra']) . '</td></tr>';
         if(!empty($editor['url']))
-            echo '<dt>Website</dt><dd><a href="' . esc_url($editor['url']) . '" target="_blank" rel="noopener noreferrer">' . esc_html($editor['url']) . '</a></dd>';
-        echo '</dl>';
+            echo '<tr><td>Website:</td><td><a href="' . esc_url($editor['url']) . '" target="_blank" rel="noopener noreferrer">' . esc_html($editor['url']) . '</a></td></tr>';
+        echo '</table>';
         echo '</div>';
 
     }
