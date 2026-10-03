@@ -429,6 +429,8 @@ class WP_Query
                 $include_post = true;
                 foreach($array as $key => $value)
                 {
+                    if(in_array($key, array('fields', 'no_found_rows', 'update_post_term_cache'), true))
+                        continue;
                     if($key === 'meta_key')
                         continue;
                     if($key === 'meta_value')
@@ -952,7 +954,13 @@ function wp_mail( $to, $subject, $body, $headers, $attach=null) {
 }
 
 
-function delete_transient() {}
+global $deleted_transients;
+$deleted_transients = array();
+function delete_transient( $transient ) {
+    global $deleted_transients;
+
+    $deleted_transients[] = $transient;
+}
 
 global $get_transient_returns;
 $get_transient_returns = false;

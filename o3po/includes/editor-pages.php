@@ -93,12 +93,17 @@ class O3PO_EditorPages {
             'posts_per_page' => -1,
             'meta_key' => $publication_type . '_handling_editor_uuidv4',
             'meta_value' => $uuidv4,
+            'fields' => 'ids',
+            'no_found_rows' => true,
+            'update_post_term_cache' => false,
         ));
 
         foreach($query->posts as $post_id => $post)
         {
             if(is_object($post))
                 $post_id = $post->ID;
+            elseif(is_numeric($post))
+                $post_id = $post;
 
             $papers[] = array(
                 'title' => get_the_title($post_id),
@@ -109,6 +114,28 @@ class O3PO_EditorPages {
         set_transient($transient, $papers, $refresh_seconds);
 
         return $papers;
+    }
+
+        /**
+         * Invalidate cached editor paper lists when a primary publication is saved.
+         *
+         * To be added to the 'save_post' action.
+         *
+         * @since  0.4.4
+         * @access public
+         * @param  int $post_id The saved post ID.
+         */
+    public static function invalidate_handled_papers_cache($post_id, $post=null) {
+
+        $settings = O3PO_Settings::instance();
+        $post_type = is_object($post) ? $post->post_type : get_post_type($post_id);
+        if($post_type !== $settings->get_field_value('primary_publication_type_name'))
+            return;
+
+        foreach(O3PO_PeopleShortcodes::get_person_data() as $person)
+            if($person['role'] === 'editor' and !empty($person['uuidv4']))
+                delete_transient('o3po_editor_handled_papers_' . $person['uuidv4']);
+
     }
 
         /**
@@ -191,7 +218,7 @@ class O3PO_EditorPages {
         if(!empty($editor['since_year']))
             $service = ($current_year >= $editor['since_year'] ? 'Since ' : 'Starting in ') . $editor['since_year'];
         if(!empty($editor['until_year']))
-            $service = (!empty($service) ? $editor['since_year'] . '–' : 'Until ') . $editor['until_year'];
+            $service = (!empty($editor['since_year']) ? $editor['since_year'] . '–' : 'Until ') . $editor['until_year'];
 
         echo '<div class="entry-header editor-profile">';
         echo '<h1 class="entry-title title citation_title">' . esc_html($editor_name) . '</h1>';

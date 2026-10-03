@@ -448,6 +448,8 @@ class O3PO {
         $this->loader->add_filter('the_posts', 'O3PO_EditorPages', 'add_fake_editor_post_to_query');
         $this->loader->add_filter('template_include', 'O3PO_EditorPages', 'editor_profile_template');
         $this->loader->add_action('loop_start', 'O3PO_EditorPages', 'editor_profile_at_loop_start');
+        $this->loader->add_action('save_post', 'O3PO_EditorPages', 'invalidate_handled_papers_cache');
+        $this->loader->add_action('deleted_post', 'O3PO_EditorPages', 'invalidate_handled_papers_cache', 10, 2);
         $this->loader->add_action('template_redirect', $this->secondary_publication_type, 'handle_404_errors');
 
 	}

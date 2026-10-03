@@ -144,4 +144,19 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $this->assertStringNotContains('Draft paper', $html);
         $this->assertStringNotContains('Another editor paper', $html);
     }
+
+    public function test_saving_a_primary_paper_invalidates_editor_paper_caches() {
+        $this->configure_people();
+        global $posts, $deleted_transients;
+        $paper_id = 990004;
+        $this->original_papers[$paper_id] = isset($posts[$paper_id]) ? $posts[$paper_id] : null;
+        $posts[$paper_id] = array('post_type' => 'paper');
+        $deleted_transients = array();
+
+        O3PO_EditorPages::invalidate_handled_papers_cache($paper_id);
+
+        $this->assertContains('o3po_editor_handled_papers_' . $this->editor_uuid, $deleted_transients);
+        $this->assertContains('o3po_editor_handled_papers_' . $this->former_editor_uuid, $deleted_transients);
+        $this->assertCount(2, $deleted_transients);
+    }
 }
