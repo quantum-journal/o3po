@@ -69,6 +69,49 @@ class O3PO_EditorPages {
     }
 
         /**
+         * Get published papers handled by an editor, refreshing the transient periodically.
+         *
+         * @since  0.4.4
+         * @access private
+         * @param  string $uuidv4 The editor UUID.
+         * @return array List of published paper titles and permalinks.
+         */
+    private static function get_handled_papers($uuidv4) {
+
+        $transient = 'o3po_editor_handled_papers_' . $uuidv4;
+        $papers = get_transient($transient);
+        if(false !== $papers)
+            return $papers;
+
+        $settings = O3PO_Settings::instance();
+        $refresh_seconds = max(1, (int)$settings->get_field_value('cited_by_refresh_seconds'));
+        $publication_type = $settings->get_field_value('primary_publication_type_name');
+        $papers = array();
+        $query = new WP_Query(array(
+            'post_type' => $publication_type,
+            'post_status' => 'publish',
+            'posts_per_page' => -1,
+            'meta_key' => $publication_type . '_handling_editor_uuidv4',
+            'meta_value' => $uuidv4,
+        ));
+
+        foreach($query->posts as $post_id => $post)
+        {
+            if(is_object($post))
+                $post_id = $post->ID;
+
+            $papers[] = array(
+                'title' => get_the_title($post_id),
+                'url' => get_permalink($post_id),
+            );
+        }
+
+        set_transient($transient, $papers, $refresh_seconds);
+
+        return $papers;
+    }
+
+        /**
          * Add a fake page post so editor profiles use the active theme's page template.
          *
          * To be added to the 'the_posts' filter.
@@ -165,6 +208,20 @@ class O3PO_EditorPages {
         if(!empty($editor['url']))
             echo '<tr><td>Website:</td><td><a href="' . esc_url($editor['url']) . '" target="_blank" rel="noopener noreferrer">' . esc_html($editor['url']) . '</a></td></tr>';
         echo '</table>';
+        echo '</div>';
+
+        $handled_papers = static::get_handled_papers($editor['uuidv4']);
+        echo '<div class="entry-content editor-handled-papers">';
+        echo '<h3 class="references additional-info">Published papers handled</h3>';
+        if(!empty($handled_papers))
+        {
+            echo '<ul>';
+            foreach($handled_papers as $paper)
+                echo '<li><a href="' . esc_url($paper['url']) . '">' . esc_html($paper['title']) . '</a></li>';
+            echo '</ul>';
+        }
+        else
+            echo '<p>No published papers are currently listed.</p>';
         echo '</div>';
 
     }

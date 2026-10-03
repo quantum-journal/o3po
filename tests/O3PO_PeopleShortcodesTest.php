@@ -11,6 +11,8 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
     private $coordinator_uuid = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
     private $original_settings;
     private $original_query;
+    private $original_papers;
+    private $paper_ids = array(990001, 990002, 990003);
 
     private function configure_people() {
         global $options;
@@ -37,6 +39,15 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
             global $options;
             $options['o3po-settings'] = $this->original_settings;
             set_global_query($this->original_query);
+        }
+        if(isset($this->original_papers))
+        {
+            global $posts;
+            foreach($this->original_papers as $paper_id => $post)
+                if(null === $post)
+                    unset($posts[$paper_id]);
+                else
+                    $posts[$paper_id] = $post;
         }
         parent::tearDown();
     }
@@ -93,5 +104,44 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $this->assertStringContains('Navy', $html);
         $this->assertStringContains('2015–2020', $html);
         $this->assertStringContains('https://grace.example', $html);
+    }
+
+    public function test_editor_profile_lists_only_published_papers_handled_by_that_editor() {
+        $this->configure_people();
+        global $posts;
+        foreach($this->paper_ids as $paper_id)
+            $this->original_papers[$paper_id] = isset($posts[$paper_id]) ? $posts[$paper_id] : null;
+
+        $posts[$this->paper_ids[0]] = array(
+            'post_type' => 'paper',
+            'post_status' => 'publish',
+            'post_title' => 'Handled paper',
+            'permalink' => 'https://foo.bar.com/papers/handled-paper/',
+            'meta' => array('paper_handling_editor_uuidv4' => $this->former_editor_uuid),
+        );
+        $posts[$this->paper_ids[1]] = array(
+            'post_type' => 'paper',
+            'post_status' => 'draft',
+            'post_title' => 'Draft paper',
+            'permalink' => 'https://foo.bar.com/papers/draft-paper/',
+            'meta' => array('paper_handling_editor_uuidv4' => $this->former_editor_uuid),
+        );
+        $posts[$this->paper_ids[2]] = array(
+            'post_type' => 'paper',
+            'post_status' => 'publish',
+            'post_title' => 'Another editor paper',
+            'permalink' => 'https://foo.bar.com/papers/another-editor-paper/',
+            'meta' => array('paper_handling_editor_uuidv4' => $this->editor_uuid),
+        );
+
+        $query = new WP_Query(null, array('editor_profile_uuid' => $this->former_editor_uuid));
+        ob_start();
+        O3PO_EditorPages::editor_profile_at_loop_start($query);
+        $html = ob_get_clean();
+
+        $this->assertStringContains('Handled paper', $html);
+        $this->assertStringContains('https://foo.bar.com/papers/handled-paper/', $html);
+        $this->assertStringNotContains('Draft paper', $html);
+        $this->assertStringNotContains('Another editor paper', $html);
     }
 }

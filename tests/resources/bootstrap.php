@@ -429,6 +429,19 @@ class WP_Query
                 $include_post = true;
                 foreach($array as $key => $value)
                 {
+                    if($key === 'meta_key')
+                        continue;
+                    if($key === 'meta_value')
+                    {
+                        $meta_key = $array['meta_key'];
+                        if(!isset($posts[$id]['meta'][$meta_key]) or $posts[$id]['meta'][$meta_key] != $value)
+                        {
+                            $include_post = false;
+                            break;
+                        }
+                        continue;
+                    }
+
                     if(!is_array($value))
                         $value = array($value);
 
