@@ -466,6 +466,8 @@ class WP_Query
 
         $this->post_count = count($this->posts);
         $this->found_posts = $this->post_count;
+        if(isset($array['fields']) and $array['fields'] === 'ids')
+            $this->posts = array_keys($this->posts);
     }
 
     function get($key) {

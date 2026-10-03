@@ -98,13 +98,8 @@ class O3PO_EditorPages {
             'update_post_term_cache' => false,
         ));
 
-        foreach($query->posts as $post_id => $post)
+        foreach($query->posts as $post_id)
         {
-            if(is_object($post))
-                $post_id = $post->ID;
-            elseif(is_numeric($post))
-                $post_id = $post;
-
             $papers[] = array(
                 'title' => get_the_title($post_id),
                 'url' => get_permalink($post_id),
@@ -124,6 +119,7 @@ class O3PO_EditorPages {
          * @since  0.4.4
          * @access public
          * @param  int $post_id The saved post ID.
+         * @param  WP_Post|null $post The saved post, if provided by the action.
          */
     public static function invalidate_handled_papers_cache($post_id, $post=null) {
 
@@ -213,12 +209,12 @@ class O3PO_EditorPages {
             return;
 
         $editor_name = trim($editor['first_names'] . ' ' . $editor['last_names']);
-        $current_year = date('Y');
+        $current_year = (int)date('Y');
         $service = '';
         if(!empty($editor['since_year']))
-            $service = ($current_year >= $editor['since_year'] ? 'Since ' : 'Starting in ') . $editor['since_year'];
+            $service = ($current_year >= (int)$editor['since_year'] ? 'Since ' : 'Starting in ') . (int)$editor['since_year'];
         if(!empty($editor['until_year']))
-            $service = (!empty($editor['since_year']) ? $editor['since_year'] . '–' : 'Until ') . $editor['until_year'];
+            $service = (!empty($editor['since_year']) ? (int)$editor['since_year'] . '–' : 'Until ') . (int)$editor['until_year'];
 
         echo '<div class="entry-header editor-profile">';
         echo '<h1 class="entry-title title citation_title">' . esc_html($editor_name) . '</h1>';
