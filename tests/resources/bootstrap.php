@@ -393,6 +393,11 @@ class WP_Query
 
     function __construct( $input=null, $query_vars=array() ) {
         global $posts;
+        // Used to assert that transient cache hits do not construct another WP_Query.
+        global $wp_query_constructor_count;
+        if(!isset($wp_query_constructor_count))
+            $wp_query_constructor_count = 0;
+        $wp_query_constructor_count++;
 
         $this->query = $input;
         $this->query_vars = $query_vars;
@@ -429,6 +434,21 @@ class WP_Query
                 $include_post = true;
                 foreach($array as $key => $value)
                 {
+                    if(in_array($key, array('fields', 'no_found_rows', 'update_post_term_cache'), true))
+                        continue;
+                    if($key === 'meta_key')
+                        continue;
+                    if($key === 'meta_value')
+                    {
+                        $meta_key = $array['meta_key'];
+                        if(!isset($posts[$id]['meta'][$meta_key]) or $posts[$id]['meta'][$meta_key] != $value)
+                        {
+                            $include_post = false;
+                            break;
+                        }
+                        continue;
+                    }
+
                     if(!is_array($value))
                         $value = array($value);
 
@@ -451,6 +471,8 @@ class WP_Query
 
         $this->post_count = count($this->posts);
         $this->found_posts = $this->post_count;
+        if(isset($array['fields']) and $array['fields'] === 'ids')
+            $this->posts = array_keys($this->posts);
     }
 
     function get($key) {
@@ -939,7 +961,13 @@ function wp_mail( $to, $subject, $body, $headers, $attach=null) {
 }
 
 
-function delete_transient() {}
+global $deleted_transients;
+$deleted_transients = array();
+function delete_transient( $transient ) {
+    global $deleted_transients;
+
+    $deleted_transients[] = $transient;
+}
 
 global $get_transient_returns;
 $get_transient_returns = false;
@@ -949,7 +977,12 @@ function get_transient( $transient ) {
     return $get_transient_returns;
 }
 
-function set_transient( $transient, $value, $expiration=0 ) {}
+global $set_transient_calls;
+$set_transient_calls = array();
+function set_transient( $transient, $value, $expiration=0 ) {
+    global $set_transient_calls;
+    $set_transient_calls[] = array($transient, $value, $expiration);
+}
 
 function wp_remote_get( $url, $args=array() ) {
         //return http_get( $url, $args );
@@ -1019,12 +1052,18 @@ function current_user_can() {
     return true;
 }
 
-function wp_is_post_autosave() {
-    return false;
+global $autosave_post_id;
+$autosave_post_id = null;
+function wp_is_post_autosave( $post_id ) {
+    global $autosave_post_id;
+    return $post_id === $autosave_post_id ? $post_id : false;
 }
 
-function wp_is_post_revision() {
-    return false;
+global $revision_post_id;
+$revision_post_id = null;
+function wp_is_post_revision( $post_id ) {
+    global $revision_post_id;
+    return $post_id === $revision_post_id ? $post_id : false;
 }
 
 function remove_action() {}
