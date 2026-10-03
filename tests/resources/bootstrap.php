@@ -393,6 +393,10 @@ class WP_Query
 
     function __construct( $input=null, $query_vars=array() ) {
         global $posts;
+        global $wp_query_constructor_count;
+        if(!isset($wp_query_constructor_count))
+            $wp_query_constructor_count = 0;
+        $wp_query_constructor_count++;
 
         $this->query = $input;
         $this->query_vars = $query_vars;
@@ -972,7 +976,12 @@ function get_transient( $transient ) {
     return $get_transient_returns;
 }
 
-function set_transient( $transient, $value, $expiration=0 ) {}
+global $set_transient_calls;
+$set_transient_calls = array();
+function set_transient( $transient, $value, $expiration=0 ) {
+    global $set_transient_calls;
+    $set_transient_calls[] = array($transient, $value, $expiration);
+}
 
 function wp_remote_get( $url, $args=array() ) {
         //return http_get( $url, $args );
@@ -1042,12 +1051,18 @@ function current_user_can() {
     return true;
 }
 
-function wp_is_post_autosave() {
-    return false;
+global $autosave_post_id;
+$autosave_post_id = null;
+function wp_is_post_autosave( $post_id ) {
+    global $autosave_post_id;
+    return $post_id === $autosave_post_id ? $post_id : false;
 }
 
-function wp_is_post_revision() {
-    return false;
+global $revision_post_id;
+$revision_post_id = null;
+function wp_is_post_revision( $post_id ) {
+    global $revision_post_id;
+    return $post_id === $revision_post_id ? $post_id : false;
 }
 
 function remove_action() {}

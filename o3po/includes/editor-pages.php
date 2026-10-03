@@ -112,9 +112,9 @@ class O3PO_EditorPages {
     }
 
         /**
-         * Invalidate cached editor paper lists when a primary publication is saved.
+         * Invalidate the cached paper list for a primary publication's handling editor.
          *
-         * To be added to the 'save_post' action.
+         * To be added to the 'save_post' and 'before_delete_post' actions.
          *
          * @since  0.4.4
          * @access public
@@ -123,14 +123,30 @@ class O3PO_EditorPages {
          */
     public static function invalidate_handled_papers_cache($post_id, $post=null) {
 
+        if(wp_is_post_revision($post_id) or wp_is_post_autosave($post_id))
+            return;
+
         $settings = O3PO_Settings::instance();
         $post_type = is_object($post) ? $post->post_type : get_post_type($post_id);
         if($post_type !== $settings->get_field_value('primary_publication_type_name'))
             return;
 
-        foreach(O3PO_PeopleShortcodes::get_person_data() as $person)
-            if($person['role'] === 'editor' and !empty($person['uuidv4']))
-                delete_transient('o3po_editor_handled_papers_' . $person['uuidv4']);
+        $uuidv4 = get_post_meta($post_id, $post_type . '_handling_editor_uuidv4', true);
+        static::invalidate_editor_papers_cache($uuidv4);
+
+    }
+
+        /**
+         * Invalidate the cached paper list for one editor.
+         *
+         * @since  0.4.4
+         * @access public
+         * @param  string $uuidv4 The editor UUID.
+         */
+    public static function invalidate_editor_papers_cache($uuidv4) {
+
+        if(!empty($uuidv4))
+            delete_transient('o3po_editor_handled_papers_' . $uuidv4);
 
     }
 

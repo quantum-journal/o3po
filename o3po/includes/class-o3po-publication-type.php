@@ -525,6 +525,10 @@ abstract class O3PO_PublicationType {
         $new_buffer_special_text = isset($_POST[ $post_type . '_buffer_special_text' ]) ? sanitize_text_field( $_POST[ $post_type . '_buffer_special_text' ]) : '';
 
         $new_handling_editor_uuidv4 = isset( $_POST[ $post_type . '_handling_editor_uuidv4' ] ) ? sanitize_text_field( $_POST[ $post_type . '_handling_editor_uuidv4' ] ) : '';
+        $old_handling_editor_uuidv4 = get_post_meta( $post_id, $post_type . '_handling_editor_uuidv4', true );
+        $settings = O3PO_Settings::instance();
+        if($post_type === $settings->get_field_value('primary_publication_type_name') and $old_handling_editor_uuidv4 !== $new_handling_editor_uuidv4)
+            O3PO_EditorPages::invalidate_editor_papers_cache($old_handling_editor_uuidv4);
 
         $new_bbl = isset( $_POST[ $post_type . '_bbl' ] ) ? $_POST[ $post_type . '_bbl' ] : '';
         delete_transient($post_id . '_bibliography_html'); //Delete cached version of the bibliography html

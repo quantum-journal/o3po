@@ -12,12 +12,15 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
     private $original_settings;
     private $original_query;
     private $original_papers;
+    private $original_transient_result;
     private $paper_ids = array(990001, 990002, 990003);
 
     private function configure_people() {
         global $options;
         $this->original_settings = $options['o3po-settings'];
         $this->original_query = get_global_query();
+        global $get_transient_returns;
+        $this->original_transient_result = $get_transient_returns;
         O3PO_SettingsTest::get_settings();
         $options['o3po-settings'] = array_merge($options['o3po-settings'], array(
             'person_first_names' => array('Ada', 'Grace', 'Katherine'),
@@ -37,7 +40,9 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         if(isset($this->original_settings))
         {
             global $options;
+            global $get_transient_returns;
             $options['o3po-settings'] = $this->original_settings;
+            $get_transient_returns = $this->original_transient_result;
             set_global_query($this->original_query);
         }
         if(isset($this->original_papers))
@@ -143,20 +148,67 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $this->assertStringContains('https://foo.bar.com/papers/handled-paper/', $html);
         $this->assertStringNotContains('Draft paper', $html);
         $this->assertStringNotContains('Another editor paper', $html);
+        global $set_transient_calls;
+        $last_transient = end($set_transient_calls);
+        $this->assertSame('o3po_editor_handled_papers_' . $this->former_editor_uuid, $last_transient[0]);
+        $this->assertSame((int)O3PO_Settings::instance()->get_field_value('cited_by_refresh_seconds'), $last_transient[2]);
     }
 
-    public function test_saving_a_primary_paper_invalidates_editor_paper_caches() {
+    public function test_cached_editor_paper_list_is_rendered_without_querying_again() {
+        $this->configure_people();
+        global $get_transient_returns, $wp_query_constructor_count;
+        $get_transient_returns = array(array(
+            'title' => 'Cached handled paper',
+            'url' => 'https://foo.bar.com/papers/cached-paper/',
+        ));
+        $query = new WP_Query(null, array('editor_profile_uuid' => $this->former_editor_uuid));
+        $query_count = $wp_query_constructor_count;
+
+        ob_start();
+        O3PO_EditorPages::editor_profile_at_loop_start($query);
+        $html = ob_get_clean();
+
+        $this->assertStringContains('Cached handled paper', $html);
+        $this->assertSame($query_count, $wp_query_constructor_count);
+    }
+
+    public function test_saving_a_primary_paper_invalidates_only_its_editor_cache() {
         $this->configure_people();
         global $posts, $deleted_transients;
         $paper_id = 990004;
         $this->original_papers[$paper_id] = isset($posts[$paper_id]) ? $posts[$paper_id] : null;
-        $posts[$paper_id] = array('post_type' => 'paper');
+        $posts[$paper_id] = array(
+            'post_type' => 'paper',
+            'meta' => array('paper_handling_editor_uuidv4' => $this->former_editor_uuid),
+        );
         $deleted_transients = array();
 
         O3PO_EditorPages::invalidate_handled_papers_cache($paper_id);
 
-        $this->assertContains('o3po_editor_handled_papers_' . $this->editor_uuid, $deleted_transients);
         $this->assertContains('o3po_editor_handled_papers_' . $this->former_editor_uuid, $deleted_transients);
-        $this->assertCount(2, $deleted_transients);
+        $this->assertCount(1, $deleted_transients);
+    }
+
+    public function test_saving_a_primary_paper_revision_or_autosave_does_not_invalidate_editor_cache() {
+        $this->configure_people();
+        global $posts, $deleted_transients, $revision_post_id, $autosave_post_id;
+        $paper_id = 990005;
+        $this->original_papers[$paper_id] = isset($posts[$paper_id]) ? $posts[$paper_id] : null;
+        $posts[$paper_id] = array(
+            'post_type' => 'paper',
+            'meta' => array('paper_handling_editor_uuidv4' => $this->former_editor_uuid),
+        );
+        $deleted_transients = array();
+        $revision_post_id = $paper_id;
+
+        O3PO_EditorPages::invalidate_handled_papers_cache($paper_id);
+
+        $this->assertCount(0, $deleted_transients);
+        $revision_post_id = null;
+
+        $autosave_post_id = $paper_id;
+        O3PO_EditorPages::invalidate_handled_papers_cache($paper_id);
+        $this->assertCount(0, $deleted_transients);
+        $autosave_post_id = null;
     }
 }
