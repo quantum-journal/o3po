@@ -189,6 +189,24 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $this->assertCount(1, $deleted_transients);
     }
 
+    public function test_changing_publication_status_invalidates_editor_cache() {
+        $this->configure_people();
+        global $posts, $deleted_transients;
+        $paper_id = 990006;
+        $this->original_papers[$paper_id] = isset($posts[$paper_id]) ? $posts[$paper_id] : null;
+        $posts[$paper_id] = array(
+            'post_type' => 'paper',
+            'meta' => array('paper_handling_editor_uuidv4' => $this->former_editor_uuid),
+        );
+        $deleted_transients = array();
+
+        O3PO_EditorPages::invalidate_handled_papers_on_status_transition('trash', 'publish', new WP_Post($paper_id, 'paper'));
+
+        $this->assertSame(array('o3po_editor_handled_papers_' . $this->former_editor_uuid), $deleted_transients);
+        O3PO_EditorPages::invalidate_handled_papers_on_status_transition('publish', 'publish', new WP_Post($paper_id, 'paper'));
+        $this->assertCount(1, $deleted_transients);
+    }
+
     public function test_changing_handling_editor_invalidates_old_and_new_editor_caches() {
         $this->configure_people();
         global $deleted_transients;

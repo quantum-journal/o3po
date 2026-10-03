@@ -450,6 +450,7 @@ class O3PO {
         $this->loader->add_action('loop_start', 'O3PO_EditorPages', 'editor_profile_at_loop_start');
         $this->loader->add_action('save_post', 'O3PO_EditorPages', 'invalidate_handled_papers_cache', 20, 2);
         $this->loader->add_action('before_delete_post', 'O3PO_EditorPages', 'invalidate_handled_papers_cache', 10, 2);
+        $this->loader->add_action('transition_post_status', 'O3PO_EditorPages', 'invalidate_handled_papers_on_status_transition', 10, 3);
         $this->loader->add_action('template_redirect', $this->secondary_publication_type, 'handle_404_errors');
 
 	}

@@ -8,6 +8,7 @@ class O3PO_EditorPages {
      * Editor paper lists deliberately share the cited-by refresh schedule.
      */
     const HANDLED_PAPERS_REFRESH_SETTING = 'cited_by_refresh_seconds';
+    const HANDLED_PAPERS_TRANSIENT_PREFIX = 'o3po_editor_handled_papers_';
 
         /**
          * Add the /editor/ endpoint for editor profile pages.
@@ -83,7 +84,7 @@ class O3PO_EditorPages {
          */
     private static function get_handled_papers($uuidv4) {
 
-        $transient = 'o3po_editor_handled_papers_' . $uuidv4;
+        $transient = static::HANDLED_PAPERS_TRANSIENT_PREFIX . $uuidv4;
         $papers = get_transient($transient);
         if(false !== $papers)
             return $papers;
@@ -142,6 +143,26 @@ class O3PO_EditorPages {
     }
 
         /**
+         * Invalidate an editor's cached paper list when publication status changes.
+         *
+         * To be added to the 'transition_post_status' action.
+         *
+         * @since  0.4.4
+         * @access public
+         * @param  string  $new_status The new post status.
+         * @param  string  $old_status The old post status.
+         * @param  WP_Post $post The post whose status changed.
+         */
+    public static function invalidate_handled_papers_on_status_transition($new_status, $old_status, $post) {
+
+        if($new_status === $old_status or !is_object($post) or empty($post->ID))
+            return;
+
+        static::invalidate_handled_papers_cache($post->ID, $post);
+
+    }
+
+        /**
          * Invalidate the cached paper list for one editor.
          *
          * @since  0.4.4
@@ -151,7 +172,7 @@ class O3PO_EditorPages {
     public static function invalidate_editor_papers_cache($uuidv4) {
 
         if(!empty($uuidv4))
-            delete_transient('o3po_editor_handled_papers_' . $uuidv4);
+            delete_transient(static::HANDLED_PAPERS_TRANSIENT_PREFIX . $uuidv4);
 
     }
 
