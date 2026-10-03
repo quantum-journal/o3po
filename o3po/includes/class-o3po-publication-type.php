@@ -25,7 +25,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-latex
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-utility.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-shortcode-template.php';
-require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-people-shortcodes.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/people.php';
 
 
 /**
@@ -1739,8 +1739,8 @@ abstract class O3PO_PublicationType {
         $handling_editor_uuidv4 = get_post_meta( $post_id, $post_type . '_handling_editor_uuidv4', true );
 
         $current_year = date('Y');
-        $person_data = O3PO_PeopleShortcodes::get_person_data();
-        uasort($person_data, array('O3PO_PeopleShortcodes', 'sort_by_first_names'));
+        $person_data = O3PO_People::get_person_data();
+        uasort($person_data, array('O3PO_People', 'sort_by_first_names'));
 
 		echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_handling_editor_uuidv4" class="' . $post_type .'_handling_editor_uuidv4_label">' . 'Handling Editor' . '</label></th>';
@@ -1773,7 +1773,7 @@ abstract class O3PO_PublicationType {
         if(empty($handling_editor_uuidv4))
             return '';
 
-        $handling_editor_name = O3PO_PeopleShortcodes::get_formated_name_from_uuidv4($handling_editor_uuidv4);
+        $handling_editor_name = O3PO_People::get_formated_name_from_uuidv4($handling_editor_uuidv4);
 
         return '<a href="/people/#person-' . esc_attr($handling_editor_uuidv4) . '">' . esc_html($handling_editor_name) . '</a>';
     }

@@ -393,6 +393,7 @@ class WP_Query
 
     function __construct( $input=null, $query_vars=array() ) {
         global $posts;
+        // Used to assert that transient cache hits do not construct another WP_Query.
         global $wp_query_constructor_count;
         if(!isset($wp_query_constructor_count))
             $wp_query_constructor_count = 0;

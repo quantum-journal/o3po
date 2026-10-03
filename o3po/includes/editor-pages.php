@@ -1,6 +1,6 @@
 <?php
 
-require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-people-shortcodes.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/people.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-publication-type.php';
 
 class O3PO_EditorPages {
@@ -8,9 +8,9 @@ class O3PO_EditorPages {
     private static $handling_editor_uuid_before_meta_change = array();
 
     /**
-     * Editor paper lists deliberately share the cited-by refresh schedule.
+     * Editor paper lists refresh every 12 hours, matching the default cited-by interval.
      */
-    const HANDLED_PAPERS_REFRESH_SETTING = 'cited_by_refresh_seconds';
+    const HANDLED_PAPERS_REFRESH_SECONDS = 43200;
     const HANDLED_PAPERS_TRANSIENT_PREFIX = 'o3po_editor_handled_papers_';
 
         /**
@@ -70,7 +70,7 @@ class O3PO_EditorPages {
         if(!is_string($uuidv4) or empty($uuidv4))
             return null;
 
-        foreach(O3PO_PeopleShortcodes::get_person_data() as $person)
+        foreach(O3PO_People::get_person_data() as $person)
             if($person['role'] === 'editor' and $person['uuidv4'] === $uuidv4)
                 return $person;
 
@@ -124,7 +124,6 @@ class O3PO_EditorPages {
             return $papers;
 
         $settings = O3PO_Settings::instance();
-        $refresh_seconds = max(1, (int)$settings->get_field_value(static::HANDLED_PAPERS_REFRESH_SETTING));
         $publication_type = $settings->get_field_value('primary_publication_type_name');
         $papers = array();
         $query = new WP_Query(array(
@@ -153,7 +152,7 @@ class O3PO_EditorPages {
             );
         }
 
-        set_transient($transient, $papers, $refresh_seconds);
+        set_transient($transient, $papers, static::HANDLED_PAPERS_REFRESH_SECONDS);
 
         return $papers;
     }

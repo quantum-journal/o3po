@@ -124,6 +124,8 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
 
     public function test_editor_profile_lists_only_published_papers_handled_by_that_editor() {
         $this->configure_people();
+        global $options;
+        $options['o3po-settings']['cited_by_refresh_seconds'] = 600;
         global $posts;
         foreach($this->paper_ids as $paper_id)
             $this->original_papers[$paper_id] = isset($posts[$paper_id]) ? $posts[$paper_id] : null;
@@ -169,7 +171,7 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         global $set_transient_calls;
         $last_transient = end($set_transient_calls);
         $this->assertSame('o3po_editor_handled_papers_' . $this->former_editor_uuid, $last_transient[0]);
-        $this->assertSame((int)O3PO_Settings::instance()->get_field_value('cited_by_refresh_seconds'), $last_transient[2]);
+        $this->assertSame(O3PO_EditorPages::HANDLED_PAPERS_REFRESH_SECONDS, $last_transient[2]);
     }
 
     public function test_cached_editor_paper_list_is_rendered_without_querying_again() {
