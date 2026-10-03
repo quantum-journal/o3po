@@ -189,9 +189,14 @@ class O3PO_EditorPages {
         if($post_type !== $settings->get_field_value('primary_publication_type_name') or $meta_key !== $post_type . '_handling_editor_uuidv4')
             return;
 
-        $previous_uuidv4 = isset(static::$handling_editor_uuid_before_meta_change[$post_id]) ? static::$handling_editor_uuid_before_meta_change[$post_id] : '';
+        $has_previous_uuidv4 = array_key_exists($post_id, static::$handling_editor_uuid_before_meta_change);
+        $previous_uuidv4 = $has_previous_uuidv4 ? static::$handling_editor_uuid_before_meta_change[$post_id] : '';
         unset(static::$handling_editor_uuid_before_meta_change[$post_id]);
-        static::invalidate_editor_assignment_caches($previous_uuidv4, $meta_value);
+        if($has_previous_uuidv4 and null === $previous_uuidv4)
+            return;
+
+        $current_uuidv4 = get_post_meta($post_id, $meta_key, true);
+        static::invalidate_editor_assignment_caches($previous_uuidv4, $current_uuidv4);
 
     }
 
@@ -214,21 +219,52 @@ class O3PO_EditorPages {
         if(null !== $check)
             return $check;
 
-        if(wp_is_post_revision($post_id) or wp_is_post_autosave($post_id))
+        static::capture_previous_editor_uuid($post_id, $meta_key, $meta_value, false);
+
+        return $check;
+
+    }
+
+        /**
+         * Remember the previous editor before a post-meta update.
+         *
+         * To be added to the 'update_post_metadata' filter.
+         *
+         * @since  0.4.4
+         * @access public
+         * @param  mixed  $check The short-circuit filter value.
+         * @param  int    $post_id The post ID.
+         * @param  string $meta_key The metadata key.
+         * @param  mixed  $meta_value The metadata value being saved.
+         * @param  mixed  $previous_value Additional filter arguments.
+         * @return mixed The unchanged short-circuit filter value.
+         */
+    public static function remember_editor_uuid_before_update($check, $post_id, $meta_key, $meta_value, $previous_value=null) {
+
+        if(null !== $check)
             return $check;
+
+        static::capture_previous_editor_uuid($post_id, $meta_key, $meta_value, true);
+
+        return $check;
+
+    }
+
+    private static function capture_previous_editor_uuid($post_id, $meta_key, $meta_value, $skip_unchanged) {
+
+        if(wp_is_post_revision($post_id) or wp_is_post_autosave($post_id))
+            return;
 
         $settings = O3PO_Settings::instance();
         $post_type = get_post_type($post_id);
         if($post_type === $settings->get_field_value('primary_publication_type_name') and $meta_key === $post_type . '_handling_editor_uuidv4')
         {
             $previous_uuidv4 = get_post_meta($post_id, $meta_key, true);
-            if($previous_uuidv4 === $meta_value)
-                unset(static::$handling_editor_uuid_before_meta_change[$post_id]);
+            if($skip_unchanged and $previous_uuidv4 === $meta_value)
+                static::$handling_editor_uuid_before_meta_change[$post_id] = null;
             else
                 static::$handling_editor_uuid_before_meta_change[$post_id] = $previous_uuidv4;
         }
-
-        return $check;
 
     }
 

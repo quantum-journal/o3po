@@ -386,7 +386,7 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
             if(empty($atts['role']) or $atts['role'] === $person['role'] or in_array($person['role'], preg_split('/\s*,\s*/u', $atts['role'])))
             {
 
-                $result .= '<li' . (!empty($atts['li-style']) ? ' style="' . esc_attr($atts['li-style']) : '') . (!empty($person['uuidv4']) ? ' id="person-' . esc_attr($person['uuidv4']) : '') . '">';
+                $result .= '<li' . (!empty($atts['li-style']) ? ' style="' . esc_attr($atts['li-style']) . '"' : '') . (!empty($person['uuidv4']) ? ' id="person-' . esc_attr($person['uuidv4']) . '"' : '') . '>';
 
                 $person_name = $person['first_names'] . ' ' . $person['last_names'];
                 if($atts['link'] !== 'False' and $person['role'] === 'editor' and !empty($person['uuidv4']))

@@ -218,7 +218,7 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         );
         $deleted_transients = array();
 
-        O3PO_EditorPages::remember_editor_uuid_before_meta_change(null, $paper_id, 'paper_handling_editor_uuidv4', $this->former_editor_uuid);
+        O3PO_EditorPages::remember_editor_uuid_before_update(null, $paper_id, 'paper_handling_editor_uuidv4', $this->former_editor_uuid);
         $previous_assignments = new ReflectionProperty('O3PO_EditorPages', 'handling_editor_uuid_before_meta_change');
         $previous_assignments->setAccessible(true);
         $this->assertSame($this->editor_uuid, $previous_assignments->getValue()[$paper_id]);
@@ -230,8 +230,11 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $this->assertCount(2, $deleted_transients);
         $this->assertArrayNotHasKey($paper_id, $previous_assignments->getValue());
 
-        O3PO_EditorPages::remember_editor_uuid_before_meta_change(null, $paper_id, 'paper_handling_editor_uuidv4', $this->former_editor_uuid);
+        $deleted_transients = array();
+        O3PO_EditorPages::remember_editor_uuid_before_update(null, $paper_id, 'paper_handling_editor_uuidv4', $this->former_editor_uuid);
+        O3PO_EditorPages::invalidate_handled_papers_cache_on_meta_change(1, $paper_id, 'paper_handling_editor_uuidv4', $this->former_editor_uuid);
         $this->assertArrayNotHasKey($paper_id, $previous_assignments->getValue());
+        $this->assertCount(0, $deleted_transients);
     }
 
     public function test_deleting_handling_editor_meta_invalidates_the_deleted_editors_cache() {
