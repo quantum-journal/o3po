@@ -134,14 +134,19 @@ class O3PO_EditorPages {
         if(wp_is_post_revision($post_id) or wp_is_post_autosave($post_id))
             return;
 
+        $previous_uuidv4 = isset(static::$handling_editor_uuid_before_post_update[$post_id]) ? static::$handling_editor_uuid_before_post_update[$post_id] : '';
+        unset(static::$handling_editor_uuid_before_post_update[$post_id]);
+
         $settings = O3PO_Settings::instance();
         $post_type = is_object($post) ? $post->post_type : get_post_type($post_id);
         if($post_type !== $settings->get_field_value('primary_publication_type_name'))
+        {
+            static::invalidate_editor_papers_cache($previous_uuidv4);
             return;
+        }
 
         $uuidv4 = get_post_meta($post_id, $post_type . '_handling_editor_uuidv4', true);
-        if(isset(static::$handling_editor_uuid_before_post_update[$post_id]))
-            static::invalidate_editor_papers_cache(static::$handling_editor_uuid_before_post_update[$post_id]);
+        static::invalidate_editor_papers_cache($previous_uuidv4);
         static::invalidate_editor_papers_cache($uuidv4);
 
     }
@@ -153,7 +158,7 @@ class O3PO_EditorPages {
          *
          * @since  0.4.4
          * @access public
-         * @param  int    $meta_id The post-meta ID.
+         * @param  mixed  $meta_id The post-meta ID or IDs.
          * @param  int    $post_id The post ID.
          * @param  string $meta_key The metadata key.
          * @param  string $meta_value The new or deleted metadata value.
@@ -169,11 +174,9 @@ class O3PO_EditorPages {
             return;
 
         if(isset(static::$handling_editor_uuid_before_post_update[$post_id]))
-        {
             static::invalidate_editor_papers_cache(static::$handling_editor_uuid_before_post_update[$post_id]);
-            unset(static::$handling_editor_uuid_before_post_update[$post_id]);
-        }
-        static::invalidate_editor_papers_cache($meta_value);
+        if(is_string($meta_value))
+            static::invalidate_editor_papers_cache($meta_value);
 
     }
 
@@ -230,7 +233,7 @@ class O3PO_EditorPages {
          */
     public static function invalidate_editor_papers_cache($uuidv4) {
 
-        if(!empty($uuidv4))
+        if(is_string($uuidv4) and !empty($uuidv4))
             delete_transient(static::HANDLED_PAPERS_TRANSIENT_PREFIX . $uuidv4);
 
     }
