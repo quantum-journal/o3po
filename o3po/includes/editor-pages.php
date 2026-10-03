@@ -77,6 +77,28 @@ class O3PO_EditorPages {
     }
 
         /**
+         * Format the editor's service years for display.
+         *
+         * @since  0.4.4
+         * @access private
+         * @param  string $since_year The first service year.
+         * @param  string $until_year The last service year.
+         * @param  int    $current_year The current year.
+         * @return string The formatted service period.
+         */
+    private static function format_service_period($since_year, $until_year, $current_year) {
+
+        $service = '';
+        if(!empty($since_year))
+            $service = ($current_year >= (int)$since_year ? 'Since ' : 'Starting in ') . (int)$since_year;
+        if(!empty($until_year))
+            $service = (!empty($since_year) ? (int)$since_year . '–' : 'Until ') . (int)$until_year;
+
+        return $service;
+
+    }
+
+        /**
          * Get published papers handled by an editor, refreshing the transient periodically.
          *
          * @since  0.4.4
@@ -177,6 +199,34 @@ class O3PO_EditorPages {
             static::invalidate_editor_papers_cache(static::$handling_editor_uuid_before_post_update[$post_id]);
         if(is_string($meta_value))
             static::invalidate_editor_papers_cache($meta_value);
+
+    }
+
+            /**
+             * Remember the prior handling editor before post metadata is changed.
+             *
+             * To be added to the add/update/delete post-meta filters.
+             *
+             * @since  0.4.4
+             * @access public
+             * @param  mixed  $check The short-circuit filter value.
+             * @param  int    $post_id The post ID.
+             * @param  string $meta_key The metadata key.
+             * @param  mixed  $meta_value The metadata value being saved.
+             * @param  mixed  $extra Additional filter arguments.
+             * @return mixed The unchanged short-circuit filter value.
+             */
+    public static function remember_editor_uuid_before_meta_change($check, $post_id, $meta_key, $meta_value, $extra=null) {
+
+            if(wp_is_post_revision($post_id) or wp_is_post_autosave($post_id))
+                return $check;
+
+            $settings = O3PO_Settings::instance();
+            $post_type = get_post_type($post_id);
+            if($post_type === $settings->get_field_value('primary_publication_type_name') and $meta_key === $post_type . '_handling_editor_uuidv4')
+                static::$handling_editor_uuid_before_post_update[$post_id] = get_post_meta($post_id, $meta_key, true);
+
+            return $check;
 
     }
 
@@ -330,11 +380,7 @@ class O3PO_EditorPages {
 
         $editor_name = trim($editor['first_names'] . ' ' . $editor['last_names']);
         $current_year = (int)date('Y');
-        $service = '';
-        if(!empty($editor['since_year']))
-            $service = ($current_year >= (int)$editor['since_year'] ? 'Since ' : 'Starting in ') . (int)$editor['since_year'];
-        if(!empty($editor['until_year']))
-            $service = (!empty($editor['since_year']) ? (int)$editor['since_year'] . '–' : 'Until ') . (int)$editor['until_year'];
+        $service = static::format_service_period($editor['since_year'], $editor['until_year'], $current_year);
 
         echo '<div class="entry-header editor-profile">';
         echo '<h1 class="entry-title title citation_title">' . esc_html($editor_name) . '</h1>';

@@ -218,7 +218,7 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         );
         $deleted_transients = array();
 
-        O3PO_EditorPages::remember_editor_before_post_update($paper_id, array('post_type' => 'paper'));
+        O3PO_EditorPages::remember_editor_uuid_before_meta_change(null, $paper_id, 'paper_handling_editor_uuidv4', $this->former_editor_uuid);
         $previous_assignments = new ReflectionProperty('O3PO_EditorPages', 'handling_editor_uuid_before_post_update');
         $previous_assignments->setAccessible(true);
         $this->assertSame($this->editor_uuid, $previous_assignments->getValue()[$paper_id]);
@@ -228,6 +228,24 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $this->assertContains('o3po_editor_handled_papers_' . $this->editor_uuid, $deleted_transients);
         $this->assertContains('o3po_editor_handled_papers_' . $this->former_editor_uuid, $deleted_transients);
         $this->assertCount(2, $deleted_transients);
+    }
+
+    public function test_deleting_handling_editor_meta_invalidates_the_deleted_editors_cache() {
+        $this->configure_people();
+        global $posts, $deleted_transients;
+        $paper_id = 990008;
+        $this->original_papers[$paper_id] = isset($posts[$paper_id]) ? $posts[$paper_id] : null;
+        $posts[$paper_id] = array(
+            'post_type' => 'paper',
+            'meta' => array('paper_handling_editor_uuidv4' => $this->former_editor_uuid),
+        );
+        $deleted_transients = array();
+
+        O3PO_EditorPages::remember_editor_uuid_before_meta_change(null, $paper_id, 'paper_handling_editor_uuidv4', '');
+        unset($posts[$paper_id]['meta']['paper_handling_editor_uuidv4']);
+        O3PO_EditorPages::invalidate_handled_papers_cache_on_meta_change(array(1), $paper_id, 'paper_handling_editor_uuidv4', '');
+
+        $this->assertSame(array('o3po_editor_handled_papers_' . $this->former_editor_uuid), $deleted_transients);
     }
 
     public function test_saving_a_primary_paper_revision_or_autosave_does_not_invalidate_editor_cache() {

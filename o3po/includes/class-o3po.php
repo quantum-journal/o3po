@@ -455,6 +455,9 @@ class O3PO {
         $this->loader->add_action('added_post_meta', 'O3PO_EditorPages', 'invalidate_handled_papers_cache_on_meta_change', 10, 4);
         $this->loader->add_action('updated_post_meta', 'O3PO_EditorPages', 'invalidate_handled_papers_cache_on_meta_change', 10, 4);
         $this->loader->add_action('deleted_post_meta', 'O3PO_EditorPages', 'invalidate_handled_papers_cache_on_meta_change', 10, 4);
+        $this->loader->add_filter('add_post_metadata', 'O3PO_EditorPages', 'remember_editor_uuid_before_meta_change', 10, 5);
+        $this->loader->add_filter('update_post_metadata', 'O3PO_EditorPages', 'remember_editor_uuid_before_meta_change', 10, 5);
+        $this->loader->add_filter('delete_post_metadata', 'O3PO_EditorPages', 'remember_editor_uuid_before_meta_change', 10, 5);
         $this->loader->add_action('template_redirect', $this->secondary_publication_type, 'handle_404_errors');
 
 	}
