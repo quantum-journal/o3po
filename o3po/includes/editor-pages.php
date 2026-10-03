@@ -4,6 +4,11 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-peopl
 
 class O3PO_EditorPages {
 
+    /**
+     * Editor paper lists deliberately share the cited-by refresh schedule.
+     */
+    const HANDLED_PAPERS_REFRESH_SETTING = 'cited_by_refresh_seconds';
+
         /**
          * Add the /editor/ endpoint for editor profile pages.
          *
@@ -84,7 +89,7 @@ class O3PO_EditorPages {
             return $papers;
 
         $settings = O3PO_Settings::instance();
-        $refresh_seconds = max(1, (int)$settings->get_field_value('cited_by_refresh_seconds'));
+        $refresh_seconds = max(1, (int)$settings->get_field_value(static::HANDLED_PAPERS_REFRESH_SETTING));
         $publication_type = $settings->get_field_value('primary_publication_type_name');
         $papers = array();
         $query = new WP_Query(array(
@@ -147,6 +152,22 @@ class O3PO_EditorPages {
 
         if(!empty($uuidv4))
             delete_transient('o3po_editor_handled_papers_' . $uuidv4);
+
+    }
+
+        /**
+         * Invalidate cached lists for the previous and current handling editors.
+         *
+         * @since  0.4.4
+         * @access public
+         * @param  string $old_uuidv4 The previous editor UUID.
+         * @param  string $new_uuidv4 The current editor UUID.
+         */
+    public static function invalidate_editor_assignment_caches($old_uuidv4, $new_uuidv4) {
+
+        static::invalidate_editor_papers_cache($old_uuidv4);
+        if($new_uuidv4 !== $old_uuidv4)
+            static::invalidate_editor_papers_cache($new_uuidv4);
 
     }
 

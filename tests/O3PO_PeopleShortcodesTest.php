@@ -189,6 +189,18 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $this->assertCount(1, $deleted_transients);
     }
 
+    public function test_changing_handling_editor_invalidates_old_and_new_editor_caches() {
+        $this->configure_people();
+        global $deleted_transients;
+        $deleted_transients = array();
+
+        O3PO_EditorPages::invalidate_editor_assignment_caches($this->editor_uuid, $this->former_editor_uuid);
+
+        $this->assertContains('o3po_editor_handled_papers_' . $this->editor_uuid, $deleted_transients);
+        $this->assertContains('o3po_editor_handled_papers_' . $this->former_editor_uuid, $deleted_transients);
+        $this->assertCount(2, $deleted_transients);
+    }
+
     public function test_saving_a_primary_paper_revision_or_autosave_does_not_invalidate_editor_cache() {
         $this->configure_people();
         global $posts, $deleted_transients, $revision_post_id, $autosave_post_id;
