@@ -1,7 +1,6 @@
 <?php
 
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po.php');
-require_once(dirname( __FILE__ ) . '/../o3po/includes/editor-pages.php');
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-settings.php');
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-environment.php');
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-journal.php');
@@ -1130,24 +1129,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
 
         foreach($POST_args as $key => $value)
             $_POST[ $post_type . $key ] = $value;
-        global $posts, $deleted_transients;
-        $previous_editor_uuid = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
-        $new_editor_uuid = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
-        $handling_editor_meta_key = $post_type . '_handling_editor_uuidv4';
-        $posts[$post_id]['meta'][$handling_editor_meta_key] = $previous_editor_uuid;
-        $_POST[$handling_editor_meta_key] = $new_editor_uuid;
-        $deleted_transients = array();
         $method->invokeArgs($primary_publication_type, array($post_id, new WP_Post($post_id) ));
-        $editor_transients = array_values(array_filter($deleted_transients, function($transient) {
-            return strpos($transient, O3PO_EditorPages::HANDLED_PAPERS_TRANSIENT_PREFIX) === 0;
-        }));
-        if($post_type === $primary_publication_type->get_publication_type_name())
-        {
-            $this->assertContains(O3PO_EditorPages::HANDLED_PAPERS_TRANSIENT_PREFIX . $previous_editor_uuid, $editor_transients);
-            $this->assertContains(O3PO_EditorPages::HANDLED_PAPERS_TRANSIENT_PREFIX . $new_editor_uuid, $editor_transients);
-        }
-        else
-            $this->assertCount(0, $editor_transients);
 
         $validation_result = get_post_meta( $post_id, $post_type . '_validation_result');
         foreach($expections_first as $expection)
@@ -1159,12 +1141,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         set_post_status($post_id, 'publish');
         foreach(get_all_post_metas($post_id) as $key => $value)
             $_POST[ $key ] = $value;
-        $deleted_transients = array();
         $method->invokeArgs($primary_publication_type, array($post_id, new WP_Post($post_id) ));
-        $editor_transients = array_values(array_filter($deleted_transients, function($transient) {
-            return strpos($transient, O3PO_EditorPages::HANDLED_PAPERS_TRANSIENT_PREFIX) === 0;
-        }));
-        $this->assertCount(0, $editor_transients);
 
         $validation_result = get_post_meta( $post_id, $post_type . '_validation_result');
         foreach($expections_second as $expection)

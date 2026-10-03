@@ -26,7 +26,6 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-setti
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-utility.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-shortcode-template.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-people-shortcodes.php';
-require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/editor-pages.php';
 
 
 /**
@@ -526,9 +525,6 @@ abstract class O3PO_PublicationType {
         $new_buffer_special_text = isset($_POST[ $post_type . '_buffer_special_text' ]) ? sanitize_text_field( $_POST[ $post_type . '_buffer_special_text' ]) : '';
 
         $new_handling_editor_uuidv4 = isset( $_POST[ $post_type . '_handling_editor_uuidv4' ] ) ? sanitize_text_field( $_POST[ $post_type . '_handling_editor_uuidv4' ] ) : '';
-        $settings = O3PO_Settings::instance();
-        $is_primary_publication_type = $post_type === $settings->get_field_value('primary_publication_type_name');
-        $old_handling_editor_uuidv4 = $is_primary_publication_type ? get_post_meta( $post_id, $post_type . '_handling_editor_uuidv4', true ) : '';
 
         $new_bbl = isset( $_POST[ $post_type . '_bbl' ] ) ? $_POST[ $post_type . '_bbl' ] : '';
         delete_transient($post_id . '_bibliography_html'); //Delete cached version of the bibliography html
@@ -565,8 +561,6 @@ abstract class O3PO_PublicationType {
         update_post_meta( $post_id, $post_type . '_buffer_email', $new_buffer_email ); #we keep using the buffer_email and buffer_email_xxx fields for compatibility, even though the new buffer.com interface does no longer send emails but uses the buffer.com api
         update_post_meta( $post_id, $post_type . '_buffer_special_text', $new_buffer_special_text );
         update_post_meta( $post_id, $post_type . '_handling_editor_uuidv4', $new_handling_editor_uuidv4 );
-        if($is_primary_publication_type and $old_handling_editor_uuidv4 !== $new_handling_editor_uuidv4)
-            O3PO_EditorPages::invalidate_editor_assignment_caches($old_handling_editor_uuidv4, $new_handling_editor_uuidv4);
         update_post_meta( $post_id, $post_type . '_number_award_numbers', $new_number_award_numbers );
         update_post_meta( $post_id, $post_type . '_award_numbers', $new_award_numbers );
         update_post_meta( $post_id, $post_type . '_funder_identifiers', $new_funder_identifiers );

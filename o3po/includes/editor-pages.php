@@ -4,8 +4,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-peopl
 
 class O3PO_EditorPages {
 
-    private static $handling_editor_uuid_before_post_update = array();
-    private static $post_update_in_progress = array();
+    private static $handling_editor_uuid_before_meta_change = array();
 
     /**
      * Editor paper lists deliberately share the cited-by refresh schedule.
@@ -89,13 +88,14 @@ class O3PO_EditorPages {
          */
     private static function format_service_period($since_year, $until_year, $current_year) {
 
-        $service = '';
+        if(!empty($since_year) and !empty($until_year))
+            return (int)$since_year . '–' . (int)$until_year;
         if(!empty($since_year))
-            $service = ($current_year >= (int)$since_year ? 'Since ' : 'Starting in ') . (int)$since_year;
+            return ($current_year >= (int)$since_year ? 'Since ' : 'Starting in ') . (int)$since_year;
         if(!empty($until_year))
-            $service = (!empty($since_year) ? (int)$since_year . '–' : 'Until ') . (int)$until_year;
+            return 'Until ' . (int)$until_year;
 
-        return $service;
+        return '';
 
     }
 
@@ -145,35 +145,24 @@ class O3PO_EditorPages {
         /**
          * Invalidate the cached paper list for a primary publication's handling editor.
          *
-         * To be added to the 'save_post' and 'before_delete_post' actions.
+         * To be added to the 'save_post', 'before_delete_post', and status-transition actions.
          *
          * @since  0.4.4
          * @access public
          * @param  int $post_id The saved post ID.
          * @param  WP_Post|null $post The saved post, if provided by the action.
          */
-    public static function invalidate_handled_papers_cache($post_id, $post=null, $clear_previous=true) {
+    public static function invalidate_handled_papers_cache($post_id, $post=null) {
 
         if(wp_is_post_revision($post_id) or wp_is_post_autosave($post_id))
             return;
 
-        $previous_uuidv4 = isset(static::$handling_editor_uuid_before_post_update[$post_id]) ? static::$handling_editor_uuid_before_post_update[$post_id] : '';
-        if($clear_previous)
-        {
-            unset(static::$handling_editor_uuid_before_post_update[$post_id]);
-            unset(static::$post_update_in_progress[$post_id]);
-        }
-
         $settings = O3PO_Settings::instance();
         $post_type = is_object($post) ? $post->post_type : get_post_type($post_id);
         if($post_type !== $settings->get_field_value('primary_publication_type_name'))
-        {
-            static::invalidate_editor_papers_cache($previous_uuidv4);
             return;
-        }
 
         $uuidv4 = get_post_meta($post_id, $post_type . '_handling_editor_uuidv4', true);
-        static::invalidate_editor_papers_cache($previous_uuidv4);
         static::invalidate_editor_papers_cache($uuidv4);
 
     }
@@ -188,7 +177,7 @@ class O3PO_EditorPages {
          * @param  mixed  $meta_id The post-meta ID or IDs.
          * @param  int    $post_id The post ID.
          * @param  string $meta_key The metadata key.
-         * @param  string $meta_value The new or deleted metadata value.
+         * @param  mixed  $meta_value The new or deleted metadata value.
          */
     public static function invalidate_handled_papers_cache_on_meta_change($meta_id, $post_id, $meta_key, $meta_value) {
 
@@ -200,12 +189,9 @@ class O3PO_EditorPages {
         if($post_type !== $settings->get_field_value('primary_publication_type_name') or $meta_key !== $post_type . '_handling_editor_uuidv4')
             return;
 
-        if(isset(static::$handling_editor_uuid_before_post_update[$post_id]))
-            static::invalidate_editor_papers_cache(static::$handling_editor_uuid_before_post_update[$post_id]);
-        if(empty(static::$post_update_in_progress[$post_id]))
-            unset(static::$handling_editor_uuid_before_post_update[$post_id]);
-        if(is_string($meta_value))
-            static::invalidate_editor_papers_cache($meta_value);
+        $previous_uuidv4 = isset(static::$handling_editor_uuid_before_meta_change[$post_id]) ? static::$handling_editor_uuid_before_meta_change[$post_id] : '';
+        unset(static::$handling_editor_uuid_before_meta_change[$post_id]);
+        static::invalidate_editor_assignment_caches($previous_uuidv4, $meta_value);
 
     }
 
@@ -225,40 +211,24 @@ class O3PO_EditorPages {
          */
     public static function remember_editor_uuid_before_meta_change($check, $post_id, $meta_key, $meta_value, $extra=null) {
 
+        if(null !== $check)
+            return $check;
+
         if(wp_is_post_revision($post_id) or wp_is_post_autosave($post_id))
             return $check;
 
         $settings = O3PO_Settings::instance();
         $post_type = get_post_type($post_id);
         if($post_type === $settings->get_field_value('primary_publication_type_name') and $meta_key === $post_type . '_handling_editor_uuidv4')
-            static::$handling_editor_uuid_before_post_update[$post_id] = get_post_meta($post_id, $meta_key, true);
+        {
+            $previous_uuidv4 = get_post_meta($post_id, $meta_key, true);
+            if($previous_uuidv4 === $meta_value)
+                unset(static::$handling_editor_uuid_before_meta_change[$post_id]);
+            else
+                static::$handling_editor_uuid_before_meta_change[$post_id] = $previous_uuidv4;
+        }
 
         return $check;
-
-    }
-
-        /**
-         * Preserve the assigned editor before a post update can change its metadata.
-         *
-         * To be added to the 'pre_post_update' action.
-         *
-         * @since  0.4.4
-         * @access public
-         * @param  int   $post_id The post ID.
-         * @param  array $data The post data being updated.
-         */
-    public static function remember_editor_before_post_update($post_id, $data=array()) {
-
-        if(wp_is_post_revision($post_id) or wp_is_post_autosave($post_id))
-            return;
-
-        $settings = O3PO_Settings::instance();
-        $post_type = (is_array($data) and !empty($data['post_type'])) ? $data['post_type'] : get_post_type($post_id);
-        if($post_type !== $settings->get_field_value('primary_publication_type_name'))
-            return;
-
-        static::$handling_editor_uuid_before_post_update[$post_id] = get_post_meta($post_id, $post_type . '_handling_editor_uuidv4', true);
-        static::$post_update_in_progress[$post_id] = true;
 
     }
 
@@ -278,7 +248,7 @@ class O3PO_EditorPages {
         if($new_status === $old_status or !is_object($post) or empty($post->ID))
             return;
 
-        static::invalidate_handled_papers_cache($post->ID, $post, false);
+        static::invalidate_handled_papers_cache($post->ID, $post);
 
     }
 
