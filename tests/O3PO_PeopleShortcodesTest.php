@@ -209,10 +209,21 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
 
     public function test_changing_handling_editor_invalidates_old_and_new_editor_caches() {
         $this->configure_people();
-        global $deleted_transients;
+        global $posts, $deleted_transients;
+        $paper_id = 990007;
+        $this->original_papers[$paper_id] = isset($posts[$paper_id]) ? $posts[$paper_id] : null;
+        $posts[$paper_id] = array(
+            'post_type' => 'paper',
+            'meta' => array('paper_handling_editor_uuidv4' => $this->editor_uuid),
+        );
         $deleted_transients = array();
 
-        O3PO_EditorPages::invalidate_editor_assignment_caches($this->editor_uuid, $this->former_editor_uuid);
+        O3PO_EditorPages::remember_editor_before_post_update($paper_id, array('post_type' => 'paper'));
+        $previous_assignments = new ReflectionProperty('O3PO_EditorPages', 'handling_editor_uuid_before_post_update');
+        $previous_assignments->setAccessible(true);
+        $this->assertSame($this->editor_uuid, $previous_assignments->getValue()[$paper_id]);
+        $posts[$paper_id]['meta']['paper_handling_editor_uuidv4'] = $this->former_editor_uuid;
+        O3PO_EditorPages::invalidate_handled_papers_cache_on_meta_change(1, $paper_id, 'paper_handling_editor_uuidv4', $this->former_editor_uuid);
 
         $this->assertContains('o3po_editor_handled_papers_' . $this->editor_uuid, $deleted_transients);
         $this->assertContains('o3po_editor_handled_papers_' . $this->former_editor_uuid, $deleted_transients);

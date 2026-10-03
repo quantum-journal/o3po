@@ -4,6 +4,8 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-peopl
 
 class O3PO_EditorPages {
 
+    private static $handling_editor_uuid_before_post_update = array();
+
     /**
      * Editor paper lists deliberately share the cited-by refresh schedule.
      */
@@ -138,7 +140,64 @@ class O3PO_EditorPages {
             return;
 
         $uuidv4 = get_post_meta($post_id, $post_type . '_handling_editor_uuidv4', true);
+        if(isset(static::$handling_editor_uuid_before_post_update[$post_id]))
+            static::invalidate_editor_papers_cache(static::$handling_editor_uuid_before_post_update[$post_id]);
         static::invalidate_editor_papers_cache($uuidv4);
+
+    }
+
+        /**
+         * Invalidate paper lists after handling-editor metadata changes.
+         *
+         * To be added to post-meta add, update, and delete actions.
+         *
+         * @since  0.4.4
+         * @access public
+         * @param  int    $meta_id The post-meta ID.
+         * @param  int    $post_id The post ID.
+         * @param  string $meta_key The metadata key.
+         * @param  string $meta_value The new or deleted metadata value.
+         */
+    public static function invalidate_handled_papers_cache_on_meta_change($meta_id, $post_id, $meta_key, $meta_value) {
+
+        if(wp_is_post_revision($post_id) or wp_is_post_autosave($post_id))
+            return;
+
+        $settings = O3PO_Settings::instance();
+        $post_type = get_post_type($post_id);
+        if($post_type !== $settings->get_field_value('primary_publication_type_name') or $meta_key !== $post_type . '_handling_editor_uuidv4')
+            return;
+
+        if(isset(static::$handling_editor_uuid_before_post_update[$post_id]))
+        {
+            static::invalidate_editor_papers_cache(static::$handling_editor_uuid_before_post_update[$post_id]);
+            unset(static::$handling_editor_uuid_before_post_update[$post_id]);
+        }
+        static::invalidate_editor_papers_cache($meta_value);
+
+    }
+
+        /**
+         * Preserve the assigned editor before a post update can change its metadata.
+         *
+         * To be added to the 'pre_post_update' action.
+         *
+         * @since  0.4.4
+         * @access public
+         * @param  int   $post_id The post ID.
+         * @param  array $data The post data being updated.
+         */
+    public static function remember_editor_before_post_update($post_id, $data=array()) {
+
+        if(wp_is_post_revision($post_id) or wp_is_post_autosave($post_id))
+            return;
+
+        $settings = O3PO_Settings::instance();
+        $post_type = (is_array($data) and !empty($data['post_type'])) ? $data['post_type'] : get_post_type($post_id);
+        if($post_type !== $settings->get_field_value('primary_publication_type_name'))
+            return;
+
+        static::$handling_editor_uuid_before_post_update[$post_id] = get_post_meta($post_id, $post_type . '_handling_editor_uuidv4', true);
 
     }
 
