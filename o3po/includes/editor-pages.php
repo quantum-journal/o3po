@@ -1,6 +1,7 @@
 <?php
 
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-people-shortcodes.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-publication-type.php';
 
 class O3PO_EditorPages {
 
@@ -105,7 +106,7 @@ class O3PO_EditorPages {
          * @since  0.4.4
          * @access private
          * @param  string $uuidv4 The editor UUID.
-         * @return array List of published paper titles and permalinks.
+         * @return array List of published paper titles, citations, and permalinks.
          */
     private static function get_handled_papers($uuidv4) {
 
@@ -114,7 +115,7 @@ class O3PO_EditorPages {
         $valid_papers = is_array($papers);
         if($valid_papers)
             foreach($papers as $paper)
-                if(!is_array($paper) or !isset($paper['title']) or !is_string($paper['title']) or !isset($paper['url']) or !is_string($paper['url']))
+                if(!is_array($paper) or !isset($paper['title']) or !is_string($paper['title']) or !isset($paper['citation']) or !is_string($paper['citation']) or !isset($paper['url']) or !is_string($paper['url']))
                 {
                     $valid_papers = false;
                     break;
@@ -140,12 +141,14 @@ class O3PO_EditorPages {
         foreach($query->posts as $post_id)
         {
             $title = get_the_title($post_id);
+            $citation = O3PO_PublicationType::get_formated_citation($post_id);
             $url = get_permalink($post_id);
-            if(!is_string($title) or !is_string($url))
+            if(!is_string($title) or !is_string($citation) or !is_string($url))
                 continue;
 
             $papers[] = array(
                 'title' => $title,
+                'citation' => $citation,
                 'url' => $url,
             );
         }
@@ -433,7 +436,7 @@ class O3PO_EditorPages {
         {
             echo '<ul>';
             foreach($handled_papers as $paper)
-                echo '<li><a href="' . esc_url($paper['url']) . '">' . esc_html($paper['title']) . '</a></li>';
+                echo '<li><a href="' . esc_url($paper['url']) . '">' . esc_html($paper['title']) . '</a><br><a href="' . esc_url($paper['url']) . '">' . esc_html($paper['citation']) . '</a></li>';
             echo '</ul>';
         }
         else

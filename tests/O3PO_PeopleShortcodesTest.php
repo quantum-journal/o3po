@@ -133,7 +133,13 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
             'post_status' => 'publish',
             'post_title' => 'Handled paper',
             'permalink' => 'https://foo.bar.com/papers/handled-paper/',
-            'meta' => array('paper_handling_editor_uuidv4' => $this->former_editor_uuid),
+            'meta' => array(
+                'paper_handling_editor_uuidv4' => $this->former_editor_uuid,
+                'paper_journal' => 'Quantum Journal',
+                'paper_volume' => '12',
+                'paper_pages' => '34',
+                'paper_date_published' => '2023-07-01',
+            ),
         );
         $posts[$this->paper_ids[1]] = array(
             'post_type' => 'paper',
@@ -156,6 +162,7 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $html = ob_get_clean();
 
         $this->assertStringContains('Handled paper', $html);
+        $this->assertStringContains('Quantum Journal 12, 34 (2023).', $html);
         $this->assertStringContains('https://foo.bar.com/papers/handled-paper/', $html);
         $this->assertStringNotContains('Draft paper', $html);
         $this->assertStringNotContains('Another editor paper', $html);
@@ -170,6 +177,7 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         global $get_transient_returns, $wp_query_constructor_count;
         $get_transient_returns = array(array(
             'title' => 'Cached handled paper',
+            'citation' => 'Quantum Journal 1, 2 (2024).',
             'url' => 'https://foo.bar.com/papers/cached-paper/',
         ));
         $query = new WP_Query(null, array('editor_profile_uuid' => $this->former_editor_uuid));
@@ -180,6 +188,8 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $html = ob_get_clean();
 
         $this->assertStringContains('Cached handled paper', $html);
+        $this->assertStringContains('Quantum Journal 1, 2 (2024).', $html);
+        $this->assertSame(2, substr_count($html, 'href="https://foo.bar.com/papers/cached-paper/"'));
         $this->assertSame($query_count, $wp_query_constructor_count);
     }
 
@@ -190,8 +200,10 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
             'invalid cached value',
             array(array('title' => 'Missing URL')),
             array('not a paper record'),
-            array(array('title' => 1, 'url' => 'https://example.org')),
-            array(array('title' => 'Paper', 'url' => 1)),
+            array(array('citation' => 'Citation', 'url' => 'https://example.org')),
+            array(array('title' => 1, 'citation' => 'Citation', 'url' => 'https://example.org')),
+            array(array('title' => 'Paper', 'citation' => 1, 'url' => 'https://example.org')),
+            array(array('title' => 'Paper', 'citation' => 'Citation', 'url' => 1)),
         );
         foreach($invalid_caches as $invalid_cache)
         {
