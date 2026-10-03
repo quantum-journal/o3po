@@ -186,16 +186,19 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
     public function test_invalid_editor_paper_cache_is_rebuilt() {
         $this->configure_people();
         global $get_transient_returns, $wp_query_constructor_count;
-        $get_transient_returns = 'invalid cached value';
-        $query = new WP_Query(null, array('editor_profile_uuid' => $this->former_editor_uuid));
-        $query_count = $wp_query_constructor_count;
+        foreach(array('invalid cached value', array(array('title' => 'Missing URL'))) as $invalid_cache)
+        {
+            $get_transient_returns = $invalid_cache;
+            $query = new WP_Query(null, array('editor_profile_uuid' => $this->former_editor_uuid));
+            $query_count = $wp_query_constructor_count;
 
-        ob_start();
-        O3PO_EditorPages::editor_profile_at_loop_start($query);
-        $html = ob_get_clean();
+            ob_start();
+            O3PO_EditorPages::editor_profile_at_loop_start($query);
+            $html = ob_get_clean();
 
-        $this->assertStringContains('No published papers are currently listed.', $html);
-        $this->assertSame($query_count + 1, $wp_query_constructor_count);
+            $this->assertStringContains('No published papers are currently listed.', $html);
+            $this->assertSame($query_count + 1, $wp_query_constructor_count);
+        }
     }
 
     public function test_saving_a_primary_paper_invalidates_only_its_editor_cache() {

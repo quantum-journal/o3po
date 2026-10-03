@@ -111,7 +111,15 @@ class O3PO_EditorPages {
 
         $transient = static::HANDLED_PAPERS_TRANSIENT_PREFIX . $uuidv4;
         $papers = get_transient($transient);
-        if(is_array($papers))
+        $valid_papers = is_array($papers);
+        if($valid_papers)
+            foreach($papers as $paper)
+                if(!is_array($paper) or !isset($paper['title']) or !is_string($paper['title']) or !isset($paper['url']) or !is_string($paper['url']))
+                {
+                    $valid_papers = false;
+                    break;
+                }
+        if($valid_papers)
             return $papers;
 
         $settings = O3PO_Settings::instance();
