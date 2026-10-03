@@ -139,9 +139,14 @@ class O3PO_EditorPages {
 
         foreach($query->posts as $post_id)
         {
+            $title = get_the_title($post_id);
+            $url = get_permalink($post_id);
+            if(!is_string($title) or !is_string($url))
+                continue;
+
             $papers[] = array(
-                'title' => get_the_title($post_id),
-                'url' => get_permalink($post_id),
+                'title' => $title,
+                'url' => $url,
             );
         }
 

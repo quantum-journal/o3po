@@ -186,7 +186,14 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
     public function test_invalid_editor_paper_cache_is_rebuilt() {
         $this->configure_people();
         global $get_transient_returns, $wp_query_constructor_count;
-        foreach(array('invalid cached value', array(array('title' => 'Missing URL'))) as $invalid_cache)
+        $invalid_caches = array(
+            'invalid cached value',
+            array(array('title' => 'Missing URL')),
+            array('not a paper record'),
+            array(array('title' => 1, 'url' => 'https://example.org')),
+            array(array('title' => 'Paper', 'url' => 1)),
+        );
+        foreach($invalid_caches as $invalid_cache)
         {
             $get_transient_returns = $invalid_cache;
             $query = new WP_Query(null, array('editor_profile_uuid' => $this->former_editor_uuid));
