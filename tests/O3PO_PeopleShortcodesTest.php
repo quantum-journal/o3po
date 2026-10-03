@@ -228,6 +228,7 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $this->assertContains('o3po_editor_handled_papers_' . $this->editor_uuid, $deleted_transients);
         $this->assertContains('o3po_editor_handled_papers_' . $this->former_editor_uuid, $deleted_transients);
         $this->assertCount(2, $deleted_transients);
+        $this->assertArrayNotHasKey($paper_id, $previous_assignments->getValue());
     }
 
     public function test_deleting_handling_editor_meta_invalidates_the_deleted_editors_cache() {
