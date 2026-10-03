@@ -68,6 +68,17 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $this->assertStringNotContains('href="https://ada.example"', $html);
     }
 
+    public function test_people_shortcode_sanitizes_external_urls_and_adds_safe_link_rel() {
+        $this->configure_people();
+        global $options;
+        $options['o3po-settings']['person_url'][2] = 'javascript:alert(1)';
+
+        $html = O3PO_PeopleShortcodes::persons_ul_shortcode(array('role' => 'coordinator'), null, 'persons-ul');
+
+        $this->assertStringNotContains('javascript:', $html);
+        $this->assertStringContains('rel="noopener noreferrer"', $html);
+    }
+
     public function test_editor_endpoint_sets_up_page_for_matching_editor_uuid() {
         $this->configure_people();
 
@@ -170,6 +181,21 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
 
         $this->assertStringContains('Cached handled paper', $html);
         $this->assertSame($query_count, $wp_query_constructor_count);
+    }
+
+    public function test_invalid_editor_paper_cache_is_rebuilt() {
+        $this->configure_people();
+        global $get_transient_returns, $wp_query_constructor_count;
+        $get_transient_returns = 'invalid cached value';
+        $query = new WP_Query(null, array('editor_profile_uuid' => $this->former_editor_uuid));
+        $query_count = $wp_query_constructor_count;
+
+        ob_start();
+        O3PO_EditorPages::editor_profile_at_loop_start($query);
+        $html = ob_get_clean();
+
+        $this->assertStringContains('No published papers are currently listed.', $html);
+        $this->assertSame($query_count + 1, $wp_query_constructor_count);
     }
 
     public function test_saving_a_primary_paper_invalidates_only_its_editor_cache() {

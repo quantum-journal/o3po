@@ -392,7 +392,7 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
                 if($atts['link'] !== 'False' and $person['role'] === 'editor' and !empty($person['uuidv4']))
                     $result .= '<a href="' . esc_url(get_site_url() . '/editor/' . rawurlencode($person['uuidv4']) . '/') . '">' . esc_html($person_name) . '</a>';
                 elseif($atts['link'] !== 'False' and !empty($person['url']))
-                    $result .= '<a href="' . esc_attr($person['url']) . '" target="_blank">' . esc_html($person_name) . '</a>';
+                    $result .= '<a href="' . esc_url($person['url']) . '" target="_blank" rel="noopener noreferrer">' . esc_html($person_name) . '</a>';
                 else
                     $result .= esc_html($person_name);
                 if($atts['affiliation'] !== 'False' and !empty($person['affiliation']))
