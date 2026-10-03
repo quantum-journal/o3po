@@ -258,6 +258,11 @@ class O3PO {
              */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-people-shortcodes.php';
 
+            /**
+             * The class providing public editor profile pages.
+             */
+        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/editor-pages.php';
+
         $this->loader = new O3PO_Loader();
 
         $settings = O3PO_Settings::instance($this->plugin_name, $this->get_plugin_pretty_name(), $this->version, 'O3PO_PublicationType::get_active_publication_type_names'); # configure settings singleton during first initialization
@@ -438,11 +443,11 @@ class O3PO {
             $this->loader->add_filter('template_include', $this->secondary_publication_type, 'use_page_template');
 
         $this->loader->add_action('init', 'O3PO_PeopleShortcodes', 'add_shortcodes');
-        $this->loader->add_action('init', 'O3PO_PeopleShortcodes', 'add_editor_endpoint');
-        $this->loader->add_action('parse_request', 'O3PO_PeopleShortcodes', 'handle_editor_endpoint_request');
-        $this->loader->add_filter('the_posts', 'O3PO_PeopleShortcodes', 'add_fake_editor_post_to_query');
-        $this->loader->add_filter('template_include', 'O3PO_PeopleShortcodes', 'editor_profile_template');
-        $this->loader->add_action('loop_start', 'O3PO_PeopleShortcodes', 'editor_profile_at_loop_start');
+        $this->loader->add_action('init', 'O3PO_EditorPages', 'add_editor_endpoint');
+        $this->loader->add_action('parse_request', 'O3PO_EditorPages', 'handle_editor_endpoint_request');
+        $this->loader->add_filter('the_posts', 'O3PO_EditorPages', 'add_fake_editor_post_to_query');
+        $this->loader->add_filter('template_include', 'O3PO_EditorPages', 'editor_profile_template');
+        $this->loader->add_action('loop_start', 'O3PO_EditorPages', 'editor_profile_at_loop_start');
         $this->loader->add_action('template_redirect', $this->secondary_publication_type, 'handle_404_errors');
 
 	}

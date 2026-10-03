@@ -1,6 +1,7 @@
 <?php
 
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-people-shortcodes.php');
+require_once(dirname( __FILE__ ) . '/../o3po/includes/editor-pages.php');
 require_once(dirname( __FILE__ ) . '/O3PO_SettingsTest.php');
 
 class O3PO_PeopleShortcodesTest extends O3PO_TestCase
@@ -55,27 +56,27 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $this->configure_people();
 
         $wp = (object) array('query_vars' => array('editor' => $this->former_editor_uuid));
-        O3PO_PeopleShortcodes::handle_editor_endpoint_request($wp);
+        O3PO_EditorPages::handle_editor_endpoint_request($wp);
 
         global $wp_query;
         $this->assertSame($this->former_editor_uuid, $wp_query->query_vars['editor_profile_uuid']);
         $this->assertTrue($wp_query->query_vars['editor_profile_add_fake_post']);
 
-        $posts = O3PO_PeopleShortcodes::add_fake_editor_post_to_query(array());
+        $posts = O3PO_EditorPages::add_fake_editor_post_to_query(array());
         $this->assertCount(1, $posts);
         $this->assertSame('page', $posts[0]->post_type);
-        $this->assertSame('page.php', O3PO_PeopleShortcodes::editor_profile_template('index.php'));
+        $this->assertSame('page.php', O3PO_EditorPages::editor_profile_template('index.php'));
     }
 
     public function test_editor_endpoint_uses_wordpress_404_for_unknown_or_non_editor_uuid() {
         $this->configure_people();
 
         $unknown = (object) array('query_vars' => array('editor' => 'dddddddd-dddd-4ddd-8ddd-dddddddddddd'));
-        O3PO_PeopleShortcodes::handle_editor_endpoint_request($unknown);
+        O3PO_EditorPages::handle_editor_endpoint_request($unknown);
         $this->assertSame('404', $unknown->query_vars['error']);
 
         $coordinator = (object) array('query_vars' => array('editor' => $this->coordinator_uuid));
-        O3PO_PeopleShortcodes::handle_editor_endpoint_request($coordinator);
+        O3PO_EditorPages::handle_editor_endpoint_request($coordinator);
         $this->assertSame('404', $coordinator->query_vars['error']);
     }
 
@@ -84,7 +85,7 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $query = new WP_Query(null, array('editor_profile_uuid' => $this->former_editor_uuid));
 
         ob_start();
-        O3PO_PeopleShortcodes::editor_profile_at_loop_start($query);
+        O3PO_EditorPages::editor_profile_at_loop_start($query);
         $html = ob_get_clean();
 
         $this->assertValidHTMLFragment($html);
