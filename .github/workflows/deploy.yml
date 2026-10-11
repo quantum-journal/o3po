@@ -24,7 +24,7 @@ name: Deploy
 #
 # Safety: rsync runs with --delete, so everything inside <FTP_URL>/o3po that is not in the
 # repository is removed on the server (nothing outside o3po/ is touched). Guards: FTP_URL's
-# path must end in /wp-content/plugins and exist, local o3po/ must be complete, at most 50
+# path must end in /wp-content/plugins and exist, local o3po/ must contain o3po.php, includes/ and >=20 files, at most 50
 # deletions are allowed (--max-delete), and the manual run defaults to a dry run. Real
 # production deploys are only allowed from a tag vX.Y.Z or vX.Y.Z-rc.N; manual dry runs may target either.
 # The production environment's tag rule v*.*.* is fine; the workflow trigger is stricter.
@@ -119,7 +119,7 @@ jobs:
             || { echo "::error::FTP_URL has no valid host"; exit 1; }
           [[ "$path" =~ ^/[A-Za-z0-9._/-]+/wp-content/plugins$ ]] && [[ "$path" != *..* ]] \
             || { echo "::error::FTP_URL path must be an absolute path ending in /wp-content/plugins"; exit 1; }
-          [ -f o3po/o3po.php ] && [ "$(find o3po -type f | wc -l)" -ge 50 ] \
+          [ -f o3po/o3po.php ] && [ -d o3po/includes ] && [ "$(find o3po -type f | wc -l)" -ge 20 ] \
             || { echo "::error::Local o3po/ looks incomplete, refusing to --delete"; exit 1; }
           sudo apt-get install -y sshpass rsync
           mkdir -p ~/.ssh
