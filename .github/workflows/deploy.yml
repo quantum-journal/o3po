@@ -1,15 +1,29 @@
 name: Deploy
 
-# Tags v* deploy to the "production" environment (must be on master).
-# Pull requests labeled "deploy-dev" (and manual runs) deploy to "qjwp.cgogolin.de".
+# Deploys the plugin directory ./o3po with rsync over ssh (password auth via sshpass).
 #
-# Per environment, configure:
-#   variable FTP_URL         host/path of the plugins directory, e.g.
-#                            rb06.serverdomain.org/home/www/wordpress/wp-content/plugins/
-#   secret   FTP_USER        SSH user name
-#   secret   FTP_PASSWORD    SSH password
-#   variable SSH_KNOWN_HOSTS (optional) known_hosts line(s) of the host; if unset
-#                            the host key is fetched with ssh-keyscan
+# Triggers
+#   - push of a tag v*            -> environment "production" (tag must be on master and
+#                                    match the plugin header Version and readme Stable tag)
+#   - PR labeled "deploy-dev"     -> environment "qjwp.cgogolin.de" (redeploys on every push
+#                                    to the PR while the label is set; fork PRs are skipped)
+#   - manual workflow_dispatch    -> environment "qjwp.cgogolin.de" (from the selected branch)
+#
+# One-time setup in GitHub (Settings -> Environments)
+#   1. Create environments "qjwp.cgogolin.de" and, once dev is tested, "production".
+#      For "production" restrict deployment tags to the pattern v*.
+#   2. In EACH environment set:
+#        variable FTP_URL          host and plugins directory of the target WordPress, no
+#                                  user and no trailing o3po, e.g.
+#                                  rb06.serverdomain.org/home/www/wordpress/wp-content/plugins/
+#        secret   FTP_USER         ssh user name
+#        secret   FTP_PASSWORD     ssh password
+#        variable SSH_KNOWN_HOSTS  (optional) known_hosts line(s) of the host. If unset, the
+#                                  host key is fetched with ssh-keyscan at deploy time.
+#   3. Create the repository label "deploy-dev".
+#
+# WARNING: rsync runs with --delete, so everything inside <FTP_URL>/o3po that is not in the
+# repository is removed on the server.
 
 on:
   push:
