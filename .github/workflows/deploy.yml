@@ -1,0 +1,87 @@
+name: Deploy
+
+# Tags v* deploy to the "production" environment (must be on master).
+# Pull requests labeled "deploy-dev" (and manual runs) deploy to "qjwp.cgogolin.de".
+#
+# Per environment, configure:
+#   variable FTP_URL         host/path of the plugins directory, e.g.
+#                            rb06.serverdomain.org/home/www/wordpress/wp-content/plugins/
+#   secret   FTP_USER        SSH user name
+#   secret   FTP_PASSWORD    SSH password
+#   variable SSH_KNOWN_HOSTS (optional) known_hosts line(s) of the host; if unset
+#                            the host key is fetched with ssh-keyscan
+
+on:
+  push:
+    tags: ['v*']
+  pull_request:
+    types: [labeled, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    if: >-
+      github.event_name != 'pull_request' ||
+      (contains(github.event.pull_request.labels.*.name, 'deploy-dev') &&
+       github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.0'
+          tools: phpunit:9
+      - run: sudo apt-get install -y libimage-exiftool-perl
+      - run: make lint
+      - run: make test
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: ${{ startsWith(github.ref, 'refs/tags/v') && 'production' || 'qjwp.cgogolin.de' }}
+    concurrency:
+      group: deploy-${{ startsWith(github.ref, 'refs/tags/v') && 'production' || 'qjwp.cgogolin.de' }}
+      cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check tag is on master and versions are consistent
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/master \
+            || { echo "::error::Tag is not on master"; exit 1; }
+          header=$(sed -n 's/^ \* Version: *//p' o3po/o3po.php | tr -d '[:space:]')
+          stable=$(sed -n 's/^\* Stable tag: *//p' readme.txt | tr -d '[:space:]')
+          [ "$tag" = "$header" ] || { echo "::error::Tag $tag != plugin header version $header"; exit 1; }
+          [ "$tag" = "$stable" ] || { echo "::error::Tag $tag != readme stable tag $stable"; exit 1; }
+
+      - name: Deploy via rsync over ssh
+        env:
+          FTP_URL: ${{ vars.FTP_URL }}
+          SSH_USER: ${{ secrets.FTP_USER }}
+          SSHPASS: ${{ secrets.FTP_PASSWORD }}
+          SSH_KNOWN_HOSTS: ${{ vars.SSH_KNOWN_HOSTS }}
+        run: |
+          set -eu
+          [ -n "$FTP_URL" ] && [ -n "$SSH_USER" ] && [ -n "$SSHPASS" ] \
+            || { echo "::error::FTP_URL, FTP_USER and FTP_PASSWORD must be set"; exit 1; }
+          url="${FTP_URL#*://}"
+          host="${url%%/*}"
+          path="/${url#*/}"
+          path="${path%/}"
+          sudo apt-get install -y sshpass rsync
+          mkdir -p ~/.ssh
+          if [ -n "$SSH_KNOWN_HOSTS" ]; then
+            echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          else
+            ssh-keyscan -H "$host" > ~/.ssh/known_hosts
+          fi
+          sshpass -e rsync -avHz --delete \
+            -e "ssh -ax -o StrictHostKeyChecking=yes" \
+            ./o3po "$SSH_USER@$host:$path/"
