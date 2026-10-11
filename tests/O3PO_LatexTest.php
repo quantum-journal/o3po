@@ -2,6 +2,10 @@
 
 require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-latex.php';
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Depends;
+
+
 class O3PO_LatexTest extends O3PO_TestCase
 {
 
@@ -60,6 +64,7 @@ class O3PO_LatexTest extends O3PO_TestCase
         /**
          * @depends test_get_bbl_file
          */
+    #[Depends('test_get_bbl_file')]
     public function test_extract_latex_macros_bbl( $bbl ) {
 
         $macros = O3PO_Latex::extract_latex_macros($bbl);
@@ -71,6 +76,7 @@ class O3PO_LatexTest extends O3PO_TestCase
         /**
          * @depends test_get_biblatex_bbl_file
          */
+    #[Depends('test_get_biblatex_bbl_file')]
     public function test_extract_latex_macros_bbl_biblatex( $bbl ) {
 
         $macros = O3PO_Latex::extract_latex_macros($bbl);
@@ -81,6 +87,7 @@ class O3PO_LatexTest extends O3PO_TestCase
         /**
          * @depends test_extract_latex_macros_bbl
          */
+    #[Depends('test_extract_latex_macros_bbl')]
     public function test_remove_special_macros_to_ignore_in_bbl( $latex_macro_definitions ) {
 
         $macros = O3PO_Latex::remove_special_macros_to_ignore_in_bbl($latex_macro_definitions);
@@ -91,6 +98,7 @@ class O3PO_LatexTest extends O3PO_TestCase
         /**
          * @depends test_remove_special_macros_to_ignore_in_bbl
          */
+    #[Depends('test_remove_special_macros_to_ignore_in_bbl')]
     public function test_all_special_macros_removed( $latex_macro_definitions_without_specials ) {
 
         $special_macros_to_ignore = O3PO_Latex::get_special_macros_to_ignore_in_bbl();
@@ -106,6 +114,7 @@ class O3PO_LatexTest extends O3PO_TestCase
         /**
          * @depends test_get_bbl_file
          */
+    #[Depends('test_get_bbl_file')]
     public function test_parse_bbl( $bbl ) {
 
         $parsed_bbl = O3PO_Latex::parse_bbl($bbl);
@@ -117,6 +126,7 @@ class O3PO_LatexTest extends O3PO_TestCase
         /**
          * @depends test_get_biblatex_bbl_file
          */
+    #[Depends('test_get_biblatex_bbl_file')]
     public function test_parse_biblatex_bbl( $bbl ) {
 
         $parsed_bbl = O3PO_Latex::parse_bbl($bbl);
@@ -125,7 +135,7 @@ class O3PO_LatexTest extends O3PO_TestCase
         return $parsed_bbl;
     }
 
-    public function get_month_string_provider() {
+    public static function get_month_string_provider() {
         return [
             [0, null],
             [1 , 'jan'],
@@ -148,6 +158,7 @@ class O3PO_LatexTest extends O3PO_TestCase
         /**
          * @dataProvider get_month_string_provider
          */
+    #[DataProvider('get_month_string_provider')]
     public function test_get_month_string( $month, $expected ) {
         $exception = null;
         try
@@ -168,6 +179,7 @@ class O3PO_LatexTest extends O3PO_TestCase
         /**
          * @depends test_get_latex_file
          */
+    #[Depends('test_get_latex_file')]
     public function test_extract_latex_macros_latex( $latex ) {
 
         $macros = O3PO_Latex::extract_latex_macros($latex);
@@ -192,6 +204,8 @@ class O3PO_LatexTest extends O3PO_TestCase
          * @depends test_extract_latex_macros_latex
          * @depends test_get_latex_file
          */
+    #[Depends('test_extract_latex_macros_latex')]
+    #[Depends('test_get_latex_file')]
     public function test_expand_latex_macros_latex( $macro_definitions, $text ) {
 
         $text_expanded = O3PO_Latex::expand_latex_macros( $macro_definitions, $text );
@@ -205,11 +219,11 @@ class O3PO_LatexTest extends O3PO_TestCase
 
 
 
-    public function expand_latex_macros_provider() {
+    public static function expand_latex_macros_provider() {
 
         return [
             array(
-                'definitions' => array(
+                'macro_definitions' => array(
             ['\newcommand{\unam}', 'newcommand', '\unam', '', '', 'Universidad Nacional Aut\'onoma de M\'exico, M\'exico, D.F., M\'exico'],
             ['\newcommand{\ifunam}', 'newcommand', '\ifunam', '', '', 'Instituto de F\'{\i}sica, \unam'],
             ['\newcommand{\ifoo}', 'newcommand', '\ifoo', '', '', 'bar']
@@ -232,6 +246,7 @@ class O3PO_LatexTest extends O3PO_TestCase
         /**
          * @dataProvider expand_latex_macros_provider
          */
+    #[DataProvider('expand_latex_macros_provider')]
     public function test_expand_latex_macros($macro_definitions, $cases) {
 
         foreach($cases as $input => $output)
@@ -241,7 +256,7 @@ class O3PO_LatexTest extends O3PO_TestCase
 
 
 
-    public function latex_to_utf8_outside_math_mode_test_case_provider() {
+    public static function latex_to_utf8_outside_math_mode_test_case_provider() {
         return [
             ["\\'  \n a" , "á"],
             ["\\'  \n ab" , "áb"],
@@ -310,12 +325,13 @@ ab' , 'äb'],
         /**
          * @dataProvider latex_to_utf8_outside_math_mode_test_case_provider
          */
+    #[DataProvider('latex_to_utf8_outside_math_mode_test_case_provider')]
     public function test_latex_to_utf8_outside_math_mode( $input, $expected ) {
         $this->assertSame($expected, O3PO_Latex::latex_to_utf8_outside_math_mode($input, false));
     }
 
 
-    public function utf8_to_closest_latin_letter_string_provider() {
+    public static function utf8_to_closest_latin_letter_string_provider() {
         return [
             ['foo' , 'foo'],
             ['ä' , 'a'],
@@ -328,13 +344,14 @@ ab' , 'äb'],
         /**
          * @dataProvider utf8_to_closest_latin_letter_string_provider
          */
+    #[DataProvider('utf8_to_closest_latin_letter_string_provider')]
     public function test_utf8_to_closest_latin_letter_string( $input, $expected ) {
         $this->assertSame($expected, O3PO_Latex::utf8_to_closest_latin_letter_string($input));
     }
 
 
 
-    public function preg_split_at_latex_math_mode_delimters_provider() {
+    public static function preg_split_at_latex_math_mode_delimters_provider() {
         return [
             ['foo' , ['foo']],
             ['foo \\$ bar' , ['foo \\$ bar']],
@@ -360,6 +377,7 @@ ab' , 'äb'],
         /**
          * @dataProvider preg_split_at_latex_math_mode_delimters_provider
          */
+    #[DataProvider('preg_split_at_latex_math_mode_delimters_provider')]
     public function test_preg_split_at_latex_math_mode_delimters( $input, $expected ) {
         if(is_array($input))
             $this->assertSame($expected, O3PO_Latex::preg_split_at_latex_math_mode_delimters($input[0], $input[1], $input[2]));
@@ -369,7 +387,7 @@ ab' , 'äb'],
         $this->assertSame($input[0], implode(O3PO_Latex::preg_split_at_latex_math_mode_delimters($input[0], -1, PREG_SPLIT_DELIM_CAPTURE)));
     }
 
-    public function strpos_outside_math_mode_provider() {
+    public static function strpos_outside_math_mode_provider() {
         return [
             [['foo', 'o'] , 1],
             [['foo', 'x'] , false],
@@ -386,11 +404,12 @@ ab' , 'äb'],
         /**
          * @dataProvider strpos_outside_math_mode_provider
          */
+    #[DataProvider('strpos_outside_math_mode_provider')]
     public function test_strpos_outside_math_mode( $input, $expected ) {
         $this->assertSame($expected, O3PO_Latex::strpos_outside_math_mode($input[0], $input[1]));
     }
 
-    public function utf8_to_latex_provider() {
+    public static function utf8_to_latex_provider() {
         return [
             ['foo', 'foo'],
             ['ô', '{\\^{o}}'],
@@ -401,13 +420,14 @@ ab' , 'äb'],
         /**
          * @dataProvider utf8_to_latex_provider
          */
+    #[DataProvider('utf8_to_latex_provider')]
     public function test_utf8_to_latex( $input, $expected ) {
         $this->assertSame($expected, O3PO_Latex::utf8_to_latex($input, $expected));
     }
 
 
 
-    public function utf8_to_bibtex_provider() {
+    public static function utf8_to_bibtex_provider() {
         return [
             ['foo', 'foo'],
             ['ô', '{\\^{o}}'],
@@ -419,12 +439,13 @@ ab' , 'äb'],
         /**
          * @dataProvider utf8_to_bibtex_provider
          */
+    #[DataProvider('utf8_to_bibtex_provider')]
     public function test_utf8_to_bibtex( $input, $expected ) {
         $this->assertSame($expected, O3PO_Latex::utf8_to_bibtex($input, $expected));
     }
 
 
-    public function preg_match_outside_math_mode_provider() {
+    public static function preg_match_outside_math_mode_provider() {
         return [
             [['#o#', 'foo'] , 1],
             [['#x#', 'foo'] , 0],
@@ -444,12 +465,13 @@ ab' , 'äb'],
         /**
          * @dataProvider preg_match_outside_math_mode_provider
          */
+    #[DataProvider('preg_match_outside_math_mode_provider')]
     public function test_preg_match_outside_math_mode( $input, $expected ) {
         $this->assertSame($expected, O3PO_Latex::preg_match_outside_math_mode($input[0], $input[1]));
     }
 
 
-    public function normalize_whitespace_and_linebreak_characters_provider() {
+    public static function normalize_whitespace_and_linebreak_characters_provider() {
         return [
             [["abc", True, False] , "abc"],
             [["a \t c", True, False] , "a c"],
@@ -491,12 +513,13 @@ ab' , 'äb'],
         /**
          * @dataProvider normalize_whitespace_and_linebreak_characters_provider
          */
+    #[DataProvider('normalize_whitespace_and_linebreak_characters_provider')]
     public function test_normalize_whitespace_and_linebreak_characters( $input, $expected ) {
         $this->assertSame($expected, O3PO_Latex::normalize_whitespace_and_linebreak_characters($input[0], $input[1], $input[2]));
     }
 
 
-    public function expand_cite_to_html_provider() {
+    public static function expand_cite_to_html_provider() {
         return [
             ["abc", "abc"],
             ['\cite{CampisiRMP}', '[<a onclick="document.getElementById(\'references\').style.display=\'block\';" href="#CampisiRMP">2</a>]'],
@@ -508,6 +531,7 @@ ab' , 'äb'],
         /**
          * @dataProvider expand_cite_to_html_provider
          */
+    #[DataProvider('expand_cite_to_html_provider')]
     public function test_expand_cite_to_html( $input, $expected ) {
 
         $bbl = file_get_contents(dirname( __FILE__ ) . "/resources/test_bibliography.bbl");

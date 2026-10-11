@@ -112,6 +112,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
         $this->the_admin_panel_title($post_id);
         $this->the_admin_panel_corresponding_author_email($post_id);
         $this->the_admin_panel_buffer($post_id);
+        $this->the_admin_panel_handling_editor($post_id);
         $this->the_admin_panel_authors($post_id);
         $this->the_admin_panel_affiliations($post_id);
         $this->the_admin_panel_date_volume_pages($post_id);
@@ -936,6 +937,11 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 
             $content .= '<table class="meta-data-table">';
             $content .= '<tr><td>Published:</td><td>' . esc_html($this->get_formated_date_published( $post_id )) .  ', ' . $this->get_formated_volume_html($post_id) . ', page ' . get_post_meta( $post_id, $post_type . '_pages', true ) . '</td></tr>';
+
+            $formated_handling_editor_html = $this->get_formated_handling_editor( $post_id );
+            if(!empty($formated_handling_editor_html))
+                $content .= '<tr><td>Editor:</td><td>' . $formated_handling_editor_html . '</td></tr>';
+
             $content .= '<tr><td>Doi:</td><td><a href="' . esc_attr($this->get_journal_property('doi_url_prefix') . $doi) . '">' . esc_html($this->get_journal_property('doi_url_prefix') . $doi ) . '</a></td></tr>';
             $content .= '<tr><td>Citation:</td><td>' . esc_html($citation) . '</td></tr>';
             $content .= '</table>';

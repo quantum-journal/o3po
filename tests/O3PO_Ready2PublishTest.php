@@ -1,7 +1,12 @@
 <?php
 
 require_once(dirname( __FILE__ ) . '/../o3po/public/class-o3po-ready2publish-form.php');
-require_once(dirname( __FILE__ ) . '/o3po-settings-test.php');
+require_once(dirname( __FILE__ ) . '/../o3po/admin/class-o3po-ready2publish-dashboard.php');
+require_once(dirname( __FILE__ ) . '/O3PO_SettingsTest.php');
+
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Depends;
 
 class O3PO_Ready2PublishTest extends O3PO_TestCase
 {
@@ -16,6 +21,7 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
         /**
          * @depends test_initialize_settings
          */
+    #[Depends('test_initialize_settings')]
     public function test_setup_environment( $settings ) {
 
         $environment = new O3PO_Environment($settings->get_field_value("production_site_url"));
@@ -28,6 +34,8 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
          * @depends test_initialize_settings
          * @doesNotPerformAssertions
          */
+    #[Depends('test_initialize_settings')]
+    #[DoesNotPerformAssertions]
     public function test_initialize_ready2publish_storage( $settings ) {
 
         $storage = new O3PO_Ready2PublishStorage('o3po', $settings->get_field_value("ready2publish_slug") . '-storage');
@@ -41,6 +49,10 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
          * @depends test_setup_environment
          * @doesNotPerformAssertions
          */
+    #[Depends('test_initialize_settings')]
+    #[Depends('test_initialize_ready2publish_storage')]
+    #[Depends('test_setup_environment')]
+    #[DoesNotPerformAssertions]
     public function test_initialize_ready2publish_form( $settings, $storage, $environment ) {
 
         $form = new O3PO_Ready2PublishForm('o3po', $settings->get_field_value("ready2publish_slug"), $environment, $storage);
@@ -53,6 +65,9 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
          * @depends test_setup_environment
          * @depends test_initialize_ready2publish_storage
          */
+    #[Depends('test_initialize_settings')]
+    #[Depends('test_setup_environment')]
+    #[Depends('test_initialize_ready2publish_storage')]
     public function test_form_html_and_logic( $settings, $environment, $storage ) {
 
         global $wp_query; # content ends up in here
@@ -288,7 +303,7 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
 
     }
 
-    public function validate_featured_image_upload_provider() {
+    public static function validate_featured_image_upload_provider() {
 
         return [
             [array(
@@ -325,6 +340,10 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
          * @depends test_setup_environment
          * @depends test_initialize_ready2publish_storage
          */
+    #[DataProvider('validate_featured_image_upload_provider')]
+    #[Depends('test_initialize_settings')]
+    #[Depends('test_setup_environment')]
+    #[Depends('test_initialize_ready2publish_storage')]
     public function test_validate_featured_image_upload( $file_of_this_id, $max_file_size, $expected_key, $settings, $environment, $storage ) {
 
         $form = new O3PO_Ready2PublishForm('o3po', $settings->get_field_value("ready2publish_slug"), $environment, $storage);
@@ -346,7 +365,7 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
     }
 
 
-    public function acceptance_code_provider() {
+    public static function acceptance_code_provider() {
 
         return [
             ['AAA', 'AAA', True],
@@ -361,6 +380,10 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
          * @depends test_initialize_ready2publish_storage
          * @depends test_setup_environment
          */
+    #[DataProvider('acceptance_code_provider')]
+    #[Depends('test_initialize_settings')]
+    #[Depends('test_initialize_ready2publish_storage')]
+    #[Depends('test_setup_environment')]
     public function test_validate_acceptance_code( $code, $expected, $is_valid, $settings, $environment, $storage) {
 
         $form = new O3PO_Ready2PublishForm('o3po', $settings->get_field_value("ready2publish_slug"), $environment, $storage);
@@ -371,6 +394,69 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
             $this->assertSame(count($form->get_errors()), 0);
         else
             $this->assertSame(count($form->get_errors()), 1);
+    }
+
+        /**
+         * @depends test_initialize_settings
+         * @depends test_setup_environment
+         * @depends test_initialize_ready2publish_storage
+         */
+    #[Depends('test_initialize_settings')]
+    #[Depends('test_setup_environment')]
+    #[Depends('test_initialize_ready2publish_storage')]
+    public function test_render_dashboard_widget( $settings, $environment, $storage ) {
+
+        $manuscript_info = array(
+            'abstract' => "This is a paper by very smart authors.",
+            'acceptance_code' => "AAABBB",
+            'agree_to_publish' => "checked",
+            'author_first_names' => ['Foo', 'Bar'],
+            'author_name_styles' => ['western', 'eastern'],
+            'author_last_names' => ['Ffo', 'Bbr'],
+            'award_numbers' => ['52562351'],
+            'comments' => 'hweg',
+            'copyright_confirmation',
+            'corresponding_author_email' => "foo@bar.com",
+            'dissemination_multimedia',
+            'eprint' => "0819.7347v4",
+            'feature_image_attachment_id', // due to compatibility with the publication type class we call these fields feature_image_... and not featured_image_... as in the form
+            'feature_image_caption',
+            'featured_image_attachment_id' => 'foo',
+            'featured_image_caption' => 'awfea',
+            'fermats_library',
+            'funder_identifiers' => ['id6214124'],
+            'funder_names' => ['Awesome Funder'],
+            'invoice_address' => "Foo City",
+            'invoice_recipient' => "Foo Universtiy",
+            'invoice_vat_number',
+            'number_award_numbers',
+            'payment_amount' => "200€",
+            'payment_method' => "invoice",
+            'popular_summary',
+            'ready2publish_comments',
+            'title' => "Newest paper",
+            'time_submitted' => 1735856642,
+                                 );
+        $storage->store_manuscript($manuscript_info);
+        #echo json_encode($storage->get_all_manuscripts()[0]);
+
+        $dashboard = new O3PO_Ready2PublishDashboard('o3po', 'O-3PO', $settings->get_field_value("ready2publish_slug"), "Dashboard Title", $storage);
+
+        ob_start();
+        $dashboard->render_dashboard_widget();
+        $content = ob_get_contents();
+        ob_end_clean();
+
+        $this->assertValidHTMLFragment($content);
+
+        ob_start();
+        $dashboard->show_invoice(0);
+        $content = ob_get_contents();
+        ob_end_clean();
+
+        $this->assertValidHTMLFragment($content, false);
+
+        $dashboard->insert_post(0);
     }
 
 }

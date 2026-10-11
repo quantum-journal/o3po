@@ -2,10 +2,12 @@
 
 require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-author.php';
 
+use PHPUnit\Framework\Attributes\DataProvider;
+
 class O3PO_AuthorTest extends O3PO_TestCase
 {
 
-    public function author_provider() {
+    public static function author_provider() {
         return [
             array(
                 'given_name' => 'Foo',
@@ -76,6 +78,7 @@ class O3PO_AuthorTest extends O3PO_TestCase
         /**
          * @dataProvider author_provider
          */
+    #[DataProvider('author_provider')]
     public function test_match( $given_name, $surname, $name_style, $orcid, $url, $affiliations, $expected_exception ) {
 
         if(!empty($expected_exception))

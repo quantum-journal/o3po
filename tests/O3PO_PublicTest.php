@@ -1,7 +1,11 @@
 <?php
 
 require_once(dirname( __FILE__ ) . '/../o3po/public/class-o3po-public.php');
-require_once(dirname( __FILE__ ) . '/o3po-settings-test.php');
+require_once(dirname( __FILE__ ) . '/O3PO_SettingsTest.php');
+
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Depends;
 
 class O3PO_PublicTest extends O3PO_TestCase
 {
@@ -12,6 +16,7 @@ class O3PO_PublicTest extends O3PO_TestCase
         /**
          * @doesNotPerformAssertions
          */
+    #[Doesnotperformassertions]
     public function test_construct() {
         $public = new O3PO_Public( 'o3po', '0.3.0' );
 
@@ -28,6 +33,8 @@ class O3PO_PublicTest extends O3PO_TestCase
          * @doesNotPerformAssertions
          * @depends test_construct
          */
+    #[Doesnotperformassertions]
+    #[Depends('test_construct')]
     public function test_enqueue_styles( $public ) {
 
         $public->enqueue_styles();
@@ -37,13 +44,15 @@ class O3PO_PublicTest extends O3PO_TestCase
          * @doesNotPerformAssertions
          * @depends test_construct
          */
+    #[Doesnotperformassertions]
+    #[Depends('test_construct')]
     public function test_enqueue_scripts( $public ) {
 
         $public->enqueue_scripts();
     }
 
 
-    public function id_provider() {
+    public static function id_provider() {
 
         return [[1],[5]];
     }
@@ -52,6 +61,8 @@ class O3PO_PublicTest extends O3PO_TestCase
          * @dataProvider id_provider
          * @depends test_construct
          */
+    #[DataProvider('id_provider')]
+    #[Depends('test_construct')]
     public function test_add_open_graph_meta_tags_for_social_media_and_enable_mathjax_and_fix_custom_logo_html( $post_id, $public ) {
         global $is_single;
 
@@ -80,6 +91,7 @@ class O3PO_PublicTest extends O3PO_TestCase
         /**
          * @depends test_construct
          */
+    #[Depends('test_construct')]
     public function test_extended_search_and_navigation_at_loop_start( $public ) {
 
         global $is_home;
@@ -108,6 +120,7 @@ class O3PO_PublicTest extends O3PO_TestCase
         /**
          * @depends test_construct
          */
+    #[Depends('test_construct')]
     public function test_search_form_at_loop_start_on_search_page( $public ) {
 
         global $is_home;
@@ -134,7 +147,7 @@ class O3PO_PublicTest extends O3PO_TestCase
     }
 
 
-    public function secondary_journal_help_text_query_provider() {
+    public static function secondary_journal_help_text_query_provider() {
 
         $settings = O3PO_SettingsTest::get_settings();
 
@@ -148,6 +161,8 @@ class O3PO_PublicTest extends O3PO_TestCase
          * @dataProvider secondary_journal_help_text_query_provider
          * @depends test_construct
          */
+    #[DataProvider('secondary_journal_help_text_query_provider')]
+    #[Depends('test_construct')]
     public function test_secondary_journal_help_text( $query, $public ) {
 
         global $is_home;
