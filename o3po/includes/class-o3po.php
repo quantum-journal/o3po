@@ -444,6 +444,7 @@ class O3PO {
 
         $this->loader->add_action('init', 'O3PO_PeopleShortcodes', 'add_shortcodes');
         $this->loader->add_action('init', 'O3PO_EditorPages', 'add_editor_endpoint');
+        $this->loader->add_action('wp_loaded', 'O3PO_EditorPages', 'refresh_editor_endpoint_rewrite_rules');
         $this->loader->add_action('parse_request', 'O3PO_EditorPages', 'handle_editor_endpoint_request');
         $this->loader->add_filter('the_posts', 'O3PO_EditorPages', 'add_fake_editor_post_to_query');
         $this->loader->add_filter('template_include', 'O3PO_EditorPages', 'editor_profile_template');

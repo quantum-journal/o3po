@@ -12,6 +12,7 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
     private $original_settings;
     private $original_rewrite_rules;
     private $original_permalink_structure;
+    private $original_editor_rewrite_rules_version;
     private $original_query;
     private $original_papers;
     private $original_transient_result;
@@ -22,6 +23,7 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $this->original_settings = $options['o3po-settings'];
         $this->original_rewrite_rules = isset($options['rewrite_rules']) ? $options['rewrite_rules'] : null;
         $this->original_permalink_structure = isset($options['permalink_structure']) ? $options['permalink_structure'] : null;
+        $this->original_editor_rewrite_rules_version = isset($options[O3PO_EditorPages::REWRITE_RULES_VERSION_OPTION]) ? $options[O3PO_EditorPages::REWRITE_RULES_VERSION_OPTION] : null;
         $this->original_query = get_global_query();
         global $get_transient_returns;
         $this->original_transient_result = $get_transient_returns;
@@ -54,6 +56,10 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
                 unset($options['permalink_structure']);
             else
                 $options['permalink_structure'] = $this->original_permalink_structure;
+            if(null === $this->original_editor_rewrite_rules_version)
+                unset($options[O3PO_EditorPages::REWRITE_RULES_VERSION_OPTION]);
+            else
+                $options[O3PO_EditorPages::REWRITE_RULES_VERSION_OPTION] = $this->original_editor_rewrite_rules_version;
             $get_transient_returns = $this->original_transient_result;
             set_global_query($this->original_query);
         }
@@ -107,7 +113,7 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $this->assertSame('page.php', O3PO_EditorPages::editor_profile_template('index.php'));
     }
 
-    public function test_editor_endpoint_flushes_missing_rewrite_rule_only_once() {
+    public function test_editor_endpoint_rewrite_rules_are_flushed_once_after_registration() {
         $this->configure_people();
         global $options;
         $options['rewrite_rules'] = array();
@@ -115,15 +121,14 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $flushes_before = get_flush_rewrite_rules_call_counter();
 
         O3PO_EditorPages::add_editor_endpoint();
+        O3PO_EditorPages::refresh_editor_endpoint_rewrite_rules();
 
         $this->assertSame($flushes_before + 1, get_flush_rewrite_rules_call_counter());
 
-        $options['rewrite_rules'] = array(
-            '^editor(/(.*))?/?$' => 'index.php?editor=$matches[1]',
-        );
-        O3PO_EditorPages::add_editor_endpoint();
+        O3PO_EditorPages::refresh_editor_endpoint_rewrite_rules();
 
         $this->assertSame($flushes_before + 1, get_flush_rewrite_rules_call_counter());
+        $this->assertSame(O3PO_EditorPages::REWRITE_RULES_VERSION, $options[O3PO_EditorPages::REWRITE_RULES_VERSION_OPTION]);
     }
 
     public function test_editor_endpoint_does_not_flush_rewrite_rules_without_pretty_permalinks() {
@@ -133,9 +138,10 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $options['permalink_structure'] = '';
         $flushes_before = get_flush_rewrite_rules_call_counter();
 
-        O3PO_EditorPages::add_editor_endpoint();
+        O3PO_EditorPages::refresh_editor_endpoint_rewrite_rules();
 
         $this->assertSame($flushes_before, get_flush_rewrite_rules_call_counter());
+        $this->assertSame(O3PO_EditorPages::REWRITE_RULES_VERSION, $options[O3PO_EditorPages::REWRITE_RULES_VERSION_OPTION]);
     }
 
     public function test_editor_endpoint_uses_wordpress_404_for_unknown_or_non_editor_uuid() {

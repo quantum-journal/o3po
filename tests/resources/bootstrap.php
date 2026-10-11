@@ -235,10 +235,13 @@ function get_option( $option, $default = false ) {
         return $options['o3po-settings'];
     elseif($option === 'blog_charset')
         return 'UTF-8';
+    // Tests configure rewrite state through $options to simulate WordPress settings.
     elseif($option === 'rewrite_rules')
         return isset($options['rewrite_rules']) ? $options['rewrite_rules'] : array();
     elseif($option === 'permalink_structure')
         return isset($options['permalink_structure']) ? $options['permalink_structure'] : '';
+    elseif($option === 'o3po_editor_rewrite_rules_version')
+        return isset($options[$option]) ? $options[$option] : $default;
     elseif($option === 'o3po-ready2publish')
         return $options['o3po-ready2publish'];
     elseif($option === 'o3po-ready2publish-storage')
@@ -272,6 +275,7 @@ function get_file_data( $file, $options ) {
 
 global $flush_rewrite_rules_call_counter;
 $flush_rewrite_rules_call_counter = 0;
+// Tests inspect this count to verify rewrite rules are refreshed only once.
 function flush_rewrite_rules( $hard=false ) {
     global $flush_rewrite_rules_call_counter;
 

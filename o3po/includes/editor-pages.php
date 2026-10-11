@@ -12,6 +12,8 @@ class O3PO_EditorPages {
      */
     const HANDLED_PAPERS_REFRESH_SECONDS = 43200;
     const HANDLED_PAPERS_TRANSIENT_PREFIX = 'o3po_editor_handled_papers_';
+    const REWRITE_RULES_VERSION_OPTION = 'o3po_editor_rewrite_rules_version';
+    const REWRITE_RULES_VERSION = '1';
 
         /**
          * Add the /editor/ endpoint for editor profile pages.
@@ -24,17 +26,26 @@ class O3PO_EditorPages {
     public static function add_editor_endpoint() {
 
         add_rewrite_endpoint('editor', EP_ROOT);
-        $rewrite_rules = get_option('rewrite_rules', array());
-        $editor_endpoint_rule_exists = false;
-        if(is_array($rewrite_rules))
-            foreach($rewrite_rules as $rule => $query)
-                if(is_string($rule) and is_string($query) and strpos($rule, '^editor') === 0 and strpos($query, 'editor=') !== false)
-                {
-                    $editor_endpoint_rule_exists = true;
-                    break;
-                }
-        if(!$editor_endpoint_rule_exists and !empty(get_option('permalink_structure')))
-            flush_rewrite_rules(true);
+
+    }
+
+        /**
+         * Refresh rewrite rules once after the editor endpoint has been registered.
+         *
+         * To be added to the 'wp_loaded' action, after all rewrite rules are registered.
+         *
+         * @since  0.4.4
+         * @access public
+         */
+    public static function refresh_editor_endpoint_rewrite_rules() {
+
+        if(get_option(static::REWRITE_RULES_VERSION_OPTION) === static::REWRITE_RULES_VERSION)
+            return;
+
+        if(!empty(get_option('permalink_structure')))
+            flush_rewrite_rules(false);
+
+        update_option(static::REWRITE_RULES_VERSION_OPTION, static::REWRITE_RULES_VERSION);
 
     }
 
