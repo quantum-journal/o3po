@@ -26,12 +26,14 @@ name: Deploy
 # repository is removed on the server (nothing outside o3po/ is touched). Guards: FTP_URL's
 # path must end in /wp-content/plugins and exist, local o3po/ must be complete, at most 50
 # deletions are allowed (--max-delete), and the manual run defaults to a dry run. Real
-# production deploys are only allowed from a tag vX.Y.Z; manual dry runs may target either.
+# production deploys are only allowed from a tag vX.Y.Z or vX.Y.Z-rc.N; manual dry runs may target either.
 # The production environment's tag rule v*.*.* is fine; the workflow trigger is stricter.
 
 on:
   push:
-    tags: ['v[0-9]+.[0-9]+.[0-9]+']
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-rc.[0-9]+'
   pull_request:
     types: [labeled, synchronize, reopened]
   workflow_dispatch:
@@ -93,7 +95,8 @@ jobs:
           header=$(sed -n 's/^ \* Version: *//p' o3po/o3po.php | tr -d '[:space:]')
           stable=$(sed -n 's/^\* Stable tag: *//p' readme.txt | tr -d '[:space:]')
           [ "$tag" = "$header" ] || { echo "::error::Tag $tag != plugin header version $header"; exit 1; }
-          [ "$tag" = "$stable" ] || { echo "::error::Tag $tag != readme stable tag $stable"; exit 1; }
+          base="${tag%-rc.*}"  # release candidates: readme stable tag is the base version
+          [ "$base" = "$stable" ] || { echo "::error::Tag $tag (base $base) != readme stable tag $stable"; exit 1; }
 
       - name: Deploy via rsync over ssh
         env:
