@@ -24,6 +24,17 @@ class O3PO_EditorPages {
     public static function add_editor_endpoint() {
 
         add_rewrite_endpoint('editor', EP_ROOT);
+        $rewrite_rules = get_option('rewrite_rules', array());
+        $editor_endpoint_rule_exists = false;
+        if(is_array($rewrite_rules))
+            foreach($rewrite_rules as $rule => $query)
+                if(is_string($rule) and is_string($query) and strpos($rule, '^editor') === 0 and strpos($query, 'editor=') !== false)
+                {
+                    $editor_endpoint_rule_exists = true;
+                    break;
+                }
+        if(!$editor_endpoint_rule_exists and !empty(get_option('permalink_structure')))
+            flush_rewrite_rules(true);
 
     }
 

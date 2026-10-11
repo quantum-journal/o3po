@@ -236,7 +236,9 @@ function get_option( $option, $default = false ) {
     elseif($option === 'blog_charset')
         return 'UTF-8';
     elseif($option === 'rewrite_rules')
-        return array();
+        return isset($options['rewrite_rules']) ? $options['rewrite_rules'] : array();
+    elseif($option === 'permalink_structure')
+        return isset($options['permalink_structure']) ? $options['permalink_structure'] : '';
     elseif($option === 'o3po-ready2publish')
         return $options['o3po-ready2publish'];
     elseif($option === 'o3po-ready2publish-storage')

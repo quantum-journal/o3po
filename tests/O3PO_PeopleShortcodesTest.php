@@ -10,6 +10,8 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
     private $former_editor_uuid = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
     private $coordinator_uuid = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
     private $original_settings;
+    private $original_rewrite_rules;
+    private $original_permalink_structure;
     private $original_query;
     private $original_papers;
     private $original_transient_result;
@@ -18,6 +20,8 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
     private function configure_people() {
         global $options;
         $this->original_settings = $options['o3po-settings'];
+        $this->original_rewrite_rules = isset($options['rewrite_rules']) ? $options['rewrite_rules'] : null;
+        $this->original_permalink_structure = isset($options['permalink_structure']) ? $options['permalink_structure'] : null;
         $this->original_query = get_global_query();
         global $get_transient_returns;
         $this->original_transient_result = $get_transient_returns;
@@ -42,6 +46,14 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
             global $options;
             global $get_transient_returns;
             $options['o3po-settings'] = $this->original_settings;
+            if(null === $this->original_rewrite_rules)
+                unset($options['rewrite_rules']);
+            else
+                $options['rewrite_rules'] = $this->original_rewrite_rules;
+            if(null === $this->original_permalink_structure)
+                unset($options['permalink_structure']);
+            else
+                $options['permalink_structure'] = $this->original_permalink_structure;
             $get_transient_returns = $this->original_transient_result;
             set_global_query($this->original_query);
         }
@@ -93,6 +105,37 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $this->assertCount(1, $posts);
         $this->assertSame('page', $posts[0]->post_type);
         $this->assertSame('page.php', O3PO_EditorPages::editor_profile_template('index.php'));
+    }
+
+    public function test_editor_endpoint_flushes_missing_rewrite_rule_only_once() {
+        $this->configure_people();
+        global $options;
+        $options['rewrite_rules'] = array();
+        $options['permalink_structure'] = '/%postname%/';
+        $flushes_before = get_flush_rewrite_rules_call_counter();
+
+        O3PO_EditorPages::add_editor_endpoint();
+
+        $this->assertSame($flushes_before + 1, get_flush_rewrite_rules_call_counter());
+
+        $options['rewrite_rules'] = array(
+            '^editor(/(.*))?/?$' => 'index.php?editor=$matches[1]',
+        );
+        O3PO_EditorPages::add_editor_endpoint();
+
+        $this->assertSame($flushes_before + 1, get_flush_rewrite_rules_call_counter());
+    }
+
+    public function test_editor_endpoint_does_not_flush_rewrite_rules_without_pretty_permalinks() {
+        $this->configure_people();
+        global $options;
+        $options['rewrite_rules'] = array();
+        $options['permalink_structure'] = '';
+        $flushes_before = get_flush_rewrite_rules_call_counter();
+
+        O3PO_EditorPages::add_editor_endpoint();
+
+        $this->assertSame($flushes_before, get_flush_rewrite_rules_call_counter());
     }
 
     public function test_editor_endpoint_uses_wordpress_404_for_unknown_or_non_editor_uuid() {
