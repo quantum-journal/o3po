@@ -263,6 +263,16 @@ function update_option( $option, $content) {
     $options[$option] = $content;
 }
 
+function add_option( $option, $value, $deprecated = '', $autoload = 'yes') {
+    global $options;
+
+    if(array_key_exists($option, $options))
+        return false;
+
+    $options[$option] = $value;
+    return true;
+}
+
 function delete_option( $option ) {
     global $options;
     unset($options[$option]);

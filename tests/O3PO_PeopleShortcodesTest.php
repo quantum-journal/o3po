@@ -26,7 +26,7 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $this->original_rewrite_rules = isset($options['rewrite_rules']) ? $options['rewrite_rules'] : null;
         $this->original_permalink_structure = isset($options['permalink_structure']) ? $options['permalink_structure'] : null;
         $this->original_rewrite_rule_options = array();
-        foreach(array(O3PO_RewriteRules::VERSION_OPTION, O3PO_RewriteRules::REFRESH_PENDING_OPTION, O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION) as $option)
+        foreach(array(O3PO_RewriteRules::VERSION_OPTION, O3PO_RewriteRules::REFRESH_PENDING_OPTION, O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION, O3PO_RewriteRules::REFRESH_404_LOCK_OPTION) as $option)
             $this->original_rewrite_rule_options[$option] = isset($options[$option]) ? $options[$option] : null;
         $this->original_request_uri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : null;
         $this->original_home_url_path = isset($options['home_url_path']) ? $options['home_url_path'] : null;
@@ -240,6 +240,23 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
 
         $this->assertArrayNotHasKey(O3PO_RewriteRules::REFRESH_PENDING_OPTION, $options);
         $this->assertArrayNotHasKey(O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION, $options);
+    }
+
+    public function test_concurrent_endpoint_404_does_not_bypass_refresh_rate_limit() {
+        $this->configure_people();
+        global $options, $wp_query;
+        $options['permalink_structure'] = '/%postname%/';
+        $options[O3PO_RewriteRules::REFRESH_404_LOCK_OPTION] = true;
+        unset($options[O3PO_RewriteRules::REFRESH_PENDING_OPTION], $options[O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION]);
+        $_SERVER['REQUEST_URI'] = '/editor/' . $this->editor_uuid . '/';
+        $wp_query = new WP_Query(null, array('editor' => $this->editor_uuid));
+        $wp_query->is_404 = true;
+
+        O3PO_RewriteRules::schedule_refresh_on_endpoint_404();
+
+        $this->assertArrayNotHasKey(O3PO_RewriteRules::REFRESH_PENDING_OPTION, $options);
+        $this->assertArrayNotHasKey(O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION, $options);
+        $this->assertTrue($options[O3PO_RewriteRules::REFRESH_404_LOCK_OPTION]);
     }
 
     public function test_publication_404_without_matching_rewrite_rule_schedules_refresh() {

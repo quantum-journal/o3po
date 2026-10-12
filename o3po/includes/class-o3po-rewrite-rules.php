@@ -6,6 +6,7 @@ class O3PO_RewriteRules {
     const VERSION = '1';
     const REFRESH_PENDING_OPTION = 'o3po_rewrite_rules_refresh_pending';
     const LAST_404_REFRESH_TRIGGER_OPTION = 'o3po_rewrite_rules_last_404_trigger';
+    const REFRESH_404_LOCK_OPTION = 'o3po_rewrite_rules_404_lock';
     // Limit 404-triggered rewrite refreshes to one every ten minutes.
     const REWRITE_404_RATE_LIMIT_SECONDS = 600;
 
@@ -34,13 +35,23 @@ class O3PO_RewriteRules {
         if(!is_404() or !isset($wp_query->query_vars) or empty(get_option('permalink_structure')) or !static::is_o3po_endpoint_request($wp_query->query_vars))
             return;
 
-        $now = time();
-        $last_trigger = (int)get_option(static::LAST_404_REFRESH_TRIGGER_OPTION, 0);
-        if($last_trigger > $now - static::REWRITE_404_RATE_LIMIT_SECONDS)
+        if(!add_option(static::REFRESH_404_LOCK_OPTION, true, '', false))
             return;
 
-        update_option(static::LAST_404_REFRESH_TRIGGER_OPTION, $now, false);
-        static::schedule_refresh();
+        try
+        {
+            $now = time();
+            $last_trigger = (int)get_option(static::LAST_404_REFRESH_TRIGGER_OPTION, 0);
+            if($last_trigger > $now - static::REWRITE_404_RATE_LIMIT_SECONDS)
+                return;
+
+            update_option(static::LAST_404_REFRESH_TRIGGER_OPTION, $now, false);
+            static::schedule_refresh();
+        }
+        finally
+        {
+            delete_option(static::REFRESH_404_LOCK_OPTION);
+        }
 
     }
 
@@ -85,21 +96,82 @@ class O3PO_RewriteRules {
     private static function is_o3po_endpoint_request($query_vars) {
 
         $settings = O3PO_Settings::instance();
-        $endpoint_query_vars = array(
-            'editor',
-            'pdf',
-            'web-statement',
+        foreach(static::get_endpoint_query_vars($settings) as $query_var)
+            if(is_string($query_var) and $query_var !== '' and array_key_exists($query_var, $query_vars))
+                return true;
+
+        $request_path = static::get_normalized_request_path();
+        if($request_path === false)
+            return false;
+
+        $segments = array_values(array_filter(explode('/', trim($request_path, '/')), 'strlen'));
+        if(empty($segments))
+            return false;
+
+        if(in_array($segments[0], static::get_root_endpoint_slugs($settings), true))
+            return true;
+
+        $publication_slugs = array(
+            $settings->get_field_value('primary_publication_type_name_plural'),
+            $settings->get_field_value('secondary_publication_type_name_plural'),
+        );
+        if(in_array($segments[0], $publication_slugs, true))
+        {
+            if(!static::has_rewrite_rule_for_request_path($request_path))
+                return true;
+        }
+
+        return false;
+
+    }
+
+        /**
+         * Get the root-level routes configured by O3PO.
+         *
+         * @access private
+         * @param  O3PO_Settings $settings The plugin settings.
+         * @return array The root-level endpoint slugs.
+         */
+    private static function get_root_endpoint_slugs($settings) {
+
+        return array(
             $settings->get_field_value('arxiv_paper_doi_feed_endpoint'),
             $settings->get_field_value('volumes_endpoint'),
             $settings->get_field_value('ready2publish_slug'),
             $settings->get_field_value('ready2publish_slug') . '-dashboard',
-            $settings->get_field_value('primary_publication_type_name'),
-            $settings->get_field_value('secondary_publication_type_name'),
+            'editor',
         );
 
-        foreach($endpoint_query_vars as $query_var)
-            if(is_string($query_var) and $query_var !== '' and array_key_exists($query_var, $query_vars))
-                return true;
+    }
+
+        /**
+         * Get the query vars used to identify O3PO endpoint requests.
+         *
+         * @access private
+         * @param  O3PO_Settings $settings The plugin settings.
+         * @return array The O3PO endpoint query vars.
+         */
+    private static function get_endpoint_query_vars($settings) {
+
+        return array_merge(
+            static::get_root_endpoint_slugs($settings),
+            array(
+                'pdf',
+                'web-statement',
+                $settings->get_field_value('primary_publication_type_name'),
+                $settings->get_field_value('secondary_publication_type_name'),
+            )
+        );
+
+    }
+
+        /**
+         * Get the request path without the site's home path prefix.
+         *
+         * @access private
+         * @return string|false The normalized request path, or false when unavailable.
+         */
+    private static function get_normalized_request_path() {
 
         if(empty($_SERVER['REQUEST_URI']))
             return false;
@@ -115,31 +187,7 @@ class O3PO_RewriteRules {
         elseif($home_path !== '' and strpos($request_path, $home_path . '/') === 0)
             $request_path = substr($request_path, strlen($home_path));
 
-        $segments = array_values(array_filter(explode('/', trim($request_path, '/')), 'strlen'));
-        if(empty($segments))
-            return false;
-
-        $root_endpoints = array(
-            $settings->get_field_value('arxiv_paper_doi_feed_endpoint'),
-            $settings->get_field_value('volumes_endpoint'),
-            $settings->get_field_value('ready2publish_slug'),
-            $settings->get_field_value('ready2publish_slug') . '-dashboard',
-            'editor',
-        );
-        if(in_array($segments[0], $root_endpoints, true))
-            return true;
-
-        $publication_slugs = array(
-            $settings->get_field_value('primary_publication_type_name_plural'),
-            $settings->get_field_value('secondary_publication_type_name_plural'),
-        );
-        if(in_array($segments[0], $publication_slugs, true))
-        {
-            if(!static::has_rewrite_rule_for_request_path($request_path))
-                return true;
-        }
-
-        return false;
+        return $request_path;
 
     }
 
@@ -162,12 +210,38 @@ class O3PO_RewriteRules {
             if(!is_string($rule))
                 continue;
 
-            $matches = @preg_match('#^' . $rule . '#', $request);
-            if($matches === 1)
+            $rule = static::escape_regex_delimiter($rule, '#');
+            $match_result = @preg_match('#^' . $rule . '#', $request);
+            if($match_result === 1)
                 return true;
         }
 
         return false;
+
+    }
+
+        /**
+         * Escape unescaped instances of a regex delimiter without changing existing escapes.
+         *
+         * @access private
+         * @param  string $pattern The regular expression.
+         * @param  string $delimiter The regex delimiter.
+         * @return string The delimiter-safe regular expression.
+         */
+    private static function escape_regex_delimiter($pattern, $delimiter) {
+
+        $escaped_pattern = '';
+        $backslash_count = 0;
+        for($i = 0; $i < strlen($pattern); $i++)
+        {
+            $character = $pattern[$i];
+            if($character === $delimiter and $backslash_count % 2 === 0)
+                $escaped_pattern .= '\\';
+            $escaped_pattern .= $character;
+            $backslash_count = $character === '\\' ? $backslash_count + 1 : 0;
+        }
+
+        return $escaped_pattern;
 
     }
 }
