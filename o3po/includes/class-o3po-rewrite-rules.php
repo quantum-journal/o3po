@@ -6,6 +6,7 @@ class O3PO_RewriteRules {
     const VERSION = '1';
     const REFRESH_PENDING_OPTION = 'o3po_rewrite_rules_refresh_pending';
     const LAST_404_REFRESH_TRIGGER_OPTION = 'o3po_rewrite_rules_last_404_trigger';
+    // Limit 404-triggered rewrite refreshes to one every ten minutes.
     const REWRITE_404_RATE_LIMIT_SECONDS = 600;
 
         /**
@@ -132,9 +133,6 @@ class O3PO_RewriteRules {
         );
         if(in_array($segments[0], $publication_slugs, true))
         {
-            if(in_array(end($segments), array('pdf', 'web-statement'), true))
-                return true;
-
             if(!static::has_rewrite_rules_for_publication_slug($segments[0]))
                 return true;
         }
@@ -157,7 +155,7 @@ class O3PO_RewriteRules {
             return false;
 
         foreach($rewrite_rules as $rule => $query)
-            if(is_string($rule) and (strpos($rule, $slug . '/') === 0 or strpos($rule, '^' . $slug . '/') === 0 or strpos($rule, '/' . $slug . '/') !== false))
+            if(is_string($rule) and (strpos($rule, $slug . '/') === 0 or strpos($rule, '^' . $slug . '/') === 0))
                 return true;
 
         return false;

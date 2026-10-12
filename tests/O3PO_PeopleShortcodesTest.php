@@ -215,7 +215,7 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $options['rewrite_rules'] = array(
             'papers/([^/]+)/?$' => 'index.php?paper=$matches[1]',
         );
-        $_SERVER['REQUEST_URI'] = '/papers/missing-post/';
+        $_SERVER['REQUEST_URI'] = '/papers/missing-post/pdf/';
         $wp_query = new WP_Query(null, array());
         $wp_query->is_404 = true;
 
@@ -231,6 +231,9 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         global $options, $wp_query;
         $options['home_url_path'] = '/subsite';
         $settings = O3PO_Settings::instance();
+        $options['rewrite_rules'] = array(
+            'unrelated/' . $settings->get_field_value('secondary_publication_type_name_plural') . '/([^/]+)/?$' => 'index.php?page=$matches[1]',
+        );
         $request_paths = array(
             '/subsite/' . $settings->get_field_value('volumes_endpoint') . '/2/',
             '/subsite/' . $settings->get_field_value('ready2publish_slug') . '/',
@@ -251,6 +254,7 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         }
 
     }
+
     public function test_endpoint_and_secondary_publication_query_vars_trigger_404_refresh() {
         $this->configure_people();
         global $options, $wp_query;
