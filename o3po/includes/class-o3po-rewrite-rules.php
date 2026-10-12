@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Schedule and recover O-3PO rewrite rules.
+ *
+ * @since 0.5.0
+ */
 class O3PO_RewriteRules {
 
     const REFRESH_PENDING_OPTION = 'o3po_rewrite_rules_refresh_pending';
@@ -14,6 +19,7 @@ class O3PO_RewriteRules {
         /**
          * Schedule a rewrite refresh for the next request.
          *
+         * @since 0.5.0
          * @access public
          */
     public static function schedule_refresh() {
@@ -27,6 +33,7 @@ class O3PO_RewriteRules {
          *
          * To be added to the 'template_redirect' action.
          *
+         * @since 0.5.0
          * @access public
          */
     public static function schedule_refresh_on_endpoint_404() {
@@ -79,6 +86,7 @@ class O3PO_RewriteRules {
          * A refresh queued on 'template_redirect' runs on the next request; it
          * does not change the 404 response that caused it.
          *
+         * @since 0.5.0
          * @access public
          */
     public static function refresh_if_needed() {
@@ -99,6 +107,7 @@ class O3PO_RewriteRules {
         /**
          * Flush all rewrite rules after plugin deactivation.
          *
+         * @since 0.5.0
          * @access public
          */
     public static function flush_on_deactivation() {
@@ -113,6 +122,7 @@ class O3PO_RewriteRules {
          * Query vars catch recognized routes. The URI fallback also catches
          * endpoint URLs whose rewrite rule is missing and therefore was not parsed.
          *
+         * @since 0.5.0
          * @access private
          * @param  array $query_vars Parsed WordPress query variables.
          * @return bool Whether the request targets an O3PO endpoint or publication route.
@@ -165,6 +175,7 @@ class O3PO_RewriteRules {
         /**
          * Check whether a rewrite query targets a custom publication type.
          *
+         * @since 0.5.0
          * @access private
          * @param  string $query The stored rewrite query.
          * @param  string $publication_query_var The publication type's query var.
@@ -190,6 +201,7 @@ class O3PO_RewriteRules {
         /**
          * Check a route slug against configured values without case sensitivity.
          *
+         * @since 0.5.0
          * @access private
          * @param  string $value The route slug from the request.
          * @param  array $values Configured route slugs.
@@ -208,6 +220,7 @@ class O3PO_RewriteRules {
         /**
          * Get the root-level routes configured by O3PO.
          *
+         * @since 0.5.0
          * @access private
          * @param  O3PO_Settings $settings The plugin settings.
          * @return array The root-level endpoint slugs.
@@ -227,6 +240,7 @@ class O3PO_RewriteRules {
         /**
          * Get the query vars used to identify O3PO endpoint requests.
          *
+         * @since 0.5.0
          * @access private
          * @param  O3PO_Settings $settings The plugin settings.
          * @return array The O3PO endpoint query vars.
@@ -248,6 +262,7 @@ class O3PO_RewriteRules {
         /**
          * Get the request path without the site's home path prefix.
          *
+         * @since 0.5.0
          * @access private
          * @return string|false The normalized request path, or false when unavailable.
          */
@@ -274,6 +289,7 @@ class O3PO_RewriteRules {
         /**
          * Check whether a matching stored rewrite rule targets a publication type.
          *
+         * @since 0.5.0
          * @access private
          * @param  string $publication_query_var The publication type's query var.
          * @param  string $request_path The request path.
@@ -313,6 +329,7 @@ class O3PO_RewriteRules {
         /**
          * Atomically replace a stale 404 refresh lock.
          *
+         * @since 0.5.0
          * @access private
          * @param  int $stale_lock_time The timestamp currently stored in the lock.
          * @param  int $new_lock_time The timestamp to store for this request.
@@ -346,6 +363,7 @@ class O3PO_RewriteRules {
         /**
          * Clear cached option values before a fresh database-backed read.
          *
+         * @since 0.5.0
          * @access private
          * @param  string $option_name The option to invalidate.
          */
@@ -362,6 +380,7 @@ class O3PO_RewriteRules {
         /**
          * Release the refresh lock only if it is still owned by this request.
          *
+         * @since 0.5.0
          * @access private
          * @param  int $lock_time The timestamp stored by this request.
          */

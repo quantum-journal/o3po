@@ -13,6 +13,11 @@
 - `tests/resources/bootstrap.php` supplies WordPress test doubles. Keep test-only instrumentation explained at its declaration and verify that tests exercise the behavior it measures.
 - Some publication metadata tests rely on external tools or environment details; inspect failure output before attributing test failures to a code change.
 
+## API documentation
+
+- Run `make docs` to download the pinned phpDocumentor PHAR from the official GitHub release, verify its SHA-256 checksum, and regenerate `docs/` from `o3po/`. The new site is staged and replaces the old output only after generation succeeds.
+- When updating phpDocumentor, change the release version and matching SHA-256 checksum in `Makefile`; official PHAR downloads are available from the phpDocumentor GitHub Releases page.
+
 ## People and editor pages
 
 - People records are read from settings through `O3PO_People` in `o3po/includes/people.php`. Keep shared data access and name/sort helpers there; shortcode rendering belongs in `O3PO_PeopleShortcodes`.

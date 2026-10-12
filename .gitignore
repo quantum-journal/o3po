@@ -1,4 +1,6 @@
 phpDocumentor.phar
+.phpdoc/
+docs.tmp/
 docs/phpdoc-cache-*
 deploy
 phpunit-*.phar
