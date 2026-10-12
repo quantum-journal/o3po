@@ -596,7 +596,7 @@ function the_post() {
 function wp_insert_post($postarr, $wp_error = false, $fire_after_hooks = true ) {
     global $posts;
     $post_id = 0;
-    while(isset($array[$post_id])) $post_id++;
+    while(isset($posts[$post_id])) $post_id++;
     $posts[$post_id] = $postarr;
 
     return $post_id;
