@@ -2193,8 +2193,13 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
     #[Depends('test_create_primary_publication_type')]
     #[Depends('test_initialize_settings')]
     public function test_404_error_on_primary_schedules_deferred_rewrite_refresh( $primary_publication_type, $settings ) {
+        global $options;
+        $had_permalink_structure = isset($options['permalink_structure']);
+        $previous_permalink_structure = isset($options['permalink_structure']) ? $options['permalink_structure'] : null;
+        $options['permalink_structure'] = '/%postname%/';
         delete_option(O3PO_RewriteRules::REFRESH_PENDING_OPTION);
         delete_option(O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION);
+        delete_option(O3PO_RewriteRules::REFRESH_404_LOCK_OPTION);
 
         $wp_query = new WP_Query(null, array(
             $primary_publication_type->get_publication_type_name() => 'unmatched-doi-suffix',
@@ -2207,6 +2212,11 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
 
         $this->assertTrue(get_option(O3PO_RewriteRules::REFRESH_PENDING_OPTION));
         $this->assertSame($flushes_before, get_flush_rewrite_rules_call_counter());
+
+        if($had_permalink_structure)
+            $options['permalink_structure'] = $previous_permalink_structure;
+        else
+            unset($options['permalink_structure']);
     }
 
 
