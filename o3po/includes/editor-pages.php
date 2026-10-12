@@ -8,6 +8,8 @@ class O3PO_EditorPages {
 
     private static $handling_editor_uuid_before_meta_change = array();
 
+    const ENDPOINT_SLUG = 'editor';
+
     /**
      * Editor paper lists refresh every 12 hours, matching the default cited-by interval.
      */
@@ -24,7 +26,7 @@ class O3PO_EditorPages {
          */
     public static function add_editor_endpoint() {
 
-        add_rewrite_endpoint('editor', EP_ROOT);
+        add_rewrite_endpoint(static::ENDPOINT_SLUG, EP_ROOT);
 
     }
 
@@ -39,10 +41,10 @@ class O3PO_EditorPages {
          */
     public static function handle_editor_endpoint_request($wp) {
 
-        if(!isset($wp->query_vars['editor']))
+        if(!isset($wp->query_vars[static::ENDPOINT_SLUG]))
             return;
 
-        $editor = static::get_editor_by_uuid($wp->query_vars['editor']);
+        $editor = static::get_editor_by_uuid($wp->query_vars[static::ENDPOINT_SLUG]);
         if(empty($editor))
         {
             $wp->query_vars['error'] = '404';
@@ -353,7 +355,7 @@ class O3PO_EditorPages {
 
         $post = new stdClass;
         $post->post_author = 0;
-        $post->post_name = 'editor';
+        $post->post_name = static::ENDPOINT_SLUG;
         $post->guid = get_site_url();
         $post->post_title = '';
         $post->post_content = '';

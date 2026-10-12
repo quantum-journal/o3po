@@ -8,6 +8,7 @@ require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-primary-publica
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-secondary-publication-type.php');
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-latex.php');
 require_once(dirname( __FILE__ ) . '/../o3po/admin/class-o3po-admin.php');
+require_once(dirname( __FILE__ ) . '/../o3po/includes/editor-pages.php');
 require_once(dirname( __FILE__ ) . '/O3PO_SettingsTest.php');
 
 use PHPUnit\Framework\Attributes\Depends;

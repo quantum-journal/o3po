@@ -17,6 +17,16 @@ class O3PO_TestWpdb {
         $options[$option] = $data['option_value'];
         return 1;
     }
+
+    public function delete($table, $where, $where_format = null) {
+        global $options;
+        $option = $where['option_name'];
+        if($table !== $this->options or !isset($options[$option]) or (string)$options[$option] !== $where['option_value'])
+            return 0;
+
+        unset($options[$option]);
+        return 1;
+    }
 }
 
 class O3PO_PeopleShortcodesTest extends O3PO_TestCase
@@ -240,6 +250,25 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $this->assertArrayNotHasKey(O3PO_RewriteRules::REFRESH_PENDING_OPTION, $options);
         $this->assertArrayNotHasKey(O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION, $options);
 
+    }
+
+    public function test_anchored_publication_rewrite_rule_prevents_refresh() {
+        $this->configure_people();
+        global $options, $wp_query;
+        $options['permalink_structure'] = '/%postname%/';
+        $publication_slug = O3PO_Settings::instance()->get_field_value('primary_publication_type_name_plural');
+        $options['rewrite_rules'] = array(
+            '^' . $publication_slug . '/?$' => 'index.php?page_id=1',
+        );
+        $_SERVER['REQUEST_URI'] = '/' . $publication_slug . '/';
+        unset($options[O3PO_RewriteRules::REFRESH_PENDING_OPTION], $options[O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION]);
+        $wp_query = new WP_Query(null, array());
+        $wp_query->is_404 = true;
+
+        O3PO_RewriteRules::schedule_refresh_on_endpoint_404();
+
+        $this->assertArrayNotHasKey(O3PO_RewriteRules::REFRESH_PENDING_OPTION, $options);
+        $this->assertArrayNotHasKey(O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION, $options);
     }
 
     public function test_endpoint_404_without_pretty_permalinks_does_not_schedule_rewrite_refresh() {

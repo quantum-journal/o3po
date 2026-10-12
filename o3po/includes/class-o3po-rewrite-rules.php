@@ -47,8 +47,6 @@ class O3PO_RewriteRules {
                 return;
         }
 
-        $lock_value = get_option(static::REFRESH_404_LOCK_OPTION, 0);
-
         try
         {
             $now = time();
@@ -61,8 +59,7 @@ class O3PO_RewriteRules {
         }
         finally
         {
-            if((int)get_option(static::REFRESH_404_LOCK_OPTION, 0) === (int)$lock_value)
-                delete_option(static::REFRESH_404_LOCK_OPTION);
+            static::release_refresh_lock($lock_time);
         }
 
     }
@@ -151,7 +148,7 @@ class O3PO_RewriteRules {
             $settings->get_field_value('volumes_endpoint'),
             $settings->get_field_value('ready2publish_slug'),
             $settings->get_field_value('ready2publish_slug') . '-dashboard',
-            'editor',
+            O3PO_EditorPages::ENDPOINT_SLUG,
         );
 
     }
@@ -223,11 +220,18 @@ class O3PO_RewriteRules {
             if(!is_string($rule))
                 continue;
 
-            if(strpos($rule, $slug . '/') !== 0 and strpos($rule, '^' . $slug . '/') !== 0)
+            $rule_pattern = $rule;
+            if(isset($rule_pattern[0]) and $rule_pattern[0] === '^')
+                $rule_pattern = substr($rule_pattern, 1);
+            if(strpos($rule_pattern, $slug) !== 0)
+                continue;
+
+            $path_after_slug = substr($rule_pattern, strlen($slug));
+            if($path_after_slug !== '' and $path_after_slug[0] !== '/')
                 continue;
 
             $delimiter = chr(1);
-            $match_result = preg_match($delimiter . '^' . $rule . $delimiter, $request);
+            $match_result = preg_match($delimiter . '^' . $rule_pattern . $delimiter, $request);
             if($match_result === false)
                 continue;
             if($match_result === 1)
@@ -272,6 +276,38 @@ class O3PO_RewriteRules {
         }
 
         return true;
+
+    }
+
+        /**
+         * Release the refresh lock only if it is still owned by this request.
+         *
+         * @access private
+         * @param  int $lock_time The timestamp stored by this request.
+         */
+    private static function release_refresh_lock($lock_time) {
+
+        global $wpdb;
+        if(isset($wpdb) and isset($wpdb->options) and method_exists($wpdb, 'delete'))
+        {
+            $deleted = $wpdb->delete(
+                $wpdb->options,
+                array(
+                    'option_name' => static::REFRESH_404_LOCK_OPTION,
+                    'option_value' => (string)$lock_time,
+                ),
+                array('%s', '%s')
+            );
+            if($deleted === 1 and function_exists('wp_cache_delete'))
+            {
+                wp_cache_delete(static::REFRESH_404_LOCK_OPTION, 'options');
+                wp_cache_delete('alloptions', 'options');
+            }
+            return;
+        }
+
+        if((int)get_option(static::REFRESH_404_LOCK_OPTION, 0) === (int)$lock_time)
+            delete_option(static::REFRESH_404_LOCK_OPTION);
 
     }
 }
