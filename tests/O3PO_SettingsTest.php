@@ -56,6 +56,55 @@ class O3PO_SettingsTest extends O3PO_TestCase
         return $settings;
     }
 
+        /**
+         * @depends test_initialize_settings
+         */
+    #[Depends('test_initialize_settings')]
+    public function test_get_person_data_backfills_missing_person_uuids( $settings ) {
+
+        global $options;
+        $previous_settings = $options['o3po-settings'];
+        $options['o3po-settings'] = array_merge($previous_settings, array(
+            'person_first_names' => array('Alice', 'Bob', 'Carol'),
+            'person_last_names' => array('One', 'Two', 'Three'),
+            'person_role' => array('editor', 'editor', 'editor'),
+            'person_since_year' => array('', '', ''),
+            'person_until_year' => array('', '', ''),
+            'person_url' => array('', '', ''),
+            'person_affiliation' => array('', '', ''),
+            'person_country' => array('', '', ''),
+            'person_extra' => array('', '', ''),
+        ));
+        unset($options['o3po-settings']['person_uuidv4']);
+
+        try
+        {
+            $people = O3PO_PeopleShortcodes::get_person_data();
+            $person_uuidv4 = array_column($people, 'uuidv4');
+
+            $this->assertCount(3, $person_uuidv4);
+            foreach($person_uuidv4 as $uuidv4)
+                $this->assertTrue(O3PO_Utility::valid_uuidv4($uuidv4));
+            $this->assertSame($person_uuidv4, $options['o3po-settings']['person_uuidv4']);
+
+            $options['o3po-settings']['person_uuidv4'] = array(
+                0 => $person_uuidv4[0],
+                2 => $person_uuidv4[2],
+            );
+            $people = O3PO_PeopleShortcodes::get_person_data();
+
+            $this->assertSame($person_uuidv4[0], $people[0]['uuidv4']);
+            $this->assertNotEmpty($people[1]['uuidv4']);
+            $this->assertSame($person_uuidv4[2], $people[2]['uuidv4']);
+            foreach($people as $x => $person)
+                $this->assertSame($person['uuidv4'], $options['o3po-settings']['person_uuidv4'][$x]);
+        }
+        finally
+        {
+            $options['o3po-settings'] = $previous_settings;
+        }
+    }
+
 
         /**
          * @depends test_initialize_settings

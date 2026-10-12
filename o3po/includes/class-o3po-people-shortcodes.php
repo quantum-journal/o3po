@@ -295,7 +295,7 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
         $settings = O3PO_Settings::instance();
         $person_first_names = $settings->get_field_value('person_first_names');
         $person_last_names = $settings->get_field_value('person_last_names');
-        $person_uuidv4 = $settings->get_field_value('person_uuidv4');
+        $person_uuidv4 = static::get_person_uuidv4s($settings, $person_first_names, $person_last_names);
 
         $key = array_search($uuidv4, $person_uuidv4, true);
 
@@ -325,7 +325,7 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
         $person_affiliation = $settings->get_field_value('person_affiliation');
         $person_country = $settings->get_field_value('person_country');
         $person_extra = $settings->get_field_value('person_extra');
-        $person_uuidv4 = $settings->get_field_value('person_uuidv4');
+        $person_uuidv4 = static::get_person_uuidv4s($settings, $person_first_names, $person_last_names);
 
         $person_data = array();
         foreach($person_first_names as $x => $foo)
@@ -343,6 +343,33 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
                                    );
 
         return $person_data;
+    }
+
+    private static function get_person_uuidv4s($settings, $person_first_names, $person_last_names) {
+
+        $person_uuidv4 = $settings->get_field_value('person_uuidv4');
+        if(!is_array($person_uuidv4))
+            $person_uuidv4 = array();
+
+        $updated = false;
+        foreach($person_first_names as $x => $foo)
+            if((!empty($foo) || !empty($person_last_names[$x])) && empty($person_uuidv4[$x]))
+            {
+                $person_uuidv4[$x] = O3PO_Utility::uuidv4();
+                $updated = true;
+            }
+
+        if($updated)
+        {
+            $option_name = $settings->get_plugin_name() . '-settings';
+            $options = get_option($option_name, array());
+            if(!is_array($options))
+                $options = array();
+            $options['person_uuidv4'] = $person_uuidv4;
+            update_option($option_name, $options);
+        }
+
+        return $person_uuidv4;
     }
 
 
