@@ -123,8 +123,8 @@ function trigger_hook( $hook ) {
         call_user_func($callable);
 }
 
-global $filteres;
-$filteres = array();
+global $filters;
+$filters = array();
 function add_filter( $hook, $callable ) {
     global $filters;
 
