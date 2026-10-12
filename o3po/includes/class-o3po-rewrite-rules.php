@@ -8,6 +8,8 @@ class O3PO_RewriteRules {
     const LAST_404_REFRESH_TRIGGER_OPTION = 'o3po_rewrite_rules_last_404_trigger';
     const REFRESH_404_LOCK_OPTION = 'o3po_rewrite_rules_404_lock';
     const REFRESH_404_LOCK_TIMEOUT_SECONDS = 60;
+    // Avoid delimiter collisions with user-configured rewrite patterns.
+    const REWRITE_RULE_REGEX_DELIMITER = "\x01";
     // Limit 404-triggered rewrite refreshes to one every ten minutes.
     const REWRITE_404_RATE_LIMIT_SECONDS = 600;
 
@@ -37,19 +39,24 @@ class O3PO_RewriteRules {
             return;
 
         $lock_time = time();
-        if(!add_option(static::REFRESH_404_LOCK_OPTION, $lock_time, '', false))
-        {
-            static::clear_option_cache(static::REFRESH_404_LOCK_OPTION);
-            $existing_lock_time = (int)get_option(static::REFRESH_404_LOCK_OPTION, 0);
-            if($existing_lock_time > $lock_time - static::REFRESH_404_LOCK_TIMEOUT_SECONDS)
-                return;
-
-            if(!static::replace_stale_refresh_lock($existing_lock_time, $lock_time))
-                return;
-        }
-
+        $lock_acquired = false;
         try
         {
+            if(add_option(static::REFRESH_404_LOCK_OPTION, $lock_time, '', false))
+                $lock_acquired = true;
+            else
+            {
+                static::clear_option_cache(static::REFRESH_404_LOCK_OPTION);
+                $existing_lock_time = (int)get_option(static::REFRESH_404_LOCK_OPTION, 0);
+                if($existing_lock_time > $lock_time - static::REFRESH_404_LOCK_TIMEOUT_SECONDS)
+                    return;
+
+                if(!static::replace_stale_refresh_lock($existing_lock_time, $lock_time))
+                    return;
+
+                $lock_acquired = true;
+            }
+
             $now = time();
             static::clear_option_cache(static::LAST_404_REFRESH_TRIGGER_OPTION);
             $last_trigger = (int)get_option(static::LAST_404_REFRESH_TRIGGER_OPTION, 0);
@@ -61,7 +68,8 @@ class O3PO_RewriteRules {
         }
         finally
         {
-            static::release_refresh_lock($lock_time);
+            if($lock_acquired)
+                static::release_refresh_lock($lock_time);
         }
 
     }
@@ -250,8 +258,8 @@ class O3PO_RewriteRules {
             if($path_after_slug !== '' and $path_after_slug[0] !== '/')
                 continue;
 
-            $delimiter = chr(1);
-            $match_result = preg_match($delimiter . '^' . $rule_pattern . $delimiter . 'i', $request);
+            $delimiter = static::REWRITE_RULE_REGEX_DELIMITER;
+            $match_result = preg_match($delimiter . '^(?:' . $rule_pattern . ')' . $delimiter . 'i', $request);
             if($match_result === false)
                 continue;
             if($match_result === 1)
