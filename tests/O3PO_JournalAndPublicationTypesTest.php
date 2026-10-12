@@ -40,6 +40,73 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         unset($posts[$post_id]);
     }
 
+        /**
+         * @depends test_create_primary_publication_type
+         */
+    #[Depends('test_create_primary_publication_type')]
+    function test_editor_leaderboard_counts_published_primary_papers_by_year( $primary_publication_type ) {
+        global $options, $posts, $_GET;
+
+        $previous_settings = $options['o3po-settings'];
+        $previous_posts = $posts;
+        $previous_get = $_GET;
+        $post_type = $primary_publication_type->get_publication_type_name();
+        $editor_one_uuid = 'uuid-editor-one';
+        $editor_two_uuid = 'uuid-editor-two';
+        $options['o3po-settings']['person_first_names'] = array('Alice', 'Zed');
+        $options['o3po-settings']['person_last_names'] = array('Editor', 'Editor');
+        $options['o3po-settings']['person_role'] = array('editor', 'editor');
+        $options['o3po-settings']['person_since_year'] = array('', '');
+        $options['o3po-settings']['person_until_year'] = array('', '');
+        $options['o3po-settings']['person_url'] = array('', '');
+        $options['o3po-settings']['person_affiliation'] = array('', '');
+        $options['o3po-settings']['person_country'] = array('', '');
+        $options['o3po-settings']['person_extra'] = array('', '');
+        $options['o3po-settings']['person_uuidv4'] = array($editor_one_uuid, $editor_two_uuid);
+        $posts = array(
+            1001 => array('post_type' => $post_type, 'post_status' => 'publish', 'meta' => array(
+                $post_type . '_date_published' => '2024-01-01',
+                $post_type . '_handling_editor_uuidv4' => $editor_one_uuid,
+            )),
+            1002 => array('post_type' => $post_type, 'post_status' => 'publish', 'meta' => array(
+                $post_type . '_date_published' => '2024-02-01',
+                $post_type . '_handling_editor_uuidv4' => $editor_one_uuid,
+            )),
+            1003 => array('post_type' => $post_type, 'post_status' => 'publish', 'meta' => array(
+                $post_type . '_date_published' => '2024-03-01',
+                $post_type . '_handling_editor_uuidv4' => $editor_two_uuid,
+            )),
+            1004 => array('post_type' => $post_type, 'post_status' => 'publish', 'meta' => array(
+                $post_type . '_date_published' => '2023-01-01',
+                $post_type . '_handling_editor_uuidv4' => $editor_two_uuid,
+            )),
+            1005 => array('post_type' => $post_type, 'post_status' => 'draft', 'meta' => array(
+                $post_type . '_date_published' => '2024-04-01',
+                $post_type . '_handling_editor_uuidv4' => $editor_two_uuid,
+            )),
+        );
+        $_GET['tab'] = 'editor-leaderboard';
+
+        ob_start();
+        (new O3PO_Admin('o3po', '0.3.0', 'O-3PO'))->render_meta_data_explorer();
+        $output = ob_get_clean();
+
+        $options['o3po-settings'] = $previous_settings;
+        $posts = $previous_posts;
+        $_GET = $previous_get;
+
+        $this->assertValidHTMLFragment($output);
+        $this->assertStringContainsString('/editor/' . $editor_one_uuid . '/', $output);
+        $this->assertStringContainsString('/editor/' . $editor_two_uuid . '/', $output);
+        $this->assertStringContainsString('2024', $output);
+        $this->assertStringContainsString('2023', $output);
+        $this->assertStringContainsString('Alice Editor</a></td><td style="text-align: right;">2</td>', $output);
+        $this->assertStringContainsString('Zed Editor</a></td><td style="text-align: right;">1</td>', $output);
+        $this->assertSame(1, substr_count($output, '<h4>2024</h4>'));
+        $this->assertLessThan(strpos($output, '<h4>2023</h4>'), strpos($output, '<h4>2024</h4>'));
+        $this->assertLessThan(strpos($output, 'Zed Editor'), strpos($output, 'Alice Editor'));
+    }
+
     public static function test_initialize_settings() {
 
         $settings = O3PO_SettingsTest::get_settings();
