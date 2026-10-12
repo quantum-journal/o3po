@@ -20,6 +20,26 @@ use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
 {
 
+    public function test_handling_editor_links_to_editor_profile() {
+        global $posts;
+        $post_id = 123456;
+        $editor_uuid = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+        $posts[$post_id] = array(
+            'post_type' => 'paper',
+            'meta' => array('paper_handling_editor_uuidv4' => $editor_uuid),
+        );
+
+        $link = O3PO_PublicationType::get_formated_handling_editor($post_id);
+
+        $this->assertSame(
+            '<a href="' . esc_url(get_site_url() . '/editor/' . rawurlencode($editor_uuid) . '/') . '">' .
+            esc_html(O3PO_People::get_formated_name_from_uuidv4($editor_uuid)) . '</a>',
+            $link
+        );
+        $this->assertStringNotContainsString('/people/#person-', $link);
+        unset($posts[$post_id]);
+    }
+
     public static function test_initialize_settings() {
 
         $settings = O3PO_SettingsTest::get_settings();
