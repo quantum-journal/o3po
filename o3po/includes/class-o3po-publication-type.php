@@ -2841,7 +2841,7 @@ abstract class O3PO_PublicationType {
                 $first_affiliation = False;
             else
                 $formated_affiliations .= "; ";
-            $formated_affiliations .= esc_html($affiliation);
+            $formated_affiliations .= $affiliation;
         }
 
         return $formated_affiliations;
