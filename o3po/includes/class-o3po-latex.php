@@ -840,7 +840,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
 
         $month = intval($month);
         if ($month < 1 || $month > 12)
-            throw new Exception("Month must be an integeger between 1 and 12");
+            throw new Exception("Month must be an integer between 1 and 12");
         return array(
             1 => 'jan',
             2 => 'feb',
