@@ -47,6 +47,8 @@ class O3PO_RewriteRules {
          * Refresh rewrite rules once all endpoints and post types have registered.
          *
          * To be added to the 'wp_loaded' action.
+         * A refresh queued on 'template_redirect' runs on the next request; it
+         * does not change the 404 response that caused it.
          *
          * @access public
          */
@@ -129,7 +131,34 @@ class O3PO_RewriteRules {
             $settings->get_field_value('secondary_publication_type_name_plural'),
         );
         if(in_array($segments[0], $publication_slugs, true))
-            return true;
+        {
+            if(in_array(end($segments), array('pdf', 'web-statement'), true))
+                return true;
+
+            if(!static::has_rewrite_rules_for_publication_slug($segments[0]))
+                return true;
+        }
+
+        return false;
+
+    }
+
+        /**
+         * Check whether WordPress has stored rewrite rules for a publication slug.
+         *
+         * @access private
+         * @param  string $slug The publication type's rewrite slug.
+         * @return bool Whether at least one rule uses the slug.
+         */
+    private static function has_rewrite_rules_for_publication_slug($slug) {
+
+        $rewrite_rules = get_option('rewrite_rules', array());
+        if(!is_array($rewrite_rules))
+            return false;
+
+        foreach($rewrite_rules as $rule => $query)
+            if(is_string($rule) and (strpos($rule, $slug . '/') === 0 or strpos($rule, '^' . $slug . '/') === 0 or strpos($rule, '/' . $slug . '/') !== false))
+                return true;
 
         return false;
 

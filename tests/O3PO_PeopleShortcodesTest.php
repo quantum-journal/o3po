@@ -212,7 +212,10 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $this->configure_people();
         global $options, $wp_query;
         unset($options[O3PO_RewriteRules::REFRESH_PENDING_OPTION], $options[O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION]);
-        $_SERVER['REQUEST_URI'] = '/unrelated-page/';
+        $options['rewrite_rules'] = array(
+            'papers/([^/]+)/?$' => 'index.php?paper=$matches[1]',
+        );
+        $_SERVER['REQUEST_URI'] = '/papers/missing-post/';
         $wp_query = new WP_Query(null, array());
         $wp_query->is_404 = true;
 
@@ -245,6 +248,28 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
             O3PO_RewriteRules::schedule_refresh_on_endpoint_404();
 
             $this->assertTrue($options[O3PO_RewriteRules::REFRESH_PENDING_OPTION], $request_path);
+        }
+
+    }
+    public function test_endpoint_and_secondary_publication_query_vars_trigger_404_refresh() {
+        $this->configure_people();
+        global $options, $wp_query;
+        $_SERVER['REQUEST_URI'] = '/unrelated-page/';
+        $query_vars_to_test = array(
+            'pdf' => '',
+            'web-statement' => '',
+            O3PO_Settings::instance()->get_field_value('secondary_publication_type_name') => 'unmatched-slug',
+        );
+
+        foreach($query_vars_to_test as $query_var => $value)
+        {
+            unset($options[O3PO_RewriteRules::REFRESH_PENDING_OPTION], $options[O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION]);
+            $wp_query = new WP_Query(null, array($query_var => $value));
+            $wp_query->is_404 = true;
+
+            O3PO_RewriteRules::schedule_refresh_on_endpoint_404();
+
+            $this->assertTrue($options[O3PO_RewriteRules::REFRESH_PENDING_OPTION], $query_var);
         }
     }
 
