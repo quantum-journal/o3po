@@ -39,6 +39,7 @@ class O3PO_RewriteRules {
         $lock_time = time();
         if(!add_option(static::REFRESH_404_LOCK_OPTION, $lock_time, '', false))
         {
+            static::clear_option_cache(static::REFRESH_404_LOCK_OPTION);
             $existing_lock_time = (int)get_option(static::REFRESH_404_LOCK_OPTION, 0);
             if($existing_lock_time > $lock_time - static::REFRESH_404_LOCK_TIMEOUT_SECONDS)
                 return;
@@ -50,6 +51,7 @@ class O3PO_RewriteRules {
         try
         {
             $now = time();
+            static::clear_option_cache(static::LAST_404_REFRESH_TRIGGER_OPTION);
             $last_trigger = (int)get_option(static::LAST_404_REFRESH_TRIGGER_OPTION, 0);
             if($last_trigger > $now - static::REWRITE_404_RATE_LIMIT_SECONDS)
                 return;
@@ -117,18 +119,36 @@ class O3PO_RewriteRules {
         if(empty($segments))
             return false;
 
-        if(in_array($segments[0], static::get_root_endpoint_slugs($settings), true))
+        if(static::contains_case_insensitive($segments[0], static::get_root_endpoint_slugs($settings)))
             return true;
 
         $publication_slugs = array(
             $settings->get_field_value('primary_publication_type_name_plural'),
             $settings->get_field_value('secondary_publication_type_name_plural'),
         );
-        if(in_array($segments[0], $publication_slugs, true))
+        if(static::contains_case_insensitive($segments[0], $publication_slugs))
         {
             if(!static::has_rewrite_rule_for_publication_path($segments[0], $request_path))
                 return true;
         }
+
+        return false;
+
+    }
+
+        /**
+         * Check a route slug against configured values without case sensitivity.
+         *
+         * @access private
+         * @param  string $value The route slug from the request.
+         * @param  array $values Configured route slugs.
+         * @return bool Whether the route slug matches.
+         */
+    private static function contains_case_insensitive($value, $values) {
+
+        foreach($values as $candidate)
+            if(is_string($candidate) and strcasecmp($value, $candidate) === 0)
+                return true;
 
         return false;
 
@@ -223,7 +243,7 @@ class O3PO_RewriteRules {
             $rule_pattern = $rule;
             if(isset($rule_pattern[0]) and $rule_pattern[0] === '^')
                 $rule_pattern = substr($rule_pattern, 1);
-            if(strpos($rule_pattern, $slug) !== 0)
+            if(stripos($rule_pattern, $slug) !== 0)
                 continue;
 
             $path_after_slug = substr($rule_pattern, strlen($slug));
@@ -231,7 +251,7 @@ class O3PO_RewriteRules {
                 continue;
 
             $delimiter = chr(1);
-            $match_result = preg_match($delimiter . '^' . $rule_pattern . $delimiter, $request);
+            $match_result = preg_match($delimiter . '^' . $rule_pattern . $delimiter . 'i', $request);
             if($match_result === false)
                 continue;
             if($match_result === 1)
@@ -269,13 +289,25 @@ class O3PO_RewriteRules {
         if($updated !== 1)
             return false;
 
-        if(function_exists('wp_cache_delete'))
-        {
-            wp_cache_delete(static::REFRESH_404_LOCK_OPTION, 'options');
-            wp_cache_delete('alloptions', 'options');
-        }
+        static::clear_option_cache(static::REFRESH_404_LOCK_OPTION);
 
         return true;
+
+    }
+
+        /**
+         * Clear cached option values before a fresh database-backed read.
+         *
+         * @access private
+         * @param  string $option_name The option to invalidate.
+         */
+    private static function clear_option_cache($option_name) {
+
+        if(!function_exists('wp_cache_delete'))
+            return;
+
+        wp_cache_delete($option_name, 'options');
+        wp_cache_delete('alloptions', 'options');
 
     }
 
@@ -298,11 +330,8 @@ class O3PO_RewriteRules {
                 ),
                 array('%s', '%s')
             );
-            if($deleted === 1 and function_exists('wp_cache_delete'))
-            {
-                wp_cache_delete(static::REFRESH_404_LOCK_OPTION, 'options');
-                wp_cache_delete('alloptions', 'options');
-            }
+            if($deleted === 1)
+                static::clear_option_cache(static::REFRESH_404_LOCK_OPTION);
             return;
         }
 

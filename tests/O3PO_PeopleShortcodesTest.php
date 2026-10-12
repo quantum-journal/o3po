@@ -258,7 +258,7 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $options['permalink_structure'] = '/%postname%/';
         $publication_slug = O3PO_Settings::instance()->get_field_value('primary_publication_type_name_plural');
         $options['rewrite_rules'] = array(
-            '^' . $publication_slug . '/?$' => 'index.php?page_id=1',
+            '^' . strtoupper($publication_slug) . '/?$' => 'index.php?page_id=1',
         );
         $_SERVER['REQUEST_URI'] = '/' . $publication_slug . '/';
         unset($options[O3PO_RewriteRules::REFRESH_PENDING_OPTION], $options[O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION]);
@@ -341,7 +341,7 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
             'unrelated/' . $publication_slug . '/([^/]+)/?$' => 'index.php?page=$matches[1]',
             '([^/]+)/?$' => 'index.php?pagename=$matches[1]',
         );
-        $_SERVER['REQUEST_URI'] = '/' . $publication_slug . '/missing-post/';
+        $_SERVER['REQUEST_URI'] = '/' . strtoupper($publication_slug) . '/missing-post/';
         unset($options[O3PO_RewriteRules::REFRESH_PENDING_OPTION], $options[O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION]);
         $wp_query = new WP_Query(null, array());
         $wp_query->is_404 = true;
