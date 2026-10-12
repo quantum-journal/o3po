@@ -253,6 +253,10 @@ function get_option( $option, $default = false ) {
 
 }
 
+function wp_parse_url( $url, $component = -1 ) {
+    return parse_url($url, $component);
+}
+
 function update_option( $option, $content) {
     global $options;
 
@@ -1433,10 +1437,12 @@ function is_feed() {
 
 
 function home_url( $path=null, $scheme=null ) {
+    global $options;
     if($scheme === null)
         $scheme = 'https';
 
-    return $scheme . '://some.site' . $path;
+    $home_path = isset($options['home_url_path']) ? $options['home_url_path'] : '';
+    return $scheme . '://some.site' . $home_path . $path;
 }
 
 function __( $input ) {

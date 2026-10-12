@@ -33,11 +33,12 @@ class O3PO_RewriteRules {
         if(!is_404() or !isset($wp_query->query_vars) or !static::is_o3po_endpoint_request($wp_query->query_vars))
             return;
 
+        $now = time();
         $last_trigger = (int)get_option(static::LAST_404_REFRESH_TRIGGER_OPTION, 0);
-        if($last_trigger > time() - static::REWRITE_404_RATE_LIMIT_SECONDS)
+        if($last_trigger > $now - static::REWRITE_404_RATE_LIMIT_SECONDS)
             return;
 
-        update_option(static::LAST_404_REFRESH_TRIGGER_OPTION, time(), false);
+        update_option(static::LAST_404_REFRESH_TRIGGER_OPTION, $now, false);
         static::schedule_refresh();
 
     }
@@ -55,11 +56,16 @@ class O3PO_RewriteRules {
         if(!$refresh_pending and get_option(static::VERSION_OPTION) === static::VERSION)
             return;
 
-        delete_option(static::REFRESH_PENDING_OPTION);
-        if(!empty(get_option('permalink_structure')))
-            flush_rewrite_rules(false);
+        if(empty(get_option('permalink_structure')))
+        {
+            if(!$refresh_pending)
+                update_option(static::VERSION_OPTION, static::VERSION, false);
+            return;
+        }
 
+        flush_rewrite_rules(false);
         update_option(static::VERSION_OPTION, static::VERSION, false);
+        delete_option(static::REFRESH_PENDING_OPTION);
 
     }
 
@@ -95,8 +101,9 @@ class O3PO_RewriteRules {
         if(empty($_SERVER['REQUEST_URI']))
             return false;
 
-        $request_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        $home_path = parse_url(home_url(), PHP_URL_PATH);
+        $request_uri = wp_unslash($_SERVER['REQUEST_URI']);
+        $request_path = wp_parse_url($request_uri, PHP_URL_PATH);
+        $home_path = wp_parse_url(home_url(), PHP_URL_PATH);
         if(!is_string($request_path))
             return false;
         $home_path = is_string($home_path) ? rtrim($home_path, '/') : '';
