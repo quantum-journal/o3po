@@ -215,7 +215,7 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $options['rewrite_rules'] = array(
             'papers/([^/]+)/?$' => 'index.php?paper=$matches[1]',
         );
-        $_SERVER['REQUEST_URI'] = '/papers/missing-post/pdf/';
+        $_SERVER['REQUEST_URI'] = '/papers/missing-post/';
         $wp_query = new WP_Query(null, array());
         $wp_query->is_404 = true;
 
@@ -224,6 +224,23 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $this->assertArrayNotHasKey(O3PO_RewriteRules::REFRESH_PENDING_OPTION, $options);
         $this->assertArrayNotHasKey(O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION, $options);
 
+    }
+
+    public function test_publication_404_without_matching_rewrite_rule_schedules_refresh() {
+        $this->configure_people();
+        global $options, $wp_query;
+        $publication_slug = O3PO_Settings::instance()->get_field_value('primary_publication_type_name_plural');
+        $options['rewrite_rules'] = array(
+            'unrelated/' . $publication_slug . '/([^/]+)/?$' => 'index.php?page=$matches[1]',
+        );
+        $_SERVER['REQUEST_URI'] = '/' . $publication_slug . '/missing-post/';
+        unset($options[O3PO_RewriteRules::REFRESH_PENDING_OPTION], $options[O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION]);
+        $wp_query = new WP_Query(null, array());
+        $wp_query->is_404 = true;
+
+        O3PO_RewriteRules::schedule_refresh_on_endpoint_404();
+
+        $this->assertTrue($options[O3PO_RewriteRules::REFRESH_PENDING_OPTION]);
     }
 
     public function test_root_endpoint_and_secondary_publication_404s_are_detected_under_subdirectory() {

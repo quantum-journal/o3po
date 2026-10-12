@@ -110,7 +110,9 @@ class O3PO_RewriteRules {
         if(!is_string($request_path))
             return false;
         $home_path = is_string($home_path) ? rtrim($home_path, '/') : '';
-        if($home_path !== '' and ($request_path === $home_path or strpos($request_path, $home_path . '/') === 0))
+        if($home_path !== '' and $request_path === $home_path)
+            $request_path = '/';
+        elseif($home_path !== '' and strpos($request_path, $home_path . '/') === 0)
             $request_path = substr($request_path, strlen($home_path));
 
         $segments = array_values(array_filter(explode('/', trim($request_path, '/')), 'strlen'));
@@ -133,7 +135,7 @@ class O3PO_RewriteRules {
         );
         if(in_array($segments[0], $publication_slugs, true))
         {
-            if(!static::has_rewrite_rules_for_publication_slug($segments[0]))
+            if(!static::has_rewrite_rule_for_request_path($request_path))
                 return true;
         }
 
@@ -142,20 +144,21 @@ class O3PO_RewriteRules {
     }
 
         /**
-         * Check whether WordPress has stored rewrite rules for a publication slug.
+         * Check whether WordPress has a stored rewrite rule matching the request path.
          *
          * @access private
-         * @param  string $slug The publication type's rewrite slug.
-         * @return bool Whether at least one rule uses the slug.
+         * @param  string $request_path The request path.
+         * @return bool Whether a stored rewrite rule matches the request path.
          */
-    private static function has_rewrite_rules_for_publication_slug($slug) {
+    private static function has_rewrite_rule_for_request_path($request_path) {
 
         $rewrite_rules = get_option('rewrite_rules', array());
         if(!is_array($rewrite_rules))
             return false;
 
+        $request = ltrim($request_path, '/');
         foreach($rewrite_rules as $rule => $query)
-            if(is_string($rule) and (strpos($rule, $slug . '/') === 0 or strpos($rule, '^' . $slug . '/') === 0))
+            if(is_string($rule) and preg_match('~^' . str_replace('~', '\\~', $rule) . '~', $request))
                 return true;
 
         return false;
