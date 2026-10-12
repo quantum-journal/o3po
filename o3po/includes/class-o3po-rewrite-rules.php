@@ -43,11 +43,7 @@ class O3PO_RewriteRules {
             if($existing_lock_time > $lock_time - static::REFRESH_404_LOCK_TIMEOUT_SECONDS)
                 return;
 
-            if((int)get_option(static::REFRESH_404_LOCK_OPTION, 0) !== $existing_lock_time)
-                return;
-
-            delete_option(static::REFRESH_404_LOCK_OPTION);
-            if(!add_option(static::REFRESH_404_LOCK_OPTION, $lock_time, '', false))
+            if(!static::replace_stale_refresh_lock($existing_lock_time, $lock_time))
                 return;
         }
 
@@ -65,7 +61,7 @@ class O3PO_RewriteRules {
         }
         finally
         {
-            if(get_option(static::REFRESH_404_LOCK_OPTION, false) === $lock_value)
+            if((int)get_option(static::REFRESH_404_LOCK_OPTION, 0) === (int)$lock_value)
                 delete_option(static::REFRESH_404_LOCK_OPTION);
         }
 
@@ -230,8 +226,10 @@ class O3PO_RewriteRules {
             if(strpos($rule, $slug . '/') !== 0 and strpos($rule, '^' . $slug . '/') !== 0)
                 continue;
 
-            $rule = static::escape_regex_delimiter($rule, '#');
-            $match_result = preg_match('#^' . $rule . '#', $request);
+            $delimiter = chr(1);
+            $match_result = preg_match($delimiter . '^' . $rule . $delimiter, $request);
+            if($match_result === false)
+                continue;
             if($match_result === 1)
                 return true;
         }
@@ -241,27 +239,39 @@ class O3PO_RewriteRules {
     }
 
         /**
-         * Escape unescaped instances of a regex delimiter without changing existing escapes.
+         * Atomically replace a stale 404 refresh lock.
          *
          * @access private
-         * @param  string $pattern The regular expression.
-         * @param  string $delimiter The regex delimiter.
-         * @return string The delimiter-safe regular expression.
+         * @param  int $stale_lock_time The timestamp currently stored in the lock.
+         * @param  int $new_lock_time The timestamp to store for this request.
+         * @return bool Whether the stale lock was replaced.
          */
-    private static function escape_regex_delimiter($pattern, $delimiter) {
+    private static function replace_stale_refresh_lock($stale_lock_time, $new_lock_time) {
 
-        $escaped_pattern = '';
-        $backslash_count = 0;
-        for($i = 0; $i < strlen($pattern); $i++)
+        global $wpdb;
+        if(!isset($wpdb) or !isset($wpdb->options))
+            return false;
+
+        $updated = $wpdb->update(
+            $wpdb->options,
+            array('option_value' => (string)$new_lock_time),
+            array(
+                'option_name' => static::REFRESH_404_LOCK_OPTION,
+                'option_value' => (string)$stale_lock_time,
+            ),
+            array('%s'),
+            array('%s', '%s')
+        );
+        if($updated !== 1)
+            return false;
+
+        if(function_exists('wp_cache_delete'))
         {
-            $character = $pattern[$i];
-            if($character === $delimiter and $backslash_count % 2 === 0)
-                $escaped_pattern .= '\\';
-            $escaped_pattern .= $character;
-            $backslash_count = $character === '\\' ? $backslash_count + 1 : 0;
+            wp_cache_delete(static::REFRESH_404_LOCK_OPTION, 'options');
+            wp_cache_delete('alloptions', 'options');
         }
 
-        return $escaped_pattern;
+        return true;
 
     }
 }
