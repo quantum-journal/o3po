@@ -79,7 +79,7 @@ class O3PO_SettingsTest extends O3PO_TestCase
 
         try
         {
-            $people = O3PO_PeopleShortcodes::get_person_data();
+            $people = O3PO_People::get_person_data();
             $person_uuidv4 = array_column($people, 'uuidv4');
 
             $this->assertCount(3, $person_uuidv4);
@@ -91,7 +91,7 @@ class O3PO_SettingsTest extends O3PO_TestCase
                 0 => $person_uuidv4[0],
                 2 => $person_uuidv4[2],
             );
-            $people = O3PO_PeopleShortcodes::get_person_data();
+            $people = O3PO_People::get_person_data();
 
             $this->assertSame($person_uuidv4[0], $people[0]['uuidv4']);
             $this->assertNotEmpty($people[1]['uuidv4']);
@@ -513,6 +513,29 @@ public static function validate_array_as_comma_separated_list_provider() {
     public function test_trim_settings_field_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed_on_empty_setting( $settings ) {
 
         $this->assertSame($settings->trim_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed('arxiv_paper_doi_feed_endpoint', ''), 'arxiv_paper_doi_feed');
+    }
+
+        /**
+         * @depends test_initialize_settings
+         */
+    #[Depends('test_initialize_settings')]
+    public function test_endpoint_setting_change_schedules_deferred_rewrite_refresh( $settings ) {
+
+        global $options;
+        $pending_option = O3PO_RewriteRules::REFRESH_PENDING_OPTION;
+        $original_pending = isset($options[$pending_option]) ? $options[$pending_option] : null;
+        unset($options[$pending_option]);
+        $flushes_before = get_flush_rewrite_rules_call_counter();
+
+        $settings->trim_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed('arxiv_paper_doi_feed_endpoint', 'changed_feed_endpoint');
+
+        $this->assertTrue(get_option($pending_option));
+        $this->assertSame($flushes_before, get_flush_rewrite_rules_call_counter());
+
+        if(null === $original_pending)
+            unset($options[$pending_option]);
+        else
+            $options[$pending_option] = $original_pending;
     }
 
 

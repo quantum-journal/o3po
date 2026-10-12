@@ -1,5 +1,7 @@
 <?php
 
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-rewrite-rules.php';
+
 /**
  * Fired during plugin deactivation
  *
@@ -31,8 +33,7 @@ class O3PO_Deactivator {
 	 */
 	public static function deactivate() {
 
-            //Flush the rewrite rules to completely disable custom post types and endpoints
-        flush_rewrite_rules(true);
+        O3PO_RewriteRules::flush_on_deactivation();
 
 	}
 

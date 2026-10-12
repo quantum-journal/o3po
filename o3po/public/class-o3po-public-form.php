@@ -365,7 +365,6 @@ abstract class O3PO_PublicForm {
     public function init() {
 
         add_rewrite_endpoint($this->slug, EP_ROOT);
-            //flush_rewrite_rules( true );  //// <---------- ONLY COMMENT IN WHILE TESTING
     }
 
         /**

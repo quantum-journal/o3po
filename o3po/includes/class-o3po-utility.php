@@ -315,14 +315,7 @@ class O3PO_Utility
          * @return string A v4 UUID
          */
     public static function valid_uuidv4($uuid) {
-        if (!preg_match('/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[0-9a-f]{4}-[0-9a-f]{12}/u', $uuid))
-            return false;
-
-        foreach(["8", "9", "a", "b"] as $char)
-            if($uuid[19] == $char)
-                return true;
-
-        return false;
+        return preg_match('/\A[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\z/iu', $uuid) === 1;
     }
 
 

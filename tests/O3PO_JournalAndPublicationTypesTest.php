@@ -8,6 +8,7 @@ require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-primary-publica
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-secondary-publication-type.php');
 require_once(dirname( __FILE__ ) . '/../o3po/includes/class-o3po-latex.php');
 require_once(dirname( __FILE__ ) . '/../o3po/admin/class-o3po-admin.php');
+require_once(dirname( __FILE__ ) . '/../o3po/includes/editor-pages.php');
 require_once(dirname( __FILE__ ) . '/O3PO_SettingsTest.php');
 
 use PHPUnit\Framework\Attributes\Depends;
@@ -18,6 +19,93 @@ use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 
 class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
 {
+
+    public function test_handling_editor_links_to_editor_profile() {
+        global $posts;
+        $post_id = 123456;
+        $editor_uuid = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+        $posts[$post_id] = array(
+            'post_type' => 'paper',
+            'meta' => array('paper_handling_editor_uuidv4' => $editor_uuid),
+        );
+
+        $link = O3PO_PublicationType::get_formated_handling_editor($post_id);
+
+        $this->assertSame(
+            '<a href="' . esc_url(get_site_url() . '/editor/' . rawurlencode($editor_uuid) . '/') . '">' .
+            esc_html(O3PO_People::get_formated_name_from_uuidv4($editor_uuid)) . '</a>',
+            $link
+        );
+        $this->assertStringNotContainsString('/people/#person-', $link);
+        unset($posts[$post_id]);
+    }
+
+        /**
+         * @depends test_create_primary_publication_type
+         */
+    #[Depends('test_create_primary_publication_type')]
+    function test_editor_leaderboard_counts_published_primary_papers_by_year( $primary_publication_type ) {
+        global $options, $posts, $_GET;
+
+        $previous_settings = $options['o3po-settings'];
+        $previous_posts = $posts;
+        $previous_get = $_GET;
+        $post_type = $primary_publication_type->get_publication_type_name();
+        $editor_one_uuid = 'uuid-editor-one';
+        $editor_two_uuid = 'uuid-editor-two';
+        $options['o3po-settings']['person_first_names'] = array('Alice', 'Zed');
+        $options['o3po-settings']['person_last_names'] = array('Editor', 'Editor');
+        $options['o3po-settings']['person_role'] = array('editor', 'editor');
+        $options['o3po-settings']['person_since_year'] = array('', '');
+        $options['o3po-settings']['person_until_year'] = array('', '');
+        $options['o3po-settings']['person_url'] = array('', '');
+        $options['o3po-settings']['person_affiliation'] = array('', '');
+        $options['o3po-settings']['person_country'] = array('', '');
+        $options['o3po-settings']['person_extra'] = array('', '');
+        $options['o3po-settings']['person_uuidv4'] = array($editor_one_uuid, $editor_two_uuid);
+        $posts = array(
+            1001 => array('post_type' => $post_type, 'post_status' => 'publish', 'meta' => array(
+                $post_type . '_date_published' => '2024-01-01',
+                $post_type . '_handling_editor_uuidv4' => $editor_one_uuid,
+            )),
+            1002 => array('post_type' => $post_type, 'post_status' => 'publish', 'meta' => array(
+                $post_type . '_date_published' => '2024-02-01',
+                $post_type . '_handling_editor_uuidv4' => $editor_one_uuid,
+            )),
+            1003 => array('post_type' => $post_type, 'post_status' => 'publish', 'meta' => array(
+                $post_type . '_date_published' => '2024-03-01',
+                $post_type . '_handling_editor_uuidv4' => $editor_two_uuid,
+            )),
+            1004 => array('post_type' => $post_type, 'post_status' => 'publish', 'meta' => array(
+                $post_type . '_date_published' => '2023-01-01',
+                $post_type . '_handling_editor_uuidv4' => $editor_two_uuid,
+            )),
+            1005 => array('post_type' => $post_type, 'post_status' => 'draft', 'meta' => array(
+                $post_type . '_date_published' => '2024-04-01',
+                $post_type . '_handling_editor_uuidv4' => $editor_two_uuid,
+            )),
+        );
+        $_GET['tab'] = 'editor-leaderboard';
+
+        ob_start();
+        (new O3PO_Admin('o3po', '0.3.0', 'O-3PO'))->render_meta_data_explorer();
+        $output = ob_get_clean();
+
+        $options['o3po-settings'] = $previous_settings;
+        $posts = $previous_posts;
+        $_GET = $previous_get;
+
+        $this->assertValidHTMLFragment($output);
+        $this->assertStringContainsString('/editor/' . $editor_one_uuid . '/', $output);
+        $this->assertStringContainsString('/editor/' . $editor_two_uuid . '/', $output);
+        $this->assertStringContainsString('2024', $output);
+        $this->assertStringContainsString('2023', $output);
+        $this->assertStringContainsString('Alice Editor</a></td><td style="text-align: right;">2</td>', $output);
+        $this->assertStringContainsString('Zed Editor</a></td><td style="text-align: right;">1</td>', $output);
+        $this->assertSame(1, substr_count($output, '<h4>2024</h4>'));
+        $this->assertLessThan(strpos($output, '<h4>2023</h4>'), strpos($output, '<h4>2024</h4>'));
+        $this->assertLessThan(strpos($output, 'Zed Editor'), strpos($output, 'Alice Editor'));
+    }
 
     public static function test_initialize_settings() {
 
@@ -2192,34 +2280,31 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
          */
     #[Depends('test_create_primary_publication_type')]
     #[Depends('test_initialize_settings')]
-    public function test_404_error_on_primary( $primary_publication_type, $settings ) {
-        global $posts;
-        global $post;
+    public function test_404_error_on_primary_schedules_deferred_rewrite_refresh( $primary_publication_type, $settings ) {
+        global $options;
+        $had_permalink_structure = isset($options['permalink_structure']);
+        $previous_permalink_structure = isset($options['permalink_structure']) ? $options['permalink_structure'] : null;
+        $options['permalink_structure'] = '/%postname%/';
+        delete_option(O3PO_RewriteRules::REFRESH_PENDING_OPTION);
+        delete_option(O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION);
+        delete_option(O3PO_RewriteRules::REFRESH_404_LOCK_OPTION);
 
-        foreach($posts as $post_id => $post_data)
-        {
-            $post_type = get_post_type($post_id);
-            if ( $primary_publication_type->get_publication_type_name() !== $post_type )
-                continue;
+        $wp_query = new WP_Query(null, array(
+            $primary_publication_type->get_publication_type_name() => 'unmatched-doi-suffix',
+        ));
+        $wp_query->is_404 = true;
+        set_global_query($wp_query);
 
-            $post = new WP_Post($post_id);
-            $wp_query = new WP_Query(array('ID' => $post_id, 'error' => '404', 'post_type' => get_post_type($post_id)));
-            $wp_query->is_404 = true;
-            $doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
-            $wp_query->query_vars[$post_type] = $doi_suffix;
+        $flushes_before = get_flush_rewrite_rules_call_counter();
+        O3PO_RewriteRules::schedule_refresh_on_endpoint_404();
 
-            set_global_query($wp_query);
-            the_post();
+        $this->assertTrue(get_option(O3PO_RewriteRules::REFRESH_PENDING_OPTION));
+        $this->assertSame($flushes_before, get_flush_rewrite_rules_call_counter());
 
-            $counter_before = get_flush_rewrite_rules_call_counter();
-            $primary_publication_type->handle_404_errors();
-            $counter_after = get_flush_rewrite_rules_call_counter();
-
-            if (get_post_status($post_id) == "publish")
-                $this->assertSame($counter_before + 1, $counter_after);
-            else
-                $this->assertSame($counter_before, $counter_after);
-        }
+        if($had_permalink_structure)
+            $options['permalink_structure'] = $previous_permalink_structure;
+        else
+            unset($options['permalink_structure']);
     }
 
 

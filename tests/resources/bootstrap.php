@@ -235,8 +235,13 @@ function get_option( $option, $default = false ) {
         return $options['o3po-settings'];
     elseif($option === 'blog_charset')
         return 'UTF-8';
+    // Tests configure rewrite state through $options to simulate WordPress settings.
     elseif($option === 'rewrite_rules')
-        return array();
+        return isset($options['rewrite_rules']) ? $options['rewrite_rules'] : array();
+    elseif($option === 'permalink_structure')
+        return isset($options['permalink_structure']) ? $options['permalink_structure'] : '';
+    elseif(strpos($option, 'o3po_rewrite_rules_') === 0)
+        return isset($options[$option]) ? $options[$option] : $default;
     elseif($option === 'o3po-ready2publish')
         return $options['o3po-ready2publish'];
     elseif($option === 'o3po-ready2publish-storage')
@@ -248,10 +253,29 @@ function get_option( $option, $default = false ) {
 
 }
 
+function wp_parse_url( $url, $component = -1 ) {
+    return parse_url($url, $component);
+}
+
 function update_option( $option, $content) {
     global $options;
 
     $options[$option] = $content;
+}
+
+function add_option( $option, $value, $deprecated = '', $autoload = 'yes') {
+    global $options;
+
+    if(array_key_exists($option, $options))
+        return false;
+
+    $options[$option] = $value;
+    return true;
+}
+
+function delete_option( $option ) {
+    global $options;
+    unset($options[$option]);
 }
 
 function get_file_data( $file, $options ) {
@@ -270,6 +294,7 @@ function get_file_data( $file, $options ) {
 
 global $flush_rewrite_rules_call_counter;
 $flush_rewrite_rules_call_counter = 0;
+// Tests inspect this count to verify rewrite rules are refreshed only once.
 function flush_rewrite_rules( $hard=false ) {
     global $flush_rewrite_rules_call_counter;
 
@@ -393,6 +418,11 @@ class WP_Query
 
     function __construct( $input=null, $query_vars=array() ) {
         global $posts;
+        // Used to assert that transient cache hits do not construct another WP_Query.
+        global $wp_query_constructor_count;
+        if(!isset($wp_query_constructor_count))
+            $wp_query_constructor_count = 0;
+        $wp_query_constructor_count++;
 
         $this->query = $input;
         $this->query_vars = $query_vars;
@@ -429,6 +459,21 @@ class WP_Query
                 $include_post = true;
                 foreach($array as $key => $value)
                 {
+                    if(in_array($key, array('fields', 'no_found_rows', 'update_post_term_cache'), true))
+                        continue;
+                    if($key === 'meta_key')
+                        continue;
+                    if($key === 'meta_value')
+                    {
+                        $meta_key = $array['meta_key'];
+                        if(!isset($posts[$id]['meta'][$meta_key]) or $posts[$id]['meta'][$meta_key] != $value)
+                        {
+                            $include_post = false;
+                            break;
+                        }
+                        continue;
+                    }
+
                     if(!is_array($value))
                         $value = array($value);
 
@@ -451,6 +496,8 @@ class WP_Query
 
         $this->post_count = count($this->posts);
         $this->found_posts = $this->post_count;
+        if(isset($array['fields']) and $array['fields'] === 'ids')
+            $this->posts = array_keys($this->posts);
     }
 
     function get($key) {
@@ -596,7 +643,7 @@ function the_post() {
 function wp_insert_post($postarr, $wp_error = false, $fire_after_hooks = true ) {
     global $posts;
     $post_id = 0;
-    while(isset($array[$post_id])) $post_id++;
+    while(isset($posts[$post_id])) $post_id++;
     $posts[$post_id] = $postarr;
 
     return $post_id;
@@ -939,7 +986,13 @@ function wp_mail( $to, $subject, $body, $headers, $attach=null) {
 }
 
 
-function delete_transient() {}
+global $deleted_transients;
+$deleted_transients = array();
+function delete_transient( $transient ) {
+    global $deleted_transients;
+
+    $deleted_transients[] = $transient;
+}
 
 global $get_transient_returns;
 $get_transient_returns = false;
@@ -949,7 +1002,12 @@ function get_transient( $transient ) {
     return $get_transient_returns;
 }
 
-function set_transient( $transient, $value, $expiration=0 ) {}
+global $set_transient_calls;
+$set_transient_calls = array();
+function set_transient( $transient, $value, $expiration=0 ) {
+    global $set_transient_calls;
+    $set_transient_calls[] = array($transient, $value, $expiration);
+}
 
 function wp_remote_get( $url, $args=array() ) {
         //return http_get( $url, $args );
@@ -1019,12 +1077,18 @@ function current_user_can() {
     return true;
 }
 
-function wp_is_post_autosave() {
-    return false;
+global $autosave_post_id;
+$autosave_post_id = null;
+function wp_is_post_autosave( $post_id ) {
+    global $autosave_post_id;
+    return $post_id === $autosave_post_id ? $post_id : false;
 }
 
-function wp_is_post_revision() {
-    return false;
+global $revision_post_id;
+$revision_post_id = null;
+function wp_is_post_revision( $post_id ) {
+    global $revision_post_id;
+    return $post_id === $revision_post_id ? $post_id : false;
 }
 
 function remove_action() {}
@@ -1383,10 +1447,12 @@ function is_feed() {
 
 
 function home_url( $path=null, $scheme=null ) {
+    global $options;
     if($scheme === null)
         $scheme = 'https';
 
-    return $scheme . '://some.site' . $path;
+    $home_path = isset($options['home_url_path']) ? $options['home_url_path'] : '';
+    return $scheme . '://some.site' . $home_path . $path;
 }
 
 function __( $input ) {
