@@ -246,7 +246,7 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $this->configure_people();
         global $options, $wp_query;
         $options['permalink_structure'] = '/%postname%/';
-        $options[O3PO_RewriteRules::REFRESH_404_LOCK_OPTION] = true;
+        $options[O3PO_RewriteRules::REFRESH_404_LOCK_OPTION] = time();
         unset($options[O3PO_RewriteRules::REFRESH_PENDING_OPTION], $options[O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION]);
         $_SERVER['REQUEST_URI'] = '/editor/' . $this->editor_uuid . '/';
         $wp_query = new WP_Query(null, array('editor' => $this->editor_uuid));
@@ -256,7 +256,23 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
 
         $this->assertArrayNotHasKey(O3PO_RewriteRules::REFRESH_PENDING_OPTION, $options);
         $this->assertArrayNotHasKey(O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION, $options);
-        $this->assertTrue($options[O3PO_RewriteRules::REFRESH_404_LOCK_OPTION]);
+        $this->assertArrayHasKey(O3PO_RewriteRules::REFRESH_404_LOCK_OPTION, $options);
+    }
+
+    public function test_stale_404_refresh_lock_is_reclaimed() {
+        $this->configure_people();
+        global $options, $wp_query;
+        $options['permalink_structure'] = '/%postname%/';
+        $options[O3PO_RewriteRules::REFRESH_404_LOCK_OPTION] = time() - O3PO_RewriteRules::REFRESH_404_LOCK_TIMEOUT_SECONDS - 1;
+        unset($options[O3PO_RewriteRules::REFRESH_PENDING_OPTION], $options[O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION]);
+        $_SERVER['REQUEST_URI'] = '/editor/' . $this->editor_uuid . '/';
+        $wp_query = new WP_Query(null, array('editor' => $this->editor_uuid));
+        $wp_query->is_404 = true;
+
+        O3PO_RewriteRules::schedule_refresh_on_endpoint_404();
+
+        $this->assertTrue($options[O3PO_RewriteRules::REFRESH_PENDING_OPTION]);
+        $this->assertArrayNotHasKey(O3PO_RewriteRules::REFRESH_404_LOCK_OPTION, $options);
     }
 
     public function test_publication_404_without_matching_rewrite_rule_schedules_refresh() {
@@ -266,6 +282,7 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $publication_slug = O3PO_Settings::instance()->get_field_value('primary_publication_type_name_plural');
         $options['rewrite_rules'] = array(
             'unrelated/' . $publication_slug . '/([^/]+)/?$' => 'index.php?page=$matches[1]',
+            '([^/]+)/?$' => 'index.php?pagename=$matches[1]',
         );
         $_SERVER['REQUEST_URI'] = '/' . $publication_slug . '/missing-post/';
         unset($options[O3PO_RewriteRules::REFRESH_PENDING_OPTION], $options[O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION]);

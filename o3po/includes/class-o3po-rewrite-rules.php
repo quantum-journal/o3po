@@ -7,6 +7,7 @@ class O3PO_RewriteRules {
     const REFRESH_PENDING_OPTION = 'o3po_rewrite_rules_refresh_pending';
     const LAST_404_REFRESH_TRIGGER_OPTION = 'o3po_rewrite_rules_last_404_trigger';
     const REFRESH_404_LOCK_OPTION = 'o3po_rewrite_rules_404_lock';
+    const REFRESH_404_LOCK_TIMEOUT_SECONDS = 60;
     // Limit 404-triggered rewrite refreshes to one every ten minutes.
     const REWRITE_404_RATE_LIMIT_SECONDS = 600;
 
@@ -35,8 +36,22 @@ class O3PO_RewriteRules {
         if(!is_404() or !isset($wp_query->query_vars) or empty(get_option('permalink_structure')) or !static::is_o3po_endpoint_request($wp_query->query_vars))
             return;
 
-        if(!add_option(static::REFRESH_404_LOCK_OPTION, true, '', false))
-            return;
+        $lock_time = time();
+        if(!add_option(static::REFRESH_404_LOCK_OPTION, $lock_time, '', false))
+        {
+            $existing_lock_time = (int)get_option(static::REFRESH_404_LOCK_OPTION, 0);
+            if($existing_lock_time > $lock_time - static::REFRESH_404_LOCK_TIMEOUT_SECONDS)
+                return;
+
+            if((int)get_option(static::REFRESH_404_LOCK_OPTION, 0) !== $existing_lock_time)
+                return;
+
+            delete_option(static::REFRESH_404_LOCK_OPTION);
+            if(!add_option(static::REFRESH_404_LOCK_OPTION, $lock_time, '', false))
+                return;
+        }
+
+        $lock_value = get_option(static::REFRESH_404_LOCK_OPTION, 0);
 
         try
         {
@@ -50,7 +65,8 @@ class O3PO_RewriteRules {
         }
         finally
         {
-            delete_option(static::REFRESH_404_LOCK_OPTION);
+            if(get_option(static::REFRESH_404_LOCK_OPTION, false) === $lock_value)
+                delete_option(static::REFRESH_404_LOCK_OPTION);
         }
 
     }
@@ -117,7 +133,7 @@ class O3PO_RewriteRules {
         );
         if(in_array($segments[0], $publication_slugs, true))
         {
-            if(!static::has_rewrite_rule_for_request_path($request_path))
+            if(!static::has_rewrite_rule_for_publication_path($segments[0], $request_path))
                 return true;
         }
 
@@ -192,13 +208,14 @@ class O3PO_RewriteRules {
     }
 
         /**
-         * Check whether WordPress has a stored rewrite rule matching the request path.
+         * Check whether WordPress has a stored rewrite rule for a publication path.
          *
          * @access private
+         * @param  string $slug The publication type's rewrite slug.
          * @param  string $request_path The request path.
          * @return bool Whether a stored rewrite rule matches the request path.
          */
-    private static function has_rewrite_rule_for_request_path($request_path) {
+    private static function has_rewrite_rule_for_publication_path($slug, $request_path) {
 
         $rewrite_rules = get_option('rewrite_rules', array());
         if(!is_array($rewrite_rules))
@@ -210,8 +227,11 @@ class O3PO_RewriteRules {
             if(!is_string($rule))
                 continue;
 
+            if(strpos($rule, $slug . '/') !== 0 and strpos($rule, '^' . $slug . '/') !== 0)
+                continue;
+
             $rule = static::escape_regex_delimiter($rule, '#');
-            $match_result = @preg_match('#^' . $rule . '#', $request);
+            $match_result = preg_match('#^' . $rule . '#', $request);
             if($match_result === 1)
                 return true;
         }
