@@ -93,6 +93,7 @@ class O3PO_RewriteRules {
         {
             if(!$refresh_pending)
                 update_option(static::VERSION_OPTION, static::VERSION, false);
+            // Preserve queued refreshes so they can run after pretty permalinks are enabled.
             return;
         }
 
@@ -134,13 +135,51 @@ class O3PO_RewriteRules {
             $settings->get_field_value('primary_publication_type_name_plural'),
             $settings->get_field_value('secondary_publication_type_name_plural'),
         );
-        if(static::contains_case_insensitive($segments[0], $publication_slugs))
+        $publication_query_vars = array(
+            $settings->get_field_value('primary_publication_type_name'),
+            $settings->get_field_value('secondary_publication_type_name'),
+        );
+        $publication_slug_index = false;
+        foreach($publication_slugs as $index => $publication_slug)
+            if(is_string($publication_slug) and strcasecmp($segments[0], $publication_slug) === 0)
+            {
+                $publication_slug_index = $index;
+                break;
+            }
+
+        if($publication_slug_index !== false)
         {
-            if(!static::has_rewrite_rule_for_publication_path($segments[0], $request_path))
+            $publication_query_var = $publication_query_vars[$publication_slug_index];
+            if(!static::has_rewrite_rule_for_publication_path($publication_query_var, $request_path))
                 return true;
         }
 
         return false;
+
+    }
+
+        /**
+         * Check whether a rewrite query targets a custom publication type.
+         *
+         * @access private
+         * @param  string $query The stored rewrite query.
+         * @param  string $publication_query_var The publication type's query var.
+         * @return bool Whether the query targets the publication type.
+         */
+    private static function rewrite_rule_targets_publication_type($query, $publication_query_var) {
+
+        if(!is_string($query) or !is_string($publication_query_var) or $publication_query_var === '')
+            return false;
+
+        $query_string = wp_parse_url($query, PHP_URL_QUERY);
+        if(!is_string($query_string))
+            return false;
+
+        parse_str($query_string, $query_vars);
+        if(array_key_exists($publication_query_var, $query_vars))
+            return true;
+
+        return isset($query_vars['post_type']) and is_string($query_vars['post_type']) and strcasecmp($query_vars['post_type'], $publication_query_var) === 0;
 
     }
 
@@ -229,14 +268,14 @@ class O3PO_RewriteRules {
     }
 
         /**
-         * Check whether WordPress has a stored rewrite rule for a publication path.
+         * Check whether a matching stored rewrite rule targets a publication type.
          *
          * @access private
-         * @param  string $slug The publication type's rewrite slug.
+         * @param  string $publication_query_var The publication type's query var.
          * @param  string $request_path The request path.
          * @return bool Whether a stored rewrite rule matches the request path.
          */
-    private static function has_rewrite_rule_for_publication_path($slug, $request_path) {
+    private static function has_rewrite_rule_for_publication_path($publication_query_var, $request_path) {
 
         $rewrite_rules = get_option('rewrite_rules', array());
         if(!is_array($rewrite_rules))
@@ -251,11 +290,8 @@ class O3PO_RewriteRules {
             $rule_pattern = $rule;
             if(isset($rule_pattern[0]) and $rule_pattern[0] === '^')
                 $rule_pattern = substr($rule_pattern, 1);
-            if(stripos($rule_pattern, $slug) !== 0)
-                continue;
 
-            $path_after_slug = substr($rule_pattern, strlen($slug));
-            if($path_after_slug !== '' and $path_after_slug[0] !== '/')
+            if(!static::rewrite_rule_targets_publication_type($query, $publication_query_var))
                 continue;
 
             $delimiter = static::REWRITE_RULE_REGEX_DELIMITER;
@@ -340,6 +376,8 @@ class O3PO_RewriteRules {
             );
             if($deleted === 1)
                 static::clear_option_cache(static::REFRESH_404_LOCK_OPTION);
+            elseif($deleted === false and (int)get_option(static::REFRESH_404_LOCK_OPTION, 0) === (int)$lock_time)
+                delete_option(static::REFRESH_404_LOCK_OPTION);
             return;
         }
 

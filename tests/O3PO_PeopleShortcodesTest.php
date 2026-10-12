@@ -7,10 +7,15 @@ require_once(dirname( __FILE__ ) . '/O3PO_SettingsTest.php');
 // Simulate wpdb's conditional option update when testing stale-lock reclamation.
 class O3PO_TestWpdb {
     public $options = 'wp_options';
+    public $force_update_failure = false;
+    public $force_delete_failure = false;
 
     public function update($table, $data, $where, $format = null, $where_format = null) {
         global $options;
         $option = $where['option_name'];
+        if($this->force_update_failure)
+            return 0;
+
         if($table !== $this->options or !isset($options[$option]) or (string)$options[$option] !== $where['option_value'])
             return 0;
 
@@ -20,6 +25,9 @@ class O3PO_TestWpdb {
 
     public function delete($table, $where, $where_format = null) {
         global $options;
+        if($this->force_delete_failure)
+            return false;
+
         $option = $where['option_name'];
         if($table !== $this->options or !isset($options[$option]) or (string)$options[$option] !== $where['option_value'])
             return 0;
@@ -258,7 +266,7 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $options['permalink_structure'] = '/%postname%/';
         $publication_slug = O3PO_Settings::instance()->get_field_value('primary_publication_type_name_plural');
         $options['rewrite_rules'] = array(
-            '^' . strtoupper($publication_slug) . '/?$' => 'index.php?page_id=1',
+            '^(?:' . strtoupper($publication_slug) . ')/?$' => 'index.php?' . O3PO_Settings::instance()->get_field_value('primary_publication_type_name') . '=$matches[1]',
         );
         $_SERVER['REQUEST_URI'] = '/' . $publication_slug . '/';
         unset($options[O3PO_RewriteRules::REFRESH_PENDING_OPTION], $options[O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION]);
@@ -311,6 +319,69 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $GLOBALS['wpdb'] = new O3PO_TestWpdb();
         $options['permalink_structure'] = '/%postname%/';
         $options[O3PO_RewriteRules::REFRESH_404_LOCK_OPTION] = time() - O3PO_RewriteRules::REFRESH_404_LOCK_TIMEOUT_SECONDS - 1;
+        unset($options[O3PO_RewriteRules::REFRESH_PENDING_OPTION], $options[O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION]);
+        $_SERVER['REQUEST_URI'] = '/editor/' . $this->editor_uuid . '/';
+        $wp_query = new WP_Query(null, array('editor' => $this->editor_uuid));
+        $wp_query->is_404 = true;
+
+        try
+        {
+            O3PO_RewriteRules::schedule_refresh_on_endpoint_404();
+
+            $this->assertTrue($options[O3PO_RewriteRules::REFRESH_PENDING_OPTION]);
+            $this->assertArrayNotHasKey(O3PO_RewriteRules::REFRESH_404_LOCK_OPTION, $options);
+        }
+        finally
+        {
+            if($had_wpdb)
+                $GLOBALS['wpdb'] = $previous_wpdb;
+            else
+                unset($GLOBALS['wpdb']);
+        }
+    }
+
+    public function test_stale_lock_compare_and_swap_failure_does_not_schedule_refresh() {
+        $this->configure_people();
+        global $options, $wp_query;
+        $had_wpdb = array_key_exists('wpdb', $GLOBALS);
+        $previous_wpdb = $had_wpdb ? $GLOBALS['wpdb'] : null;
+        $test_wpdb = new O3PO_TestWpdb();
+        $test_wpdb->force_update_failure = true;
+        $GLOBALS['wpdb'] = $test_wpdb;
+        $options['permalink_structure'] = '/%postname%/';
+        $stale_lock_time = time() - O3PO_RewriteRules::REFRESH_404_LOCK_TIMEOUT_SECONDS - 1;
+        $options[O3PO_RewriteRules::REFRESH_404_LOCK_OPTION] = $stale_lock_time;
+        unset($options[O3PO_RewriteRules::REFRESH_PENDING_OPTION], $options[O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION]);
+        $_SERVER['REQUEST_URI'] = '/editor/' . $this->editor_uuid . '/';
+        $wp_query = new WP_Query(null, array('editor' => $this->editor_uuid));
+        $wp_query->is_404 = true;
+
+        try
+        {
+            O3PO_RewriteRules::schedule_refresh_on_endpoint_404();
+
+            $this->assertArrayNotHasKey(O3PO_RewriteRules::REFRESH_PENDING_OPTION, $options);
+            $this->assertArrayNotHasKey(O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION, $options);
+            $this->assertSame($stale_lock_time, $options[O3PO_RewriteRules::REFRESH_404_LOCK_OPTION]);
+        }
+        finally
+        {
+            if($had_wpdb)
+                $GLOBALS['wpdb'] = $previous_wpdb;
+            else
+                unset($GLOBALS['wpdb']);
+        }
+    }
+
+    public function test_option_api_releases_lock_when_database_delete_fails() {
+        $this->configure_people();
+        global $options, $wp_query;
+        $had_wpdb = array_key_exists('wpdb', $GLOBALS);
+        $previous_wpdb = $had_wpdb ? $GLOBALS['wpdb'] : null;
+        $test_wpdb = new O3PO_TestWpdb();
+        $test_wpdb->force_delete_failure = true;
+        $GLOBALS['wpdb'] = $test_wpdb;
+        $options['permalink_structure'] = '/%postname%/';
         unset($options[O3PO_RewriteRules::REFRESH_PENDING_OPTION], $options[O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION]);
         $_SERVER['REQUEST_URI'] = '/editor/' . $this->editor_uuid . '/';
         $wp_query = new WP_Query(null, array('editor' => $this->editor_uuid));
