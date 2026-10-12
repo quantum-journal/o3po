@@ -41,6 +41,7 @@ class O3PO_Test extends O3PO_TestCase
 
             //Test activation and deactivation
         activate_o3po();
+        $this->assertTrue(get_option(O3PO_RewriteRules::REFRESH_PENDING_OPTION));
         deactivate_o3po();
 
     }

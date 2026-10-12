@@ -412,7 +412,6 @@ class O3PO {
         $this->loader->add_action('parse_request', $this->primary_publication_type, 'handle_arxiv_paper_doi_feed_endpoint_request' , 1 );
         $this->loader->add_filter('the_content', $this->primary_publication_type, 'get_the_content');
         $this->loader->add_filter('get_the_excerpt', $this->primary_publication_type, 'get_the_excerpt', 1) ;//Use get_the_excerpt instead of 'the_excerpt' to also affect get_the_excerpt(). The low priority number is crucial to ensure early execution and prevent (expensive) auto generation of excerpt from content via wp_trim_excerpt() (see default-filters.php in WP)
-        $this->loader->add_action('template_redirect', $this->primary_publication_type, 'handle_404_errors');
 
         # For RSS feed testing the WP caching mechanism can be disabled by commenting in the following
         /* $callback = function() { */
@@ -444,7 +443,8 @@ class O3PO {
 
         $this->loader->add_action('init', 'O3PO_PeopleShortcodes', 'add_shortcodes');
         $this->loader->add_action('init', 'O3PO_EditorPages', 'add_editor_endpoint');
-        $this->loader->add_action('wp_loaded', 'O3PO_EditorPages', 'refresh_editor_endpoint_rewrite_rules');
+        $this->loader->add_action('wp_loaded', 'O3PO_RewriteRules', 'refresh_if_needed');
+        $this->loader->add_action('template_redirect', 'O3PO_RewriteRules', 'schedule_refresh_on_endpoint_404', 0);
         $this->loader->add_action('parse_request', 'O3PO_EditorPages', 'handle_editor_endpoint_request');
         $this->loader->add_filter('the_posts', 'O3PO_EditorPages', 'add_fake_editor_post_to_query');
         $this->loader->add_filter('template_include', 'O3PO_EditorPages', 'editor_profile_template');
@@ -458,7 +458,6 @@ class O3PO {
         $this->loader->add_filter('add_post_metadata', 'O3PO_EditorPages', 'remember_editor_uuid_before_meta_change', 10, 5);
         $this->loader->add_filter('update_post_metadata', 'O3PO_EditorPages', 'remember_editor_uuid_before_update', 10, 5);
         $this->loader->add_filter('delete_post_metadata', 'O3PO_EditorPages', 'remember_editor_uuid_before_meta_change', 10, 5);
-        $this->loader->add_action('template_redirect', $this->secondary_publication_type, 'handle_404_errors');
 
 	}
 

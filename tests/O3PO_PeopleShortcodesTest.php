@@ -12,7 +12,8 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
     private $original_settings;
     private $original_rewrite_rules;
     private $original_permalink_structure;
-    private $original_editor_rewrite_rules_version;
+    private $original_rewrite_rule_options;
+    private $original_request_uri;
     private $original_query;
     private $original_papers;
     private $original_transient_result;
@@ -23,7 +24,10 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $this->original_settings = $options['o3po-settings'];
         $this->original_rewrite_rules = isset($options['rewrite_rules']) ? $options['rewrite_rules'] : null;
         $this->original_permalink_structure = isset($options['permalink_structure']) ? $options['permalink_structure'] : null;
-        $this->original_editor_rewrite_rules_version = isset($options[O3PO_EditorPages::REWRITE_RULES_VERSION_OPTION]) ? $options[O3PO_EditorPages::REWRITE_RULES_VERSION_OPTION] : null;
+        $this->original_rewrite_rule_options = array();
+        foreach(array(O3PO_RewriteRules::VERSION_OPTION, O3PO_RewriteRules::REFRESH_PENDING_OPTION, O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION) as $option)
+            $this->original_rewrite_rule_options[$option] = isset($options[$option]) ? $options[$option] : null;
+        $this->original_request_uri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : null;
         $this->original_query = get_global_query();
         global $get_transient_returns;
         $this->original_transient_result = $get_transient_returns;
@@ -56,10 +60,15 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
                 unset($options['permalink_structure']);
             else
                 $options['permalink_structure'] = $this->original_permalink_structure;
-            if(null === $this->original_editor_rewrite_rules_version)
-                unset($options[O3PO_EditorPages::REWRITE_RULES_VERSION_OPTION]);
+            foreach($this->original_rewrite_rule_options as $option => $value)
+                if(null === $value)
+                    unset($options[$option]);
+                else
+                    $options[$option] = $value;
+            if(null === $this->original_request_uri)
+                unset($_SERVER['REQUEST_URI']);
             else
-                $options[O3PO_EditorPages::REWRITE_RULES_VERSION_OPTION] = $this->original_editor_rewrite_rules_version;
+                $_SERVER['REQUEST_URI'] = $this->original_request_uri;
             $get_transient_returns = $this->original_transient_result;
             set_global_query($this->original_query);
         }
@@ -113,35 +122,84 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $this->assertSame('page.php', O3PO_EditorPages::editor_profile_template('index.php'));
     }
 
-    public function test_editor_endpoint_rewrite_rules_are_flushed_once_after_registration() {
+    public function test_rewrite_rules_are_flushed_once_after_registration() {
         $this->configure_people();
         global $options;
-        $options['rewrite_rules'] = array();
         $options['permalink_structure'] = '/%postname%/';
+        unset($options[O3PO_RewriteRules::VERSION_OPTION], $options[O3PO_RewriteRules::REFRESH_PENDING_OPTION]);
         $flushes_before = get_flush_rewrite_rules_call_counter();
 
         O3PO_EditorPages::add_editor_endpoint();
-        O3PO_EditorPages::refresh_editor_endpoint_rewrite_rules();
+        O3PO_RewriteRules::refresh_if_needed();
 
         $this->assertSame($flushes_before + 1, get_flush_rewrite_rules_call_counter());
 
-        O3PO_EditorPages::refresh_editor_endpoint_rewrite_rules();
+        O3PO_RewriteRules::refresh_if_needed();
 
         $this->assertSame($flushes_before + 1, get_flush_rewrite_rules_call_counter());
-        $this->assertSame(O3PO_EditorPages::REWRITE_RULES_VERSION, $options[O3PO_EditorPages::REWRITE_RULES_VERSION_OPTION]);
+        $this->assertSame(O3PO_RewriteRules::VERSION, $options[O3PO_RewriteRules::VERSION_OPTION]);
     }
 
     public function test_editor_endpoint_does_not_flush_rewrite_rules_without_pretty_permalinks() {
         $this->configure_people();
         global $options;
-        $options['rewrite_rules'] = array();
         $options['permalink_structure'] = '';
+        unset($options[O3PO_RewriteRules::VERSION_OPTION], $options[O3PO_RewriteRules::REFRESH_PENDING_OPTION]);
         $flushes_before = get_flush_rewrite_rules_call_counter();
 
-        O3PO_EditorPages::refresh_editor_endpoint_rewrite_rules();
+        O3PO_RewriteRules::refresh_if_needed();
 
         $this->assertSame($flushes_before, get_flush_rewrite_rules_call_counter());
-        $this->assertSame(O3PO_EditorPages::REWRITE_RULES_VERSION, $options[O3PO_EditorPages::REWRITE_RULES_VERSION_OPTION]);
+        $this->assertSame(O3PO_RewriteRules::VERSION, $options[O3PO_RewriteRules::VERSION_OPTION]);
+    }
+
+    public function test_custom_endpoint_404_schedules_one_rate_limited_deferred_refresh() {
+        $this->configure_people();
+        global $options, $wp_query;
+        $options['permalink_structure'] = '/%postname%/';
+        unset($options[O3PO_RewriteRules::REFRESH_PENDING_OPTION], $options[O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION]);
+        $_SERVER['REQUEST_URI'] = '/editor/' . $this->editor_uuid . '/';
+        $wp_query = new WP_Query(null, array());
+        $wp_query->is_404 = true;
+        $queries_before = $GLOBALS['wp_query_constructor_count'];
+        $flushes_before = get_flush_rewrite_rules_call_counter();
+
+        O3PO_RewriteRules::schedule_refresh_on_endpoint_404();
+        $first_trigger_time = $options[O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION];
+
+        $this->assertTrue($options[O3PO_RewriteRules::REFRESH_PENDING_OPTION]);
+        $this->assertSame($queries_before, $GLOBALS['wp_query_constructor_count']);
+        $this->assertSame($flushes_before, get_flush_rewrite_rules_call_counter());
+
+        $_SERVER['REQUEST_URI'] = '/papers/not-found/pdf/';
+        O3PO_RewriteRules::schedule_refresh_on_endpoint_404();
+        $this->assertSame($first_trigger_time, $options[O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION]);
+        $this->assertSame($flushes_before, get_flush_rewrite_rules_call_counter());
+
+        O3PO_RewriteRules::refresh_if_needed();
+        $this->assertSame($flushes_before + 1, get_flush_rewrite_rules_call_counter());
+        $this->assertArrayNotHasKey(O3PO_RewriteRules::REFRESH_PENDING_OPTION, $options);
+
+        $options[O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION] = 1;
+        O3PO_RewriteRules::schedule_refresh_on_endpoint_404();
+        $this->assertGreaterThan(1, $options[O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION]);
+        $this->assertTrue($options[O3PO_RewriteRules::REFRESH_PENDING_OPTION]);
+
+    }
+
+    public function test_unrelated_404_does_not_schedule_rewrite_refresh() {
+        $this->configure_people();
+        global $options, $wp_query;
+        unset($options[O3PO_RewriteRules::REFRESH_PENDING_OPTION], $options[O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION]);
+        $_SERVER['REQUEST_URI'] = '/unrelated-page/';
+        $wp_query = new WP_Query(null, array());
+        $wp_query->is_404 = true;
+
+        O3PO_RewriteRules::schedule_refresh_on_endpoint_404();
+
+        $this->assertArrayNotHasKey(O3PO_RewriteRules::REFRESH_PENDING_OPTION, $options);
+        $this->assertArrayNotHasKey(O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION, $options);
+
     }
 
     public function test_editor_endpoint_uses_wordpress_404_for_unknown_or_non_editor_uuid() {

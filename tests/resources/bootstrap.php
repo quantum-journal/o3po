@@ -240,7 +240,7 @@ function get_option( $option, $default = false ) {
         return isset($options['rewrite_rules']) ? $options['rewrite_rules'] : array();
     elseif($option === 'permalink_structure')
         return isset($options['permalink_structure']) ? $options['permalink_structure'] : '';
-    elseif($option === 'o3po_editor_rewrite_rules_version')
+    elseif(strpos($option, 'o3po_rewrite_rules_') === 0)
         return isset($options[$option]) ? $options[$option] : $default;
     elseif($option === 'o3po-ready2publish')
         return $options['o3po-ready2publish'];
@@ -257,6 +257,11 @@ function update_option( $option, $content) {
     global $options;
 
     $options[$option] = $content;
+}
+
+function delete_option( $option ) {
+    global $options;
+    unset($options[$option]);
 }
 
 function get_file_data( $file, $options ) {
