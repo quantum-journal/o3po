@@ -16,7 +16,7 @@
  * Plugin Name:       O-3PO
  * Plugin URI:        https://quantum-journal.org/o3po/
  * Description:       Open-source open-access overlay publishing option
- * Version:           0.4.3
+ * Version:           0.5.0
  * Author:            Christian Gogolin, Quantum - the open journal for quantum science
  * Author URI:        http://cgogolin.de/
  * License:           GPL-3.0+
@@ -61,7 +61,7 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/class-o3po.php';
 /**
  * Begins execution of the plugin.
  *
- * Since everything within the plugin is registered via hooks,
+ * Since everything within the file is registered via hooks,
  * then kicking off the plugin from this point in the file does
  * not affect the page life cycle.
  *
