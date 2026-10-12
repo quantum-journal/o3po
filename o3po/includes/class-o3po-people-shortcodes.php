@@ -352,8 +352,8 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
             $person_uuidv4 = array();
 
         $updated = false;
-        foreach($person_first_names as $x => $foo)
-            if((!empty($foo) || !empty($person_last_names[$x])) && empty($person_uuidv4[$x]))
+        foreach($person_first_names as $x => $person_first_name)
+            if((!empty($person_first_name) || !empty($person_last_names[$x])) && empty($person_uuidv4[$x]))
             {
                 $person_uuidv4[$x] = O3PO_Utility::uuidv4();
                 $updated = true;
