@@ -466,6 +466,29 @@ public static function validate_array_as_comma_separated_list_provider() {
         $this->assertSame($settings->trim_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed('arxiv_paper_doi_feed_endpoint', ''), 'arxiv_paper_doi_feed');
     }
 
+        /**
+         * @depends test_initialize_settings
+         */
+    #[Depends('test_initialize_settings')]
+    public function test_endpoint_setting_change_schedules_deferred_rewrite_refresh( $settings ) {
+
+        global $options;
+        $pending_option = O3PO_RewriteRules::REFRESH_PENDING_OPTION;
+        $original_pending = isset($options[$pending_option]) ? $options[$pending_option] : null;
+        unset($options[$pending_option]);
+        $flushes_before = get_flush_rewrite_rules_call_counter();
+
+        $settings->trim_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed('arxiv_paper_doi_feed_endpoint', 'changed_feed_endpoint');
+
+        $this->assertTrue(get_option($pending_option));
+        $this->assertSame($flushes_before, get_flush_rewrite_rules_call_counter());
+
+        if(null === $original_pending)
+            unset($options[$pending_option]);
+        else
+            $options[$pending_option] = $original_pending;
+    }
+
 
         /**
          * @depends test_initialize_settings

@@ -10,6 +10,8 @@
  * @subpackage O3PO/includes
  */
 
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-rewrite-rules.php';
+
 /**
  * Fired during plugin activation.
  *
@@ -30,16 +32,9 @@ class O3PO_Activator {
 	 * @since    0.1.0
 	 */
 	public static function activate() {
-            //Flush the rewrite rules to make custom endpoints work
-        flush_rewrite_rules(true);
-            /* Note: As this plugin contains dynamically generated post types
-             * which cannot be registered via a static function call,
-             * flushing rewrite rules here is not sufficient to make these
-             * post types accessible. We thus flush again after registering
-             * the post types, but only if there are not yet any rewrite
-             * rules associated with the slugs of these post types, to avoid
-             * unnecessary flusing. See class-o3po-publication-type.php for more
-             * info.*/
+
+        O3PO_RewriteRules::schedule_refresh();
+        // The pending refresh runs on wp_loaded after dynamic post types and endpoints register.
 
     }
 

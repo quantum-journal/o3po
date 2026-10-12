@@ -12,6 +12,7 @@
 
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-utility.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/people.php';
 
 /**
  * Class representing the shortcodes generating various lists of people
@@ -237,116 +238,6 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
     }
 
         /**
-         * Compare names
-         *
-         * Tries to takes into account name prefixes.
-         *
-         * @since    0.4.1+
-         * @access   public
-         */
-    public static function compare_names($name_a, $name_b) {
-        $name_a = trim($name_a);
-        $name_b = trim($name_b);
-
-        if($name_a === $name_b)
-            return 0;
-
-        $prefix_regex = '#^([aA][pflb]|[dD]el|[dD][ea]|[dD]i|[dD]os|[dD]u|[lL]a|[lL]e|[vV]an ([dD]e|[dD]en|[dD]er|[hH]et|)|[vV]on|[zZ]u) #u';
-
-        $name_a_without_prefix = preg_replace($prefix_regex, '', $name_a);
-        $name_b_without_prefix = preg_replace($prefix_regex, '', $name_b);
-
-        return strnatcmp($name_a_without_prefix, $name_b_without_prefix);
-    }
-
-        /**
-         * Sort by last names
-         *
-         * @since    0.4.1+
-         * @access   public
-         */
-    public static function sort_by_last_names($person_a, $person_b) {
-
-        return static::compare_names($person_a['last_names'], $person_b['last_names']);
-    }
-
-        /**
-         * Sort by first names
-         *
-         * @since    0.4.1+
-         * @access   public
-         */
-    public static function sort_by_first_names($person_a, $person_b) {
-
-        return static::compare_names($person_a['first_names'], $person_b['first_names']);
-    }
-
-
-        /**
-         * Get person data from settings storage in a convenient array structure
-         *
-         * @since  0.4.1+
-         * @access public
-         * @return array Array with of arrays, one per person, containing that
-         *               persons data.
-         */
-    public static function get_formated_name_from_uuidv4($uuidv4) {
-
-        $settings = O3PO_Settings::instance();
-        $person_first_names = $settings->get_field_value('person_first_names');
-        $person_last_names = $settings->get_field_value('person_last_names');
-        $person_uuidv4 = $settings->get_field_value('person_uuidv4');
-
-        $key = array_search($uuidv4, $person_uuidv4, true);
-
-        if($key === false)
-            return "";
-
-        return  $person_first_names[$key] . " " . $person_last_names[$key];
-    }
-
-        /**
-         * Get person data from settings storage in a convenient array structure
-         *
-         * @since  0.4.1+
-         * @access public
-         * @return array Array with of arrays, one per person, containing that
-         *               persons data.
-         */
-    public static function get_person_data() {
-
-        $settings = O3PO_Settings::instance();
-        $person_first_names = $settings->get_field_value('person_first_names');
-        $person_last_names = $settings->get_field_value('person_last_names');
-        $person_role = $settings->get_field_value('person_role');
-        $person_since_year = $settings->get_field_value('person_since_year');
-        $person_until_year = $settings->get_field_value('person_until_year');
-        $person_url = $settings->get_field_value('person_url');
-        $person_affiliation = $settings->get_field_value('person_affiliation');
-        $person_country = $settings->get_field_value('person_country');
-        $person_extra = $settings->get_field_value('person_extra');
-        $person_uuidv4 = $settings->get_field_value('person_uuidv4');
-
-        $person_data = array();
-        foreach($person_first_names as $x => $foo)
-            $person_data[] = array(
-                'first_names' => $person_first_names[$x],
-                'last_names' => $person_last_names[$x],
-                'role' => $person_role[$x],
-                'since_year' => $person_since_year[$x],
-                'until_year' => $person_until_year[$x],
-                'url' => $person_url[$x],
-                'affiliation' => $person_affiliation[$x],
-                'country' => $person_country[$x],
-                'extra' => $person_extra[$x],
-                'uuidv4' => $person_uuidv4[$x],
-                                   );
-
-        return $person_data;
-    }
-
-
-        /**
          * Function generating the person-ul shotcode
          *
          * To be added as a shortcode via add_shortcode()
@@ -366,12 +257,12 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
         foreach(static::$shortcode_atts['persons-ul'] as $key => $value)
             if(empty($atts[$key])) $atts[$key] = $value['default'];
 
-        $person_data = static::get_person_data();
+        $person_data = O3PO_People::get_person_data();
 
         if($atts['sort'] === 'last_names')
-            uasort($person_data, array('self', 'sort_by_last_names'));
+            uasort($person_data, array('O3PO_People', 'sort_by_last_names'));
         elseif($atts['sort'] === 'first_names')
-            uasort($person_data, array('self', 'sort_by_first_names'));
+            uasort($person_data, array('O3PO_People', 'sort_by_first_names'));
 
         $current_year = date('Y');
         $result = '<ul>';
@@ -387,11 +278,13 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
             if(empty($atts['role']) or $atts['role'] === $person['role'] or in_array($person['role'], preg_split('/\s*,\s*/u', $atts['role'])))
             {
 
-                $result .= '<li' . (!empty($atts['li-style']) ? ' style="' . esc_attr($atts['li-style']) : '') . (!empty($person['uuidv4']) ? ' id="person-' . esc_attr($person['uuidv4']) : '') . '">';
+                $result .= '<li' . (!empty($atts['li-style']) ? ' style="' . esc_attr($atts['li-style']) . '"' : '') . (!empty($person['uuidv4']) ? ' id="person-' . esc_attr($person['uuidv4']) . '"' : '') . '>';
 
                 $person_name = $person['first_names'] . ' ' . $person['last_names'];
-                if($atts['link'] !== 'False' and !empty($person['url']))
-                    $result .= '<a href="' . esc_attr($person['url']) . '" target="_blank">' . esc_html($person_name) . '</a>';
+                if($atts['link'] !== 'False' and $person['role'] === 'editor' and !empty($person['uuidv4']))
+                    $result .= '<a href="' . esc_url(get_site_url() . '/editor/' . rawurlencode($person['uuidv4']) . '/') . '">' . esc_html($person_name) . '</a>';
+                elseif($atts['link'] !== 'False' and !empty($person['url']))
+                    $result .= '<a href="' . esc_url($person['url']) . '" target="_blank" rel="noopener noreferrer">' . esc_html($person_name) . '</a>';
                 else
                     $result .= esc_html($person_name);
                 if($atts['affiliation'] !== 'False' and !empty($person['affiliation']))
@@ -446,7 +339,7 @@ class O3PO_PeopleShortcodes implements O3PO_SettingsSpecifyer {
         foreach(static::$shortcode_atts['persons-count'] as $key => $value)
             if(empty($atts[$key])) $atts[$key] = $value['default'];
 
-        $person_data = static::get_person_data();
+        $person_data = O3PO_People::get_person_data();
 
         $current_year = date('Y');
         $count = 0;

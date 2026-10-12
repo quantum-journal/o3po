@@ -25,7 +25,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-latex
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-utility.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-shortcode-template.php';
-require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-people-shortcodes.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/people.php';
 
 
 /**
@@ -269,23 +269,6 @@ abstract class O3PO_PublicationType {
 
         register_post_type($this->get_publication_type_name(), $args );
 
-            /* As this post type is dnynamically created, we cannot register
-             * it via a static function call during the activation hook.
-             * Flushing rewrite rules there is hence not sufficient to make
-             * the post pages it creates accessible. At the same time,
-             * flush_rewrite_rules() must not be called on every page load.
-             * We thus resort to checking whether get_option('rewrite_rules')
-             * already contains rules associated with this slug and only
-             * flush if this is not the case. */
-        $rewrite_rules_must_be_fluhed = true;
-        foreach( get_option( 'rewrite_rules' ) as $key => $rule)
-            if(strpos($key, $args['rewrite']['slug'] ) === 0)
-            {
-                $rewrite_rules_must_be_fluhed = false;
-                break;
-            }
-        if($rewrite_rules_must_be_fluhed)
-            flush_rewrite_rules(true);
     }
 
         /**
@@ -1739,8 +1722,8 @@ abstract class O3PO_PublicationType {
         $handling_editor_uuidv4 = get_post_meta( $post_id, $post_type . '_handling_editor_uuidv4', true );
 
         $current_year = date('Y');
-        $person_data = O3PO_PeopleShortcodes::get_person_data();
-        uasort($person_data, array('O3PO_PeopleShortcodes', 'sort_by_first_names'));
+        $person_data = O3PO_People::get_person_data();
+        uasort($person_data, array('O3PO_People', 'sort_by_first_names'));
 
 		echo '	<tr>';
 		echo '		<th><label for="' . $post_type . '_handling_editor_uuidv4" class="' . $post_type .'_handling_editor_uuidv4_label">' . 'Handling Editor' . '</label></th>';
@@ -1773,9 +1756,9 @@ abstract class O3PO_PublicationType {
         if(empty($handling_editor_uuidv4))
             return '';
 
-        $handling_editor_name = O3PO_PeopleShortcodes::get_formated_name_from_uuidv4($handling_editor_uuidv4);
+        $handling_editor_name = O3PO_People::get_formated_name_from_uuidv4($handling_editor_uuidv4);
 
-        return '<a href="/people/#person-' . esc_attr($handling_editor_uuidv4) . '">' . esc_html($handling_editor_name) . '</a>';
+        return '<a href="' . esc_url(get_site_url() . '/editor/' . rawurlencode($handling_editor_uuidv4) . '/') . '">' . esc_html($handling_editor_name) . '</a>';
     }
 
         /**
@@ -3323,55 +3306,6 @@ abstract class O3PO_PublicationType {
         $settings = O3PO_Settings::instance();
         $default_image_url = $settings->get_field_value('social_media_thumbnail_url');
         return $default_image_url;
-    }
-
-
-        /**
-         * Handle 404 errors on queries that should return a publication page
-         *
-         * Flush rewrite_rules if the query should not have been an error.
-         *
-         * @since  0.4.3
-         * @access public
-         */
-    public function handle_404_errors() {
-        global $wp_query;
-
-        if( is_404() ){
-
-            $post_type = $this->get_publication_type_name();
-
-            if(!empty($wp_query->query_vars[$post_type]))
-            {
-                $doi_suffix_in_404_query = $wp_query->query_vars[$post_type];
-
-                $query = array(
-                    'post_type' => $post_type,
-                    'post_status' => array('publish'),
-                    'posts_per_page' => 10,
-                               );
-                $my_query = new WP_Query( $query );
-                while ( $my_query->have_posts() ) {
-                    $my_query->the_post();
-
-                    $post_id = get_the_ID();
-                    $post_type = get_post_type($post_id);
-                    $doi_suffix = get_post_meta( $post_id, $post_type . '_doi_suffix', true );
-                    if($doi_suffix_in_404_query == $doi_suffix)
-                    {
-                        $rewrite_rules_before = get_option('rewrite_rules');
-                        flush_rewrite_rules(true);
-                        $rewrite_rules_after = get_option('rewrite_rules');
-
-                        $developer_email = $this->get_journal_property('developer_email');
-
-                        $successfully_sent = wp_mail( $developer_email, "404 error on quantum-journal.org", json_encode($rewrite_rules_before) . "\n\n" . json_encode($rewrite_rules_after) . "\n\n" . json_encode($wp_query->query_vars), array('From: ' . $developer_email));
-                        break;
-                    }
-                }
-                wp_reset_postdata();
-            }
-        }
     }
 
 

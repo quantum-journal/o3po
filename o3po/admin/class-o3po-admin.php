@@ -13,6 +13,7 @@
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-plotter.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-publication-type.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/editor-pages.php';
 
 
 
@@ -466,8 +467,88 @@ class O3PO_Admin {
             $html .= '<p>Updating submission history data requires fetching the abstract page from the arXiv. Fresh submission history data is thus fetched when the page of a publication is visited and the last time submission history data for that publication was fetched lies more than ' . esc_html($arxiv_submission_history_refresh_seconds) . ' seconds in the past. This balances the load and makes sure that submission history data is always reasonably up to date. If, for some reason, you want to fetch fresh submission history data for all publications with data older than ' . esc_html($arxiv_submission_history_refresh_seconds) . ' seconds you can press the fetch fresh data button below. Beware that this might be a very long operation that can easily time out depending on your server setup and the number of publications.</p>';
             $html .= '<form method="post" action="' . esc_url('?page=' . $this->get_plugin_name() . '-meta-data-explorer' . '&amp;tab=' . $tab_slug) . '"><input type="checkbox" id="refresh" name="refresh" value="checked" /><label for="refresh">I have read the above text on refreshing submission history data.</label><input id="submit" type="submit" value="Refresh submission history data"></form>';
         }
+        elseif($active_tab === 'editor-leaderboard')
+        {
+            $html .= '<h3>Editor leaderboard</h3>';
+
+            foreach($this->get_editor_leaderboard_data() as $year => $editors)
+            {
+                $html .= '<h4>' . esc_html($year) . '</h4>';
+                $html .= '<table><thead><tr><th>Editor</th><th>Published papers</th></tr></thead><tbody>';
+                foreach($editors as $editor)
+                    $html .= '<tr><td><a href="' . esc_url(get_site_url() . '/' . O3PO_EditorPages::ENDPOINT_SLUG . '/' . rawurlencode($editor['uuidv4']) . '/') . '">' . esc_html($editor['name']) . '</a></td><td style="text-align: right;">' . esc_html($editor['count']) . '</td></tr>';
+                $html .= '</tbody></table>';
+            }
+        }
 
         echo $html;
+    }
+
+        /**
+         * Get the number of published papers handled by each editor in each year.
+         *
+         * @access private
+         * @return array Paper counts indexed by publication year and editor.
+         */
+    private function get_editor_leaderboard_data() {
+
+        $settings = O3PO_Settings::instance();
+        $post_type = $settings->get_field_value('primary_publication_type_name');
+        $editors = array();
+        foreach(O3PO_People::get_person_data() as $person)
+            if($person['role'] === 'editor' and !empty($person['uuidv4']))
+                $editors[$person['uuidv4']] = trim($person['first_names'] . ' ' . $person['last_names']);
+
+        $query = new WP_Query(array(
+            'post_type' => $post_type,
+            'post_status' => 'publish',
+            'posts_per_page' => -1,
+            'fields' => 'ids',
+            'no_found_rows' => true,
+            'update_post_term_cache' => false,
+        ));
+        $leaderboard = array();
+
+        foreach($query->posts as $post_id)
+        {
+            $date_published = get_post_meta($post_id, $post_type . '_date_published', true);
+            if(!is_string($date_published) or preg_match('/^([0-9]{4})-[0-9]{2}-[0-9]{2}$/D', $date_published, $matches) !== 1)
+                continue;
+            if(!checkdate((int)substr($date_published, 5, 2), (int)substr($date_published, 8, 2), (int)$matches[1]))
+                continue;
+
+            $editor_uuidv4 = get_post_meta($post_id, $post_type . '_handling_editor_uuidv4', true);
+            if(!is_string($editor_uuidv4) or !isset($editors[$editor_uuidv4]))
+                continue;
+
+            $year = $matches[1];
+            if(!isset($leaderboard[$year][$editor_uuidv4]))
+                $leaderboard[$year][$editor_uuidv4] = array(
+                    'uuidv4' => $editor_uuidv4,
+                    'name' => $editors[$editor_uuidv4],
+                    'count' => 0,
+                );
+            $leaderboard[$year][$editor_uuidv4]['count']++;
+        }
+
+        krsort($leaderboard, SORT_NUMERIC);
+        foreach($leaderboard as &$yearly_editors)
+        {
+            usort($yearly_editors, function($editor_a, $editor_b) {
+                if($editor_a['count'] !== $editor_b['count'])
+                    return $editor_b['count'] <=> $editor_a['count'];
+
+                $name_comparison = O3PO_People::compare_names($editor_a['name'], $editor_b['name']);
+                if($name_comparison !== 0)
+                    return $name_comparison;
+
+                return strcmp($editor_a['uuidv4'], $editor_b['uuidv4']);
+            });
+        }
+        unset($yearly_editors);
+
+        return $leaderboard;
+
     }
 
         /**
@@ -481,6 +562,7 @@ class O3PO_Admin {
         'meta-data' => 'Meta-data',
         'citation-metrics' => 'Citation metrics',
         'updated-after-publication' => 'Updated after publication',
+        'editor-leaderboard' => 'Editor leaderboard',
                                              ];
 
 

@@ -258,6 +258,11 @@ class O3PO {
              */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-people-shortcodes.php';
 
+            /**
+             * The class providing public editor profile pages.
+             */
+        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/editor-pages.php';
+
         $this->loader = new O3PO_Loader();
 
         $settings = O3PO_Settings::instance($this->plugin_name, $this->get_plugin_pretty_name(), $this->version, 'O3PO_PublicationType::get_active_publication_type_names'); # configure settings singleton during first initialization
@@ -407,7 +412,6 @@ class O3PO {
         $this->loader->add_action('parse_request', $this->primary_publication_type, 'handle_arxiv_paper_doi_feed_endpoint_request' , 1 );
         $this->loader->add_filter('the_content', $this->primary_publication_type, 'get_the_content');
         $this->loader->add_filter('get_the_excerpt', $this->primary_publication_type, 'get_the_excerpt', 1) ;//Use get_the_excerpt instead of 'the_excerpt' to also affect get_the_excerpt(). The low priority number is crucial to ensure early execution and prevent (expensive) auto generation of excerpt from content via wp_trim_excerpt() (see default-filters.php in WP)
-        $this->loader->add_action('template_redirect', $this->primary_publication_type, 'handle_404_errors');
 
         # For RSS feed testing the WP caching mechanism can be disabled by commenting in the following
         /* $callback = function() { */
@@ -438,7 +442,22 @@ class O3PO {
             $this->loader->add_filter('template_include', $this->secondary_publication_type, 'use_page_template');
 
         $this->loader->add_action('init', 'O3PO_PeopleShortcodes', 'add_shortcodes');
-        $this->loader->add_action('template_redirect', $this->secondary_publication_type, 'handle_404_errors');
+        $this->loader->add_action('init', 'O3PO_EditorPages', 'add_editor_endpoint');
+        $this->loader->add_action('wp_loaded', 'O3PO_RewriteRules', 'refresh_if_needed');
+        $this->loader->add_action('template_redirect', 'O3PO_RewriteRules', 'schedule_refresh_on_endpoint_404', 0);
+        $this->loader->add_action('parse_request', 'O3PO_EditorPages', 'handle_editor_endpoint_request');
+        $this->loader->add_filter('the_posts', 'O3PO_EditorPages', 'add_fake_editor_post_to_query');
+        $this->loader->add_filter('template_include', 'O3PO_EditorPages', 'editor_profile_template');
+        $this->loader->add_action('loop_start', 'O3PO_EditorPages', 'editor_profile_at_loop_start');
+        $this->loader->add_action('save_post', 'O3PO_EditorPages', 'invalidate_handled_papers_cache', 20, 2);
+        $this->loader->add_action('before_delete_post', 'O3PO_EditorPages', 'invalidate_handled_papers_cache', 10, 2);
+        $this->loader->add_action('transition_post_status', 'O3PO_EditorPages', 'invalidate_handled_papers_on_status_transition', 10, 3);
+        $this->loader->add_action('added_post_meta', 'O3PO_EditorPages', 'invalidate_handled_papers_cache_on_meta_change', 10, 4);
+        $this->loader->add_action('updated_post_meta', 'O3PO_EditorPages', 'invalidate_handled_papers_cache_on_meta_change', 10, 4);
+        $this->loader->add_action('deleted_post_meta', 'O3PO_EditorPages', 'invalidate_handled_papers_cache_on_meta_change', 10, 4);
+        $this->loader->add_filter('add_post_metadata', 'O3PO_EditorPages', 'remember_editor_uuid_before_meta_change', 10, 5);
+        $this->loader->add_filter('update_post_metadata', 'O3PO_EditorPages', 'remember_editor_uuid_before_update', 10, 5);
+        $this->loader->add_filter('delete_post_metadata', 'O3PO_EditorPages', 'remember_editor_uuid_before_meta_change', 10, 5);
 
 	}
 
