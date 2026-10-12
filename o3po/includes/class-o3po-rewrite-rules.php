@@ -31,7 +31,7 @@ class O3PO_RewriteRules {
 
         global $wp_query;
 
-        if(!is_404() or !isset($wp_query->query_vars) or !static::is_o3po_endpoint_request($wp_query->query_vars))
+        if(!is_404() or !isset($wp_query->query_vars) or empty(get_option('permalink_structure')) or !static::is_o3po_endpoint_request($wp_query->query_vars))
             return;
 
         $now = time();
@@ -158,8 +158,14 @@ class O3PO_RewriteRules {
 
         $request = ltrim($request_path, '/');
         foreach($rewrite_rules as $rule => $query)
-            if(is_string($rule) and preg_match('~^' . str_replace('~', '\\~', $rule) . '~', $request))
+        {
+            if(!is_string($rule))
+                continue;
+
+            $matches = @preg_match('#^' . $rule . '#', $request);
+            if($matches === 1)
                 return true;
+        }
 
         return false;
 

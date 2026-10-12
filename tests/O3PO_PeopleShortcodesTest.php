@@ -211,6 +211,7 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
     public function test_unrelated_404_does_not_schedule_rewrite_refresh() {
         $this->configure_people();
         global $options, $wp_query;
+        $options['permalink_structure'] = '/%postname%/';
         unset($options[O3PO_RewriteRules::REFRESH_PENDING_OPTION], $options[O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION]);
         $options['rewrite_rules'] = array(
             'papers/([^/]+)/?$' => 'index.php?paper=$matches[1]',
@@ -226,9 +227,25 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
 
     }
 
+    public function test_endpoint_404_without_pretty_permalinks_does_not_schedule_rewrite_refresh() {
+        $this->configure_people();
+        global $options, $wp_query;
+        $options['permalink_structure'] = '';
+        unset($options[O3PO_RewriteRules::REFRESH_PENDING_OPTION], $options[O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION]);
+        $_SERVER['REQUEST_URI'] = '/editor/' . $this->editor_uuid . '/';
+        $wp_query = new WP_Query(null, array('editor' => $this->editor_uuid));
+        $wp_query->is_404 = true;
+
+        O3PO_RewriteRules::schedule_refresh_on_endpoint_404();
+
+        $this->assertArrayNotHasKey(O3PO_RewriteRules::REFRESH_PENDING_OPTION, $options);
+        $this->assertArrayNotHasKey(O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION, $options);
+    }
+
     public function test_publication_404_without_matching_rewrite_rule_schedules_refresh() {
         $this->configure_people();
         global $options, $wp_query;
+        $options['permalink_structure'] = '/%postname%/';
         $publication_slug = O3PO_Settings::instance()->get_field_value('primary_publication_type_name_plural');
         $options['rewrite_rules'] = array(
             'unrelated/' . $publication_slug . '/([^/]+)/?$' => 'index.php?page=$matches[1]',
@@ -247,6 +264,7 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $this->configure_people();
         global $options, $wp_query;
         $options['home_url_path'] = '/subsite';
+        $options['permalink_structure'] = '/%postname%/';
         $settings = O3PO_Settings::instance();
         $options['rewrite_rules'] = array(
             'unrelated/' . $settings->get_field_value('secondary_publication_type_name_plural') . '/([^/]+)/?$' => 'index.php?page=$matches[1]',
@@ -275,6 +293,7 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
     public function test_endpoint_and_secondary_publication_query_vars_trigger_404_refresh() {
         $this->configure_people();
         global $options, $wp_query;
+        $options['permalink_structure'] = '/%postname%/';
         $_SERVER['REQUEST_URI'] = '/unrelated-page/';
         $query_vars_to_test = array(
             'pdf' => '',
