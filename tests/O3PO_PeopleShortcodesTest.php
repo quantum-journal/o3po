@@ -59,7 +59,7 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $this->original_rewrite_rules = isset($options['rewrite_rules']) ? $options['rewrite_rules'] : null;
         $this->original_permalink_structure = isset($options['permalink_structure']) ? $options['permalink_structure'] : null;
         $this->original_rewrite_rule_options = array();
-        foreach(array(O3PO_RewriteRules::VERSION_OPTION, O3PO_RewriteRules::REFRESH_PENDING_OPTION, O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION, O3PO_RewriteRules::REFRESH_404_LOCK_OPTION) as $option)
+        foreach(array(O3PO_RewriteRules::REFRESH_PENDING_OPTION, O3PO_RewriteRules::LAST_404_REFRESH_TRIGGER_OPTION, O3PO_RewriteRules::REFRESH_404_LOCK_OPTION) as $option)
             $this->original_rewrite_rule_options[$option] = isset($options[$option]) ? $options[$option] : null;
         $this->original_request_uri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : null;
         $this->original_home_url_path = isset($options['home_url_path']) ? $options['home_url_path'] : null;
@@ -165,10 +165,11 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $this->configure_people();
         global $options;
         $options['permalink_structure'] = '/%postname%/';
-        unset($options[O3PO_RewriteRules::VERSION_OPTION], $options[O3PO_RewriteRules::REFRESH_PENDING_OPTION]);
+        unset($options[O3PO_RewriteRules::REFRESH_PENDING_OPTION]);
         $flushes_before = get_flush_rewrite_rules_call_counter();
 
         O3PO_EditorPages::add_editor_endpoint();
+        O3PO_RewriteRules::schedule_refresh();
         O3PO_RewriteRules::refresh_if_needed();
 
         $this->assertSame($flushes_before + 1, get_flush_rewrite_rules_call_counter());
@@ -176,20 +177,18 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         O3PO_RewriteRules::refresh_if_needed();
 
         $this->assertSame($flushes_before + 1, get_flush_rewrite_rules_call_counter());
-        $this->assertSame(O3PO_RewriteRules::VERSION, $options[O3PO_RewriteRules::VERSION_OPTION]);
     }
 
     public function test_editor_endpoint_does_not_flush_rewrite_rules_without_pretty_permalinks() {
         $this->configure_people();
         global $options;
         $options['permalink_structure'] = '';
-        unset($options[O3PO_RewriteRules::VERSION_OPTION], $options[O3PO_RewriteRules::REFRESH_PENDING_OPTION]);
+        unset($options[O3PO_RewriteRules::REFRESH_PENDING_OPTION]);
         $flushes_before = get_flush_rewrite_rules_call_counter();
 
         O3PO_RewriteRules::refresh_if_needed();
 
         $this->assertSame($flushes_before, get_flush_rewrite_rules_call_counter());
-        $this->assertSame(O3PO_RewriteRules::VERSION, $options[O3PO_RewriteRules::VERSION_OPTION]);
     }
 
     public function test_scheduled_rewrite_refresh_waits_for_pretty_permalinks() {
@@ -197,14 +196,12 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         global $options;
         $options['permalink_structure'] = '';
         $options[O3PO_RewriteRules::REFRESH_PENDING_OPTION] = true;
-        unset($options[O3PO_RewriteRules::VERSION_OPTION]);
         $flushes_before = get_flush_rewrite_rules_call_counter();
 
         O3PO_RewriteRules::refresh_if_needed();
 
         $this->assertSame($flushes_before, get_flush_rewrite_rules_call_counter());
         $this->assertTrue($options[O3PO_RewriteRules::REFRESH_PENDING_OPTION]);
-        $this->assertArrayNotHasKey(O3PO_RewriteRules::VERSION_OPTION, $options);
     }
 
     public function test_custom_endpoint_404_schedules_one_rate_limited_deferred_refresh() {

@@ -2,8 +2,6 @@
 
 class O3PO_RewriteRules {
 
-    const VERSION_OPTION = 'o3po_rewrite_rules_version';
-    const VERSION = '1';
     const REFRESH_PENDING_OPTION = 'o3po_rewrite_rules_refresh_pending';
     const LAST_404_REFRESH_TRIGGER_OPTION = 'o3po_rewrite_rules_last_404_trigger';
     const REFRESH_404_LOCK_OPTION = 'o3po_rewrite_rules_404_lock';
@@ -86,20 +84,26 @@ class O3PO_RewriteRules {
     public static function refresh_if_needed() {
 
         $refresh_pending = get_option(static::REFRESH_PENDING_OPTION, false);
-        if(!$refresh_pending and get_option(static::VERSION_OPTION) === static::VERSION)
+        if(!$refresh_pending)
             return;
 
         if(empty(get_option('permalink_structure')))
-        {
-            if(!$refresh_pending)
-                update_option(static::VERSION_OPTION, static::VERSION, false);
             // Preserve queued refreshes so they can run after pretty permalinks are enabled.
             return;
-        }
 
         flush_rewrite_rules(false);
-        update_option(static::VERSION_OPTION, static::VERSION, false);
         delete_option(static::REFRESH_PENDING_OPTION);
+
+    }
+
+        /**
+         * Flush all rewrite rules after plugin deactivation.
+         *
+         * @access public
+         */
+    public static function flush_on_deactivation() {
+
+        flush_rewrite_rules(true);
 
     }
 

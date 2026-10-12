@@ -42,7 +42,9 @@ class O3PO_Test extends O3PO_TestCase
             //Test activation and deactivation
         activate_o3po();
         $this->assertTrue(get_option(O3PO_RewriteRules::REFRESH_PENDING_OPTION));
+        $flushes_before_deactivation = get_flush_rewrite_rules_call_counter();
         deactivate_o3po();
+        $this->assertSame($flushes_before_deactivation + 1, get_flush_rewrite_rules_call_counter());
 
     }
 

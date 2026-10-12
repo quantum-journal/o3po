@@ -154,7 +154,6 @@ class O3PO_Journal implements O3PO_SettingsSpecifyer {
     public function add_volumes_endpoint() {
 
         add_rewrite_endpoint( $this->get_journal_property('volumes_endpoint'), EP_ROOT );
-            // flush_rewrite_rules( true );  //// <---------- ONLY COMMENT IN WHILE TESTING
     }
 
 

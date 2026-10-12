@@ -32,11 +32,9 @@ class O3PO_Activator {
 	 * @since    0.1.0
 	 */
 	public static function activate() {
+
         O3PO_RewriteRules::schedule_refresh();
-            /* Note: As this plugin contains dynamically generated post types
-             * which cannot be registered via a static function call,
-             * the scheduled rewrite refresh runs on wp_loaded after their
-             * registration and also registers all plugin endpoints. */
+        // The pending refresh runs on wp_loaded after dynamic post types and endpoints register.
 
     }
 
