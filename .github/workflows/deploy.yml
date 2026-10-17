@@ -121,31 +121,28 @@ jobs:
           if [ -z "$SSH_KNOWN_HOSTS" ]; then
             echo "::error::SSH_KNOWN_HOSTS is not set. Candidate known_hosts value for $host:"
             scan_stderr=$(mktemp)
-            trap 'rm -f "$scan_stderr"' EXIT
+            scan_capped=$(mktemp)
+            trap 'rm -f "$scan_stderr" "$scan_capped"' EXIT
             scan_status=0
-            scan_output=
-            if scan_output=$(timeout 10s ssh-keyscan -T 5 -t ed25519,ecdsa,rsa "$host" 2>"$scan_stderr" | awk 'NR <= 10 { print } END { if (NR > 10) print "__O3PO_SCAN_OUTPUT_CAPPED__" }'); then
+            if candidate=$(timeout 10s ssh-keyscan -T 5 -t ed25519,ecdsa,rsa "$host" 2>"$scan_stderr" | awk -v capped_file="$scan_capped" 'NR <= 10 { print } NR == 11 { print "true" > capped_file; close(capped_file) }'); then
               scan_status=0
             else
               scan_status=$?
             fi
-            output_capped=false
-            if [[ "$scan_output" == *$'\n__O3PO_SCAN_OUTPUT_CAPPED__' ]]; then
-              output_capped=true
-              scan_output=${scan_output%$'\n__O3PO_SCAN_OUTPUT_CAPPED__'}
-            fi
-            candidate=$scan_output
             if [ -n "$candidate" ]; then
               printf '%s\n' "$candidate"
               echo "Candidate key fingerprints to compare with a trusted source:"
               printf '%s\n' "$candidate" | ssh-keygen -lf - || true
               echo "::error::Verify this host key through a trusted channel before setting SSH_KNOWN_HOSTS; this scan is not authenticated."
             fi
-            if [ "$output_capped" = true ]; then
+            if [ -s "$scan_capped" ]; then
               echo "::warning::Only the first 10 candidate key lines are shown; the output was capped."
             fi
             if [ "$scan_status" -ne 0 ]; then
               echo "::warning::ssh-keyscan did not complete (exit status $scan_status; 124 indicates timeout). Displayed candidates may be incomplete."
+            fi
+            if [ -z "$candidate" ] && [ "$scan_status" -eq 0 ]; then
+              echo "::warning::ssh-keyscan returned no host keys; it may exit successfully when the host is unreachable. Review any scanner diagnostics below."
             fi
             if [ -s "$scan_stderr" ]; then
               echo "ssh-keyscan diagnostics:"
