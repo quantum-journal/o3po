@@ -109,6 +109,7 @@ jobs:
           DRY_RUN: ${{ inputs.dry_run == true && 'true' || 'false' }}
         run: |
           set -eu
+          set -o pipefail
           [ -n "$FTP_URL" ] && [ -n "$SSH_USER" ] && [ -n "$SSHPASS" ] \
             || { echo "::error::FTP_URL, FTP_USER and FTP_PASSWORD must be set"; exit 1; }
           url="${FTP_URL#*://}"
@@ -120,17 +121,26 @@ jobs:
           if [ -z "$SSH_KNOWN_HOSTS" ]; then
             echo "::error::SSH_KNOWN_HOSTS is not set. Candidate known_hosts value for $host:"
             scan_stderr=$(mktemp)
-            candidate=$(timeout 10s ssh-keyscan -T 5 -t ed25519,ecdsa,rsa "$host" 2>"$scan_stderr" | head -n 10 || true)
+            scan_status=0
+            if candidate=$(timeout 10s ssh-keyscan -T 5 -t ed25519,ecdsa,rsa "$host" 2>"$scan_stderr" | head -n 10); then
+              scan_status=0
+            else
+              scan_status=$?
+            fi
             if [ -n "$candidate" ]; then
               printf '%s\n' "$candidate"
               echo "Candidate key fingerprints to compare with a trusted source:"
               printf '%s\n' "$candidate" | ssh-keygen -lf - || true
               echo "::error::Verify this host key through a trusted channel before setting SSH_KNOWN_HOSTS; this scan is not authenticated."
-            else
-              if [ -s "$scan_stderr" ]; then
-                echo "ssh-keyscan diagnostics:"
-                head -n 10 "$scan_stderr"
-              fi
+            fi
+            if [ "$scan_status" -ne 0 ]; then
+              echo "::warning::ssh-keyscan did not complete (exit status $scan_status; 124 indicates timeout and 141 indicates the output cap). Displayed candidates may be incomplete."
+            fi
+            if [ -s "$scan_stderr" ]; then
+              echo "ssh-keyscan diagnostics:"
+              head -n 10 "$scan_stderr"
+            fi
+            if [ -z "$candidate" ]; then
               echo "::error::Could not retrieve a candidate host key. Set SSH_KNOWN_HOSTS to a trusted known_hosts entry manually."
             fi
             rm -f "$scan_stderr"
