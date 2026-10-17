@@ -25,3 +25,9 @@
 - When changing handled-paper selection or cached values, preserve the corresponding invalidation behavior for publication saves, deletions, status changes, and handling-editor metadata changes.
 - Route rewrite refreshes through `O3PO_RewriteRules` in `o3po/includes/class-o3po-rewrite-rules.php`: schedule soft refreshes for `wp_loaded` after endpoint and post-type registration; deactivation uses its centralized hard-flush method.
 - Plugin-endpoint 404 recovery is deferred to a subsequent request and rate-limited; keep route detection aligned with configurable endpoint slugs and publication-type routes.
+
+## Working from an existing branch on github.com
+
+- When asked to start from, or build on, an existing branch (for example `develop`), the clone may contain only the default branch. Run `git fetch origin <branch>` and create your working branch from `FETCH_HEAD`, not from the default branch.
+- If `report_progress` cannot push (for example an HTTP 403) or `create_pull_request` fails with "No commits between ..." because it compares the wrong branch, do not leave the changes only in the local clone: the user cannot see them. Create the new branch with the GitHub MCP `create_branch` tool (`from_branch` set to the requested base) and upload the changed files with `create_or_update_file` or `push_files`, passing the current blob SHA for existing files.
+- Then tell the user the branch name and give a compare link (`https://github.com/<owner>/<repo>/compare/<base>...<branch>`) so they can open the PR against the requested base, or ask for permission if something blocks you.
