@@ -92,7 +92,8 @@ It is obviously a play on the name of humanoid robot character from a series of 
 ## Changelog
 
 ### 0.5.0
-* Added editor profile pages with lists of handled publications and a yearly editor publication leaderboard.
+* Added public profiles for journal personnel, with handled-publication citations and a yearly editor publication leaderboard.
+* Automatically generated and saved profile IDs for existing people records.
 * Improved recovery from publication-page 404 errors caused by stale rewrite rules.
 * Updated invoice payment options and excluded people being phased out from the current year.
 * Removed the Fermat's Library integration.
