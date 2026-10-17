@@ -424,7 +424,7 @@ class O3PO_EditorPages {
         if(!empty($editor['country']))
             echo '<tr><td>Country:</td><td>' . esc_html($editor['country']) . '</td></tr>';
         if(!empty($service))
-            echo '<tr><td>With ' . esc_html($journal_title) . ' since:</td><td>' . esc_html($service) . '</td></tr>';
+            echo '<tr><td>With ' . esc_html($journal_title) . ':</td><td>' . esc_html($service) . '</td></tr>';
         if(!empty($editor['extra']))
             echo '<tr><td>Additional information:</td><td>' . esc_html($editor['extra']) . '</td></tr>';
         if(!empty($editor['url']))
