@@ -18,7 +18,9 @@ name: Deploy
 #                                  rb06.serverdomain.org/home/www/wordpress/wp-content/plugins/
 #        secret   FTP_USER         ssh user name
 #        secret   FTP_PASSWORD     ssh password
-#        variable SSH_KNOWN_HOSTS  trusted known_hosts line(s) for the deployment host.
+#        variable SSH_KNOWN_HOSTS  trusted known_hosts line(s) for the deployment host. If
+#                                  unset, the workflow prints a candidate from ssh-keyscan and
+#                                  fails; verify the key independently before setting the variable.
 #   3. Create the repository label "deploy-dev".
 #
 # Safety: rsync runs with --delete, so everything inside <FTP_URL>/o3po that is not in the
@@ -106,16 +108,27 @@ jobs:
           DRY_RUN: ${{ inputs.dry_run == true && 'true' || 'false' }}
         run: |
           set -eu
-          [ -n "$FTP_URL" ] && [ -n "$SSH_USER" ] && [ -n "$SSHPASS" ] && [ -n "$SSH_KNOWN_HOSTS" ] \
-            || { echo "::error::FTP_URL, FTP_USER, FTP_PASSWORD and trusted SSH_KNOWN_HOSTS must be set"; exit 1; }
+          [ -n "$FTP_URL" ] && [ -n "$SSH_USER" ] && [ -n "$SSHPASS" ] \
+            || { echo "::error::FTP_URL, FTP_USER and FTP_PASSWORD must be set"; exit 1; }
           url="${FTP_URL#*://}"
           host="${url%%/*}"
           path="/${url#*/}"
           path="${path%/}"
-          # Safety checks: --delete only ever acts inside <path>/o3po, but make sure
-          # that this is really the plugins directory of a WordPress installation.
           [[ "$host" =~ ^[A-Za-z0-9.-]+$ ]] \
             || { echo "::error::FTP_URL has no valid host"; exit 1; }
+          if [ -z "$SSH_KNOWN_HOSTS" ]; then
+            echo "::error::SSH_KNOWN_HOSTS is not set. Candidate known_hosts value for $host:"
+            candidate=$(ssh-keyscan -H "$host" 2>/dev/null || true)
+            if [ -n "$candidate" ]; then
+              printf '%s\n' "$candidate"
+              echo "::error::Verify this host key through a trusted channel before setting SSH_KNOWN_HOSTS; this scan is not authenticated."
+            else
+              echo "::error::Could not retrieve a candidate host key. Set SSH_KNOWN_HOSTS to a trusted known_hosts entry manually."
+            fi
+            exit 1
+          fi
+          # Safety checks: --delete only ever acts inside <path>/o3po, but make sure
+          # that this is really the plugins directory of a WordPress installation.
           [[ "$path" =~ ^/[A-Za-z0-9._/-]+/wp-content/plugins$ ]] && [[ "$path" != *..* ]] \
             || { echo "::error::FTP_URL path must be an absolute path ending in /wp-content/plugins"; exit 1; }
           [ -f o3po/o3po.php ] && [ -d o3po/includes ] && [ "$(find o3po -type f | wc -l)" -ge 20 ] \
