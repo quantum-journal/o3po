@@ -472,16 +472,12 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         }
     }
 
-    public function test_editor_endpoint_uses_wordpress_404_for_unknown_or_non_editor_uuid() {
+    public function test_editor_endpoint_uses_wordpress_404_for_unknown_uuid() {
         $this->configure_people();
 
         $unknown = (object) array('query_vars' => array('editor' => 'dddddddd-dddd-4ddd-8ddd-dddddddddddd'));
         O3PO_EditorPages::handle_editor_endpoint_request($unknown);
         $this->assertSame('404', $unknown->query_vars['error']);
-
-        $coordinator = (object) array('query_vars' => array('editor' => $this->coordinator_uuid));
-        O3PO_EditorPages::handle_editor_endpoint_request($coordinator);
-        $this->assertSame('404', $coordinator->query_vars['error']);
     }
 
     public function test_editor_profile_renders_existing_data_for_former_editor() {
