@@ -476,7 +476,7 @@ class O3PO_Admin {
                 $html .= '<h4>' . esc_html($year) . '</h4>';
                 $html .= '<table><thead><tr><th>Editor</th><th>Published papers</th></tr></thead><tbody>';
                 foreach($editors as $editor)
-                    $html .= '<tr><td><a href="' . esc_url(get_site_url() . '/' . O3PO_EditorPages::ENDPOINT_SLUG . '/' . rawurlencode($editor['uuidv4']) . '/') . '">' . esc_html($editor['name']) . '</a></td><td style="text-align: right;">' . esc_html($editor['count']) . '</td></tr>';
+                    $html .= '<tr><td><a href="' . esc_url(home_url('/' . O3PO_EditorPages::ENDPOINT_SLUG . '/' . rawurlencode($editor['uuidv4']) . '/')) . '">' . esc_html($editor['name']) . '</a></td><td style="text-align: right;">' . esc_html($editor['count']) . '</td></tr>';
                 $html .= '</tbody></table>';
             }
         }

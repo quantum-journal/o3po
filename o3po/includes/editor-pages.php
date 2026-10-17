@@ -51,12 +51,10 @@ class O3PO_EditorPages {
             return;
         }
 
-        query_posts(array(
-            'post_type' => 'page',
-            'post__in' => array(0),
-            'editor_profile_add_fake_post' => true,
-            'editor_profile_uuid' => $editor['uuidv4'],
-        ));
+        $wp->query_vars['post_type'] = 'page';
+        $wp->query_vars['post__in'] = array(0);
+        $wp->query_vars['editor_profile_add_fake_post'] = true;
+        $wp->query_vars['editor_profile_uuid'] = $editor['uuidv4'];
 
     }
 

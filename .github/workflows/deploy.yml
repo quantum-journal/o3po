@@ -18,8 +18,7 @@ name: Deploy
 #                                  rb06.serverdomain.org/home/www/wordpress/wp-content/plugins/
 #        secret   FTP_USER         ssh user name
 #        secret   FTP_PASSWORD     ssh password
-#        variable SSH_KNOWN_HOSTS  (optional) known_hosts line(s) of the host. If unset, the
-#                                  host key is fetched with ssh-keyscan at deploy time.
+#        variable SSH_KNOWN_HOSTS  trusted known_hosts line(s) for the deployment host.
 #   3. Create the repository label "deploy-dev".
 #
 # Safety: rsync runs with --delete, so everything inside <FTP_URL>/o3po that is not in the
@@ -107,8 +106,8 @@ jobs:
           DRY_RUN: ${{ inputs.dry_run == true && 'true' || 'false' }}
         run: |
           set -eu
-          [ -n "$FTP_URL" ] && [ -n "$SSH_USER" ] && [ -n "$SSHPASS" ] \
-            || { echo "::error::FTP_URL, FTP_USER and FTP_PASSWORD must be set"; exit 1; }
+          [ -n "$FTP_URL" ] && [ -n "$SSH_USER" ] && [ -n "$SSHPASS" ] && [ -n "$SSH_KNOWN_HOSTS" ] \
+            || { echo "::error::FTP_URL, FTP_USER, FTP_PASSWORD and trusted SSH_KNOWN_HOSTS must be set"; exit 1; }
           url="${FTP_URL#*://}"
           host="${url%%/*}"
           path="/${url#*/}"
@@ -123,11 +122,7 @@ jobs:
             || { echo "::error::Local o3po/ looks incomplete, refusing to --delete"; exit 1; }
           sudo apt-get install -y sshpass rsync
           mkdir -p ~/.ssh
-          if [ -n "$SSH_KNOWN_HOSTS" ]; then
-            echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
-          else
-            ssh-keyscan -H "$host" > ~/.ssh/known_hosts
-          fi
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
           ssh_cmd="ssh -ax -o StrictHostKeyChecking=yes"
           sshpass -e $ssh_cmd "$SSH_USER@$host" test -d "'$path'" \
             || { echo "::error::Remote directory $path does not exist"; exit 1; }

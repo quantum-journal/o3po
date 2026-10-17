@@ -16,7 +16,6 @@ class O3PO_EmailTemplatesTest extends O3PO_TestCase
         /**
          * @depends test_initialize_settings
          */
-    #[Depends('test_initialize_settings')]
     public function test_self_notification_subject(){
 
       $message = O3PO_EmailTemplates::expand('self_notification_subject',
@@ -32,7 +31,6 @@ class O3PO_EmailTemplatesTest extends O3PO_TestCase
         /**
          * @depends test_initialize_settings
          */
-    #[Depends('test_initialize_settings')]
     public function test_self_notification_body(){
       $message = O3PO_EmailTemplates::expand('self_notification_body',
                                              array(
@@ -57,7 +55,6 @@ class O3PO_EmailTemplatesTest extends O3PO_TestCase
         /**
          * @depends test_initialize_settings
          */
-    #[Depends('test_initialize_settings')]
     public function test_author_notification_subject() {
       $message = O3PO_EmailTemplates::expand('author_notification_subject',
                                              array(
@@ -72,7 +69,6 @@ class O3PO_EmailTemplatesTest extends O3PO_TestCase
         /**
          * @depends test_initialize_settings
          */
-    #[Depends('test_initialize_settings')]
     public function test_author_notification_body(){
       $message = O3PO_EmailTemplates::expand('author_notification_body',
                                              array(
@@ -110,7 +106,6 @@ class O3PO_EmailTemplatesTest extends O3PO_TestCase
         /**
          * @depends test_initialize_settings
          */
-    #[Depends('test_initialize_settings')]
     public function test_author_notification_secondary_body(){
     $message = O3PO_EmailTemplates::expand('author_notification_secondary_body',
                                            array(
@@ -147,7 +142,6 @@ class O3PO_EmailTemplatesTest extends O3PO_TestCase
         /**
          * @depends test_initialize_settings
          */
-    #[Depends('test_initialize_settings')]
     public function test_fermats_library_notification_subject(){
        $message = O3PO_EmailTemplates::expand('fermats_library_notification_subject',
                                               array(
@@ -163,7 +157,6 @@ class O3PO_EmailTemplatesTest extends O3PO_TestCase
         /**
          * @depends test_initialize_settings
          */
-    #[Depends('test_initialize_settings')]
    public function test_fermats_library_notification_body(){
        $message = O3PO_EmailTemplates::expand('fermats_library_notification_body',
                                               array(
@@ -195,7 +188,6 @@ class O3PO_EmailTemplatesTest extends O3PO_TestCase
        /**
          * @depends test_initialize_settings
          */
-   #[Depends('test_initialize_settings')]
    public function test_render_short_codes(){
      $actualDom = new DomDocument();
      $actualDom->loadHTML(O3PO_EmailTemplates::render_short_codes('self_notification_subject'));

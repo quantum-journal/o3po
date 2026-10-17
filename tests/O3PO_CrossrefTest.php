@@ -1,10 +1,6 @@
 <?php
 
 require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-crossref.php';
-
-use PHPUnit\Framework\Attributes\DataProvider;
-
-
 class O3PO_CrossrefTest extends O3PO_TestCase
 {
 
@@ -51,7 +47,6 @@ class O3PO_CrossrefTest extends O3PO_TestCase
         /**
          * @dataProvider get_cited_by_xml_body_provider
          */
-    #[DataProvider('get_cited_by_xml_body_provider')]
     public function test_get_cited_by_xml_body( $crossref_url, $crossref_id, $crossref_pw, $doi, $expected ) {
 
         $this->assertEquals($expected, O3PO_Crossref::get_cited_by_xml_body($crossref_url, $crossref_id, $crossref_pw, $doi));
@@ -540,7 +535,6 @@ class O3PO_CrossrefTest extends O3PO_TestCase
         /**
          * @dataProvider get_cited_by_bibentries_provider
          */
-    #[DataProvider('get_cited_by_bibentries_provider')]
     public function test_get_cited_by_bibentries( $crossref_url, $crossref_id, $crossref_pw, $doi, $expected ) {
 
         $all = O3PO_Crossref::get_cited_by_bibentries($crossref_url, $crossref_id, $crossref_pw, $doi);

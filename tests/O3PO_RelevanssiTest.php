@@ -16,7 +16,6 @@ class O3PO_RelevanssiTest extends O3PO_TestCase
         /**
          * @depends test_initialize_settings
          */
-    #[Depends('test_initialize_settings')]
     public function test_exclude_mime_types_by_regexp() {
 
         $this->assertFalse(O3PO_Relevanssi::exclude_mime_types_by_regexp(false, 6));

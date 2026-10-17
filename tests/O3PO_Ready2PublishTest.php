@@ -3,11 +3,6 @@
 require_once(dirname( __FILE__ ) . '/../o3po/public/class-o3po-ready2publish-form.php');
 require_once(dirname( __FILE__ ) . '/../o3po/admin/class-o3po-ready2publish-dashboard.php');
 require_once(dirname( __FILE__ ) . '/O3PO_SettingsTest.php');
-
-use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Depends;
-
 class O3PO_Ready2PublishTest extends O3PO_TestCase
 {
 
@@ -21,7 +16,6 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
         /**
          * @depends test_initialize_settings
          */
-    #[Depends('test_initialize_settings')]
     public function test_setup_environment( $settings ) {
 
         $environment = new O3PO_Environment($settings->get_field_value("production_site_url"));
@@ -34,8 +28,6 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
          * @depends test_initialize_settings
          * @doesNotPerformAssertions
          */
-    #[Depends('test_initialize_settings')]
-    #[DoesNotPerformAssertions]
     public function test_initialize_ready2publish_storage( $settings ) {
 
         $storage = new O3PO_Ready2PublishStorage('o3po', $settings->get_field_value("ready2publish_slug") . '-storage');
@@ -49,10 +41,6 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
          * @depends test_setup_environment
          * @doesNotPerformAssertions
          */
-    #[Depends('test_initialize_settings')]
-    #[Depends('test_initialize_ready2publish_storage')]
-    #[Depends('test_setup_environment')]
-    #[DoesNotPerformAssertions]
     public function test_initialize_ready2publish_form( $settings, $storage, $environment ) {
 
         $form = new O3PO_Ready2PublishForm('o3po', $settings->get_field_value("ready2publish_slug"), $environment, $storage);
@@ -65,9 +53,6 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
          * @depends test_setup_environment
          * @depends test_initialize_ready2publish_storage
          */
-    #[Depends('test_initialize_settings')]
-    #[Depends('test_setup_environment')]
-    #[Depends('test_initialize_ready2publish_storage')]
     public function test_form_html_and_logic( $settings, $environment, $storage ) {
 
         global $wp_query; # content ends up in here
@@ -340,10 +325,6 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
          * @depends test_setup_environment
          * @depends test_initialize_ready2publish_storage
          */
-    #[DataProvider('validate_featured_image_upload_provider')]
-    #[Depends('test_initialize_settings')]
-    #[Depends('test_setup_environment')]
-    #[Depends('test_initialize_ready2publish_storage')]
     public function test_validate_featured_image_upload( $file_of_this_id, $max_file_size, $expected_key, $settings, $environment, $storage ) {
 
         $form = new O3PO_Ready2PublishForm('o3po', $settings->get_field_value("ready2publish_slug"), $environment, $storage);
@@ -380,10 +361,6 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
          * @depends test_initialize_ready2publish_storage
          * @depends test_setup_environment
          */
-    #[DataProvider('acceptance_code_provider')]
-    #[Depends('test_initialize_settings')]
-    #[Depends('test_initialize_ready2publish_storage')]
-    #[Depends('test_setup_environment')]
     public function test_validate_acceptance_code( $code, $expected, $is_valid, $settings, $environment, $storage) {
 
         $form = new O3PO_Ready2PublishForm('o3po', $settings->get_field_value("ready2publish_slug"), $environment, $storage);
@@ -401,9 +378,6 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
          * @depends test_setup_environment
          * @depends test_initialize_ready2publish_storage
          */
-    #[Depends('test_initialize_settings')]
-    #[Depends('test_setup_environment')]
-    #[Depends('test_initialize_ready2publish_storage')]
     public function test_render_dashboard_widget( $settings, $environment, $storage ) {
 
         $manuscript_info = array(

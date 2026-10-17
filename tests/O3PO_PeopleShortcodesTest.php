@@ -125,11 +125,13 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
 
     public function test_editor_names_link_to_profile_pages_including_former_editors() {
         $this->configure_people();
+        global $options;
+        $options['home_url_path'] = '/public';
 
         $html = O3PO_PeopleShortcodes::persons_ul_shortcode(array('former' => 'True'), null, 'persons-ul');
 
-        $this->assertStringContains('href="https://foo.bar.com/editor/' . $this->editor_uuid . '/"', $html);
-        $this->assertStringContains('href="https://foo.bar.com/editor/' . $this->former_editor_uuid . '/"', $html);
+        $this->assertStringContains('href="' . home_url('/editor/' . $this->editor_uuid . '/') . '"', $html);
+        $this->assertStringContains('href="' . home_url('/editor/' . $this->former_editor_uuid . '/') . '"', $html);
         $this->assertStringContains('href="https://katherine.example"', $html);
         $this->assertStringNotContains('href="https://ada.example"', $html);
     }
@@ -151,6 +153,12 @@ class O3PO_PeopleShortcodesTest extends O3PO_TestCase
         $wp = (object) array('query_vars' => array('editor' => $this->former_editor_uuid));
         O3PO_EditorPages::handle_editor_endpoint_request($wp);
 
+        $this->assertSame('page', $wp->query_vars['post_type']);
+        $this->assertSame(array(0), $wp->query_vars['post__in']);
+        $this->assertTrue($wp->query_vars['editor_profile_add_fake_post']);
+        $this->assertSame($this->former_editor_uuid, $wp->query_vars['editor_profile_uuid']);
+
+        query_posts($wp->query_vars);
         global $wp_query;
         $this->assertSame($this->former_editor_uuid, $wp_query->query_vars['editor_profile_uuid']);
         $this->assertTrue($wp_query->query_vars['editor_profile_add_fake_post']);

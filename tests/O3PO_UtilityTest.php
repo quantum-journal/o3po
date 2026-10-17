@@ -1,15 +1,11 @@
 <?php
 
 require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-utility.php';
-
-use PHPUnit\Framework\Attributes\DataProvider;
-
 class O3PO_UtilityTest extends O3PO_TestCase
 {
         /**
          * @dataProvider orcid_provider
          */
-    #[DataProvider('orcid_provider')]
     public function test_check_orcid( $orcid, $expected ) {
 
         $this->assertSame($expected, O3PO_Utility::check_orcid($orcid));
@@ -32,7 +28,6 @@ class O3PO_UtilityTest extends O3PO_TestCase
         /**
          * @dataProvider base_convert_arbitrary_precision_provider
          */
-    #[DataProvider('base_convert_arbitrary_precision_provider')]
     public function test_base_convert_arbitrary_precision( $str, $frombase, $tobase , $expected ) {
 
         $this->assertSame($expected, O3PO_Utility::base_convert_arbitrary_precision($str, $frombase, $tobase));
@@ -56,7 +51,6 @@ class O3PO_UtilityTest extends O3PO_TestCase
         /**
          * @dataProvider remove_stopwords_provider
          */
-    #[DataProvider('remove_stopwords_provider')]
     public function test_remove_stopwords( $str, $expected ) {
 
         $this->assertSame($expected, O3PO_Utility::remove_stopwords($str));
@@ -75,7 +69,6 @@ class O3PO_UtilityTest extends O3PO_TestCase
         /**
          * @dataProvider oxford_comma_implode_provider
          */
-    #[DataProvider('oxford_comma_implode_provider')]
     public function test_oxford_comma_implode( $array, $expected ) {
 
         $this->assertSame($expected, O3PO_Utility::oxford_comma_implode($array));
@@ -96,7 +89,6 @@ class O3PO_UtilityTest extends O3PO_TestCase
         /**
          * @dataProvider make_slash_breakable_html_provider
          */
-    #[DataProvider('make_slash_breakable_html_provider')]
     public function test_make_slash_breakable_html( $str, $expected ) {
 
         $this->assertSame($expected, O3PO_Utility::make_slash_breakable_html($str));
@@ -125,7 +117,6 @@ class O3PO_UtilityTest extends O3PO_TestCase
         /**
          * @dataProvider valid_issn_provider
          */
-    #[DataProvider('valid_issn_provider')]
     public function test_valid_issn( $array, $expected ) {
 
         $this->assertSame($expected, O3PO_Utility::valid_issn($array));
@@ -161,7 +152,6 @@ class O3PO_UtilityTest extends O3PO_TestCase
         /**
          * @dataProvider valid_email_provider
          */
-    #[DataProvider('valid_email_provider')]
     public function test_valid_email( $array, $expected ) {
 
         $this->assertSame($expected, O3PO_Utility::valid_email($array));
@@ -181,7 +171,6 @@ class O3PO_UtilityTest extends O3PO_TestCase
         /**
          * @dataProvider array_mean_provider
          */
-    #[DataProvider('array_mean_provider')]
     public function test_array_mean( $array, $expected ) {
 
         if(!is_array($array))
@@ -205,7 +194,6 @@ class O3PO_UtilityTest extends O3PO_TestCase
         /**
          * @dataProvider array_stddev_provider
          */
-    #[DataProvider('array_stddev_provider')]
     public function test_array_stddev( $array, $expected ) {
 
         if(!is_array($array))
@@ -230,7 +218,6 @@ class O3PO_UtilityTest extends O3PO_TestCase
         /**
          * @dataProvider array_median_provider
          */
-    #[DataProvider('array_median_provider')]
     public function test_array_median( $array, $expected ) {
 
         if(!is_array($array) or empty($array))

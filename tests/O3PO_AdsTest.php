@@ -1,9 +1,6 @@
 <?php
 
 require_once dirname( __FILE__ ) . '/../o3po/includes/class-o3po-ads.php';
-
-use PHPUnit\Framework\Attributes\DataProvider;
-
 class O3PO_AdsTest extends O3PO_TestCase
 {
 
@@ -131,7 +128,6 @@ class O3PO_AdsTest extends O3PO_TestCase
         /**
          * @dataProvider ads_provider
          */
-    #[DataProvider('ads_provider')]
     public function test_get_cited_by_bibentries( $ads_api_search_url, $api_token, $eprint, $expected ) {
 
         if(is_wp_error($expected))
