@@ -19,8 +19,8 @@ name: Deploy
 #        secret   FTP_USER         ssh user name
 #        secret   FTP_PASSWORD     ssh password
 #        variable SSH_KNOWN_HOSTS  trusted known_hosts line(s) for the deployment host. If
-#                                  unset, the workflow prints a candidate from ssh-keyscan and
-#                                  fails; verify the key independently before setting the variable.
+#                                  unset, the workflow prints candidate keys and fingerprints,
+#                                  then fails; verify them independently before setting the variable.
 #   3. Create the repository label "deploy-dev".
 #
 # Safety: rsync runs with --delete, so everything inside <FTP_URL>/o3po that is not in the
@@ -118,9 +118,11 @@ jobs:
             || { echo "::error::FTP_URL must use a hostname without a port; only SSH port 22 is supported"; exit 1; }
           if [ -z "$SSH_KNOWN_HOSTS" ]; then
             echo "::error::SSH_KNOWN_HOSTS is not set. Candidate known_hosts value for $host:"
-            candidate=$(ssh-keyscan -T 5 "$host" 2>/dev/null || true)
+            candidate=$(ssh-keyscan -T 5 -t ed25519,ecdsa,rsa "$host" 2>/dev/null || true)
             if [ -n "$candidate" ]; then
               printf '%s\n' "$candidate"
+              echo "Candidate key fingerprints to compare with a trusted source:"
+              printf '%s\n' "$candidate" | ssh-keygen -lf - || true
               echo "::error::Verify this host key through a trusted channel before setting SSH_KNOWN_HOSTS; this scan is not authenticated."
             else
               echo "::error::Could not retrieve a candidate host key. Set SSH_KNOWN_HOSTS to a trusted known_hosts entry manually."
