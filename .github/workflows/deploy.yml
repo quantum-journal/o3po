@@ -116,10 +116,10 @@ jobs:
           host="${url%%/*}"
           path="/${url#*/}"
           path="${path%/}"
-          [[ "$host" =~ ^[A-Za-z0-9][A-Za-z0-9.-]*$ ]] \
-            || { echo "::error::FTP_URL host must be a plain hostname (letters, digits, dots, hyphens); no user, port or IPv6 literal"; exit 1; }
+          [[ "$host" =~ ^[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?)*$ ]] \
+            || { echo "::error::FTP_URL host must be a valid plain DNS hostname; no user, port or IPv6 literal"; exit 1; }
           if [ -z "$SSH_KNOWN_HOSTS" ]; then
-            echo "::error::SSH_KNOWN_HOSTS is not set. Candidate known_hosts value for $host:"
+            echo "SSH_KNOWN_HOSTS is not set. Candidate known_hosts value for $host:"
             scan_stderr=$(mktemp)
             scan_capped=$(mktemp)
             trap 'rm -f "$scan_stderr" "$scan_capped"' EXIT
@@ -143,7 +143,7 @@ jobs:
               echo "::warning::Only the first 10 candidate key lines are shown; the output was capped."
             fi
             if [ "$scan_status" -ne 0 ]; then
-              echo "::warning::ssh-keyscan did not complete (exit status $scan_status; 124 indicates timeout). Displayed candidates may be incomplete."
+              echo "::warning::ssh-keyscan did not complete (exit status $scan_status; 124 indicates timeout). Any displayed candidates may be incomplete, even if the 10-line output cap was not reached."
             fi
             if [ -z "$candidate" ] && [ "$scan_status" -eq 0 ]; then
               echo "::warning::ssh-keyscan returned no host keys; it may exit successfully when the host is unreachable. Review any scanner diagnostics below."
