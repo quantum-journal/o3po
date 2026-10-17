@@ -19,9 +19,11 @@ name: Deploy
 #                                  rb06.serverdomain.org/home/www/wordpress/wp-content/plugins/
 #        secret   FTP_USER         ssh user name
 #        secret   FTP_PASSWORD     ssh password
-#        variable SSH_KNOWN_HOSTS  trusted known_hosts line(s) for the deployment host. If
-#                                  unset, the workflow prints candidate keys and fingerprints,
-#                                  then fails; verify them independently before setting the variable.
+#        variable SSH_KNOWN_HOSTS  complete OpenSSH known_hosts line(s) for the deployment host,
+#                                  e.g. "rb06.serverdomain.org ssh-ed25519 AAAA...". Use one
+#                                  line per key, matching FTP_URL's hostname (port 22). If unset,
+#                                  the workflow explains the format and prints untrusted candidate
+#                                  keys and fingerprints; verify keys independently before setting it.
 #   3. Create the repository label "deploy-dev".
 #
 # Safety: rsync runs with --delete, so everything inside <FTP_URL>/o3po that is not in the
@@ -119,7 +121,10 @@ jobs:
           [[ "$host" =~ ^[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?)*$ ]] \
             || { echo "::error::FTP_URL host must be a valid plain DNS hostname; no user, port or IPv6 literal"; exit 1; }
           if [ -z "$SSH_KNOWN_HOSTS" ]; then
-            echo "SSH_KNOWN_HOSTS is not set. Candidate known_hosts value for $host:"
+            echo "::error::SSH_KNOWN_HOSTS is empty. Set it in the selected GitHub Environment under Settings > Environments > Environment variables."
+            echo "::error::Use a complete OpenSSH known_hosts line matching FTP_URL's hostname: $host <key-type> <base64-public-key>."
+            echo "::error::For multiple keys, put one complete entry on each line. Use the server's independently verified public key; fingerprints or unverified scan output are not sufficient."
+            echo "The following scan output is only an unauthenticated candidate and must not be trusted without independent verification:"
             scan_stderr=$(mktemp)
             scan_capped=$(mktemp)
             trap 'rm -f "$scan_stderr" "$scan_capped"' EXIT
@@ -166,9 +171,13 @@ jobs:
           sudo apt-get install -y sshpass rsync
           mkdir -p ~/.ssh
           printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          if ! ssh-keygen -F "$host" -f ~/.ssh/known_hosts >/dev/null; then
+            echo "::error::SSH_KNOWN_HOSTS contains no entry matching FTP_URL hostname '$host'. Add a complete known_hosts line for this exact hostname."
+            exit 1
+          fi
           ssh_cmd="ssh -ax -o StrictHostKeyChecking=yes"
           sshpass -e $ssh_cmd "$SSH_USER@$host" test -d "'$path'" \
-            || { echo "::error::Remote directory $path does not exist"; exit 1; }
+            || { echo "::error::SSH connection or remote directory check failed (exit status $?). Review the SSH diagnostics above and verify the host key, credentials, network access, and remote directory $path."; exit 1; }
           opts="-avHz --delete --max-delete=50"
           if [ "$DRY_RUN" = true ]; then
             echo "DRY RUN: nothing will be changed on the server"
