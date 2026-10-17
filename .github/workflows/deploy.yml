@@ -13,8 +13,8 @@ name: Deploy
 #   1. Create environments "qjwp.cgogolin.de" and, once dev is tested, "production".
 #      For "production" restrict deployment tags to the pattern v*.
 #   2. In EACH environment set:
-#        variable FTP_URL          host and plugins directory of the target WordPress, no
-#                                  user and no trailing o3po, e.g.
+#        variable FTP_URL          hostname (SSH port 22 only) and plugins directory of the
+#                                  target WordPress, no user and no trailing o3po, e.g.
 #                                  rb06.serverdomain.org/home/www/wordpress/wp-content/plugins/
 #        secret   FTP_USER         ssh user name
 #        secret   FTP_PASSWORD     ssh password
@@ -115,7 +115,7 @@ jobs:
           path="/${url#*/}"
           path="${path%/}"
           [[ "$host" =~ ^[A-Za-z0-9.-]+$ ]] \
-            || { echo "::error::FTP_URL has no valid host"; exit 1; }
+            || { echo "::error::FTP_URL must use a hostname without a port; only SSH port 22 is supported"; exit 1; }
           if [ -z "$SSH_KNOWN_HOSTS" ]; then
             echo "::error::SSH_KNOWN_HOSTS is not set. Candidate known_hosts value for $host:"
             candidate=$(ssh-keyscan -T 5 "$host" 2>/dev/null || true)
