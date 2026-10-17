@@ -66,7 +66,7 @@ class O3PO_EditorPages {
          * @since  0.5.0
          * @access private
          * @param  string $uuidv4 The editor UUID.
-         * @return array|null Editor data or null if the UUID does not belong to an editor.
+         * @return array|null Editor data or null if the UUID does not belong to a person.
          */
     private static function get_editor_by_uuid($uuidv4) {
 
@@ -74,7 +74,7 @@ class O3PO_EditorPages {
             return null;
 
         foreach(O3PO_People::get_person_data() as $person)
-            if($person['role'] === 'editor' and $person['uuidv4'] === $uuidv4)
+            if($person['uuidv4'] === $uuidv4)
                 return $person;
 
         return null;
@@ -413,17 +413,18 @@ class O3PO_EditorPages {
         $editor_name = trim($editor['first_names'] . ' ' . $editor['last_names']);
         $current_year = (int)date('Y');
         $service = static::format_service_period($editor['since_year'], $editor['until_year'], $current_year);
+        $journal_title = O3PO_Settings::instance()->get_field_value('journal_title');
 
         echo '<div class="entry-header editor-profile">';
         echo '<h1 class="entry-title title citation_title">' . esc_html($editor_name) . '</h1>';
-        echo '<p class="authors citation_author">' . esc_html(ucwords($editor['role'])) . '</p>';
+        echo '<p class="authors citation_author">' . 'Current role: ' . esc_html(ucwords($editor['role'])) . '</p>';
         echo '<table class="meta-data-table">';
         if(!empty($editor['affiliation']))
             echo '<tr><td>Affiliation:</td><td>' . esc_html($editor['affiliation']) . '</td></tr>';
         if(!empty($editor['country']))
             echo '<tr><td>Country:</td><td>' . esc_html($editor['country']) . '</td></tr>';
         if(!empty($service))
-            echo '<tr><td>Service:</td><td>' . esc_html($service) . '</td></tr>';
+            echo '<tr><td>With ' . esc_html($journal_title) . ' since:</td><td>' . esc_html($service) . '</td></tr>';
         if(!empty($editor['extra']))
             echo '<tr><td>Additional information:</td><td>' . esc_html($editor['extra']) . '</td></tr>';
         if(!empty($editor['url']))
