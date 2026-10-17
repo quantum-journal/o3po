@@ -66,7 +66,7 @@ class O3PO_EditorPages {
          * @since  0.5.0
          * @access private
          * @param  string $uuidv4 The editor UUID.
-         * @return array|null Editor data or null if the UUID does not belong to a person.
+         * @return array|null Editor data or null if the UUID does not belong to a person with the editor role.
          */
     private static function get_editor_by_uuid($uuidv4) {
 
@@ -74,7 +74,7 @@ class O3PO_EditorPages {
             return null;
 
         foreach(O3PO_People::get_person_data() as $person)
-            if($person['uuidv4'] === $uuidv4)
+            if($person['role'] === 'editor' and $person['uuidv4'] === $uuidv4)
                 return $person;
 
         return null;
