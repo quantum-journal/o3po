@@ -201,6 +201,8 @@ class O3PO_Crossref {
                     $cite = $f_link->standard_cite;
                 elseif(!empty($f_link->database_cite))
                     $cite = $f_link->database_cite;
+                elseif(!empty($f_link->postedcontent_cite))
+                    $cite = $f_link->postedcontent_cite;
                 else
                     throw new Exception("Encountered the unhandled forward link type " . $f_link->children()[0]->getName() . " while looking for citations to DOI " . $doi . ".");
 

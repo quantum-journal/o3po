@@ -25,6 +25,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-latex
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-settings.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-utility.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-shortcode-template.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/people.php';
 
 
 /**
@@ -268,23 +269,6 @@ abstract class O3PO_PublicationType {
 
         register_post_type($this->get_publication_type_name(), $args );
 
-            /* As this post type is dnynamically created, we cannot register
-             * it via a static function call during the activation hook.
-             * Flushing rewrite rules there is hence not sufficient to make
-             * the post pages it creates accessible. At the same time,
-             * flush_rewrite_rules() must not be called on every page load.
-             * We thus resort to checking whether get_option('rewrite_rules')
-             * already contains rules associated with this slug and only
-             * flush if this is not the case. */
-        $rewrite_rules_must_be_fluhed = true;
-        foreach( get_option( 'rewrite_rules' ) as $key => $rule)
-            if(strpos($key, $args['rewrite']['slug'] ) === 0)
-            {
-                $rewrite_rules_must_be_fluhed = false;
-                break;
-            }
-        if($rewrite_rules_must_be_fluhed)
-            flush_rewrite_rules(true);
     }
 
         /**
@@ -523,6 +507,8 @@ abstract class O3PO_PublicationType {
         $new_buffer_email = isset($_POST[ $post_type . '_buffer_email' ]) ? sanitize_text_field( $_POST[ $post_type . '_buffer_email' ]) : ''; #we keep using the buffer_email and buffer_email_xxx fields for compatibility, even though the new buffer.com interface does no longer send emails but uses the buffer.com api
         $new_buffer_special_text = isset($_POST[ $post_type . '_buffer_special_text' ]) ? sanitize_text_field( $_POST[ $post_type . '_buffer_special_text' ]) : '';
 
+        $new_handling_editor_uuidv4 = isset( $_POST[ $post_type . '_handling_editor_uuidv4' ] ) ? sanitize_text_field( $_POST[ $post_type . '_handling_editor_uuidv4' ] ) : '';
+
         $new_bbl = isset( $_POST[ $post_type . '_bbl' ] ) ? $_POST[ $post_type . '_bbl' ] : '';
         delete_transient($post_id . '_bibliography_html'); //Delete cached version of the bibliography html
 
@@ -557,10 +543,11 @@ abstract class O3PO_PublicationType {
         update_post_meta( $post_id, $post_type . '_bbl', $new_bbl );
         update_post_meta( $post_id, $post_type . '_buffer_email', $new_buffer_email ); #we keep using the buffer_email and buffer_email_xxx fields for compatibility, even though the new buffer.com interface does no longer send emails but uses the buffer.com api
         update_post_meta( $post_id, $post_type . '_buffer_special_text', $new_buffer_special_text );
-        update_post_meta($post_id, $post_type . '_number_award_numbers', $new_number_award_numbers);
-        update_post_meta($post_id, $post_type . '_award_numbers', $new_award_numbers);
-        update_post_meta($post_id, $post_type . '_funder_identifiers', $new_funder_identifiers);
-        update_post_meta($post_id, $post_type . '_funder_names', $new_funder_names);
+        update_post_meta( $post_id, $post_type . '_handling_editor_uuidv4', $new_handling_editor_uuidv4 );
+        update_post_meta( $post_id, $post_type . '_number_award_numbers', $new_number_award_numbers );
+        update_post_meta( $post_id, $post_type . '_award_numbers', $new_award_numbers );
+        update_post_meta( $post_id, $post_type . '_funder_identifiers', $new_funder_identifiers );
+        update_post_meta( $post_id, $post_type . '_funder_names', $new_funder_names );
 
     }
 
@@ -1723,6 +1710,58 @@ abstract class O3PO_PublicationType {
     }
 
         /**
+         * Echo an controls for choosing the handling editor on the admin panel.
+         *
+         * @since    0.3.0
+         * @access   proteted
+         * @param    int         $post_id    Id of the post.
+         */
+    protected function the_admin_panel_handling_editor( $post_id ) {
+
+        $post_type = get_post_type($post_id);
+        $handling_editor_uuidv4 = get_post_meta( $post_id, $post_type . '_handling_editor_uuidv4', true );
+
+        $current_year = date('Y');
+        $person_data = O3PO_People::get_person_data();
+        uasort($person_data, array('O3PO_People', 'sort_by_first_names'));
+
+		echo '	<tr>';
+		echo '		<th><label for="' . $post_type . '_handling_editor_uuidv4" class="' . $post_type .'_handling_editor_uuidv4_label">' . 'Handling Editor' . '</label></th>';
+        echo '		<td>';
+
+        echo '        <select name="' . $post_type . '_handling_editor_uuidv4" style="width:100%">';
+        echo '        <option value=""' . (empty($handling_editor_uuidv4)? 'selected' : '') . '>' . "No handling editor" . '</option>';
+        foreach($person_data as $x => $person)
+            if(($person["role"] === "editor" || $person["role"] === "coordinator") && !empty($person["uuidv4"]) && (empty($person["since_year"]) || $current_year >= $person['since_year']) && (empty($person["until_year"]) || $current_year <= $person['until_year'] + 1))
+                echo '        <option value="' . esc_attr($person["uuidv4"]) . '"' . ($person["uuidv4"] == $handling_editor_uuidv4 ? 'selected' : '') . '>' . esc_html($person["first_names"]) . " " . esc_html($person["last_names"]) . ' (' . esc_html($person["role"]) . ') ID=' . esc_html($person["uuidv4"]) . '</option>';
+        echo '        </select>';
+
+        echo '		</td>';
+		echo '	</tr>';
+
+    }
+
+        /**
+         * Outputs the html formated handling editor of this publication
+         * type.
+         *
+         * @since     0.4.3
+         * @access    public
+         * @param     int     $post_id     Id of the post.
+         */
+    public static function get_formated_handling_editor( $post_id ) {
+
+        $post_type = get_post_type($post_id);
+        $handling_editor_uuidv4 = get_post_meta( $post_id, $post_type . '_handling_editor_uuidv4', true );
+        if(empty($handling_editor_uuidv4))
+            return '';
+
+        $handling_editor_name = O3PO_People::get_formated_name_from_uuidv4($handling_editor_uuidv4);
+
+        return '<a href="' . esc_url(home_url('/editor/' . rawurlencode($handling_editor_uuidv4) . '/')) . '">' . esc_html($handling_editor_name) . '</a>';
+    }
+
+        /**
          * Echo the title for the admin panel.
          *
          * @since     0.1.0
@@ -2754,6 +2793,38 @@ abstract class O3PO_PublicationType {
             if (!$all_authors_have_same_affiliation)
                 $formated_affiliations .= '<sup>' . (string)($x+1) . '</sup>';
             $formated_affiliations .= esc_html($affiliation) . "<br />";
+        }
+
+        return $formated_affiliations;
+    }
+
+
+        /**
+         * Echo the afiliations text formated.
+         *
+         * Semicolon separated list of all distinct affiliations.
+         *
+         * @since     0.4.3+
+         * @access    public
+         * @param     int       $post_id      Id of the post.
+         */
+    public static function get_formated_affiliations( $post_id ) {
+
+        $post_type = get_post_type($post_id);
+        $affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_affiliations');
+        $number_affiliations = get_post_meta( $post_id, $post_type . '_number_affiliations', true );
+        $author_affiliations = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_affiliations');
+
+        if ( empty($affiliations) ) return '';
+
+        $formated_affiliations = "";
+        $first_affiliation = True;
+        foreach ($affiliations as $x => $affiliation) {
+            if ($first_affiliation)
+                $first_affiliation = False;
+            else
+                $formated_affiliations .= "; ";
+            $formated_affiliations .= $affiliation;
         }
 
         return $formated_affiliations;

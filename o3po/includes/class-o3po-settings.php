@@ -29,6 +29,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/trait-o3po-form.
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-o3po-ready2publish-form.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-o3po-ready2publish-dashboard.php';
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-people-shortcodes.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-rewrite-rules.php';
 
 /**
  * Manage the settings of the plugin.
@@ -206,17 +207,6 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   public
          */
     public function render_settings_page() {
-
-            /*
-             * Flush the rewrite rules here because only during the rendering
-             * of the settings page can we be sure that all post types and
-             * endpoints have been registered.
-             */
-        if(get_transient($this->plugin_name . '-' . $this->slug . '-rewrite-rules-affected'))
-        {
-            flush_rewrite_rules(true);
-            delete_transient($this->plugin_name . '-' . $this->slug . '-rewrite-rules-affected');
-        }
 
         echo '<div>';
         echo '<h2>' . $this->plugin_pretty_name . ' settings (version ' . $this->version . ')</h2>';
@@ -1449,7 +1439,8 @@ class O3PO_Settings extends O3PO_Singleton {
          */
     public function trim_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed( $id, $input ) {
 
-        $input = trim($input);
+        if(!empty($input))
+            $input = trim($input);
         if(empty($input))
         {
             $this->add_error( $id, 'must-not-be-empty', "The field '" . $this->fields[$id]['title'] . "' must not be empty. Field reset.", 'error');
@@ -1460,12 +1451,8 @@ class O3PO_Settings extends O3PO_Singleton {
 
         if($input !== $this->get_field_value($id))
         {
-                /*
-                 * In render_settings_page() we check for transient and
-                 * flush rewrite rules there if it is set and True.
-                 */
-            set_transient($this->plugin_name . '-' . $this->slug . '-rewrite-rules-affected', True);
-            $this->add_error( $id, 'rewrite-rules-affected', "The rewrite rules have been updated because the field '" . $this->fields[$id]['title'] . "' was changed.", 'updated');
+            O3PO_RewriteRules::schedule_refresh();
+            $this->add_error( $id, 'rewrite-rules-affected', "The rewrite rules will be refreshed because the field '" . $this->fields[$id]['title'] . "' was changed.", 'updated');
         }
 
         return $input;

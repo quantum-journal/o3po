@@ -258,6 +258,11 @@ class O3PO {
              */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-people-shortcodes.php';
 
+            /**
+             * The class providing public editor profile pages.
+             */
+        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/editor-pages.php';
+
         $this->loader = new O3PO_Loader();
 
         $settings = O3PO_Settings::instance($this->plugin_name, $this->get_plugin_pretty_name(), $this->version, 'O3PO_PublicationType::get_active_publication_type_names'); # configure settings singleton during first initialization
@@ -396,6 +401,7 @@ class O3PO {
         $this->loader->add_action('admin_head', $this->primary_publication_type, 'admin_page_extra_css');
         $this->loader->add_filter('request', $this->primary_publication_type, 'add_custom_post_types_to_rss_feed');
         $this->loader->add_filter('the_author', $this->primary_publication_type, 'the_author_feed', PHP_INT_MAX, 1);
+
             //...and those inherited from publicationtype
         $this->loader->add_action('init', $this->primary_publication_type, 'register_as_custom_post_type' );
         $this->loader->add_action('init', $this->primary_publication_type, 'add_pdf_endpoint' , 0 );
@@ -436,8 +442,22 @@ class O3PO {
             $this->loader->add_filter('template_include', $this->secondary_publication_type, 'use_page_template');
 
         $this->loader->add_action('init', 'O3PO_PeopleShortcodes', 'add_shortcodes');
-
-
+        $this->loader->add_action('init', 'O3PO_EditorPages', 'add_editor_endpoint');
+        $this->loader->add_action('wp_loaded', 'O3PO_RewriteRules', 'refresh_if_needed');
+        $this->loader->add_action('template_redirect', 'O3PO_RewriteRules', 'schedule_refresh_on_endpoint_404', 0);
+        $this->loader->add_action('parse_request', 'O3PO_EditorPages', 'handle_editor_endpoint_request');
+        $this->loader->add_filter('the_posts', 'O3PO_EditorPages', 'add_fake_editor_post_to_query');
+        $this->loader->add_filter('template_include', 'O3PO_EditorPages', 'editor_profile_template');
+        $this->loader->add_action('loop_start', 'O3PO_EditorPages', 'editor_profile_at_loop_start');
+        $this->loader->add_action('save_post', 'O3PO_EditorPages', 'invalidate_handled_papers_cache', 20, 2);
+        $this->loader->add_action('before_delete_post', 'O3PO_EditorPages', 'invalidate_handled_papers_cache', 10, 2);
+        $this->loader->add_action('transition_post_status', 'O3PO_EditorPages', 'invalidate_handled_papers_on_status_transition', 10, 3);
+        $this->loader->add_action('added_post_meta', 'O3PO_EditorPages', 'invalidate_handled_papers_cache_on_meta_change', 10, 4);
+        $this->loader->add_action('updated_post_meta', 'O3PO_EditorPages', 'invalidate_handled_papers_cache_on_meta_change', 10, 4);
+        $this->loader->add_action('deleted_post_meta', 'O3PO_EditorPages', 'invalidate_handled_papers_cache_on_meta_change', 10, 4);
+        $this->loader->add_filter('add_post_metadata', 'O3PO_EditorPages', 'remember_editor_uuid_before_meta_change', 10, 5);
+        $this->loader->add_filter('update_post_metadata', 'O3PO_EditorPages', 'remember_editor_uuid_before_update', 10, 5);
+        $this->loader->add_filter('delete_post_metadata', 'O3PO_EditorPages', 'remember_editor_uuid_before_meta_change', 10, 5);
 
 	}
 

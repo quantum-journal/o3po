@@ -8,9 +8,9 @@
 * Donate link: https://quantum-journal.org/donate/
 * Tags: publishing, open-access
 * Requires at least: 4.0.1
-* Tested up to: 5.7.2
-* Requires PHP: 7.2
-* Stable tag: 1.0.0
+* Tested up to: 6.9.4
+* Requires PHP: 7.4
+* Stable tag: 0.5.0
 * License: GPLv3 or later
 * License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -91,6 +91,20 @@ It is obviously a play on the name of humanoid robot character from a series of 
 
 ## Changelog
 
+### 0.5.0
+* Added public profiles for journal personnel, with handled-publication citations and a yearly editor publication leaderboard.
+* Automatically generated and saved profile IDs for existing people records.
+* Improved recovery from publication-page 404 errors caused by stale rewrite rules.
+* Updated invoice payment options and excluded people being phased out from the current year.
+* Removed the Fermat's Library integration.
+* Improved HTML error handling and messages, and fixed the ADS API token header.
+### 0.4.3
+* Show handling editor on pages of published papers
+* Handle 404 errors for queries to publication pages that are sometimes caused when other plugins flush rewrite rules without loading O-3PO
+* Unpack tar.gz files in one go to avoid problems with long file names (see https://stackoverflow.com/questions/24800217/phardata-limitation-of-file-name-length)
+* Include formated affiliations in meta-data.
+* Fixed detection of license information from arXiv abstract page.
+* Compatibility with newer PHPUnit versions
 ### 0.4.2
 * Treat .txt files like LaTeX source files because this is what the arXiv seems to be doing
 * More robust error handling for the case of pdf-only arXiv manuscripts

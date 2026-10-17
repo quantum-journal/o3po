@@ -38,18 +38,18 @@ if(!class_exists('PHPUnit_Framework_TestCase')){
 class O3PO_TestCase extends PHPUnit_Framework_TestCase
 {
 
-    public function assertStringContains( $needle, $haystack ) {
-        if(method_exists($this, 'assertStringContainsString'))
-            $this->assertStringContainsString($needle, $haystack);
+    public static function assertStringContains( $needle, $haystack ) {
+        if(method_exists('PHPUnit_Framework_TestCase', 'assertStringContainsString'))
+            static::assertStringContainsString($needle, $haystack);
         else
-            $this->assertContains($needle, $haystack);
+            static::assertContains($needle, $haystack);
     }
 
-    public function assertStringNotContains( $needle, $haystack ) {
-        if(method_exists($this, 'assertStringNotContainsString'))
-            $this->assertStringNotContainsString($needle, $haystack);
+    public static function assertStringNotContains( $needle, $haystack ) {
+        if(method_exists('PHPUnit_Framework_TestCase', 'assertStringNotContainsString'))
+            static::assertStringNotContainsString($needle, $haystack);
         else
-            $this->assertNotContains($needle, $haystack);
+            static::assertNotContains($needle, $haystack);
     }
 
     public static function assertRegexpCompat($pattern, $string, $message = '' ) {
@@ -59,18 +59,27 @@ class O3PO_TestCase extends PHPUnit_Framework_TestCase
             parent::assertRegexp($pattern, $string, $message = $message);
     }
 
-    public function assertValidHTMLFragment( $html ) {
+    public static function assertValidHTMLFragment( $html, $is_fragment=true ) {
 
         $dom = new DOMDocument;
         try
         {
-            $result = $dom->loadHTML('<div>' . $html . '</div>');
-            $this->assertNotFalse($result);
+            if($is_fragment === true)
+                $result = $dom->loadHTML('<div>' . $html . '</div>');
+            else
+            {
+                $lines = explode("\n", $html);
+                # if(strpos($lines[0], "DOCTYPE") !== false)
+                #     array_shift($lines);
+                $html = implode("\n", $lines);
+                $result = $dom->loadHTML($html);
+            }
+            O3PO_TestCase::assertNotFalse($result);
             //$this->assertTrue($dom->validate()); //we cannot easily validate: https://stackoverflow.com/questions/4062792/domdocumentvalidate-problem
         }
         catch(Exception $e)
         {
-            $this->assertNotFalse(false, "The following html caused the error " . $e->getMessage() . "\n" . $html);
+            O3PO_TestCase::assertNotFalse(false, "The following html caused the error " . $e->getMessage() . ":\n" . $html);
         }
 
         return($result);
@@ -91,6 +100,7 @@ function wp_upload_dir( $time = null, $create_dir = true, $refresh_cache = false
                  );
 }
 
+global $hooks;
 $hooks = array();
 function add_action( $hook, $callable ) {
     global $hooks;
@@ -113,7 +123,8 @@ function trigger_hook( $hook ) {
         call_user_func($callable);
 }
 
-$filteres = array();
+global $filters;
+$filters = array();
 function add_filter( $hook, $callable ) {
     global $filters;
 
@@ -152,6 +163,7 @@ function get_site_url() {
     return 'https://foo.bar.com';
 }
 
+global $options;
 $options = array();
 $options['o3po-settings'] = array(
             'production_site_url' => get_site_url(),#we test as if this were the production system
@@ -216,12 +228,20 @@ $options['o3po-ready2publish-storage'] = array();
 function get_option( $option, $default = false ) {
     global $options;
 
+    if(is_null($options))
+        throw(new Exception("Global options array is null."));
+
     if($option === 'o3po-settings')
         return $options['o3po-settings'];
     elseif($option === 'blog_charset')
         return 'UTF-8';
+    // Tests configure rewrite state through $options to simulate WordPress settings.
     elseif($option === 'rewrite_rules')
-        return array();
+        return isset($options['rewrite_rules']) ? $options['rewrite_rules'] : array();
+    elseif($option === 'permalink_structure')
+        return isset($options['permalink_structure']) ? $options['permalink_structure'] : '';
+    elseif(strpos($option, 'o3po_rewrite_rules_') === 0)
+        return isset($options[$option]) ? $options[$option] : $default;
     elseif($option === 'o3po-ready2publish')
         return $options['o3po-ready2publish'];
     elseif($option === 'o3po-ready2publish-storage')
@@ -233,10 +253,29 @@ function get_option( $option, $default = false ) {
 
 }
 
+function wp_parse_url( $url, $component = -1 ) {
+    return parse_url($url, $component);
+}
+
 function update_option( $option, $content) {
     global $options;
 
     $options[$option] = $content;
+}
+
+function add_option( $option, $value, $deprecated = '', $autoload = 'yes') {
+    global $options;
+
+    if(array_key_exists($option, $options))
+        return false;
+
+    $options[$option] = $value;
+    return true;
+}
+
+function delete_option( $option ) {
+    global $options;
+    unset($options[$option]);
 }
 
 function get_file_data( $file, $options ) {
@@ -253,10 +292,26 @@ function get_file_data( $file, $options ) {
     return $matches;
 }
 
-function flush_rewrite_rules( $hard=false ) {}
+global $flush_rewrite_rules_call_counter;
+$flush_rewrite_rules_call_counter = 0;
+// Tests inspect this count to verify rewrite rules are refreshed only once.
+function flush_rewrite_rules( $hard=false ) {
+    global $flush_rewrite_rules_call_counter;
+
+    $flush_rewrite_rules_call_counter += 1;
+}
+
+
+function get_flush_rewrite_rules_call_counter() {
+    global $flush_rewrite_rules_call_counter;
+
+    return $flush_rewrite_rules_call_counter;
+}
+
 
 function add_rewrite_endpoint( $a, $b=Null ) {}
 
+global $post_data;
 $post_data = array();
 
 function get_post_type( $post_id ) {
@@ -353,9 +408,21 @@ class WP_Query
     public $query_vars;
     public $post_count;
     public $found_posts;
+    public $is_page;
+    public $is_singular;
+    public $is_home;
+    public $max_num_pages;
+    public $post;
+    public $queried_object;
+    public $is_404;
 
     function __construct( $input=null, $query_vars=array() ) {
         global $posts;
+        // Used to assert that transient cache hits do not construct another WP_Query.
+        global $wp_query_constructor_count;
+        if(!isset($wp_query_constructor_count))
+            $wp_query_constructor_count = 0;
+        $wp_query_constructor_count++;
 
         $this->query = $input;
         $this->query_vars = $query_vars;
@@ -392,6 +459,21 @@ class WP_Query
                 $include_post = true;
                 foreach($array as $key => $value)
                 {
+                    if(in_array($key, array('fields', 'no_found_rows', 'update_post_term_cache'), true))
+                        continue;
+                    if($key === 'meta_key')
+                        continue;
+                    if($key === 'meta_value')
+                    {
+                        $meta_key = $array['meta_key'];
+                        if(!isset($posts[$id]['meta'][$meta_key]) or $posts[$id]['meta'][$meta_key] != $value)
+                        {
+                            $include_post = false;
+                            break;
+                        }
+                        continue;
+                    }
+
                     if(!is_array($value))
                         $value = array($value);
 
@@ -414,6 +496,8 @@ class WP_Query
 
         $this->post_count = count($this->posts);
         $this->found_posts = $this->post_count;
+        if(isset($array['fields']) and $array['fields'] === 'ids')
+            $this->posts = array_keys($this->posts);
     }
 
     function get($key) {
@@ -477,6 +561,8 @@ function is_category( $category_name ) {
 }
 
 
+global $wp_query;
+global $old_wp_query;
 $wp_query = new WP_Query();
 $old_wp_query = new WP_Query();
 function set_global_query( $query ) {
@@ -515,6 +601,13 @@ function is_search() {
 }
 
 
+function is_404() {
+    global $wp_query;
+
+    return $wp_query->is_404;
+}
+
+global $global_search_query;
 $global_search_query = '';
 function set_global_search_query( $string ) {
     global $global_search_query;
@@ -544,6 +637,23 @@ function the_post() {
         throw(new Exception('You must fist set the $wp_query before you can use have_posts()'));
 
     return $wp_query->the_post();
+}
+
+
+function wp_insert_post($postarr, $wp_error = false, $fire_after_hooks = true ) {
+    global $posts;
+$post_id = 1;
+    while(isset($posts[$post_id])) $post_id++;
+    $posts[$post_id] = $postarr;
+
+    return $post_id;
+}
+
+
+function set_post_thumbnail( $post_id, $thumbnail_id ) {
+    global $posts;
+
+    $posts[$post_id]["thumbnail_id"] = $thumbnail_id;
 }
 
 
@@ -876,8 +986,15 @@ function wp_mail( $to, $subject, $body, $headers, $attach=null) {
 }
 
 
-function delete_transient() {}
+global $deleted_transients;
+$deleted_transients = array();
+function delete_transient( $transient ) {
+    global $deleted_transients;
 
+    $deleted_transients[] = $transient;
+}
+
+global $get_transient_returns;
 $get_transient_returns = false;
 function get_transient( $transient ) {
     global $get_transient_returns;
@@ -885,7 +1002,12 @@ function get_transient( $transient ) {
     return $get_transient_returns;
 }
 
-function set_transient( $transient, $value, $expiration=0 ) {}
+global $set_transient_calls;
+$set_transient_calls = array();
+function set_transient( $transient, $value, $expiration=0 ) {
+    global $set_transient_calls;
+    $set_transient_calls[] = array($transient, $value, $expiration);
+}
 
 function wp_remote_get( $url, $args=array() ) {
         //return http_get( $url, $args );
@@ -955,12 +1077,18 @@ function current_user_can() {
     return true;
 }
 
-function wp_is_post_autosave() {
-    return false;
+global $autosave_post_id;
+$autosave_post_id = null;
+function wp_is_post_autosave( $post_id ) {
+    global $autosave_post_id;
+    return $post_id === $autosave_post_id ? $post_id : false;
 }
 
-function wp_is_post_revision() {
-    return false;
+global $revision_post_id;
+$revision_post_id = null;
+function wp_is_post_revision( $post_id ) {
+    global $revision_post_id;
+    return $post_id === $revision_post_id ? $post_id : false;
 }
 
 function remove_action() {}
@@ -1022,6 +1150,7 @@ function register_post_type( $post_type, $args ) {}
 function add_meta_box( $id, $title, $callback, $screen = null, $context = 'advanced', $priority = 'default', $callback_args = null ) {}
 
 
+global $is_home;
 $is_home = false;
 function is_home() {
     global $is_home;
@@ -1072,8 +1201,12 @@ function the_posts_navigation() {
     echo '';
 }
 
+# do not declare global beacsus not serializable and phpunit tries to serialize all globals
+# global $global_settings;
 $global_settings = array();
+# global $wp_settings_fields;
 $wp_settings_fields = array();
+# global $wp_settings_sections;
 $wp_settings_sections = array();
 
 function register_setting( $option_group, $option_name, $args = array() ) {
@@ -1121,6 +1254,7 @@ function add_settings_field( $id, $title, $callback, $page, $section = 'default'
     $wp_settings_fields[$page][$section][$id] = array('id' => $id, 'title' => $title, 'callback' => $callback, 'args' => $args);
 }
 
+global $global_setting_errors;
 $global_setting_errors = array();
 
 function settings_errors( $setting = '', $sanitize = false, $hide_on_update = false ) {
@@ -1298,6 +1432,7 @@ function wp_get_theme( $stylesheet=null, $theme_root=null ) {
     return new WP_Theme('OnePress');
 }
 
+global $is_single;
 $is_single = false;
 function is_single() {
     global $is_single;
@@ -1312,10 +1447,12 @@ function is_feed() {
 
 
 function home_url( $path=null, $scheme=null ) {
+    global $options;
     if($scheme === null)
         $scheme = 'https';
 
-    return $scheme . '://some.site' . $path;
+    $home_path = isset($options['home_url_path']) ? $options['home_url_path'] : '';
+    return $scheme . '://some.site' . $home_path . $path;
 }
 
 function __( $input ) {
@@ -1419,6 +1556,7 @@ function get_current_user_id() {
 }
 
 
+global $shortcodes;
 $shortcodes = array();
 function add_shortcode( $tag, $callback ) {
     global $shortcodes;

@@ -1,0 +1,186 @@
+name: Deploy
+
+# Deploys the plugin directory ./o3po with rsync over ssh (password auth via sshpass).
+#
+# Triggers
+#   - push of a tag v*            -> environment "production" (tag must be on master and
+#                                    match the plugin header Version and readme Stable tag)
+#   - PR labeled "deploy-dev"     -> environment "qjwp.cgogolin.de" (redeploys on every push
+#                                    to the PR while the label is set; fork PRs are skipped)
+#   - manual workflow_dispatch    -> environment "qjwp.cgogolin.de" (from the selected branch)
+#
+# One-time setup in GitHub (Settings -> Environments)
+#   1. Create environments "qjwp.cgogolin.de" and, once dev is tested, "production".
+#      For "production" restrict deployment tags to the pattern v*.
+#   2. In EACH environment set:
+#        variable FTP_URL          plain hostname (SSH port 22 only; no user or IPv6 literal)
+#                                  and plugins directory of the target WordPress, no trailing
+#                                  o3po, e.g.
+#                                  rb06.serverdomain.org/home/www/wordpress/wp-content/plugins/
+#        secret   FTP_USER         ssh user name
+#        secret   FTP_PASSWORD     ssh password
+#        variable SSH_KNOWN_HOSTS  complete OpenSSH known_hosts line(s) for the deployment host,
+#                                  e.g. "rb06.serverdomain.org ssh-ed25519 AAAA...". Use one
+#                                  line per key, matching FTP_URL's hostname (port 22). If unset,
+#                                  the workflow explains the format and prints untrusted candidate
+#                                  keys and fingerprints; verify keys independently before setting it.
+#   3. Create the repository label "deploy-dev".
+#
+# Safety: rsync runs with --delete, so everything inside <FTP_URL>/o3po that is not in the
+# repository is removed on the server (nothing outside o3po/ is touched). Guards: FTP_URL's
+# path must end in /wp-content/plugins and exist, local o3po/ must contain o3po.php, includes/ and >=20 files, at most 50
+# deletions are allowed (--max-delete), and the manual run defaults to a dry run. Real
+# production deploys are only allowed from a tag vX.Y.Z or vX.Y.Z-rc.N; manual dry runs may target either.
+# The production environment's tag rule v*.*.* is fine; the workflow trigger is stricter.
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-rc.[0-9]+'
+  pull_request:
+    types: [labeled, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        type: choice
+        options: ['qjwp.cgogolin.de', 'production']
+        default: 'qjwp.cgogolin.de'
+      dry_run:
+        description: Dry run (rsync -n, nothing is changed on the server)
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    if: >-
+      github.event_name != 'pull_request' ||
+      (contains(github.event.pull_request.labels.*.name, 'deploy-dev') &&
+       github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.0'
+          tools: phpunit:9
+      - run: sudo apt-get install -y libimage-exiftool-perl
+      - run: make lint
+      - run: make test
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: ${{ (github.event_name == 'workflow_dispatch' && inputs.environment || (github.ref_type == 'tag' && 'production' || 'qjwp.cgogolin.de')) }}
+    concurrency:
+      group: deploy-${{ (github.event_name == 'workflow_dispatch' && inputs.environment || (github.ref_type == 'tag' && 'production' || 'qjwp.cgogolin.de')) }}
+      cancel-in-progress: ${{ (github.event_name == 'workflow_dispatch' && inputs.environment || (github.ref_type == 'tag' && 'production' || 'qjwp.cgogolin.de')) != 'production' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Refuse real production deploys that are not from a tag
+        if: ${{ (github.event_name == 'workflow_dispatch' && inputs.environment || (github.ref_type == 'tag' && 'production' || 'qjwp.cgogolin.de')) == 'production' && github.ref_type != 'tag' && inputs.dry_run != true }}
+        run: |
+          echo "::error::Real deploys to production are only allowed from a version tag (dry runs are fine)"
+          exit 1
+
+      - name: Check tag is on master and versions are consistent
+        if: github.ref_type == 'tag'
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/master \
+            || { echo "::error::Tag is not on master"; exit 1; }
+          header=$(sed -n 's/^ \* Version: *//p' o3po/o3po.php | tr -d '[:space:]')
+          stable=$(sed -n 's/^\* Stable tag: *//p' readme.txt | tr -d '[:space:]')
+          [ "$tag" = "$header" ] || { echo "::error::Tag $tag != plugin header version $header"; exit 1; }
+          base="${tag%-rc.*}"  # release candidates: readme stable tag is the base version
+          [ "$base" = "$stable" ] || { echo "::error::Tag $tag (base $base) != readme stable tag $stable"; exit 1; }
+
+      - name: Deploy via rsync over ssh
+        env:
+          FTP_URL: ${{ vars.FTP_URL }}
+          SSH_USER: ${{ secrets.FTP_USER }}
+          SSHPASS: ${{ secrets.FTP_PASSWORD }}
+          SSH_KNOWN_HOSTS: ${{ vars.SSH_KNOWN_HOSTS }}
+          DRY_RUN: ${{ inputs.dry_run == true && 'true' || 'false' }}
+        run: |
+          set -eu
+          set -o pipefail
+          [ -n "$FTP_URL" ] && [ -n "$SSH_USER" ] && [ -n "$SSHPASS" ] \
+            || { echo "::error::FTP_URL, FTP_USER and FTP_PASSWORD must be set"; exit 1; }
+          url="${FTP_URL#*://}"
+          host="${url%%/*}"
+          path="/${url#*/}"
+          path="${path%/}"
+          [[ "$host" =~ ^[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?)*$ ]] \
+            || { echo "::error::FTP_URL host must be a valid plain DNS hostname; no user, port or IPv6 literal"; exit 1; }
+          if [ -z "$SSH_KNOWN_HOSTS" ]; then
+            echo "::error::SSH_KNOWN_HOSTS is empty. Set it in the selected GitHub Environment under Settings > Environments > Environment variables."
+            echo "::error::Use a complete OpenSSH known_hosts line matching FTP_URL's hostname: $host <key-type> <base64-public-key>."
+            echo "::error::For multiple keys, put one complete entry on each line. Use the server's independently verified public key; fingerprints or unverified scan output are not sufficient."
+            echo "The following scan output is only an unauthenticated candidate and must not be trusted without independent verification:"
+            scan_stderr=$(mktemp)
+            scan_capped=$(mktemp)
+            trap 'rm -f "$scan_stderr" "$scan_capped"' EXIT
+            if candidate=$(timeout 10s ssh-keyscan -T 5 -t ed25519,ecdsa,rsa "$host" 2>"$scan_stderr" | awk -v capped_file="$scan_capped" 'NR <= 10 { print } NR == 11 { print "true" > capped_file; close(capped_file) }'); then
+              scan_status=0
+            else
+              scan_status=$?
+            fi
+            if [ -n "$candidate" ]; then
+              printf '%s\n' "$candidate"
+              echo "Candidate key fingerprints to compare with a trusted source:"
+              if fingerprints=$(printf '%s\n' "$candidate" | ssh-keygen -lf - 2>&1); then
+                printf '%s\n' "$fingerprints"
+              else
+                echo "::warning::Could not compute fingerprints for the candidate host keys:"
+                printf '%s\n' "$fingerprints"
+              fi
+              echo "::error::Verify this host key through a trusted channel before setting SSH_KNOWN_HOSTS; this scan is not authenticated."
+            fi
+            if [ -s "$scan_capped" ]; then
+              echo "::warning::Only the first 10 candidate key lines are shown; the output was capped."
+            fi
+            if [ "$scan_status" -ne 0 ]; then
+              echo "::warning::ssh-keyscan did not complete (exit status $scan_status; 124 indicates timeout). Any displayed candidates may be incomplete, even if the 10-line output cap was not reached."
+            fi
+            if [ -z "$candidate" ] && [ "$scan_status" -eq 0 ]; then
+              echo "::warning::ssh-keyscan returned no host keys; it may exit successfully when the host is unreachable. Review any scanner diagnostics below."
+            fi
+            if [ -s "$scan_stderr" ]; then
+              echo "ssh-keyscan diagnostics:"
+              head -n 10 "$scan_stderr"
+            fi
+            if [ -z "$candidate" ]; then
+              echo "::error::Could not retrieve a candidate host key. Set SSH_KNOWN_HOSTS to a trusted known_hosts entry manually."
+            fi
+            exit 1
+          fi
+          # Safety checks: --delete only ever acts inside <path>/o3po, but make sure
+          # that this is really the plugins directory of a WordPress installation.
+          [[ "$path" =~ ^/[A-Za-z0-9._/-]+/wp-content/plugins$ ]] && [[ "$path" != *..* ]] \
+            || { echo "::error::FTP_URL path must be an absolute path ending in /wp-content/plugins"; exit 1; }
+          [ -f o3po/o3po.php ] && [ -d o3po/includes ] && [ "$(find o3po -type f | wc -l)" -ge 20 ] \
+            || { echo "::error::Local o3po/ looks incomplete, refusing to --delete"; exit 1; }
+          sudo apt-get install -y sshpass rsync
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          if ! ssh-keygen -F "$host" -f ~/.ssh/known_hosts >/dev/null; then
+            echo "::error::SSH_KNOWN_HOSTS contains no entry matching FTP_URL hostname '$host'. Add a complete known_hosts line for this exact hostname."
+            exit 1
+          fi
+          ssh_cmd="ssh -ax -o StrictHostKeyChecking=yes"
+          sshpass -e $ssh_cmd "$SSH_USER@$host" test -d "'$path'" \
+            || { echo "::error::SSH connection or remote directory check failed (exit status $?). Review the SSH diagnostics above and verify the host key, credentials, network access, and remote directory $path."; exit 1; }
+          opts="-avHz --delete --max-delete=50"
+          if [ "$DRY_RUN" = true ]; then
+            echo "DRY RUN: nothing will be changed on the server"
+            opts="$opts -n --itemize-changes"
+          fi
+          sshpass -e rsync $opts -e "$ssh_cmd" ./o3po "$SSH_USER@$host:$path/"
