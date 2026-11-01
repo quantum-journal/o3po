@@ -49,6 +49,7 @@ class O3PO_Environment {
          *
          * @since    0.1.0
          * @access   public
+         * @return   bool Whether the current site differs from the configured production site.
          * */
     public function is_test_environment() {
 
@@ -85,6 +86,7 @@ class O3PO_Environment {
          * @param    string     $dir        Directory.
          * @param    string     $filename   Base Filename including the extension.
          * @param    string     $ext        Desired extension, e.g., '.txt', '.pdf', or '.tar.gz'.
+         * @return   string A unique filename in the directory.
          * */
     public function unique_filename_callback( $dir, $filename, $ext ) {
 
@@ -111,6 +113,7 @@ class O3PO_Environment {
          * @since    0.1.0
          * @access   public
          * @param    array    $mime_types    Array of mime types.
+         * @return   array The MIME types including the supported upload types.
          * */
     public function custom_upload_mimes( $mime_types=array() ) {
 
@@ -173,6 +176,7 @@ class O3PO_Environment {
          * @param    string    $mime_type         Expected mime type of the download.
          * @param    int       $parent_post_id    Id of post to which to link the download.
          * @param    int       $timeout_seconds   Timeout of the download.
+         * @return   array Upload details, or an array containing an error message.
          * */
     public function download_to_media_library( $url, $filename, $extension, $mime_type, $parent_post_id, $timeout_seconds = 40 ) {
 
@@ -290,6 +294,7 @@ class O3PO_Environment {
          * @access   public
          * @param    string    $path    Path to file/folder to delete.
          * @param    string    $root    Root folder to which to restric the deleting.
+         * @return   false|null False when the path is outside the root; otherwise no value is returned.
          * */
     public static function save_recursive_remove_dir( $path, $root ) {
 
@@ -318,6 +323,7 @@ class O3PO_Environment {
          * @since    0.1.0
          * @access   public
          * @param    string     $path    Path to the file to get.
+         * @return   string The file contents converted to UTF-8.
          * */
     public function file_get_contents_utf8( $path ) {
 
@@ -337,6 +343,7 @@ class O3PO_Environment {
          * @since    0.1.0
          * @access   public
          * @param    int    $post_id   Id of the post.
+         * @return   string The feature image path, or an empty string if no file exists.
          * */
     public function get_feature_image_path( $post_id ) {
 

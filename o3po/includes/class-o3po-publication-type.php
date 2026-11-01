@@ -100,6 +100,7 @@ abstract class O3PO_PublicationType {
          * @since    0.1.0
          * @access   public
          * @param    string    $id    If of the property.
+         * @return   mixed The configured value of the journal property.
          */
     public function get_journal_property( $id ) {
 
@@ -111,6 +112,7 @@ abstract class O3PO_PublicationType {
          *
          * @since    0.1.0
          * @access   public
+         * @return   string The name of this publication type.
          */
     public function get_publication_type_name() {
 
@@ -122,6 +124,7 @@ abstract class O3PO_PublicationType {
          *
          * @since    0.1.0
          * @access   public
+         * @return   string The plural name of this publication type.
          */
     public function get_publication_type_name_plural() {
 
@@ -133,6 +136,7 @@ abstract class O3PO_PublicationType {
          *
          * @since    0.1.0
          * @access   public
+         * @return   int The default number of authors for this publication type.
          */
     public function get_default_number_authors() {
 
@@ -182,6 +186,7 @@ abstract class O3PO_PublicationType {
          * @since    0.1.0
          * @access   public
          * @param    string     $name    Name of a publication type. If provided returns only that publication type (if it is acitve).
+         * @return   array|O3PO_PublicationType|null All active types, the named active type, or null if none match.
          */
     public static function get_active_publication_types( $name=Null ) {
 
@@ -560,6 +565,7 @@ abstract class O3PO_PublicationType {
          * @since    0.1.0
          * @access   protected
          * @param    int          $post_id   The id of the post.
+         * @return   string Validation messages produced while processing the publication.
          */
     protected function validate_and_process_data( $post_id ) {
 
@@ -963,6 +969,7 @@ abstract class O3PO_PublicationType {
          * @since     0.1.0
          * @access    protected
          * @param     int    $post_id   Id of the post that is actually beeing finally published publicly.
+         * @return    string Publication and status messages.
          */
     protected function on_post_actually_published( $post_id ) {
 
@@ -1021,6 +1028,7 @@ abstract class O3PO_PublicationType {
          * @since    0.1.0
          * @access   public
          * @param    array    $request    The request to which this post type is maybe to be added.
+         * @return  array The possibly updated feed request.
          */
     public final function add_custom_post_types_to_rss_feed( $request ) {
 
@@ -1037,6 +1045,7 @@ abstract class O3PO_PublicationType {
          * @since    0.1.0
          * @access   public
          * @param    string    $display_name    Original author name.
+         * @return   string The author name to display in the feed.
          */
     public function the_author_feed( $display_name ) {
         global $post;
@@ -1158,6 +1167,7 @@ abstract class O3PO_PublicationType {
          * @since    0.1.0
          * @access   public
          * @param    int    $post_id    The id of the post for which to get the doi.
+         * @return   string The post DOI, or an empty string if its prefix or suffix is missing.
          */
     public static function get_doi( $post_id ) {
 
@@ -1176,6 +1186,7 @@ abstract class O3PO_PublicationType {
          * @since    0.1.0
          * @access   public
          * @param    int    $post_id    The id of the post for which to get the volume.
+         * @return   string The post's volume metadata.
          */
     public static function get_volume( $post_id ) {
 
@@ -1189,6 +1200,7 @@ abstract class O3PO_PublicationType {
          * @since    0.1.0
          * @access   public
          * @param    int    $post_id    The id of the post for which to get the page.
+         * @return   string The post's page metadata.
          */
     public static function get_page( $post_id ) {
 
@@ -1202,6 +1214,7 @@ abstract class O3PO_PublicationType {
          * @since    0.1.0
          * @access   public
          * @param    int    $post_id   Id of the post for which the formated citation is to be returned
+         * @return   string The formatted journal citation.
          */
     public static function get_formated_citation( $post_id ) {
 
@@ -1221,6 +1234,7 @@ abstract class O3PO_PublicationType {
          * @access   public
          * @param    int        $post_id      Id of the post for which to generate the doi batch id.
          * @param    string     $timestamp    Timestamp of the submission for which the requested batch id is to be used.
+         * @return   string The DOI batch identifier.
          */
     public static function generate_crossref_xml_doi_batch_id( $post_id, $timestamp ) {
 
@@ -1244,6 +1258,7 @@ abstract class O3PO_PublicationType {
          * @param    int       $post_id         Id of the post for which the crossref xml is to be generated.
          * @param    string    $doi_batch_id    Batch id of the submission for which the crossref xml is to be generated.
          * @param    string    %timestamp       Timestamp of the submission for which the crossref xml is to be generated.
+         * @return   string|WP_Error The Crossref XML, or an error when required metadata is missing.
          */
     public function generate_crossref_xml( $post_id, $doi_batch_id, $timestamp ) {
 
@@ -1319,6 +1334,7 @@ abstract class O3PO_PublicationType {
          * @param    string   $crossref_id     The id for which to submit this upload.
          * @param    string   $crossref_pw     The password corresponding to the crossref_id.
          * @param    string   $crossref_url    The url of the crossref server to upload to.
+         * @return   string The Crossref response or a warning/error message.
          * */
     private static function upload_meta_data_to_crossref( $doi_batch_id, $crossref_xml, $crossref_id, $crossref_pw, $crossref_url ) {
 
@@ -1354,6 +1370,7 @@ abstract class O3PO_PublicationType {
          * @param    string     $doaj_json      The JSON encoded meta-data to upload.
          * @param    string     $doaj_api_url   The url of the DOAJ api to upload to.
          * @param    string     $doaj_api_key   The API key with DOAJ
+         * @return   string The DOAJ response or a warning/error message.
          */
     private static function upload_meta_data_to_doaj( $doaj_json, $doaj_api_url, $doaj_api_key ) {
 
@@ -1394,6 +1411,7 @@ abstract class O3PO_PublicationType {
          * @param    string     $clockss_ftp_url  The url of the CLOCKSS ftp server.
          * @param    string     $clockss_username The CLOCKSS username
          * @param    string     $clockss_password The CLOCKSS password
+         * @return   string The CLOCKSS upload response or a warning message.
          */
     private static function upload_meta_data_and_pdf_to_clockss( $clockss_xml, $pdf_path, $remote_filename_without_extension, $clockss_ftp_url, $clockss_username, $clockss_password ) {
 
@@ -1415,6 +1433,7 @@ abstract class O3PO_PublicationType {
          * @since    0.1.0
          * @access   public
          * @param    int     $post_id    Id of the post for which to generate the clockss xml.
+         * @return   string|WP_Error CLOCKSS XML, or an error when required metadata is missing.
          * */
     public function generate_clockss_xml( $post_id ) {
 
@@ -1473,6 +1492,7 @@ abstract class O3PO_PublicationType {
          * @since    0.1.0
          * @acccess  public
          * @param    int     $post_id    Id of the post for which to generate the the json encoded meta-data.
+         * @return   string|false|WP_Error DOAJ JSON, false if encoding fails, or a metadata error.
          */
     public function generate_doaj_json( $post_id ) {
 
@@ -1748,6 +1768,7 @@ abstract class O3PO_PublicationType {
          * @since     0.4.3
          * @access    public
          * @param     int     $post_id     Id of the post.
+         * @return    string HTML link to the handling editor's profile, or an empty string if none is assigned.
          */
     public static function get_formated_handling_editor( $post_id ) {
 
@@ -2203,6 +2224,7 @@ abstract class O3PO_PublicationType {
          * @since    0.1.0
          * @access   public
          * @param    int    $post_id     Id of the post.
+         * @return   string The formatted volume label.
          */
     public static function get_formated_volume_html( $post_id ) {
 
@@ -2218,6 +2240,7 @@ abstract class O3PO_PublicationType {
          * @since    0.1.0
          * @access   public
          * @param    int    $post_id     Id of the post.
+         * @return   string Formatted bibliography HTML for the post.
          */
     public function get_formated_bibliography_html( $post_id ) {
 
@@ -2246,6 +2269,7 @@ abstract class O3PO_PublicationType {
          * @since    0.1.0
          * @access   public
          * @param    array  $entry       Array describing the bibliography entry.
+         * @return   string Formatted HTML for the bibliography entry.
          */
     public function get_formated_bibliography_entry_html( $entry ) {
 
@@ -2262,6 +2286,7 @@ abstract class O3PO_PublicationType {
          * @since   0.1.0
          * @access   public
          * @param    int    $post_id     Id of the post.
+         * @return  string Cached or generated bibliography HTML.
          */
     public function get_bibliography_html( $post_id ) {
 
@@ -2290,6 +2315,7 @@ abstract class O3PO_PublicationType {
          * @since   0.1.0
          * @access   public
          * @param    int    $post_id     Id of the post.
+         * @return  string HTML cited-by information for the post.
          */
     public function get_formated_cited_by_html( $post_id ) {
         return $this->get_cited_by_data($post_id)['html'];
@@ -2496,6 +2522,7 @@ abstract class O3PO_PublicationType {
          * @since    0.1.0
          * @access   public
          * @param    int    $post_id     Id of the post.
+         * @return   string Cached or generated cited-by HTML.
          */
     public function get_cited_by( $post_id ) {
 
@@ -2548,6 +2575,7 @@ abstract class O3PO_PublicationType {
      * @since    0.1.0
      * @access   public
      * @param    int    $post_id     Id of the post.
+     * @return   string BibTeX representation of the publication metadata.
      */
     public function generate_bibtex( $post_id ) {
 
@@ -2607,6 +2635,7 @@ abstract class O3PO_PublicationType {
          * @since 0.1.0
          * @access   public
          * @param    int    $post_id     Id of the post.
+         * @return   string HTML containing the BibTeX data.
          */
     public function get_bibtex_html( $post_id ) {
 
@@ -2631,6 +2660,7 @@ abstract class O3PO_PublicationType {
          * @since  0.3.0
          * @access public
          * @param  int    $post_id     Id of the post.
+         * @return string HTML popular summary, or an empty string if none is available.
          */
     public static function get_popular_summary( $post_id ) {
         $output = '';
@@ -2654,6 +2684,7 @@ abstract class O3PO_PublicationType {
          * @since    0.1.0
          * @access   public
          * @param    int    $post_id     Id of the post.
+         * @return   string Authors' names joined with Oxford comma punctuation.
          */
     public static function get_formated_authors( $post_id ) {
 
@@ -2677,6 +2708,7 @@ abstract class O3PO_PublicationType {
          * @since    0.1.0
          * @access   public
          * @param    int       $post_id     Id of the post.
+         * @return   string Authors formatted for BibTeX.
          */
     public static function get_formated_authors_bibtex( $post_id ) {
 
@@ -2701,6 +2733,7 @@ abstract class O3PO_PublicationType {
          * @since     0.1.0
          * @access    public
          * @param     int      $post_id   Id of the post.
+         * @return    string HTML licensing statement for the publication.
          */
     public function get_license_information( $post_id ) {
 
@@ -2720,6 +2753,7 @@ abstract class O3PO_PublicationType {
          * @since    0.1.0
          * @access   public
          * @param    int    $post_id     Id of the post.
+         * @return   string HTML-formatted author names and affiliation references.
          */
     public function get_formated_authors_html( $post_id ) {
 
@@ -2769,6 +2803,7 @@ abstract class O3PO_PublicationType {
          * @since     0.1.0
          * @access    public
          * @param     int       $post_id      Id of the post.
+         * @return    string HTML-formatted affiliations.
          */
     public static function get_formated_affiliations_html( $post_id ) {
 
@@ -2807,6 +2842,7 @@ abstract class O3PO_PublicationType {
          * @since     0.4.3+
          * @access    public
          * @param     int       $post_id      Id of the post.
+         * @return    string Distinct affiliations joined by semicolons.
          */
     public static function get_formated_affiliations( $post_id ) {
 
@@ -2840,6 +2876,7 @@ abstract class O3PO_PublicationType {
          * @since    0.1.0
          * @access   public
          * @param    int      $post_id    Id of the post.
+         * @return   string Publication date in YYYY-MM-DD format.
          */
     public static function get_formated_date_published( $post_id ) {
 
@@ -2916,6 +2953,7 @@ abstract class O3PO_PublicationType {
          * @since 0.2.1
          * @param int     $post_id    The Id of the post whose meta field is to be retreived.
          * @param string  $key        The key that is to be retreived.
+         * @return array|string The stored array-valued metadata, or its string value; an unset field is an empty array.
          */
     public static function get_post_meta_field_containing_array( $post_id, $key ) {
 
@@ -2959,6 +2997,7 @@ abstract class O3PO_PublicationType {
          * @since    0.1.0
          * @access   pulic
          * @param    string    $display_name   Display name to be filtered.
+         * @return   string The author name or display name to show.
          */
     public function get_the_author( $display_name ) {
 
@@ -2985,6 +3024,7 @@ abstract class O3PO_PublicationType {
          * @since    0.3.0
          * @access   pulic
          * @param    string    $link   Link to be filtered.
+         * @return   string The author link or its replacement for publication posts.
          */
     public function get_the_author_posts_link( $link ) {
 
@@ -3037,6 +3077,7 @@ abstract class O3PO_PublicationType {
          * @since 0.3.0
          * @access    public
          * @param     int     $post_id     Id of the post.
+         * @return    string The corresponding author's email address.
          */
     public static function get_corresponding_author_email( $post_id ) {
 
@@ -3050,6 +3091,7 @@ abstract class O3PO_PublicationType {
          * @since 0.3.0
          * @access    public
          * @param     int     $post_id     Id of the post.
+         * @return    string The stored number of authors.
          */
     public static function get_number_authors( $post_id ) {
 
@@ -3063,6 +3105,7 @@ abstract class O3PO_PublicationType {
          * @since 0.3.0
          * @access    public
          * @param     int     $post_id     Id of the post.
+         * @return    string The publication title.
          */
     public static function get_title( $post_id ) {
 
@@ -3077,6 +3120,7 @@ abstract class O3PO_PublicationType {
          * @access    public
          * @param     int     $post_id     Id of the post.
          * @param     string  $field       The field to get.
+         * @return    mixed The stored metadata value for the field.
          */
     public static function get_post_meta( $post_id, $field ) {
 
@@ -3091,7 +3135,7 @@ abstract class O3PO_PublicationType {
          * @since 0.3.0
          * @access    public
          * @param     int     $post_id     Id of the post.
-         * @retur     string               YYYY-mm-dd representation of the date of publication.
+         * @return    string The publication date in YYYY-MM-DD format.
          */
     public static function get_date_published( $post_id ) {
 
@@ -3218,6 +3262,7 @@ abstract class O3PO_PublicationType {
          *
          * @since 0.1.0
          * @param string    $content    Content to be filtered.
+         * @return string The formatted publication excerpt, or the unchanged content for other post types.
          */
     public function get_the_excerpt( $content ) {
 
@@ -3316,6 +3361,7 @@ abstract class O3PO_PublicationType {
          * @access public
          * @param  bool    $delete   Whether this post is supposed to be trashed/deleted
          * @param  WP_Post $post     Post
+         * @return bool Whether WordPress should proceed with deleting the post.
          */
     function prevent_deletion($delete, $post) {
         $post_id = $post->ID;
@@ -3338,6 +3384,7 @@ abstract class O3PO_PublicationType {
          * @param  bool    $delete       Whether this post is supposed to be deleted
          * @param  WP_Post $post         Post
          * @param  bool    $force_delete Whether this is a force delete
+         * @return bool Whether WordPress should proceed with deleting the post.
          */
     function pre_delete_post( $delete, $post, $force_delete ) {
         return $this->prevent_deletion($delete, $post);
@@ -3353,6 +3400,7 @@ abstract class O3PO_PublicationType {
          * @access public
          * @param  bool    $delete       Whether this post is supposed to be trashed
          * @param  WP_Post $post         Post
+         * @return bool Whether WordPress should proceed with trashing the post.
          */
     function pre_trash_post( $trash, $post ) {
         return $this->prevent_deletion($trash, $post);

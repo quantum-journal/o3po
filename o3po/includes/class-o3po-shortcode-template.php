@@ -165,6 +165,7 @@ class O3PO_ShortcodeTemplate {
          *
          * @sinde  0.4.0
          * @access public
+         * @return string HTML listing the available shortcodes and descriptions.
          */
     public function render_short_codes() {
 

@@ -99,7 +99,7 @@ class O3PO_Bibentry {
          * @since 0.3.0
          * @access public
          * @param string $field The key of the field to get.
-         * @return mixed The string or array stored in the field.
+         * @return string|array The string or array stored in the field.
          */
     public function get( $field ) {
 
@@ -114,7 +114,7 @@ class O3PO_Bibentry {
          *
          * @since 0.3.0
          * @access public
-         * @return string Oxford comma separated list of all author surnames.
+         * @return string Oxford comma separated list of all author and editor surnames.
          */
     public function get_surnames() {
 
@@ -419,6 +419,7 @@ class O3PO_Bibentry {
          * @access public
          * @param array $array  Array of bibentries from which duplicates are to be removed.
          * @param bool $merge   Whether to merge duplicates or simply discard them.
+         * @return array The bibentries with duplicates removed.
          */
     public static function remove_duplicates($array, $merge=false) {
 

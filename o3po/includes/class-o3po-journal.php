@@ -122,6 +122,7 @@ class O3PO_Journal implements O3PO_SettingsSpecifyer {
          *
          * @since    0.1.0
          * @access   public
+         * @return   array The property names required in the journal configuration.
          */
     public static function get_journal_config_properties() {
 
@@ -134,6 +135,7 @@ class O3PO_Journal implements O3PO_SettingsSpecifyer {
          * @since    0.1.0
          * @access   public
          * @param    string    $id    Id of the property.
+         * @return   mixed The configured value of the journal property.
          */
     public function get_journal_property( $id ) {
 
@@ -198,7 +200,6 @@ class O3PO_Journal implements O3PO_SettingsSpecifyer {
          * @since    0.1.0
          * @access   public
          * @param    WP_Query     $wp_query   Query to act on.
-         * @return WP_Query Modified WP_Query object.
          * */
     public function handle_volumes_endpoint_request( $wp_query ) {
 
@@ -343,6 +344,7 @@ class O3PO_Journal implements O3PO_SettingsSpecifyer {
          * @since  0.3.0
          * @access public
          * @param  WP_Query  $wp_query   The current Wordpress query.
+         * @return WP_Query The unchanged query after outputting the notice.
          */
     public function add_notice_to_search_results_at_loop_start( $wp_query ) {
 
@@ -359,6 +361,7 @@ class O3PO_Journal implements O3PO_SettingsSpecifyer {
          *
          * @since  0.3.0
          * @access public
+         * @return string The search notice markup.
          */
     public function get_search_notice() {
 
@@ -468,6 +471,7 @@ for (i = 0; i < elemets_to_condense.length; i++) {
          * @access   public
          * @param    int    $post_id_to_exclude    Id of a post to exclude in the calculation
          * @param    array  $post_types            Array of post types to take into account.
+         * @return   array{pages: int|string, date_published: string, future_post_exists: bool} Highest page data and whether a future post exists.
          * */
     public static function get_post_type_highest_pages_info( $post_id_to_exclude, $post_types ) {
 
@@ -523,6 +527,7 @@ for (i = 0; i < elemets_to_condense.length; i++) {
          * @param    int      $post_id_to_exclude    Id of a post to exclude.
          * @param    int      $pages                 Page number to be checked for whether it is still free or not.
          * @param    array    $post_types            Post types to take into account.
+         * @return   array{still_free: bool, title: string} Whether the page is free and the title using it, if any.
          * */
     public static function pages_still_free_info( $post_id_to_exclude, $pages, $post_types ) {
 
@@ -570,6 +575,7 @@ for (i = 0; i < elemets_to_condense.length; i++) {
          * @access   public
          * @param    string   $doi_suffix   Doi suffix to be checked.
          * @param    array    $post_types   Post types to take into accoun.
+         * @return   bool Whether the DOI suffix is unused by the given post types.
          * */
     public static function doi_suffix_still_free( $doi_suffix, $post_types ) {
 
@@ -605,6 +611,7 @@ for (i = 0; i < elemets_to_condense.length; i++) {
          * @access public
          * @param   int     $vol_num            Volume number to count or all volumes if empty.
          * @param   string  $publication_type   Publication type to count.
+         * @return int The number of published posts in the volume, or across all volumes.
          */
     public static function get_count_of_volume( $vol_num, $publication_type ) {
 

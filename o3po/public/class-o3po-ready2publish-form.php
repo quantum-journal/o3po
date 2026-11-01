@@ -935,6 +935,7 @@ while(nextSibling) {
          *
          * @since    0.4.0
          * @access   public
+         * @return string HTML summary of funder information.
          */
     public function render_funder_information_summary() {
 
@@ -955,6 +956,7 @@ while(nextSibling) {
          *
          * @since    0.4.0
          * @access   public
+         * @return string HTML summary of author names.
          */
     public function render_author_data_summary() {
 
@@ -975,6 +977,7 @@ while(nextSibling) {
          * @access public
          * @param  string $id    Id of the field
          * @param  string $input Input
+         * @return string The accepted payment method, or the field default if invalid.
          */
     public function one_of_invoice_noinvoice_waiver( $id, $input ) {
 
@@ -993,6 +996,7 @@ while(nextSibling) {
          * @access public
          * @param  string $id    Id of the field
          * @param  string $input Input
+         * @return string The trimmed input, or the field default when it is empty.
          */
     public function non_empty_if_payment_method_is_invoice_and_on_or_past_containing_page( $id, $input ) {
 

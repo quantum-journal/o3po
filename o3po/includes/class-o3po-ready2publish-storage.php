@@ -162,6 +162,7 @@ class O3PO_Ready2PublishStorage {
          * @since    0.4.0
          * @access   public
          * @param    int    $id ID of the manuscript to get.
+         * @return   array|null The manuscript data, or null if the ID is not present.
          * */
     public function get_manuscript( $id ) {
 
@@ -173,6 +174,7 @@ class O3PO_Ready2PublishStorage {
          *
          * @since    0.4.0
          * @access   public
+         * @return   array Manuscript data indexed by manuscript ID.
          * */
     public function get_all_manuscripts() {
 
