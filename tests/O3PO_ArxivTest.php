@@ -28,11 +28,11 @@ class O3PO_ArxivTest extends O3PO_TestCase
                 'expected' => array(
                     'arxiv_fetch_results' => 'SUCCESS: Fetched meta-data from https://arxiv.org/abs/2411.04858v4
 ',
-                    'abstract' => 'An abstract with ünïcödé.',
-                    'number_authors' => 3,
-                    'author_first_names' => array(0 => 'Jérémie', 1 => 'Zoltán', 2 => 'Łukasz'),
-                    'author_last_names' => array(0 => 'Roland', 1 => 'Zimborás', 2 => 'Pawela'),
-                    'title' => 'Test paper with special characters',
+                    'abstract' => 'This paper introduces a numerical framework for establishing lower bounds on the conditional von-Neumann entropy in device-independent quantum cryptography and randomness extraction scenarios. Leveraging a hierarchy of semidefinite programs derived from the Navascués-Pironio-Acin (NPA) hierarchy, our tool enables efficient computation of entropy bounds based solely on observed statistics, assuming the validity of quantum mechanics. The method\'s computational efficiency is ensured by its reliance on projective operators within the non-commutative polynomial optimization problem. The method facilitates provable bounds for extractable randomness in noisy scenarios and aligns with modern entropy accumulation theorems. Consequently, the framework offers an adaptable tool for practical quantum cryptographic protocols, expanding secure communication possibilities in untrusted environments.',
+                    'number_authors' => 2,
+                    'author_first_names' => array(0 => 'Gereon', 1 => 'René'),
+                    'author_last_names' => array(0 => 'Koßmann', 1 => 'Schwonnek'),
+                    'title' => 'Reliable Entropy Estimation from Observed Statistics for Device-Independent Quantum Cryptography',
                     'arxiv_license' => 'http://creativecommons.org/licenses/by/4.0/'
                                     ),
                   ),
