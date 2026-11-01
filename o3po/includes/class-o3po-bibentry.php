@@ -179,7 +179,7 @@ class O3PO_Bibentry {
          * @access public
          * @param $doi_url_prefix        Prefix to use for DOI links.
          * @param $arxiv_url_abs_prefix  Prefix to use for arXiv links.
-         * @return string                HTHL representation of the bibentry.
+         * @return string                HTML representation of the bibentry.
          */
     public function get_formated_html( $doi_url_prefix, $arxiv_url_abs_prefix ) {
 

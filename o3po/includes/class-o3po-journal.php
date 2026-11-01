@@ -198,7 +198,7 @@ class O3PO_Journal implements O3PO_SettingsSpecifyer {
          * @since    0.1.0
          * @access   public
          * @param    WP_Query     $wp_query   Query to act on.
-         * @return   Modified WP_Query object.
+         * @return WP_Query Modified WP_Query object.
          * */
     public function handle_volumes_endpoint_request( $wp_query ) {
 

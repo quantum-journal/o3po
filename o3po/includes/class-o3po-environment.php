@@ -362,7 +362,7 @@ class O3PO_Environment {
          *
          * @since   0.4.0
          * @access  public
-         * @returns int Maximum file size in bytes.
+         * @return int Maximum file size in bytes.
          * */
     public static function max_file_upload_bytes() {
 

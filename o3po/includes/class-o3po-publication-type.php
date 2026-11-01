@@ -3203,7 +3203,7 @@ abstract class O3PO_PublicationType {
          * @since 0.3.1
          * @access public
          * @param int $post_id The ID of the post.
-         * @return The basis for the text of the excerpt.
+         * @return string The basis for the text of the excerpt.
          */
     abstract public function get_basis_for_excerpt( $post_id );
 

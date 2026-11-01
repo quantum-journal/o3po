@@ -246,7 +246,7 @@ class O3PO_Crossref {
          * @since    0.4.1
          * @access   public
          * @param    string   $title           The title of the work.
-         * @return   strong XML for registering a DOI at Crossref
+         * @return string XML for registering a DOI at Crossref.
          *
          */
     public static function generate_crossref_xml( $doi_batch_id, $timestamp, $title, $title_mathml, $abstract, $abstract_mathml, $number_authors, $author_given_names, $author_surnames, $author_name_styles, $author_orcids, $author_affiliations, $date_published, $pages, $doi, $affiliations, $journal, $volume, $parsed_bbl, $post_url, $pdf_pretty_permalink, $number_award_numbers, $award_numbers, $funder_identifiers, $funder_names, $crossref_crossmark_policy_page_doi, $email_address, $publisher, $eissn, $crossref_archive_locations, $journal_title, $journal_level_doi_suffix, $doi_prefix, $site_url, $orcid_url_prefix, $license_url ) {
