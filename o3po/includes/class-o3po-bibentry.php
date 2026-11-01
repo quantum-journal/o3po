@@ -319,8 +319,8 @@ class O3PO_Bibentry {
                 if(!empty($bibitem1->get('title')) and !empty($bibitem2->get('title')))
                 {
                     # using byte based string functions here because levenshtein() is also byte based
-                    $t1 = substr(mb_strtolower($bibitem1->get('title')), 0, 255);
-                    $t2 = substr(mb_strtolower($bibitem2->get('title')), 0, 255);
+                    $t1 = mb_strcut(mb_strtolower($bibitem1->get('title')), 0, 255, 'UTF-8');
+                    $t2 = mb_strcut(mb_strtolower($bibitem2->get('title')), 0, 255, 'UTF-8');
                     $l1 = strlen($t1);
                     $l2 = strlen($t2);
                     $lmin = min($l1, $l2);
@@ -337,8 +337,8 @@ class O3PO_Bibentry {
                     if(!empty($bibitem1->get_surnames()) and !empty($bibitem2->get_surnames()))
                     {
                         # using byte based string functions here because levenshtein() is also byte based
-                        $a1 = substr(mb_strtolower($bibitem1->get_surnames()), 0, 255);
-                        $a2 = substr(mb_strtolower($bibitem2->get_surnames()), 0, 255);
+                        $a1 = mb_strcut(mb_strtolower($bibitem1->get_surnames()), 0, 255, 'UTF-8');
+                        $a2 = mb_strcut(mb_strtolower($bibitem2->get_surnames()), 0, 255, 'UTF-8');
                         $l1 = strlen($a1);
                         $l2 = strlen($a2);
                         $lmin = min($l1, $l2);

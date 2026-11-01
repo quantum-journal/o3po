@@ -166,7 +166,7 @@ abstract class O3PO_PublicForm {
                 $sanitized_value = $this->get_field_default($id);
 
             if($field_options['max_length'] !== false)
-                $sanitized_value = substr($sanitized_value, 0, $field_options['max_length']);
+                $sanitized_value = mb_substr($sanitized_value, 0, $field_options['max_length'], 'UTF-8');
             $this->field_values[$id] = call_user_func($this->fields[$id]['validation_callable'], $id, $sanitized_value);
         }
         if($this->navigation === 'Upload' and count($this->errors) === 0)

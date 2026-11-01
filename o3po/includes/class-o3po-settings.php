@@ -181,7 +181,7 @@ class O3PO_Settings extends O3PO_Singleton {
             if($this->fields[$id]['max_length'] === false)
                 return $fields[$id];
             else
-                return substr($fields[$id], 0, $this->fields[$id]['max_length']);
+                return mb_substr($fields[$id], 0, $this->fields[$id]['max_length'], 'UTF-8');
         else
             return $this->get_field_default($id);
     }
