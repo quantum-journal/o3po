@@ -86,7 +86,7 @@ abstract class O3PO_PublicForm {
          * @access   private
          * @var      string   $navigation One of 'Next', 'Back', 'Submit', or 'Upload'
          */
-    private $navigation = false;
+    protected $navigation = false;
 
         /**
          * Whether the form was submitted successfully
