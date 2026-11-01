@@ -24,6 +24,19 @@ class O3PO_ArxivTest extends O3PO_TestCase
                                     ),
                   ),
             array(
+                'eprint' => '2411.04858v4',
+                'expected' => array(
+                    'arxiv_fetch_results' => 'SUCCESS: Fetched meta-data from https://arxiv.org/abs/2411.04858v4
+',
+                    'abstract' => 'An abstract with ünïcödé.',
+                    'number_authors' => 3,
+                    'author_first_names' => array(0 => 'Jérémie', 1 => 'Zoltán', 2 => 'Łukasz'),
+                    'author_last_names' => array(0 => 'Roland', 1 => 'Zimborás', 2 => 'Pawela'),
+                    'title' => 'Test paper with special characters',
+                    'arxiv_license' => 'http://creativecommons.org/licenses/by/4.0/'
+                                    ),
+                  ),
+            array(
                 'eprint' => '0809.2542v4',
                 'expected' => array(
                     'arxiv_fetch_results' => 'ERROR: It seems like https://arxiv.org/abs/0809.2542v4 is not published under one of the creative commons licenses (CC BY 4.0, CC BY-SA 4.0, CC BY-NC-SA 4.0, or CC BY-NC-ND 4.0). Please inform the authors that they must put the paper on the arXiv under CC BY 4.0 and remind them that we will publish under CC BY 4.0 and that, by our terms and conditions, they grant us the right to do so.

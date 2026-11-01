@@ -1016,6 +1016,7 @@ function wp_remote_get( $url, $args=array() ) {
         'https://arxiv.org/abs/2004.04173' => dirname(__FILE__) . '/arxiv/2004.04173v4.html',
         'https://arxiv.org/abs/0809.2542v4' => dirname(__FILE__) . '/arxiv/0809.2542v4.html',
         'https://arxiv.org/abs/1609.09584v4' => dirname(__FILE__) . '/arxiv/1609.09584v4.html',
+        'https://arxiv.org/abs/2411.04858v4' => dirname(__FILE__) . '/arxiv/2411.04858v4.html',
         'https://arxiv.org/abs/1609.09584' => dirname(__FILE__) . '/arxiv/1609.09584v4.html',
         'https://arxiv.org/abs/0809.2542v5' => dirname(__FILE__) . '/arxiv/0809.2542v5.html',
         'https://arxiv.org/abs/0809.2542' => dirname(__FILE__) . '/arxiv/0809.2542v5.html',
