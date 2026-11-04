@@ -68,7 +68,7 @@ class O3PO_Arxiv {
             $html = static::get_abstract_page_html( $arxiv_url_abs_prefix, $eprint, $timeout );
 
             $dom = new DOMDocument;
-            @$dom->loadHTML($html);
+            @$dom->loadHTML('<?xml encoding="UTF-8">' . $html);
             $x_path = new DOMXPath($dom);
 
             $arxiv_abs_page_url = $arxiv_url_abs_prefix . $eprint;
@@ -170,7 +170,7 @@ class O3PO_Arxiv {
             $html = static::get_abstract_page_html($arxiv_url_abs_prefix, $eprint_without_version, $timeout);
 
             $dom = new DOMDocument;
-            @$dom->loadHTML($html);
+            @$dom->loadHTML('<?xml encoding="UTF-8">' . $html);
             $x_path = new DOMXPath($dom);
 
             $arxiv_fetch_results = '';
@@ -282,7 +282,7 @@ class O3PO_Arxiv {
 
             $html = $response['body'];
             $dom = new DOMDocument;
-            @$dom->loadHTML($html);
+            @$dom->loadHTML('<?xml encoding="UTF-8">' . $html);
             $x_path = new DOMXPath($dom);
             $date = -1;
             $arxiv_submission_history = $x_path->query("(/html/body//div[@class='submission-history']/b[last()]/following-sibling::text() | /html/body//div[@class='submission-history']/strong[last()]/following-sibling::text())");

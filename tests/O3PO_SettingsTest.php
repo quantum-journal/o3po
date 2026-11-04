@@ -183,6 +183,39 @@ class O3PO_SettingsTest extends O3PO_TestCase
     }
 
 
+        /**
+         * @depends test_initialize_settings
+         */
+    public function test_max_length_truncation_is_multibyte_safe( $settings ) {
+
+        $property = new ReflectionProperty($settings, 'fields');
+        $property->setAccessible(true);
+        $original_fields = $property->getValue($settings);
+        $fields = $original_fields;
+        $fields['journal_title']['max_length'] = 3;
+        $fields['editor_names_test']['max_length'] = 3;
+        $property->setValue($settings, $fields);
+
+        $option_name = $settings->get_plugin_name() . '-settings';
+        $original_option = get_option($option_name, array());
+        update_option($option_name, array_merge((array) $original_option, array('journal_title' => "J\u{00E9}r\u{00E9}mie")));
+
+        try {
+            $value = $settings->get_field_value('journal_title');
+            $this->assertSame("J\u{00E9}r", $value);
+            $this->assertTrue(mb_check_encoding($value, 'UTF-8'));
+
+            $names = $settings->validate_array_of_at_most_1000_names('editor_names_test', array("J\u{00E9}r\u{00E9}mie", "\u{0141}ukasz"));
+            $this->assertSame(array("J\u{00E9}r", "\u{0141}uk"), $names);
+            foreach($names as $name)
+                $this->assertTrue(mb_check_encoding($name, 'UTF-8'));
+        } finally {
+            update_option($option_name, $original_option);
+            $property->setValue($settings, $original_fields);
+        }
+    }
+
+
     public static function validate_doi_prefix_provider() {
         return [
             ['1234567890.-', '1234567890.-'],

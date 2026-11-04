@@ -135,7 +135,7 @@ trait O3PO_Form {
          *                                      and return a valid value for the field. Should
          *                                      call $this->add_error() to indicate problems.
          * @param string   $default  Default value for the field.
-         * @param  int      $max_length Maximum length of the value of the field.
+         * @param  int      $max_length Maximum length of the value of the field in characters (not bytes).
          */
     public function specify_field($id, $title, $callback, $page, $section, $args, $validation_callable, $default, $max_length=false ) {
 
@@ -703,7 +703,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         foreach($input as $key => $name)
         {
             if($this->fields[$id]['max_length'] !== false)
-                $this_name = substr($name, 0, $this->fields[$id]['max_length']);
+                $this_name = mb_substr($name, 0, $this->fields[$id]['max_length'], 'UTF-8');
             else
                 $this_name = $name;
             $this_name = strip_tags($this_name);

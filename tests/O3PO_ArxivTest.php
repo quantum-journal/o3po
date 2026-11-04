@@ -24,6 +24,19 @@ class O3PO_ArxivTest extends O3PO_TestCase
                                     ),
                   ),
             array(
+                'eprint' => '2411.04858v4',
+                'expected' => array(
+                    'arxiv_fetch_results' => 'SUCCESS: Fetched meta-data from https://arxiv.org/abs/2411.04858v4
+',
+                    'abstract' => 'This paper introduces a numerical framework for establishing lower bounds on the conditional von-Neumann entropy in device-independent quantum cryptography and randomness extraction scenarios. Leveraging a hierarchy of semidefinite programs derived from the Navascués-Pironio-Acin (NPA) hierarchy, our tool enables efficient computation of entropy bounds based solely on observed statistics, assuming the validity of quantum mechanics. The method\'s computational efficiency is ensured by its reliance on projective operators within the non-commutative polynomial optimization problem. The method facilitates provable bounds for extractable randomness in noisy scenarios and aligns with modern entropy accumulation theorems. Consequently, the framework offers an adaptable tool for practical quantum cryptographic protocols, expanding secure communication possibilities in untrusted environments.',
+                    'number_authors' => 2,
+                    'author_first_names' => array(0 => 'Gereon', 1 => 'René'),
+                    'author_last_names' => array(0 => 'Koßmann', 1 => 'Schwonnek'),
+                    'title' => 'Reliable Entropy Estimation from Observed Statistics for Device-Independent Quantum Cryptography',
+                    'arxiv_license' => 'http://creativecommons.org/licenses/by/4.0/'
+                                    ),
+                  ),
+            array(
                 'eprint' => '0809.2542v4',
                 'expected' => array(
                     'arxiv_fetch_results' => 'ERROR: It seems like https://arxiv.org/abs/0809.2542v4 is not published under one of the creative commons licenses (CC BY 4.0, CC BY-SA 4.0, CC BY-NC-SA 4.0, or CC BY-NC-ND 4.0). Please inform the authors that they must put the paper on the arXiv under CC BY 4.0 and remind them that we will publish under CC BY 4.0 and that, by our terms and conditions, they grant us the right to do so.
