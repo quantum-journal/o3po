@@ -458,6 +458,7 @@ abstract class O3PO_PublicForm {
         global $wp_query;
 
         $wp_query->init();
+        $wp_query->query_vars = $wp_query->fill_query_vars( array() );
         $wp_query->is_page       = TRUE;
         $wp_query->is_singular   = TRUE;
         $wp_query->is_home       = FALSE;
@@ -825,8 +826,9 @@ abstract class O3PO_PublicForm {
         $sideloaded_files = $this->get_session_data('sideloaded_files', array(), $session_id);
         foreach($sideloaded_files as $sideloaded_file)
         {
-            if(file_exists($sideloaded_file))
-                unlink($sideloaded_file);
+            $path = is_array($sideloaded_file) ? ($sideloaded_file['file'] ?? null) : $sideloaded_file;
+            if(is_string($path) && file_exists($path))
+                unlink($path);
         }
 
     }
