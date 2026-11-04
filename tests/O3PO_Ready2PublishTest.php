@@ -431,7 +431,7 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
 
         $this->assertValidHTMLFragment($content, false);
 
-        $post_id = $dashboard->insert_post(0);
+        $post_id = $dashboard->insert_post(count($storage->get_all_manuscripts()) - 1);
         $this->assertSame(['0000-0002-1483-5661', ''], get_post_meta($post_id, 'paper_author_orcids', true));
     }
 
