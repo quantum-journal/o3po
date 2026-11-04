@@ -26,6 +26,24 @@ class O3PO_UtilityTest extends O3PO_TestCase
     }
 
         /**
+         * @dataProvider normalize_orcid_provider
+         */
+    public function test_normalize_orcid( $orcid, $expected ) {
+
+        $this->assertSame($expected, O3PO_Utility::normalize_orcid($orcid));
+    }
+
+    public static function normalize_orcid_provider() {
+
+        return [
+            ["0000-0002-1483-5661", "0000-0002-1483-5661"],
+            ["https://orcid.org/0000-0002-1483-5661", "0000-0002-1483-5661"],
+            [" http://orcid.org/0000-0002-1483-5661 ", "0000-0002-1483-5661"],
+            ["", ""],
+                ];
+    }
+
+        /**
          * @dataProvider base_convert_arbitrary_precision_provider
          */
     public function test_base_convert_arbitrary_precision( $str, $frombase, $tobase , $expected ) {

@@ -387,6 +387,7 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
             'author_first_names' => ['Foo', 'Bar'],
             'author_name_styles' => ['western', 'eastern'],
             'author_last_names' => ['Ffo', 'Bbr'],
+            'author_orcids' => ['0000-0002-1483-5661', ''],
             'award_numbers' => ['52562351'],
             'comments' => 'hweg',
             'copyright_confirmation',
@@ -430,7 +431,8 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
 
         $this->assertValidHTMLFragment($content, false);
 
-        $dashboard->insert_post(0);
+        $post_id = $dashboard->insert_post(0);
+        $this->assertSame(['0000-0002-1483-5661', ''], get_post_meta($post_id, 'paper_author_orcids', true));
     }
 
 }
