@@ -28,6 +28,9 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/editor-pages.php
  */
 class O3PO_Admin {
 
+    const REFRESH_NONCE_ACTION = 'o3po-meta-data-explorer-refresh';
+    const REFRESH_NONCE_NAME = 'o3po_refresh_nonce';
+
         /**
          * The ID of this plugin.
          *
@@ -158,6 +161,19 @@ class O3PO_Admin {
                     'dashicons-chart-pie'
                               );
         }
+    }
+
+        /**
+         * Whether a valid, nonce-protected request to refresh data was submitted
+         *
+         * @access private
+         * @return bool
+         */
+    private function refresh_requested() {
+
+        return isset($_POST['refresh']) and $_POST['refresh'] === 'checked'
+            and isset($_POST[self::REFRESH_NONCE_NAME]) and is_string($_POST[self::REFRESH_NONCE_NAME])
+            and wp_verify_nonce(wp_unslash($_POST[self::REFRESH_NONCE_NAME]), self::REFRESH_NONCE_ACTION);
     }
 
         /**
@@ -312,7 +328,7 @@ class O3PO_Admin {
             $first_volume_year = $settings->get_field_value('first_volume_year');
 
             $fetch_if_outdated = false;
-            if(isset($_POST['refresh']) and $_POST['refresh'] === 'checked')
+            if($this->refresh_requested())
                 $fetch_if_outdated = true;
 
             $html .= '<p>The following analysis is based on cited-by data from Crossref (if a user name and password are configured in the settings and you are participating in Crossref cited-by) and ADS (if an API token was configures in the settings) for publications published through this plugin. Not all publishers provide complete and suitable citation date, so that the data may be incomplete. Best efforts are made to identify and merge duplicates in case more than one data source is configured.</p>';
@@ -408,7 +424,7 @@ class O3PO_Admin {
 
             $html .= '<h4>Why is the data not always up to date?</h4>';
             $html .= '<p>Fetching cited-by data is a time consuming operation for which external services need to be queried. Fresh cited-by data is thus fetched when the page of a publication is visited and the last time cited-by data for that publication was fetched lies more than ' . esc_html($cited_by_refresh_seconds) . ' seconds in the past. This balances the load and makes sure that cited by data is always reasonably up to date. If, for some reason, you want to fetch fresh cited-by data for all publications with cited-by data older than ' . esc_html($cited_by_refresh_seconds) . ' seconds you can press the fetch fresh data button below. Beware that this might be a very long operation that can easily time out depending on your server setup and the number of publications.</p>';
-            $html .= '<form method="post" action="' . esc_url('?page=' . $this->get_plugin_name() . '-meta-data-explorer' . '&amp;tab=' . $tab_slug) . '"><input type="checkbox" id="refresh" name="refresh" value="checked" /><label for="refresh">I have read the above text on refreshing cited-by data.</label><input id="submit" type="submit" value="Refresh cited-by data"></form>';
+            $html .= '<form method="post" action="' . esc_url('?page=' . $this->get_plugin_name() . '-meta-data-explorer' . '&amp;tab=' . $tab_slug) . '">' . wp_nonce_field(self::REFRESH_NONCE_ACTION, self::REFRESH_NONCE_NAME, false, false) . '<input type="checkbox" id="refresh" name="refresh" value="checked" /><label for="refresh">I have read the above text on refreshing cited-by data.</label><input id="submit" type="submit" value="Refresh cited-by data"></form>';
         }
         elseif($active_tab === 'updated-after-publication')
         {
@@ -418,7 +434,7 @@ class O3PO_Admin {
             $arxiv_url_abs_prefix = $settings->get_field_value('arxiv_url_abs_prefix');
 
             $fetch_if_outdated = false;
-            if(isset($_POST['refresh']) and $_POST['refresh'] === 'checked')
+            if($this->refresh_requested())
                 $fetch_if_outdated = true;
 
             $post_type = $settings->get_field_value('primary_publication_type_name');
@@ -467,7 +483,7 @@ class O3PO_Admin {
 
             $html .= '<h4>Why is the data not always up to date?</h4>';
             $html .= '<p>Updating submission history data requires fetching the abstract page from the arXiv. Fresh submission history data is thus fetched when the page of a publication is visited and the last time submission history data for that publication was fetched lies more than ' . esc_html($arxiv_submission_history_refresh_seconds) . ' seconds in the past. This balances the load and makes sure that submission history data is always reasonably up to date. If, for some reason, you want to fetch fresh submission history data for all publications with data older than ' . esc_html($arxiv_submission_history_refresh_seconds) . ' seconds you can press the fetch fresh data button below. Beware that this might be a very long operation that can easily time out depending on your server setup and the number of publications.</p>';
-            $html .= '<form method="post" action="' . esc_url('?page=' . $this->get_plugin_name() . '-meta-data-explorer' . '&amp;tab=' . $tab_slug) . '"><input type="checkbox" id="refresh" name="refresh" value="checked" /><label for="refresh">I have read the above text on refreshing submission history data.</label><input id="submit" type="submit" value="Refresh submission history data"></form>';
+            $html .= '<form method="post" action="' . esc_url('?page=' . $this->get_plugin_name() . '-meta-data-explorer' . '&amp;tab=' . $tab_slug) . '">' . wp_nonce_field(self::REFRESH_NONCE_ACTION, self::REFRESH_NONCE_NAME, false, false) . '<input type="checkbox" id="refresh" name="refresh" value="checked" /><label for="refresh">I have read the above text on refreshing submission history data.</label><input id="submit" type="submit" value="Refresh submission history data"></form>';
         }
         elseif($active_tab === 'editor-leaderboard')
         {

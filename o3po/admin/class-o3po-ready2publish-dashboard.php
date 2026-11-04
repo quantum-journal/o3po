@@ -329,7 +329,7 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
         if(is_wp_error($post_id))
             echo "ERROR: " . $post_id->get_error_message();
         else
-            header('Location: /wp-admin/post.php?post=' . $post_id . '&action=edit');
+            header('Location: /wp-admin/post.php?post=' . intval($post_id) . '&action=edit');
 
     }
 
@@ -377,7 +377,9 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
                     $this->insert_and_display_post($id);
                 break;
             case 'continue':
-                if($id !== null)
+                if(!current_user_can('edit_posts'))
+                    break;
+                if(is_string($id) and isset($this->storage->get_all_manuscripts()[$id]))
                 {
                     $post_eprint = $this->storage->get_manuscript($id)['eprint'];
                     $eprint_without_version = preg_replace('#v[0-9]+$#u', '', $post_eprint);
