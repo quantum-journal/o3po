@@ -200,12 +200,12 @@ trait O3PO_Form {
 
 
         if(preg_match('#(.*)\[(.*)\]#u', $id, $matches) === 1)
-            $name_end = '[' . $matches[1] . '][' . $matches[2] . ']';
+            $name_end = '[' . esc_attr($matches[1]) . '][' . esc_attr($matches[2]) . ']';
         else
-            $name_end = '[' . $id . ']';
-        echo '<input class="regular-text ltr ' . $this->plugin_name . '-' . $this->slug . ' ' . $this->plugin_name . '-' . $this->slug . '-text" type="text" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . $name_end . '" value="' . esc_attr($value) . '"' . ($placeholder ? ' placeholder="' . esc_attr($placeholder) . '"' : '' ) . ($style ? ' style="' . esc_attr($style). '" ': '') . ($autocomplete === 'off' ? ' autocomplete=off': '') . ($readonly ? ' readonly="readonly"': '') .' />';
+            $name_end = '[' . esc_attr($id) . ']';
+        echo '<input class="regular-text ltr ' . $this->plugin_name . '-' . $this->slug . ' ' . $this->plugin_name . '-' . $this->slug . '-text" type="text" id="' . $this->plugin_name . '-' . $this->slug . '-' . esc_attr($id) . '" name="' . $this->plugin_name . '-' . $this->slug . $name_end . '" value="' . esc_attr($value) . '"' . ($placeholder ? ' placeholder="' . esc_attr($placeholder) . '"' : '' ) . ($style ? ' style="' . esc_attr($style). '" ': '') . ($autocomplete === 'off' ? ' autocomplete=off': '') . ($readonly ? ' readonly="readonly"': '') .' />';
         if(!empty($label))
-            echo '<label for="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '"' . ($label_style ? ' style="' . esc_attr($label_style). '" ': '') . '>' . ($esc_label ? esc_html($label) : $label) . '</label>';
+            echo '<label for="' . $this->plugin_name . '-' . $this->slug . '-' . esc_attr($id) . '"' . ($label_style ? ' style="' . esc_attr($label_style). '" ': '') . '>' . ($esc_label ? esc_html($label) : $label) . '</label>';
 
     }
 
@@ -223,7 +223,7 @@ trait O3PO_Form {
     public function render_multi_line_field( $id, $rows=false, $style=false, $preview=false, $placeholder=false ) {
 
         $value = $this->get_field_value($id);
-        echo '<textarea class="regular-text ltr o3po-' . $this->slug . ' o3po-' . $this->slug . '-text-multi-line" ' . ($style ? 'style="' . esc_attr($style). '" ': '') . ($preview ? ' oninput=UpdatePreview(this.id)': '') . ($rows ? ' rows="' . esc_attr($rows). '" ': ' ') . 'id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']"' . ($placeholder !== false ? ' placeholder="' . esc_attr($placeholder) . '"' : '') . '>' . esc_textarea($value) . '</textarea>';
+        echo '<textarea class="regular-text ltr o3po-' . $this->slug . ' o3po-' . $this->slug . '-text-multi-line" ' . ($style ? 'style="' . esc_attr($style). '" ': '') . ($preview ? ' oninput=UpdatePreview(this.id)': '') . ($rows ? ' rows="' . esc_attr($rows). '" ': ' ') . 'id="' . $this->plugin_name . '-' . $this->slug . '-' . esc_attr($id) . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . esc_attr($id) . ']"' . ($placeholder !== false ? ' placeholder="' . esc_attr($placeholder) . '"' : '') . '>' . esc_textarea($value) . '</textarea>';
         if($preview === true)
         {
             echo'<script>
@@ -235,8 +235,8 @@ target.textContent = source.value;
 MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
 }
 </script>';
-            echo '<p><span id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '-preview-lable" stype="">LaTeX preview:</span><br/>';
-            echo '<span id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '-preview" style="white-space:pre-wrap;">' . (!empty($value) ? esc_html($value) : 'Nothing to show') . '</span></p>';
+            echo '<p><span id="' . $this->plugin_name . '-' . $this->slug . '-' . esc_attr($id) . '-preview-lable" stype="">LaTeX preview:</span><br/>';
+            echo '<span id="' . $this->plugin_name . '-' . $this->slug . '-' . esc_attr($id) . '-preview" style="white-space:pre-wrap;">' . (!empty($value) ? esc_html($value) : 'Nothing to show') . '</span></p>';
         }
     }
 
@@ -251,9 +251,9 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
 
         $value = $this->get_field_value($id);
 
-        echo '<input class="regular-text ltr o3po-' . $this->slug . ' o3po-' . $this->slug . '-password" type="password" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="' . esc_attr($value) . '" />';
+        echo '<input class="regular-text ltr o3po-' . $this->slug . ' o3po-' . $this->slug . '-password" type="password" id="' . $this->plugin_name . '-' . $this->slug . '-' . esc_attr($id) . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . esc_attr($id) . ']" value="' . esc_attr($value) . '" />';
         echo '<input type="checkbox" onclick="(function myFunction() {
-    var x = document.getElementById(\'' . $this->plugin_name . '-' . $this->slug . '-' . $id . '\');
+    var x = document.getElementById(\'' . $this->plugin_name . '-' . $this->slug . '-' . esc_js($id) . '\');
     if (x.type === \'password\') {
         x.type = \'text\';
     } else {
@@ -276,13 +276,13 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         $value = $this->get_field_value($id);
 
         if(preg_match('#(.*)\[(.*)\]#u', $id, $matches) === 1)
-            $name_end = '[' . $matches[1] . '][' . $matches[2] . ']';
+            $name_end = '[' . esc_attr($matches[1]) . '][' . esc_attr($matches[2]) . ']';
         else
-            $name_end = '[' . $id . ']';
+            $name_end = '[' . esc_attr($id) . ']';
         echo '<input type="hidden" name="' . $this->plugin_name . '-' . $this->slug . $name_end . '" value="unchecked">'; //To have a value in POST when the checkbox is unchecked
-        echo '<input class="o3po-' . $this->slug . ' o3po-' . $this->slug . '-checkbox" type="checkbox" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . $name_end . '" value="checked"' . checked( 'checked', $value, false ) . '/>';
+        echo '<input class="o3po-' . $this->slug . ' o3po-' . $this->slug . '-checkbox" type="checkbox" id="' . $this->plugin_name . '-' . $this->slug . '-' . esc_attr($id) . '" name="' . $this->plugin_name . '-' . $this->slug . $name_end . '" value="checked"' . checked( 'checked', $value, false ) . '/>';
         if(!empty($label))
-            echo '<label for="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '">' . ($esc_label ? esc_html($label) : $label) . '</label>';
+            echo '<label for="' . $this->plugin_name . '-' . $this->slug . '-' . esc_attr($id) . '">' . ($esc_label ? esc_html($label) : $label) . '</label>';
 
     }
 
@@ -300,17 +300,17 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         $value = $this->get_field_value($id);
 
         if(preg_match('#(.*)\[(.*)\]#u', $id, $matches) === 1)
-            $name_end = '[' . $matches[1] . '][' . $matches[2] . ']';
+            $name_end = '[' . esc_attr($matches[1]) . '][' . esc_attr($matches[2]) . ']';
         else
-            $name_end = '[' . $id . ']';
+            $name_end = '[' . esc_attr($id) . ']';
 
-        echo '<select class="o3po-' . $this->slug . ' o3po-' . $this->slug . '-select" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . $name_end . '"' . ($onchange !== false ? ' onchange="' . $onchange . '"' : '') . '>';
+        echo '<select class="o3po-' . $this->slug . ' o3po-' . $this->slug . '-select" id="' . $this->plugin_name . '-' . $this->slug . '-' . esc_attr($id) . '" name="' . $this->plugin_name . '-' . $this->slug . $name_end . '"' . ($onchange !== false ? ' onchange="' . $onchange . '"' : '') . '>';
         foreach($options as $option)
             echo '<option value="' . $option['value'] . '"' . ($value == $option['value'] ? 'selected': '' ) . '>' . $option['description'] . '</option>';
         echo '</select>';
 
         if(!empty($label))
-            echo '<label for="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" style="display:block;">' . ($esc_label ? esc_html($label) : $label) . '</label>';
+            echo '<label for="' . $this->plugin_name . '-' . $this->slug . '-' . esc_attr($id) . '" style="display:block;">' . ($esc_label ? esc_html($label) : $label) . '</label>';
     }
 
         /**
@@ -329,7 +329,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         if(!is_array($value))
             $value = array();
 
-        echo '<input class="regular-text ltr o3po-' . $this->slug . ' o3po-' . $this->slug . '-text" type="text" id="' . $this->plugin_name . '-' . $this->slug . '-' . $id . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . $id . ']" value="' . esc_attr(implode(',', $value)) . '"' . ($placeholder ? ' placeholder="' . esc_attr($placeholder) . '"' : '' ) . ' />';
+        echo '<input class="regular-text ltr o3po-' . $this->slug . ' o3po-' . $this->slug . '-text" type="text" id="' . $this->plugin_name . '-' . $this->slug . '-' . esc_attr($id) . '" name="' . $this->plugin_name . '-' . $this->slug . '[' . esc_attr($id) . ']" value="' . esc_attr(implode(',', $value)) . '"' . ($placeholder ? ' placeholder="' . esc_attr($placeholder) . '"' : '' ) . ' />';
 
     }
 
@@ -707,7 +707,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
             else
                 $this_name = $name;
             $this_name = strip_tags($this_name);
-            $result[$key] = trim($this_name);
+            $result[] = trim($this_name);
         }
 
         return $result;
@@ -745,7 +745,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
             else
                 $this_uuidv4 = $value;
             $this_uuidv4 = strip_tags($this_uuidv4);
-            $result[$key] = trim($this_uuidv4);
+            $result[] = trim($this_uuidv4);
         }
 
         return $result;
