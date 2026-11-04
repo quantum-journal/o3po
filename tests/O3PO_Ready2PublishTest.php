@@ -435,4 +435,32 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
         $this->assertSame(['0000-0002-1483-5661', ''], get_post_meta($post_id, 'paper_author_orcids', true));
     }
 
+
+        /**
+         * @depends test_initialize_settings
+         * @depends test_setup_environment
+         * @depends test_initialize_ready2publish_storage
+         */
+    public function test_caption_without_image_is_an_error( $settings, $environment, $storage ) {
+
+        $_SERVER['REQUEST_URI'] = parse_url(home_url(), PHP_URL_PATH) . $settings->get_field_value("ready2publish_slug");
+
+        $caption = array('o3po-ready2publish' => array('featured_image_caption' => 'A caption'));
+
+        $form = new O3PO_Ready2PublishForm('o3po', $settings->get_field_value("ready2publish_slug"), $environment, $storage);
+        $_POST = array('navigation' => 'Next') + $caption;
+        $form->read_and_validate_field_values();
+        $this->assertArrayHasKey('caption-without-image', array_column($form->get_errors(), 'code', 'code'));
+
+        $form = new O3PO_Ready2PublishForm('o3po', $settings->get_field_value("ready2publish_slug"), $environment, $storage);
+        $_POST = array('navigation' => 'Upload') + $caption;
+        $form->read_and_validate_field_values();
+        $this->assertArrayNotHasKey('caption-without-image', array_column($form->get_errors(), 'code', 'code'));
+
+        $form = new O3PO_Ready2PublishForm('o3po', $settings->get_field_value("ready2publish_slug"), $environment, $storage);
+        $_POST = array('navigation' => 'Next');
+        $form->read_and_validate_field_values();
+        $this->assertArrayNotHasKey('caption-without-image', array_column($form->get_errors(), 'code', 'code'));
+        $_POST = array();
+    }
 }

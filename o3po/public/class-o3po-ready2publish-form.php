@@ -119,7 +119,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
 
         $this->specify_field('popular_summary', 'Popular summary', array( $this, 'render_popular_summary' ), 'dissemination', 'dissemination_material', array(), array($this, 'trim_strip_tags'), '');
         $this->specify_field('featured_image_upload', 'Featured image', array( $this, 'render_featured_image_upload' ), 'dissemination', 'dissemination_material', array(), array($this, 'validate_featured_image_upload'), '');
-        $this->specify_field('featured_image_caption', 'Featured image caption', array( $this, 'render_featured_image_caption' ), 'dissemination', 'dissemination_material', array(), array($this, 'trim_strip_tags'), '');
+        $this->specify_field('featured_image_caption', 'Featured image caption', array( $this, 'render_featured_image_caption' ), 'dissemination', 'dissemination_material', array(), array($this, 'validate_featured_image_caption'), '');
         $this->specify_field('dissemination_multimedia', 'Multi media', array( $this, 'render_dissemination_multimedia' ), 'dissemination', 'dissemination_material', array(), array($this, 'trim_strip_tags'), '');
 
             /* We are phasing out support for Fermat's Libray */
@@ -298,6 +298,32 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         }
 
         return $result;
+    }
+
+        /**
+         * Validate the featured image caption
+         *
+         * A non-empty caption requires that a featured image was uploaded.
+         * The check is skipped when going back or uploading.
+         *
+         * @since  0.4.0
+         * @access public
+         * @param  string $id    Id of the field
+         * @param  string $input Input
+         * @return string The trimmed caption without tags.
+         */
+    public function validate_featured_image_caption( $id, $input ) {
+
+        $input = $this->trim_strip_tags($id, $input);
+
+        if($input !== '' and in_array($this->navigation, ['Next', 'Submit']))
+        {
+            $upload_result = $this->get_session_data('file_upload_result_featured_image_upload');
+            if(empty($upload_result['file']))
+                $this->add_error($id, 'caption-without-image', "You provided a caption for the featured image but did not upload an image. Please upload the image or remove the caption.", 'error');
+        }
+
+        return $input;
     }
 
         /**
