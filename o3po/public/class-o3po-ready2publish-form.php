@@ -461,7 +461,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         $author_last_names = $this->get_field_value('author_last_names');
 
         echo '<p>Please help us identify which part(s) of the authors\' names belong to the first and which to their second name(s) as well as which part is their given name (e.g., in Chinese names, the given name comes after the family name, whereas in Spanish names, the given name is the first name and family names are the second names). We are aware that this format does not do justice to <a href="https://www.w3.org/International/questions/qa-personal-names">all common name styles around the world</a>, but names in this format are needed for the registration of DOIs with Crossref.</p>';
-        echo '<p>Entering ORCIDs is optional. You do not need to supply them if they are already contained in the source code of your paper (e.g., via the \\orcid{...} command). ORCIDs entered here take precedence over those found in the source code.</p>';
+        echo '<p>Entering ORCIDs is optional. You do not need to supply them if they are already contained in the source code of your paper (e.g., via the \\orcid{...} command). ORCIDs found in the source code take precedence over those entered here.</p>';
         echo '<div id="' . $this->plugin_name . '-' . $this->slug . '-author-list">';
         foreach($author_first_names as $x => $foo)
         {
