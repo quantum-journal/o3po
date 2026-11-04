@@ -162,6 +162,18 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
     }
 
         /**
+         * Nonce action protecting the publish link of a manuscript
+         *
+         * @access private
+         * @param  string|int $id The id of the manuscript
+         * @return string
+         */
+    private static function publish_nonce_action( $id ) {
+
+        return 'o3po-ready2publish-publish-' . $id;
+    }
+
+        /**
          * Render a single manuscript entry.
          *
          * @since    0.4.0
@@ -188,7 +200,7 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
         $out .= '<div style="float:right">';
         $out .= '<span><a class="button-secondary" href="mailto:' . esc_attr($manuscript_info['corresponding_author_email']) . '">Email ' . esc_html($manuscript_info['corresponding_author_email']) . '</a></span>';
         $out .= '<span class=""><a class="button-secondary" target="_blank" href="/' . esc_attr($this->slug . '?action=' . 'show_invoice' . '&id=' . urlencode($id)) . '">' . "Create invoice" .  '</a></span>';
-        $out .= '<span class=""><a class="button-secondary" href="/' . esc_attr($this->slug . '?action=' . $action . '&id=' . urlencode($id)) . '">' . ($action === 'continue' ? "Go to post" : "Begin publishing") .  '</a></span>';
+        $out .= '<span class=""><a class="button-secondary" href="/' . esc_attr($this->slug . '?action=' . $action . '&id=' . urlencode($id) . ($action === 'publish' ? '&_wpnonce=' . urlencode(wp_create_nonce(self::publish_nonce_action($id))) : '')) . '">' . ($action === 'continue' ? "Go to post" : "Begin publishing") .  '</a></span>';
         $out .= '</div>';
         $out .= '<div style="clear:both"></div>';
         $out .= '</div>';
@@ -373,7 +385,11 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
         switch($action)
         {
             case 'publish':
-                if($id !== null)
+                if(!is_string($id))
+                    break;
+                if(!isset($_GET['_wpnonce']) or !is_string($_GET['_wpnonce']) or !wp_verify_nonce(wp_unslash($_GET['_wpnonce']), self::publish_nonce_action($id)))
+                    echo "This link is invalid or expired. Please go back to the dashboard and try again.";
+                else
                     $this->insert_and_display_post($id);
                 break;
             case 'continue':
