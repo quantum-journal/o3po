@@ -83,6 +83,7 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
         'author_given_names',
         'author_surnames',
         'author_name_styles',
+        'author_orcids',
         'number_award_numbers',
         'award_numbers',
         'funder_names',

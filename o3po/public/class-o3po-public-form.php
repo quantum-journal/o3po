@@ -539,7 +539,7 @@ abstract class O3PO_PublicForm {
         {
             $array = $matches[1];
             $key = $matches[2];
-            return $this->field_values[$array][$key];
+            return isset($this->field_values[$array][$key]) ? $this->field_values[$array][$key] : '';
         }
         else
             return $this->field_values[$id];

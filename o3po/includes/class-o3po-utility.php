@@ -22,6 +22,19 @@ class O3PO_Utility
 {
 
         /**
+         * Strip a leading URL prefix (e.g. https://orcid.org/) and
+         * surrounding whitespace from an ORCID.
+         *
+         * @since    0.3.1
+         * @access   public
+         * @param    string     $orcid   ORCID, possibly given as full URL
+         * */
+    static public function normalize_orcid( $orcid ) {
+
+        return preg_replace( '#^https?://[^/]+/#iu', '', trim( (string)$orcid ) );
+    }
+
+        /**
          * Check that the given ORCID is well formated.
          *
          * Verifies whether the given ORCID has a valid checksum.
