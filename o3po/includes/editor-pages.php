@@ -21,7 +21,7 @@ class O3PO_EditorPages {
          *
          * To be added to the 'init' action.
          *
-         * @since  0.5.0
+         * @since  0.5.1
          * @access public
          */
     public static function add_editor_endpoint() {
@@ -35,7 +35,7 @@ class O3PO_EditorPages {
          *
          * To be added to the 'parse_request' action.
          *
-         * @since  0.5.0
+         * @since  0.5.1
          * @access public
          * @param  WP $wp The current WordPress environment.
          */
@@ -61,7 +61,7 @@ class O3PO_EditorPages {
         /**
          * Find an editor by UUID.
          *
-         * @since  0.5.0
+         * @since  0.5.1
          * @access private
          * @param  string $uuidv4 The editor UUID.
          * @return array|null Editor data or null if the UUID does not belong to a person.
@@ -81,7 +81,7 @@ class O3PO_EditorPages {
         /**
          * Format the editor's service years for display.
          *
-         * @since  0.5.0
+         * @since  0.5.1
          * @access private
          * @param  string $since_year The first service year.
          * @param  string $until_year The last service year.
@@ -104,7 +104,7 @@ class O3PO_EditorPages {
         /**
          * Get published papers handled by an editor, refreshing the transient periodically.
          *
-         * @since  0.5.0
+         * @since  0.5.1
          * @access private
          * @param  string $uuidv4 The editor UUID.
          * @return array List of published paper titles, citations, and permalinks.
@@ -163,7 +163,7 @@ class O3PO_EditorPages {
          *
          * To be added to the 'save_post', 'before_delete_post', and status-transition actions.
          *
-         * @since  0.5.0
+         * @since  0.5.1
          * @access public
          * @param  int $post_id The saved post ID.
          * @param  WP_Post|null $post The saved post, if provided by the action.
@@ -188,7 +188,7 @@ class O3PO_EditorPages {
          *
          * To be added to post-meta add, update, and delete actions.
          *
-         * @since  0.5.0
+         * @since  0.5.1
          * @access public
          * @param  mixed  $meta_id The post-meta ID or IDs.
          * @param  int    $post_id The post ID.
@@ -221,7 +221,7 @@ class O3PO_EditorPages {
          *
          * To be added to the add/update/delete post-meta filters.
          *
-         * @since  0.5.0
+         * @since  0.5.1
          * @access public
          * @param  mixed  $check The short-circuit filter value.
          * @param  int    $post_id The post ID.
@@ -246,7 +246,7 @@ class O3PO_EditorPages {
          *
          * To be added to the 'update_post_metadata' filter.
          *
-         * @since  0.5.0
+         * @since  0.5.1
          * @access public
          * @param  mixed  $check The short-circuit filter value.
          * @param  int    $post_id The post ID.
@@ -289,7 +289,7 @@ class O3PO_EditorPages {
          *
          * To be added to the 'transition_post_status' action.
          *
-         * @since  0.5.0
+         * @since  0.5.1
          * @access public
          * @param  string  $new_status The new post status.
          * @param  string  $old_status The old post status.
@@ -307,7 +307,7 @@ class O3PO_EditorPages {
         /**
          * Invalidate the cached paper list for one editor.
          *
-         * @since  0.5.0
+         * @since  0.5.1
          * @access public
          * @param  string $uuidv4 The editor UUID.
          */
@@ -321,7 +321,7 @@ class O3PO_EditorPages {
         /**
          * Invalidate cached lists for the previous and current handling editors.
          *
-         * @since  0.5.0
+         * @since  0.5.1
          * @access public
          * @param  string $old_uuidv4 The previous editor UUID.
          * @param  string $new_uuidv4 The current editor UUID.
@@ -339,7 +339,7 @@ class O3PO_EditorPages {
          *
          * To be added to the 'the_posts' filter.
          *
-         * @since  0.5.0
+         * @since  0.5.1
          * @access public
          * @param  array $posts The posts returned by the query.
          * @return array Posts, including a fake page post for an editor profile.
@@ -374,7 +374,7 @@ class O3PO_EditorPages {
          *
          * To be added to the 'template_include' filter.
          *
-         * @since  0.5.0
+         * @since  0.5.1
          * @access public
          * @param  string $template The template that would otherwise be used.
          * @return string The page template for editor profiles.
@@ -395,7 +395,7 @@ class O3PO_EditorPages {
          *
          * To be added to the 'loop_start' action.
          *
-         * @since  0.5.0
+         * @since  0.5.1
          * @access public
          * @param  WP_Query $wp_query The current WordPress query.
          */

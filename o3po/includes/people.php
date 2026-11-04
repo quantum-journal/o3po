@@ -5,7 +5,7 @@ require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-o3po-setti
 /**
  * Shared people data and name helpers.
  *
- * @since 0.5.0
+ * @since 0.5.1
  */
 class O3PO_People {
 
@@ -14,7 +14,7 @@ class O3PO_People {
          *
          * Tries to takes into account name prefixes.
          *
-         * @since    0.5.0
+         * @since    0.5.1
          * @access   public
          * @return int Negative, zero, or positive according to the name ordering.
          */
@@ -36,7 +36,7 @@ class O3PO_People {
         /**
          * Sort by last names
          *
-         * @since    0.5.0
+         * @since    0.5.1
          * @access   public
          * @return int Name comparison result for the people’s last names.
          */
@@ -48,7 +48,7 @@ class O3PO_People {
         /**
          * Sort by first names
          *
-         * @since    0.5.0
+         * @since    0.5.1
          * @access   public
          * @return int Name comparison result for the people’s first names.
          */
@@ -60,7 +60,7 @@ class O3PO_People {
         /**
          * Get a person's formatted name from their UUID.
          *
-         * @since  0.5.0
+         * @since  0.5.1
          * @access public
          * @return string The formatted name, or an empty string if no person has the UUID.
          */
@@ -82,7 +82,7 @@ class O3PO_People {
         /**
          * Get person data from settings storage in a convenient array structure
          *
-         * @since  0.5.0
+         * @since  0.5.1
          * @access public
          * @return array Array with of arrays, one per person, containing that
          *               persons data.
