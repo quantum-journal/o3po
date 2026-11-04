@@ -41,6 +41,7 @@ class O3PO_Ready2PublishStorage {
         'author_given_names', // is populated from author_last_names
         'author_surnames', // is populated from author_last_names
         'author_name_styles',
+        'author_orcids',
         'number_award_numbers',
         'award_numbers',
         'funder_names',

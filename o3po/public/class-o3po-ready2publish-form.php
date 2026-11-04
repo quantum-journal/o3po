@@ -104,6 +104,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         $this->specify_section('author_data', 'Authors', array($this, 'render_author_data'), 'meta_data', array($this, 'render_author_data_summary')); # We render everything here as part of the section and set the render callable of the fields to Null
         $this->specify_field('author_first_names', Null, Null, 'meta_data', 'author_data', array(), array($this, 'validate_array_of_at_most_1000_names'), array());
         $this->specify_field('author_last_names', Null, Null, 'meta_data', 'author_data', array(), array($this, 'validate_array_of_at_most_1000_names'), array());
+        $this->specify_field('author_orcids', Null, Null, 'meta_data', 'author_data', array(), array($this, 'validate_array_of_at_most_1000_orcids'), array());
         $this->specify_field('author_name_styles', Null, Null, 'meta_data', 'author_data', array(), array($this, 'validate_array_of_at_most_1000_name_styles'), array());
 
         $this->specify_section('funder_information', 'Funder information', array($this, 'render_funder_information'), 'meta_data', array($this, 'render_funder_information_summary')); # We render everything here as part of the section and set the render callable of the fields to Null
@@ -424,6 +425,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         $author_last_names = $this->get_field_value('author_last_names');
 
         echo '<p>Please help us identify which part(s) of the authors\' names belong to the first and which to their second name(s) as well as which part is their given name (e.g., in Chinese names, the given name comes after the family name, whereas in Spanish names, the given name is the first name and family names are the second names). We are aware that this format does not do justice to <a href="https://www.w3.org/International/questions/qa-personal-names">all common name styles around the world</a>, but names in this format are needed for the registration of DOIs with Crossref.</p>';
+        echo '<p>Entering ORCIDs is optional. You do not need to supply them if they are already contained in the source code of your paper (e.g., via the \\orcid{...} command). ORCIDs entered here take precedence over those found in the source code.</p>';
         echo '<div id="' . $this->plugin_name . '-' . $this->slug . '-author-list">';
         foreach($author_first_names as $x => $foo)
         {
@@ -434,6 +436,9 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
             echo '</div>';
             echo '<div style="float:left;">';
             $this->render_single_line_field('author_last_names[' . $x . ']', '', 'on', 'width:20em;max-width:100%;', 'Last name(s)', true, 'display:block;');
+            echo '</div>';
+            echo '<div style="float:left;">';
+            $this->render_single_line_field('author_orcids[' . $x . ']', '0000-0000-0000-0000', 'on', 'width:13em;max-width:100%;', 'ORCID (optional)', true, 'display:block;');
             echo '</div>';
 
             $this->render_select_field('author_name_styles[' . $x . ']', [
@@ -483,6 +488,39 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         echo '<p><button type="button" onclick="addAuthor()">Add author</button>';
         echo '<button type="button" onclick="removeAuthor()">Remove last author</button></p>';
 
+    }
+
+        /**
+         * Validate an array of at most 1000 ORCIDs.
+         *
+         * Strips a leading URL from each ORCID and checks its format and checksum.
+         *
+         * @since  0.4.0
+         * @access public
+         * @param  string  $id    The id of the field whose input is validated.
+         * @param  array   $input The input.
+         */
+    public function validate_array_of_at_most_1000_orcids( $id, $input ) {
+
+        $input = $this->validate_array_of_at_most_1000_names( $id, $input );
+
+        $result = array();
+        foreach($input as $key => $orcid)
+        {
+            $orcid = O3PO_Utility::normalize_orcid($orcid);
+            if($orcid !== '')
+            {
+                $check_result = O3PO_Utility::check_orcid($orcid);
+                if($check_result !== true)
+                {
+                    $this->add_error( $id . '[' . $key . ']', 'invalid-orcid', "The ORCID of author " . ($key+1) . " " . $check_result . ".", 'error');
+                    $orcid = '';
+                }
+            }
+            $result[$key] = $orcid;
+        }
+
+        return $result;
     }
 
         /**

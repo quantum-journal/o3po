@@ -179,7 +179,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
 			$affiliation_nums = isset( $_POST[ $post_type . '_reviewer_affiliations' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_reviewer_affiliations' ][$x] ) : 'western';
 			$affiliation_nums = trim( preg_replace("/[^,0-9]/u", "", $affiliation_nums ), ',');
 			$new_reviewer_affiliations[] = $affiliation_nums;
-			$new_reviewer_orcids[] = isset( $_POST[ $post_type . '_reviewer_orcids' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_reviewer_orcids' ][$x] ) : '';
+			$new_reviewer_orcids[] = isset( $_POST[ $post_type . '_reviewer_orcids' ][$x] ) ? O3PO_Utility::normalize_orcid( sanitize_text_field( $_POST[ $post_type . '_reviewer_orcids' ][$x] ) ) : '';
             $new_reviewer_urls[] = isset( $_POST[ $post_type . '_reviewer_urls' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_reviewer_urls' ][$x] ) : '';
 
             $new_reviewer_ages[] = isset( $_POST[ $post_type . '_reviewer_ages' ][$x] ) ? sanitize_text_field( $_POST[ $post_type . '_reviewer_ages' ][$x] ) : '';
