@@ -458,7 +458,15 @@ abstract class O3PO_PublicForm {
         global $wp_query;
 
         $wp_query->init();
-        $wp_query->query_vars = $wp_query->fill_query_vars( array() );
+        // the_post() reads these, but they are normally only set in WP_Query::get_posts(), which we bypass
+        $wp_query->query_vars = array_merge(
+            $wp_query->fill_query_vars( array() ),
+            array(
+                'fields'                 => 'all',
+                'update_post_term_cache' => true,
+                'update_post_meta_cache' => true,
+            )
+        );
         $wp_query->is_page       = TRUE;
         $wp_query->is_singular   = TRUE;
         $wp_query->is_home       = FALSE;
