@@ -542,6 +542,10 @@ class WP_Query
         return isset($this->query_vars['is_main']) ? $this->query_vars['is_main'] : false;
     }
 
+    function fill_query_vars( $query_vars ) {
+        return $query_vars;
+    }
+
     function init() {
 
     }
