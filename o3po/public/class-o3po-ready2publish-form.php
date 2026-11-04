@@ -306,7 +306,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
          * A non-empty caption requires that a featured image was uploaded.
          * The check is skipped when going back or uploading.
          *
-         * @since  0.4.0
+         * @since  0.5.1
          * @access public
          * @param  string $id    Id of the field
          * @param  string $input Input
@@ -531,7 +531,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
          *
          * Strips a leading URL from each ORCID and checks its format and checksum.
          *
-         * @since  0.4.0
+         * @since  0.5.1
          * @access public
          * @param  string  $id    The id of the field whose input is validated.
          * @param  array   $input The input.
