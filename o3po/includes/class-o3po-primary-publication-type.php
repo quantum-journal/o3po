@@ -269,10 +269,8 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
             }
             $old_author_orcids = static::get_post_meta_field_containing_array( $post_id, $post_type . '_author_orcids');
             $new_author_orcids = $parse_publication_source_result['author_orcids'];
-                // ORCIDs supplied by the authors via the ready2publish form take precedence over those in the source
-            $has_user_supplied_orcids = !empty(get_post_meta( $post_id, $post_type . '_ready2publish_storage_id', true));
             foreach($old_author_orcids as $key => $value)
-                if(!empty($value) and ($has_user_supplied_orcids or empty($new_author_orcids[$key])))
+                if(!empty($value) and empty($new_author_orcids[$key]))
                     $new_author_orcids[$key] = $value;
             $new_author_affiliations = $parse_publication_source_result['author_affiliations'];
             $new_affiliations = $parse_publication_source_result['affiliations'];
