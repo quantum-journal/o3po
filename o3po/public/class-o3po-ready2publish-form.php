@@ -316,6 +316,16 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
 
         $input = $this->trim_strip_tags($id, $input);
 
+        $page = $this->fields[$id]['page'];
+        $page_id_of_field = mb_substr($page, mb_strlen($this->plugin_name . '-' . $this->slug . ':'));
+        foreach($this->pages as $page_id => $page_info)
+        {
+            if($page_id === $page_id_of_field)
+                break;
+            elseif($page_id === $this->coming_from_page)
+                return $input;
+        }
+
         if($input !== '' and in_array($this->navigation, ['Next', 'Submit']))
         {
             $upload_result = $this->get_session_data('file_upload_result_featured_image_upload');
