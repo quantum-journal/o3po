@@ -546,7 +546,9 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
             $orcid = O3PO_Utility::normalize_orcid($orcid);
             if($orcid !== '')
             {
-                $check_result = O3PO_Utility::check_orcid($orcid);
+                $check_result = preg_match('/\A(?:[0-9]{4}-){3}[0-9]{3}[0-9X]\z/', $orcid) === 1
+                    ? O3PO_Utility::check_orcid($orcid)
+                    : 'is malformed';
                 if($check_result !== true)
                 {
                     $this->add_error( $id . '[' . $key . ']', 'invalid-orcid', "The ORCID of author " . ($key+1) . " " . $check_result . ".", 'error');
