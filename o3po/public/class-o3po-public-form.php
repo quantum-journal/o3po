@@ -871,7 +871,7 @@ abstract class O3PO_PublicForm {
         {
             if($name !== 'western' and $name !== 'eastern')
                 $name = 'western';
-            $result[$key] = $name;
+            $result[] = $name;
         }
 
         return $result;
