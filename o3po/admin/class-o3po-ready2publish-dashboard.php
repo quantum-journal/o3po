@@ -390,7 +390,7 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
                     $this->show_invoice($id);
                 break;
             default:
-                echo "unsupported action " . $action;
+                echo "unsupported action " . esc_html(is_string($action) ? $action : '');
         }
         exit();
     }

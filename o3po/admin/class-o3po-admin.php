@@ -176,7 +176,7 @@ class O3PO_Admin {
         $html .= '<h2>' . $this->get_plugin_pretty_name() .' meta-data explorer</h2>';
         $html .= '</div>';
 
-        if(isset( $_GET['tab'] ))
+        if(isset( $_GET['tab'] ) and is_string($_GET['tab']) and array_key_exists($_GET['tab'], $this->meta_data_explorer_tabs))
             $active_tab = $_GET['tab'];
         else
         {
@@ -184,8 +184,8 @@ class O3PO_Admin {
             $active_tab = key($this->meta_data_explorer_tabs);
         }
 
-        if(isset( $_GET['max_entries'] ))
-            $max_entries = $_GET['max_entries'];
+        if(isset( $_GET['max_entries'] ) and is_string($_GET['max_entries']) and preg_match('/^-?[0-9]+$/', $_GET['max_entries']))
+            $max_entries = intval($_GET['max_entries']);
         else
         {
             $max_entries = 10;
@@ -204,40 +204,40 @@ class O3PO_Admin {
             $html .= '<p>Here you can display and export some of the stored meta-data.</p>';
 
             $post_type_names = O3PO_PublicationType::get_active_publication_type_names();
-            if(isset( $_GET['post_type'] ))
+            if(isset( $_GET['post_type'] ) and is_string($_GET['post_type']) and in_array($_GET['post_type'], $post_type_names, true))
                 $post_type = $_GET['post_type'];
             else
                 $post_type = $post_type_names[0];
 
             $output_formats = $this->get_output_formats();
 
-            if(isset( $_GET['output_format'] ))
+            if(isset( $_GET['output_format'] ) and is_string($_GET['output_format']) and in_array($_GET['output_format'], $output_formats, true))
                 $output_format = $_GET['output_format'];
             else
                 $output_format = $output_formats[0];
 
-            if(isset( $_GET['meta_data_field_list'] ))
-                $meta_data_field_list = preg_split('/\s*,\s*/u', $_GET['meta_data_field_list'], -1, PREG_SPLIT_NO_EMPTY);
+            if(isset( $_GET['meta_data_field_list'] ) and is_string($_GET['meta_data_field_list']))
+                $meta_data_field_list = array_values(array_intersect(preg_split('/\s*,\s*/u', $_GET['meta_data_field_list'], -1, PREG_SPLIT_NO_EMPTY), array_keys($this->get_meta_data_field_map())));
             else
                 $meta_data_field_list = ['formated_authors', 'number_authors', 'title', 'corresponding_author_email'];
 
             $html .= '<form style="padding-right:1em; margin-bottom:1em;" method="get">';
             $html .= '<input type="hidden" name="page" value="' . $this->get_plugin_name() . '-meta-data-explorer' . '">';
-            $html .= '<input type="hidden" name="tab" value="' . $active_tab . '">';
+            $html .= '<input type="hidden" name="tab" value="' . esc_attr($active_tab) . '">';
 
             $html .= '<select name="post_type" id="post_type">';
 			foreach($post_type_names as $post_type_name)
-                $html .= '<option value="' . $post_type_name . '"' . ( ($post_type_name === $post_type) ? " selected" : "" ) . '>' . $post_type_name . '</option>';
+                $html .= '<option value="' . esc_attr($post_type_name) . '"' . ( ($post_type_name === $post_type) ? " selected" : "" ) . '>' . esc_html($post_type_name) . '</option>';
 			$html .= '</select><label for="post_type">Chose the type of publication</label><br />';
 
             $html .= '<select name="output_format" id="output_format">';
 			foreach($output_formats as $format)
-                $html .= '<option value="' . $format . '"' . ( ($output_format === $format) ? " selected" : "" ) . '>' . $format . '</option>';
+                $html .= '<option value="' . esc_attr($format) . '"' . ( ($output_format === $format) ? " selected" : "" ) . '>' . esc_html($format) . '</option>';
 			$html .= '</select><label for="output_format">Chose the output format</label><br />';
 
-            $html .= '<label for="' . 'max_entries' . '">Maximum number of entries (use -1 for unlimited):</label><br /><input name="max_entries" value="' . $max_entries . '">';
+            $html .= '<label for="' . 'max_entries' . '">Maximum number of entries (use -1 for unlimited):</label><br /><input name="max_entries" value="' . esc_attr($max_entries) . '">';
 
-            $html .= '<label for="' . 'meta_data_field_list' . '">Comma separated list of meta-data elements to export:</label><br /><input style="width:100%;" type="text" name="' . 'meta_data_field_list" id="' . 'meta_data_field_list" placeholder="' . '' . '" value="' . implode(', ', $meta_data_field_list) . '" />';
+            $html .= '<label for="' . 'meta_data_field_list' . '">Comma separated list of meta-data elements to export:</label><br /><input style="width:100%;" type="text" name="' . 'meta_data_field_list" id="' . 'meta_data_field_list" placeholder="' . '' . '" value="' . esc_attr(implode(', ', $meta_data_field_list)) . '" />';
             $html .= '<p>The available elements are (beware that not all of them will work for all publication types!):</p>';
             $html .= '<ul>';
             foreach(array_keys($this->get_meta_data_field_map()) as $field)
