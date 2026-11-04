@@ -39,6 +39,7 @@ class O3PO_Crossref {
          * @param    string   $crossref_id     The id for which to submit this upload.
          * @param    string   $crossref_pw     The password corresponding to the crossref_id.
          * @param    string   $crossref_url    The url of the crossref server to upload to.
+         * @return   array|WP_Error The HTTP response or an error from WordPress.
          */
     public static function remote_post_meta_data_to_crossref( $doi_batch_id, $crossref_xml, $crossref_id, $crossref_pw, $crossref_url ) {
 
@@ -92,7 +93,7 @@ class O3PO_Crossref {
          * @param    string   $doi             The doi for which cited-by data is to be retrieved.
          * @param    int      $storage_time    The maximal time for which to cache the response in a transient (default 600 seconds).
          * @param    int      $timeout         Maximum time to wait for a response (default 6 seconds).
-         * @return   mixed    Response of wp_remote_get() from Crossref or WP_Error.
+         * @return   array|WP_Error Response of wp_remote_get() from Crossref or a WordPress error.
          */
     private static function remote_get_cited_by( $crossref_url, $crossref_id, $crossref_pw, $doi, $storage_time=60*10, $timeout=10 ) {
 
@@ -124,6 +125,7 @@ class O3PO_Crossref {
          * @param    string   $crossref_id     The id for which to submit this upload.
          * @param    string   $crossref_pw     The password corresponding to the crossref_id.
          * @param    string   $doi             The doi for which cited-by data is to be retrieved.
+         * @return   SimpleXMLElement|WP_Error The cited-by XML body or an error.
          */
     public static function get_cited_by_xml_body( $crossref_url, $crossref_id, $crossref_pw, $doi ) {
 
@@ -171,7 +173,7 @@ class O3PO_Crossref {
          * @param    string   $crossref_id     The id for which to submit this upload.
          * @param    string   $crossref_pw     The password corresponding to the crossref_id.
          * @param    string   $doi             The doi for which cited-by data is to be retrieved.
-         * @return   array Array of bibentries citing the given DOI
+         * @return   array|WP_Error Bibentries citing the given DOI, or an error.
          *
          */
     public static function get_cited_by_bibentries( $crossref_url, $crossref_id, $crossref_pw, $doi ) {
@@ -246,7 +248,7 @@ class O3PO_Crossref {
          * @since    0.4.1
          * @access   public
          * @param    string   $title           The title of the work.
-         * @return   strong XML for registering a DOI at Crossref
+         * @return string XML for registering a DOI at Crossref.
          *
          */
     public static function generate_crossref_xml( $doi_batch_id, $timestamp, $title, $title_mathml, $abstract, $abstract_mathml, $number_authors, $author_given_names, $author_surnames, $author_name_styles, $author_orcids, $author_affiliations, $date_published, $pages, $doi, $affiliations, $journal, $volume, $parsed_bbl, $post_url, $pdf_pretty_permalink, $number_award_numbers, $award_numbers, $funder_identifiers, $funder_names, $crossref_crossmark_policy_page_doi, $email_address, $publisher, $eissn, $crossref_archive_locations, $journal_title, $journal_level_doi_suffix, $doi_prefix, $site_url, $orcid_url_prefix, $license_url ) {

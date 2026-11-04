@@ -135,7 +135,7 @@ trait O3PO_Form {
          *                                      and return a valid value for the field. Should
          *                                      call $this->add_error() to indicate problems.
          * @param string   $default  Default value for the field.
-         * @param  int      $max_length Maximum length of the value of the field.
+         * @param  int      $max_length Maximum length of the value of the field in characters (not bytes).
          */
     public function specify_field($id, $title, $callback, $page, $section, $args, $validation_callable, $default, $max_length=false ) {
 
@@ -361,6 +361,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @since   0.4.0
          * @acceess public
          * @param   boolean $include_fake_fields Whether to also include fake fields in the list.
+         * @return  array Field IDs mapped to their default values.
          */
     public function get_field_defaults( $include_fake_fields=false ) {
 
@@ -378,6 +379,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @since    0.4.0
          * @acceess  prublic
          * @param    int    $id     Id of the field.
+         * @return   string The title of the field.
          */
     public function get_field_title( $id ) {
 
@@ -415,6 +417,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @access   private
          * @param    string   $id    The field this was input to.
          * @param    string   $input User input.
+         * @return   string The trimmed DOI prefix, or the field default if invalid.
          */
     public function validate_doi_prefix( $id, $input ) {
 
@@ -433,6 +436,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @access private
          * @param  string  $id    The field this was input to.
          * @param  string  $input User input.
+         * @return string The trimmed DOI suffix, or the field default if invalid.
          */
     public function validate_doi_suffix( $id, $input ) {
 
@@ -451,6 +455,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @access   private
          * @param    string   $id    The field this was input to.
          * @param    string   $input User input.
+         * @return  string The four-digit year, or the field default if invalid.
          */
     public function validate_four_digit_year( $id, $input ) {
 
@@ -469,7 +474,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @access private
          * @param  string  $id    The field this was input to.
          * @param  string  $input User input.
-         * @return string  Valid issn or empty string.
+         * @return string A valid arXiv eprint identifier, or the field default if invalid.
          */
     public function validate_eprint( $id, $input ) {
 
@@ -505,6 +510,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @access   private
          * @param    string   $id    The field this was input to.
          * @param    string   $input    User input.
+         * @return   string The validated ISSN, or the field default if invalid.
          */
     public function validate_issn( $id, $input ) {
 
@@ -524,6 +530,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @access private
          * @param  string  $id    The field this was input to.
          * @param  string  $input User input.
+         * @return string The validated email address, or the field default if invalid.
          */
     public function validate_email( $id, $input ) {
 
@@ -542,6 +549,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @access   private
          * @param    string   $id    The field this was input to.
          * @param    string   $input    User input.
+         * @return   string The sanitized URL, or the field default if invalid.
          */
     public function validate_url( $id, $input ) {
 
@@ -578,6 +586,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @access   private
          * @param    string   $id    The field this was input to.
          * @param    string   $input    User input.
+         * @return   array The trimmed values from the comma-separated list.
          */
     public function validate_array_as_comma_separated_list( $id, $input ) {
 
@@ -602,6 +611,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @access   private
          * @param    string   $id    The field this was input to.
          * @param    string   $input    User input.
+         * @return   string The two-letter country code, or the field default if invalid.
          */
     public function validate_two_letter_country_code( $id, $input ) {
 
@@ -621,6 +631,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @access   private
          * @param    string   $id    The field this was input to.
          * @param    string   $input    User input.
+         * @return   string The positive integer string, or the field default if invalid.
          */
     public function validate_positive_integer( $id, $input ) {
 
@@ -639,6 +650,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @access   private
          * @param    string   $id    The field this was input to.
          * @param    string   $input    User input.
+         * @return   string The non-negative euro amount, or the field default if invalid.
          */
     public function validate_non_negative_euros( $id, $input ) {
 
@@ -657,6 +669,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @access   private
          * @param    string   $id    The field this was input to.
          * @param    string   $input    User input.
+         * @return   string The non-negative decimal string, or the field default if invalid.
          */
     public function validate_non_negative_float( $id, $input ) {
 
@@ -675,6 +688,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @access private
          * @param  string  $id    The id of the field whose input is validated.
          * @param  array   $input The input.
+         * @return array The sanitized names, limited to 1000 entries.
          */
     public function validate_array_of_at_most_1000_names( $id, $input ) {
 
@@ -689,7 +703,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
         foreach($input as $key => $name)
         {
             if($this->fields[$id]['max_length'] !== false)
-                $this_name = substr($name, 0, $this->fields[$id]['max_length']);
+                $this_name = mb_substr($name, 0, $this->fields[$id]['max_length'], 'UTF-8');
             else
                 $this_name = $name;
             $this_name = strip_tags($this_name);
@@ -707,6 +721,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @access private
          * @param  string  $id    The id of the field whose input is validated.
          * @param  array   $input The input.
+         * @return array The validated UUIDs, or an empty array if validation fails.
          */
     public function validate_array_of_at_most_1000_uuidv4s( $id, $input ) {
 
@@ -744,6 +759,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @access private
          * @param  string  $id    The id of the field whose input is validated.
          * @param  array   $input The input.
+         * @return array The validated roles, limited to 1000 entries.
          */
     public function validate_array_of_at_most_1000_roles( $id, $input ) {
 
@@ -771,6 +787,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @access private
          * @param  string  $id    The id of the field whose input is validated.
          * @param  array   $input The input.
+         * @return array The validated four-digit years, limited to 1000 entries.
          */
     public function validate_array_of_at_most_1000_years( $id, $input ) {
 
@@ -806,6 +823,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @access private
          * @param  string  $id    The id of the field whose input is validated.
          * @param  array   $input The input.
+         * @return array The validated years or empty strings, limited to 1000 entries.
          */
     public function validate_array_of_at_most_1000_years_or_empty( $id, $input ) {
 
@@ -841,6 +859,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @access private
          * @param  string  $id    The id of the field whose input is validated.
          * @param  array   $input The input.
+         * @return array The sanitized URLs, limited to 1000 entries.
          */
     public function validate_array_of_at_most_1000_urls( $id, $input ) {
 
@@ -868,6 +887,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @access private
          * @param  string  $id    The id of the field whose input is validated.
          * @param  array   $input The input.
+         * @return array The sanitized URLs or empty strings, limited to 1000 entries.
          */
     public function validate_array_of_at_most_1000_urls_or_empty( $id, $input ) {
 
@@ -898,6 +918,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @access private
          * @param  string  $id    The id of the field whose input is validated.
          * @param  array   $input The input.
+         * @return array The validated checkbox values, or the field default if input is not an array.
          */
     public function validate_array_of_at_most_1000_checked_or_unchecked( $id, $input ) {
 
@@ -925,6 +946,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @access   private
          * @param    string   $id    The field this was input to.
          * @param    string   $input    User input.
+         * @return   string The checked state, or the field default if invalid.
          */
     public function checked_or_unchecked( $id, $input ) {
 
@@ -942,6 +964,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @access   private
          * @param    string   $id    The field this was input to.
          * @param    string   $input    User input.
+         * @return   string The accepted role, or the field default if invalid.
          */
     public function validate_role( $id, $input ) {
 
@@ -966,6 +989,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @access public
          * @param  string $id    The field this was input to.
          * @param  string $input User input.
+         * @return string The checked value, or the field default if it is not checked.
          */
     public function checked( $id, $input ) {
 
@@ -984,6 +1008,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @access   private
          * @param    string   $id    The field this was input to.
          * @param    string   $input    User input.
+         * @return   string The trimmed input.
          */
     public function trim( $id, $input ) {
 
@@ -997,6 +1022,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @access   private
          * @param    string   $id    The field this was input to.
          * @param    string   $input    User input.
+         * @return   string The trimmed input with HTML tags removed.
          */
     public function trim_strip_tags( $id, $input ) {
 
@@ -1015,6 +1041,7 @@ MathJax.Hub.Queue(["Typeset", MathJax.Hub, target]);
          * @access   private
          * @param    string   $id    The field this was input to.
          * @param    string   $input    User input.
+         * @return   string The input unchanged.
          */
     public function leave_unchanged( $id, $input ) {
 

@@ -158,6 +158,7 @@ class O3PO_Settings extends O3PO_Singleton {
          * @since   0.4.1 If $id is of the form foo[bar] and a field of that name does not exist then an attempt is made to return index bar of field foo.
          * @acceess prublic
          * @param   int     $id Id of the field.
+         * @return mixed The configured value of the field.
          */
     public function get_field_value( $id ) {
 
@@ -181,7 +182,7 @@ class O3PO_Settings extends O3PO_Singleton {
             if($this->fields[$id]['max_length'] === false)
                 return $fields[$id];
             else
-                return substr($fields[$id], 0, $this->fields[$id]['max_length']);
+                return mb_substr($fields[$id], 0, $this->fields[$id]['max_length'], 'UTF-8');
         else
             return $this->get_field_default($id);
     }
@@ -1436,6 +1437,7 @@ class O3PO_Settings extends O3PO_Singleton {
          * @access   private
          * @param    string   $id    The field this was input to.
          * @param    string   $input    User input.
+         * @return   string The trimmed value, or the field default if the value is empty.
          */
     public function trim_ensure_not_empty_and_schedule_flush_rewrite_rules_if_changed( $id, $input ) {
 
@@ -1498,6 +1500,7 @@ class O3PO_Settings extends O3PO_Singleton {
          *
          * @since 0.3.0
          * @access public
+         * @return string The human-readable plugin name.
          */
     public function get_plugin_pretty_name() {
 

@@ -104,6 +104,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         $this->specify_section('author_data', 'Authors', array($this, 'render_author_data'), 'meta_data', array($this, 'render_author_data_summary')); # We render everything here as part of the section and set the render callable of the fields to Null
         $this->specify_field('author_first_names', Null, Null, 'meta_data', 'author_data', array(), array($this, 'validate_array_of_at_most_1000_names'), array());
         $this->specify_field('author_last_names', Null, Null, 'meta_data', 'author_data', array(), array($this, 'validate_array_of_at_most_1000_names'), array());
+        $this->specify_field('author_orcids', Null, Null, 'meta_data', 'author_data', array(), array($this, 'validate_array_of_at_most_1000_orcids'), array());
         $this->specify_field('author_name_styles', Null, Null, 'meta_data', 'author_data', array(), array($this, 'validate_array_of_at_most_1000_name_styles'), array());
 
         $this->specify_section('funder_information', 'Funder information', array($this, 'render_funder_information'), 'meta_data', array($this, 'render_funder_information_summary')); # We render everything here as part of the section and set the render callable of the fields to Null
@@ -118,7 +119,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
 
         $this->specify_field('popular_summary', 'Popular summary', array( $this, 'render_popular_summary' ), 'dissemination', 'dissemination_material', array(), array($this, 'trim_strip_tags'), '');
         $this->specify_field('featured_image_upload', 'Featured image', array( $this, 'render_featured_image_upload' ), 'dissemination', 'dissemination_material', array(), array($this, 'validate_featured_image_upload'), '');
-        $this->specify_field('featured_image_caption', 'Featured image caption', array( $this, 'render_featured_image_caption' ), 'dissemination', 'dissemination_material', array(), array($this, 'trim_strip_tags'), '');
+        $this->specify_field('featured_image_caption', 'Featured image caption', array( $this, 'render_featured_image_caption' ), 'dissemination', 'dissemination_material', array(), array($this, 'validate_featured_image_caption'), '');
         $this->specify_field('dissemination_multimedia', 'Multi media', array( $this, 'render_dissemination_multimedia' ), 'dissemination', 'dissemination_material', array(), array($this, 'trim_strip_tags'), '');
 
             /* We are phasing out support for Fermat's Libray */
@@ -300,6 +301,42 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
     }
 
         /**
+         * Validate the featured image caption
+         *
+         * A non-empty caption requires that a featured image was uploaded.
+         * The check is skipped when going back or uploading.
+         *
+         * @since  0.5.1
+         * @access public
+         * @param  string $id    Id of the field
+         * @param  string $input Input
+         * @return string The trimmed caption without tags.
+         */
+    public function validate_featured_image_caption( $id, $input ) {
+
+        $input = $this->trim_strip_tags($id, $input);
+
+        $page = $this->fields[$id]['page'];
+        $page_id_of_field = mb_substr($page, mb_strlen($this->plugin_name . '-' . $this->slug . ':'));
+        foreach($this->pages as $page_id => $page_info)
+        {
+            if($page_id === $page_id_of_field)
+                break;
+            elseif($page_id === $this->coming_from_page)
+                return $input;
+        }
+
+        if($input !== '' and in_array($this->navigation, ['Next', 'Submit']))
+        {
+            $upload_result = $this->get_session_data('file_upload_result_featured_image_upload');
+            if(empty($upload_result['file']))
+                $this->add_error($id, 'caption-without-image', "You provided a caption for the featured image but did not upload an image. Please upload the image or remove the caption.", 'error');
+        }
+
+        return $input;
+    }
+
+        /**
          * Validate the provided acceptance code
          *
          * @since  0.4.0
@@ -424,6 +461,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         $author_last_names = $this->get_field_value('author_last_names');
 
         echo '<p>Please help us identify which part(s) of the authors\' names belong to the first and which to their second name(s) as well as which part is their given name (e.g., in Chinese names, the given name comes after the family name, whereas in Spanish names, the given name is the first name and family names are the second names). We are aware that this format does not do justice to <a href="https://www.w3.org/International/questions/qa-personal-names">all common name styles around the world</a>, but names in this format are needed for the registration of DOIs with Crossref.</p>';
+        echo '<p>Entering ORCIDs is optional. You do not need to supply them if they are already contained in the source code of your paper (e.g., via the \\orcid{...} command). ORCIDs found in the source code take precedence over those entered here.</p>';
         echo '<div id="' . $this->plugin_name . '-' . $this->slug . '-author-list">';
         foreach($author_first_names as $x => $foo)
         {
@@ -434,6 +472,9 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
             echo '</div>';
             echo '<div style="float:left;">';
             $this->render_single_line_field('author_last_names[' . $x . ']', '', 'on', 'width:20em;max-width:100%;', 'Last name(s)', true, 'display:block;');
+            echo '</div>';
+            echo '<div style="float:left;">';
+            $this->render_single_line_field('author_orcids[' . $x . ']', '0000-0000-0000-0000', 'on', 'width:13em;max-width:100%;', 'ORCID (optional)', true, 'display:block;');
             echo '</div>';
 
             $this->render_select_field('author_name_styles[' . $x . ']', [
@@ -483,6 +524,41 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
         echo '<p><button type="button" onclick="addAuthor()">Add author</button>';
         echo '<button type="button" onclick="removeAuthor()">Remove last author</button></p>';
 
+    }
+
+        /**
+         * Validate an array of at most 1000 ORCIDs.
+         *
+         * Strips a leading URL from each ORCID and checks its format and checksum.
+         *
+         * @since  0.5.1
+         * @access public
+         * @param  string  $id    The id of the field whose input is validated.
+         * @param  array   $input The input.
+         */
+    public function validate_array_of_at_most_1000_orcids( $id, $input ) {
+
+        $input = $this->validate_array_of_at_most_1000_names( $id, $input );
+
+        $result = array();
+        foreach($input as $key => $orcid)
+        {
+            $orcid = O3PO_Utility::normalize_orcid($orcid);
+            if($orcid !== '')
+            {
+                $check_result = preg_match('/\A(?:[0-9]{4}-){3}[0-9]{3}[0-9X]\z/', $orcid) === 1
+                    ? O3PO_Utility::check_orcid($orcid)
+                    : 'is malformed';
+                if($check_result !== true)
+                {
+                    $this->add_error( $id . '[' . $key . ']', 'invalid-orcid', "The ORCID of author " . ($key+1) . " " . $check_result . ".", 'error');
+                    $orcid = '';
+                }
+            }
+            $result[$key] = $orcid;
+        }
+
+        return $result;
     }
 
         /**
@@ -935,6 +1011,7 @@ while(nextSibling) {
          *
          * @since    0.4.0
          * @access   public
+         * @return string HTML summary of funder information.
          */
     public function render_funder_information_summary() {
 
@@ -955,6 +1032,7 @@ while(nextSibling) {
          *
          * @since    0.4.0
          * @access   public
+         * @return string HTML summary of author names.
          */
     public function render_author_data_summary() {
 
@@ -975,6 +1053,7 @@ while(nextSibling) {
          * @access public
          * @param  string $id    Id of the field
          * @param  string $input Input
+         * @return string The accepted payment method, or the field default if invalid.
          */
     public function one_of_invoice_noinvoice_waiver( $id, $input ) {
 
@@ -993,6 +1072,7 @@ while(nextSibling) {
          * @access public
          * @param  string $id    Id of the field
          * @param  string $input Input
+         * @return string The trimmed input, or the field default when it is empty.
          */
     public function non_empty_if_payment_method_is_invoice_and_on_or_past_containing_page( $id, $input ) {
 

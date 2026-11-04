@@ -22,6 +22,19 @@ class O3PO_Utility
 {
 
         /**
+         * Strip a leading URL prefix (e.g. https://orcid.org/) and
+         * surrounding whitespace from an ORCID.
+         *
+         * @since    0.3.1
+         * @access   public
+         * @param    string     $orcid   ORCID, possibly given as full URL
+         * */
+    static public function normalize_orcid( $orcid ) {
+
+        return preg_replace( '#^https?://[^/]+/#iu', '', trim( (string)$orcid ) );
+    }
+
+        /**
          * Check that the given ORCID is well formated.
          *
          * Verifies whether the given ORCID has a valid checksum.
@@ -32,6 +45,7 @@ class O3PO_Utility
          * @since    0.1.0
          * @access   public
          * @param    string     $orcid   ORCID to check
+         * @return bool|string True if valid, otherwise a description of the validation failure.
          * */
     static public function check_orcid( $orcid ) {
 
@@ -67,6 +81,7 @@ class O3PO_Utility
          * @param    string    $str          String representation of the number to covert.
          * @param    int       $frombase     Base the input number is represented in.
          * @param    int       $tobase       Base to with the number is to be converted.
+         * @return string The number represented in the target base.
          * */
     static public function base_convert_arbitrary_precision( $str, $frombase, $tobase ) {
 
@@ -118,6 +133,7 @@ class O3PO_Utility
          * @since    0.1.0
          * @access   public
          * @param    string    $text    Text from which stopwords are to be removed.
+         * @return string The text with stopwords removed.
          * */
     static public function remove_stopwords( $text ) {
 
@@ -134,6 +150,7 @@ class O3PO_Utility
          * @since    0.1.0
          * @access   public
          * @param    array    $array   Array of strings to be imploded with Oxford commas.
+         * @return string The values joined using Oxford comma punctuation.
          * */
     static public function oxford_comma_implode( $array ) {
 
@@ -166,6 +183,7 @@ class O3PO_Utility
          * @since    0.1.0
          * @access   public
          * @param    string    $string     String in which slashes are to be made breakable.
+         * @return string The text with a zero-width space after each slash.
          * */
     static public function make_slash_breakable_html( $string ) {
         $zero_width_space = html_entity_decode('&#8203;', 0, 'UTF-8');
@@ -297,7 +315,7 @@ class O3PO_Utility
          * Code is taken from https://stackoverflow.com/a/15875555
          *
          * @since  0.4.3
-         * @return string A v4 UUID
+         * @return string A UUIDv4 string.
          */
     public static function uuidv4() {
         $data = random_bytes(16);
@@ -312,7 +330,7 @@ class O3PO_Utility
          * Validate v4 UUID
          *
          * @since  0.4.3
-         * @return string A v4 UUID
+         * @return bool Whether the input is a valid UUIDv4.
          */
     public static function valid_uuidv4($uuid) {
         return preg_match('/\A[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\z/iu', $uuid) === 1;

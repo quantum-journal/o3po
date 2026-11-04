@@ -83,6 +83,7 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
         'author_given_names',
         'author_surnames',
         'author_name_styles',
+        'author_orcids',
         'number_award_numbers',
         'award_numbers',
         'funder_names',
@@ -167,6 +168,7 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
          * @access   public
          * @param   int    $id                The id of the manuscript
          * @param   string $action            The action appropriate for this entry, e.g., 'continue' or 'publish'
+         * @return string The rendered manuscript list item.
          */
     public function render_manuscript_entry( $id, $action ) {
 
@@ -242,6 +244,7 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
          * @since    0.4.0
          * @access   public
          * @param   int    $id                The id of the manuscript
+         * @return int|WP_Error|null The new post ID, an insertion error, or null when insertion is skipped.
          */
     public function insert_post( $id ) {
 
@@ -354,6 +357,7 @@ class O3PO_Ready2PublishDashboard implements O3PO_SettingsSpecifyer {
          * @param   bool            $bool                Whether or not to parse the request.
          * @param   WP              $wp                  Current WordPress environment instance.
          * @param   array|string    $extra_query_vars    Extra passed query variables.
+         * @return bool Whether WordPress should parse the request when it is not handled by this endpoint.
          */
     public function do_parse_request( $bool, $wp, $extra_query_vars ) {
 

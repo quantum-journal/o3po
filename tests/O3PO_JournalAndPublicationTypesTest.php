@@ -716,6 +716,31 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         $this->assertFalse(strpos('Exception while downloading the source', $validation_result));
     }
 
+        /**
+         * @runInSeparateProcess
+         * @preserveGlobalState disabled
+         */
+    public function test_source_orcids_override_ready2publish_orcids() {
+
+        $this->test_initialize_settings();
+        $settings = O3PO_SettingsTest::get_settings();
+        $journal = O3PO::setup_primary_journal($settings);
+        $environment = new O3PO_Environment($settings->get_field_value('production_site_url'));
+        $primary_publication_type = new O3PO_PrimaryPublicationType($journal, $environment);
+
+        $post_id = 1;
+        $post_type = get_post_type($post_id);
+        update_post_meta($post_id, $post_type . '_ready2publish_storage_id', 1);
+        update_post_meta($post_id, $post_type . '_author_orcids', ['0000-0002-1483-5661', '']);
+
+        $class = new ReflectionClass('O3PO_PrimaryPublicationType');
+        $method = $class->getMethod('validate_and_process_data');
+        $method->setAccessible(true);
+        $method->invokeArgs($primary_publication_type, array($post_id));
+
+        $this->assertSame(['0000-0003-0290-4698'], get_post_meta($post_id, $post_type . '_author_orcids', true));
+    }
+
 
         /**
          * @runInSeparateProcess

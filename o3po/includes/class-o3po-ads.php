@@ -35,7 +35,7 @@ class O3PO_Ads {
          * @param string $eprint                  Eprint for which cited-by information is to be retrieved.
          * @param string (optional) $storage_time Time for which to store the response in a transient.
          * @param string (optional) $timeout      Maximal time to wait for a response from ADS.
-         * @return mixed Json encoded cited-by information or a WP_Error in case of an error.
+         * @return mixed Decoded JSON data, an empty array for an empty eprint, or a WP_Error.
          */
     private static function get_cited_by_json( $ads_api_search_url, $api_token, $eprint, $storage_time=60*60*12, $timeout=6 ) {
 
@@ -79,6 +79,7 @@ class O3PO_Ads {
          * @param string $ads_api_search_url      ADS api url.
          * @param array $bibcodes                 Bibcodes for which to construct the query url.
          * @param int $max_number_of_citations    Maximal number of citations to return.
+         * @return string ADS query URL for the requested bibcodes.
          */
     private static function bibcodes_to_query_url( $ads_api_search_url, $bibcodes, $max_number_of_citations ) {
 
@@ -106,7 +107,7 @@ class O3PO_Ads {
          * @param string (optional) $storage_time Time for which to store the response from ADS in a transient.
          * @param int $max_number_of_citations    Maximal number of citations to return.
          * @param string (optional) $timeout      Maximal time to wait for a response from ADS.
-         * @return mixed Cited-by information as an array of O3PO_Bibentries or WP_Error
+         * @return array|WP_Error Cited-by entries, or an error from ADS.
          */
     public static function get_cited_by_bibentries( $ads_api_search_url, $api_token, $eprint, $storage_time=60*60*12, $max_number_of_citations=1000, $timeout=10 ) {
 

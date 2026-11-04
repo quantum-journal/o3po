@@ -86,7 +86,7 @@ abstract class O3PO_PublicForm {
          * @access   private
          * @var      string   $navigation One of 'Next', 'Back', 'Submit', or 'Upload'
          */
-    private $navigation = false;
+    protected $navigation = false;
 
         /**
          * Whether the form was submitted successfully
@@ -166,7 +166,7 @@ abstract class O3PO_PublicForm {
                 $sanitized_value = $this->get_field_default($id);
 
             if($field_options['max_length'] !== false)
-                $sanitized_value = substr($sanitized_value, 0, $field_options['max_length']);
+                $sanitized_value = mb_substr($sanitized_value, 0, $field_options['max_length'], 'UTF-8');
             $this->field_values[$id] = call_user_func($this->fields[$id]['validation_callable'], $id, $sanitized_value);
         }
         if($this->navigation === 'Upload' and count($this->errors) === 0)
@@ -246,6 +246,7 @@ abstract class O3PO_PublicForm {
          *
          * @since  0.4.0
          * @access public
+         * @return string The rendered form content or submission message.
          */
     public function handle_form_data_and_produce_content() {
 
@@ -377,6 +378,7 @@ abstract class O3PO_PublicForm {
          * @param   bool   $bool        Whether or not to parse the request.
          * @param   WP     $wp          Current WordPress environment instance.
          * @param   bool   $do_not_exit Whether to exit after parsing the request. Can be set to false for testing only.
+         * @return  bool|null The original filter value when not handled, or null after handling without exiting.
          * */
     public function do_parse_request( $bool, $wp, $do_not_exit=False ) {
 
@@ -417,6 +419,7 @@ abstract class O3PO_PublicForm {
          * @access public
          * @param  string $title   Title of the post
          * @param  string $content Content of the post
+         * @return WP_Post A synthetic page post containing the supplied title and content.
          */
     private function make_post( $title, $content ) {
         $post = new WP_Post((object) array(
@@ -458,6 +461,15 @@ abstract class O3PO_PublicForm {
         global $wp_query;
 
         $wp_query->init();
+        // the_post() reads these, but they are normally only set in WP_Query::get_posts(), which we bypass
+        $wp_query->query_vars = array_merge(
+            $wp_query->fill_query_vars( array() ),
+            array(
+                'fields'                 => 'all',
+                'update_post_term_cache' => true,
+                'update_post_meta_cache' => true,
+            )
+        );
         $wp_query->is_page       = TRUE;
         $wp_query->is_singular   = TRUE;
         $wp_query->is_home       = FALSE;
@@ -523,6 +535,7 @@ abstract class O3PO_PublicForm {
          * @since   0.4.0
          * @acceess prublic
          * @param   int     $id Id of the field.
+         * @return  mixed The submitted value of the field.
          */
     public function get_field_value( $id ) {
 
@@ -530,7 +543,7 @@ abstract class O3PO_PublicForm {
         {
             $array = $matches[1];
             $key = $matches[2];
-            return $this->field_values[$array][$key];
+            return isset($this->field_values[$array][$key]) ? $this->field_values[$array][$key] : '';
         }
         else
             return $this->field_values[$id];
@@ -593,7 +606,7 @@ abstract class O3PO_PublicForm {
          *
          * @since  0.4.0
          * @param  int   $id Id to validate
-         * @return mixed Session id or False if invalid.
+         * @return string|false Session ID if valid, or false otherwise.
          */
     public function validate_session_id( $id ) {
 
@@ -685,6 +698,7 @@ abstract class O3PO_PublicForm {
          * @param  string $field      The field to set.
          * @param  mixed  $value      The value to set.
          * @param  string $session_id The session id for which to set the field.
+         * @return false|null False if the session data cannot be updated; otherwise no value is returned.
          */
     protected function put_session_data( $field, $value, $session_id=Null )
     {
@@ -709,6 +723,7 @@ abstract class O3PO_PublicForm {
          * @param  string $field      The field to get.
          * @param  mixed  $default    The default value in case the field is not set.
          * @param   string $session_id The session id for which to get the field.
+         * @return mixed The stored session value, or the supplied default.
          */
     protected function get_session_data( $field, $default=Null, $session_id=Null ) {
 
@@ -772,6 +787,7 @@ abstract class O3PO_PublicForm {
          *
          * @since  0.4.0
          * @access protected
+         * @return array Attachment IDs keyed by their upload field IDs.
          */
     protected function add_sideloaded_files_to_media_library() {
 
@@ -825,8 +841,9 @@ abstract class O3PO_PublicForm {
         $sideloaded_files = $this->get_session_data('sideloaded_files', array(), $session_id);
         foreach($sideloaded_files as $sideloaded_file)
         {
-            if(file_exists($sideloaded_file))
-                unlink($sideloaded_file);
+            $path = is_array($sideloaded_file) ? ($sideloaded_file['file'] ?? null) : $sideloaded_file;
+            if(is_string($path) && file_exists($path))
+                unlink($path);
         }
 
     }
@@ -838,6 +855,7 @@ abstract class O3PO_PublicForm {
          * @access private
          * @param  string  $id    The id of the field whose input is validated.
          * @param  array   $input The input.
+         * @return array The validated name styles, limited to 1000 entries.
          */
     public function validate_array_of_at_most_1000_name_styles( $id, $input ) {
 
@@ -908,6 +926,7 @@ abstract class O3PO_PublicForm {
          * @access public
          * @param  string $id    The field this was input to.
          * @param  string $input User input.
+         * @return string The checked value or the field default if the input is invalid.
          */
     public function checked_if_on_or_past_containing_page_unless_back_or_upload( $id, $input ) {
 

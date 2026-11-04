@@ -68,7 +68,7 @@ class O3PO_Arxiv {
             $html = static::get_abstract_page_html( $arxiv_url_abs_prefix, $eprint, $timeout );
 
             $dom = new DOMDocument;
-            @$dom->loadHTML($html);
+            @$dom->loadHTML('<?xml encoding="UTF-8">' . $html);
             $x_path = new DOMXPath($dom);
 
             $arxiv_abs_page_url = $arxiv_url_abs_prefix . $eprint;
@@ -170,7 +170,7 @@ class O3PO_Arxiv {
             $html = static::get_abstract_page_html($arxiv_url_abs_prefix, $eprint_without_version, $timeout);
 
             $dom = new DOMDocument;
-            @$dom->loadHTML($html);
+            @$dom->loadHTML('<?xml encoding="UTF-8">' . $html);
             $x_path = new DOMXPath($dom);
 
             $arxiv_fetch_results = '';
@@ -230,7 +230,7 @@ class O3PO_Arxiv {
          * @param  string            $eprint                       The eprint whose source is to be downloaded
          * @param  string            $file_name_without_extension  The desired filename without extension of the local file after the download.
          * @param  int               $post_id                      Id of the post to which to attach the download.
-         * @return mixed             Returns a map with information on the downloaded file. See O3PO_Environment for more details.
+         * @return array Upload details, or an array containing an error message.
          */
     public static function download_pdf( $environment, $arxiv_url_pdf_prefix, $eprint, $file_name_without_extension, $post_id ) {
 
@@ -253,7 +253,7 @@ class O3PO_Arxiv {
          * @param  string            $eprint                       The eprint whose source is to be downloaded
          * @param  string            $file_name_without_extension  The desired filename without extension of the local file after the download.
          * @param  int               $post_id                      Id of the post to which to attach the download.
-         * @return mixed             Returns a map with information on the downloaded file. See O3PO_Environment for more details.
+         * @return array Upload details, or an array containing an error message.
          */
     public static function download_source( $environment, $arxiv_url_source_prefix, $eprint, $file_name_without_extension, $post_id ) {
 
@@ -282,7 +282,7 @@ class O3PO_Arxiv {
 
             $html = $response['body'];
             $dom = new DOMDocument;
-            @$dom->loadHTML($html);
+            @$dom->loadHTML('<?xml encoding="UTF-8">' . $html);
             $x_path = new DOMXPath($dom);
             $date = -1;
             $arxiv_submission_history = $x_path->query("(/html/body//div[@class='submission-history']/b[last()]/following-sibling::text() | /html/body//div[@class='submission-history']/strong[last()]/following-sibling::text())");
