@@ -172,6 +172,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
          * @since    0.1.0
          * @access   protected
          * @param    int          $post_id   The id of the post whose meta-data is to be validated and processed.
+         * @return   string Validation messages produced while processing the publication.
          */
     protected function validate_and_process_data( $post_id ) {
 
@@ -356,6 +357,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
          * @since     0.1.0
          * @acesss    public
          * @param     int     $post_id     Id of the post whose meta data is to be saved.
+         * @return    string Status and error messages from adding licensing metadata.
          */
     public function add_licensing_information_to_last_pdf_from_arxiv( $post_id ) {
 
@@ -425,6 +427,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
          * @since     0.1.0
          * @access    public
          * @param     int     $post_id     Id of the post that is actually published publicly.
+         * @return    string Validation and publication status messages.
          */
     protected function on_post_actually_published( $post_id ) {
 
@@ -592,6 +595,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
          * @since     0.1.0
          * @access    public
          * @param     int     $post_id     Id of the post.
+         * @return    string HTML link to the publication volume.
          */
     public static function get_formated_volume_html( $post_id ) {
 
@@ -827,6 +831,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
          * @since     0.1.0
          * @access    public
          * @param     int     $post_id     Id of the post.
+         * @return    string|false URL of the latest attached arXiv PDF, or false if unavailable.
          */
     public function get_last_arxiv_pdf_url( $post_id ) {
 
@@ -849,6 +854,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
          * @since     0.1.0
          * @access    public
          * @param     int     $post_id     Id of the post.
+         * @return    string|false Path of the latest attached arXiv PDF, or false if unavailable.
          */
     public static function get_last_arxiv_pdf_path( $post_id ) {
         $post_type = get_post_type($post_id);
@@ -872,6 +878,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
          * @since 0.2.0
          * @access    public
          * @param     int     $post_id     Id of the post.
+         * @return    string|false Path of the latest attached arXiv PDF, or false if unavailable.
          */
     public function get_fulltext_pdf_path( $post_id ) {
 
@@ -884,6 +891,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
          * @since     0.1.0
          * @access    public
          * @param     int     $post_id     Id of the post.
+         * @return    string|false URL of the latest attached arXiv source, or false if unavailable.
          */
     protected static function get_last_arxiv_source_url( $post_id ) {
         $post_type = get_post_type($post_id);
@@ -905,6 +913,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
          * @since     0.1.0
          * @access    public
          * @param     int     $post_id     Id of the post.
+         * @return    bool Whether the Fermat's Library permalink is available.
          */
     public static function show_fermats_library_permalink( $post_id ) {
 
@@ -936,6 +945,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
          * @since     0.1.0
          * @access    public
          * @param     string     $content     Content to be ammended.
+         * @return    string The RSS content for the post.
          */
     public function get_feed_content( $content ) {
 
@@ -973,7 +983,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
          * @since 0.3.1
          * @access public
          * @param int $post_id The ID of the post.
-         * @return The basis for the text of the excerpt.
+         * @return string The basis for the text of the excerpt.
          */
     public function get_basis_for_excerpt( $post_id ) {
 
@@ -996,6 +1006,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
          * @since     0.1.0
          * @access    public
          * @param     int     $post_id     Id of the post.
+         * @return    string The PDF permalink, or an empty string if no PDF is attached.
          */
     public function get_pdf_pretty_permalink( $post_id ) {
 
@@ -1313,6 +1324,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
          * @access  private
          * @param   string     $path_source    Path to the source file.
          * @param   string     $mime_type      Mime type of the source file.
+         * @return  array Parsed metadata and validation messages from the source files.
          */
     private function parse_publication_source( $path_source, $mime_type )
     {
@@ -1573,6 +1585,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
          * @since     0.1.0
          * @access    public
          * @param     string    $content     Content to be filtered.
+         * @return    string The rendered publication content.
          */
     public function get_the_content( $content ) {
 
@@ -1756,6 +1769,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
          * @since    0.4.1+
          * @access   public
          * @param    int    $post_id     Id of the post.
+         * @return   string Warning markup about newer arXiv versions.
          */
     public function get_newer_arxiv_version_warning( $post_id ) {
 
@@ -1814,6 +1828,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
          * @since    0.3.0
          * @access   public
          * @param    int    $post_id    The id of the post for which to get the eprint.
+         * @return   string The post's arXiv eprint identifier.
          */
     public static function get_eprint( $post_id ) {
 
@@ -1828,6 +1843,7 @@ class O3PO_PrimaryPublicationType extends O3PO_PublicationType {
          * @since    0.3.0
          * @access   public
          * @param    int    $post_id    The id of the post for which to get the arXiv upload date.
+         * @return   int|string|WP_Error The cached or newly fetched upload timestamp, or an error from arXiv.
          */
     public function get_arxiv_upload_date( $post_id ) {
 

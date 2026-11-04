@@ -78,6 +78,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          *
          * @since    0.1.0
          * @access   public
+         * @return   array Categories associated with this publication type.
          */
     public static function get_associated_categories() {
 
@@ -220,6 +221,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @since    0.1.0
          * @access   protected
          * @param    int          $post_id   The id of the post whose meta-data is to be validated and processed.
+         * @return   string Validation messages produced while processing the publication.
          */
     protected function validate_and_process_data( $post_id ) {
 
@@ -342,6 +344,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @since     0.1.0
          * @access    public
          * @param     int     $post_id     Id of the post that is actually published publicly.
+         * @return    string Validation and publication status messages.
          */
     protected function on_post_actually_published( $post_id ) {
         $settings = O3PO_Settings::instance();
@@ -499,6 +502,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @since    0.1.0
          * @access   private
          * @param    int      $post_id    Id of the post.
+         * @return   string The formatted trackback excerpt, or an empty string for other post types.
          */
     public function get_trackback_excerpt( $post_id ) {
 
@@ -526,7 +530,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @since 0.3.1
          * @access public
          * @param int $post_id The ID of the post.
-         * @return The basis for the text of the excerpt.
+         * @return string The basis for the text of the excerpt.
          */
     public function get_basis_for_excerpt( $post_id ) {
 
@@ -742,6 +746,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @since    0.1.0
          * @access   protected
          * @param    int     $post_id     Id of the post.
+         * @return   string HTML summary of the reviewers.
          */
     public static function get_reviewers_summary_html( $post_id ) {
 
@@ -762,6 +767,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @since    0.1.0
          * @access   protected
          * @param    int     $post_id     Id of the post.
+         * @return   string HTML listing the reviewers and their details.
          */
     public static function get_reviewers_html( $post_id ) {
 
@@ -818,6 +824,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @since    0.1.0
          * @access   protected
          * @param    int     $post_id     Id of the post.
+         * @return   string HTML summary of the authors' commentary.
          */
     public static function get_author_commentary_html( $post_id ) {
 
@@ -845,6 +852,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @since     0.1.0
          * @access    public
          * @param     string    $content     Content to be filtered.
+         * @return    string The rendered publication content.
          */
     public function get_the_content( $content ) {
 
@@ -981,6 +989,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @since    0.1.0
          * @access   public
          * @param    int    $post_id    Id of the post.
+         * @return   string HTML lead-in paragraph for the publication.
          */
     public function lead_in_paragraph( $post_id ) {
 
@@ -1050,6 +1059,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          *
          * @since    0.1.0
          * @access   protected
+         * @return   int The default number of reviewers.
          */
     protected static function get_default_number_reviewers() {
 
@@ -1064,6 +1074,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @since 0.2.0
          * @access    public
          * @param     int     $post_id     Id of the post.
+         * @return    null This publication type has no full-text PDF path.
          */
     public function get_fulltext_pdf_path( $post_id ) {
 
@@ -1079,6 +1090,7 @@ class O3PO_SecondaryPublicationType extends O3PO_PublicationType {
          * @since 0.2.0
          * @access    public
          * @param     int     $post_id     Id of the post.
+         * @return    null This publication type has no PDF permalink.
          */
     public function get_pdf_pretty_permalink( $post_id ) {
 

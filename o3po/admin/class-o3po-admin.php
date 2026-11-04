@@ -127,6 +127,7 @@ class O3PO_Admin {
          *
          * @since    0.2.0
          * @param    array     $actions    Array of links to filter
+         * @return   array Updated action links.
          */
     public function add_plugin_action_links( $actions ) {
 
@@ -164,6 +165,7 @@ class O3PO_Admin {
          *
          * @access public
          * @sinde 0.3.0
+         * @return string The meta-data explorer page markup.
          */
     public function render_meta_data_explorer() {
 
@@ -683,6 +685,7 @@ class O3PO_Admin {
          *
          * @since 0.3.0
          * @access public
+         * @return string The plugin name.
          */
     public function get_plugin_name() {
 
@@ -694,6 +697,7 @@ class O3PO_Admin {
          *
          * @since 0.3.0
          * @access public
+         * @return string The human-readable plugin name.
          */
     public function get_plugin_pretty_name() {
 

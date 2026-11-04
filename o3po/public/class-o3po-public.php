@@ -184,6 +184,7 @@ class O3PO_Public {
          *
          * @since    0.1.0
          * @access   public
+         * @return string The corrected custom-logo HTML.
          */
     public function fix_custom_logo_html() {
 

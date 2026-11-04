@@ -16,6 +16,7 @@ class O3PO_People {
          *
          * @since    0.5.0
          * @access   public
+         * @return int Negative, zero, or positive according to the name ordering.
          */
     public static function compare_names($name_a, $name_b) {
         $name_a = trim($name_a);
@@ -37,6 +38,7 @@ class O3PO_People {
          *
          * @since    0.5.0
          * @access   public
+         * @return int Name comparison result for the people’s last names.
          */
     public static function sort_by_last_names($person_a, $person_b) {
 
@@ -48,6 +50,7 @@ class O3PO_People {
          *
          * @since    0.5.0
          * @access   public
+         * @return int Name comparison result for the people’s first names.
          */
     public static function sort_by_first_names($person_a, $person_b) {
 
@@ -59,6 +62,7 @@ class O3PO_People {
          *
          * @since  0.5.0
          * @access public
+         * @return string The formatted name, or an empty string if no person has the UUID.
          */
     public static function get_formated_name_from_uuidv4($uuidv4) {
 

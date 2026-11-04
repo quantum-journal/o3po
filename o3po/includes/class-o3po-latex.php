@@ -78,6 +78,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
          * @param    string    $text    Text to be split at LaTeX math mode delimiters such as $...$ \[...\] \(...\).
          * @param int $limit If specified, then only substrings up to limit are returned with the rest of the string being placed in the last substring. A limit of -1 or 0 means "no limit" and, as is standard across PHP, you can use NULL to skip to the flags parameter.
          * @param int $flags Flags can be any combination of valid preg_split flags. Defaults to 0.
+         * @return array|false The text segments, or false if splitting fails.
          */
     static public function preg_split_at_latex_math_mode_delimters( $text, $limit = -1, $flags = 0 ) {
 
@@ -94,6 +95,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
          * @param array &$matches If provided is filled with matches.
          * @param int $flags Flags can be any combination of valid preg_match flags. Defaults to 0.
          * @pram int $offset Start search at given offset. Defaults to 0.
+         * @return int|false The number of matches, or false if matching fails.
          */
     static public function preg_match_latex_math_mode_delimters( $text, &$matches = null, $flags = 0, $offset = 0 ) {
 
@@ -110,6 +112,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
          * @access   public
          * @param    string   $latex_text      Latex text in whose non-math parts the string is to be found.
          * @param    string   $string          String to be found.
+         * @return int|false The character offset of the first match outside math mode, or false if none exists.
          */
     static public function strpos_outside_math_mode( $latex_text, $string ) {
 
@@ -140,7 +143,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
          * @param    array    $matches         If matches is provided, then it is filled with the results of search. $matches[0] will contain an array of texts that matched the full pattern, $matches[1] will have an array of the texts that matched the first captured parenthesized subpattern, and so on.
          * @param    int      $flags           Flags as in preg_match().
          * @param    int      $offset          Place from which to start the search (in bytes) within each segment of subjbect that is outisde math mode.
-         * @return   int      False in case an error occurred during any of the matches. Alternatively returns the total number of segments in which a match was found.
+         * @return   int|false The number of matching segments, or false if any match fails.
          */
     static public function preg_match_outside_math_mode( $pattern, $subject, &$matches=array(), $flags=0, $offset=0 ) {
 
@@ -175,6 +178,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
          * @since    0.1.0
          * @access   public
          * @param    string    $bbl    Bibliography or concatenation of bibliographies in .bbl format as it is produced by BibTeX, Biber, and BibLaTeX.
+         * @return array Parsed bibliography entries.
          */
     static public function parse_bbl( $bbl ) {
 
@@ -196,6 +200,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
          * @since    0.1.0
          * @access   public
          * @param    string    $bbl    Bibliography in .bbl format as it is produced by BibTeX, Biber, and BibLaTeX.
+         * @return array Entries parsed from the bibliography.
          */
     static public function parse_single_bbl( $bbl ) {
 
@@ -594,6 +599,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
          * @since    0.1.0
          * @access   public
          * @param    string    $text    Text with special characters that are to be converted to LaTeX encoding.
+         * @return string The text with special characters converted to LaTeX.
          */
     static public function utf8_to_latex($text) {
 
@@ -611,6 +617,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
          * @since    0.1.0
          * @access   public
          * @param    string     $text    Text with special characters that are to be converted to a LaTeX type encoding suitable for the use in BibTeX .bib files.
+         * @return string The BibTeX-compatible text.
          */
     static public function utf8_to_bibtex( $text ) {
 
@@ -658,6 +665,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
          * @since    0.1.0
          * @access   public
          * @param    string    $latex_source     LaTeX source code from with the macro definitions are to be extracted.
+         * @return array Extracted LaTeX macro definitions.
          */
     static public function extract_latex_macros( $latex_source ) {
 
@@ -718,6 +726,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
          *
          * @since    0.1.0
          * @access   public
+         * @return array Macro names to leave unexpanded in bibliography processing.
          */
     static public function get_special_macros_to_ignore_in_bbl() {
 
@@ -730,6 +739,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
          * @since    0.1.0
          * @access   public
          * @param    array    $latex_macro_definitions    Array of latex macro definitions.
+         * @return array The macro definitions with ignored special macros removed.
          */
     static public function remove_special_macros_to_ignore_in_bbl( $latex_macro_definitions ) {
         $latex_macro_definitions_without_specials = array();
@@ -757,6 +767,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
          * @access   public
          * @param    array    $macro_definitions   Array of macro definitions.
          * @param    string   $text                Text containing LaTeX macros that are to be expanded.
+         * @return string The text with the supplied LaTeX macros expanded.
          */
     static public function expand_latex_macros( $macro_definitions, $text ) {
 
@@ -835,6 +846,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
          * @since    0.1.0
          * @access   public
          * @param    string/int   $month   Number of the month in the range 1-12.
+         * @return string The three-letter BibTeX month name.
          */
     static public function get_month_string( $month ) {
 
@@ -863,6 +875,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
          * @since    0.1.0
          * @access   public
          * @param    string     $text    Text with utf8 special characters.
+         * @return string The closest Latin-letter approximation of the text.
          */
     static public function utf8_to_closest_latin_letter_string( $text ) {
 
@@ -881,6 +894,7 @@ class O3PO_Latex extends O3PO_Latex_Dictionary_Provider
          * @since    0.1.0
          * @access   public
          * @param    string   $text    Title of an article from which a BibTeX entry key is to be generated.
+         * @return string A lowercase suffix suitable for a BibTeX key.
          * */
     static public function title_to_key_suffix( $text ) {
 
@@ -921,6 +935,7 @@ class O3PO_Latex_Dictionary_Provider
          * @since    0.1.0
          * @access   protected
          * @param    string    $char    The non-character symbol characteristic to the respective latex macro.
+         * @return string A regular-expression fragment matching the LaTeX macro.
          */
     static private function match_single_non_character_makro_regexp_fragment( $char ) {
 
@@ -933,6 +948,7 @@ class O3PO_Latex_Dictionary_Provider
          * @since    0.1.0
          * @access   protected
          * @param    string    $char    The character characteristic to the respective latex macro.
+         * @return string A regular-expression fragment matching the LaTeX character macro.
          */
     static private function match_single_character_makro_regexp_fragment( $char ) {
 
@@ -968,6 +984,7 @@ class O3PO_Latex_Dictionary_Provider
          *
          * @since    0.1.0
          * @access   public
+         * @return array Regular expressions mapped to their UTF-8 character replacements.
          */
     static public function get_latex_special_chars_dictionary() {
         if(self::$latex_special_chars_dictionary===null)
@@ -1224,6 +1241,7 @@ class O3PO_Latex_Dictionary_Provider
          *
          * @since    0.1.0
          * @access   public
+         * @return array LaTeX control sequences and characters mapped to their replacements.
          */
     static public function get_latex_clean_up_dictionary() {
 
@@ -1406,6 +1424,7 @@ class O3PO_Latex_Dictionary_Provider
          *
          * @since     0.1.0
          * @access    public
+         * @return array UTF-8 characters mapped to their LaTeX representations.
          */
     static public function get_latex_special_chars_reverse_dictionary() {
 
@@ -1588,6 +1607,7 @@ class O3PO_Latex_Dictionary_Provider
          *
          * @sine     0.1.0
          * @access   public
+         * @return array UTF-8 characters mapped to their closest ASCII characters.
          */
     static public function get_utf8_to_ascii_dictionary() {
 
@@ -1604,6 +1624,7 @@ class O3PO_Latex_Dictionary_Provider
          * @access   public
          * @param    string    $text    The text in which \cite commands are to be expanded
          * @param    string    $bbl     The bbl code of the bibliography that contains the corresponding bibliography entries.
+         * @return string The text with LaTeX citations converted to HTML links.
          */
     public static function expand_cite_to_html( $text, $bbl ) {
 
@@ -1643,6 +1664,7 @@ class O3PO_Latex_Dictionary_Provider
          * @param    string   $text          LaTeX text to normalize.
          * @param    boolean  $single_line   Whether to output a single-line text.
          * @param    boolean  $remove_extra_newlines If true, single newlines are replaced by space and any number of more than two successive newlines are replaced by exactly two newlines.
+         * @return string The normalized text.
          */
     static public function normalize_whitespace_and_linebreak_characters( $text, $single_line=true, $remove_extra_newlines=false) {
         if($remove_extra_newlines)
@@ -1687,6 +1709,7 @@ class O3PO_Latex_Dictionary_Provider
          * @since  0.4.0
          * @access public
          * @param  string $text LaTeX text to remove font commands from.
+         * @return string The text with font-changing commands removed.
          */
     static public function remove_font_changing_commands( $text ) {
         $str_replacements = array(
@@ -1730,6 +1753,7 @@ class O3PO_Latex_Dictionary_Provider
          * @access  public
          * @param   string    $latex   Latex code to search for bibliographies.
          *
+         * @return string The concatenated bibliography environments, or an empty string if none are found.
          */
     static public function extract_bibliographies( $latex ) {
 
@@ -1756,6 +1780,7 @@ class O3PO_Latex_Dictionary_Provider
          * @access  public
          * @param   string    $latex   Latex code to search for abstracts.
          *
+         * @return string The concatenated abstract environments, or an empty string if none are found.
          */
     static public function extract_abstracts( $latex ) {
 

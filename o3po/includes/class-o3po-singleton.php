@@ -31,6 +31,7 @@ class O3PO_Singleton
      * Retuns the singleton
      *
      * @since    0.1.0
+     * @return static The singleton instance of the called class.
      */
     public static function instance()
     {
