@@ -555,7 +555,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
                     $orcid = '';
                 }
             }
-            $result[$key] = $orcid;
+            $result[] = $orcid;
         }
 
         return $result;
