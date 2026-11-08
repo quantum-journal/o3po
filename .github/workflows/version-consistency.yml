@@ -1,0 +1,26 @@
+name: Version Consistency
+
+on:
+  pull_request:
+    branches: [ "master" ]
+
+permissions:
+  contents: read
+
+jobs:
+  versions:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Check plugin header, readme stable tag and changelog agree
+      run: |
+        header=$(sed -n 's/^ \* Version: *//p' o3po/o3po.php | tr -d '[:space:]')
+        stable=$(sed -n 's/^\* Stable tag: *//p' readme.txt | tr -d '[:space:]')
+        changelog=$(sed -n 's/^### \([0-9][^ ]*\).*/\1/p' readme.txt | head -n1)
+        echo "header=$header stable=$stable changelog=$changelog"
+        [ -n "$header" ] || { echo "::error::No Version found in o3po/o3po.php"; exit 1; }
+        base="${header%-rc.*}"
+        [ "$base" = "$stable" ] || { echo "::error::Plugin header base version $base != readme stable tag $stable"; exit 1; }
+        [ "$base" = "$changelog" ] || { echo "::error::Plugin header base version $base != newest changelog entry $changelog"; exit 1; }
