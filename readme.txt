@@ -93,6 +93,7 @@ It is obviously a play on the name of humanoid robot character from a series of 
 
 ### 0.5.2
 * Fixed ready-to-publish form so that invoice-related validation errors on step 4 no longer block the "Back" navigation.
+* Security fixes
 ### 0.5.1
 * Improved ready-to-publish ORCID validation and clarified that ORCIDs from the paper source take precedence over form entries.
 ### 0.5.0
