@@ -21,5 +21,6 @@ jobs:
         changelog=$(sed -n 's/^### \([0-9][^ ]*\).*/\1/p' readme.txt | head -n1)
         echo "header=$header stable=$stable changelog=$changelog"
         [ -n "$header" ] || { echo "::error::No Version found in o3po/o3po.php"; exit 1; }
-        [ "$header" = "$stable" ] || { echo "::error::Plugin header version $header != readme stable tag $stable"; exit 1; }
-        [ "$header" = "$changelog" ] || { echo "::error::Plugin header version $header != newest changelog entry $changelog"; exit 1; }
+        base="${header%-rc.*}"
+        [ "$base" = "$stable" ] || { echo "::error::Plugin header base version $base != readme stable tag $stable"; exit 1; }
+        [ "$base" = "$changelog" ] || { echo "::error::Plugin header base version $base != newest changelog entry $changelog"; exit 1; }
