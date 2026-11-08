@@ -1074,6 +1074,10 @@ function wp_remote_get( $url, $args=array() ) {
 
 }
 
+function wp_create_nonce() {
+    return 'fakenonce';
+}
+
 function wp_verify_nonce() {
     return true;
 }

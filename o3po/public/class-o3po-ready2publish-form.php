@@ -555,7 +555,7 @@ class O3PO_Ready2PublishForm extends O3PO_PublicForm implements O3PO_SettingsSpe
                     $orcid = '';
                 }
             }
-            $result[$key] = $orcid;
+            $result[] = $orcid;
         }
 
         return $result;
@@ -1087,7 +1087,7 @@ while(nextSibling) {
         {
             if($page_id === $page_id_of_field)
             {
-                if(!empty($this->get_field_value('payment_method')) and $this->get_field_value('payment_method') === 'invoice' and empty($input))
+                if(!empty($this->get_field_value('payment_method')) and $this->get_field_value('payment_method') === 'invoice' and empty($input) and in_array($this->navigation, ['Next', 'Submit']))
                     $this->add_error($id, 'empty-despite-invoice-requested', "The field '" . $this->fields[$id]['title'] . "' must not be empty if you are requesting an invoice.", 'error');
                 break;
             }

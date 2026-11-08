@@ -2078,6 +2078,7 @@ class O3PO_JournalAndPublicationTypesTest extends O3PO_TestCase
         #test the citation-metrics tab
         $_GET['tab'] = 'citation-metrics';
         $_POST['refresh'] = 'checked';
+        $_POST[O3PO_Admin::REFRESH_NONCE_NAME] = 'fake-nonce'; # the test double of wp_verify_nonce() accepts everything
         ob_start();
         $admin->render_meta_data_explorer();
         $output = ob_get_contents();

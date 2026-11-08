@@ -424,6 +424,9 @@ class O3PO_Ready2PublishTest extends O3PO_TestCase
 
         $this->assertValidHTMLFragment($content);
 
+        $this->assertStringContainsString('action=publish&amp;id=0&amp;_wpnonce=', $dashboard->render_manuscript_entry(0, 'publish'));
+        $this->assertStringNotContainsString('_wpnonce', $dashboard->render_manuscript_entry(0, 'continue'));
+
         ob_start();
         $dashboard->show_invoice(0);
         $content = ob_get_contents();

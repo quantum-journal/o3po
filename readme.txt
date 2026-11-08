@@ -10,7 +10,7 @@
 * Requires at least: 4.0.1
 * Tested up to: 6.9.4
 * Requires PHP: 7.4
-* Stable tag: 0.5.1
+* Stable tag: 0.5.2
 * License: GPLv3 or later
 * License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -91,6 +91,9 @@ It is obviously a play on the name of humanoid robot character from a series of 
 
 ## Changelog
 
+### 0.5.2
+* Fixed ready-to-publish form so that invoice-related validation errors on step 4 no longer block the "Back" navigation.
+* Security fixes
 ### 0.5.1
 * Improved ready-to-publish ORCID validation and clarified that ORCIDs from the paper source take precedence over form entries.
 ### 0.5.0
