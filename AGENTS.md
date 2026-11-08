@@ -13,6 +13,11 @@
 - `tests/resources/bootstrap.php` supplies WordPress test doubles. Keep test-only instrumentation explained at its declaration and verify that tests exercise the behavior it measures.
 - Some publication metadata tests rely on external tools or environment details; inspect failure output before attributing test failures to a code change.
 
+## Releases
+
+- Before merging to `master`, the plugin header `Version:` in `o3po/o3po.php`, the `Stable tag:` in `readme.txt`, and the top `Changelog` entry in `readme.txt` must be consistent. The `Version Consistency` workflow enforces this for pull requests into `master`, and `deploy.yml` requires the pushed tag `vX.Y.Z` to match.
+- Immutable release tag names can never be reused, even after deleting the release; double-check versions before tagging.
+
 ## API documentation
 
 - Run `make docs` to download the pinned phpDocumentor PHAR from the official GitHub release, verify its SHA-256 checksum, and regenerate `docs/` from `o3po/`. The new site is staged and replaces the old output only after generation succeeds.
